@@ -1177,11 +1177,13 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         return;
     }
 
-    // The already planned legs count as sold: deduct their value so the residual loop does not
-    // chase a gap the queued legs will already cover (a multi-close suspension re-derives the
-    // round while the queued legs wait for a quote)
+    // The already planned legs count as sold for the residual base only: the pro-rata ratio still
+    // uses the full gap, otherwise the share deduction below would subtract the same legs twice
+    // (the round would undersell when the queued legs cover only part of the gap)
+    const price_t need_gap = need_back_funds;
     double planned_value = 0.0;
     for (const auto& [stk, value] : values) {
+        double hold = sub_tm->getPosition(date, stk).number;
         for (const auto& a : m_pending_calibration) {
             if (a.sys != sys || a.kind != CalibrationKind::SUB_SELL || a.stock != stk) {
                 continue;
@@ -1191,13 +1193,13 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
                 p = stk.getMarketValue(date, ktype);
             }
             if (p > 0.0) {
-                planned_value += a.number * p * stk.unit();
+                planned_value += std::min(a.number, hold) * p * stk.unit();
             }
         }
     }
     need_back_funds = std::max(0.0, need_back_funds - planned_value);
 
-    double ratio = std::min(1.0, need_back_funds / total_value);
+    double ratio = std::min(1.0, need_gap / total_value);
     double sold_value = 0.0;
     bool deferred = false;
     auto sell_part = [&](const Stock& stk, double num, price_t close_price) {
@@ -1239,7 +1241,7 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         double planned = 0.0;
         for (const auto& a : m_pending_calibration) {
             if (a.sys == sys && a.kind == CalibrationKind::SUB_SELL && a.stock == stk) {
-                planned += a.number;
+                planned += std::min(a.number, hold);
             }
         }
         if (close_price <= 0.0) {
@@ -1301,7 +1303,12 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
             }
         }
     }
-    if (!m_trade_on_close || deferred) {
+    bool has_pending_sell = std::any_of(
+      m_pending_calibration.begin(), m_pending_calibration.end(), [&](const CalibrationAction& a) {
+          return a.sys == sys &&
+                 (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::SUB_COVER);
+      });
+    if (!m_trade_on_close || deferred || has_pending_sell) {
         m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
         return;
     }

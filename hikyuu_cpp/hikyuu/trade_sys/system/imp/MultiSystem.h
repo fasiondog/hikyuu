@@ -456,6 +456,8 @@ private:
     void _purgePendingFor(const SystemPtr& sys);
 
     /** Mode B: reduce an A/C composite sub-system above its quota pro rata over its leaf holdings
+     *  (a suspended leaf is valued at its last available close, and the legs queued by an earlier
+     *  round are valued out of the residual base, so the round does not sell the same excess twice)
      * and mirror the sells on the parent account (a B composite is delegated instead) */
     void _reduceCompositeToQuota(const SystemPtr& sys, const Datetime& date,
                                  price_t need_back_funds, KQuery::KType ktype,
