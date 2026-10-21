@@ -95,10 +95,11 @@ Built-in Portfolios
     it is driven (recycle the shadow cash, reduce the over-quota part, inject the gap) and trades with
     the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on
     its own account; the L3 portfolio risk control is skipped (the sub-manager autonomy is respected).
-    The unselected sub-systems skip this round of quota calibration and keep running, so the shadow
-    books and the parent book stay matched; with ``set_sell_at_not_selected(True)`` the unselected
-    ones are cleared together with the parent holdings instead. The sub-system shadow accounts start
-    from zero and follow the cost function of the parent account.
+    ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``: ``trade_on_close=True`` and
+    ``sell_at_not_selected=True`` are fixed, so the unselected ones are cleared together with the
+    parent holdings on the rebalancing day; for the "unselected keep running" semantics use
+    ``MultiSystem(mode="B")`` with ``sell_at_not_selected=False`` directly. The sub-system shadow
+    accounts start from zero and follow the cost function of the parent account.
 
     The quota cash is a **virtual budget**: ``checkin/checkout`` only touch the sub ledger, the parent
     account is neither debited nor credited by them; the parent real cash only changes with the

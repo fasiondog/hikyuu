@@ -5,7 +5,7 @@
  *      Author: fasiondog
  *
  *  Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
- *  Dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
+ *  Three modes (A/B/C) + arbitrary nesting + AF L1/L2/L3 + rebalancing cycle + hierarchy path.
  */
 
 #include "MultiSystem.h"
@@ -790,6 +790,9 @@ void MultiSystem::_discardOpenPending(const string& reason) {
     m_pending_calibration.clear();
     m_pending_calibration_date = Datetime();
     m_pending_calibration_assets = 0.0;
+    m_pending_calibration_retry = false;
+    m_open_pending_retry = false;
+    m_open_pending_adjust = false;
 }
 
 void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType ktype,
@@ -1443,7 +1446,8 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
     return result;
 }
 
-void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions) {
+void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions,
+                                    bool is_adjust) {
     HKU_WARN_IF_RETURN(suggestions.empty(), void(), "Empty suggestions!");
     m_open_pending_assets =
       m_tm ? m_tm->getFunds(date, m_kdata.getQuery().kType()).total_assets() : 0.0;
@@ -1472,13 +1476,14 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
         m_open_pending_suggestions.clear();
     }
     m_open_pending_date = date;
-    m_open_pending_adjust = _isAdjustDate(date);
     if (!m_open_pending_suggestions.empty() && m_open_pending_retry) {
+        m_open_pending_adjust = m_open_pending_adjust || is_adjust;
         TradeSuggestionList merged = m_open_pending_suggestions;
         merged.insert(merged.end(), suggestions.begin(), suggestions.end());
         m_open_pending_suggestions = merged;
     } else {
         m_open_pending_suggestions = suggestions;
+        m_open_pending_adjust = is_adjust;
     }
 }
 
@@ -1919,8 +1924,9 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         }
     }
 
-    // The turnover of the rebalancing close: every parent-account trade of this open (the
-    // deferred calibration legs, the queued batch and the mode C sub-system open fills)
+    // The turnover of the rebalancing executions at this open: the deferred calibration legs, a
+    // batch queued on a rebalancing close and the mode C fills (a continuous-mirror batch of the
+    // modes A/B is not rebalancing turnover and is not counted)
     if (!m_trade_on_close) {
         double traded = 0.0;
         for (const auto& tr : result.tradesOnOpen) {
@@ -1944,7 +1950,9 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         }
         m_open_turnover_date = Datetime();
         m_open_turnover_assets = 0.0;
-        m_open_pending_adjust = false;
+        if (m_open_pending_suggestions.empty()) {
+            m_open_pending_adjust = false;
+        }
     }
     return result;
 }
@@ -2157,9 +2165,10 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                         }
                     }
                 }
-                // With trade_on_close=false the quota was injected at this open: it must stay in
-                // the sub account for the close trades (the gap injection already accounts for
-                // the sub net assets, so the virtual ledger stays correct without the recycle)
+                // With trade_on_close=false the recycle is skipped: the injection of this round
+                // lands at this open (or at a later open while a sell leg still waits for a
+                // quote), so the idle cash stays in the sub ledger and the gap injection accounts
+                // for it
             }
         }
         // The reduction of all the over quota sub-systems runs before the injection (the master
@@ -2176,6 +2185,15 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             if (qit != quota_map.end()) {
                 _reduceSubSystemToQuota(sys, datetime, qit->second, ktype, executed);
             }
+        }
+        // The injections are re-derived from this round's quotas: drop the stale targets of
+        // earlier rounds (a lowered quota must not be re-inflated)
+        if (!m_trade_on_close) {
+            m_pending_calibration.erase(
+              std::remove_if(
+                m_pending_calibration.begin(), m_pending_calibration.end(),
+                [](const CalibrationAction& a) { return a.kind == CalibrationKind::INJECT; }),
+              m_pending_calibration.end());
         }
         // The cash already freed by the reduction phase, shared by the injections: the total must
         // never exceed what the parent can actually fund
@@ -2335,7 +2353,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             if (m_trade_on_close) {
                 _executeSuggestions(datetime, suggestions, ktype, executed);
             } else {
-                _queueOpenPending(datetime, suggestions);
+                _queueOpenPending(datetime, suggestions, is_adjust);
             }
         }
         m_last_suggestions = suggestions;
@@ -2357,7 +2375,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 _executeSuggestions(datetime, suggestions, ktype, executed);
             } else {
                 // trade_on_close=false: convert first, execute uniformly at the next open
-                _queueOpenPending(datetime, suggestions);
+                _queueOpenPending(datetime, suggestions, is_adjust);
             }
         }
     } else {
@@ -2402,7 +2420,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 _executeSuggestions(datetime, suggestions, ktype, executed);
             } else {
                 // trade_on_close=false: convert first, execute uniformly at the next open
-                _queueOpenPending(datetime, suggestions);
+                _queueOpenPending(datetime, suggestions, is_adjust);
             }
         }
         for (auto& ctx : contexts) {
@@ -2522,7 +2540,7 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
         if (m_trade_on_close) {
             _executeSuggestions(datetime, suggestions, ktype, executed);
         } else {
-            _queueOpenPending(datetime, suggestions);
+            _queueOpenPending(datetime, suggestions, is_adjust);
         }
     }
 
@@ -2717,8 +2735,9 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
     }
 
     // The rebalancing close of a trade_on_close=false session records its date/assets here, so
-    // the open stage can attribute every executed leg (including the mode C sub open fills and
-    // the A/B delayed fills) to that rebalancing day
+    // the open stage can attribute the deferred calibration legs, a batch queued on this close
+    // and the mode C fills to that close (a continuous-mirror batch of A/B is not rebalancing
+    // turnover)
     if (!m_trade_on_close && is_adjust) {
         m_open_turnover_date = datetime;
         m_open_turnover_assets = assets_before;
@@ -2735,7 +2754,7 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
 
     // The rebalancing turnover rate: the turnover amount / the total assets before rebalancing
     // (only recorded on the rebalancing days with actual rebalancing trades)
-    if (is_adjust && m_trade_on_close && !executed.empty()) {
+    if (is_adjust && (m_trade_on_close || getMode() == "C") && !executed.empty()) {
         double turnover_cash = 0.0;
         for (auto& tr : executed) {
             turnover_cash += std::fabs(tr.realPrice) * tr.number * tr.stock.unit();

@@ -4861,6 +4861,8 @@ TEST_CASE("test_MultiSystem_open_pending_retry_merged_with_new_batch") {
     CHECK_EQ(parent1, doctest::Approx(leaf1_pos));
     CHECK_GT(leaf2_pos, 0.0);
     CHECK_EQ(parent2, doctest::Approx(leaf2_pos));
+    CHECK_UNARY(!ms->getAdjustTurnover().empty());
+    CHECK_EQ(ms->getAdjustTurnover().back().first, Datetime(200006300000LL));
 }
 
 /** @par Check point: a nested mode B with trade_on_close=false still matches the three ledgers
@@ -5162,7 +5164,86 @@ TEST_CASE("test_MultiSystem_mode_b_deferred_inject_waits_for_retry") {
     ms->setAF(AF_FixedWeightList({0.1, 0.9}));
     ms->run(k2, false);
     double leaf2_after = leaf2->getTM()->getPosition(k2[2].datetime, stk2).number;
+    double leaf1_after = leaf1->getTM()->getPosition(k2[2].datetime, stk1).number;
+    double leaf1_before = leaf1->getTM()->getPosition(k2[0].datetime, stk1).number;
     CHECK_GT(leaf2_after, leaf2_before);
+    CHECK_LT(leaf1_after, leaf1_before);
+}
+
+/** @par Check point: a calendar adjust-mode with trade_on_close=false still records the monthly
+ * rebalancing turnover (the adjust decision comes from the close stage, never re-derived) */
+TEST_CASE("test_MultiSystem_mode_a_calendar_turnover_deferred") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto ms = std::make_shared<MultiSystem>("ms_a_calendar_turnover");
+    ms->setTM(crtTM(Datetime(200001010000LL), 1000000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setAdjustMode("month");
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    size_t i0 = k.size();
+    for (size_t i = 0; i < k.size(); ++i) {
+        if (k[i].datetime >= Datetime(200001010000LL)) {
+            i0 = i;
+            break;
+        }
+    }
+    REQUIRE(i0 < k.size() - 2);
+
+    /** @arg the first monthly rebalance fills at the next open and is recorded */
+    REQUIRE(!ms->getAdjustTurnover().empty());
+    CHECK_EQ(ms->getAdjustTurnover().front().first, k[i0].datetime);
+    CHECK_GE(ms->getAdjustTurnover().size(), 2);
+}
+
+/** @par Check point: the continuous-mirror fills of the non-rebalancing days are not counted into
+ * the turnover (only the batches queued on the explicit rebalancing closes are) */
+TEST_CASE("test_MultiSystem_mode_b_mirror_not_in_turnover") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000121));
+    KQuery q2(Datetime(20000124), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 8);
+    REQUIRE(k2.size() > 8);
+
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto ms = std::make_shared<MultiSystem>("ms_b_mirror_turnover");
+    ms->setTM(crtTM(Datetime(199911010000LL), 1000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k1);
+
+    size_t base = ms->getAdjustTurnover().size();
+
+    /** @arg only the fills of the batches queued on the two rebalancing closes are recorded */
+    ms->setAdjustDates(DatetimeList{k2[3].datetime, k2[7].datetime});
+    ms->run(k2, false);
+    const auto& turnover = ms->getAdjustTurnover();
+    REQUIRE_GE(turnover.size() - base, 2);
+    // The last two records are the two rebalancing batches (an earlier one may carry the last
+    // batch of the first run, executed at the first open of the second run)
+    CHECK_EQ(turnover[turnover.size() - 2].first, k2[3].datetime);
+    CHECK_EQ(turnover[turnover.size() - 1].first, k2[7].datetime);
 }
 
 /** @} */

@@ -25,10 +25,11 @@
  *
  *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
  *    calibrated to its quota on the rebalancing day BEFORE it is driven (recycle the shadow cash,
- *    clear the unselected, reduce the over-quota part, inject the gap), so the sub-system trades
- *    with the exact allocated quota; the parent mirrors the real instructions of the sub-systems
- *    (L2 pass-through) on its own account. The shadow accounts start from zero and follow the
- *    cost function of the parent account, keeping in step with the parent trades.
+ *    clear the unselected when sell_at_not_selected is on, reduce the over-quota part, inject the
+ *    gap), so the sub-system trades with the exact allocated quota; the parent mirrors the real
+ *    instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts
+ *    start from zero and follow the cost function of the parent account, keeping in step with the
+ *    parent trades.
  *
  *  - **Mode C "Shared Account Compatibility" (the legacy Portfolio behavior)**: no shadow account
  *    is created, every sub-system trades DIRECTLY on the single real account of the parent
@@ -413,9 +414,11 @@ private:
 
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): reduce the over quota
      * position of the sub-system (the sub book sells on its own and the parent sells the same
-     * quantity immediately, the executed records are appended to out_executed). It runs in the
-     * reduction phase before the injection phase, so the freed cash is available to the whole
-     * portfolio. */
+     * quantity, capped by the parent holding; with trade_on_close=false the whole reduction is
+     * deferred to the next open, the executed records are appended to out_executed). It runs in
+     * the reduction phase before the injection phase, so the freed cash is available to the whole
+     * portfolio. A nested mode B with SE/AF consumes the quota as a budget instead; an A/C
+     * composite is reduced pro rata over its leaves. */
     void _reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& date, price_t quota,
                                  KQuery::KType ktype, TradeRecordList& out_executed);
 
@@ -427,7 +430,8 @@ private:
 
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): clear the sub-system shadow
      * account (force selling its holdings and recycling the cash); the parent account holding is
-     * cleared by the CLEAR suggestion submitted by the caller */
+     * liquidated by the caller (_liquidateParent in mode B). A nested aggregate also drops its
+     * queued batch and resets the external quota. */
     void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
     /** Mode B: liquidate the parent holdings of the instruments of the sub-system (a composite
@@ -458,8 +462,9 @@ private:
     TradeSuggestionList _netSuggestions(const Datetime& date,
                                         const TradeSuggestionList& suggestions) const;
 
-    /** Mode B with trade_on_close=false: the quota calibration legs (sub and parent side) are
-     * deferred to the next open, so every leg shares one price basis */
+    /** Mode B with trade_on_close=false: the quota calibration legs (sub/parent sells, covers,
+     * checkouts) and the injections are deferred to the next open; the injections wait while any
+     * sell leg still waits for a quote, so every leg shares one price basis */
     enum class CalibrationKind {
         SUB_SELL,
         SUB_COVER,
@@ -480,7 +485,8 @@ private:
 
     /** Fold the delayed requests of a composite child's leaf sub-systems into the net exposure
      * ratio (a nested C/leaf queues its own requests, the composite MomentResult does not carry
-     * them) */
+     * them). A nested aggregate's converted queued batch is folded instead of its leaves; a mode A
+     * child already sampled on that day is skipped (no 2x) */
     void _foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date, double base,
                                      std::map<Stock, double>& ratio);
 
@@ -502,8 +508,11 @@ private:
      * uniformly; return the actual trades of the parent. Reused by runMoment / runMomentOnClose. */
     TradeRecordList _closePhase(const Datetime& datetime);
 
-    /** The common tail of the close stage: record the rebalancing-day turnover and the trace
-     *  output. Shared by the mode A/B tail and the mode C early return. */
+    /** The common tail of the close stage: advance the close-day counter (once per day), record
+     *  the rebalancing date/assets for the deferred open attribution, the close-stage turnover
+     *  (trade_on_close=true, or the mode C close-stage force sells), the trace output and the
+     *  deferred calibration attribution. Shared by the mode A/B tail and the mode C early return.
+     */
     void _finishClosePhase(const Datetime& datetime, const TradeSuggestionList& suggestions,
                            const TradeRecordList& executed, bool is_adjust, double assets_before);
 
@@ -578,9 +587,13 @@ private:
 
     /** Queue the close-stage suggestions for the execution at the next open (trade_on_close=false).
      *  It is keyed by the driving day: a repeat drive of the same day replaces the queued batch
-     *  (idempotent), and a batch left over from an earlier day (a session that only drives close)
-     *  is dropped with a single warning, keeping only the latest batch. */
-    void _queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions);
+     *  (idempotent), except while a retry batch is pending (kept as is); a batch left over from an
+     *  earlier day (a session that only drives close) is dropped with a single warning, unless it
+     *  is a retry -- the retry legs mirror fills that already happened, so they are merged into the
+     *  new batch (the prices are re-set at the next open). `is_adjust` records whether the close
+     *  that produced the batch was a rebalancing close (the turnover attribution). */
+    void _queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions,
+                           bool is_adjust);
 
 private:
     SystemList m_sys_list;
@@ -620,8 +633,8 @@ private:
                                         // pending suggestions (for the turnover record)
     bool m_open_pending_retry{false};   // The pending batch is a retry after a suspension, exempt
                                         // from the cross-day drop
-    bool m_open_pending_adjust{false};  // The pending batch was queued on a rebalancing close (the
-                                        // turnover attribution)
+    bool m_open_pending_adjust{false};  // Whether the close that produced the pending batch was a
+                                        // rebalancing close (the turnover attribution)
     std::vector<CalibrationAction>
       m_pending_calibration;  // The deferred quota calibration legs (trade_on_close=false)
     Datetime m_pending_calibration_date;       // The close day the deferred calibration belongs to
@@ -635,8 +648,9 @@ private:
                                               // warning when the inner cannot consume the budget
     bool m_pending_calibration_retry{false};  // The pending calibration is a retry of a previous
                                               // suspension, exempt from the cross-day drop
-    Datetime m_open_turnover_date;          // The rebalancing close whose open executions carry the
-                                            // turnover (all modes, trade_on_close=false)
+    Datetime m_open_turnover_date;            // The rebalancing close whose mode C open fills
+                                    // carry the turnover (trade_on_close=false); the modes
+                                    // A/B attribute through m_open_pending_adjust
     double m_open_turnover_assets{0.0};     // The assets before that close stage
     bool m_open_pending_warned{false};      // The once-per-instance flag of the cross-day pending
                                             // backlog warning (runtime state, not serialized)
