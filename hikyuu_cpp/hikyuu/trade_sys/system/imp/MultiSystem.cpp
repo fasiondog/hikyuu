@@ -242,6 +242,7 @@ void MultiSystem::_reset() {
     m_open_pending_date = Datetime();
     m_open_pending_assets = 0.0;
     m_open_pending_retry = false;
+    m_open_pending_adjust = false;
     m_pending_calibration.clear();
     m_pending_calibration_date = Datetime();
     m_pending_calibration_assets = 0.0;
@@ -302,6 +303,7 @@ void MultiSystem::_forceResetAll() {
     m_open_pending_date = Datetime();
     m_open_pending_assets = 0.0;
     m_open_pending_retry = false;
+    m_open_pending_adjust = false;
     m_pending_calibration.clear();
     m_pending_calibration_date = Datetime();
     m_pending_calibration_assets = 0.0;
@@ -747,6 +749,8 @@ void MultiSystem::_clearSubSystem(const SystemPtr& sys, const Datetime& date, KQ
     }
     if (auto* ms = dynamic_cast<MultiSystem*>(sys.get())) {
         ms->_discardOpenPending("the sub-system is cleared");
+        ms->m_external_quota = 0.0;
+        ms->m_external_quota_set = false;
     }
     sys->clearDelayBuyRequest();
     sys->clearDelaySellRequest();
@@ -763,6 +767,8 @@ void MultiSystem::_clearSubSystemAccounts(const SystemPtr& sys, const Datetime& 
     }
     if (auto* ms = dynamic_cast<MultiSystem*>(sys.get())) {
         ms->_discardOpenPending("the sub-system is removed");
+        ms->m_external_quota = 0.0;
+        ms->m_external_quota_set = false;
     }
     sys->clearDelayBuyRequest();
     sys->clearDelaySellRequest();
@@ -851,13 +857,23 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
         }
     }
 
-    // Phase 2: the deferred injections, funded by the actual cash after the sells
-    price_t cash_left = m_tm->getFunds(date, ktype).cash;
-    for (const auto& a : m_pending_calibration) {
-        if (a.kind != CalibrationKind::INJECT || !a.sys || cash_left <= 0.0) {
-            continue;
+    // Phase 2: the deferred injections, funded by the actual cash after the sells. While some
+    // sell legs still wait for a quote, the injections wait with them: the freed cash is part of
+    // their funding, injecting now would truncate the quota
+    if (retry.empty()) {
+        price_t cash_left = m_tm->getFunds(date, ktype).cash;
+        for (const auto& a : m_pending_calibration) {
+            if (a.kind != CalibrationKind::INJECT || !a.sys || cash_left <= 0.0) {
+                continue;
+            }
+            cash_left -= _injectSubSystemGap(a.sys, date, a.quota, ktype, cash_left);
         }
-        cash_left -= _injectSubSystemGap(a.sys, date, a.quota, ktype, cash_left);
+    } else {
+        for (const auto& a : m_pending_calibration) {
+            if (a.kind == CalibrationKind::INJECT) {
+                retry.push_back(a);
+            }
+        }
     }
 
     if (!retry.empty()) {
@@ -1434,6 +1450,9 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
     // Keyed by the driving day: a repeat drive of the same close day replaces the queued batch, so
     // that a double-driven session cannot silently double the orders executed at the next open
     if (!m_open_pending_date.isNull() && date == m_open_pending_date) {
+        if (m_open_pending_retry) {
+            return;  // keep the batch with the merged retry legs (a re-drive is idempotent)
+        }
         m_open_pending_suggestions = suggestions;
         return;
     }
@@ -1453,6 +1472,7 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
         m_open_pending_suggestions.clear();
     }
     m_open_pending_date = date;
+    m_open_pending_adjust = _isAdjustDate(date);
     if (!m_open_pending_suggestions.empty() && m_open_pending_retry) {
         TradeSuggestionList merged = m_open_pending_suggestions;
         merged.insert(merged.end(), suggestions.begin(), suggestions.end());
@@ -1906,19 +1926,25 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         for (const auto& tr : result.tradesOnOpen) {
             traded += tr.number * tr.realPrice * tr.stock.unit();
         }
-        Datetime adjust_date = !calibration_date.isNull() ? calibration_date : pending_date;
+        Datetime adjust_date = calibration_date;
+        double assets = calibration_assets;
         if (adjust_date.isNull()) {
-            adjust_date = m_open_turnover_date;
-        }
-        double assets = calibration_assets > 0.0 ? calibration_assets : pending_assets;
-        if (assets <= 0.0) {
-            assets = m_open_turnover_assets;
+            if (m_open_pending_adjust) {
+                adjust_date = pending_date;
+                assets = pending_assets;
+            } else if (getMode() == "C") {
+                // The mode C surfaced fills keep the last rebalance attribution; a mirror-only
+                // batch of the modes A / B is not rebalancing turnover and is not recorded
+                adjust_date = m_open_turnover_date;
+                assets = m_open_turnover_assets;
+            }
         }
         if (!adjust_date.isNull() && assets > 0.0 && traded > 0.0) {
             m_adjust_turnover.push_back({adjust_date, traded / assets});
         }
         m_open_turnover_date = Datetime();
         m_open_turnover_assets = 0.0;
+        m_open_pending_adjust = false;
     }
     return result;
 }

@@ -620,6 +620,8 @@ private:
                                         // pending suggestions (for the turnover record)
     bool m_open_pending_retry{false};   // The pending batch is a retry after a suspension, exempt
                                         // from the cross-day drop
+    bool m_open_pending_adjust{false};  // The pending batch was queued on a rebalancing close (the
+                                        // turnover attribution)
     std::vector<CalibrationAction>
       m_pending_calibration;  // The deferred quota calibration legs (trade_on_close=false)
     Datetime m_pending_calibration_date;       // The close day the deferred calibration belongs to
