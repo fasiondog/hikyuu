@@ -36,14 +36,18 @@ public:
     virtual ~PyMultiFactor() override {}
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        // Hand-rolled to explicitly convert the C++ nested vector to a Python list of lists before
-        // calling the Python subclass override. Caller path is Python-facing (Selector::select ->
-        // MultiFactorBase::calculate), so the GIL is already held here; no extra acquire needed.
+        // May be driven by a pooled C++ worker that owns no GIL, hence the reentrant acquire.
+        // Hand-rolled instead of the macro: the nested vector needs an explicit conversion.
+        py::gil_scoped_acquire gil;
         auto self = py::cast(this);
         auto func = self.attr("_calculate");
         auto py_all_stk_inds = vector_to_python_list<IndicatorList>(all_stk_inds);
         auto py_ret = func(py_all_stk_inds);
         return py_ret.cast<IndicatorList>();
+    }
+
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, MultiFactorBase, _reset, );
     }
 
 public:
@@ -55,12 +59,109 @@ public:
     void add_special_norm(const string& name, py::object norm, const string& category,
                           const IndicatorList& style_inds) {
         py::gil_scoped_acquire gil;
-        HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
-        addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
+        NormPtr norm_ptr;
+        if (norm && !norm.is_none()) {
+            norm_ptr = norm.cast<NormPtr>();
+        }
+        addSpecialNormalize(name, norm_ptr, category, style_inds);
     }
 };
 
+namespace {
+
+// Stable field names, so that the programmatic access does not depend on the current locale
+const std::vector<string>& kScoreNpFields() {
+    static const std::vector<string> fields{"market_code", "name", "score"};
+    return fields;
+}
+
+// The offsets in the dtype below must match this layout
+struct alignas(8) ScoreRawData {
+    int32_t code[10];
+    int32_t name[20];
+    double value;
+};
+
+// Built once per field set: building it per array costs several temporary python objects
+const py::dtype& score_np_dtype(const std::vector<string>& fields) {
+    struct Cache {
+        std::unordered_map<string, py::dtype> dtypes;
+    };
+    // Leaked on purpose: destroying a py::dtype during the interpreter finalization would touch the
+    // GIL, which is not allowed there
+    static auto* cache = new Cache();
+
+    string key;
+    for (const auto& field : fields) {
+        key += field;
+        key += '\n';
+    }
+    auto iter = cache->dtypes.find(key);
+    if (iter == cache->dtypes.end()) {
+        iter = cache->dtypes
+                 .emplace(key, py::dtype(vector_to_python_list<string>(fields),
+                                         vector_to_python_list<string>({"U10", "U20", "d"}),
+                                         vector_to_python_list<int64_t>({0, 40, 120}),
+                                         sizeof(ScoreRawData)))
+                 .first;
+    }
+    return iter->second;
+}
+
+// One cross-section as a numpy structured array, shared by the module helper and the MF methods so
+// that a large result never materializes a Python object per record. The fields default to the
+// localized names the module helper has always produced; pass the literal names for a stable access.
+py::array score_records_to_np(
+  const ScoreRecordList& scs,
+  const std::vector<string>& fields = {htr("market_code"), htr("name"), htr("score")}) {
+    size_t total = scs.size();
+    HKU_IF_RETURN(total == 0, py::array());
+
+    auto* data = static_cast<ScoreRawData*>(std::malloc(total * sizeof(ScoreRawData)));
+    HKU_CHECK(data != nullptr, "scorerecords_to_np: malloc failed!");
+    for (size_t i = 0; i < total; i++) {
+        const ScoreRecord& sc = scs[i];
+        utf8_to_utf32(sc.stock.market_code(), data[i].code, 10);
+        utf8_to_utf32(sc.stock.name(), data[i].name, 20);
+        data[i].value = sc.value;
+    }
+
+    return py::array(score_np_dtype(fields), total, data,
+                     py::capsule(data, [](void* p) { std::free(p); }));
+}
+
+// A lazy per-date iterable: a plain python type, because pybind's make_iterator applies its
+// keep-alive policy per element, which costs far more than the conversion itself. It holds the model,
+// so the result stays alive while the iteration runs.
+class ScoreArrayIterable {
+public:
+    ScoreArrayIterable(MultiFactorPtr mf, size_t index, size_t end)
+    : m_mf(std::move(mf)), m_index(index), m_end(end) {}
+
+    ScoreArrayIterable& iter() {
+        return *this;
+    }
+
+    py::array next() {
+        const auto& all = m_mf->getAllScores();
+        if (m_index >= m_end || m_index >= all.size()) {
+            throw py::stop_iteration();
+        }
+        return score_records_to_np(all[m_index++], kScoreNpFields());
+    }
+private:
+    MultiFactorPtr m_mf;
+    size_t m_index;
+    size_t m_end;
+};
+
+}  // namespace
+
 void export_MultiFactor(py::module& m) {
+    py::class_<ScoreArrayIterable>(m, "_ScoreArrayIterable", py::module_local())
+      .def("__iter__", &ScoreArrayIterable::iter, py::return_value_policy::reference)
+      .def("__next__", &ScoreArrayIterable::next);
+
     py::class_<ScoreRecord>(m, "ScoreRecord", "")
       .def(py::init<>())
       .def(py::init<const Stock&, ScoreRecord::value_t>())
@@ -69,37 +170,7 @@ void export_MultiFactor(py::module& m) {
       .def_readwrite("stock", &ScoreRecord::stock, "The security")
       .def_readwrite("value", &ScoreRecord::value, "The score");
 
-    m.def("scorerecords_to_np", [](const ScoreRecordList& scs) {
-        size_t total = scs.size();
-        HKU_IF_RETURN(total == 0, py::array());
-
-        struct alignas(8) RawData {
-            int32_t code[10];
-            int32_t name[20];
-            double value;
-        };
-
-        // Allocate the memory with malloc
-        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
-        HKU_CHECK(data != nullptr, "scorerecords_to_np: malloc failed!");
-        std::string ucode, uname;
-        for (size_t i = 0, len = scs.size(); i < len; i++) {
-            const ScoreRecord& sc = scs[i];
-            utf8_to_utf32(sc.stock.market_code(), data[i].code, 10);
-            utf8_to_utf32(sc.stock.name(), data[i].name, 20);
-            data[i].value = sc.value;
-        }
-
-        // Define the NumPy structured data type
-        py::dtype dtype =
-          py::dtype(vector_to_python_list<string>({htr("market_code"), htr("name"), htr("score")}),
-                    vector_to_python_list<string>({"U10", "U20", "d"}),
-                    vector_to_python_list<int64_t>({0, 40, 120}), sizeof(RawData));
-
-        // Manage the memory with the capsule
-        return py::array(dtype, total, static_cast<RawData*>(data),
-                         py::capsule(data, [](void* p) { std::free(p); }));
-    });
+    m.def("scorerecords_to_np", [](const ScoreRecordList& scs) { return score_records_to_np(scs); });
 
     m.def("scorerecords_to_df", [](const ScoreRecordList& scs) {
         size_t total = scs.size();
@@ -294,6 +365,8 @@ The custom multi-factor model override hooks:
 
       .def("clone", &MultiFactorBase::clone, "The clone operation")
 
+      .def("reset", &MultiFactorBase::reset, "The reset operation")
+
       .def(
         "get_scores",
         [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end,
@@ -330,7 +403,52 @@ The custom multi-factor model override hooks:
 
     Get all the scores of all the dates, with the same length as the reference dates
 
+    :note: every record becomes a Python object, so the memory grows with stocks x dates; use get_scores_np(date) or iter_scores() for the large results
+
     :return: ScoreRecordList)")
+
+      .def(
+        "get_scores_np",
+        [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end) {
+            size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
+            return score_records_to_np(self.getScores(date, start, cend), kScoreNpFields());
+        },
+        py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
+        R"(get_scores_np(self, date[, start=0, end=Null])
+
+    Get the cross-section of the specified date as a numpy structured array, already sorted
+    descending. Prefer it over get_scores for the large results: one array is built for the whole
+    cross-section instead of one Python object per record.
+
+    :param Datetime date: the specified date
+    :param int start: the start of the daily ranking to take
+    :param int end: the end of the daily ranking to take (excluded)
+    :rtype: numpy.ndarray)")
+
+      .def(
+        "iter_scores",
+        [](const MultiFactorPtr& self, size_t start, py::object end) {
+            const auto& all = self->getAllScores();
+            size_t total = all.size();
+            size_t cend = end.is_none() ? total : end.cast<size_t>();
+            if (cend > total) {
+                cend = total;
+            }
+            if (start > cend) {
+                start = cend;
+            }
+            return ScoreArrayIterable(self, start, cend);
+        },
+        py::arg("start") = 0, py::arg("end") = py::none(),
+        R"(iter_scores(self[, start=0, end=Null])
+
+    Iterate the cross-sections of all the dates, yielding one numpy structured array per date in
+    the order of get_datetime_list(). Only the current date is materialized, so the memory stays at
+    one cross-section instead of every date at once.
+
+    :param int start: the start of the date range to iterate
+    :param int end: the end of the date range to iterate (excluded)
+    :rtype: iterator)")
 
       .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors, R"(get_all_src_factors(self)
 

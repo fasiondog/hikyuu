@@ -106,19 +106,13 @@ public:
 
     const string& name() const noexcept;
 
-    void name(const string& name);
-
     const string& ktype() const noexcept;
-
-    void ktype(const string& ktype);
 
     KQuery::RecoverType recoverType() const noexcept;
 
     void recoverType(KQuery::RecoverType recover_type);
 
     const Indicator& formula() const noexcept;
-
-    void formula(const Indicator& formula);
 
     const Datetime& startDate() const noexcept;
 
@@ -298,10 +292,6 @@ inline const string& Factor::ktype() const noexcept {
     return m_data->ktype;
 }
 
-inline void Factor::ktype(const string& ktype) {
-    m_data->ktype = ktype;
-}
-
 inline KQuery::RecoverType Factor::recoverType() const noexcept {
     return m_data->recover_type;
 }
@@ -312,11 +302,6 @@ inline void Factor::recoverType(KQuery::RecoverType recover_type) {
 
 inline const Indicator& Factor::formula() const noexcept {
     return m_data->formula;
-}
-
-inline void Factor::formula(const Indicator& formula) {
-    m_data->formula = formula;
-    m_data->formula.name(m_data->name);
 }
 
 inline const Datetime& Factor::startDate() const noexcept {

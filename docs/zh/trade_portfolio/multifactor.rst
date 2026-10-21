@@ -130,6 +130,8 @@
 自定义多因子合成算法接口：
 
 * :py:meth:`MultiFactorBase._calculate` - 【必须】计算合成因子
+* :py:meth:`MultiFactorBase._clone` - 【必须】返回当前子类的一个新实例
+* :py:meth:`MultiFactorBase._reset` - 【可选】重置子类的私有成员变量，由 :py:meth:`MultiFactorBase.reset` 调用
 
 
 多因子合成算法基类
@@ -168,6 +170,10 @@
     .. py:method:: clone(self)
     
         克隆操作 
+
+    .. py:method:: reset(self)
+
+        复位操作，清除已计算的结果并调用子类的 _reset 钩子
 
     .. py:method:: get_ref_stock(self)
 
@@ -251,7 +257,26 @@
 
         获取所有日期的所有评分，长度与参考日期相同
 
+        :note: 每条记录都会成为一个 Python 对象，内存随"证券数 x 日期数"增长；结果较大时请改用 get_scores_np(date) 或 iter_scores()
+
         :return: ScoreRecordList
+
+    .. py:method:: get_scores_np(self, date[, start=0, end=Null])
+
+        获取指定日期截面的 numpy 结构化数组，已按评分降序排列。结果较大时优先于 get_scores 使用：整个截面只构建一个数组，而非每条记录一个 Python 对象。字段名为 market_code、name、score。
+
+        :param Datetime date: 指定日期
+        :param int start: 取当日排名开始
+        :param int end: 取当日排名结束(不包含本身)
+        :rtype: numpy.ndarray
+
+    .. py:method:: iter_scores(self[, start=0, end=Null])
+
+        按日期迭代所有截面，每次产出一个 numpy 结构化数组，顺序与 get_datetime_list() 一致。某一时刻只有当日截面被物化，内存保持在一个截面而非全部日期。
+
+        :param int start: 迭代的日期范围开始
+        :param int end: 迭代的日期范围结束(不包含本身)
+        :rtype: iterator
 
     .. py:method:: get_all_src_factors(self)
 
@@ -287,3 +312,16 @@
 
         :param list stks_inds: 与证券列表顺序相同已经计算好的所有证券的原始因子列表
         :return: 按证券列表顺序存放的所有新的因子
+
+    .. py:method:: _clone(self)
+
+        返回当前子类的一个新实例，由 clone() 调用。返回值必须是当前子类的实例，而非基类实例。
+
+        :rtype: MultiFactorBase
+
+    .. py:method:: _reset(self)
+
+        重置子类的私有成员变量，由 reset() 调用。若子类无需复位成员变量，可不实现该接口。
+
+        .. note::
+            该钩子在基类持有内部锁期间被调用，其实现不可再次调用本实例需要该内部锁的其它方法，否则会死锁。

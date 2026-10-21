@@ -184,6 +184,43 @@ TEST_CASE("test_Stoploss_setTO_reset_before_calculate") {
     CHECK_EQ(p->count(), static_cast<int>(k2.size()));
 }
 
+/** @arg reset drops the calculated flag, so a later setTO recomputes instead of early-returning
+ * into a "calculated but no data" state (SL10) */
+TEST_CASE("test_Stoploss_reset_clears_calculated") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sz000001").getKData(KQuery(0, 10));
+    CHECK_UNARY(!k.empty());
+
+    auto st = ST_FixedPercent(0.01);
+    st->setTO(k);
+    CHECK_UNARY(std::isfinite(st->getPrice(k[0].datetime, k[0].closePrice)));
+
+    // reset() must clear the calculated flag. Otherwise setTO(empty) could early-return (KData
+    // equality treats two empty stocks as equal) and leave a stale "calculated but no data" state,
+    // and a following real setTO would be skipped.
+    st->reset();
+    st->setTO(KData());
+    st->setTO(k);
+    for (size_t i = 0; i < k.size(); ++i) {
+        CHECK_UNARY(std::isfinite(st->getPrice(k[i].datetime, k[i].closePrice)));
+    }
+}
+
+/** @arg clone carries only the ST's own configuration: the source's trade manager and trading object
+ * are not copied, since the System re-injects them (m_tm via readyForRun, m_kdata via setTO) (SL11) */
+TEST_CASE("test_Stoploss_clone_does_not_copy_tm_kdata") {
+    auto st = ST_FixedPercent(0.01);
+    KData k = StockManager::instance().getStock("sz000001").getKData(KQuery(0, 10));
+    auto tm = crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM");
+    st->setTO(k);
+    st->setTM(tm);
+    CHECK_UNARY(st->getTM() != nullptr);
+    CHECK_UNARY(!st->getTO().empty());
+    auto st_clone = st->clone();
+    CHECK_UNARY(st_clone->getTM() == nullptr);
+    CHECK_UNARY(st_clone->getTO().empty());
+}
+
 /** @arg clone copies m_kdata and the subclass cache, so the clone is directly usable; setTO always
  * recalculates (lazy recalculation), with the same or a different KData alike */
 TEST_CASE("test_Stoploss_clone_preserves_cache") {
@@ -310,7 +347,9 @@ TEST_CASE("test_Stoploss_invalid_hook_result_is_null") {
     CHECK_EQ(st->getShortPrice(datetime, 10.0), 9.5);
 }
 
-/** @arg clone keeps its own result cache independent of the source (ST-007) */
+/** @arg clone carries no result cache; after its own setTO it computes an independent result that does
+ * not leak from the source's recomputation (ST-007). A standalone clone must be set before use,
+ * consistent with the "clone copies only configuration" contract (SL11) */
 TEST_CASE("test_Stoploss_indicator_clone_independent") {
     StockManager &sm = StockManager::instance();
     KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 10));
@@ -321,9 +360,15 @@ TEST_CASE("test_Stoploss_indicator_clone_independent") {
     auto st = ST_Indicator(CLOSE());
     st->setTO(k1);
     StoplossPtr st_clone = st->clone();
+    // The clone carries no cached result; it must be set (System::readyForRun / setTO) before use.
     st->setTO(k2);
+    st_clone->setTO(k1);
+    // The clone computes its own result, independent of the source's recomputation.
     for (size_t i = 0; i < k1.size(); ++i) {
         CHECK_EQ(st_clone->getPrice(k1[i].datetime, 0.0), doctest::Approx(k1[i].closePrice));
+    }
+    for (size_t i = 0; i < k2.size(); ++i) {
+        CHECK_EQ(st->getPrice(k2[i].datetime, 0.0), doctest::Approx(k2[i].closePrice));
     }
 }
 
@@ -397,6 +442,46 @@ price_t buyStoploss(const SYSPtr &sys) {
 }
 
 }  // namespace
+
+/** @arg an empty indicator does not crash and yields no stop-loss (SL07) */
+TEST_CASE("test_Stoploss_indicator_empty_input_guard") {
+    StockManager &sm = StockManager::instance();
+    KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 10));
+    CHECK_UNARY(!k1.empty());
+
+    // ST_Indicator(Indicator()) has an empty underlying indicator. setTO must not throw (it used to
+    // throw before the input guard), and every bar must stay invalid (Null) so the trade opens
+    // without stop-loss.
+    auto st = ST_Indicator(Indicator());
+    CHECK_NOTHROW(st->setTO(k1));
+    for (size_t i = 0; i < k1.size(); ++i) {
+        CHECK_UNARY(std::isnan(st->getPrice(k1[i].datetime, 0.0)));
+    }
+
+    // The same must hold when the empty-indicator ST drives a System: the buy opens without
+    // stop-loss instead of crashing or throwing at setTO.
+    Datetime buy_date = k1[0].datetime;
+    auto sys = makeStoplossSys(k1, ST_Indicator(Indicator()), buy_date);
+    CHECK_EQ(countBuy(sys), 1);
+    CHECK_EQ(buyStoploss(sys), 0.0);
+}
+
+/** @arg a cloned system's stoploss gets the cloned system's own TM after run, not the source's;
+ * before run neither m_tm nor m_kdata is carried (SL11) */
+TEST_CASE("test_Stoploss_system_clone_injects_own_tm") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sz000001").getKData(KQuery(0, 10));
+    Datetime buy_date = k[0].datetime;
+    auto sys = makeStoplossSys(k, ST_FixedPercent(0.01), buy_date);
+    auto sys_clone = sys->clone();
+    // Immediately after clone the ST must not carry the source system's TM or kdata.
+    CHECK_UNARY(sys_clone->getST()->getTM() == nullptr);
+    CHECK_UNARY(sys_clone->getST()->getTO().empty());
+    // After the cloned system runs, readyForRun re-injects the cloned system's own TM.
+    sys_clone->run(k);
+    CHECK_UNARY(sys_clone->getST()->getTM() != nullptr);
+    CHECK_UNARY(sys_clone->getST()->getTM() == sys_clone->getTM());
+}
 
 /** @arg an invalid stop-loss level does not block the entry: the trade opens without stop-loss,
  * while a valid level keeps its protection */

@@ -30,7 +30,7 @@ namespace hku {
  * @see SAFTYLOSS
  * @param n1 the lookback time window for calculating the average noise, 10 days by default
  * @param n2 take the highest value within n2 days for the preliminary stop-loss line, 3 by default
- * @param p the noise coefficient, 2 by default
+ * @param p the noise coefficient, 2 by default, must be finite and greater than 0
  * @ingroup Stoploss
  */
 StoplossPtr HKU_API ST_Saftyloss(int n1 = 10, int n2 = 3, double p = 2.0);

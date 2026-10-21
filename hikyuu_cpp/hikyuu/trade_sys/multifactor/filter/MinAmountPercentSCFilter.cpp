@@ -44,9 +44,14 @@ ScoreRecordList MinAmountPercentSCFilter::_filter(const ScoreRecordList& scores,
         amount_list.emplace_back(i, kr.transAmount);
     }
 
+    // The market code breaks the ties, so equal amounts keep a deterministic order
     std::sort(amount_list.begin(), amount_list.end(),
-              [](const std::pair<size_t, price_t>& a, const std::pair<size_t, price_t>& b) {
-                  return a.second > b.second;
+              [&scores](const std::pair<size_t, price_t>& a, const std::pair<size_t, price_t>& b) {
+                  if (a.second != b.second) {
+                      return a.second > b.second;
+                  }
+                  return scores[a.first].stock.market_code() <
+                         scores[b.first].stock.market_code();
               });
 
     // Calculate the number to keep (the last 10% is filtered out)
@@ -56,15 +61,21 @@ ScoreRecordList MinAmountPercentSCFilter::_filter(const ScoreRecordList& scores,
     }
 
     double min_amount_percent_limit = getParam<double>("min_amount_percent_limit");
-    size_t keep_count = total * (1 - min_amount_percent_limit);  // Keep the first 90%
-    if (keep_count == 0) {
-        keep_count = 1;  // Keep at least one
+    size_t keep_count = std::max<size_t>(
+      1, static_cast<size_t>(std::llround(total * (1.0 - min_amount_percent_limit))));
+
+    // Emit in the score order of the input: TopN / Group slice by position, so emitting in the
+    // amount order would make them select by the amount instead of by the score
+    std::vector<bool> keep(scores.size(), false);
+    for (size_t i = 0; i < keep_count; ++i) {
+        keep[amount_list[i].first] = true;
     }
 
-    // Add the first keep_count records into the result
-    for (size_t i = 0; i < keep_count && i < amount_list.size(); ++i) {
-        size_t index = amount_list[i].first;
-        ret.emplace_back(scores[index]);
+    ret.reserve(keep_count);
+    for (size_t i = 0; i < scores.size(); ++i) {
+        if (keep[i]) {
+            ret.emplace_back(scores[i]);
+        }
     }
 
     return ret;

@@ -132,6 +132,32 @@ TEST_CASE("test_FactorSet_basic") {
     CHECK_FALSE(fs.have("MA10"));
 }
 
+/** @par Test point: test that index access is bounds-checked and throws on out-of-range */
+TEST_CASE("test_FactorSet_index_out_of_range") {
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    FactorSet fs("IndexOob");
+    fs.add(Factor("MA5", ma5, KQuery::DAY));
+    fs.add(Factor("MA10", ma10, KQuery::DAY));
+    CHECK_EQ(fs.size(), 2);
+
+    /** @arg in-range index access works for both get(size_t) and operator[] */
+    CHECK_EQ(fs[0].name(), "MA5");
+    CHECK_EQ(fs.get(1).name(), "MA10");
+
+    /** @arg index == size throws std::out_of_range */
+    CHECK_THROWS_AS(fs.get(2), std::out_of_range);
+    CHECK_THROWS_AS(fs[2], std::out_of_range);
+
+    /** @arg a far out-of-range index throws std::out_of_range */
+    CHECK_THROWS_AS(fs.get(100), std::out_of_range);
+
+    /** @arg any index on an empty set throws std::out_of_range */
+    FactorSet empty_fs("EmptyOob");
+    CHECK_THROWS_AS(empty_fs.get(0), std::out_of_range);
+    CHECK_THROWS_AS(empty_fs[0], std::out_of_range);
+}
+
 /** @par Test point: test the ktype match check of FactorSet */
 TEST_CASE("test_FactorSet_ktype_check") {
     // Create the factors of the different periods
@@ -653,6 +679,55 @@ TEST_CASE("test_FactorSet_order_preservation") {
         CHECK_FALSE(fs.have("MA10"));
         CHECK_FALSE(fs.have("MA20"));
     }
+}
+
+/** @par Test point: FT05 - remove() must keep the insertion order (not swap the last element into the
+ * hole), so the getValues column order and the serialization order stay stable. */
+TEST_CASE("test_FactorSet_remove_preserves_insertion_order") {
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    Indicator ma15 = MA(CLOSE(), 15);
+    Indicator ma20 = MA(CLOSE(), 20);
+
+    FactorSet fs("FT05_ORDER", KQuery::DAY);
+    fs.add(Factor("MA5", ma5, KQuery::DAY));
+    fs.add(Factor("MA10", ma10, KQuery::DAY));
+    fs.add(Factor("MA15", ma15, KQuery::DAY));
+    fs.add(Factor("MA20", ma20, KQuery::DAY));
+    CHECK_EQ(fs.size(), 4);
+
+    /** @arg the initial order matches the addition order */
+    vector<string> order = {"MA5", "MA10", "MA15", "MA20"};
+    size_t i = 0;
+    for (const auto& f : fs) {
+        CHECK_EQ(f.name(), order[i++]);
+    }
+    CHECK_EQ(i, 4);
+
+    /** @arg removing an interior factor keeps the remaining factors in insertion order (not permuted) */
+    fs.remove("MA10");
+    vector<string> after = {"MA5", "MA15", "MA20"};
+    i = 0;
+    for (const auto& f : fs) {
+        CHECK_EQ(f.name(), after[i++]);
+    }
+    CHECK_EQ(i, 3);
+    CHECK_EQ(fs.get("MA15").name(), "MA15");
+    CHECK_EQ(fs.get("MA20").name(), "MA20");
+
+    /** @arg removing another interior factor keeps the order */
+    fs.remove("MA20");
+    vector<string> after2 = {"MA5", "MA15"};
+    i = 0;
+    for (const auto& f : fs) {
+        CHECK_EQ(f.name(), after2[i++]);
+    }
+    CHECK_EQ(i, 2);
+
+    /** @arg removing the rest empties the set */
+    fs.remove("MA5");
+    fs.remove("MA15");
+    CHECK(fs.empty());
 }
 
 /** @par Test point: test the getValues functionality of FactorSet */
@@ -1338,6 +1413,48 @@ TEST_CASE("test_FactorSet_compiled_values_match_legacy") {
             CAPTURE(fi);
             CAPTURE(factorset[fi].name());
             Indicator expected = ALIGN(factorset[fi].formula(), dates, false)(kdata).getResult(0);
+            check_indicator(aligned[si][fi], expected);
+        }
+    }
+}
+
+/** @par Test point: the single-layer slow path (tovalue=false) must match the serial reference, for
+ * both the plain and the aligned variants */
+TEST_CASE("test_FactorSet_getValues_slow_path_match_legacy") {
+    StockManager& sm = StockManager::instance();
+    StockList stocks{sm.getStock("sh000001"), sm.getStock("sz000001")};
+    REQUIRE_FALSE(stocks[0].isNull());
+    REQUIRE_FALSE(stocks[1].isNull());
+
+    KQuery query(0, 120, KQuery::DAY);
+    FactorSet factorset("SLOW_VALUES", KQuery::DAY);
+    factorset.add("MA5", MA(CLOSE(), 5));
+    factorset.add("EMA13", EMA(CLOSE(), 13));
+    factorset.add("STDEV20", STDEV(CLOSE(), 20));
+
+    auto values = factorset.getValues(stocks, query, false, false, false);
+    REQUIRE_EQ(values.size(), stocks.size());
+    for (size_t si = 0; si < stocks.size(); ++si) {
+        KData kdata = stocks[si].getKData(query);
+        REQUIRE_EQ(values[si].size(), factorset.size());
+        for (size_t fi = 0; fi < factorset.size(); ++fi) {
+            CAPTURE(si);
+            CAPTURE(fi);
+            Indicator expected = factorset[fi].formula()(kdata);
+            check_indicator(values[si][fi], expected);
+        }
+    }
+
+    DatetimeList dates = sm.getTradingCalendar(query);
+    REQUIRE_FALSE(dates.empty());
+    auto aligned = factorset.getValues(stocks, query, true, false, false, false, dates);
+    REQUIRE_EQ(aligned.size(), stocks.size());
+    for (size_t si = 0; si < stocks.size(); ++si) {
+        KData kdata = stocks[si].getKData(query);
+        for (size_t fi = 0; fi < factorset.size(); ++fi) {
+            CAPTURE(si);
+            CAPTURE(fi);
+            Indicator expected = ALIGN(factorset[fi].formula(), dates, false)(kdata);
             check_indicator(aligned[si][fi], expected);
         }
     }

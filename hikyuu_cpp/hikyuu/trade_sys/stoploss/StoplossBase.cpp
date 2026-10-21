@@ -39,6 +39,7 @@ void StoplossBase::reset() {
     m_kdata = Null<KData>();
     m_tm.reset();
     _reset();
+    m_calculated = false;
 }
 
 StoplossPtr StoplossBase::clone() {
@@ -49,9 +50,7 @@ StoplossPtr StoplossBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_name = m_name;
     p->m_params = m_params;
-    p->m_tm = m_tm;
-    p->m_kdata = m_kdata;
-    // The clone recalculates lazily so the subclass runtime state is rebuilt on the next setTO
+    // m_tm and m_kdata are intentionally not copied; the System re-injects them (readyForRun / setTO)
     p->m_calculated = false;
     return p;
 }

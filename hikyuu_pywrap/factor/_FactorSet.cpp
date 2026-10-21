@@ -89,7 +89,8 @@ void export_FactorSet(py::module& m) {
       .def("add", py::overload_cast<const FactorList&>(&FactorSet::add))
       .def("add", py::overload_cast<const std::map<string, Indicator>&>(&FactorSet::add))
 
-      .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy, "Get the factor list")
+      .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy,
+           "Get the factor list")
 
       .def(
         "get_all_values", &FactorSet::getAllValues, py::arg("query"), py::arg("align") = false,
@@ -155,8 +156,17 @@ void export_FactorSet(py::module& m) {
 
       .def("__getitem__", py::overload_cast<const string&>(&FactorSet::get, py::const_),
            py::return_value_policy::copy)
-      .def("__getitem__", py::overload_cast<size_t>(&FactorSet::get, py::const_),
-           py::return_value_policy::copy)
+      .def(
+        "__getitem__",
+        [](const FactorSet& self, py::int_ obj) {
+            int64_t i = obj.cast<int64_t>();
+            int64_t length = static_cast<int64_t>(self.size());
+            int64_t index = i < 0 ? length + i : i;
+            if (index < 0 || index >= length)
+                throw std::out_of_range(fmt::format("index out of range: {}", i));
+            return self.get(static_cast<size_t>(index));
+        },
+        py::return_value_policy::copy)
       .def("__len__", &FactorSet::size, "The number of the contained factors")
       .def(
         "__iter__",

@@ -57,23 +57,21 @@ void export_Factor(py::module& m) {
       .def("__str__", &Factor::str)
       .def("__repr__", &Factor::str)
 
-      .def_property("name", py::overload_cast<>(&Factor::name, py::const_),
-                    py::overload_cast<const string&>(&Factor::name), py::return_value_policy::copy,
-                    "The factor name")
-      .def_property("ktype", py::overload_cast<>(&Factor::ktype, py::const_),
-                    py::overload_cast<const string&>(&Factor::ktype), py::return_value_policy::copy,
-                    "The factor frequency type")
+      .def_property_readonly("name", py::overload_cast<>(&Factor::name, py::const_),
+                             py::return_value_policy::copy, "The factor name")
+      .def_property_readonly("ktype", py::overload_cast<>(&Factor::ktype, py::const_),
+                             py::return_value_policy::copy, "The factor frequency type")
       .def_property("create_at", py::overload_cast<>(&Factor::createAt, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::createAt),
                     py::return_value_policy::copy, "The creation date")
       .def_property("update_at", py::overload_cast<>(&Factor::updateAt, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::updateAt),
                     py::return_value_policy::copy, "The modification date")
-      .def_property("formula", py::overload_cast<>(&Factor::formula, py::const_),
-                    py::overload_cast<const Indicator&>(&Factor::formula),
-                    py::return_value_policy::copy, "The factor formula")
+      .def_property_readonly("formula", py::overload_cast<>(&Factor::formula, py::const_),
+                             py::return_value_policy::copy, "The factor formula")
       .def_property("start_date", py::overload_cast<>(&Factor::startDate, py::const_),
-                    py::overload_cast<const Datetime&>(&Factor::startDate), "The start date of the data storage")
+                    py::overload_cast<const Datetime&>(&Factor::startDate),
+                    "The start date of the data storage")
       .def_property("block", py::overload_cast<>(&Factor::block, py::const_),
                     py::overload_cast<const Block&>(&Factor::block), py::return_value_policy::copy,
                     "The security set")
@@ -84,7 +82,8 @@ void export_Factor(py::module& m) {
                     py::overload_cast<const string&>(&Factor::details),
                     py::return_value_policy::copy, "The detailed description")
       .def_property("need_save_value", py::overload_cast<>(&Factor::needSaveValue, py::const_),
-                    py::overload_cast<bool>(&Factor::needSaveValue), "Whether to persist the factor value data")
+                    py::overload_cast<bool>(&Factor::needSaveValue),
+                    "Whether to persist the factor value data")
       .def_property("recover_type", py::overload_cast<>(&Factor::recoverType, py::const_),
                     py::overload_cast<KQuery::RecoverType>(&Factor::recoverType),
                     py::return_value_policy::copy, "The recovery type")
@@ -100,9 +99,10 @@ void export_Factor(py::module& m) {
     
     :param bool update_before: whether to check and update the existing factor before saving, defaulting to True). Note: it usually must be true, otherwise it will cause the data errors, unless you are certain that all the factor values have been updated)")
 
-      .def("save_special_values_to_db",
-           py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
-           py::arg("stock"), py::arg("values"), py::arg("replace") = false)
+      .def(
+        "save_special_values_to_db",
+        py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
+        py::arg("stock"), py::arg("values"), py::arg("replace") = false)
 
       .def("save_special_values_to_db",
            py::overload_cast<const Stock&, const DatetimeList&, const PriceList&, bool>(

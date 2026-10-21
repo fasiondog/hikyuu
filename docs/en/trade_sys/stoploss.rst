@@ -32,7 +32,7 @@ Fixed Percentage Stop-loss
 Technical Indicator Stop-loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: ST_Indicator(op[, kpart="CLOSE"])
+.. py:function:: ST_Indicator(ind)
 
     Use a technical indicator as the stop-loss level. For example, use the 10-day EMA::
     
@@ -55,7 +55,7 @@ Alexander Elder Safety Zone Stop-loss
 
     :param int n1: the lookback window used to calculate the average noise, defaults to 10 days
     :param int n2: number of days over which the highest preliminary stop-loss value is taken, defaults to 3
-    :param double p: the noise coefficient, defaults to 2
+    :param double p: the noise coefficient, defaults to 2; it must be finite and > 0, otherwise the creation throws (p <= 0 puts the stop-loss line above the price, a NaN p filters out every bar and silently disables the stop-loss)
     :return: the stop-loss/take-profit strategy instance
     
 
@@ -73,8 +73,11 @@ The custom stop-loss/take-profit strategy interface:
 Return Value Contract and System Behaviour
 ------------------------------------------
 
-``_get_price`` / ``_get_short_price`` are called once per bar. The meaning of the return value and
-the resulting system behaviour are:
+How often ``_get_price`` / ``_get_short_price`` run depends on the role the instance is used in:
+**as a stop-loss they run on the entry path only** (about once or twice per trade; once the level is
+fixed it is stored in the position record and never queried again while the position is held), while
+**as a take-profit they run once per bar while the position is held**, because the take-profit level
+is trailing. The meaning of the return value and the resulting system behaviour are:
 
 * **> 0**: a valid stop-loss / take-profit level. It must use the same (adjusted) price coordinate
   as the KData passed to ``setTO``; the system maps it back to the original price coordinate

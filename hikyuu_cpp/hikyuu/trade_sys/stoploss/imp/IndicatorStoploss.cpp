@@ -37,7 +37,6 @@ void IndicatorStoploss::_reset() {
 StoplossPtr IndicatorStoploss::_clone() {
     auto p = make_shared<IndicatorStoploss>();
     p->m_ind = m_ind.clone();
-    p->m_result = m_result;
     return p;
 }
 
@@ -45,6 +44,10 @@ void IndicatorStoploss::_calculate() {
     // Align the indicator to the trading object so that ind and m_kdata share the same date
     // range; otherwise an index mismatch would read m_kdata out of bounds.
     Indicator ind = ALIGN(m_ind(m_kdata), m_kdata);
+    HKU_WARN_IF_RETURN(ind.size() != m_kdata.size(), void(),
+                       "IndicatorStoploss: indicator size({}) does not match kdata size({}), no "
+                       "stop-loss will be applied",
+                       ind.size(), m_kdata.size());
     size_t total = ind.size();
     auto const* ind_data = ind.data();
     auto const* ks = m_kdata.data();

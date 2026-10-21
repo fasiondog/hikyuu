@@ -23,13 +23,13 @@ ScoresFilterPtr HKU_API SCFilter_LessOrEqualValue(double value = 0.0);
 ScoresFilterPtr HKU_API SCFilter_TopN(int topn = 10);
 
 /**
- * Filter out the cross-sections whose turnover amount is within the percentage range at the end of
- * the score list
- * @note
- * It is related to the order of the passed cross-section score list: if it is in the descending
- * order, the system score records with a smaller turnover amount are filtered; otherwise the ones
- * with a larger amount are filtered
- * @note At least one record is always kept, so a limit of 1.0 still keeps the best one
+ * Filter out the given percentage of the cross-section records that have the smallest turnover
+ * amount
+ * @note The selection is unrelated to the order of the passed cross-section score list: the records
+ * with the smaller turnover amount are always the ones filtered out, and the output keeps the score
+ * order of the input, so the chained filters (TopN / Group) still select by the score
+ * @note At least one record is always kept, so a limit of 1.0 keeps the one with the largest
+ * turnover amount
  * @param min_amount_percent_limit the minimum turnover amount percentage limit
  * @return ScoresFilterPtr
  */

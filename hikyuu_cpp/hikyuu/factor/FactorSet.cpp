@@ -12,6 +12,7 @@
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/plugin/factor.h"
 #include "hikyuu/plugin/device.h"
+#include "hikyuu/lang.h"
 #include "FactorSet.h"
 #include "imp/CompiledFactorPlan.h"
 
@@ -139,22 +140,13 @@ void FactorSet::remove(const string& name) {
         return;  // The factor does not exist
     }
 
+    // Keep the insertion order and rebuild the shifted indices
     size_t index_to_remove = it->second;
-    size_t last_index = m_data->factors.size() - 1;
-
-    // When the element to delete is not the last one, the index of the following element must be
-    // adjusted
-    if (index_to_remove != last_index) {
-        // Move the last element to the position to be deleted
-        m_data->factors[index_to_remove] = std::move(m_data->factors[last_index]);
-        // Update the index of the moved element in the map
-        const string& moved_factor_name = m_data->factors[index_to_remove].name();
-        m_data->nameIndexMap[moved_factor_name] = index_to_remove;
-    }
-
-    // Delete the last element and the map entry
-    m_data->factors.pop_back();
+    m_data->factors.erase(m_data->factors.begin() + index_to_remove);
     m_data->nameIndexMap.erase(it);
+    for (size_t i = index_to_remove; i < m_data->factors.size(); ++i) {
+        m_data->nameIndexMap[m_data->factors[i].name()] = i;
+    }
 }
 
 bool FactorSet::have(const string& name) const noexcept {
@@ -168,10 +160,16 @@ const Factor& FactorSet::get(const string& name) const {
 }
 
 void FactorSet::save_to_db() const {
+    HKU_CHECK(isValidFactorName(name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     saveFactorSet(*this);
 }
 
 void FactorSet::remove_from_db() const {
+    HKU_CHECK(isValidFactorName(name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     removeFactorSet(name(), ktype());
 }
 
@@ -269,21 +267,39 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     }
 
     // Create the result container, one IndicatorList per stock
-    size_t stk_total = stocks.size();
-    size_t factor_total = m_data->factors.size();
-    result.resize(stk_total);
-    for (size_t i = 0; i < stk_total; ++i) {
-        result[i].resize(factor_total);
-    }
+    const size_t stk_total = stocks.size();
+    const size_t factor_total = m_data->factors.size();
+    result.resize(stk_total, IndicatorList(factor_total));
+    HKU_IF_RETURN(stk_total == 0 || factor_total == 0, result);
 
     const auto& factors = m_data->factors;
-    global_parallel_for_index_void(0, factor_total, [&](size_t i) {
-        IndicatorList factor_values =
-          factors[i].getValues(stocks, query, align, fill_null, tovalue, false, align_dates);
-        for (size_t j = 0; j < stk_total; ++j) {
-            result[j][i] = std::move(factor_values[j]);
-        }
-    });
+    if (align) {
+        DatetimeList dates = align_dates.empty()
+                               ? StockManager::instance().getTradingCalendar(query)
+                               : align_dates;
+        HKU_IF_RETURN(dates.empty(), result);
+        Indicator null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);
+        global_parallel_for_index_void(0, stk_total, [&](size_t j) {
+            KData k = stocks[j].getKData(query);
+            for (size_t i = 0; i < factor_total; ++i) {
+                if (k.empty()) {
+                    result[j][i] = null_ind;
+                } else {
+                    result[j][i] =
+                      tovalue ? ALIGN(factors[i].formula(), dates, fill_null)(k).getResult(0)
+                              : ALIGN(factors[i].formula(), dates, fill_null)(k);
+                }
+            }
+        });
+    } else {
+        global_parallel_for_index_void(0, stk_total, [&](size_t j) {
+            KData k = stocks[j].getKData(query);
+            for (size_t i = 0; i < factor_total; ++i) {
+                result[j][i] =
+                  tovalue ? factors[i].formula()(k).getResult(0) : factors[i].formula()(k);
+            }
+        });
+    }
 
     return result;
 }
