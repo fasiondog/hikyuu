@@ -6168,4 +6168,149 @@ TEST_CASE("test_MultiSystem_cascade_b_b_b_delegated_reserve") {
     CHECK_EQ(parent_pos, doctest::Approx(leaf_pos));
 }
 
+/** @par Check point: a three-level mode C chain surfaces the leaf trades once per layer and the
+ * shared account holds exactly one buy and one sell */
+TEST_CASE("test_MultiSystem_cascade_c_c_c_surface_once") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 4].datetime;
+    Datetime sell_date = k[k.size() - 2].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, sell_date);
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setParam<bool>("sell_delay", false);
+
+    auto inner = std::make_shared<MultiSystem>("ccc_inner");
+    inner->setMode("C");
+    inner->add(leaf);
+    auto middle = std::make_shared<MultiSystem>("ccc_middle");
+    middle->setMode("C");
+    middle->add(inner);
+    auto outer = std::make_shared<MultiSystem>("ccc_outer");
+    outer->setTM(crtTM(k[0].datetime, 100000.0));
+    outer->setMode("C");
+    outer->add(middle);
+    outer->run(k);
+
+    size_t buys = 0;
+    size_t sells = 0;
+    for (const auto& tr : outer->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            buys++;
+        } else if (tr.business == BUSINESS_SELL) {
+            sells++;
+        }
+    }
+
+    /** @arg the shared account only sees the leaf trades once */
+    CHECK_EQ(buys, 1);
+    CHECK_EQ(sells, 1);
+    CHECK_EQ(outer->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a zero quota on the middle mode B clears the whole nested subtree and the
+ * outer parent holdings */
+TEST_CASE("test_MultiSystem_cascade_b_b_a_zero_quota_middle") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("bba_inner");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+    auto middle = std::make_shared<MultiSystem>("bba_middle");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    auto outer = std::make_shared<MultiSystem>("bba_outer");
+    outer->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    outer->setMode("B");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle, other}));
+    outer->setSellAtNotSelected(true);
+    outer->add(middle);
+    outer->add(other);
+    outer->run(k1);
+
+    REQUIRE_GT(leaf->getTM()->getPosition(k1.back().datetime, stk).number, 0.0);
+
+    /** @arg the middle zero quota clears the inner A shadow, the middle account and the parent */
+    outer->setAF(AF_FixedWeightList({0.0, 1.0}));
+    outer->run(k2, false);
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(inner->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(middle->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(outer->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: the A -> B -> A cascade still mirrors a suspended close reduction only once */
+TEST_CASE("test_MultiSystem_cascade_a_b_a_suspended_deferred") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE(k2.size() > 2);
+    REQUIRE_UNARY(stk.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("aba_inner_susp");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+    auto middle = std::make_shared<MultiSystem>("aba_middle_susp");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->setTradeOnClose(false);
+    middle->add(inner);
+    auto outer = std::make_shared<MultiSystem>("aba_outer_susp");
+    outer->setTM(crtTM(Datetime(200005010000LL), 300000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+    REQUIRE_GT(inner1, 0.0);
+
+    /** @arg the suspended close reduction of the middle B reaches the inner A account and the
+     * outer A shadow once (the leaf shadow is the signal book, unaffected by the reduction) */
+    middle->setAF(AF_FixedAmount(30000.0));
+    outer->run(k2, false);
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = outer->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_GT(parent2, 0.0);
+}
+
 /** @} */

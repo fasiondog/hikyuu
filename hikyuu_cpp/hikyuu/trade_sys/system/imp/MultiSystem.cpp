@@ -654,6 +654,15 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     if (hold_num - need_back_num < min_num) {
         need_back_num = hold_num;
     }
+    // A cross-day retry leg may already be planned for this stock: deduct it so the same excess
+    // is not sold twice
+    double planned = 0.0;
+    for (const auto& a : m_pending_calibration) {
+        if (a.sys == sys && a.kind == CalibrationKind::SUB_SELL && a.stock == stock) {
+            planned += a.number;
+        }
+    }
+    need_back_num = std::max(0.0, need_back_num - planned);
     if (need_back_num <= 0.0) {
         return;
     }
@@ -1165,6 +1174,7 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
 
     double ratio = std::min(1.0, need_back_funds / total_value);
     double sold_value = 0.0;
+    bool deferred = false;
     auto sell_part = [&](const Stock& stk, double num, price_t close_price) {
         if (num <= 0.0) {
             return;
@@ -1194,15 +1204,30 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
 
     for (const auto& [stk, value] : values) {
         price_t close_price = _getClosePrice(date, stk);
-        if (close_price <= 0.0) {
-            continue;
-        }
+        double hold = sub_tm->getPosition(date, stk).number;
         double min_num = stk.minTradeNumber();
         if (min_num <= 0.0) {
             continue;
         }
+        if (close_price <= 0.0) {
+            // Suspended: queue the pro-rata leg so the excess is sold at the next quoted open
+            double num = std::floor(hold * ratio / min_num) * min_num;
+            num = std::min(num, hold);
+            if (num > 0.0) {
+                m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
+                double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
+                if (parent_num > 0.0) {
+                    m_pending_calibration.push_back(
+                      {CalibrationKind::PARENT_SELL, sys, stk, parent_num});
+                }
+                remaining[stk] -= num;
+                sold_value += value * num / hold;
+                deferred = true;
+            }
+            continue;
+        }
         double num = std::floor(value * ratio / close_price / min_num) * min_num;
-        num = std::min(num, sub_tm->getPosition(date, stk).number);
+        num = std::min(num, hold);
         sell_part(stk, num, close_price);
     }
 
@@ -1239,7 +1264,7 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
             }
         }
     }
-    if (!m_trade_on_close) {
+    if (!m_trade_on_close || deferred) {
         m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
         return;
     }
@@ -2058,10 +2083,11 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         }
     }
 
-    // The turnover of the rebalancing executions at this open: the deferred calibration legs, a
-    // batch queued on a rebalancing close and the mode C fills (a continuous-mirror batch of the
-    // modes A/B is not rebalancing turnover and is not counted)
-    if (!m_trade_on_close) {
+    // The turnover of the rebalancing executions at this open: the deferred calibration legs (a
+    // toc=false rebalancing or a toc=true suspended close), a batch queued on a rebalancing close
+    // and the mode C fills (a continuous-mirror batch of the modes A/B is not rebalancing turnover
+    // and is not counted)
+    if (!m_trade_on_close || !m_pending_calibration.empty()) {
         double traded = 0.0;
         for (const auto& tr : result.tradesOnOpen) {
             traded += tr.number * tr.realPrice * tr.stock.unit();
@@ -2253,8 +2279,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                     total += kv.second;
                 }
                 price_t budget = m_external_quota;
+                double fixed_amount = m_af->getParam<double>("fixed-amount");
                 double max_total = m_af->getParam<double>("max-total-position");
-                if (max_total > 0.0 && max_total < 1.0) {
+                if (fixed_amount <= 0.0 && max_total > 0.0 && max_total < 1.0) {
                     price_t cap = max_total * m_tm->getFunds(datetime, ktype).net_assets();
                     if (budget > cap) {
                         if (!m_external_quota_capped_warned) {
@@ -2917,9 +2944,9 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
         m_open_turnover_assets = assets_before;
     }
 
-    // The deferred calibration of the close (trade_on_close=false) records its date/assets here,
-    // so the open stage can attribute the executed legs to the rebalancing day (all modes,
-    // including the early-returning modes A and C)
+    // The deferred calibration legs (a trade_on_close=false rebalancing, or a trade_on_close=true
+    // close suspended by a missing quote) record their date/assets here, so the open stage can
+    // attribute the executed legs to the rebalancing day (all modes)
     if (!m_pending_calibration.empty() && m_pending_calibration_date.isNull()) {
         m_pending_calibration_date = datetime;
         m_pending_calibration_assets = assets_before;
