@@ -268,6 +268,7 @@ void MultiSystem::_reset() {
     m_external_quota = 0.0;
     m_external_quota_set = false;
     m_external_delegate_warned = false;
+    m_external_quota_capped_warned = false;
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
@@ -328,6 +329,7 @@ void MultiSystem::_forceResetAll() {
     m_external_quota = 0.0;
     m_external_quota_set = false;
     m_external_delegate_warned = false;
+    m_external_quota_capped_warned = false;
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
@@ -670,6 +672,13 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
 
     price_t close_price = _getClosePrice(date, stock);
     if (close_price <= 0.0) {
+        // Suspended at the close: queue the legs and let the executor retry them
+        m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stock, need_back_num});
+        double parent_num = std::min(need_back_num, m_tm->getPosition(date, stock).number);
+        if (parent_num > 0.0) {
+            m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stock, parent_num});
+        }
+        m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
         return;
     }
 
@@ -2236,14 +2245,30 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 quota_map[ctx.sys.get()] = ctx.quota;
             }
             // The outer mode B layer may have assigned this aggregate a budget: scale the leaf
-            // quotas to that total (the FOF/MOM budget semantics)
+            // quotas to that total (the FOF/MOM budget semantics), capped by the inner reserve
+            // (max-total-position x the inner net assets)
             if (m_external_quota_set) {
                 price_t total = 0.0;
                 for (const auto& kv : quota_map) {
                     total += kv.second;
                 }
-                if (total > 0.0 && m_external_quota > 0.0) {
-                    double scale = m_external_quota / total;
+                price_t budget = m_external_quota;
+                double max_total = m_af->getParam<double>("max-total-position");
+                if (max_total > 0.0 && max_total < 1.0) {
+                    price_t cap = max_total * m_tm->getFunds(datetime, ktype).net_assets();
+                    if (budget > cap) {
+                        if (!m_external_quota_capped_warned) {
+                            m_external_quota_capped_warned = true;
+                            HKU_WARN(
+                              "The delegated quota {:.2f} exceeds the inner reserve cap "
+                              "{:.2f} (max-total-position), capped!",
+                              budget, cap);
+                        }
+                        budget = cap;
+                    }
+                }
+                if (total > 0.0 && budget > 0.0) {
+                    double scale = budget / total;
                     for (auto& kv : quota_map) {
                         kv.second *= scale;
                     }
@@ -2278,8 +2303,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     if (quota_calibrated) {
         // A same-day re-drive rebuilds the round: the legs pushed by the previous drive of the same
         // close are replaced instead of duplicated (the retry legs of earlier days are kept)
-        if (!m_trade_on_close && !m_pending_calibration_retry &&
-            !m_pending_calibration_date.isNull() &&
+        if (!m_pending_calibration_retry && !m_pending_calibration_date.isNull() &&
             m_pending_calibration_date.startOfDay() == datetime.startOfDay()) {
             m_pending_calibration.clear();
             m_pending_calibration_date = Datetime();
@@ -2888,7 +2912,7 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
     // the open stage can attribute the deferred calibration legs, a batch queued on this close
     // and the mode C fills to that close (a continuous-mirror batch of A/B is not rebalancing
     // turnover)
-    if (!m_trade_on_close && is_adjust) {
+    if (is_adjust) {
         m_open_turnover_date = datetime;
         m_open_turnover_assets = assets_before;
     }
@@ -2896,8 +2920,7 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
     // The deferred calibration of the close (trade_on_close=false) records its date/assets here,
     // so the open stage can attribute the executed legs to the rebalancing day (all modes,
     // including the early-returning modes A and C)
-    if (!m_trade_on_close && !m_pending_calibration.empty() &&
-        m_pending_calibration_date.isNull()) {
+    if (!m_pending_calibration.empty() && m_pending_calibration_date.isNull()) {
         m_pending_calibration_date = datetime;
         m_pending_calibration_assets = assets_before;
     }

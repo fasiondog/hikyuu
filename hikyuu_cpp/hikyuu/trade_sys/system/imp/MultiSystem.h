@@ -416,7 +416,8 @@ private:
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): reduce the over quota
      * position of the sub-system (the sub book sells on its own and the parent sells the same
      * quantity, capped by the parent holding; with trade_on_close=false the whole reduction is
-     * deferred to the next open, the executed records are appended to out_executed). It runs in
+     * deferred to the next open, and with trade_on_close=true a suspended close falls back to the
+     * deferred legs too; the executed records are appended to out_executed). It runs in
      * the reduction phase before the injection phase, so the freed cash is available to the whole
      * portfolio. A nested mode B with SE/AF consumes the quota as a budget instead; an A/C
      * composite is reduced pro rata over its leaves. */
@@ -437,8 +438,8 @@ private:
     void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
     /** Mode B: liquidate the parent holdings of the instruments of the sub-system (a composite
-     * covers all of its leaf instruments) and push the executed trades; with trade_on_close=false
-     * the legs are queued before the quote check (the executor retries a suspended day) */
+     * covers all of its leaf instruments) and push the executed trades; the legs are queued before
+     * the quote check in every mode, so a suspended close is retried at the next open */
     void _liquidateParent(const SystemPtr& sys, const Datetime& date, TradeRecordList& out);
 
     /** Sell the holdings of the sub-system own ledger and recycle its cash (no recursion) */
@@ -468,11 +469,12 @@ private:
     TradeSuggestionList _netSuggestions(const Datetime& date,
                                         const TradeSuggestionList& suggestions) const;
 
-    /** Mode B with trade_on_close=false: the quota calibration legs (sub/parent sells, covers,
-     * checkouts) and the injections are deferred to the next open; the injections wait while any
-     * sell leg still waits for a quote, so every leg shares one price basis. A sub leg is judged
-     * by the initiating sub book, a parent leg by the parent book; a leg without a sellable
-     * quantity left (a dead leg, or a residual the parent can no longer fill) is dropped */
+    /** The quota calibration legs (sub/parent sells, covers, checkouts) and the injections are
+     * deferred to the next open: with trade_on_close=false for the whole rebalancing, with
+     * trade_on_close=true only when the close is suspended. The injections wait while any sell leg
+     * still waits for a quote, so every leg shares one price basis. A sub leg is judged by the
+     * initiating sub book, a parent leg by the parent book; a leg without a sellable quantity left
+     * (a dead leg, or a residual the parent can no longer fill) is dropped */
     enum class CalibrationKind {
         SUB_SELL,
         SUB_COVER,
@@ -516,7 +518,8 @@ private:
      * uniformly; return the actual trades of the parent. Reused by runMoment / runMomentOnClose. */
     TradeRecordList _closePhase(const Datetime& datetime);
 
-    /** The common tail of the close stage: advance the close-day counter (once per day), record
+    /** The common tail of the close stage: advance the close-day counter (once per distinct ktype
+     *  bar, i.e. per day on a daily axis), record
      *  the rebalancing date/assets for the deferred open attribution, the close-stage turnover
      *  (trade_on_close=true, or the mode C close-stage force sells), the trace output and the
      *  deferred calibration attribution. Shared by the mode A/B tail and the mode C early return.
@@ -652,11 +655,13 @@ private:
     price_t m_external_quota{0.0};  // The quota assigned by the outer mode B layer (the
                                     // inner layer scales its leaf quotas to this total)
     bool m_external_quota_set{false};
-    bool m_external_delegate_warned{false};   // The once-per-instance flag of the nested B fallback
-                                              // warning when the inner cannot consume the budget
-    bool m_pending_calibration_retry{false};  // The pending calibration is a retry of a previous
-                                              // suspension, exempt from the cross-day drop
-    Datetime m_open_turnover_date;            // The rebalancing close whose mode C open fills
+    bool m_external_delegate_warned{false};  // The once-per-instance flag of the nested B fallback
+                                             // warning when the inner cannot consume the budget
+    bool m_external_quota_capped_warned{false};  // The once-per-instance flag of the delegated
+                                                 // quota capped by the inner reserve
+    bool m_pending_calibration_retry{false};     // The pending calibration is a retry of a previous
+                                                 // suspension, exempt from the cross-day drop
+    Datetime m_open_turnover_date;               // The rebalancing close whose mode C open fills
                                     // carry the turnover (trade_on_close=false); the modes
                                     // A/B attribute through m_open_pending_adjust
     double m_open_turnover_assets{0.0};     // The assets before that close stage

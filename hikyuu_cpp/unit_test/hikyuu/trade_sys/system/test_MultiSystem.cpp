@@ -6128,4 +6128,44 @@ TEST_CASE("test_MultiSystem_reduction_on_suspended_close_deferred") {
     CHECK_LT(leaf->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
 }
 
+/** @par Check point: a delegated budget above the inner reserve cap (max-total-position) is
+ * capped, so the inner layer keeps its reserved cash */
+TEST_CASE("test_MultiSystem_cascade_b_b_b_delegated_reserve") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("bbb_inner");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->getAF()->setParam<double>("max-total-position", 0.8);
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("bbb_middle");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("bbb_outer");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("B");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k);
+
+    double leaf_nav = leaf->getTM()->getFunds(k.back().datetime, KQuery::DAY).net_assets();
+    double parent_pos = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double leaf_pos = leaf->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the inner layer keeps its 20% reserve: the delegated 100% budget is capped to 80% */
+    CHECK_GT(leaf_pos, 0.0);
+    CHECK_LE(leaf_nav, 86000.0);
+    CHECK_EQ(parent_pos, doctest::Approx(leaf_pos));
+}
+
 /** @} */
