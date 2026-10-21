@@ -183,7 +183,7 @@ public:
         return m_is_python_object;
     }
 
-    /** Whether the model itself, the global normalizer, or any special normalizer is Python-implemented. */
+    /** Whether the model itself, the global or any special normalizer is Python-implemented. */
     bool hasPythonPart() const noexcept {
         if (m_is_python_object) {
             return true;
