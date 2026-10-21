@@ -1356,7 +1356,6 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         }
     }
 
-    // The lot rounding leaves a residual: sell one more lot from the largest remaining holdings //
     // The lot rounding leaves a residual: sell one more lot from the largest remaining holdings
     // until the excess is covered (or there is nothing left to sell)
     double residual = need_back_funds - sold_value;
