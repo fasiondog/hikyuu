@@ -5246,4 +5246,100 @@ TEST_CASE("test_MultiSystem_mode_b_mirror_not_in_turnover") {
     CHECK_EQ(turnover[turnover.size() - 1].first, k2[7].datetime);
 }
 
+/** @par Check point: the trade_on_close=true rebalancing records its turnover at the close stage
+ * (the master path of the turnover attribution) */
+TEST_CASE("test_MultiSystem_mode_b_close_turnover") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000121));
+    KQuery q2(Datetime(20000124), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 8);
+    REQUIRE(k2.size() > 8);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto ms = std::make_shared<MultiSystem>("ms_b_close_turnover");
+    ms->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->add(leaf);
+    ms->run(k1);
+
+    size_t base = ms->getAdjustTurnover().size();
+
+    /** @arg the close-stage reduction of the shrunk budget is recorded on its own close day */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    REQUIRE_GT(ms->getAdjustTurnover().size(), base);
+    CHECK_EQ(ms->getAdjustTurnover()[base].first, k2.front().datetime);
+    CHECK_GT(ms->getAdjustTurnover()[base].second, 0.0);
+}
+
+/** @par Check point: a stale injection of an earlier round does not re-inflate a child whose quota
+ * was lowered while a sell leg was still waiting for a quote */
+TEST_CASE("test_MultiSystem_mode_b_stale_inject_purged") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sz000001");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(20000401), Datetime(20000731));
+    KQuery full2(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000626));
+    KQuery q2(Datetime(20000629), Datetime(20000630));
+    KQuery q3(Datetime(20000630), Datetime(20000720));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    KData k3 = market.getKData(q3);
+    REQUIRE(k1.size() > 5);
+    REQUIRE_GE(k2.size(), 1);
+    REQUIRE(k3.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_stale_inject");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    // The 06-29 close: leaf1 (suspended on 06-30) is over quota -> a stuck sell leg; leaf2 is
+    // under quota -> an injection with the high quota
+    ms->setAF(AF_FixedWeightList({0.1, 0.9}));
+    ms->run(k2, false);
+
+    double leaf2_before = leaf2->getTM()->getPosition(k3[0].datetime, stk2).number;
+    REQUIRE_GT(leaf2_before, 0.0);
+
+    // The 06-30 close lowers leaf2's quota while leaf1's sell leg still waits: the stale high
+    // injection of leaf2 must be purged, otherwise it re-inflates leaf2 after its own sells
+    ms->setAF(AF_FixedWeightList({0.45, 0.05}));
+    ms->run(k3, false);
+
+    // Measured on the day the stuck sell finally fills (07-03): the stale injection would show
+    // up exactly here, re-inflating leaf2 right after its own sells
+    double leaf2_after = leaf2->getTM()->getPosition(k3[1].datetime, stk2).number;
+    double leaf2_nav = leaf2->getTM()->getFunds(k3[1].datetime, KQuery::DAY).net_assets();
+
+    /** @arg leaf2 is near its lowered quota on the retry day, not re-inflated by the stale target
+     */
+    CHECK_LT(leaf2_after, leaf2_before);
+    CHECK_LT(leaf2_nav, 100000.0);
+}
+
 /** @} */

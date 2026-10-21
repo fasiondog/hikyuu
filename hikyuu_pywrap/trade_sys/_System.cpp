@@ -824,8 +824,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the
     gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
     (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
-    autonomy is respected). The unselected sub-systems are force cleared on the rebalancing day. The
-    sub-system shadow accounts start from zero and follow the cost function of the parent account.
+    autonomy is respected). ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``:
+    ``trade_on_close=True`` and ``sell_at_not_selected=True`` are fixed, so the unselected sub-systems
+    are force cleared together with the parent holdings on the rebalancing day; for the "unselected
+    keep running" semantics use ``MultiSystem(mode="B")`` with ``sell_at_not_selected=False`` directly.
+    The sub-system shadow accounts start from zero and follow the cost function of the parent account.
 
     The rebalancing mode adjust_mode description:
     - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval

@@ -816,7 +816,20 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
         }
         price_t price = _getOpenPrice(date, a.stock);
         if (price <= 0.0) {
-            retry.push_back(a);  // No quote: the leg is left to the next session
+            // No quote: the leg is left to the next session -- unless the holding is already gone
+            // (e.g. the instrument was delisted and force-cleared while the leg waited): such a
+            // dead leg would retry forever and block every future injection
+            const bool gone = a.kind == CalibrationKind::SUB_SELL
+                                ? a.sys->getTM()->getPosition(date, a.stock).number <= 0.0
+                              : a.kind == CalibrationKind::SUB_COVER
+                                ? a.sys->getTM()->getShortPosition(a.stock).number <= 0.0
+                              : a.kind == CalibrationKind::PARENT_SELL
+                                ? m_tm->getPosition(date, a.stock).number <= 0.0
+                                : m_tm->getShortPosition(a.stock).number <= 0.0;
+            if (gone) {
+                continue;
+            }
+            retry.push_back(a);
             continue;
         }
         if (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::SUB_COVER) {
@@ -2753,7 +2766,8 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
     }
 
     // The rebalancing turnover rate: the turnover amount / the total assets before rebalancing
-    // (only recorded on the rebalancing days with actual rebalancing trades)
+    // (recorded on the rebalancing days with actual trades; the mode C close-stage force sells
+    // count even with trade_on_close=false)
     if (is_adjust && (m_trade_on_close || getMode() == "C") && !executed.empty()) {
         double turnover_cash = 0.0;
         for (auto& tr : executed) {

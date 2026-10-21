@@ -91,7 +91,6 @@ PF 部件说明:
     ``PF_Simple`` 与旧 ``SimplePortfolio`` 对齐：固定 ``trade_on_close=True``、``sell_at_not_selected=True``，
     调仓日未选中者连同父账户持仓一并清仓；如需“未选中保持运行”，请直接使用 ``MultiSystem(mode="B")``
     并保持 ``sell_at_not_selected=False``。子系统影子账户从 0 起步并跟随父账户成本函数。
-    ``set_sell_at_not_selected(True)`` 时改为将未选中者连同父账户持仓一并清仓。子系统影子账户从 0 起步并跟随父账户成本函数 。
 
     配额账户的现金是**虚拟预算**：``checkin/checkout`` 只记子账户账本，不会从父账户扣减或划回；父账户的真实现金只在镜像成交时变化。
     同一调仓日内的注资按“父剩余现金”累计封顶，因此镜像买入始终有资金支撑、两本账（持仓/成交）保持匹配；
