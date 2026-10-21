@@ -120,6 +120,8 @@ public:
 
     const Block& block() const noexcept;
 
+    void block(const Block& block);
+
     const Datetime& createAt() const noexcept;
 
     void createAt(const Datetime& datetime);
@@ -312,6 +314,10 @@ inline void Factor::startDate(const Datetime& datetime) {
 
 inline const Block& Factor::block() const noexcept {
     return m_data->block;
+}
+
+inline void Factor::block(const Block& block) {
+    m_data->block = block;
 }
 
 inline const Datetime& Factor::createAt() const noexcept {

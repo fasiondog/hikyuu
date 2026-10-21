@@ -5,10 +5,11 @@
 # ===============================================================================
 # Author: fasiondog
 # History: FT01 regression test - Factor's structural fields (name / ktype /
-#          formula / block) must be immutable after construction. Assigning to
-#          these read-only attributes from Python must raise AttributeError, so a
-#          factor held inside a FactorSet can no longer be renamed/reformulated
-#          in place, keeping FactorSet.nameIndexMap in sync with its factors.
+#          formula) must be immutable after construction; block remains settable.
+#          Assigning to these read-only attributes from Python must raise
+#          AttributeError, so a factor held inside a FactorSet can no longer be
+#          renamed/reformulated in place, keeping FactorSet.nameIndexMap in sync
+#          with its factors.
 # ===============================================================================
 
 import pickle
@@ -43,15 +44,16 @@ class FactorImmutableTest(unittest.TestCase):
         with self.assertRaises(AttributeError):
             f.formula = CVAL(2.0)
 
-    def test_block_readonly(self):
+    def test_block_mutable(self):
         f = make_factor()
         self.assertEqual(len(f.block), 0)
-        with self.assertRaises(AttributeError):
-            f.block = Block("test", "test_block_readonly")
+        blk = Block("test", "test_block_mutable")
+        f.block = blk
+        self.assertEqual(f.block.name, "test_block_mutable")
 
     def test_readonly_inside_factor_set(self):
-        # Core FT01 scenario: a factor inside a FactorSet cannot be renamed,
-        # reformulated, or re-blocked in place
+        # Core FT01 scenario: a factor inside a FactorSet cannot be renamed or
+        # reformulated in place (block remains settable)
         fs = FactorSet("test_factor_set")
         fs.add(make_factor())
         self.assertEqual(len(fs), 1)
@@ -63,8 +65,10 @@ class FactorImmutableTest(unittest.TestCase):
             fs[0].ktype = "5MIN"
         with self.assertRaises(AttributeError):
             fs[0].formula = CVAL(2.0)
-        with self.assertRaises(AttributeError):
-            fs[0].block = Block("test", "test_block_readonly")
+
+        # block remains settable even inside a FactorSet
+        fs[0].block = Block("test", "test_block_mutable")
+        self.assertEqual(fs[0].block.name, "test_block_mutable")
 
         # Metadata fields remain writable
         fs[0].brief = "new_brief"

@@ -72,8 +72,9 @@ void export_Factor(py::module& m) {
       .def_property("start_date", py::overload_cast<>(&Factor::startDate, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::startDate),
                     "The start date of the data storage")
-      .def_property_readonly("block", py::overload_cast<>(&Factor::block, py::const_),
-                             py::return_value_policy::copy, "The security set")
+      .def_property("block", py::overload_cast<>(&Factor::block, py::const_),
+                    py::overload_cast<const Block&>(&Factor::block), py::return_value_policy::copy,
+                    "The security set")
       .def_property("brief", py::overload_cast<>(&Factor::brief, py::const_),
                     py::overload_cast<const string&>(&Factor::brief), py::return_value_policy::copy,
                     "The basic description")
