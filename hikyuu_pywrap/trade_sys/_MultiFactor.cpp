@@ -55,8 +55,11 @@ public:
     void add_special_norm(const string& name, py::object norm, const string& category,
                           const IndicatorList& style_inds) {
         py::gil_scoped_acquire gil;
-        HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
-        addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
+        NormPtr norm_ptr;
+        if (norm && !norm.is_none()) {
+            norm_ptr = norm.cast<NormPtr>();
+        }
+        addSpecialNormalize(name, norm_ptr, category, style_inds);
     }
 };
 
