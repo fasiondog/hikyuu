@@ -11,6 +11,7 @@
 #          in place, keeping FactorSet.nameIndexMap in sync with its factors.
 # ===============================================================================
 
+import pickle
 import unittest
 
 from test_init import *
@@ -143,12 +144,65 @@ class FactorNameGuardTest(unittest.TestCase):
             self.assertFalse(bad.is_null())
 
 
+class FactorConstructionTest(unittest.TestCase):
+    def test_default_ctor_is_null(self):
+        f = Factor()
+        self.assertTrue(f.is_null())
+
+    def test_ctor_with_formula(self):
+        f = Factor("ft09_factor", CVAL(1.0), "DAY")
+        self.assertFalse(f.is_null())
+        self.assertEqual(f.name, "FT09_FACTOR")
+        self.assertEqual(f.ktype, "DAY")
+
+    def test_load_by_name_graceful(self):
+        # 缺失因子 / 无因子库时按名加载不抛异常（优雅降级契约）
+        Factor("NO_SUCH_FACTOR_FT09", "DAY")
+
+    def test_get_value_with_stock(self):
+        sm = StockManager.instance()
+        s = sm["sh000001"]
+        q = Query(-10)
+        f = Factor("FT09_MA", MA(CLOSE(), 3), "DAY")
+        ind = f.get_value(s, q)
+        self.assertEqual(len(ind), len(s.get_kdata(q)))
+
+    def test_get_values_follow_stock_order(self):
+        sm = StockManager.instance()
+        stocks = [sm["sh000001"], sm["sz000001"]]
+        q = Query(-10)
+        f = Factor("FT09_ORDER", MA(CLOSE(), 3), "DAY")
+        results = f.get_values(stocks, q)
+        self.assertEqual(len(results), 2)
+        for i, s in enumerate(stocks):
+            k = s.get_kdata(q)
+            single = f.get_value(s, q)
+            self.assertEqual(len(results[i]), len(k))
+            self.assertAlmostEqual(results[i][len(k) - 1], single[len(k) - 1], places=10)
+
+    def test_pickle_factor(self):
+        f = Factor("ft09_pickle", CVAL(1.0), "DAY")
+        f2 = pickle.loads(pickle.dumps(f))
+        self.assertFalse(f2.is_null())
+        self.assertEqual(f2.name, "FT09_PICKLE")
+        self.assertEqual(f2.ktype, "DAY")
+
+    def test_pickle_factor_set(self):
+        fs = FactorSet("ft09_pickle_set")
+        fs.add("F1", CVAL(1.0))
+        fs.add("F2", CVAL(2.0))
+        fs2 = pickle.loads(pickle.dumps(fs))
+        self.assertEqual(len(fs2), 2)
+        self.assertEqual([fs2[i].name for i in range(len(fs2))], ["F1", "F2"])
+
+
 def suite():
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     suite.addTests(loader.loadTestsFromTestCase(FactorImmutableTest))
     suite.addTests(loader.loadTestsFromTestCase(FactorSetIndexTest))
     suite.addTests(loader.loadTestsFromTestCase(FactorNameGuardTest))
+    suite.addTests(loader.loadTestsFromTestCase(FactorConstructionTest))
     return suite
 
 
