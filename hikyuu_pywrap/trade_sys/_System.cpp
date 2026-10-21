@@ -710,7 +710,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
     Set the rebalancing mode (taking over the master PF adjust_mode):
       - "query" / "day" (the default): continue the "every N close days" counting judgment of set_adjust_cycle;
-      - "week" / "month" / "quarter" / "year": expand the rebalancing day table by "the adjust_cycle-th day within the cycle" on the driving axis.
+      - "week" / "month" / "quarter" / "year": judge the rebalancing days by the runtime period rule ("the adjust_cycle-th day within the cycle" on the driving axis).
     An invalid value is warned and it falls back to "query".
 
     :param str mode: "query" / "day" / "week" / "month" / "quarter" / "year")")
@@ -718,7 +718,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("set_delay_to_trading_day", &MultiSystem::setDelayToTradingDay, py::arg("delay"),
            "Set whether to postpone to the first trading day within the current cycle when the "
            "rebalancing day is not a trading day (it takes effect only when "
-           "week/month/quarter/year are expanded)")
+           "week/month/quarter/year use the runtime period rule)")
       .def("get_delay_to_trading_day", &MultiSystem::getDelayToTradingDay,
            "Get whether the rebalancing day is postponed to the trading day")
       .def("set_se", &MultiSystem::setSE, py::arg("se"),
@@ -728,7 +728,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("set_sell_at_not_selected", &MultiSystem::setSellAtNotSelected, py::arg("on"),
            "Set whether to force liquidating the unselected sub-systems, and the selected ones "
            "with a zero "
-           "quota, together with their "
+           "quota (a running sub is exempt when adjust_running_sys is off), together with their "
            "shadow/quota accounts (mode B/C; SE is required). In mode B the two books must stay "
            "matched, so with the default off the unselected sub-systems keep running and only skip "
            "the quota calibration")

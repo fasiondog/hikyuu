@@ -259,9 +259,9 @@ public:
     /** Set the rebalancing mode (aligned with the master PF adjust_mode):
      *  - "query" / "day" (the default): continue the "every N close days" counting judgment of
      * m_adjust_cycle;
-     *  - "week" / "month" / "quarter" / "year": expand the rebalancing day table by "the
-     * adjust_cycle-th day within the cycle" on the driving axis; An invalid value is warned and it
-     * falls back to "query". */
+     *  - "week" / "month" / "quarter" / "year": judge the rebalancing days by the runtime period
+     * rule ("the adjust_cycle-th day within the cycle" on the driving axis); an invalid value is
+     * warned and it falls back to "query". */
     void setAdjustMode(const string& mode);
 
     /** Get the rebalancing mode */
@@ -270,8 +270,8 @@ public:
     }
 
     /** Set whether to postpone to the first trading day within the current cycle when the
-     *  rebalancing day is not a trading day (it takes effect only when week/month/quarter/year are
-     *  expanded) */
+     *  rebalancing day is not a trading day (it takes effect only in the calendar period modes
+     *  week/month/quarter/year) */
     void setDelayToTradingDay(bool v);
 
     /** Get whether to postpone to the trading day */

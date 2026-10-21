@@ -656,11 +656,6 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
         return;
     }
 
-    price_t close_price = _getClosePrice(date, stock);
-    if (close_price <= 0.0) {
-        return;
-    }
-
     if (!m_trade_on_close) {
         // Defer the whole reduction (sub and parent side) to the next open, capping the parent
         // leg by the parent holding (a parent side without shares can never fill)
@@ -670,6 +665,11 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
             m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stock, parent_num});
         }
         m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+        return;
+    }
+
+    price_t close_price = _getClosePrice(date, stock);
+    if (close_price <= 0.0) {
         return;
     }
 
@@ -837,6 +837,16 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             if (!a.sys || !a.sys->getTM()) {
                 continue;
             }
+            // The checkout waits while a sell leg of the same sub-system is still retried: the
+            // sell proceeds are not in the sub ledger yet
+            bool waiting = std::any_of(retry.begin(), retry.end(), [&](const CalibrationAction& r) {
+                return r.sys == a.sys && (r.kind == CalibrationKind::SUB_SELL ||
+                                          r.kind == CalibrationKind::SUB_COVER);
+            });
+            if (waiting) {
+                retry.push_back(a);
+                continue;
+            }
             FundsRecord f = a.sys->getTM()->getFunds(date, ktype);
             if (f.cash > 0.0) {
                 a.sys->getTM()->checkout(date, f.cash);
@@ -989,6 +999,7 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
         return;
     }
 
+    bool deferred = false;
     if (stock.isNull()) {
         // A composite has no single instrument: sell its leaf holdings directly on the sub ledger
         std::set<Stock> stocks;
@@ -996,6 +1007,18 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
         for (const auto& stk : stocks) {
             price_t p = _getClosePrice(date, stk);
             if (p <= 0.0) {
+                // Suspended: queue the legs so the checkout waits for the sell proceeds
+                double num = sub_tm->getPosition(date, stk).number;
+                if (num > 0.0) {
+                    m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
+                    deferred = true;
+                }
+                double short_num = sub_tm->getShortPosition(stk).number;
+                if (short_num > 0.0) {
+                    m_pending_calibration.push_back(
+                      {CalibrationKind::SUB_COVER, sys, stk, short_num});
+                    deferred = true;
+                }
                 continue;
             }
             double num = sub_tm->getPosition(date, stk).number;
@@ -1007,12 +1030,31 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
                                  "MultiSystem");
             }
         }
-    } else if (_getClosePrice(date, stock) > 0.0) {
-        PositionRecord position = sub_tm->getPosition(date, stock);
-        // A long is sold and a short is covered (System::_sellForce flattens whichever side holds)
-        if (position.number > 0.0 || sub_tm->getShortPosition(stock).number > 0.0) {
-            sys->sellForceOnClose(date, MAX_DOUBLE, PART_PORTFOLIO);
+    } else {
+        price_t p = _getClosePrice(date, stock);
+        if (p <= 0.0) {
+            double num = sub_tm->getPosition(date, stock).number;
+            if (num > 0.0) {
+                m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stock, num});
+                deferred = true;
+            }
+            double short_num = sub_tm->getShortPosition(stock).number;
+            if (short_num > 0.0) {
+                m_pending_calibration.push_back(
+                  {CalibrationKind::SUB_COVER, sys, stock, short_num});
+                deferred = true;
+            }
+        } else {
+            PositionRecord position = sub_tm->getPosition(date, stock);
+            // A long is sold and a short is covered (System::_sellForce flattens whichever side)
+            if (position.number > 0.0 || sub_tm->getShortPosition(stock).number > 0.0) {
+                sys->sellForceOnClose(date, MAX_DOUBLE, PART_PORTFOLIO);
+            }
         }
+    }
+    if (deferred) {
+        m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+        return;
     }
     FundsRecord funds = sub_tm->getFunds(date, ktype);
     if (funds.cash > 0.0) {
@@ -1054,6 +1096,15 @@ void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
             continue;
         }
         if (price <= 0.0) {
+            // Suspended at the close even with trade_on_close=true: defer the parent legs, the
+            // executor retries them at the next open
+            if (long_num > 0.0) {
+                m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, long_num});
+            }
+            if (short_num > 0.0) {
+                m_pending_calibration.push_back(
+                  {CalibrationKind::PARENT_COVER, sys, stk, short_num});
+            }
             continue;
         }
         if (long_num > 0.0) {
@@ -2221,8 +2272,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     std::set<const void*> liquidated;
 
     // Mode B (master SimplePortfolio compatibility): the calibration runs in the master order --
-    // recycle the cash -> liquidate the unselected -> reduce the over quota -> inject the gap, so
-    // the freed cash is already in the parent pool when the following injection runs
+    // zero-quota liquidation -> per sub the unselected liquidation or the selected cash recycle ->
+    // reduce the over quota -> inject the gap, so the freed cash is already in the parent pool
+    // when the following injection runs
     if (quota_calibrated) {
         // A same-day re-drive rebuilds the round: the legs pushed by the previous drive of the same
         // close are replaced instead of duplicated (the retry legs of earlier days are kept)
