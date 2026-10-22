@@ -411,7 +411,13 @@ The custom multi-factor model override hooks:
                 hku::ScopeGilRelease rel(!self.hasPythonPart());
                 return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
             }
-            HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+            if (py::isinstance<ScoresFilterBase>(filter)) {
+                ScoresFilterPtr sc_filter = filter.cast<ScoresFilterPtr>();
+                hku::ScopeGilRelease rel(!self.hasPythonPart());
+                return self.getScores(date, start, cend, sc_filter);
+            }
+            HKU_CHECK(py::hasattr(filter, "__call__"),
+                      "filter must be None, a callable or a ScoresFilterBase instance!");
             if (check_pyfunction_arg_num(filter, 1)) {
                 return self.getScores(date, start, cend, [filter](const ScoreRecord& score_) {
                     return filter(score_).cast<bool>();
@@ -431,7 +437,7 @@ The custom multi-factor model override hooks:
     :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty list is returned and a warning is logged
     :param int start: the start of the daily ranking to take
     :param int end: the end of the daily ranking to take (exclusive)
-    :param function filter: a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
+    :param filter: a ScoresFilterBase instance, or a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
     :rtype: ScoreRecordList)")
 
       .def(

@@ -328,6 +328,37 @@ class MultiFactorTest(unittest.TestCase):
         self.assertEqual(len(mf.get_scores(weekend)), 0)
         self.assertEqual(len(mf.get_scores_np(weekend)), 0)
 
+    def test_scores_filter_in_get_scores(self):
+        # C23: get_scores accepts a ScoresFilterBase instance (a builtin one or a Python subclass)
+        # as the filter, in addition to None and callables
+        mf, ref_stk, query = self._build_mf()
+        date = Datetime(201106010000)
+        all_scores = mf.get_scores(date)
+        self.assertGreater(len(all_scores), 0)
+
+        top1 = mf.get_scores(date, filter=SCFilter_TopN(1))
+        self.assertEqual(len(top1), 1)
+        self.assertEqual(top1[0].stock.market_code, all_scores[0].stock.market_code)
+        self.assertEqual(top1[0].value, all_scores[0].value)
+
+        class KeepFirstN(ScoresFilterBase):
+            def __init__(self, n):
+                super(KeepFirstN, self).__init__("KeepFirstN")
+                self.n = n
+
+            def _filter(self, scores, date, query):
+                return scores[: self.n]
+
+        kept1 = mf.get_scores(date, filter=KeepFirstN(1))
+        self.assertEqual(len(kept1), 1)
+        self.assertEqual(kept1[0].stock.market_code, all_scores[0].stock.market_code)
+        self.assertEqual(kept1[0].value, all_scores[0].value)
+
+        kept_all = mf.get_scores(date, filter=KeepFirstN(len(all_scores)))
+        self.assertEqual([sc.stock.market_code for sc in kept_all],
+                         [sc.stock.market_code for sc in all_scores])
+        self.assertEqual([sc.value for sc in kept_all], [sc.value for sc in all_scores])
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MultiFactorTest)
