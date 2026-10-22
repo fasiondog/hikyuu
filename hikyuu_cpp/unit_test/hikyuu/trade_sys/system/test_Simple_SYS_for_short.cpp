@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <map>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include <hikyuu/StockManager.h>
@@ -135,6 +136,27 @@ public:
         if (kdata.getPos(OPEN_DATE) != Null<size_t>()) {
             _addSellSignal(OPEN_DATE);
         }
+    }
+};
+
+// A short-side goal returning the documented sentinels: 0 (no effect on a short) or the current
+// price (cover at once)
+class Iss029ShortSentinelPG : public ProfitGoalBase {
+public:
+    explicit Iss029ShortSentinelPG(bool force_close) : ProfitGoalBase("ISS029_ShortSentinelPG") {
+        setParam<bool>("force_close", force_close);
+    }
+
+    virtual ProfitGoalPtr _clone() override {
+        return make_shared<Iss029ShortSentinelPG>(getParam<bool>("force_close"));
+    }
+
+    virtual price_t _getGoal(const Datetime&, price_t) override {
+        return Null<price_t>();
+    }
+
+    virtual price_t _getShortGoal(const Datetime&, price_t price) override {
+        return getParam<bool>("force_close") ? price : 0.0;
     }
 };
 
@@ -369,6 +391,42 @@ TEST_CASE("test_SYS_Simple_short_for_profitgoal") {
     CHECK_EQ(cover_tr->datetime, src[expect_pos].datetime);
     CHECK_LE(src[expect_pos].closePrice, open_tr->goalPrice);
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+}
+
+/** @par Test points (the short-side goal sentinels: 0 never covers, the current price covers at
+ * once) */
+TEST_CASE("test_SYS_Simple_short_profitgoal_sentinels") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    // Returns: whether a PART_PROFITGOAL cover happened, its date, and whether the short is open
+    auto run_with = [&](bool force_close) {
+        SYSPtr sys = makeShortSys(makeShortSG(), StoplossPtr(),
+                                  make_shared<Iss029ShortSentinelPG>(force_close));
+        sys->run(stk, src.getQuery());
+        Datetime cover_date;
+        for (const auto& tr : sys->getTM()->getTradeList()) {
+            if (tr.business == BUSINESS_BUY_SHORT && tr.from == PART_PROFITGOAL) {
+                cover_date = tr.datetime;
+                break;
+            }
+        }
+        return std::make_tuple(!cover_date.isNull(), cover_date, sys->getTM()->haveShort(stk));
+    };
+
+    /** @arg returning 0 has no effect on the short side, so the position is never covered */
+    auto zero = run_with(false);
+    CHECK_UNARY_FALSE(std::get<0>(zero));
+    CHECK_UNARY(std::get<2>(zero));
+
+    /** @arg returning the current price covers the short on the bar after the open */
+    auto forced = run_with(true);
+    CHECK_UNARY(std::get<0>(forced));
+    CHECK_EQ(std::get<1>(forced), src[open_pos + 1].datetime);
+    CHECK_UNARY_FALSE(std::get<2>(forced));
 }
 
 /** @par Test points (the short position is covered by the downward take-profit ratchet, ISS-029) */
