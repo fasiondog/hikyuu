@@ -4900,7 +4900,6 @@ TEST_CASE("test_MultiSystem_mode_b_nested_b_trade_on_close_false") {
 
     double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
     double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
-    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
     REQUIRE_GT(leaf1, 0.0);
 
     /** @arg the delegated budget reaches the leaf through the inner deferred calibration */
@@ -4944,7 +4943,6 @@ TEST_CASE("test_MultiSystem_mode_b_nested_c_pro_rata_reduction") {
     ms->run(k1);
 
     double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
-    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
     REQUIRE_GT(inner1, 0.0);
 
     /** @arg the shrunk budget reduces the shared ledger pro rata and mirrors to the parent */

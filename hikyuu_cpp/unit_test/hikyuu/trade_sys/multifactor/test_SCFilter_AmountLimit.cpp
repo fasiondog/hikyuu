@@ -61,7 +61,6 @@ CrossSection buildReversedCrossSection(const KQuery& query, const Datetime& date
 
 /** @par Test points */
 TEST_CASE("test_SCFilter_AmountLimit_keeps_score_order") {
-    StockManager& sm = StockManager::instance();
     KQuery query = KQueryByDate(Datetime(20110104), Datetime(20111206), KQuery::DAY);
     Datetime date(201106010000);
 
@@ -99,7 +98,6 @@ TEST_CASE("test_SCFilter_AmountLimit_keeps_score_order") {
 
 /** @par Test points */
 TEST_CASE("test_SCFilter_AmountLimit_ignores_input_order") {
-    StockManager& sm = StockManager::instance();
     KQuery query = KQueryByDate(Datetime(20110104), Datetime(20111206), KQuery::DAY);
     Datetime date(201106010000);
 
@@ -129,7 +127,6 @@ TEST_CASE("test_SCFilter_AmountLimit_ignores_input_order") {
 
 /** @par Test points */
 TEST_CASE("test_SCFilter_AmountLimit_boundaries_and_determinism") {
-    StockManager& sm = StockManager::instance();
     KQuery query = KQueryByDate(Datetime(20110104), Datetime(20111206), KQuery::DAY);
     Datetime date(201106010000);
 
