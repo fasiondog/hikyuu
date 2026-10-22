@@ -202,8 +202,7 @@ protected:
 
     Datetime m_cycle_start;
     Datetime m_cycle_end;
-    // The declared rebalancing days, a run-level input of the cycle signals (runtime state, not
-    // serialized)
+    // The declared rebalancing days, a run-level input of the cycle signals
     DatetimeList m_cycle_dates;
 
 //============================================
@@ -221,6 +220,11 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        // The declared cycle dates are a run-level input consumed by cycle signals; without them a
+        // reloaded SG_Cycle would silently produce no signals on the next setTO
+        ar& BOOST_SERIALIZATION_NVP(m_cycle_start);
+        ar& BOOST_SERIALIZATION_NVP(m_cycle_end);
+        ar& BOOST_SERIALIZATION_NVP(m_cycle_dates);
         // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
@@ -235,6 +239,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& BOOST_SERIALIZATION_NVP(m_cycle_start);
+        ar& BOOST_SERIALIZATION_NVP(m_cycle_end);
+        ar& BOOST_SERIALIZATION_NVP(m_cycle_dates);
         // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
