@@ -1845,7 +1845,7 @@ static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
                                   const KRecord& src_today, price_t planPrice, price_t price,
                                   const char* side) {
     if (!std::isfinite(price) || price <= 0.0) {
-        HKU_WARN("[{}] invalid slippage {} price({}), fallback to the plan price({})", sys_name,
+        HKU_DEBUG("[{}] invalid slippage {} price({}), fallback to the plan price({})", sys_name,
                  side, price, planPrice);
         price = planPrice;
     } else {
@@ -1854,7 +1854,7 @@ static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
         price = roundEx(price, stock.isNull() ? 2 : stock.precision());
     }
     if (src_today.isValid() && (price < src_today.lowPrice || price > src_today.highPrice)) {
-        HKU_WARN("[{}] slippage {} price({}) is out of the bar range [{}, {}], clamp it", sys_name,
+        HKU_DEBUG("[{}] slippage {} price({}) is out of the bar range [{}, {}], clamp it", sys_name,
                  side, price, src_today.lowPrice, src_today.highPrice);
         price = std::min(std::max(price, src_today.lowPrice), src_today.highPrice);
     }
