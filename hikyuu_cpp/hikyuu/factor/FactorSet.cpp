@@ -67,6 +67,17 @@ FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
 
 FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {}
 
+bool FactorSet::hasPythonPart() const {
+    if (m_data) {
+        for (const auto& factor : m_data->factors) {
+            if (factor.formula().hasPythonPart()) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 FactorSet& FactorSet::operator=(const FactorSet& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_data = other.m_data;

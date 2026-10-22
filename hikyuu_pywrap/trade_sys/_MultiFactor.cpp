@@ -6,6 +6,9 @@
  */
 
 #include <hikyuu/trade_sys/multifactor/build_in.h>
+#include <limits>
+#include <memory>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -53,7 +56,11 @@ public:
 public:
     void set_norm(py::object norm) {
         py::gil_scoped_acquire gil;
-        setNormalize(norm.cast<NormPtr>());
+        if (norm.is_none()) {
+            setNormalize(NormPtr());
+        } else {
+            setNormalize(norm.cast<NormPtr>());
+        }
     }
 
     void add_special_norm(const string& name, py::object norm, const string& category,
@@ -116,18 +123,24 @@ py::array score_records_to_np(
   const std::vector<string>& fields = {htr("market_code"), htr("name"), htr("score")}) {
     size_t total = scs.size();
     HKU_IF_RETURN(total == 0, py::array());
+    HKU_CHECK(total <= static_cast<size_t>(std::numeric_limits<Py_ssize_t>::max()) /
+                         sizeof(ScoreRawData),
+              "scorerecords_to_np: the result is too large!");
 
-    auto* data = static_cast<ScoreRawData*>(std::malloc(total * sizeof(ScoreRawData)));
+    auto deleter = [](void* p) { std::free(p); };
+    std::unique_ptr<ScoreRawData[], void (*)(void*)> data(
+      static_cast<ScoreRawData*>(std::malloc(total * sizeof(ScoreRawData))), deleter);
     HKU_CHECK(data != nullptr, "scorerecords_to_np: malloc failed!");
     for (size_t i = 0; i < total; i++) {
         const ScoreRecord& sc = scs[i];
-        utf8_to_utf32(sc.stock.market_code(), data[i].code, 10);
-        utf8_to_utf32(sc.stock.name(), data[i].name, 20);
-        data[i].value = sc.value;
+        utf8_to_utf32(sc.stock.market_code(), data.get()[i].code, 10);
+        utf8_to_utf32(sc.stock.name(), data.get()[i].name, 20);
+        data.get()[i].value = sc.value;
     }
 
-    return py::array(score_np_dtype(fields), total, data,
-                     py::capsule(data, [](void* p) { std::free(p); }));
+    py::capsule owner(data.get(), deleter);
+    ScoreRawData* raw = data.release();
+    return py::array(score_np_dtype(fields), total, raw, owner);
 }
 
 // A lazy per-date iterable: a plain python type, because pybind's make_iterator applies its
@@ -254,9 +267,15 @@ The custom multi-factor model override hooks:
     
     :param Stock stk: the reference security)")
 
-      .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy,
-           "Get the reference date list (obtained from the reference security through the query "
-           "condition)")
+      .def(
+        "get_datetime_list",
+        [](MultiFactorBase& self) -> const DatetimeList& {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getDatetimeList();
+        },
+        py::return_value_policy::copy,
+        "Get the reference date list (obtained from the reference security through the query "
+        "condition)")
 
       .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy,
            "Get the security list specified at the creation")
@@ -300,15 +319,25 @@ The custom multi-factor model override hooks:
     
     :param FactorSet factorset: the new original factor set)")
 
-      .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy,
-           py::arg("stock"), R"(get_factor(self, stock)
+      .def(
+        "get_factor",
+        [](MultiFactorBase& self, const Stock& stock) -> const Indicator& {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getFactor(stock);
+        },
+        py::return_value_policy::copy, py::arg("stock"), R"(get_factor(self, stock)
 
     Get the new composed factor of the specified security
 
     :param Stock stock: the specified security)")
 
-      .def("get_all_factors", &MultiFactorBase::getAllFactors, py::return_value_policy::copy,
-           R"(get_all_factors(self)
+      .def(
+        "get_all_factors",
+        [](MultiFactorBase& self) -> const IndicatorList& {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getAllFactors();
+        },
+        py::return_value_policy::copy, R"(get_all_factors(self)
 
     Get the list of the composed factors of all the securities
 
@@ -345,7 +374,13 @@ The custom multi-factor model override hooks:
     :param str category: for the industry neutralization, specify the block category
     :param list[Indicator] style_inds: the list of the style indicators used for the neutralization)")
 
-      .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
+      .def(
+        "get_ic",
+        [](MultiFactorBase& self, int ndays) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getIC(ndays);
+        },
+        py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
 
     Get the IC of the composed factor, with the same length as the reference dates
 
@@ -355,17 +390,30 @@ The custom multi-factor model override hooks:
      
     :rtype: Indicator)")
 
-      .def("get_icir", &MultiFactorBase::getICIR, py::arg("ir_n"), py::arg("ic_n") = 0,
-           R"(get_icir(self, ir_n[, ic_n=0])
+      .def(
+        "get_icir",
+        [](MultiFactorBase& self, int ir_n, int ic_n) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getICIR(ir_n, ic_n);
+        },
+        py::arg("ir_n"), py::arg("ic_n") = 0, R"(get_icir(self, ir_n[, ic_n=0])
 
     Get the ICIR of the composed factor
 
+    An ir_n < 1, or an ic_n that resolves to < 1, returns an empty indicator with a warning.
+
     :param int ir_n: the n window for calculating the IR
-    :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic))")
+    :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic); a
+           non-positive value means using the ic_n parameter of the factor
+    :rtype: Indicator)")
 
       .def("clone", &MultiFactorBase::clone, "The clone operation")
 
       .def("reset", &MultiFactorBase::reset, "The reset operation")
+
+      .def("_reset", &MultiFactorBase::_reset,
+           "[Overload interface] The subclass reset interface, resetting the internal private "
+           "variables")
 
       .def(
         "get_scores",
@@ -373,9 +421,17 @@ The custom multi-factor model override hooks:
            py::object filter) {
             size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
             if (filter.is_none()) {
+                ScopeGilRelease gil(!self.hasPythonPart());
                 return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
             }
-            HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
+            if (py::isinstance<ScoresFilterBase>(filter)) {
+                ScoresFilterPtr sc_filter = filter.cast<ScoresFilterPtr>();
+                ScopeGilRelease gil(!self.hasPythonPart());
+                return self.getScores(date, start, cend, sc_filter);
+            }
+            // Keep the GIL: the filter is a raw py::object called per record
+            HKU_CHECK(py::hasattr(filter, "__call__"),
+                      "filter must be None, a callable or a ScoresFilterBase instance!");
             if (check_pyfunction_arg_num(filter, 1)) {
                 return self.getScores(date, start, cend, [filter](const ScoreRecord& score_) {
                     return filter(score_).cast<bool>();
@@ -390,16 +446,21 @@ The custom multi-factor model override hooks:
         py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 
-    Get all the factor values of the cross-section on the specified date, already sorted descending, equivalent to the cross-section scores of the securities on that date.
+    Get all the factor values of the cross-section on the specified date; the order follows the mode parameter: 0-descending, 1-ascending, 2-no sorting. Equivalent to the cross-section scores of the securities on that date.
 
-    :param Datetime date: the specified date
+    :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty list is returned and a warning is logged
     :param int start: the start of the daily ranking to take
     :param int end: the end of the daily ranking to take (exclusive)
-    :param function filter: a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
+    :param filter: a ScoresFilterBase instance, or a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
     :rtype: ScoreRecordList)")
 
-      .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,
-           R"(get_all_scores(self)
+      .def(
+        "get_all_scores",
+        [](MultiFactorBase& self) -> const vector<ScoreRecordList>& {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getAllScores();
+        },
+        py::return_value_policy::copy, R"(get_all_scores(self)
 
     Get all the scores of all the dates, with the same length as the reference dates
 
@@ -411,16 +472,22 @@ The custom multi-factor model override hooks:
         "get_scores_np",
         [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end) {
             size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
-            return score_records_to_np(self.getScores(date, start, cend), kScoreNpFields());
+            ScoreRecordList records;
+            {
+                // The numpy conversion needs the GIL, hence the narrowed scope
+                ScopeGilRelease gil(!self.hasPythonPart());
+                records = self.getScores(date, start, cend);
+            }
+            return score_records_to_np(records, kScoreNpFields());
         },
         py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
         R"(get_scores_np(self, date[, start=0, end=Null])
 
-    Get the cross-section of the specified date as a numpy structured array, already sorted
-    descending. Prefer it over get_scores for the large results: one array is built for the whole
+    Get the cross-section of the specified date as a numpy structured array, sorted according to
+    mode (0-descending, 1-ascending, 2-no sorting). Prefer it over get_scores for the large results: one array is built for the whole
     cross-section instead of one Python object per record.
 
-    :param Datetime date: the specified date
+    :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty array is returned and a warning is logged
     :param int start: the start of the daily ranking to take
     :param int end: the end of the daily ranking to take (excluded)
     :rtype: numpy.ndarray)")
@@ -428,8 +495,12 @@ The custom multi-factor model override hooks:
       .def(
         "iter_scores",
         [](const MultiFactorPtr& self, size_t start, py::object end) {
-            const auto& all = self->getAllScores();
-            size_t total = all.size();
+            const vector<ScoreRecordList>* p = nullptr;
+            {
+                hku::ScopeGilRelease rel(!self->hasPythonPart());
+                p = &self->getAllScores();
+            }
+            size_t total = p->size();
             size_t cend = end.is_none() ? total : end.cast<size_t>();
             if (cend > total) {
                 cend = total;
@@ -450,7 +521,13 @@ The custom multi-factor model override hooks:
     :param int end: the end of the date range to iterate (excluded)
     :rtype: iterator)")
 
-      .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors, R"(get_all_src_factors(self)
+      .def(
+        "get_all_src_factors",
+        [](MultiFactorBase& self) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getAllSrcFactors();
+        },
+        R"(get_all_src_factors(self)
 
     Get the list of all the original factors (if the standardization or the industry neutralization is specified, the returned list is the processed factor list)
 

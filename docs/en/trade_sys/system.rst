@@ -80,8 +80,8 @@ Aggregated backtesting also supports:
 
 Common parameters:
 
-    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar
-    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar
+    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar; the forced short cover triggered by an invalid environment (ev) or condition (cn) follows the same setting
+    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar; the forced long liquidation triggered by an invalid environment (ev) or condition (cn) follows the same setting (liquidated at the next open instead of at the invalidating close)
     * **delay_use_current_price=True** *(bool)* : For a delayed operation, whether to use the price of the bar at the current trading time to calculate the new stop-loss/take-profit/goal price, or to reuse the result calculated previously
     * **max_delay_count=3** *(int)* : The maximum number of consecutive delayed trade requests; must be greater than or equal to 0, and 0 means only one delay is allowed
     * **tp_monotonic=True** *(bool)* : Whether the take-profit level increases monotonically
@@ -253,6 +253,33 @@ System Part Enum Definitions
 
     :param str part_name: the string name of the system part; see: :py:func:`getSystemPartName`
     :rtype: System.Part
+
+
+
+Semantics of Stoploss, Take-profit and Profit Goal
+--------------------------------------------------
+
+All three take part in the "close or not" decision while a position is held, but they differ in state ownership and trigger criteria:
+
+* **Stoploss ST** (``setST``) — a **static** stop price. It is calculated once at entry (including an add-on) and stored in the position record; the per-bar checks during the holding period reuse that value and do not follow the market. A sell recalculates it and writes it back, so the remaining position keeps the stop price taken at the sell. Criteria: a long closes when ``current price <= stoploss``, a short when ``current price >= stoploss``.
+* **Take-profit TP** (``setTP``) — a **moving** exit level. It shares the base class with ST (both are ``StoplossBase``), but System owns the ratchet: a long only rises and a short only falls (``tp_monotonic``), and an add-on never moves it backwards; the exit also requires the position to be in profit (net of the fees). ``tp_delay_n`` sets how many bars must pass after the entry before the level may trigger; after a partial exit the ratchet resets to the current price. Criteria: a long closes when ``current price <= take-profit level``, a short when ``current price >= take-profit level``.
+* **Profit goal PG** (``setPG``) — a pure target price anchored to the **position cost**, recalculated every bar and holding no state across bars. The cost basis is ``buyMoney / totalNumber`` for a long and ``sellMoney / totalNumber`` for a short, not a snapshot of the entry price. Criteria: a long closes when ``current price >= goal``, a short when ``current price <= goal``.
+
+Within one bar the checks run in a fixed order and **only the first matched action is executed** (it returns at once, the remaining checks are not evaluated, and the next bar starts over):
+
+.. code-block:: text
+
+    environment / condition invalidation -> buy signal -> sell signal -> ST -> PG -> TP
+
+Invalid return values are handled differently:
+
+* ST unset or returning an invalid value: the entry still happens, but the position stop price is 0, i.e. no stop-loss; the risk budget then uses the full planned price (the worst case counts as a total loss).
+* PG unset: the goal is ``constant.null_price``, the comparison never holds, and that bar has no PG action.
+* PG returning ``0``: for a long it means sell at once (the forced-exit sentinel); it has no effect on a short (``current price <= 0`` never holds) — to close a short regardless of price, return the current price instead.
+* PG returning a negative or non-finite value: clamped by the base class to ``constant.null_price``, i.e. treated as unset.
+* TP returning ``0``: the bar has no take-profit level, so nothing is closed and the ratchet is not updated.
+
+The return-value contract of the stop price is detailed in the "Return Value Contract and System Behaviour" section of :doc:`stoploss`, and the long/short basis of the profit goal in :doc:`profitgoal`.
 
 
 

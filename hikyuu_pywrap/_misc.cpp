@@ -16,13 +16,7 @@ void export_misc(py::module& m) {
     m.def(
       "parallel_run_sys",
       [](const SystemList& sys_list, const KQuery& query, bool reset, bool reset_all) {
-          bool pure_cpp = true;
-          for (const auto& sys : sys_list) {
-              if (system_has_python_part(sys)) {
-                  pure_cpp = false;
-                  break;
-              }
-          }
+          bool pure_cpp = !sys_list_has_python_part(sys_list);
           vector<FundsList> result;
           {
               ScopeGilRelease gil(pure_cpp);

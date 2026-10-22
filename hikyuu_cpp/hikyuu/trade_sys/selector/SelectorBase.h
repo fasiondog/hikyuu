@@ -190,6 +190,9 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this selector, its filter, a held system, or its multi-factor is Python-defined */
+    virtual bool hasPythonPart() const noexcept;
+
 private:
     void initParam();
 

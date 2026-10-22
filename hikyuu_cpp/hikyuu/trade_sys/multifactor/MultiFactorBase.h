@@ -93,8 +93,8 @@ public:
      */
     const IndicatorList& getAllFactors();
 
-    /** Get all the factor values of the given date cross-section, they are already in the
-     * descending order */
+    /** Get all the factor values of the given date cross-section; the order follows the `mode`
+     * parameter: 0-descending, 1-ascending, 2-no sorting */
     ScoreRecordList getScores(const Datetime&);
 
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end = Null<size_t>());
@@ -102,7 +102,8 @@ public:
     /**
      * Get the factor values (scores) within the given date cross-section range [start, end], and
      * filter them through filter
-     * @param date the given date
+     * @param date the given date; if the date is not in the reference dates (e.g. a non-trading
+     *        day), an empty list is returned and a warning is logged
      * @param start the sorting start point
      * @param end the sorting end point (excluded)
      * @param filter the filter function
@@ -116,7 +117,8 @@ public:
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               const ScoresFilterPtr& filter);
 
-    /** Get all the cross-section data, they are already in the descending order */
+    /** Get all the cross-section data; the order of each date follows the `mode` parameter:
+     *  0-descending, 1-ascending, 2-no sorting */
     const vector<ScoreRecordList>& getAllScores();
 
     /**
@@ -182,6 +184,9 @@ public:
     bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
+
+    /** Whether this multi-factor, its factors, normalizers, or style indicators are Python */
+    virtual bool hasPythonPart() const noexcept;
 
     /**
      * Execute the calculation. It is calculated automatically when the result is got by default.

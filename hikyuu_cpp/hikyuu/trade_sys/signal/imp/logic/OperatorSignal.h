@@ -26,6 +26,11 @@ public:
     virtual void _calculate(const KData& kdata) override {}
     virtual void setCycleDates(const DatetimeList& dates) override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || (m_sg1 && m_sg1->hasPythonPart()) ||
+               (m_sg2 && m_sg2->hasPythonPart());
+    }
+
 protected:
     void sub_sg_calculate(SignalPtr& sg, const KData& kdata);
 

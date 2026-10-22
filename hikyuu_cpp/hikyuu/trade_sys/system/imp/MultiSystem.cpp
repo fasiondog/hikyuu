@@ -90,6 +90,11 @@ bool MultiSystem::_subtreeContains(const SystemPtr& candidate, System* target) {
     return false;
 }
 
+bool MultiSystem::hasPythonPart() const {
+    return System::hasPythonPart() || (m_se && m_se->hasPythonPart()) ||
+           (m_af && m_af->hasPythonPart());
+}
+
 void MultiSystem::add(const SystemPtr& sys) {
     HKU_WARN_IF_RETURN(!sys, void(), "Null subsystem!");
     HKU_WARN_IF_RETURN(_subtreeContains(sys, this), void(), "Cyclic reference detected! {}",

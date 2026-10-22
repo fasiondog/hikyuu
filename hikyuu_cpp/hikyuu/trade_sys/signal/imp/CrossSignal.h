@@ -23,6 +23,10 @@ public:
     virtual SignalPtr _clone() override;
     virtual void _calculate(const KData& kdata) override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_fast.hasPythonPart() || m_slow.hasPythonPart();
+    }
+
 private:
     Indicator m_fast;
     Indicator m_slow;

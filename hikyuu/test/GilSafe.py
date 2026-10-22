@@ -138,6 +138,98 @@ CLONE_LOCK_PROBE = (
     "print('OK')\n"
 ).format(root=REPO_ROOT, config=CONFIG)
 
+# The pure-C++ MultiFactor compute (EqualWeight over all the test securities) must release the GIL,
+# so a background Python thread keeps running while the long calculation is in flight.
+# sys.setswitchinterval(1.0) disables the interpreter's periodic GIL drop during the <1s compute,
+# so a held GIL would block the background thread entirely (count == 0) and only an explicit
+# release lets it progress.
+MF_GIL_RELEASE_PROBE = (
+    "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
+    "import time, threading\n"
+    "from hikyuu import *\n"
+    "set_log_level(LOG_LEVEL.OFF)\n"
+    "hikyuu_init('{config}')\n"
+    "sm = StockManager.instance()\n"
+    "blks = sm.get_block_list()\n"
+    "seen = set(); stks = []\n"
+    "for b in blks:\n"
+    "    for s in b.get_stock_list():\n"
+    "        if not s.is_null() and s.market_code not in seen:\n"
+    "            seen.add(s.market_code); stks.append(s)\n"
+    "query = Query(Datetime(20100101), Datetime(20231231), Query.DAY, Query.FORWARD)\n"
+    "ref = sm['sh000001']\n"
+    "inds = [MA(CLOSE(), n) for n in range(3, 153)]\n"
+    "mf = MF_EqualWeight(inds, stks, query, ref)\n"
+    "dates = mf.get_datetime_list()\n"
+    "mid = dates[len(dates) // 2]\n"
+    "_ = mf.get_scores(mid)\n"
+    "counter = [0]\n"
+    "def compute():\n"
+    "    mf.reset(); _ = mf.get_scores(mid)\n"
+    "sys.setswitchinterval(1.0)\n"
+    "ta = threading.Thread(target=compute, daemon=True)\n"
+    "ta.start()\n"
+    "while ta.is_alive():\n"
+    "    counter[0] += 1\n"
+    "    if (counter[0] & 0x3FF) == 0:\n"
+    "        time.sleep(0)\n"
+    "ta.join()\n"
+    "assert counter[0] > 100, 'GIL not released during pure-C++ MF compute: B_count=%d' % counter[0]\n"
+    "print('OK')\n"
+).format(root=REPO_ROOT, config=CONFIG)
+
+# A Python custom normalizer makes the MF a python-part model. The compute still releases the GIL
+# (the norm callback re-acquires it per call through the pybind11 trampoline), so the background
+# thread must keep running and the call must not deadlock. A small security set keeps the number of
+# Python norm callbacks bounded, so the probe finishes quickly instead of starving the callbacks.
+MF_PY_PART_GIL_RELEASE_PROBE = (
+    "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
+    "import time, threading\n"
+    "from hikyuu import *\n"
+    "set_log_level(LOG_LEVEL.OFF)\n"
+    "hikyuu_init('{config}')\n"
+    "sm = StockManager.instance()\n"
+    "stks = []\n"
+    "stks_set = set()\n"
+    "for b in sm.get_block_list():\n"
+    "    for s in b.get_stock_list():\n"
+    "        if not s.is_null() and s.market_code not in stks_set:\n"
+    "            stks_set.add(s.market_code); stks.append(s)\n"
+    "            if len(stks) >= 50:\n"
+    "                break\n"
+    "    if len(stks) >= 50:\n"
+    "        break\n"
+    "ref = sm['sh000001']\n"
+    "query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)\n"
+    "inds = [MA(CLOSE(), n) for n in range(3, 8)]\n"
+    "mf = MF_EqualWeight(inds, stks, query, ref)\n"
+    "class PyNorm(NormalizeBase):\n"
+    "    def __init__(self):\n"
+    "        super().__init__('PyNorm')\n"
+    "    def _clone(self):\n"
+    "        return PyNorm()\n"
+    "    def normalize(self, data):\n"
+    "        return data\n"
+    "mf.set_normalize(PyNorm())\n"
+    "dates = mf.get_datetime_list()\n"
+    "mid = dates[len(dates) // 2]\n"
+    "_ = mf.get_scores(mid)\n"
+    "counter = [0]\n"
+    "def compute():\n"
+    "    mf.reset(); _ = mf.get_scores(mid)\n"
+    "ta = threading.Thread(target=compute, daemon=True)\n"
+    "ta.start()\n"
+    "while ta.is_alive():\n"
+    "    counter[0] += 1\n"
+    "    if (counter[0] & 0x3FF) == 0:\n"
+    "        time.sleep(0)\n"
+    "ta.join()\n"
+    "assert counter[0] > 100, 'GIL not released for python-part MF: B_count=%d' % counter[0]\n"
+    "print('OK')\n"
+).format(root=REPO_ROOT, config=CONFIG)
+
 
 class GilSafeTest(unittest.TestCase):
     def test_exit_clean_after_gil_safe_use(self):
@@ -197,6 +289,40 @@ class GilSafeTest(unittest.TestCase):
         )
         self.assertEqual(
             proc.returncode, 0, "clone lock probe crashed:\n%s" % proc.stderr[-2000:]
+        )
+        self.assertIn("OK", proc.stdout)
+
+    def test_multifactor_gil_release_pure_cpp(self):
+        # A pure-C++ MultiFactor compute must release the GIL, so a background Python thread keeps
+        # running during the long calculation. sys.setswitchinterval(1.0) disables the periodic GIL
+        # drop inside the <1s compute, so without the explicit release the background thread would be
+        # fully blocked (count == 0) and the probe would fail its assertion.
+        proc = subprocess.run(
+            [sys.executable, "-c", MF_GIL_RELEASE_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
+        )
+        self.assertEqual(
+            proc.returncode, 0, "MF GIL-release probe failed:\n%s" % proc.stderr[-2000:]
+        )
+        self.assertIn("OK", proc.stdout)
+
+    def test_multifactor_gil_release_with_python_part(self):
+        # A Python custom normalizer makes the MF a python-part model; the compute must still release
+        # the GIL (the norm callback re-acquires it per call) and must not deadlock.
+        proc = subprocess.run(
+            [sys.executable, "-c", MF_PY_PART_GIL_RELEASE_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
+        )
+        self.assertEqual(
+            proc.returncode, 0, "MF python-part GIL-release probe failed:\n%s" % proc.stderr[-2000:]
         )
         self.assertIn("OK", proc.stdout)
 

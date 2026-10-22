@@ -240,6 +240,10 @@ public:
         return false;
     }
 
+    /** Whether Python may be called back during a run (this system, a part, or any sub-system at
+     *  any depth). The GIL is released regardless, this only decides the log stream routing */
+    virtual bool hasPythonPart() const;
+
     /** Get the direct sub-system list, overridden by the aggregate form. The single-security form
      * returns an empty list. */
     virtual const std::vector<std::shared_ptr<System>>& getSubSystemList() const;
@@ -362,7 +366,8 @@ private:
     price_t _getShortTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
     /** Per-share risk of opening a short: stop-loss price - entry price; stop-loss 0 means no
-     * stop-loss, in which case the full entry price is taken as the worst-case risk */
+     * stop-loss, in which case the full entry price is taken as the worst-case risk. A negative
+     * risk (a stop-loss below the entry) is rejected by the money manager */
     price_t _getShortOpenRisk(price_t stoploss, price_t price);
 
     price_t _getGoalPrice(const Datetime& datetime, price_t price);
@@ -379,20 +384,26 @@ private:
     void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
     void _autoCheckin(const Datetime& datetime, price_t realPrice, double number);
 
-    TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from);
-    TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from,
+                      price_t goal = Null<price_t>());
+    TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from,
+                         price_t goal = Null<price_t>());
     TradeRecord _sellDelay(const KRecord& today, const KRecord& src_today);
-    void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from);
+    void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from,
+                            price_t goal = Null<price_t>());
 
     TradeRecord _sellShort(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortDelay(const KRecord& today, const KRecord& src_today);
     void _submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from);
-    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from,
+                          price_t goal = Null<price_t>());
+    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from,
+                             price_t goal = Null<price_t>());
     TradeRecord _buyShortDelay(const KRecord& today, const KRecord& src_today);
-    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from);
+    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from,
+                                price_t goal = Null<price_t>());
 
     TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 
@@ -431,7 +442,6 @@ protected:
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_sell_short_days;          // Cleared on every short sell
     TradeRecordList m_trade_list;   // Saves the actually executed trade records
     price_t m_lastTakeProfit;       // The last long take-profit price, used to guarantee that the
                                     // take-profit price increases monotonically
@@ -474,7 +484,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
@@ -508,7 +517,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
@@ -517,6 +525,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_sellRequestList);
         ar& BOOST_SERIALIZATION_NVP(m_sellShortRequestList);
         ar& BOOST_SERIALIZATION_NVP(m_buyShortRequestList);
+
+        // The original (unadjusted) kdata is not serialized, so the next setTO must rebuild it
+        m_calculated = false;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

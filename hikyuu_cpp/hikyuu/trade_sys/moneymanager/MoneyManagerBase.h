@@ -179,6 +179,11 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this component or its trade manager is defined in Python; overrides may recurse */
+    virtual bool hasPythonPart() const noexcept {
+        return m_is_python_object || (m_tm && m_tm->hasPythonPart());
+    }
+
     /** Whether the MM supports multiple position building/reducing (the capability flag assigned
      *  by the subclass constructor) */
     bool isSupportMultBuySell() const noexcept {

@@ -54,6 +54,11 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this filter or the filter it combines is defined in Python */
+    virtual bool hasPythonPart() const noexcept {
+        return m_is_python_object || (m_child && m_child->hasPythonPart());
+    }
+
 protected:
     string m_name;
     ScoresFilterPtr m_child;

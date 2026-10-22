@@ -25,6 +25,10 @@ public:
     virtual StoplossPtr _clone() override;
     virtual void _calculate() override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_ind.hasPythonPart();
+    }
+
 private:
     Indicator m_ind;
     map<Datetime, price_t> m_result;

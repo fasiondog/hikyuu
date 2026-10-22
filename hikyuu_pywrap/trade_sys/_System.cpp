@@ -14,6 +14,7 @@
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include "../pybind_utils.h"
+#include "../gil_policy.h"
 #include "_System.h"
 
 namespace py = pybind11;
@@ -396,7 +397,13 @@ Common parameters:
       .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy,
                              "The query condition")
 
-      .def_property("to", &System::getTO, &System::setTO, "The trading object KData")
+      .def_property(
+        "to", &System::getTO,
+        [](System& self, const KData& kdata) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.setTO(kdata);
+        },
+        "The trading object KData")
 
       //   .def_property("tm", &System::getTM, &System::setTM, "The associated trade manager
       //   instance")
@@ -536,23 +543,71 @@ Common parameters:
 
     The clone operation; it clones according to the sharing attributes of the parts; the shared parts are not actually cloned and remain shared.)")
 
-      .def("run", py::overload_cast<const KQuery&, bool, bool>(&System::run), py::arg("query"),
-           py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", py::overload_cast<const KData&, bool, bool>(&System::run), py::arg("kdata"),
-           py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", py::overload_cast<const Stock&, const KQuery&, bool, bool>(&System::run),
-           py::arg("stock"), py::arg("query"), py::arg("reset") = true,
-           py::arg("reset_all") = false,
-           R"(run(self, stock, query[, reset=True])
+      .def(
+        "run",
+        [](System& self, const KQuery& query, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(query, reset, reset_all);
+        },
+        py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, query, reset=True, reset_all=False)
+
+    Run the system on the trading object built from the current security and the given query,
+    performing the backtest.
+
+    :param Query query: the K-line data query condition
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
+
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+      .def(
+        "run",
+        [](System& self, const KData& kdata, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(kdata, reset, reset_all);
+        },
+        py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, kdata, reset=True, reset_all=False)
+
+    Run the system on the given trading object, performing the backtest.
+
+    :param KData kdata: the trading object
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
+
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+      .def(
+        "run",
+        [](System& self, const Stock& stock, const KQuery& query, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(stock, query, reset, reset_all);
+        },
+        py::arg("stock"), py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, stock, query[, reset=True])
 
     Run the system, performing the backtest
 
     :param Stock stock: the security to trade
     :param Query query: the K-line data query condition
     :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
-    :param bool reset_all: forcibly reset all the parts)")
+    :param bool reset_all: forcibly reset all the parts
 
-      .def("ready", &System::readyForRun)
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+
+      .def(
+        "ready",
+        [](System& self) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.readyForRun();
+        },
+        R"(ready(self)
+
+    Arm the parts for running: the money manager and the profit goal get the account, and the market
+    environment / condition start from an unknown state. run calls it, so it only needs to be
+    called directly before driving with runMoment.)")
 
       .def(
         "last_suggestion",
@@ -601,17 +656,27 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("add", &MultiSystem::add, py::arg("sys"),
            "Add a sub-system (with the circular reference detection)")
       .def("get_system_list", &MultiSystem::getSystemList, "Get the sub-system list")
-      .def("run", py::overload_cast<const KData&, bool, bool>(&MultiSystem::run), py::arg("kdata"),
-           py::arg("reset") = true, py::arg("reset_all") = false,
-           R"(run(self, kdata, reset=True, reset_all=False)
+      .def(
+        "run",
+        [](MultiSystem& self, const KData& kdata, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(kdata, reset, reset_all);
+        },
+        py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, kdata, reset=True, reset_all=False)
 
     The portfolio backtesting entry. kdata is used as the aligned time axis, it traverses every trading day and drives all the sub-systems (open/close) respectively and aggregates the orders.
     Every sub-system has an independent virtual account, the parent system allocates and orders uniformly on its own account.
 
     :param KData kdata: the aligned time axis (it should cover the trading days of every sub-system))")
-      .def("run", py::overload_cast<const KQuery&, bool, bool>(&MultiSystem::run), py::arg("query"),
-           py::arg("reset") = true, py::arg("reset_all") = false,
-           R"(run(self, query, reset=True, reset_all=False)
+      .def(
+        "run",
+        [](MultiSystem& self, const KQuery& query, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(query, reset, reset_all);
+        },
+        py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, query, reset=True, reset_all=False)
 
     [master compatibility] Run with the market trading calendar as the driving axis, equivalent to the master Portfolio.run(query).
 
@@ -622,16 +687,52 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :param Query query: the query condition
     :param bool reset: whether to reset before running
     :param bool reset_all: whether to force a full reset before running)")
-      .def("runMoment", &MultiSystem::runMoment, py::arg("datetime"),
-           R"(runMoment(self, datetime)
+      .def(
+        "runMoment",
+        [](MultiSystem& self, const Datetime& datetime) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.runMoment(datetime);
+        },
+        py::arg("datetime"),
+        R"(runMoment(self, datetime)
 
     Execute one step at the specified moment, drive all the sub-systems (open/close) respectively, and aggregate the trades and suggestions.
 
     :param Datetime datetime: the specified date
     :rtype: MomentResult)")
-      .def("runMomentOnOpen", &MultiSystem::runMomentOnOpen, py::arg("datetime"))
-      .def("runMomentOnClose", &MultiSystem::runMomentOnClose, py::arg("datetime"))
-      .def("ready_for_run", &MultiSystem::readyForRun)
+      .def(
+        "runMomentOnOpen",
+        [](MultiSystem& self, const Datetime& datetime) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.runMomentOnOpen(datetime);
+        },
+        py::arg("datetime"),
+        R"(runMomentOnOpen(self, datetime)
+
+    Execute only the open stage at the specified moment: the requests delayed from the previous
+    close are fulfilled and the sub-systems are driven at the open.
+
+    :param Datetime datetime: the specified date
+    :rtype: MomentResult)")
+      .def(
+        "runMomentOnClose",
+        [](MultiSystem& self, const Datetime& datetime) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.runMomentOnClose(datetime);
+        },
+        py::arg("datetime"),
+        R"(runMomentOnClose(self, datetime)
+
+    Execute only the close stage at the specified moment: the sub-systems generate their signals and
+    close trades, which are aggregated into the parent suggestions.
+
+    :param Datetime datetime: the specified date
+    :rtype: MomentResult)")
+      .def("ready_for_run",
+           [](MultiSystem& self) {
+               ScopeGilRelease gil(!self.hasPythonPart());
+               self.readyForRun();
+           })
       .def("set_mode", &MultiSystem::setMode, py::arg("mode"),
            "Set the running mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation "
            "/ \"C\" Shared Account Compatibility (the legacy Portfolio behavior)")

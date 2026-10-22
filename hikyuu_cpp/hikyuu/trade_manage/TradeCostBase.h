@@ -106,6 +106,11 @@ public:
     /** The inheriting subclass must implement the clone interface of its private variables */
     virtual TradeCostPtr _clone() = 0;
 
+    /** Whether this cost function is defined in Python */
+    virtual bool hasPythonPart() const noexcept {
+        return m_is_python_object;
+    }
+
 protected:
     bool isPythonObject() const noexcept {
         return m_is_python_object;

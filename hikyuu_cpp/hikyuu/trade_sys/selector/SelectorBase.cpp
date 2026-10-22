@@ -24,6 +24,24 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
+bool SelectorBase::hasPythonPart() const noexcept {
+    if (m_is_python_object || (m_sc_filter && m_sc_filter->hasPythonPart()) ||
+        (m_mf && m_mf->hasPythonPart())) {
+        return true;
+    }
+    for (const auto& sys : m_pro_sys_list) {
+        if (sys && sys->hasPythonPart()) {
+            return true;
+        }
+    }
+    for (const auto& sys : m_real_sys_list) {
+        if (sys && sys->hasPythonPart()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 string SelectorBase::str() const {
     std::ostringstream buf;
     buf << "Selector(" << name() << ", " << getParameter() << ", " << m_sc_filter << ")";

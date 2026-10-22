@@ -24,6 +24,10 @@ public:
     virtual void _calculate() override;
     virtual EnvironmentPtr _clone() override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_fast.hasPythonPart() || m_slow.hasPythonPart();
+    }
+
 private:
     Indicator m_fast;
     Indicator m_slow;

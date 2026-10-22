@@ -146,6 +146,9 @@ public:
     void remove_from_db() const;
     void load_from_db();
 
+    /** Whether any factor formula is defined in Python */
+    bool hasPythonPart() const;
+
     //------------------------
     // Iterator support
     //------------------------

@@ -843,6 +843,11 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this trade manager or its cost function is defined in Python */
+    virtual bool hasPythonPart() const noexcept {
+        return m_is_python_object || (m_costfunc && m_costfunc->hasPythonPart());
+    }
+
 protected:
     string m_name;            // Account name
     TradeCostPtr m_costfunc;  // Cost algorithm

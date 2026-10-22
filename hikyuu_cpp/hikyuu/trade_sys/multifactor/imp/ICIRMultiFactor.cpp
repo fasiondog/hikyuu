@@ -86,9 +86,11 @@ IndicatorList ICIRMultiFactor::_calculate(const vector<IndicatorList>& all_stk_i
         }
 
         for (size_t di = discard; di < days_total; di++) {
-            if (countByDate[di] == 0) {
+            // Zero weight sum means no valid information that day; an identical 0.0 score would
+            // degrade the ranking to the stock code order
+            if (countByDate[di] == 0 || sum_weight[di] == 0.0) {
                 new_values[di] = Null<price_t>();
-            } else if (sum_weight[di] != 0.0) {
+            } else {
                 new_values[di] = new_values[di] / sum_weight[di];
             }
         }

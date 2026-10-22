@@ -8,6 +8,7 @@
 #pragma once
 
 #include "hikyuu/trade_sys/selector/SelectorBase.h"
+#include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h"
 #include "../System.h"
 
 namespace hku {
@@ -35,6 +36,7 @@ public:
     virtual string str() const override;
 
 public:
+    virtual bool hasPythonPart() const override;
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) override;
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) override;
     virtual void clearDelayBuyRequest() override;

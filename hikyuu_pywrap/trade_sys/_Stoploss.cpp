@@ -85,7 +85,7 @@ The system still skips a long buy when the level is not lower than the planned b
       .def_property(
         "to", &StoplossBase::getTO,
         [](StoplossBase& self, const KData& kdata) {
-            ScopeGilRelease gil(!self.isPythonObject());
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.setTO(kdata);
         },
         "The associated trading object")
@@ -155,13 +155,13 @@ The system still skips a long buy when the level is not lower than the planned b
 
       .def("reset",
            [](StoplossBase& self) {
-               ScopeGilRelease gil(!self.isPythonObject());
+               ScopeGilRelease gil(!self.hasPythonPart());
                self.reset();
            },
            "The reset operation")
       .def("clone",
            [](StoplossBase& self) -> StoplossPtr {
-               ScopeGilRelease gil(!self.isPythonObject());
+               ScopeGilRelease gil(!self.hasPythonPart());
                return self.clone();
            },
            "The clone operation")

@@ -160,6 +160,12 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this signal or any composed Python part may call back: it only decides whether the
+     *  C++ log streams stay redirected, the GIL is released regardless */
+    virtual bool hasPythonPart() const noexcept {
+        return m_is_python_object;
+    }
+
 private:
     void initParam();
 

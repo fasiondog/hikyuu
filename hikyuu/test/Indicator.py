@@ -379,50 +379,50 @@ class IndicatorTest(unittest.TestCase):
         # Get the test stock
         stock = sm['sh000001']
         k = stock.get_kdata(Query(-10))
-        
+
         # Test CODELIKE - exact match
         result = CODELIKE(k, "000001")
         self.assertEqual(len(result), len(k))
         # The code of sh000001 is 000001, it should match and return all 1
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         # Test CODELIKE - contains match (auto contains match when there is no wildcard)
         result = CODELIKE(k, "000")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         # Test CODELIKE - wildcard ? match
         result = CODELIKE(k, "??????")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         # Test CODELIKE - no match case
         result = CODELIKE(k, "01")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 0.0)
-        
+
         # Test NAMELIKE - contains match (auto contains match when there is no wildcard)
         result = NAMELIKE(k, "上证")
         self.assertEqual(len(result), len(k))
         # The Chinese name of sh000001 contains the pattern above, it should match
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         # Test NAMELIKE - no match case
         result = NAMELIKE(k, "*non-existent name*")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 0.0)
-        
+
         # Test a Shenzhen stock
         stock2 = sm['sz00001']
         if not stock2.is_null():
             k2 = stock2.get_kdata(Query(-10))
-            
+
             # Test CODELIKE
             result = CODELIKE(k2, "000")
             self.assertEqual(len(result), len(k2))
@@ -433,39 +433,39 @@ class IndicatorTest(unittest.TestCase):
             self.assertEqual(len(result), len(k2))
             for i in range(len(result)):
                 self.assertEqual(result[i], 0.0)
-        
+
         # Test NAMELIKE for a Shenzhen stock
         stock3 = sm['sz000955']
         if not stock3.is_null():
             k3 = stock3.get_kdata(Query(-10))
-            
+
             result = NAMELIKE(k3, "欣龙")
             self.assertEqual(len(result), len(k3))
             for i in range(len(result)):
                 self.assertEqual(result[i], 1.0)
-    
+
     def test_CODELIKE_NAMELIKE_wildcard(self):
         """Test the wildcard function of CODELIKE and NAMELIKE"""
         stock = sm['sh000001']
         k = stock.get_kdata(Query(-10))
-        
+
         # Test the wildcard * matching any sequence
         result = CODELIKE(k, "*")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         result = NAMELIKE(k, "*")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         # Test wildcard combinations
         result = CODELIKE(k, "0*1")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
-        
+
         result = CODELIKE(k, "0????1")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
@@ -550,17 +550,42 @@ class IndicatorTest(unittest.TestCase):
             "        assert abs(res[j][i] - expect[j][i]) < 1e-9, (j, i, res[j][i])\n"
         ).format(root=root, config=config)
         proc = subprocess.run(
-          [sys.executable, "-c", probe],
-          capture_output=True,
-          text=True,
-          encoding="utf-8",
-          errors="replace",
-          timeout=120,
+            [sys.executable, "-c", probe],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
         )
         self.assertEqual(
-          proc.returncode, 0, "batch_calculate_inds deadlocked/hung:\n%s" % proc.stderr[-2000:]
+            proc.returncode, 0, "batch_calculate_inds deadlocked/hung:\n%s" % proc.stderr[-2000:]
         )
 
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(IndicatorTest)
+
+
+class TestIndicatorContext(unittest.TestCase):
+    def test_set_context(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        ind = MA(CLOSE(), 5)
+        ind.set_context(kdata)
+        self.assertEqual(len(ind), len(kdata))
+        self.assertEqual(len(ind.get_result(0)), len(kdata))
+
+    def test_set_context_stock_query(self):
+        ind = MA(CLOSE(), 5)
+        ind.set_context(sm['sh000001'], Query(-100))
+        self.assertEqual(len(ind), 100)
+
+    def test_extend(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        ind = MA(CLOSE(), 5)
+        ind.set_context(kdata)
+        ind.extend()
+        self.assertGreaterEqual(len(ind), len(kdata))
+
+
+def suiteTestIndicatorContext():
+    return unittest.TestLoader().loadTestsFromTestCase(TestIndicatorContext)

@@ -188,6 +188,11 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this component itself is defined in Python; subclasses with Python parts recurse */
+    virtual bool hasPythonPart() const noexcept {
+        return m_is_python_object;
+    }
+
 protected:
     string m_name;
     KQuery m_query;

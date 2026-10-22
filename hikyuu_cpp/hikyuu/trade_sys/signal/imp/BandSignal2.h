@@ -21,6 +21,11 @@ public:
     virtual SignalPtr _clone() override;
     virtual void _calculate(const KData& kdata) override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_ind.hasPythonPart() || m_lower.hasPythonPart() ||
+               m_upper.hasPythonPart();
+    }
+
 private:
     Indicator m_ind;
     Indicator m_lower;
