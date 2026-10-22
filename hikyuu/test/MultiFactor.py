@@ -115,6 +115,10 @@ class MultiFactorTest(unittest.TestCase):
         py_mf.reset()
         self.assertEqual(py_mf.resets, 1)
 
+        # the _reset hook itself is bound, so it can also be invoked directly
+        py_mf._reset()
+        self.assertEqual(py_mf.resets, 2)
+
     def test_get_scores_np_and_iter_scores(self):
         mf, ref_stk, query = self._build_mf()
         date = Datetime(201106010000)
@@ -307,7 +311,7 @@ class MultiFactorTest(unittest.TestCase):
         self.assertEqual(len(mf.get_icir(-1)), 0)
 
     def test_set_normalize_none_disables(self):
-        # C16: set_normalize(None) and set_normalize(NORM_NOTHING()) must deterministically disable
+        # set_normalize(None) and set_normalize(NORM_NOTHING()) must deterministically disable
         # global normalization (no TypeError on a None argument) and yield the un-normalized baseline.
         mf, ref_stk, query = self._build_mf()
         date = Datetime(201106010000)
@@ -320,7 +324,7 @@ class MultiFactorTest(unittest.TestCase):
         self.assertEqual([sc.value for sc in mf.get_scores(date)], baseline)
 
     def test_get_scores_non_ref_date_returns_empty(self):
-        # C19: a date outside the reference dates (e.g. a weekend) must not stay silent: it returns
+        # a date outside the reference dates (e.g. a weekend) must not stay silent: it returns
         # an empty cross-section with a warning logged, for both get_scores and get_scores_np
         mf, ref_stk, query = self._build_mf()
         weekend = Datetime(201106040000)  # 2011-06-04 is a Saturday, not a trading day
@@ -329,7 +333,7 @@ class MultiFactorTest(unittest.TestCase):
         self.assertEqual(len(mf.get_scores_np(weekend)), 0)
 
     def test_scores_filter_in_get_scores(self):
-        # C23: get_scores accepts a ScoresFilterBase instance (a builtin one or a Python subclass)
+        # get_scores accepts a ScoresFilterBase instance (a builtin one or a Python subclass)
         # as the filter, in addition to None and callables
         mf, ref_stk, query = self._build_mf()
         date = Datetime(201106010000)

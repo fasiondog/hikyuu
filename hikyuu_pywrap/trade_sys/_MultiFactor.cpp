@@ -402,6 +402,10 @@ The custom multi-factor model override hooks:
 
       .def("reset", &MultiFactorBase::reset, "The reset operation")
 
+      .def("_reset", &MultiFactorBase::_reset,
+           "[Overload interface] The subclass reset interface, resetting the internal private "
+           "variables")
+
       .def(
         "get_scores",
         [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end,
