@@ -362,7 +362,8 @@ private:
     price_t _getShortTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
     /** Per-share risk of opening a short: stop-loss price - entry price; stop-loss 0 means no
-     * stop-loss, in which case the full entry price is taken as the worst-case risk */
+     * stop-loss, in which case the full entry price is taken as the worst-case risk. A negative
+     * risk (a stop-loss below the entry) is rejected by the money manager */
     price_t _getShortOpenRisk(price_t stoploss, price_t price);
 
     price_t _getGoalPrice(const Datetime& datetime, price_t price);

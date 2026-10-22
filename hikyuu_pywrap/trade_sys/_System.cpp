@@ -543,14 +543,35 @@ Common parameters:
             ScopeGilRelease gil(!system_has_python_part(self));
             self.run(query, reset, reset_all);
         },
-        py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false)
+        py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, query, reset=True, reset_all=False)
+
+    Run the system on the trading object built from the current security and the given query,
+    performing the backtest.
+
+    :param Query query: the K-line data query condition
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
+
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
       .def(
         "run",
         [](System& self, const KData& kdata, bool reset, bool reset_all) {
             ScopeGilRelease gil(!system_has_python_part(self));
             self.run(kdata, reset, reset_all);
         },
-        py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false)
+        py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, kdata, reset=True, reset_all=False)
+
+    Run the system on the given trading object, performing the backtest.
+
+    :param KData kdata: the trading object
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
+
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
       .def(
         "run",
         [](System& self, const Stock& stock, const KQuery& query, bool reset, bool reset_all) {
@@ -565,13 +586,22 @@ Common parameters:
     :param Stock stock: the security to trade
     :param Query query: the K-line data query condition
     :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
-    :param bool reset_all: forcibly reset all the parts)")
+    :param bool reset_all: forcibly reset all the parts
 
-      .def("ready",
-           [](System& self) {
-               ScopeGilRelease gil(!system_has_python_part(self));
-               self.readyForRun();
-           })
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+
+      .def(
+        "ready",
+        [](System& self) {
+            ScopeGilRelease gil(!system_has_python_part(self));
+            self.readyForRun();
+        },
+        R"(ready(self)
+
+    Arm the parts for running: the money manager and the profit goal get the account, and the market
+    environment / condition start from an unknown state. run calls it, so it only needs to be
+    called directly before driving with runMoment.)")
 
       .def(
         "last_suggestion",
@@ -670,14 +700,28 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
             ScopeGilRelease gil(!system_has_python_part(self));
             return self.runMomentOnOpen(datetime);
         },
-        py::arg("datetime"))
+        py::arg("datetime"),
+        R"(runMomentOnOpen(self, datetime)
+
+    Execute only the open stage at the specified moment: the requests delayed from the previous
+    close are fulfilled and the sub-systems are driven at the open.
+
+    :param Datetime datetime: the specified date
+    :rtype: MomentResult)")
       .def(
         "runMomentOnClose",
         [](MultiSystem& self, const Datetime& datetime) {
             ScopeGilRelease gil(!system_has_python_part(self));
             return self.runMomentOnClose(datetime);
         },
-        py::arg("datetime"))
+        py::arg("datetime"),
+        R"(runMomentOnClose(self, datetime)
+
+    Execute only the close stage at the specified moment: the sub-systems generate their signals and
+    close trades, which are aggregated into the parent suggestions.
+
+    :param Datetime datetime: the specified date
+    :rtype: MomentResult)")
       .def("ready_for_run",
            [](MultiSystem& self) {
                ScopeGilRelease gil(!system_has_python_part(self));
