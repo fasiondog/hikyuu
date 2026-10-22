@@ -454,8 +454,12 @@ void MultiSystem::clearDateAxis() {
 }
 
 void MultiSystem::setAdjustCycle(int cycle) {
+    if (cycle <= 0) {
+        HKU_WARN("Invalid adjust_cycle {} (<=0), treated as 1! [{}]", cycle, name());
+    }
     m_adjust_cycle = cycle > 0 ? cycle : 1;
     _clearCycleDates();
+    _warnAdjustCycleOutOfRange();
 }
 
 void MultiSystem::setDelayToTradingDay(bool v) {
@@ -493,6 +497,27 @@ void MultiSystem::setAdjustMode(const string& mode) {
     }
     setParam<string>("adjust-mode", m);
     _clearCycleDates();
+    _warnAdjustCycleOutOfRange();
+}
+
+void MultiSystem::_warnAdjustCycleOutOfRange() const {
+    string mode = getAdjustMode();
+    to_lower(mode);
+    int max_days = 0;
+    if (mode == "week") {
+        max_days = 7;
+    } else if (mode == "month") {
+        max_days = 31;
+    } else if (mode == "quarter") {
+        max_days = 92;
+    } else if (mode == "year") {
+        max_days = 366;
+    }
+    HKU_IF_RETURN(max_days == 0 || m_adjust_cycle <= max_days, void());
+    HKU_WARN(
+      "adjust_cycle {} exceeds the {} period (max {} days), that mode never rebalances! "
+      "[{}]",
+      m_adjust_cycle, mode, max_days, name());
 }
 
 Datetime MultiSystem::_periodStart(const Datetime& date) const {

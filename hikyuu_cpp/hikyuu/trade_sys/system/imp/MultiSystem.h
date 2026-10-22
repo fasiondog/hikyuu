@@ -202,7 +202,10 @@ public:
         return m_sub_init_cash;
     }
 
-    /** Set the rebalancing cycle (days); <=1 means rebalancing on every close day */
+    /** Set the rebalancing cycle: in query/day mode the close-day interval (1 = every close day);
+     *  in the period modes (week/month/quarter/year) the n-th calendar day within the period. A
+     *  value <=0 is warned and treated as 1; a value beyond the period length is warned but kept
+     *  (no clamping), and that mode then never rebalances. */
     void setAdjustCycle(int cycle);
 
     /** Get the rebalancing cycle (days) */
@@ -395,6 +398,10 @@ private:
     /** The adjust-mode period rule: the adjust_cycle-th calendar day of the period, postponed to
      * the first driven day of the period when delay_to_trading_day is on (once per period) */
     bool _isAdjustDateByPeriod(const Datetime& date, const Datetime& last_period) const;
+
+    /** Warn when m_adjust_cycle exceeds the length of the current adjust-mode period
+     *  (week 7 / month 31 / quarter 92 / year 366 days); the value is kept, not clamped */
+    void _warnAdjustCycleOutOfRange() const;
 
     /** Build the rebalancing-day list on the given driving axis and merge it into m_cycle_dates,
      * the run-level input injected into the cycle signals of the sub-systems */

@@ -1029,6 +1029,44 @@ TEST_CASE("test_MultiSystem_adjust_mode") {
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 }
 
+/** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value beyond
+ * the period length is warned but kept, never clamped) */
+TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
+    MultiSystem ms("ms");
+    /** @arg the default cycle is 1 */
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+
+    /** @arg <=0 is treated as 1 (the close-day counting mode) */
+    ms.setAdjustCycle(0);
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+    ms.setAdjustCycle(-5);
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+
+    /** @arg a value beyond the period length is kept as is */
+    ms.setAdjustMode("week");
+    ms.setAdjustCycle(8);
+    CHECK_EQ(ms.getAdjustCycle(), 8);
+    CHECK_EQ(ms.getAdjustMode(), "week");
+    ms.setAdjustCycle(7);
+    CHECK_EQ(ms.getAdjustCycle(), 7);
+
+    /** @arg switching to a period mode does not rewrite an out-of-range cycle */
+    ms.setAdjustMode("query");
+    ms.setAdjustCycle(60);
+    ms.setAdjustMode("month");
+    CHECK_EQ(ms.getAdjustCycle(), 60);
+    CHECK_EQ(ms.getAdjustMode(), "month");
+
+    /** @arg the factory path follows the same rule (only <=0 falls back to 1) */
+    TMPtr tm = crtTM(Datetime(20100101), 100000.0);
+    auto pf = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 0, "month");
+    CHECK_EQ(pf->getAdjustCycle(), 1);
+    CHECK_EQ(pf->getAdjustMode(), "month");
+    auto pf2 = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 32, "month");
+    CHECK_EQ(pf2->getAdjustCycle(), 32);
+    CHECK_EQ(pf2->getAdjustMode(), "month");
+}
+
 /** @par Check point: the calcAdjustDates pure function (week/month/quarter/year × delay
  * true/false + boundaries) */
 TEST_CASE("test_MultiSystem_calc_adjust_dates") {
