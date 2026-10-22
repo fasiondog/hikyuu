@@ -102,7 +102,8 @@ public:
     /**
      * Get the factor values (scores) within the given date cross-section range [start, end], and
      * filter them through filter
-     * @param date the given date
+     * @param date the given date; if the date is not in the reference dates (e.g. a non-trading
+     *        day), an empty list is returned and a warning is logged
      * @param start the sorting start point
      * @param end the sorting end point (excluded)
      * @param filter the filter function

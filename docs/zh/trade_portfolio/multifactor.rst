@@ -247,7 +247,7 @@
 
         获取指定日期截面的所有因子值，排序方式取决于 mode 参数（0-降序, 1-升序, 2-不排序），相当于各证券日期截面评分。
 
-        :param Datetime date: 指定日期
+        :param Datetime date: 指定日期；若该日期不在参考日期内（如非交易日），返回空列表并输出警告日志
         :param int start: 取当日排名开始
         :param int end: 取当日排名结束(不包含本身)
         :param function func: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
@@ -265,7 +265,7 @@
 
         获取指定日期截面的 numpy 结构化数组，按 mode 排序（0-降序, 1-升序, 2-不排序）。结果较大时优先于 get_scores 使用：整个截面只构建一个数组，而非每条记录一个 Python 对象。字段名为 market_code、name、score。
 
-        :param Datetime date: 指定日期
+        :param Datetime date: 指定日期；若该日期不在参考日期内（如非交易日），返回空数组并输出警告日志
         :param int start: 取当日排名开始
         :param int end: 取当日排名结束(不包含本身)
         :rtype: numpy.ndarray

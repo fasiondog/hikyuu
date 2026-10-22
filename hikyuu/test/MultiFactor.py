@@ -319,6 +319,15 @@ class MultiFactorTest(unittest.TestCase):
         mf.set_normalize(NORM_NOTHING())
         self.assertEqual([sc.value for sc in mf.get_scores(date)], baseline)
 
+    def test_get_scores_non_ref_date_returns_empty(self):
+        # C19: a date outside the reference dates (e.g. a weekend) must not stay silent: it returns
+        # an empty cross-section with a warning logged, for both get_scores and get_scores_np
+        mf, ref_stk, query = self._build_mf()
+        weekend = Datetime(201106040000)  # 2011-06-04 is a Saturday, not a trading day
+        self.assertNotIn(weekend, list(mf.get_datetime_list()))
+        self.assertEqual(len(mf.get_scores(weekend)), 0)
+        self.assertEqual(len(mf.get_scores_np(weekend)), 0)
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MultiFactorTest)

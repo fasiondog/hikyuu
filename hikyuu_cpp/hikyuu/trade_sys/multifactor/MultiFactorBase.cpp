@@ -345,11 +345,15 @@ const IndicatorList& MultiFactorBase::getAllFactors() {
 const ScoreRecordList& MultiFactorBase::getScoresRef(const Datetime& date) {
     calculate();
     const auto iter = m_date_index.find(date);
-    if (iter == m_date_index.cend()) {
-        static const ScoreRecordList empty_scores;
-        return empty_scores;
+    if (iter != m_date_index.cend()) {
+        return m_stk_factor_by_date[iter->second];
     }
-    return m_stk_factor_by_date[iter->second];
+
+    HKU_WARN("The date {} is not in the reference dates, returning an empty score list. Use a date "
+             "from get_datetime_list().",
+             date);
+    static const ScoreRecordList empty_scores;
+    return empty_scores;
 }
 
 ScoreRecordList MultiFactorBase::getScores(const Datetime& d) {

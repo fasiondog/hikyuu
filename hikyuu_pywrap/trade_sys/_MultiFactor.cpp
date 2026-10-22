@@ -428,7 +428,7 @@ The custom multi-factor model override hooks:
 
     Get all the factor values of the cross-section on the specified date; the order follows the mode parameter: 0-descending, 1-ascending, 2-no sorting. Equivalent to the cross-section scores of the securities on that date.
 
-    :param Datetime date: the specified date
+    :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty list is returned and a warning is logged
     :param int start: the start of the daily ranking to take
     :param int end: the end of the daily ranking to take (exclusive)
     :param function filter: a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
@@ -467,7 +467,7 @@ The custom multi-factor model override hooks:
     mode (0-descending, 1-ascending, 2-no sorting). Prefer it over get_scores for the large results: one array is built for the whole
     cross-section instead of one Python object per record.
 
-    :param Datetime date: the specified date
+    :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty array is returned and a warning is logged
     :param int start: the start of the daily ranking to take
     :param int end: the end of the daily ranking to take (excluded)
     :rtype: numpy.ndarray)")
