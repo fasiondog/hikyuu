@@ -37,6 +37,24 @@ public:
     size_t size() const noexcept;
     bool empty() const noexcept;
 
+    /**
+     * Compare two KData as a lightweight "is this the same sequence, and has its content changed
+     * at the tail" check, used mainly by the downstream cache guards to decide whether to recompute
+     *
+     * It is not a full element-wise comparison. The rules are, in order:
+     *  - the same object, or backed by the same imp -> equal;
+     *  - different stocks (or one side null) -> handled by the stock checks;
+     *  - same stock + query + size -> compare only the last KRecord (back()).
+     *
+     * Real-time scenario: with a right-open (exclusive end) KQuery, a freshly built KData over the
+     * same query picks up the latest revised or extended bar, so comparing a *different* KData
+     * against the cached one differs in size or in the last record -> not equal -> recompute is
+     * triggered. Reusing the *same* KData/imp short-circuits to equal and can never observe an
+     * in-place buffer revision, since both sides read the same memory.
+     *
+     * @note Only the last record is compared, so a revision to any intermediate bar is not
+     *       detected; this is an O(1) heuristic, not content equality.
+     */
     bool operator==(const KData&) const noexcept;
     bool operator!=(const KData&) const noexcept;
 

@@ -80,9 +80,19 @@ KData::KData(const Stock& stock, const KQuery& query) {
 }
 
 bool KData::operator==(const KData& thr) const noexcept {
-    return this == &thr || m_imp == thr.m_imp ||
-           (getStock() == thr.getStock() && getQuery() == thr.getQuery() && size() == thr.size()) ||
-           (getStock().isNull() && thr.getStock().isNull());
+    if (this == &thr || m_imp == thr.m_imp)
+        return true;
+    if (getStock() != thr.getStock())
+        return false;
+    if (getStock().isNull())
+        return true;
+    if (getQuery() != thr.getQuery() || size() != thr.size())
+        return false;
+    // Different imp paths may serve the same sequence; compare the last record so a freshly built
+    // KData over a right-open real-time query differs when the tail bar is revised or extended,
+    // letting the cache guards recompute; reusing the same imp (or an aliased buffer) is short-
+    // circuited above and cannot be detected here
+    return m_imp->back() == thr.m_imp->back();
 }
 
 size_t KData::getPosInStock(Datetime datetime) const {

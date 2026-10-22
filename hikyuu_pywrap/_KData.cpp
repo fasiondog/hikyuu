@@ -175,7 +175,13 @@ void export_KData(py::module& m) {
 
       .def("__len__", &KData::size)
 
-      .def(py::self == py::self)
+      .def(py::self == py::self,
+           "Compare as a lightweight sequence-identity + last-record check, not a full element-wise "
+           "comparison. Same object or same imp -> equal; same stock+query+size -> compare only the "
+           "last record. Used by the downstream cache guards to decide whether to recompute: with a "
+           "right-open (exclusive end) query, a freshly built KData picks up the latest revised or "
+           "extended bar, so comparing a different KData against the cached one differs and triggers "
+           "recompute; reusing the same KData cannot. Only the last record is compared.")
       .def(py::self != py::self)
 
       .def(

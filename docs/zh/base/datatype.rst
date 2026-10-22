@@ -454,6 +454,17 @@ K线数据
     
         :rtype: Stock
 
+    .. py:method:: __eq__(other)
+
+        KData 相等比较，语义为「序列身份 + 末根内容」的轻量判定，并非逐条全量比较。判定顺序：同一对象或底层同一 imp 视为相等；stock、query、size 均相同时，仅比较最后一条 KRecord。
+
+        该比较主要供下游缓存守卫判断是否需要重算：实盘场景下，若查询的结束条件为右开口（不含结束日），重新构建的 KData 会带出最新被修订或新增的末根，此时用**不同的** KData 与缓存的 KData 比较，会因 size 或末根不同而判为不等，从而触发重算；复用同一个 KData 则短路为相等，无法感知原地的缓冲区改写。
+
+        注意：仅比较末根，中间任意一根被修订不会被检测到。
+
+        :param KData other: 待比较的另一个 KData
+        :rtype: bool
+
     .. py:method:: get_kdata()
 
         通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData（注意，不是原 KData 的子集）

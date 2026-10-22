@@ -458,6 +458,17 @@ K-line Data
     
         :rtype: Stock
 
+    .. py:method:: __eq__(other)
+
+        Equality comparison of KData, with the semantics of a lightweight "sequence identity + last-record content" check, not a full element-wise comparison. The order is: the same object or one backed by the same imp is equal; when stock, query and size are all the same, only the last KRecord is compared.
+
+        This comparison is mainly used by the downstream cache guards to decide whether to recompute. In the real-time scenario, when the query end is right-open (the end day is exclusive), a freshly built KData picks up the latest revised or newly appended last record, so comparing a *different* KData against the cached one differs in size or in the last record and is judged unequal, triggering recompute; reusing the *same* KData short-circuits to equal and cannot observe an in-place buffer revision.
+
+        Note: only the last record is compared, so a revision to any intermediate bar is not detected.
+
+        :param KData other: the other KData to compare with
+        :rtype: bool
+
     .. py:method:: get_kdata()
 
         Get a new KData that keeps the data type and the adjustment type unchanged through the current KData (note that it is not a subset of the original KData)
