@@ -13,7 +13,7 @@
     * **fill_null** *(bool|True)*: 数据缺失时是否填充 nan 值, 否则以最近值填充
     * **ic_n** *(int|5)*: 用于计算合成后因子 IC 时的 ic_n 日收益率
     * **spearman** *(bool|True)*: 使用 spearman 获取相关系数，否则为 pearson
-    * **mode** *(int|2)*: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
+    * **mode** *(int|0)*: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
     * **save_all_factors** *(bool|False)*: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
 
 
@@ -245,7 +245,7 @@
 
     .. py:method:: get_score(self, date[, start=0, end=Null])
 
-        获取指定日期截面的所有因子值，已经降序排列，相当于各证券日期截面评分。
+        获取指定日期截面的所有因子值，排序方式取决于 mode 参数（0-降序, 1-升序, 2-不排序），相当于各证券日期截面评分。
 
         :param Datetime date: 指定日期
         :param int start: 取当日排名开始
@@ -263,7 +263,7 @@
 
     .. py:method:: get_scores_np(self, date[, start=0, end=Null])
 
-        获取指定日期截面的 numpy 结构化数组，已按评分降序排列。结果较大时优先于 get_scores 使用：整个截面只构建一个数组，而非每条记录一个 Python 对象。字段名为 market_code、name、score。
+        获取指定日期截面的 numpy 结构化数组，按 mode 排序（0-降序, 1-升序, 2-不排序）。结果较大时优先于 get_scores 使用：整个截面只构建一个数组，而非每条记录一个 Python 对象。字段名为 market_code、name、score。
 
         :param Datetime date: 指定日期
         :param int start: 取当日排名开始

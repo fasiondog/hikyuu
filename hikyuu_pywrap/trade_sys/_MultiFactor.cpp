@@ -422,7 +422,7 @@ The custom multi-factor model override hooks:
         py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 
-    Get all the factor values of the cross-section on the specified date, already sorted descending, equivalent to the cross-section scores of the securities on that date.
+    Get all the factor values of the cross-section on the specified date; the order follows the mode parameter: 0-descending, 1-ascending, 2-no sorting. Equivalent to the cross-section scores of the securities on that date.
 
     :param Datetime date: the specified date
     :param int start: the start of the daily ranking to take
@@ -459,8 +459,8 @@ The custom multi-factor model override hooks:
         py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
         R"(get_scores_np(self, date[, start=0, end=Null])
 
-    Get the cross-section of the specified date as a numpy structured array, already sorted
-    descending. Prefer it over get_scores for the large results: one array is built for the whole
+    Get the cross-section of the specified date as a numpy structured array, sorted according to
+    mode (0-descending, 1-ascending, 2-no sorting). Prefer it over get_scores for the large results: one array is built for the whole
     cross-section instead of one Python object per record.
 
     :param Datetime date: the specified date

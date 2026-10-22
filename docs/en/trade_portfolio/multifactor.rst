@@ -13,7 +13,7 @@ Common parameters:
     * **fill_null** *(bool|True)*: whether missing data is filled with NaN; otherwise the most recent available value is carried forward
     * **ic_n** *(int|5)*: the N-day forward return used when calculating the IC of the composed factor
     * **spearman** *(bool|True)*: use Spearman rank correlation; otherwise Pearson
-    * **mode** *(int|2)*: the sorting mode for the cross-section data: 0 descending, 1 ascending, 2 no sorting
+    * **mode** *(int|0)*: the sorting mode for the cross-section data: 0 descending, 1 ascending, 2 no sorting
     * **save_all_factors** *(bool|False)*: whether to retain all factor values; affects the get_actor/get_all_factors methods
 
 
@@ -245,7 +245,7 @@ Multi-factor Composition Algorithm Base Class
 
     .. py:method:: get_score(self, date[, start=0, end=Null])
 
-        Get all factor values on the cross-section of the specified date, already sorted in descending order; equivalent to the cross-sectional scores of the securities on that date.
+        Get all factor values on the cross-section of the specified date; the order follows the mode parameter: 0-descending, 1-ascending, 2-no sorting. Equivalent to the cross-sectional scores of the securities on that date.
 
         :param Datetime date: the specified date
         :param int start: the start index of the daily ranking slice
@@ -263,7 +263,7 @@ Multi-factor Composition Algorithm Base Class
 
     .. py:method:: get_scores_np(self, date[, start=0, end=Null])
 
-        Get the cross-section of the specified date as a numpy structured array, already sorted descending. Prefer it over get_scores for the large results: one array is built for the whole cross-section instead of one Python object per record. The field names are market_code, name and score.
+        Get the cross-section of the specified date as a numpy structured array, sorted according to mode (0-descending, 1-ascending, 2-no sorting). Prefer it over get_scores for the large results: one array is built for the whole cross-section instead of one Python object per record. The field names are market_code, name and score.
 
         :param Datetime date: the specified date
         :param int start: the start of the daily ranking to take

@@ -93,8 +93,8 @@ public:
      */
     const IndicatorList& getAllFactors();
 
-    /** Get all the factor values of the given date cross-section, they are already in the
-     * descending order */
+    /** Get all the factor values of the given date cross-section; the order follows the `mode`
+     * parameter: 0-descending, 1-ascending, 2-no sorting */
     ScoreRecordList getScores(const Datetime&);
 
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end = Null<size_t>());
@@ -116,7 +116,8 @@ public:
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               const ScoresFilterPtr& filter);
 
-    /** Get all the cross-section data, they are already in the descending order */
+    /** Get all the cross-section data; the order of each date follows the `mode` parameter:
+     *  0-descending, 1-ascending, 2-no sorting */
     const vector<ScoreRecordList>& getAllScores();
 
     /**
