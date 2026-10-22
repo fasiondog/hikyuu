@@ -942,7 +942,8 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
         return result;
     }
 
-    m_lastTakeProfit = record.realPrice;
+    // The long take-profit ratchet only rises, so an add-on at a lower price keeps the old level
+    m_lastTakeProfit = std::max(m_lastTakeProfit, record.realPrice);
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     return record;
@@ -1041,7 +1042,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        m_lastTakeProfit = record.realPrice;
+        m_lastTakeProfit = std::max(m_lastTakeProfit, record.realPrice);
         m_trade_list.push_back(record);
         _buyNotifyAll(record);
         m_buyRequestList.erase(m_buyRequestList.begin());
@@ -1637,7 +1638,11 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     }
 
     m_sell_short_days = 0;
-    m_lastShortTakeProfit = realPrice;
+    // The short take-profit ratchet only falls, so an add-on at a higher price keeps the old level;
+    // 0 means the book was flat
+    m_lastShortTakeProfit = m_lastShortTakeProfit == 0.0 || realPrice < m_lastShortTakeProfit
+                              ? realPrice
+                              : m_lastShortTakeProfit;
     m_trade_list.push_back(record);
     _sellNotifyAll(record);
     m_sellShortRequestList.clear();
@@ -1715,7 +1720,9 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
         }
 
         m_sell_short_days = 0;
-        m_lastShortTakeProfit = realPrice;
+        m_lastShortTakeProfit = m_lastShortTakeProfit == 0.0 || realPrice < m_lastShortTakeProfit
+                                  ? realPrice
+                                  : m_lastShortTakeProfit;
         m_trade_list.push_back(record);
         _sellNotifyAll(record);
         m_sellShortRequestList.erase(m_sellShortRequestList.begin());

@@ -139,6 +139,31 @@ SYSPtr makeTpSys(const Stock& stk, const StoplossPtr& tp, int tp_delay_n = 1,
     return sys;
 }
 
+// Emits a buy signal on every given date, to cover the add-position path
+class Iss081MultiBuySG : public SignalBase {
+public:
+    explicit Iss081MultiBuySG(std::vector<Datetime> dates)
+    : SignalBase("ISS081_MultiBuySG"), m_dates(std::move(dates)) {
+        // Keep every signal, so that an entry while already holding a position is exercised
+        setParam<bool>("alternate", false);
+    }
+
+    virtual SignalPtr _clone() override {
+        return make_shared<Iss081MultiBuySG>(m_dates);
+    }
+
+    virtual void _calculate(const KData& kdata) override {
+        for (const auto& d : m_dates) {
+            if (kdata.getPos(d) != Null<size_t>()) {
+                _addBuySignal(d);
+            }
+        }
+    }
+
+private:
+    std::vector<Datetime> m_dates;
+};
+
 const TradeRecord* findTpFirstTrade(const TradeRecordList& trs, BUSINESS business) {
     auto iter = std::find_if(trs.begin(), trs.end(),
                              [&](const TradeRecord& tr) { return tr.business == business; });
@@ -332,6 +357,44 @@ TEST_CASE("test_SYS_Simple_tp_ratchet_anchor_across_ex_date") {
     CHECK_EQ(sell_tr->datetime, Datetime(200007110000LL));
     CHECK_EQ(sell_tr->number, buy_tr->number);
     CHECK_UNARY_FALSE(sys->getTM()->have(stk));
+}
+
+/** @par Test points (an add-on at a lower price must not lower the long take-profit ratchet) */
+TEST_CASE("test_SYS_Simple_tp_addon_keeps_ratchet") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    const Datetime entry(200001040000LL);  // close 25.57
+    const Datetime addon(200001050000LL);  // close 25.28
+    const Datetime check(200003130000LL);  // close 25.53, above the average cost 25.425
+    KData kdata = stk.getKData(KQueryByDate(Datetime(200001040000LL), Datetime(200003200000LL),
+                                            KQuery::DAY, KQuery::NO_RECOVER));
+    REQUIRE_NE(kdata.getPos(check), Null<size_t>());
+
+    // The scripted level equals the add-on price, i.e. below the ratchet kept at the entry price
+    auto tp = make_shared<Iss081ScriptedTP>();
+    tp->addScript(check, 25.28);
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->setParam<bool>("shared_tm", true);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(make_shared<Iss081MultiBuySG>(std::vector<Datetime>{entry, addon}));
+    sys->setMM(MM_FixedCount(100));
+    sys->setTP(tp);
+    sys->run(kdata, true, true);
+
+    const TradeRecordList& trs = sys->getTM()->getTradeList();
+    size_t buys = std::count_if(trs.begin(), trs.end(),
+                                [](const TradeRecord& tr) { return tr.business == BUSINESS_BUY; });
+    REQUIRE_EQ(buys, 2);
+
+    /** @arg the take-profit exits on the check bar because the ratchet kept the entry level */
+    const TradeRecord* sell = findTpFirstTrade(trs, BUSINESS_SELL);
+    REQUIRE_NE(sell, nullptr);
+    CHECK_EQ(sell->datetime, check);
+    CHECK_EQ(sell->from, PART_TAKEPROFIT);
 }
 
 /** @} */
