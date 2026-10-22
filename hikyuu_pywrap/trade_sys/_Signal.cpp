@@ -134,22 +134,39 @@ The custom signal generator interfaces:
 
     :rtype: DatetimeList)")
 
-      .def("_add_signal", &SignalBase::_addSignal, py::arg("datetime"), py::arg("value"), R"()")
+      .def("_add_signal", &SignalBase::_addSignal, py::arg("datetime"), py::arg("value"),
+           R"(_add_signal(self, datetime, value)
+
+    Add a signal value, called in _calculate.
+
+    The signals of the same date are merged into one net value: a positive net keeps only the buy
+    signal, a negative net keeps only the sell signal (the opposite record of that date is
+    dropped), and a net of about zero adds no signal.
+
+    :param Datetime datetime: the date the signal occurs
+    :param float value: the signal value, positive for a buy intent, negative for a sell intent)")
 
       .def("_add_buy_signal", &SignalBase::_addBuySignal, py::arg("datetime"),
            py::arg("value") = 1.0,
-           R"(_add_buy_signal(self, datetime)
+           R"(_add_buy_signal(self, datetime, value=1.0)
 
     Add a buy signal, called in _calculate
 
-    :param Datetime datetime: the date indicating buying)")
+    :param Datetime datetime: the date indicating buying
+    :param float value: the signal value, must be greater than 0; it is merged with the same-date
+                        signals into one net value, so an existing sell signal of the same date is
+                        included and only the net direction is kept)")
 
       .def("_add_sell_signal", &SignalBase::_addSellSignal, py::arg("datetime"),
-           py::arg("value") = -1.0, R"(_add_sell_signal(self, datetime)
+           py::arg("value") = -1.0,
+           R"(_add_sell_signal(self, datetime, value=-1.0)
 
     Add a sell signal, called in _calculate
 
-    :param Datetime datetime: the date indicating selling)")
+    :param Datetime datetime: the date indicating selling
+    :param float value: the signal value, must be less than 0; it is merged with the same-date
+                        signals into one net value, so an existing buy signal of the same date is
+                        included and only the net direction is kept)")
 
       .def("reset", &SignalBase::reset, "The reset operation")
       .def("clone", &SignalBase::clone, "The clone operation")

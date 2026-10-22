@@ -360,17 +360,39 @@ Signal Generator Base Class
 
         :rtype: DatetimeList
 
-    .. py:method:: _add_buy_signal(self, datetime)
+    .. py:method:: _add_signal(self, datetime, value)
 
-        Add a buy signal; called from within _calculate.
+        Add a signal value; called from within _calculate.
+
+        Multiple inputs on the same date are merged into one net value: a positive net keeps only
+        the buy signal, a negative net keeps only the sell signal (the existing opposite record of
+        that date is dropped), and a net of about zero adds no signal. ``_add_buy_signal`` and
+        ``_add_sell_signal`` follow the same merge rule.
+
+        :param Datetime datetime: the datetime of the signal
+        :param float value: the signal value; positive for a buy intent, negative for a sell intent
+
+    .. py:method:: _add_buy_signal(self, datetime[, value=1.0])
+
+        Add a buy signal; called from within _calculate. ``value`` must be greater than 0.
+
+        The value is merged with the same-date signals into one net value: while the net stays
+        positive the buy signal is recorded; when it turns negative no buy signal is recorded for
+        that date and the existing sell record is updated to the net.
 
         :param Datetime datetime: the datetime of the buy signal
+        :param float value: the signal value, defaults to 1.0
 
-    .. py:method:: _add_sell_signal(self, datetime)
+    .. py:method:: _add_sell_signal(self, datetime[, value=-1.0])
 
-        Add a sell signal; called from within _calculate.
+        Add a sell signal; called from within _calculate. ``value`` must be less than 0.
+
+        The value is merged with the same-date signals into one net value: while the net stays
+        negative the sell signal is recorded; when it turns positive no sell signal is recorded
+        for that date and the existing buy record is updated to the net.
 
         :param Datetime datetime: the datetime of the sell signal
+        :param float value: the signal value, defaults to -1.0
 
     .. py:method:: reset(self)
 

@@ -80,13 +80,20 @@ public:
     /** Get the date list of all the sell indications */
     DatetimeList getSellSignal() const;
 
+    /**
+     * Add a signal, it is called in _calculate. The inputs of the same date are merged into one net
+     * value: a positive net keeps only the buy record, a negative net only the sell record, and the
+     * opposite record of the same date is dropped
+     * @param datetime the date when the signal occurs
+     * @param value the signal value, positive for a buy intent, negative for a sell intent
+     */
     void _addSignal(const Datetime& datetime, double value);
 
     /**
      * Add a buy signal, it is called in _calculate
      * @param datetime the date when the buy signal occurs
      * @param value signal value, 1.0 by default; it must be greater than 0, otherwise an exception
-     * is thrown
+     * is thrown; it is merged into the same-date net value (see _addSignal)
      */
     void _addBuySignal(const Datetime& datetime, double value = 1.0);
 
@@ -94,7 +101,7 @@ public:
      * Add a sell signal, it is called in _calculate
      * @param datetime the date when the sell signal occurs
      * @param value signal value, -1.0 by default; it must be less than 0, otherwise an exception is
-     *              thrown
+     *              thrown; it is merged into the same-date net value (see _addSignal)
      */
     void _addSellSignal(const Datetime& datetime, double value = -1.0);
 

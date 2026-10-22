@@ -358,17 +358,36 @@ PF调仓周期买入信号指示器
         
         :rtype: DatetimeList
     
-    .. py:method:: _add_buy_signal(self, datetime)
+    .. py:method:: _add_signal(self, datetime, value)
+
+        加入指定数值的信号，在 ``_calculate`` 中调用。
+
+        同一日期的多次写入按数值合并为净额：净额为正时该日仅保留买入信号，为负时仅保留卖出信号，
+        同日相反方向的已有记录会被移除；净额约为 0 时不产生信号。``_add_buy_signal`` 与
+        ``_add_sell_signal`` 走同一合并逻辑。
+
+        :param Datetime datetime: 信号日期
+        :param float value: 信号值，正数表示买入意向，负数表示卖出意向
+
+    .. py:method:: _add_buy_signal(self, datetime[, value=1.0])
     
-        加入买入信号，在_calculate中调用
+        加入买入信号，在 ``_calculate`` 中调用。value 必须大于 0。
+
+        该值会与同日已有信号合并为净额：净额保持为正时记录买入信号；转为负时该日不写入买入信号，
+        已有卖出记录被更新为净额。
         
         :param Datetime datetime: 指示买入的日期
+        :param float value: 信号值，默认为 1.0
     
-    .. py:method:: _add_sell_signal(self, datetime)
+    .. py:method:: _add_sell_signal(self, datetime[, value=-1.0])
     
-        加入卖出信号，在_calculate中调用
+        加入卖出信号，在 ``_calculate`` 中调用。value 必须小于 0。
+
+        该值会与同日已有信号合并为净额：净额保持为负时记录卖出信号；转为正时该日不写入卖出信号，
+        已有买入记录被更新为净额。
 
         :param Datetime datetime: 指示卖出的日期
+        :param float value: 信号值，默认为 -1.0
         
     .. py:method:: reset(self)
     
