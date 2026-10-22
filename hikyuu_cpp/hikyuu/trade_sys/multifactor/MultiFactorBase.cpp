@@ -506,10 +506,13 @@ Indicator MultiFactorBase::getIC(int ndays) {
 }
 
 Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
-    Indicator ic = getIC(ic_n);
+    HKU_WARN_IF_RETURN(ir_n < 1, Indicator(), htr("ir_n must be >= 1"));
+    int effective_ic_n = ic_n > 0 ? ic_n : getParam<int>("ic_n");
+    HKU_WARN_IF_RETURN(effective_ic_n < 1, Indicator(), htr("ic_n must be >= 1"));
+    Indicator ic = getIC(effective_ic_n);
     Indicator x = (MA(ic, ir_n) / STDEV(ic, ir_n)).getResult(0);
     x.name("ICIR");
-    x.setParam<int>("n", ic_n);
+    x.setParam<int>("n", effective_ic_n);
     x.setParam<int>("rolling_n", ir_n);
     return x;
 }

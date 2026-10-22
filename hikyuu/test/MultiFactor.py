@@ -276,6 +276,36 @@ class MultiFactorTest(unittest.TestCase):
             checked += 1
         self.assertGreater(checked, 0)
 
+    def test_get_icir_resolves_effective_ic_n(self):
+        # C12: getICIR must record the effective IC window in the result's "n" param (a non-positive
+        # ic_n argument falls back to the configured ic_n, but the recorded "n" must be that resolved
+        # window, not the raw 0 default), and rolling_n must match ir_n.
+        query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)
+        mf = MF_EqualWeight([MA(CLOSE(), n=5)], [sm['sh600000'], sm['sz000001']], query,
+                            sm['sh000001'])
+        mf.set_param('save_all_factors', True)
+        mf.set_param('ic_n', 20)
+
+        icir = mf.get_icir(10)  # ic_n defaults to 0 -> should resolve to the configured 20
+        self.assertEqual(icir.get_param('n'), 20)
+        self.assertEqual(icir.get_param('rolling_n'), 10)
+        self.assertGreater(len(icir), 0)
+
+        icir2 = mf.get_icir(10, 30)  # explicit ic_n must be honored
+        self.assertEqual(icir2.get_param('n'), 30)
+        self.assertEqual(icir2.get_param('rolling_n'), 10)
+
+    def test_get_icir_rejects_invalid_ir_n(self):
+        # C12: ir_n < 1 (and an unresolved ic_n < 1) must be rejected instead of producing a
+        # degenerate rolling statistic; the getter returns an empty indicator with a warning.
+        query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)
+        mf = MF_EqualWeight([MA(CLOSE(), n=5)], [sm['sh600000'], sm['sz000001']], query,
+                            sm['sh000001'])
+        mf.set_param('save_all_factors', True)
+
+        self.assertEqual(len(mf.get_icir(0)), 0)
+        self.assertEqual(len(mf.get_icir(-1)), 0)
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MultiFactorTest)
