@@ -17,6 +17,7 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/system/imp/MultiSystem.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
@@ -125,6 +126,16 @@ public:
 
     void clearSrcKData() {
         m_src_kdata = KData();
+    }
+};
+
+// Reports a Python callback without carrying a Python part of its own
+class PythonAwareSystem : public System {
+public:
+    PythonAwareSystem() : System("PythonAwareSystem") {}
+
+    virtual bool hasPythonPart() const override {
+        return true;
     }
 };
 
@@ -453,6 +464,28 @@ TEST_CASE("test_System_profit_goal_called_once_per_bar") {
     for (const auto& item : pg->calls) {
         CHECK_EQ(item.second, 1);
     }
+}
+
+/** @par Check point: an aggregate reports a Python callback held by any sub-system, at any depth */
+TEST_CASE("test_System_hasPythonPart_recurses_into_subsystems") {
+    /** @arg a system with C++ parts only reports none */
+    CHECK_UNARY_FALSE(SYS_Simple()->hasPythonPart());
+
+    /** @arg one sub-system reporting a Python callback is enough */
+    auto ms = std::make_shared<MultiSystem>(
+      SystemList{SYS_Simple(), std::make_shared<PythonAwareSystem>()}, "MS");
+    CHECK_UNARY(ms->hasPythonPart());
+
+    /** @arg the report reaches an aggregate nested in an aggregate */
+    auto nested =
+      std::make_shared<MultiSystem>(SystemList{std::make_shared<MultiSystem>(
+                                      SystemList{std::make_shared<PythonAwareSystem>()}, "INNER")},
+                                    "OUTER");
+    CHECK_UNARY(nested->hasPythonPart());
+
+    /** @arg an aggregate of C++ systems only still reports none */
+    auto clean = std::make_shared<MultiSystem>(SystemList{SYS_Simple(), SYS_Simple()}, "CLEAN");
+    CHECK_UNARY_FALSE(clean->hasPythonPart());
 }
 
 /** @} */

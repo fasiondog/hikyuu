@@ -240,6 +240,10 @@ public:
         return false;
     }
 
+    /** Whether Python may be called back during a run: this system is a Python subclass, a part is
+     *  implemented in Python, or - for the aggregate form - any sub-system at any depth is */
+    virtual bool hasPythonPart() const;
+
     /** Get the direct sub-system list, overridden by the aggregate form. The single-security form
      * returns an empty list. */
     virtual const std::vector<std::shared_ptr<System>>& getSubSystemList() const;

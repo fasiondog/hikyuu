@@ -313,6 +313,22 @@ void System::setTO(const KData& kdata) {
         m_mm->setQuery(query);
 }
 
+bool System::hasPythonPart() const {
+    if (m_is_python_object || (m_tm && m_tm->isPythonObject()) ||
+        (m_ev && m_ev->isPythonObject()) || (m_cn && m_cn->isPythonObject()) ||
+        (m_sg && m_sg->isPythonObject()) || (m_st && m_st->isPythonObject()) ||
+        (m_tp && m_tp->isPythonObject()) || (m_mm && m_mm->isPythonObject()) ||
+        (m_pg && m_pg->isPythonObject()) || (m_sp && m_sp->isPythonObject())) {
+        return true;
+    }
+    for (const auto& sub : getSubSystemList()) {
+        if (sub && sub->hasPythonPart()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 SystemPtr System::clone() {
     SystemPtr p = _clone();
     HKU_CHECK(p && p.get() != this,

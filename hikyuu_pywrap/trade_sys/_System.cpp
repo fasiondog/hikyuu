@@ -540,7 +540,7 @@ Common parameters:
       .def(
         "run",
         [](System& self, const KQuery& query, bool reset, bool reset_all) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.run(query, reset, reset_all);
         },
         py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
@@ -558,7 +558,7 @@ Common parameters:
       .def(
         "run",
         [](System& self, const KData& kdata, bool reset, bool reset_all) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.run(kdata, reset, reset_all);
         },
         py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
@@ -575,7 +575,7 @@ Common parameters:
       .def(
         "run",
         [](System& self, const Stock& stock, const KQuery& query, bool reset, bool reset_all) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.run(stock, query, reset, reset_all);
         },
         py::arg("stock"), py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
@@ -594,7 +594,7 @@ Common parameters:
       .def(
         "ready",
         [](System& self) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.readyForRun();
         },
         R"(ready(self)
@@ -653,7 +653,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def(
         "run",
         [](MultiSystem& self, const KData& kdata, bool reset, bool reset_all) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.run(kdata, reset, reset_all);
         },
         py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
@@ -666,7 +666,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def(
         "run",
         [](MultiSystem& self, const KQuery& query, bool reset, bool reset_all) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             self.run(query, reset, reset_all);
         },
         py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
@@ -684,7 +684,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def(
         "runMoment",
         [](MultiSystem& self, const Datetime& datetime) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             return self.runMoment(datetime);
         },
         py::arg("datetime"),
@@ -697,7 +697,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def(
         "runMomentOnOpen",
         [](MultiSystem& self, const Datetime& datetime) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             return self.runMomentOnOpen(datetime);
         },
         py::arg("datetime"),
@@ -711,7 +711,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def(
         "runMomentOnClose",
         [](MultiSystem& self, const Datetime& datetime) {
-            ScopeGilRelease gil(!system_has_python_part(self));
+            ScopeGilRelease gil(!self.hasPythonPart());
             return self.runMomentOnClose(datetime);
         },
         py::arg("datetime"),
@@ -724,7 +724,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :rtype: MomentResult)")
       .def("ready_for_run",
            [](MultiSystem& self) {
-               ScopeGilRelease gil(!system_has_python_part(self));
+               ScopeGilRelease gil(!self.hasPythonPart());
                self.readyForRun();
            })
       .def("set_mode", &MultiSystem::setMode, py::arg("mode"),
