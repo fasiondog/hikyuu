@@ -228,6 +228,9 @@ The custom multi-factor model override hooks:
     - _reset : [Optional] Reset the internal member variables)")
       .def(py::init<>())
       .def(py::init<const MultiFactorBase&>())
+      .def(py::init<const string&>(), R"(The initialization constructor
+
+    :param str name: the name)")
 
       .def("__str__", to_py_str<MultiFactorBase>)
       .def("__repr__", to_py_str<MultiFactorBase>)

@@ -363,6 +363,14 @@ class MultiFactorTest(unittest.TestCase):
                          [sc.stock.market_code for sc in all_scores])
         self.assertEqual([sc.value for sc in kept_all], [sc.value for sc in all_scores])
 
+    def test_crtMF_construct_with_name(self):
+        # crtMF builds the subclass instance via super().__init__(name): MultiFactorBase must
+        # expose the name constructor, otherwise the construction raises TypeError
+        from hikyuu.trade_sys.trade_sys import crtMF
+
+        mf = crtMF(lambda all_stk_inds: [inds[0] for inds in all_stk_inds])
+        self.assertEqual(mf.name, "crtMF")
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MultiFactorTest)
