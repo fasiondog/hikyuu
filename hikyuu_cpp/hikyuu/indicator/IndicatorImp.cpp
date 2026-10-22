@@ -164,6 +164,23 @@ uint64_t IndicatorImp::originId() const noexcept {
     return m_origin_id;
 }
 
+bool IndicatorImp::hasPythonPart() const noexcept {
+    if (m_is_python_object) {
+        return true;
+    }
+    for (const auto &param : m_ind_params) {
+        const IndicatorImpPtr &imp = param.second;
+        if (imp && imp->hasPythonPart()) {
+            return true;
+        }
+    }
+    if ((m_left && m_left->hasPythonPart()) || (m_right && m_right->hasPythonPart()) ||
+        (m_three && m_three->hasPythonPart())) {
+        return true;
+    }
+    return false;
+}
+
 IndicatorImp::IndicatorImp() : m_name("IndicatorImp") {
     memset(m_pBuffer, 0, sizeof(buffer_t *) * MAX_RESULT_NUM);
 }

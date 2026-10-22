@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_sys/signal/build_in.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -61,8 +62,13 @@ The custom signal generator interfaces:
       .def_property("name", py::overload_cast<>(&SignalBase::name, py::const_),
                     py::overload_cast<const string&>(&SignalBase::name),
                     py::return_value_policy::copy, "Name")
-      .def_property("to", &SignalBase::getTO, &SignalBase::setTO, py::return_value_policy::copy,
-                    "Set or get the trading object")
+      .def_property(
+        "to", &SignalBase::getTO,
+        [](SignalBase* self, const KData& kdata) {
+            ScopeGilRelease gil(!self->hasPythonPart());
+            self->setTO(kdata);
+        },
+        py::return_value_policy::copy, "Set or get the trading object")
 
       .def("get_cycle_dates", &SignalBase::getCycleDates, py::return_value_policy::copy,
            R"(get_cycle_dates(self)

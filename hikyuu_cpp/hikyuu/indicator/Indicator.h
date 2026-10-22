@@ -231,6 +231,8 @@ public:
 
     bool isPythonObject() const noexcept;
 
+    bool hasPythonPart() const noexcept;
+
 public:
     class Iterator {
     private:
@@ -413,6 +415,10 @@ inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const
 
 inline bool Indicator::isPythonObject() const noexcept {
     return m_imp ? m_imp->isPythonObject() : false;
+}
+
+inline bool Indicator::hasPythonPart() const noexcept {
+    return m_imp ? m_imp->hasPythonPart() : false;
 }
 
 //--------------------------------------------------------------

@@ -26,6 +26,10 @@ public:
     virtual void _calculate(const KData& kdata) override;
     virtual void _checkParam(const string& name) const override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_ind.hasPythonPart();
+    }
+
 private:
     Indicator m_ind;
 

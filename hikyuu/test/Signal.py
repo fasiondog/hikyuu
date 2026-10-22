@@ -7,6 +7,8 @@
 # History: 1)20130321, Added by fasiondog
 # ===============================================================================
 
+import threading
+import time
 import unittest
 
 from test_init import *
@@ -29,6 +31,27 @@ class SignalPython(SignalBase):
     def _calculate(self, kdata):
         self._add_buy_signal(Datetime(201201210000))
         self._add_sell_signal(Datetime(201201300000))
+
+
+class CountingSG(SignalBase):
+    """Counts the _calculate callbacks of every instance, clones included"""
+
+    instances = []
+
+    def __init__(self):
+        super(CountingSG, self).__init__("CountingSG")
+        self.called = 0
+        CountingSG.instances.append(self)
+
+    def _clone(self):
+        p = CountingSG()
+        p.called = self.called
+        return p
+
+    def _calculate(self, kdata):
+        self.called += 1
+        if len(kdata) > 0:
+            self._add_buy_signal(kdata[0].datetime)
 
 
 class SignalTest(unittest.TestCase):
@@ -148,6 +171,61 @@ class TestCrtSGWithClone(unittest.TestCase):
         self.assertEqual(p2.x, p.x)
 
 
+class TestSGTradingObject(unittest.TestCase):
+    """Setting the trading object recalculates with the GIL released"""
+
+    def test_set_to_releases_gil(self):
+        kdata = sm['sh000001'].get_kdata(Query(0))
+        if len(kdata) < 3000:
+            self.skipTest("not enough bars to observe the released GIL")
+
+        # different queries, so that no assignment is short-circuited by the unchanged object
+        objects = [sm['sh000001'].get_kdata(Query(i, i + 3000)) for i in range(40)]
+        sg = SG_Cross(MA(CLOSE(), 250), AMA(CLOSE(), 20))
+
+        ticks = [0]
+        stopped = threading.Event()
+
+        def ticker():
+            while not stopped.is_set():
+                ticks[0] += 1
+
+        thread = threading.Thread(target=ticker, daemon=True)
+        thread.start()
+        time.sleep(0.05)
+        ticks[0] = 0
+        try:
+            for one in objects:
+                sg.to = one
+        finally:
+            stopped.set()
+            thread.join()
+
+        # a call holding the GIL would leave the other thread at a handful of ticks
+        self.assertGreater(ticks[0], 1000)
+        self.assertGreater(len(sg.get_buy_signal()), 0)
+        self.assertGreater(len(sg.get_sell_signal()), 0)
+
+    def test_python_part_still_driven(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        self.assertFalse(kdata.empty())
+
+        sg = CountingSG()
+        sg.to = kdata
+        self.assertEqual(sg.called, 1)
+        self.assertEqual(len(sg.get_buy_signal()), 1)
+
+        # a composition drives its own clone of the Python signal through the trampoline
+        composed = sg + SG_AllwaysBuy()
+        nested = CountingSG.instances[-1]
+        self.assertIsNot(nested, sg)
+        self.assertEqual(nested.called, sg.called)
+        composed.to = kdata
+        self.assertEqual(nested.called, sg.called + 1)
+        self.assertEqual(len(composed.get_buy_signal()), 1)
+        self.assertEqual(composed.should_buy(kdata[0].datetime), True)
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
@@ -158,3 +236,7 @@ def suiteTestCrtSG():
 
 def suiteTestCrtSGWithClone():
     return unittest.TestLoader().loadTestsFromTestCase(TestCrtSGWithClone)
+
+
+def suiteTestSGTradingObject():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGTradingObject)

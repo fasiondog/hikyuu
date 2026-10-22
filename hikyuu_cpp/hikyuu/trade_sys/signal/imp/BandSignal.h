@@ -23,6 +23,10 @@ public:
     virtual SignalPtr _clone() override;
     virtual void _calculate(const KData& kdata) override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_ind.hasPythonPart();
+    }
+
 private:
     Indicator m_ind;
     price_t m_lower = 0.0, m_upper = 0.0;

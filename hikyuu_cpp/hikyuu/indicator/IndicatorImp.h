@@ -211,6 +211,10 @@ public:
 
     bool isPythonObject() const noexcept;
 
+    /** Whether this implementation or any indicator it holds is defined in Python (isPythonObject
+     *  checks only the node itself). ABI note: a new slot here needs the plugins rebuilt */
+    virtual bool hasPythonPart() const noexcept;
+
     /**
      * Whether this implementation can be recalculated repeatedly on a reusable batch executor.
      *

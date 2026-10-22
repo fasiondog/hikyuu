@@ -24,6 +24,10 @@ public:
 
     virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return IndicatorImp::hasPythonPart() || m_ref_ind.hasPythonPart();
+    }
+
     KData getContextKdata() const;
 
     // Forcefully set its own context data

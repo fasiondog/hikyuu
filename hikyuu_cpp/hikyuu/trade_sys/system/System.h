@@ -240,8 +240,8 @@ public:
         return false;
     }
 
-    /** Whether Python may be called back during a run: this system is a Python subclass, a part is
-     *  implemented in Python, or - for the aggregate form - any sub-system at any depth is */
+    /** Whether Python may be called back during a run (this system, a part, or any sub-system at
+     *  any depth). The GIL is released regardless, this only decides the log stream routing */
     virtual bool hasPythonPart() const;
 
     /** Get the direct sub-system list, overridden by the aggregate form. The single-security form
