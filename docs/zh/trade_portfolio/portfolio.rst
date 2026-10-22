@@ -17,6 +17,8 @@
 
    组合的执行范式由 :class:`MultiSystem` 自身持有的**运行模式**决定（经 ``set_mode`` 设定），三个工厂对应三种模式：
 
+   PF 工厂只设定**顶层**模式；子系统可再嵌套任意模式的 :class:`MultiSystem`。嵌套时的账户拓扑、清仓语义与调仓节拍见 :doc:`../trade_sys/system` 的「模式嵌套与混搭」。
+
    .. list-table::
       :header-rows: 1
 
@@ -83,10 +85,17 @@ PF 部件说明:
 
     创建一个多标的、单系统策略的投资组合（**返回 MultiSystem，运行于模式 B「资金配置」（Fund Allocation）**）。
 
-    模式 B 语义（配额划拨，FOF/MOM 风格）：每个调仓日由 AF 先为选中的子系统分配额度（L1）；
-    选中的子系统在驱动**之前**被校准到其额度（回收影子现金 → 清仓未选中 → 减持超配 → 注资低配），
+    模式 B 语义（配额划拨，FOF/MOM 风格）：每个调仓日由 AF 先为选中的子系统分配 额度（L1）；
+    选中的子系统在驱动**之前**被校准到其额度（零配额清算 → 未选中清算/配额现金回收 → 减持超配 → 注资低配），
     并以精确额度自主交易；父透传其真实指令（L2 透传），L3 组合风控跳过（尊重子管理人自主性）。
-    未选中的子系统在调仓日强制清仓。子系统影子账户从 0 起步并跟随父账户成本函数。
+    ``PF_Simple`` 与旧 ``SimplePortfolio`` 对齐：固定 ``trade_on_close=True``、``sell_at_not_selected=True``，
+    调仓日未选中者连同父账户持仓一并清仓；如需“未选中保持运行”，请直接使用 ``MultiSystem(mode="B")``
+    并保持 ``sell_at_not_selected=False``。子系统影子账户从 0 起步并跟随父账户成本函数。
+
+    配额账户的现金是**虚拟预算**：``checkin/checkout`` 只记子账户账本，不会从父账户扣减或划回；父账户的真实现金只在镜像成交时变化。
+    同一调仓日内的注资按“父剩余现金”累计封顶，因此镜像买入始终有资金支撑、两本账（持仓/成交）保持匹配；
+    超额配置（如 ``fixed-amount`` 超过父可用现金）会在注资时截断并一次性告警，不会形成隐性杠杆。
+    两本账的现金**不做守恒约束**（配额现金不与父现金对账）；若需要“每子硬预算 / 可审计承诺”，属于独立的“资金承诺台账”方案。
 
     调仓模式 adjust_mode 说明：
     - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype 决定周期间隔；
@@ -135,7 +144,7 @@ PF 部件说明:
     模式 A 语义（信号汇总）：子系统在信号「影子账户」上作为纯信号源（信号资金**恒运行、不重置**）；
     父通过 AF L2 把建议换算为父账户目标持仓（目标市值 = 权重 × 净敞口比重 × 父净值，按标的聚合后
     对当前持仓取差额再平衡），并应用 L3 组合风控（如 ``max-single-position``）。
-    未选中的子系统默认不清仓（``sell_at_not_selected=False``）。
+    未选中的子系统**不参与父目标采样，其标的从父目标中消失而被平仓**；``sell_at_not_selected`` 在模式 A 不参与该行为（父账户平的是自身持仓，不触碰影子账户）。
 
     这是重构初期由 ``PF_WithoutAF`` 承担的预置；``PF_WithoutAF`` 已改回模式 C，模式 A 预置另立此名。
 
@@ -148,6 +157,6 @@ PF 部件说明:
     :param str adjust_mode: 调仓模式 "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行
-    :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出
+    :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出（模式 A 中忽略该参数，见上）
     :param float sub_init_cash: 子系统影子账户的信号资金（恒运行、不重置）
     :rtype: MultiSystem

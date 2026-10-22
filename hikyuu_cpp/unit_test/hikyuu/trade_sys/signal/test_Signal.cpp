@@ -263,6 +263,7 @@ TEST_CASE("test_Signal_clone_cycle_bounds") {
     REQUIRE(k.size() >= 15);
 
     SignalPtr p(new SignalTest);
+    p->setParam<bool>("alternate", false);
     p->setParam<bool>("cycle", true);
     p->setTO(k);
 
@@ -274,11 +275,15 @@ TEST_CASE("test_Signal_clone_cycle_bounds") {
     CHECK_EQ(p->getCycleStart(), t0);
     CHECK_EQ(p->getCycleEnd(), t1);
 
+    /** @arg the cycle start is registered into the declared rebalancing days */
+    CHECK_UNARY(p->getCycleDates().size() == 1 && p->getCycleDates()[0] == t0);
+
     /** @arg After clone the cycle boundary must be copied completely, end must not become start */
     SignalPtr c = p->clone();
     CHECK_NE(p, c);
     CHECK_EQ(c->getCycleStart(), t0);
     CHECK_EQ(c->getCycleEnd(), t1);
+    CHECK_UNARY(c->getCycleDates() == p->getCycleDates());
 }
 
 /** @par Test points */
@@ -294,6 +299,7 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
 
     // The parent signal: cycle=true and startCycle already called (an Operator parent holds it)
     SignalPtr parent(new SignalTest);
+    parent->setParam<bool>("alternate", false);
     parent->setParam<bool>("cycle", true);
     parent->setTO(k);
     parent->startCycle(t0, t1);
@@ -305,10 +311,8 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
     CHECK_EQ(cloned->getCycleStart(), t0);
     CHECK_EQ(cloned->getCycleEnd(), t1);
 
-    // Simulate the cascading of OperatorSignal::sub_sg_calculate:
-    //   child->startCycle(parent.m_cycle_start, parent.m_cycle_end)
-    // Before the fix: startCycle(t0, t0) triggers HKU_CHECK(start < close)
-    // After the fix: startCycle(t0, t1) passes legally and produces a buy signal
+    // Simulate the cycle start declaration on a child: startCycle registers the day and
+    // recalculates the whole trading object once (no window slicing)
     auto child = SG_Cycle();
     child->setTO(k);
     REQUIRE_NOTHROW(child->startCycle(cloned->getCycleStart(), cloned->getCycleEnd()));
@@ -504,35 +508,34 @@ TEST_CASE("test_SG_Operator_cycle_sub") {
     }
 
     Datetime start = k[5].datetime;
-    Datetime close = k[10].datetime;
+    Datetime start2 = k[8].datetime;
 
-    /** @arg a combined signal with one cycle child inherits the cycle attribute and stays silent
-     * until startCycle drives it */
+    /** @arg a combined signal with one cycle child inherits both the cycle attribute and the
+     * non-alternating behavior of the scheduled entry; the declared days are forwarded to the
+     * children and take part in the single full-range calculation, while the normal child keeps
+     * its own full-range signals */
     SignalPtr or_mixed = SG_Cycle() | make_shared<SignalCalcTest>();
     CHECK_UNARY(or_mixed->getParam<bool>("cycle"));
+    CHECK_UNARY(!or_mixed->getParam<bool>("alternate"));
+    or_mixed->setCycleDates({start, start2});
     or_mixed->setTO(k);
-    CHECK_UNARY(or_mixed->getBuySignal().empty());
-    CHECK_UNARY(or_mixed->getSellSignal().empty());
-
-    /** @arg startCycle drives both children within the cycle window: the cycle child buys at the
-     * start, and the normal child also buys at the start and sells at the window's last bar */
-    or_mixed->startCycle(start, close);
-    CHECK_UNARY(or_mixed->getBuySignal().size() == 1 && or_mixed->getBuySignal()[0] == start);
-    // getKData(start, close) is a half-open range, so the last bar the children see is k[9]
-    CHECK_UNARY(or_mixed->getSellSignal().size() == 1 &&
-                or_mixed->getSellSignal()[0] == k[9].datetime);
+    CHECK_UNARY(or_mixed->getBuySignal().size() == 3);
     CHECK_EQ(or_mixed->getBuyValue(start), 1.0);
+    CHECK_EQ(or_mixed->getBuyValue(start2), 1.0);
+    CHECK_EQ(or_mixed->getBuyValue(k.front().datetime), 1.0);
+    CHECK_UNARY(or_mixed->getSellSignal().size() == 1 &&
+                or_mixed->getSellSignal()[0] == k.back().datetime);
 
-    /** @arg a combined signal whose both children are cycle-driven is driven by startCycle too */
+    /** @arg a combined signal whose both children are cycle-driven consumes the same declaration,
+     * every declared day yields its buy */
     SignalPtr or_cycle = SG_Cycle() | SG_Cycle();
     CHECK_UNARY(or_cycle->getParam<bool>("cycle"));
+    CHECK_UNARY(!or_cycle->getParam<bool>("alternate"));
+    or_cycle->setCycleDates({start, start2});
     or_cycle->setTO(k);
-    CHECK_UNARY(or_cycle->getBuySignal().empty());
-    CHECK_UNARY(or_cycle->getSellSignal().empty());
-
-    or_cycle->startCycle(start, close);
-    CHECK_UNARY(or_cycle->getBuySignal().size() == 1 && or_cycle->getBuySignal()[0] == start);
+    CHECK_UNARY(or_cycle->getBuySignal().size() == 2);
     CHECK_EQ(or_cycle->getBuyValue(start), 1.0);
+    CHECK_EQ(or_cycle->getBuyValue(start2), 1.0);
     CHECK_UNARY(or_cycle->getSellSignal().empty());
 }
 
@@ -544,14 +547,139 @@ TEST_CASE("test_SG_ValueSignal_cycle_sub") {
         return;
     }
 
-    /** @arg a cycle sub-signal in a value combined signal is driven by startCycle */
+    /** @arg a cycle sub-signal in a value combined signal consumes the declared days and keeps the
+     * non-alternating behavior of the scheduled entry */
     SignalPtr mul = SG_Cycle() * 2.0;
-    mul->setTO(k);
     Datetime start = k[5].datetime;
-    Datetime close = k[10].datetime;
-    mul->startCycle(start, close);
-    CHECK_UNARY(mul->getBuySignal().size() == 1 && mul->getBuySignal()[0] == start);
+    Datetime start2 = k[8].datetime;
+    CHECK_UNARY(!mul->getParam<bool>("alternate"));
+    mul->setCycleDates({start, start2});
+    mul->setTO(k);
+    CHECK_UNARY(mul->getBuySignal().size() == 2);
     CHECK_UNARY(mul->getBuyValue(start) == 2.0);
+    CHECK_UNARY(mul->getBuyValue(start2) == 2.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_Signal_cycle_flag_not_change_calculation") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 40));
+    if (k.size() < 30) {
+        return;
+    }
+
+    DatetimeList dates = k.getDatetimeList();
+    PriceList fast_vals(k.size(), 0.0);
+    PriceList slow_vals(k.size(), 0.5);
+    for (size_t i = 0; i < k.size(); ++i) {
+        fast_vals[i] = (i % 6 < 3) ? 1.0 : 0.0;
+    }
+
+    /** @arg the cycle flag no longer changes the calculation range: the same indicator signal
+     * yields the same table with cycle=true and cycle=false (both non-alternating, so that the
+     * comparison isolates the calculation range) */
+    SignalPtr normal = SG_Cross(PRICELIST(fast_vals, dates), PRICELIST(slow_vals, dates));
+    normal->setParam<bool>("alternate", false);
+    normal->setTO(k);
+    CHECK_UNARY(!normal->getBuySignal().empty() || !normal->getSellSignal().empty());
+
+    SignalPtr cycle = SG_Cross(PRICELIST(fast_vals, dates), PRICELIST(slow_vals, dates));
+    cycle->setParam<bool>("cycle", true);
+    CHECK_UNARY(!cycle->getParam<bool>("alternate"));
+    cycle->setTO(k);
+    CHECK_UNARY(cycle->getBuySignal() == normal->getBuySignal());
+    CHECK_UNARY(cycle->getSellSignal() == normal->getSellSignal());
+}
+
+/** @par Test points */
+TEST_CASE("test_Signal_cycle_forces_no_alternate") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg a cycle signal is a scheduled entry: alternate=true is coerced back */
+    auto p = make_shared<SignalCalcTest>();
+    p->setParam<bool>("alternate", false);
+    p->setParam<bool>("cycle", true);
+    CHECK_UNARY(!p->getParam<bool>("alternate"));
+    p->setParam<bool>("alternate", true);
+    CHECK_UNARY(!p->getParam<bool>("alternate"));
+
+    /** @arg SG_Cycle follows the same invariant (no hard exception left behind) */
+    SignalPtr sc = SG_Cycle();
+    sc->setParam<bool>("alternate", true);
+    CHECK_UNARY(!sc->getParam<bool>("alternate"));
+
+    /** @arg the same invariant holds when switching an already alternate signal to cycle */
+    auto q = make_shared<SignalCalcTest>();
+    CHECK_UNARY(q->getParam<bool>("alternate"));
+    q->setParam<bool>("cycle", true);
+    CHECK_UNARY(!q->getParam<bool>("alternate"));
+
+    /** @arg a composition containing a cycle child keeps the invariant even if alternate is set
+     * explicitly afterwards */
+    SignalPtr comp = SG_Cycle() | SG_Cycle();
+    CHECK_UNARY(!comp->getParam<bool>("alternate"));
+    comp->setParam<bool>("alternate", true);
+    CHECK_UNARY(!comp->getParam<bool>("alternate"));
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Cycle_injected_dates") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    Datetime t0 = k[5].datetime;
+    Datetime t1 = k[20].datetime;
+
+    /** @arg a cycle signal stays silent without the declared rebalancing days */
+    SignalPtr sg = SG_Cycle();
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+
+    /** @arg the declared days inside the trading object are emitted, the outside ones ignored */
+    sg->setCycleDates({t0, t1, k.back().datetime + Days(1)});
+    CHECK_UNARY(sg->getBuySignal().size() == 2);
+    CHECK_EQ(sg->getBuyValue(t0), 1.0);
+    CHECK_EQ(sg->getBuyValue(t1), 1.0);
+
+    /** @arg startCycle registers one more day of the same list */
+    Datetime t2 = k[10].datetime;
+    sg->startCycle(t2, k[15].datetime);
+    CHECK_UNARY(sg->getBuySignal().size() == 3);
+    CHECK_EQ(sg->getBuyValue(t2), 1.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_Signal_set_cycle_dates_recalculate_once") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    auto p = make_shared<SignalCalcTest>();
+    p->setParam<bool>("cycle", true);
+    p->setTO(k);
+    CHECK_EQ(p->calcCount(), 1);
+
+    /** @arg a changed declared list triggers exactly one full-range recalculation */
+    p->setCycleDates({k[0].datetime, k[5].datetime});
+    CHECK_EQ(p->calcCount(), 2);
+
+    /** @arg the same list in another order is a no-op */
+    p->setCycleDates({k[5].datetime, k[0].datetime});
+    CHECK_EQ(p->calcCount(), 2);
+
+    /** @arg startCycle registers the day through the same path: one more recalculation */
+    p->startCycle(k[10].datetime, k[15].datetime);
+    CHECK_EQ(p->calcCount(), 3);
+    CHECK_EQ(p->getCycleDates().size(), 3);
 }
 
 /** @par Test points */

@@ -9,6 +9,7 @@
 #ifndef POSITIONRECORD_H_
 #define POSITIONRECORD_H_
 
+#include "../serialization/PriceSerialization.h"
 #include "../StockManager.h"
 #include "../serialization/Stock_serialization.h"
 
@@ -73,7 +74,8 @@ private:
         ar& bs::make_nvp("cleanDatetime", clean);
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
-        ar& BOOST_SERIALIZATION_NVP(goalPrice);
+        std::string gp = priceToSerialString(goalPrice);
+        ar& bs::make_nvp("goalPrice", gp);
         ar& BOOST_SERIALIZATION_NVP(totalNumber);
         ar& BOOST_SERIALIZATION_NVP(buyMoney);
         ar& BOOST_SERIALIZATION_NVP(totalCost);
@@ -94,7 +96,9 @@ private:
         cleanDatetime = Datetime(clean);
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
-        ar& BOOST_SERIALIZATION_NVP(goalPrice);
+        std::string gp;
+        ar& bs::make_nvp("goalPrice", gp);
+        goalPrice = priceFromSerialString(gp);
         ar& BOOST_SERIALIZATION_NVP(totalNumber);
         ar& BOOST_SERIALIZATION_NVP(buyMoney);
         ar& BOOST_SERIALIZATION_NVP(totalCost);

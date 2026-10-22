@@ -55,7 +55,7 @@ static py::dict combinate_ind_analysis(const Stock& stk, const KQuery& query, Tr
 
     std::map<std::string, Performance> pers;
     {
-        ScopeGilRelease gil(!system_has_python_part(sys));
+        ScopeGilRelease gil(!(sys && sys->hasPythonPart()));
         pers = combinateIndicatorAnalysis(stk, query, tm, sys, c_buy_inds, c_sell_inds, n);
     }
 
@@ -82,7 +82,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
 
     vector<CombinateAnalysisOutput> records;
     {
-        ScopeGilRelease gil(!system_has_python_part(sys));
+        ScopeGilRelease gil(!(sys && sys->hasPythonPart()));
         records =
           combinateIndicatorAnalysisWithBlock(blk, query, tm, sys, c_buy_inds, c_sell_inds, n);
     }

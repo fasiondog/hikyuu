@@ -21,6 +21,7 @@ public:
     virtual void _reset() override;
     virtual SignalPtr _clone() override;
     virtual void _calculate(const KData& kdata) override {}
+    virtual void setCycleDates(const DatetimeList& dates) override;
 
 protected:
     void sub_sg_calculate(const KData& kdata);

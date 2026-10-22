@@ -205,9 +205,10 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
             // The fixed quotas are absolute amounts and stay exempt from the cap; the user is told
             // because the sum of the quotas can exceed what the parent account can fund
             std::call_once(g_fixed_amount_cap_warn_flag, [this]() {
-                HKU_WARN("{}: the fixed-amount quotas exceed max-total-position x net assets, "
-                         "they are kept as absolute amounts!",
-                         m_name);
+                HKU_WARN(
+                  "{}: the fixed-amount quotas exceed max-total-position x net assets, "
+                  "they are kept as absolute amounts!",
+                  m_name);
             });
         }
         for (auto& ctx : contexts) {
@@ -233,10 +234,19 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         // Mode B / C: pass through the real instruction of the sub-system (number is the order
         // quantity of the sub-manager), the parent does not convert it. Only the long-side SELL
         // suggestions are defensively clipped to not exceed the current position of the parent; a
-        // short-side SELL opens/increases a short and has no long position to clip against.
+        // short-side SELL opens/increases a short and has no long position to clip against. The
+        // same-batch BUY legs of the instrument are part of the available quantity: the batch is
+        // netted at execution, so a same-bar open fill followed by a close reversal is legal
+        std::map<Stock, double> batch_buy;
+        for (const auto& s : suggestions) {
+            if (s.type == SuggestionType::BUY && !s.short_side) {
+                batch_buy[s.stock] += std::abs(s.number);
+            }
+        }
         for (auto& s : suggestions) {
             if (s.type == SuggestionType::SELL && !s.short_side) {
                 double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+                current += batch_buy[s.stock];
                 if (s.number > current) {
                     s.number = current;
                 }
@@ -276,12 +286,15 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         auto it = sys_weight.find(s.sys);
         if (it != sys_weight.end()) {
             weight = it->second;
-        } else if (!sys_weight.empty()) {
+        } else if (s.sys && !sys_weight.empty()) {
             // The sub-system got no weight (the AF skipped it, e.g. a non-finite weight): never
-            // scale its intent by a fabricated equal weight
-            HKU_WARN("{}::_toTargets: no weight for the sub-system of {}, the suggestion is "
-                     "skipped!",
-                     m_name, s.stock.market_code());
+            // scale its intent by a fabricated equal weight. Parent-synthesized suggestions carry
+            // no sub-system (e.g. the zero target of an unselected instrument) and must not be
+            // dropped here
+            HKU_WARN(
+              "{}::_toTargets: no weight for the sub-system of {}, the suggestion is "
+              "skipped!",
+              m_name, s.stock.market_code());
             continue;
         }
         double v = weight * s.target_position_ratio * parent_net;
@@ -297,10 +310,10 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         // The aggregate-then-apply step: one ±fixed-amount target per instrument (a flat aggregate
         // means the conflicting intents cancel out, so the instrument is driven to zero)
         for (const auto& kv : fixed_dir) {
-            if (kv.second == 0.0) {
-                continue;
-            }
-            double target = (kv.second > 0.0) ? fixed_amount : -fixed_amount;
+            // A flat aggregate (conflicting intents cancel out, or a zero target from an unselected
+            // instrument) drives the instrument to zero
+            double target =
+              (kv.second > 0.0) ? fixed_amount : (kv.second < 0.0 ? -fixed_amount : 0.0);
             target_value[kv.first] = target;
             gross += std::fabs(target);
         }
@@ -336,9 +349,10 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     if (fixed_amount > 0.0 && max_total > 0.0 && parent_net > 0.0 &&
         gross > parent_net * max_total) {
         std::call_once(g_fixed_amount_cap_warn_flag, [this]() {
-            HKU_WARN("{}::_toTargets: the fixed-amount targets exceed max-total-position x net "
-                     "assets, they are kept as absolute amounts!",
-                     m_name);
+            HKU_WARN(
+              "{}::_toTargets: the fixed-amount targets exceed max-total-position x net "
+              "assets, they are kept as absolute amounts!",
+              m_name);
         });
     }
     if (fixed_amount <= 0.0 && max_total > 0.0 && parent_net > 0.0 &&
@@ -423,8 +437,8 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     TradeSuggestionList filtered;
     filtered.reserve(orders.size());
     for (auto& o : orders) {
-        const bool needs_lot = (o.type == SuggestionType::BUY) ||
-                               (o.type == SuggestionType::SELL && o.short_side);
+        const bool needs_lot =
+          (o.type == SuggestionType::BUY) || (o.type == SuggestionType::SELL && o.short_side);
         double min_trade = o.stock.minTradeNumber();
         if (needs_lot && min_trade > 0.0 && o.number < min_trade) {
             HKU_WARN("Skip the opening leg of {} ({:.0f}), it is below one lot!",

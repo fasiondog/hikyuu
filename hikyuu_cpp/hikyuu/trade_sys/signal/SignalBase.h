@@ -110,9 +110,29 @@ public:
      */
     const KData& getTO() const;
 
+    /**
+     * Declare a rebalancing cycle window (compatibility interface): it only records the cycle
+     * boundaries and registers the start day into the cycle-date list, it no longer slices the
+     * trading object nor recalculates the signal within the window
+     * @param start the cycle start
+     * @param end the cycle end (it is only kept for introspection)
+     */
     void startCycle(const Datetime& start, const Datetime& end);
     const Datetime& getCycleStart() const;
     const Datetime& getCycleEnd() const;
+
+    /**
+     * Declare the rebalancing days (the run-level input of the cycle signals): the signal is always
+     * calculated over the whole trading object, these dates are only consumed by the cycle signals
+     * (SG_Cycle emits a buy signal on each of them)
+     * @param dates the rebalancing days
+     */
+    virtual void setCycleDates(const DatetimeList& dates);
+
+    /** Get the declared rebalancing days */
+    const DatetimeList& getCycleDates() const {
+        return m_cycle_dates;
+    }
 
     /** Reset operation */
     void reset();
@@ -143,6 +163,10 @@ public:
 private:
     void initParam();
 
+    /** Keep the cycle/alternate parameters consistent: a scheduled (cycle) signal must not
+     *  alternate, otherwise the later rebalancing buys would be silently dropped */
+    void _normalizeCycleAlternate();
+
 protected:
     friend class OperatorSignal;
 
@@ -172,6 +196,9 @@ protected:
 
     Datetime m_cycle_start;
     Datetime m_cycle_end;
+    // The declared rebalancing days, a run-level input of the cycle signals (runtime state, not
+    // serialized)
+    DatetimeList m_cycle_dates;
 
 //============================================
 // Serialization support
@@ -205,6 +232,7 @@ private:
         // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
+        _normalizeCycleAlternate();
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

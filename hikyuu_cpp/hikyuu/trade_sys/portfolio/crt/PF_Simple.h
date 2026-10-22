@@ -43,7 +43,7 @@ namespace hku {
  *       to the quota before it is driven; the sub-system suggestions are mirrored by the parent
  *       (L2 pass-through) and the L3 portfolio risk control is skipped. The unselected
  *       sub-systems are force cleared on the rebalancing day. adjust_mode / delay_to_trading_day
- *       are expanded by MultiSystem internally into the rebalancing day table.
+ *       follow the runtime period rule inside MultiSystem.
  * @param tm trade account
  * @param se system selector
  * @param af fund allocation algorithm (AFPtr, carrying the L1/L2/L3 layers, see AllocateFundsBase)

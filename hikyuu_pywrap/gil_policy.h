@@ -17,25 +17,11 @@
 
 namespace hku {
 
-// Whether any of the parts is implemented in Python
-template <typename... Parts>
-inline bool any_python_part(const Parts&... parts) {
-    return ((parts && parts->isPythonObject()) || ...);
-}
-
-// A system may call back into Python via any of its parts, or being a Python subclass itself.
-inline bool system_has_python_part(const SystemPtr& sys) {
-    if (!sys) {
-        return false;
-    }
-    return sys->isPythonObject() ||
-           any_python_part(sys->getSG(), sys->getST(), sys->getTP(), sys->getMM(), sys->getPG(),
-                           sys->getSP(), sys->getCN(), sys->getEV(), sys->getTM());
-}
-
+// Whether any system of the list may call back into Python, either by itself, by one of its
+// parts, or through a sub-system at any depth
 inline bool sys_list_has_python_part(const vector<SystemPtr>& sys_list) {
     for (const auto& sys : sys_list) {
-        if (system_has_python_part(sys)) {
+        if (sys && sys->hasPythonPart()) {
             return true;
         }
     }

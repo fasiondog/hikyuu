@@ -10,14 +10,21 @@
 #include "../../test_config.h"
 #include <cmath>
 #include <limits>
+#include <map>
+#include <tuple>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/system/imp/MultiSystem.h>
+#include <hikyuu/trade_sys/system/imp/WalkForwardSystem.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/environment/EnvironmentBase.h>
+#include <hikyuu/trade_sys/profitgoal/ProfitGoalBase.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
 
 using namespace hku;
@@ -112,6 +119,111 @@ public:
         return p;
     }
 };
+
+// Reproduces the state of an archive loaded without setTO: the original kdata is gone, so every
+// plan price taken from it becomes 0
+class StaleSrcSystem : public System {
+public:
+    StaleSrcSystem() : System("StaleSrcSystem") {}
+
+    void clearSrcKData() {
+        m_src_kdata = KData();
+    }
+};
+
+// Reports a Python callback without carrying a Python part of its own
+class PythonAwareSystem : public System {
+public:
+    PythonAwareSystem() : System("PythonAwareSystem") {}
+
+    virtual bool hasPythonPart() const override {
+        return true;
+    }
+};
+
+// A selector reporting a Python callback; the walk-forward aggregate drives it outside the
+// sub-system list, so the sub-system recursion cannot see it
+class PythonAwareSE : public OptimalSelectorBase {
+public:
+    PythonAwareSE() : OptimalSelectorBase("PythonAwareSE") {
+        m_is_python_object = true;
+    }
+
+    virtual SelectorPtr _clone() override {
+        return std::make_shared<PythonAwareSE>();
+    }
+};
+
+class BuyOnFirstBarSG : public SignalBase {
+public:
+    BuyOnFirstBarSG() : SignalBase("BuyOnFirstBarSG") {}
+
+    virtual SignalPtr _clone() override {
+        return std::make_shared<BuyOnFirstBarSG>();
+    }
+
+    virtual void _calculate(const KData& kdata) override {
+        HKU_IF_RETURN(kdata.empty(), void());
+        _addBuySignal(kdata[0].datetime);
+    }
+};
+
+// Only the given date is valid, so the market environment turns invalid on the next bar and forces
+// a liquidation regardless of the money manager's price check
+class EvFirstBarOnly : public EnvironmentBase {
+public:
+    explicit EvFirstBarOnly(const Datetime& valid_date)
+    : EnvironmentBase("EvFirstBarOnly"), m_valid_date(valid_date) {}
+
+    virtual EnvironmentPtr _clone() override {
+        return std::make_shared<EvFirstBarOnly>(m_valid_date);
+    }
+
+    virtual void _calculate() override {
+        _addValid(m_valid_date);
+    }
+
+private:
+    Datetime m_valid_date;
+};
+
+// Emits a buy on one date and a sell on another
+class FixedDatesSG : public SignalBase {
+public:
+    FixedDatesSG(const Datetime& buy_date, const Datetime& sell_date)
+    : SignalBase("FixedDatesSG"), m_buy_date(buy_date), m_sell_date(sell_date) {}
+
+    virtual SignalPtr _clone() override {
+        return std::make_shared<FixedDatesSG>(m_buy_date, m_sell_date);
+    }
+
+    virtual void _calculate(const KData&) override {
+        _addBuySignal(m_buy_date);
+        _addSellSignal(m_sell_date);
+    }
+
+private:
+    Datetime m_buy_date;
+    Datetime m_sell_date;
+};
+
+// Counts the goal price queries per bar; the goal always stays below the current price, so every
+// held bar triggers the profit goal
+class CountingPG : public ProfitGoalBase {
+public:
+    CountingPG() : ProfitGoalBase("CountingPG") {}
+
+    std::map<Datetime, int> calls;
+
+    virtual ProfitGoalPtr _clone() override {
+        return std::make_shared<CountingPG>();
+    }
+
+    virtual price_t _getGoal(const Datetime& datetime, price_t price) override {
+        calls[datetime]++;
+        return price * 0.95;
+    }
+};
 }  // namespace
 
 /** @par Check point: System owns the price authority of the slippage result - an invalid value
@@ -185,6 +297,219 @@ TEST_CASE("test_System_slippage_price_fixup") {
             CHECK_LE(tr.realPrice, k.highPrice + 1e-9);
         });
     }
+}
+
+/** @par Check point: a stale or zero-price original kdata (plan price 0) never produces a
+ *  zero-price fill. The forced liquidation asks the money manager for the whole position before it
+ *  looks at the price, so without the closing-entry guard the position would be cleared at price 0
+ *  and the funds would evaporate */
+TEST_CASE("test_System_stale_src_no_zero_price_fill") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 2);
+
+    // Returns: hold after the buy, cash after the buy, sell fills on bar 1, cash after bar 1,
+    // hold after bar 1
+    auto run_bars = [&](bool stale_src) {
+        auto sys = std::make_shared<StaleSrcSystem>();
+        sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+        sys->setEV(std::make_shared<EvFirstBarOnly>(kdata[0].datetime));
+        sys->setSG(std::make_shared<BuyOnFirstBarSG>());
+        sys->setMM(MM_FixedCount(100));
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setTO(kdata);
+        sys->readyForRun();
+
+        sys->runMoment(kdata[0].datetime);
+        const double hold = sys->getTM()->getHoldNumber(kdata[0].datetime, stk);
+        const price_t cash = sys->getTM()->currentCash();
+
+        if (stale_src) {
+            sys->clearSrcKData();
+        }
+
+        MomentResult r1 = sys->runMoment(kdata[1].datetime);
+        return std::make_tuple(hold, cash, r1.tradesOnClose.size(), sys->getTM()->currentCash(),
+                               sys->getTM()->getHoldNumber(kdata[1].datetime, stk));
+    };
+
+    /** @arg control run with the original kdata intact: the environment turns invalid on bar 1 and
+     *  the forced liquidation fills */
+    auto ctrl = run_bars(false);
+    REQUIRE_UNARY(std::get<0>(ctrl) > 0.0);
+    CHECK_EQ(std::get<2>(ctrl), 1);
+    CHECK_GT(std::get<3>(ctrl), std::get<1>(ctrl));
+    CHECK_EQ(std::get<4>(ctrl), 0.0);
+
+    /** @arg stale original kdata (plan price 0): no fill, the position and the cash are left
+     *  untouched */
+    auto stale = run_bars(true);
+    REQUIRE_UNARY(std::get<0>(stale) > 0.0);
+    CHECK_EQ(std::get<2>(stale), 0);
+    CHECK_EQ(std::get<3>(stale), std::get<1>(stale));
+    CHECK_EQ(std::get<4>(stale), std::get<0>(stale));
+}
+
+/** @par Check point: the forced liquidation on an invalid environment follows sell_delay - delayed
+ *  to the next open when true, filled at the invalidating close when false */
+TEST_CASE("test_System_ev_force_sell_follows_sell_delay") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    // Returns: hold after the buy, fills on the invalidating close, pending delays, fills on the
+    // next open, hold after the next bar
+    auto run_bars = [&](bool sell_delay) {
+        auto sys = SYS_Simple();
+        sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+        sys->setEV(std::make_shared<EvFirstBarOnly>(kdata[0].datetime));
+        sys->setSG(std::make_shared<BuyOnFirstBarSG>());
+        sys->setMM(MM_FixedCount(100));
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", sell_delay);
+        sys->setTO(kdata);
+        sys->readyForRun();
+
+        sys->runMoment(kdata[0].datetime);
+        const double hold = sys->getTM()->getHoldNumber(kdata[0].datetime, stk);
+        MomentResult r1 = sys->runMoment(kdata[1].datetime);
+        MomentResult r2 = sys->runMoment(kdata[2].datetime);
+        return std::make_tuple(hold, r1.tradesOnClose.size(), r1.delayOnNextOpen.size(),
+                               r2.tradesOnOpen.size(),
+                               sys->getTM()->getHoldNumber(kdata[2].datetime, stk));
+    };
+
+    /** @arg sell_delay=true (the default): nothing fills on the invalidating close, the request is
+     *  exposed as pending and fills at the next open */
+    auto delayed = run_bars(true);
+    REQUIRE_UNARY(std::get<0>(delayed) > 0.0);
+    CHECK_EQ(std::get<1>(delayed), 0);
+    CHECK_EQ(std::get<2>(delayed), 1);
+    CHECK_EQ(std::get<3>(delayed), 1);
+    CHECK_EQ(std::get<4>(delayed), 0.0);
+
+    /** @arg sell_delay=false: the liquidation fills at the invalidating close itself */
+    auto immediate = run_bars(false);
+    REQUIRE_UNARY(std::get<0>(immediate) > 0.0);
+    CHECK_EQ(std::get<1>(immediate), 1);
+    CHECK_EQ(std::get<2>(immediate), 0);
+    CHECK_EQ(std::get<4>(immediate), 0.0);
+}
+
+/** @par Check point: the delayed requests are served cash generating side first - a pending sell is
+ *  executed before a pending buy on the same open */
+TEST_CASE("test_System_delay_request_priority") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(201112060000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 10);
+
+    // A suspended bar (no volume) keeps both pending requests queued: the delayed buy is not
+    // executed there and the sell request raised on its close joins the queue
+    size_t suspended = Null<size_t>();
+    for (size_t i = 2; i + 2 < kdata.size(); i++) {
+        if (kdata[i].transAmount == 0.0 || kdata[i].transCount == 0.0) {
+            suspended = i;
+            break;
+        }
+    }
+    REQUIRE_UNARY(suspended != Null<size_t>());
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0, TC_Zero());
+    REQUIRE_UNARY(
+      tm->buy(kdata[suspended - 2].datetime, stk, kdata[suspended - 2].closePrice, 100.0)
+        .business == BUSINESS_BUY);
+
+    auto sys = SYS_Simple();
+    sys->setTM(tm);
+    sys->setSG(
+      std::make_shared<FixedDatesSG>(kdata[suspended - 1].datetime, kdata[suspended].datetime));
+    sys->setMM(MM_FixedCount(100));
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", true);
+    sys->setTO(kdata);
+    sys->readyForRun();
+
+    sys->runMoment(kdata[suspended - 1].datetime);
+    MomentResult rs = sys->runMoment(kdata[suspended].datetime);
+
+    /** @arg the suspended bar fills nothing and leaves both requests pending */
+    CHECK_UNARY(rs.tradesOnOpen.empty());
+    REQUIRE_EQ(rs.delayOnNextOpen.size(), 2);
+
+    MomentResult r1 = sys->runMoment(kdata[suspended + 1].datetime);
+
+    /** @arg the sell is served first: it fills and the buy keeps waiting */
+    REQUIRE_EQ(r1.tradesOnOpen.size(), 1);
+    CHECK_EQ(r1.tradesOnOpen[0].business, BUSINESS_SELL);
+    CHECK_EQ(sys->getTM()->getHoldNumber(kdata[suspended + 1].datetime, stk), 0.0);
+    CHECK_UNARY(!r1.delayOnNextOpen.empty());
+
+    /** @arg the buy fills on the following open */
+    MomentResult r2 = sys->runMoment(kdata[suspended + 2].datetime);
+    REQUIRE_EQ(r2.tradesOnOpen.size(), 1);
+    CHECK_EQ(r2.tradesOnOpen[0].business, BUSINESS_BUY);
+    CHECK_GT(sys->getTM()->getHoldNumber(kdata[suspended + 2].datetime, stk), 0.0);
+}
+
+/** @par Check point: the profit goal price is queried once per bar even on the bar where it
+ *  triggers - the exit check and the trade record share the same value */
+TEST_CASE("test_System_profit_goal_called_once_per_bar") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+
+    auto pg = std::make_shared<CountingPG>();
+    auto sys = SYS_Simple();
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    sys->setMM(MM_FixedCount(100));
+    sys->setPG(pg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->run(stk, query);
+
+    REQUIRE_UNARY(!pg->calls.empty());
+    for (const auto& item : pg->calls) {
+        CHECK_EQ(item.second, 1);
+    }
+}
+
+/** @par Check point: an aggregate reports a Python callback held by any sub-system, at any depth */
+TEST_CASE("test_System_hasPythonPart_recurses_into_subsystems") {
+    /** @arg a system with C++ parts only reports none */
+    CHECK_UNARY_FALSE(SYS_Simple()->hasPythonPart());
+
+    /** @arg one sub-system reporting a Python callback is enough */
+    auto ms = std::make_shared<MultiSystem>(
+      SystemList{SYS_Simple(), std::make_shared<PythonAwareSystem>()}, "MS");
+    CHECK_UNARY(ms->hasPythonPart());
+
+    /** @arg the report reaches an aggregate nested in an aggregate */
+    auto nested =
+      std::make_shared<MultiSystem>(SystemList{std::make_shared<MultiSystem>(
+                                      SystemList{std::make_shared<PythonAwareSystem>()}, "INNER")},
+                                    "OUTER");
+    CHECK_UNARY(nested->hasPythonPart());
+
+    /** @arg an aggregate of C++ systems only still reports none */
+    auto clean = std::make_shared<MultiSystem>(SystemList{SYS_Simple(), SYS_Simple()}, "CLEAN");
+    CHECK_UNARY_FALSE(clean->hasPythonPart());
+
+    /** @arg the walk-forward form also reports its selector and driven candidate */
+    auto candidate = SYS_Simple();
+    candidate->setTM(crtTM());
+    candidate->setMM(MM_FixedCount(100));
+    candidate->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    auto fw = std::make_shared<WalkForwardSystem>(SystemList{candidate},
+                                                  std::make_shared<PythonAwareSE>(), crtTM());
+    CHECK_UNARY(fw->hasPythonPart());
 }
 
 /** @} */

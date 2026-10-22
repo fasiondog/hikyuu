@@ -49,6 +49,9 @@
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Logic.h>
+#include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
@@ -2105,8 +2108,9 @@ TEST_CASE("test_MultiSystem_master_pf_compat") {
     auto build_proto = []() {
         auto proto =
           SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
-        // SG_Cycle emits its buy signal only via startCycle on the rebalancing day (the master
-        // Portfolio driving); buy_delay=false keeps the trade on the same close
+        // The MultiSystem declares the rebalancing days to the sub-system signals before the run,
+        // so the cycle buy comes from the single full-range calculation; buy_delay=false keeps the
+        // trade on the same close
         proto->setParam<bool>("buy_delay", false);
         return proto;
     };
@@ -2137,6 +2141,1038 @@ TEST_CASE("test_MultiSystem_master_pf_compat") {
         }
     }
     CHECK_EQ(buy_count, 2);
+}
+
+/** @par Check point: the cycle signals are calculated once over the whole trading object -- the
+ * rebalancing days are a run-level input, they never slice the KData into per-cycle windows */
+TEST_CASE("test_MultiSystem_cycle_signal_full_range") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 30);
+
+    DatetimeList dates = k.getDatetimeList();
+    PriceList fast_vals(k.size(), 0.0);
+    PriceList slow_vals(k.size(), 0.3);
+    for (size_t i = 0, total = k.size(); i < total; ++i) {
+        fast_vals[i] = (i % 5 < 2) ? 1.0 : 0.0;
+    }
+
+    auto make_sg = [&]() {
+        return SG_Cycle() | SG_Cross(PRICELIST(fast_vals, dates), PRICELIST(slow_vals, dates));
+    };
+
+    auto ms = std::make_shared<MultiSystem>("ms_cycle_full_range");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setAdjustCycle(10);
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), make_sg());
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->run(k);
+    REQUIRE(!sys->getTO().empty());
+
+    /** @arg the sub signal equals a standalone calculation with the same declared days: one
+     * full-range calculation, no window slicing and no prefix loss */
+    auto standalone = make_sg();
+    standalone->setCycleDates(sys->getSG()->getCycleDates());
+    standalone->setTO(sys->getTO());
+    CHECK_UNARY(sys->getSG()->getBuySignal() == standalone->getBuySignal());
+    CHECK_UNARY(sys->getSG()->getSellSignal() == standalone->getSellSignal());
+
+    /** @arg the declared days are exactly the driven axis dates hitting the close-day cycle
+     * (an independent formula, not a copy of the declared list) */
+    DatetimeList driven;
+    for (size_t i = 0, total = k.size(); i < total; ++i) {
+        if (k[i].datetime >= Datetime(200001010000LL)) {
+            driven.push_back(k[i].datetime);
+        }
+    }
+    DatetimeList expected;
+    for (size_t i = 0; i < driven.size(); i += 10) {
+        expected.push_back(driven[i]);
+    }
+    const auto& cycle_dates = sys->getSG()->getCycleDates();
+    CHECK_UNARY(cycle_dates == expected);
+    CHECK_UNARY(cycle_dates.size() >= 2);
+}
+
+/** @par Check point: mode C declares the cycle start on admission (the legacy Portfolio behavior),
+ * so the admitted sub-system emits its cycle buy on the admission day only */
+TEST_CASE("test_MultiSystem_mode_c_cycle_start_on_admission") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 5);
+
+    auto proto = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto->setParam<bool>("buy_delay", false);
+    auto se = SE_Fixed();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_c_cycle");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg only the admission day is declared: the running sub-system is not re-declared on the
+     * following rebalancing days (unlike modes A/B which declare the whole run) */
+    auto sys = ms->getSystemList()[0];
+    const auto& cycle_dates = sys->getSG()->getCycleDates();
+    CHECK_UNARY(cycle_dates.size() == 1);
+    CHECK_UNARY(cycle_dates[0] >= Datetime(200001010000LL));
+    CHECK_EQ(sys->getSG()->getBuyValue(cycle_dates[0]), 1.0);
+}
+
+/** @par Check point: the runMoment* entry (the intraday live driving, no bulk run) declares the
+ * rebalancing day at the close stage, so the cycle signals are never silently lost */
+TEST_CASE("test_MultiSystem_cycle_signal_run_moment") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto ms = std::make_shared<MultiSystem>("ms_cycle_moment");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setAdjustCycle(3);
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->setTO(k);
+    ms->readyForRun();
+
+    /** @arg the close drive of four bars declares bar 0 and bar 3 (the days hitting the cycle) */
+    for (size_t i = 0; i < 4; ++i) {
+        ms->runMomentOnOpen(k[i].datetime);
+        ms->runMomentOnClose(k[i].datetime);
+    }
+    const auto& cycle_dates = sys->getSG()->getCycleDates();
+    REQUIRE_UNARY(cycle_dates.size() == 2);
+    CHECK_EQ(cycle_dates[0], k[0].datetime);
+    CHECK_EQ(cycle_dates[1], k[3].datetime);
+    CHECK_EQ(sys->getSG()->getBuyValue(k[0].datetime), 1.0);
+    CHECK_EQ(sys->getSG()->getBuyValue(k[3].datetime), 1.0);
+}
+
+/** @par Check point: a rebalancing configuration change retracts the declared cycle days */
+TEST_CASE("test_MultiSystem_cycle_dates_cleared_on_config") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+
+    auto ms = std::make_shared<MultiSystem>("ms_cycle_config");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setAdjustCycle(10);
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->run(k);
+    CHECK_UNARY(!sys->getSG()->getCycleDates().empty());
+
+    /** @arg a new cycle configuration retracts the days declared by the previous one */
+    ms->setAdjustCycle(3);
+    CHECK_UNARY(sys->getSG()->getCycleDates().empty());
+
+    /** @arg the next run rebuilds them with the new configuration */
+    ms->run(k);
+    const auto& cycle_dates = sys->getSG()->getCycleDates();
+    DatetimeList driven;
+    for (size_t i = 0, total = k.size(); i < total; ++i) {
+        if (k[i].datetime >= Datetime(200001010000LL)) {
+            driven.push_back(k[i].datetime);
+        }
+    }
+    DatetimeList expected;
+    for (size_t i = 0; i < driven.size(); i += 3) {
+        expected.push_back(driven[i]);
+    }
+    CHECK_UNARY(cycle_dates == expected);
+}
+
+/** @par Check point: only the cycle signals consume the rebalancing days -- the plain signals are
+ * not recalculated or polluted by a declaration */
+TEST_CASE("test_MultiSystem_cycle_dates_not_injected_into_plain_sg") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+
+    auto ms = std::make_shared<MultiSystem>("ms_cycle_plain");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setAdjustCycle(3);
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_AllwaysBuy());
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->run(k);
+
+    /** @arg the plain signal keeps an empty cycle-day list */
+    CHECK_UNARY(sys->getSG()->getCycleDates().empty());
+}
+
+/** @par Check point: the cycle date is the scheduled re-entry of the continuous shadow account --
+ * after the SE drops the sub-system and its shadow is cleared, the next cycle buy brings it back */
+class SelectDropSecondSE : public SelectorBase {
+public:
+    SelectDropSecondSE() : SelectorBase("SelectDropSecondSE") {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectDropSecondSE>();
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        if (call_count++ != 1) {
+            for (auto& sys : getRealSystemList()) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    int call_count{0};
+};
+
+TEST_CASE("test_MultiSystem_cycle_reentry_after_clear") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto proto = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto->setParam<bool>("buy_delay", false);
+    auto se = std::make_shared<SelectDropSecondSE>();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_cycle_reentry");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSellAtNotSelected(true);
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the quota account is cleared on the dropped day (sell_at_not_selected frees the parent
+     * cash), and the sub-system re-enters on the next cycle buy (two entries in total) */
+    auto sys = ms->getSystemList()[0];
+    size_t buy_count = 0;
+    for (const auto& tr : sys->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            buy_count++;
+        }
+    }
+    CHECK_EQ(buy_count, 2);
+    CHECK_GT(sys->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: mode B with sell_at_not_selected=false -- the unselected sub-system keeps
+ * running and the two books stay matched (no shadow clear, no parent liquidation) */
+TEST_CASE("test_MultiSystem_mode_b_unselected_books_match") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto proto = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto->setParam<bool>("buy_delay", false);
+    auto se = std::make_shared<SelectDropSecondSE>();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_keep");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");  // sell_at_not_selected defaults to false
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the shadow and the parent keep the mirrored position (one entry, never liquidated) */
+    auto sys = ms->getSystemList()[0];
+    size_t sub_buys = 0, sub_sells = 0, parent_buys = 0, parent_sells = 0;
+    for (const auto& tr : sys->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            sub_buys++;
+        } else if (tr.business == BUSINESS_SELL) {
+            sub_sells++;
+        }
+    }
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            parent_buys++;
+        } else if (tr.business == BUSINESS_SELL) {
+            parent_sells++;
+        }
+    }
+    CHECK_EQ(sub_buys, 1);
+    CHECK_EQ(sub_sells, 0);
+    CHECK_EQ(parent_buys, 1);
+    CHECK_EQ(parent_sells, 0);
+
+    /** @arg the two books stay matched: the parent mirrors the shadow position */
+    double sub_pos = sys->getTM()->getPosition(k.back().datetime, stk).number;
+    double parent_pos = ms->getTM()->getPosition(k.back().datetime, stk).number;
+    CHECK_GT(sub_pos, 0.0);
+    CHECK_EQ(sub_pos, doctest::Approx(parent_pos));
+}
+
+/** @par Check point: mode B with the default deferred trading -- the fill of the open on the drop
+ * day is still mirrored, so the two books stay matched */
+TEST_CASE("test_MultiSystem_mode_b_unselected_deferred_fill") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    // buy_delay/sell_delay keep their defaults (true): the entry fills at the next open
+    auto proto = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    auto se = std::make_shared<SelectDropSecondSE>();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_deferred");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the deferred fill of the drop day is mirrored; the two books match */
+    auto sys = ms->getSystemList()[0];
+    double sub_pos = sys->getTM()->getPosition(k.back().datetime, stk).number;
+    double parent_pos = ms->getTM()->getPosition(k.back().datetime, stk).number;
+    CHECK_GT(sub_pos, 0.0);
+    CHECK_EQ(sub_pos, doctest::Approx(parent_pos));
+}
+
+/** @par Check point: the mode B quota injections are capped by the remaining parent cash, so a
+ * fixed-amount over-allocation cannot make the shadow buy more than the parent can fund */
+TEST_CASE("test_MultiSystem_mode_b_injection_capped_by_parent_cash") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk1.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto build_proto = []() {
+        auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        sys->setParam<bool>("buy_delay", false);
+        return sys;
+    };
+    auto se = SE_Fixed();
+    se->addStockList({stk1, stk2}, build_proto());
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_cap");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setAF(AF_FixedAmount(100000.0));  // two quotas of 100k against 100k of parent cash
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg each instrument's two books match and the parent never over-commits */
+    for (auto& sys : ms->getSystemList()) {
+        Stock stk = sys->getStock();
+        double sub_pos = sys->getTM()->getPosition(k.back().datetime, stk).number;
+        double parent_pos = ms->getTM()->getPosition(k.back().datetime, stk).number;
+        CHECK_EQ(sub_pos, doctest::Approx(parent_pos));
+    }
+    CHECK_GE(ms->getTM()->cash(k.back().datetime, KQuery::DAY), 0.0);
+}
+
+/** @par Check point: the declared cycle days match the adjust-mode table (month), not the plain
+ * close-day counting */
+TEST_CASE("test_MultiSystem_cycle_dates_match_adjust_mode") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 30);
+
+    auto ms = std::make_shared<MultiSystem>("ms_cycle_month");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setAdjustMode("month");
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->run(k);
+
+    /** @arg the declared days equal the month rebalancing days of the driven axis */
+    DatetimeList driven;
+    for (size_t i = 0; i < k.size(); ++i) {
+        if (k[i].datetime >= Datetime(200001010000LL)) {
+            driven.push_back(k[i].datetime);
+        }
+    }
+    DatetimeList expected = MultiSystem::calcAdjustDates(driven, "month", 1, true);
+    CHECK_UNARY(expected.size() >= 2);
+    CHECK_UNARY(sys->getSG()->getCycleDates() == expected);
+}
+
+/** @par Check point: mode A never operates the shadow account -- the SE selection only gates the
+ * parent sampling, the shadow keeps running and the parent sells/re-buys on its own book */
+TEST_CASE("test_MultiSystem_mode_a_shadow_independent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto proto = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto->setParam<bool>("buy_delay", false);
+    auto se = std::make_shared<SelectDropSecondSE>();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_a_shadow");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("A");
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the shadow buys once, is never sold by the selection drop and keeps its holding */
+    auto sys = ms->getSystemList()[0];
+    size_t sub_buys = 0, sub_sells = 0;
+    for (const auto& tr : sys->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            sub_buys++;
+        } else if (tr.business == BUSINESS_SELL) {
+            sub_sells++;
+        }
+    }
+    CHECK_EQ(sub_buys, 1);
+    CHECK_EQ(sub_sells, 0);
+    CHECK_GT(sys->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+
+    /** @arg the parent owns its own book: it sells on the drop and re-buys on the re-selection */
+    size_t parent_buys = 0, parent_sells = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            parent_buys++;
+        } else if (tr.business == BUSINESS_SELL) {
+            parent_sells++;
+        }
+    }
+    CHECK_GE(parent_buys, 2);
+    CHECK_GE(parent_sells, 1);
+}
+
+/** Selector that selects everything on the first rebalancing call and only the first system
+ * afterwards (the partial-selection shape of the mode A orphan flattening) */
+class SelectFirstOnlySE : public SelectorBase {
+public:
+    SelectFirstOnlySE() : SelectorBase("SelectFirstOnlySE") {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectFirstOnlySE>();
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        if (call_count++ == 0) {
+            for (auto& sys : getRealSystemList()) {
+                ret.emplace_back(sys, 1.0);
+            }
+        } else if (!getRealSystemList().empty()) {
+            ret.emplace_back(getRealSystemList().front(), 1.0);
+        }
+        return ret;
+    }
+
+    int call_count{0};
+};
+
+/** @par Check point: mode A partial selection -- the instrument of the dropped sub-system is
+ * flattened in the parent account while its shadow keeps holding (the parent never touches the
+ * shadow) */
+TEST_CASE("test_MultiSystem_mode_a_partial_selection_orphan") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk1.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto build_proto = []() {
+        auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        sys->setParam<bool>("buy_delay", false);
+        return sys;
+    };
+    auto se = std::make_shared<SelectFirstOnlySE>();
+    se->addStockList({stk1, stk2}, build_proto());
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_a_partial");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("A");
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 2);
+
+    SYSPtr sub1, sub2;
+    for (auto& s : ms->getSystemList()) {
+        if (s->getStock() == stk1) {
+            sub1 = s;
+        } else if (s->getStock() == stk2) {
+            sub2 = s;
+        }
+    }
+    REQUIRE(sub1 != nullptr);
+    REQUIRE(sub2 != nullptr);
+
+    /** @arg both shadows entered once and keep their holdings (the selection drop never touches
+     * them) */
+    auto count_buys_sells = [](const SYSPtr& sys) {
+        size_t buys = 0, sells = 0;
+        for (const auto& tr : sys->getTM()->getTradeList()) {
+            if (tr.business == BUSINESS_BUY) {
+                buys++;
+            } else if (tr.business == BUSINESS_SELL) {
+                sells++;
+            }
+        }
+        return std::pair<size_t, size_t>{buys, sells};
+    };
+    auto [b1, s1] = count_buys_sells(sub1);
+    auto [b2, s2] = count_buys_sells(sub2);
+    CHECK_EQ(b1, 1);
+    CHECK_EQ(s1, 0);
+    CHECK_EQ(b2, 1);
+    CHECK_EQ(s2, 0);
+    CHECK_GT(sub1->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+    CHECK_GT(sub2->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
+
+    /** @arg the parent flattens the dropped instrument and keeps the selected one */
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+}
+
+class SelectAllSE : public SelectorBase {
+public:
+    explicit SelectAllSE(const SystemList& list) : SelectorBase("SelectAllSE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectAllSE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        for (auto& sys : m_list) {
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+};
+
+/** @par Check point: the mode C children are mode-agnostic -- a nested mode A child applies its
+ * aggregate signal to the shared account and never flattens the sibling positions */
+TEST_CASE("test_MultiSystem_mode_c_composite_keeps_sibling_positions") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk1.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    // The leaf sibling buys and holds its own instrument on the shared account
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk1);
+    leaf->setParam<bool>("buy_delay", false);
+
+    // The nested mode A child aggregates a different instrument
+    auto inner_leaf =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    inner_leaf->setStock(stk2);
+    inner_leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_a");
+    inner->setMode("A");
+    inner->setSubInitCash(10000.0);
+    inner->add(inner_leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{leaf, inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_c_mixed");
+    ms->setTM(crtTM(Datetime(200001010000LL), 200000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->add(leaf);
+    ms->add(inner);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg the sibling instrument is never sold by the nested aggregate */
+    double sibling_sells = 0.0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.stock == stk1 && tr.business == BUSINESS_SELL) {
+            sibling_sells += tr.number;
+        }
+    }
+    CHECK_EQ(sibling_sells, 0.0);
+
+    /** @arg both the sibling holding and the nested aggregate's target are on the shared account */
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
+}
+
+class SelectFirstCallOnlySE : public SelectorBase {
+public:
+    explicit SelectFirstCallOnlySE(const SystemList& list)
+    : SelectorBase("SelectFirstCallOnlySE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectFirstCallOnlySE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        if (call_count++ == 0) {
+            for (auto& sys : m_list) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    int call_count{0};
+};
+
+/** @par Check point: a mode B composite sub-system is cleared together with the parent book when
+ * it is dropped and sell_at_not_selected is on */
+TEST_CASE("test_MultiSystem_mode_b_composite_unselected_clear") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_a_clear");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectFirstCallOnlySE>(SystemList{inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_composite");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->add(inner);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the parent mirrored the entry before the drop */
+    size_t parent_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk) {
+            parent_buys++;
+        }
+    }
+    CHECK_EQ(parent_buys, 1);
+
+    /** @arg the composite shadow book and the parent book are cleared together */
+    CHECK_EQ(inner->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: the removal of a composite from the mode C running pool clears its internal
+ * ledgers (a nested mode B child) and drops the pending mirror batch */
+TEST_CASE("test_MultiSystem_mode_c_removed_composite_clears_internal_books") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_b_removed");
+    inner->setMode("B");
+    inner->setParam<bool>("trade_on_close", false);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectFirstCallOnlySE>(SystemList{inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_c_removed");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->add(inner);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the internal leaf ledger and the shared account are both flat after the removal */
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a composite above its quota is reduced pro rata and the parent mirrors the
+ * sells (the quota is shrunk between the two runs) */
+TEST_CASE("test_MultiSystem_mode_b_composite_over_quota_reduction") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query1(Datetime(19991110), Datetime(20000120));
+    KQuery query2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(query1);
+    KData k2 = stk.getKData(query2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_a_reduce");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_reduce");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->add(inner);
+    ms->run(k1);
+
+    double pos1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg a shrunk quota reduces the composite holding and the parent mirrors it */
+    ms->setAF(AF_FixedAmount(1000.0));
+    ms->run(k2, false);
+    double pos2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(pos2, pos1);
+    CHECK_EQ(pos2, doctest::Approx(parent2));
+}
+
+class SelectFirstOfGivenSE : public SelectorBase {
+public:
+    explicit SelectFirstOfGivenSE(const SystemList& list)
+    : SelectorBase("SelectFirstOfGivenSE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectFirstOfGivenSE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        const bool first_call = (call_count++ == 0);
+        for (auto& sys : m_list) {
+            ret.emplace_back(sys, 1.0);
+            if (!first_call) {
+                break;
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    int call_count{0};
+};
+
+/** @par Check point: with several mode B children holding the same instrument, dropping one sells
+ * only its own share, the sibling book and the parent mirror stay matched */
+TEST_CASE("test_MultiSystem_mode_b_overlapping_instruments_keep_sibling") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto build_inner = [&](const string& name) {
+        auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        leaf->setStock(stk);
+        leaf->setParam<bool>("buy_delay", false);
+        auto inner = std::make_shared<MultiSystem>(name);
+        inner->setMode("A");
+        inner->setSubInitCash(50000.0);
+        inner->add(leaf);
+        return inner;
+    };
+    auto inner1 = build_inner("inner1");
+    auto inner2 = build_inner("inner2");
+
+    auto se = std::make_shared<SelectFirstOfGivenSE>(SystemList{inner1, inner2});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_overlap");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->add(inner1);
+    ms->add(inner2);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg the dropped child is flat, the surviving child and the parent hold the same quantity */
+    double p1 = inner1->getTM()->getPosition(k.back().datetime, stk).number;
+    double p2 = inner2->getTM()->getPosition(k.back().datetime, stk).number;
+    double pp = ms->getTM()->getPosition(k.back().datetime, stk).number;
+    CHECK_GT(p1, 0.0);
+    CHECK_EQ(p2, 0.0);
+    CHECK_EQ(pp, doctest::Approx(p1));
+}
+
+/** @par Check point: the runMoment* entry (live) honours adjust-mode without a precomputed table */
+TEST_CASE("test_MultiSystem_adjust_mode_run_moment") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 30);
+
+    auto ms = std::make_shared<MultiSystem>("ms_adjust_mode_moment");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setAdjustMode("month");
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->setTO(k);
+    ms->readyForRun();
+
+    for (size_t i = 0; i < k.size(); ++i) {
+        ms->runMomentOnOpen(k[i].datetime);
+        ms->runMomentOnClose(k[i].datetime);
+    }
+
+    /** @arg only the first driven day of each month is declared, not every driven day */
+    const auto& dates = sys->getSG()->getCycleDates();
+    CHECK_GT(dates.size(), 0);
+    CHECK_LT(dates.size(), 5);
+}
+
+/** @par Check point: the live single-bar replay honours adjust-mode (one rebalancing day per
+ * period) */
+TEST_CASE("test_MultiSystem_adjust_mode_live_replay") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kd = stk.getKData(query);
+    REQUIRE(kd.size() > 10);
+    const DatetimeList dates = kd.getDatetimeList();
+
+    auto ms = std::make_shared<MultiSystem>("ms_adjust_mode_live");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000.0));
+    ms->setAdjustMode("month");
+    ms->setTradeOnClose(true);
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+    sys->setStock(stk);
+    sys->setTO(kd);
+    ms->add(sys);
+    ms->readyForRun();
+
+    for (auto& d : dates) {
+        KData day_kd = stk.getKData(KQuery(d, d + Days(1), query.kType()));
+        REQUIRE(day_kd.size() == 1);
+        ms->run(day_kd, false);
+    }
+
+    /** @arg one rebalancing day per month, not the whole single-bar replay */
+    const auto& cycle_dates = sys->getSG()->getCycleDates();
+    CHECK_GT(cycle_dates.size(), 0);
+    CHECK_LT(cycle_dates.size(), 5);
+}
+
+class SelectKeepFirstTwoSE : public SelectorBase {
+public:
+    explicit SelectKeepFirstTwoSE(const SystemList& list)
+    : SelectorBase("SelectKeepFirstTwoSE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectKeepFirstTwoSE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        if (call_count++ < 2) {
+            for (auto& sys : m_list) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    int call_count{0};
+};
+
+/** @par Check point: mode B with trade_on_close=false defers the quota calibration legs (sub and
+ * parent side) to the next open, so both books share one price basis and the turnover is recorded
+ */
+TEST_CASE("test_MultiSystem_mode_b_trade_on_close_false_defers_calibration") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto se = std::make_shared<SelectKeepFirstTwoSE>(SystemList{leaf});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_defer_calib");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    Datetime sub_sell_date, parent_sell_date;
+    for (const auto& tr : leaf->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
+            sub_sell_date = tr.datetime;
+        }
+    }
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
+            parent_sell_date = tr.datetime;
+        }
+    }
+
+    /** @arg the sub and parent sells execute at the same open after the drop day */
+    CHECK_UNARY(!sub_sell_date.isNull());
+    CHECK_EQ(sub_sell_date, parent_sell_date);
+    CHECK_GT(sub_sell_date, k[2].datetime);
+
+    /** @arg both books end flat and the rebalancing turnover is recorded */
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_UNARY(!ms->getAdjustTurnover().empty());
+}
+
+/** @par Check point: the mode A sampling sees the delayed intent of a nested mode C sub-layer
+ * (the composite MomentResult does not carry its leaves' queued requests) */
+TEST_CASE("test_MultiSystem_mode_a_sees_nested_c_pending") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);  // the entry queues to the next open
+    auto inner = std::make_shared<MultiSystem>("inner_c_pending");
+    inner->setMode("C");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{inner});
+    auto ms = std::make_shared<MultiSystem>("outer_a_pending");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setMode("A");
+    ms->setAdjustCycle(5);
+    ms->setSE(se);
+    ms->add(inner);
+    ms->run(k);
+
+    Datetime first_buy;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            first_buy = tr.datetime;
+            break;
+        }
+    }
+
+    /** @arg the parent buys on the first rebalancing day from the pending intent */
+    CHECK_UNARY(!first_buy.isNull());
+    CHECK_EQ(first_buy, k[0].datetime);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
+ * inner rebalancing is not degraded to every driven day */
+TEST_CASE("test_MultiSystem_nested_adjust_mode") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 30);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+
+    auto inner = std::make_shared<MultiSystem>("inner_b");
+    inner->setMode("B");
+    inner->setAdjustMode("month");
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_a");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("A");
+    ms->add(inner);
+    ms->run(k);
+
+    /** @arg only the month rebalancing days are declared, not every driven day */
+    const auto& dates = leaf->getSG()->getCycleDates();
+    CHECK_GT(dates.size(), 0);
+    CHECK_LT(dates.size(), 5);
+}
+
+/** @par Check point: mode C declares the cycle days on admission -- a rebalancing configuration
+ * change must not retract them (a running sub-system never re-declares) */
+TEST_CASE("test_MultiSystem_mode_c_config_keeps_cycle_dates") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto proto = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto->setParam<bool>("buy_delay", false);
+    auto se = SE_Fixed();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_c_cfg");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    auto sys = ms->getSystemList()[0];
+    DatetimeList dates = sys->getSG()->getCycleDates();
+    REQUIRE_UNARY(dates.size() == 1);
+
+    /** @arg the admission-declared day survives a rebalancing configuration change */
+    ms->setAdjustCycle(5);
+    CHECK_UNARY(sys->getSG()->getCycleDates() == dates);
 }
 
 /** @par Check point: the sub-system TO is built automatically from its instrument with the run
@@ -2429,6 +3465,254 @@ private:
     Datetime m_open_date;
     Datetime m_cover_date;
 };
+
+// Scripted long signals: one buy signal on buy_date, one sell signal on sell_date
+class ScriptedBuySellSG : public SignalBase {
+public:
+    ScriptedBuySellSG(Datetime buy_date, Datetime sell_date)
+    : SignalBase("ScriptedBuySellSG"), m_buy_date(buy_date), m_sell_date(sell_date) {}
+
+    SignalPtr _clone() override {
+        return make_shared<ScriptedBuySellSG>(m_buy_date, m_sell_date);
+    }
+
+    void _calculate(const KData& kdata) override {
+        if (kdata.getPos(m_buy_date) != Null<size_t>()) {
+            _addBuySignal(m_buy_date);
+        }
+        if (kdata.getPos(m_sell_date) != Null<size_t>()) {
+            _addSellSignal(m_sell_date);
+        }
+    }
+
+private:
+    Datetime m_buy_date;
+    Datetime m_sell_date;
+};
+
+/** @par Check point: a CLEAR leg only clears the attributable part -- the sibling child's
+ * same-batch buy (and holding) must survive the netting */
+TEST_CASE("test_MultiSystem_mode_b_netting_clear_keeps_sibling") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto make_inner = [&](const string& name, const SGPtr& sg) {
+        auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+        leaf->setStock(stk);
+        leaf->setParam<bool>("buy_delay", false);
+        leaf->setParam<bool>("sell_delay", false);
+        auto inner = std::make_shared<MultiSystem>(name);
+        inner->setMode("A");
+        inner->setSubInitCash(100000.0);
+        inner->add(leaf);
+        return inner;
+    };
+    auto inner1 = make_inner("inner1_clear", make_shared<ScriptedBuySellSG>(
+                                               k[k.size() - 3].datetime, k[k.size() - 2].datetime));
+    auto inner2 = make_inner("inner2_buy", SG_Cycle());
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{inner1, inner2});
+    auto ms = std::make_shared<MultiSystem>("ms_b_net_clear");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->add(inner1);
+    ms->add(inner2);
+    ms->run(k);
+
+    double p1 = inner1->getTM()->getPosition(k.back().datetime, stk).number;
+    double p2 = inner2->getTM()->getPosition(k.back().datetime, stk).number;
+    double pp = ms->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the cleared child is flat, the buying child and the parent keep the same quantity */
+    CHECK_EQ(p1, 0.0);
+    CHECK_GT(p2, 0.0);
+    CHECK_EQ(pp, doctest::Approx(p1 + p2));
+}
+
+/** @par Check point: the outer A sampling does not count a nested A's leaf intent twice (the inner
+ * sampling already folded it into its target) */
+TEST_CASE("test_MultiSystem_nested_a_no_double_pending") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto sg = make_shared<ScriptedBuySellSG>(k[k.size() - 3].datetime, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+    auto inner = std::make_shared<MultiSystem>("inner_a_double");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{inner});
+    auto ms = std::make_shared<MultiSystem>("outer_a_double");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setMode("A");
+    ms->setSE(se);
+    ms->add(inner);
+    ms->run(k);
+
+    double inner_pos = inner->getTM()->getPosition(k.back().datetime, stk).number;
+    double parent_pos = ms->getTM()->getPosition(k.back().datetime, stk).number;
+    REQUIRE_GT(inner_pos, 0.0);
+
+    /** @arg the parent follows the inner target, not twice the leaf intent */
+    CHECK_LT(parent_pos, inner_pos * 1.5);
+}
+
+/** @par Check point: a deep nested A (outer A -> middle B -> inner A, trade_on_close=false) is
+ * still visible to the outer sampling through its queued batch */
+TEST_CASE("test_MultiSystem_cascade_a_b_a_deferred_intent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 3].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+
+    auto inner = std::make_shared<MultiSystem>("inner_a_deferred");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->setParam<bool>("trade_on_close", false);
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("middle_b");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("outer_a_cascade");
+    outer->setTM(crtTM(Datetime(200001010000LL), 1000000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k);
+
+    Datetime first_buy;
+    for (const auto& tr : outer->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            first_buy = tr.datetime;
+            break;
+        }
+    }
+
+    /** @arg the outer buys on the intent day, not one period later */
+    CHECK_UNARY(!first_buy.isNull());
+    CHECK_EQ(first_buy, buy_date);
+}
+
+/** @par Check point: an outer mode B reducing a nested mode B composite delegates the budget, so
+ * the leaf ledger, the composite account and the outer parent stay matched */
+TEST_CASE("test_MultiSystem_mode_b_nested_b_quota_reduction") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query1(Datetime(19991110), Datetime(20000120));
+    KQuery query2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(query1);
+    KData k2 = stk.getKData(query2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(KQuery(Datetime(19991110), Datetime(20000225))));
+    auto inner = std::make_shared<MultiSystem>("inner_b_nested");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_nested");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+    CHECK_EQ(inner1, doctest::Approx(parent1));
+
+    /** @arg a shrunk outer budget reaches the leaf ledger through the inner calibration */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    double leaf2 = leaf->getTM()->getPosition(k2.back().datetime, stk).number;
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_EQ(leaf2, doctest::Approx(inner2));
+    CHECK_EQ(inner2, doctest::Approx(parent2));
+}
+
+/** @par Check point: mode C with trade_on_close=false records the rebalancing turnover from the
+ * next open fills */
+TEST_CASE("test_MultiSystem_mode_c_turnover_trade_on_close_false") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 3].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+
+    auto ms = std::make_shared<MultiSystem>("ms_c_turnover_false");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setMode("C");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    /** @arg the open fill is attributed to the rebalancing close */
+    CHECK_UNARY(!ms->getAdjustTurnover().empty());
+    CHECK_EQ(ms->getAdjustTurnover().back().first, buy_date);
+}
+
+/** @par Check point: a same-bar open fill followed by a close reversal is netted in one batch, so
+ * the parent does not keep a phantom position the sub-system already closed */
+TEST_CASE("test_MultiSystem_mode_b_same_bar_netting") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto sg = make_shared<ScriptedBuySellSG>(kdata[0].datetime, kdata[1].datetime);
+    auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setStock(stk);
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", false);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{sys});
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_netting");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->add(sys);
+    ms->run(kdata);
+
+    /** @arg both books are flat: the open fill and the close reversal cancel out */
+    CHECK_EQ(sys->getTM()->getPosition(kdata.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(kdata.back().datetime, stk).number, 0.0);
+}
 
 /** @par Check point: mode B mirror of a short book -- the full cover of the sub-system short must
  * reach the parent as a short-side CLEAR (buyShort), not as opening a long. The old code read the
@@ -2936,7 +4220,7 @@ TEST_CASE("test_MultiSystem_mode_c_nested_aggregate_force_sell") {
     auto outer = std::make_shared<MultiSystem>("outer_mode_c_nested_drop");
     outer->setTM(parent_tm);
     outer->setMode("C");
-    outer->setSellAtNotSelected(true);  // force liquidation of the unselected
+    outer->setSellAtNotSelected(true);               // force liquidation of the unselected
     outer->setSE(std::make_shared<SelectOnceSE>());  // admitted on the first day only
     outer->add(inner);
     outer->run(query);
@@ -2945,7 +4229,8 @@ TEST_CASE("test_MultiSystem_mode_c_nested_aggregate_force_sell") {
     CHECK_GT(parent_tm->getTradeList().size(), 1);
 
     /** @arg once it is no longer selected, the parent force-liquidates the holding of the whole
-     *  sub-tree (the inner aggregate has no stock of its own, so the check must reach the leaves) */
+     *  sub-tree (the inner aggregate has no stock of its own, so the check must reach the leaves)
+     */
     CHECK_EQ(parent_tm->getHoldNumber(Datetime(200002250000LL), stk), doctest::Approx(0.0));
     bool has_sell = false;
     for (auto& tr : parent_tm->getTradeList()) {
@@ -3080,4 +4365,2022 @@ TEST_CASE("test_MultiSystem_serialize_round_trip") {
 }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
-/** @} */
+/** @par Check point: mode B with trade_on_close=false reduces by the holding value, not the net
+ * assets that still include the un-recycled idle cash */
+TEST_CASE("test_MultiSystem_mode_b_deferred_reduction_uses_holding_value") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto sg = make_shared<ScriptedBuySellSG>(k1[k1.size() - 2].datetime, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_holding_value");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->add(leaf);
+    ms->run(k1);
+
+    double pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_EQ(pos1, 100.0);
+
+    /** @arg the idle cash (most of the quota) is not sold as if it were a holding */
+    ms->setAF(AF_FixedAmount(50000.0));
+    ms->setTradeOnClose(false);
+    ms->run(k2, false);
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
+}
+
+/** @par Check point: a trade_on_close=false rebalancing with a zero parent cash still queues the
+ * deferred injections and funds them from the next open sells */
+TEST_CASE("test_MultiSystem_mode_b_deferred_injection_after_reduction") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto make_leaf = [&](const Stock& stk) {
+        auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        sys->setStock(stk);
+        sys->setParam<bool>("buy_delay", false);
+        sys->setTO(stk.getKData(full1));
+        return sys;
+    };
+    auto leaf1 = make_leaf(stk1);
+    auto leaf2 = make_leaf(stk2);
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_deferred_inject");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    double a1 = leaf1->getTM()->getPosition(k1.back().datetime, stk1).number;
+    double b1 = leaf2->getTM()->getPosition(k1.back().datetime, stk2).number;
+    REQUIRE_GT(a1, 0.0);
+    REQUIRE_GT(b1, 0.0);
+
+    /** @arg the under-quota child receives the deferred injection, the over-quota child is reduced
+     */
+    ms->setAF(AF_FixedWeightList({0.8, 0.2}));
+    ms->setTradeOnClose(false);
+    ms->run(k2, false);
+    double a2 = leaf1->getTM()->getPosition(k2.back().datetime, stk1).number;
+    double b2 = leaf2->getTM()->getPosition(k2.back().datetime, stk2).number;
+    CHECK_GT(a2, a1);
+    CHECK_LT(b2, b1);
+}
+
+/** @par Check point: the C -> B -> A cascade keeps the shared account in step with the inner mode
+ * A account (the middle mode B mirrors every inner trade) */
+TEST_CASE("test_MultiSystem_cascade_c_b_a") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("cba_inner_a");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("cba_middle_b");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("cba_outer_c");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("C");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k);
+
+    double parent = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double apos = inner->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the shared account surfaces the inner trades exactly once */
+    CHECK_GT(parent, 0.0);
+    CHECK_EQ(parent, doctest::Approx(apos));
+}
+
+/** @par Check point: the A -> C -> B cascade mirrors the inner mode B trades onto the outer mode A
+ * shadow account */
+TEST_CASE("test_MultiSystem_cascade_a_c_b") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("acb_inner_b");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("acb_middle_c");
+    middle->setMode("C");
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("acb_outer_a");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k);
+
+    double parent = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double shadow = middle->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the outer follows the shadow account the inner trades land on */
+    CHECK_GT(parent, 0.0);
+    CHECK_EQ(parent, doctest::Approx(shadow));
+}
+
+/** @par Check point: the C -> C -> A cascade surfaces the inner A trade exactly once on the shared
+ * account */
+TEST_CASE("test_MultiSystem_cascade_c_c_a") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 3].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("cca_inner_a");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("cca_middle_c");
+    middle->setMode("C");
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("cca_outer_c");
+    outer->setTM(crtTM(k[0].datetime, 100000.0));
+    outer->setMode("C");
+    outer->add(middle);
+    outer->run(k);
+
+    size_t parent_buys = 0;
+    for (const auto& tr : outer->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            parent_buys++;
+        }
+    }
+
+    /** @arg one inner buy is surfaced once (no duplicate ordering through the cascade) */
+    CHECK_EQ(parent_buys, 1);
+    CHECK_GT(outer->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a mode C child removed and re-admitted gets a fresh cycle start and trades
+ * again */
+TEST_CASE("test_MultiSystem_mode_c_reentry_after_force_sell") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto proto =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto->setStock(stk);
+    proto->setParam<bool>("buy_delay", false);
+    auto se = std::make_shared<SelectDropSecondSE>();
+    se->addStockList({stk}, proto);
+
+    auto ms = std::make_shared<MultiSystem>("ms_c_reentry");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    auto sys = ms->getSystemList()[0];
+    bool bought_after_drop = false;
+    for (const auto& tr : sys->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.datetime > k[1].datetime) {
+            bought_after_drop = true;
+        }
+    }
+
+    /** @arg the re-admitted child trades again after the forced liquidation */
+    CHECK_UNARY(bought_after_drop);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: mode C without an SE never declares a cycle day (the direct cycle signals
+ * stay silent) */
+TEST_CASE("test_MultiSystem_mode_c_no_se_cycle_silent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+
+    auto ms = std::make_shared<MultiSystem>("ms_c_no_se");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->add(leaf);
+    ms->run(k);
+
+    /** @arg no cycle day is declared and no trade is made */
+    CHECK_UNARY(leaf->getSG()->getCycleDates().empty());
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a close-only live session (runMomentOnClose without runMomentOnOpen) does not
+ * drive the delayed requests and does not crash */
+TEST_CASE("test_MultiSystem_close_only_live_buffer_fallback") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+
+    auto ms = std::make_shared<MultiSystem>("ms_close_only");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->add(leaf);
+    ms->setTO(k);
+    ms->readyForRun();
+
+    for (size_t i = 0; i < 5; ++i) {
+        ms->runMomentOnClose(k[i].datetime);
+    }
+
+    /** @arg the parent never trades: the delayed requests need an open drive */
+    CHECK_EQ(ms->getTM()->getTradeList().size(), 1);
+}
+
+class SelectExceptDateSE : public SelectorBase {
+public:
+    SelectExceptDateSE(const SystemList& list, Datetime except_date)
+    : SelectorBase("SelectExceptDateSE"), m_list(list), m_except_date(except_date) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectExceptDateSE>(m_list, m_except_date);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime date) override {
+        SystemWeightList ret;
+        if (date.startOfDay() != m_except_date.startOfDay()) {
+            for (auto& sys : m_list) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    Datetime m_except_date;
+};
+
+class SelectExceptStockDateSE : public SelectorBase {
+public:
+    SelectExceptStockDateSE(const SystemList& list, const Stock& except_stock, Datetime except_date)
+    : SelectorBase("SelectExceptStockDateSE"),
+      m_list(list),
+      m_except_stock(except_stock),
+      m_except_date(except_date) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectExceptStockDateSE>(m_list, m_except_stock, m_except_date);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime date) override {
+        SystemWeightList ret;
+        const bool drop = (date.startOfDay() == m_except_date.startOfDay());
+        for (auto& sys : m_list) {
+            if (drop && sys->getStock() == m_except_stock) {
+                continue;
+            }
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    Stock m_except_stock;
+    Datetime m_except_date;
+};
+
+/** @par Check point: a deferred calibration sell with no quote at the next open is retried on the
+ * following open (SH600005 has no bar on 2000-06-30) */
+TEST_CASE("test_MultiSystem_pending_calibration_retry_suspension") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    // The run axis comes from a stock that trades on 2000-06-30: the sub's instrument is
+    // suspended that day, so its deferred leg has no quote and must be retried
+    KData k = market.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date(200005100000LL);
+    Datetime drop_date(200006290000LL);
+    Datetime retry_date(200007030000LL);
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    // A second, always selected child keeps the quota calibration active on the drop day
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    auto se = std::make_shared<SelectExceptStockDateSE>(SystemList{leaf, other}, stk, drop_date);
+    auto ms = std::make_shared<MultiSystem>("ms_retry_suspension");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->add(other);
+    ms->run(k);
+
+    Datetime sub_sell_date, parent_sell_date;
+    for (const auto& tr : leaf->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            sub_sell_date = tr.datetime;
+        }
+    }
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            parent_sell_date = tr.datetime;
+        }
+    }
+
+    /** @arg the leg skipped on the suspended day executes on the next quoted open */
+    CHECK_UNARY(!sub_sell_date.isNull());
+    CHECK_EQ(sub_sell_date, retry_date);
+    CHECK_UNARY(!parent_sell_date.isNull());
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a queued suggestion with no quote at the next open is retried on the
+ * following open instead of filling at the stale close price (SH600005 has no bar on 2000-06-30) */
+TEST_CASE("test_MultiSystem_open_pending_retry_suspension") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KData k = market.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date(200006290000LL);
+    Datetime retry_date(200007030000LL);
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_open_pending_retry");
+    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    Datetime parent_buy_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk) {
+            parent_buy_date = tr.datetime;
+        }
+    }
+
+    /** @arg the fill happens on the next quoted open, never on the suspended day */
+    CHECK_EQ(parent_buy_date, retry_date);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a retry batch survives the next rebalancing close (merged with the new batch,
+ * so the parent mirror of an already filled sub trade is never lost) */
+TEST_CASE("test_MultiSystem_open_pending_retry_merged_with_new_batch") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    // stk1 is suspended on 2000-06-30: its queued buy retrains, while stk2 trades and produces a
+    // new batch on that very rebalancing close
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006290000LL), Datetime(203001010000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full));
+
+    auto sg2 = make_shared<ScriptedBuySellSG>(Datetime(200006300000LL), Datetime(203001010000LL));
+    auto leaf2 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg2);
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_open_pending_merge");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k);
+
+    Datetime parent1_buy_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk1) {
+            parent1_buy_date = tr.datetime;
+        }
+    }
+    double parent1 = ms->getTM()->getPosition(k.back().datetime, stk1).number;
+    double leaf1_pos = leaf1->getTM()->getPosition(k.back().datetime, stk1).number;
+    double parent2 = ms->getTM()->getPosition(k.back().datetime, stk2).number;
+    double leaf2_pos = leaf2->getTM()->getPosition(k.back().datetime, stk2).number;
+
+    /** @arg both the retried leg and the new leg fill on the next quoted open, two books matched */
+    CHECK_EQ(parent1_buy_date, Datetime(200007030000LL));
+    CHECK_GT(leaf1_pos, 0.0);
+    CHECK_EQ(parent1, doctest::Approx(leaf1_pos));
+    CHECK_GT(leaf2_pos, 0.0);
+    CHECK_EQ(parent2, doctest::Approx(leaf2_pos));
+    CHECK_UNARY(!ms->getAdjustTurnover().empty());
+    CHECK_EQ(ms->getAdjustTurnover().back().first, Datetime(200006300000LL));
+}
+
+/** @par Check point: a nested mode B with trade_on_close=false still matches the three ledgers
+ * when the outer mode B delegates a shrunk budget */
+TEST_CASE("test_MultiSystem_mode_b_nested_b_trade_on_close_false") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    // A single scripted buy in the first run: no fresh signals in the second run, so the mirrors
+    // settle and the three ledgers are comparable one for one at the end
+    auto sg = make_shared<ScriptedBuySellSG>(k1[k1.size() - 2].datetime, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("inner_b_nested_deferred");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->setTradeOnClose(false);
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_nested_deferred");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+
+    /** @arg the delegated budget reaches the leaf through the inner deferred calibration */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    double leaf2 = leaf->getTM()->getPosition(k2.back().datetime, stk).number;
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_EQ(leaf2, doctest::Approx(inner2));
+    CHECK_EQ(inner2, doctest::Approx(parent2));
+}
+
+/** @par Check point: an outer mode B reducing a nested mode C composite falls back to the direct
+ * pro rata reduction (a mode C inner cannot consume a delegated budget) */
+TEST_CASE("test_MultiSystem_mode_b_nested_c_pro_rata_reduction") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("inner_c_under_b");
+    inner->setMode("C");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_over_c");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(inner1, 0.0);
+
+    /** @arg the shrunk budget reduces the shared ledger pro rata and mirrors to the parent */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_EQ(inner2, doctest::Approx(parent2));
+}
+
+/** @par Check point: an outer mode A follows a nested mode B child through its shadow account */
+TEST_CASE("test_MultiSystem_mode_a_nested_b_follows_shadow") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("ab_inner_b");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto outer = std::make_shared<MultiSystem>("ab_outer_a");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    outer->add(inner);
+    outer->run(k);
+
+    double parent = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double shadow = inner->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the parent tracks the shadow account the inner trades on */
+    CHECK_GT(parent, 0.0);
+    CHECK_EQ(parent, doctest::Approx(shadow));
+}
+
+/** @par Check point: with adjust_running_sys=false the nested mode B keeps its running leaf, the
+ * delegated budget does not force-sell it */
+TEST_CASE("test_MultiSystem_mode_b_nested_b_adjust_running_sys_false") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("inner_b_no_force");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->getAF()->setParam<bool>("adjust_running_sys", false);
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_no_force");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+
+    /** @arg the running leaf is not force-reduced by the delegated budget */
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, leaf1);
+    CHECK_EQ(inner->getTM()->getPosition(k2.back().datetime, stk).number, inner1);
+}
+
+/** @par Check point: the outer mode A sampling folds the raw delayed requests of an inner mode A
+ * leaf on a day the inner itself does not sample (adjust cycles 2 vs 3) */
+TEST_CASE("test_MultiSystem_cascade_a_a_unsampled_fold") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    // The 3rd close: the outer (cycle 2) samples, the inner (cycle 3) does not, and the leaf
+    // request of this very close is still pending (its delayed fill only happens the next open)
+    Datetime buy_date = k[2].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+
+    auto inner = std::make_shared<MultiSystem>("aa_inner");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->setAdjustCycle(3);
+    inner->add(leaf);
+
+    auto outer = std::make_shared<MultiSystem>("aa_outer");
+    outer->setTM(crtTM(Datetime(199911010000LL), 1000000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    outer->setAdjustCycle(2);
+    outer->add(inner);
+    outer->run(k);
+
+    Datetime first_buy;
+    for (const auto& tr : outer->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            first_buy = tr.datetime;
+            break;
+        }
+    }
+
+    /** @arg the intent is visible to the outer on the very day it samples */
+    CHECK_UNARY(!first_buy.isNull());
+    CHECK_EQ(first_buy, buy_date);
+}
+
+/** @par Check point: in mode A the retried suggestion leg merges with the new rebalancing batch
+ * (the suspended stock is excluded from the new batch by its missing quote, no double counting) */
+TEST_CASE("test_MultiSystem_mode_a_retry_merge") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006290000LL), Datetime(203001010000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", true);
+    leaf1->setTO(stk1.getKData(full));
+
+    auto sg2 = make_shared<ScriptedBuySellSG>(Datetime(200006300000LL), Datetime(203001010000LL));
+    auto leaf2 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg2);
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", true);
+    leaf2->setTO(stk2.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_a_retry_merge");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k);
+
+    size_t buys1 = 0;
+    Datetime buy1_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk1) {
+            buys1++;
+            buy1_date = tr.datetime;
+        }
+    }
+
+    /** @arg the suspended intent fills once on the next quoted open, together with the new leg */
+    CHECK_EQ(buys1, 1);
+    CHECK_EQ(buy1_date, Datetime(200007030000LL));
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
+}
+
+/** @par Check point: a deferred injection waits for the deferred sells of the same rebalancing
+ * when the sells are retried for a suspension (the freed cash is part of the injection funding) */
+TEST_CASE("test_MultiSystem_mode_b_deferred_inject_waits_for_retry") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sz000001");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(20000401), Datetime(20000731));
+    KQuery full2(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000628));
+    KQuery q2(Datetime(20000629), Datetime(20000720));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 3);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_inject_after_retry");
+    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    double leaf2_before = leaf2->getTM()->getPosition(k2[0].datetime, stk2).number;
+    REQUIRE_GT(leaf2_before, 0.0);
+
+    /** @arg the injection lands on the day the suspended sell finally fills (2000-07-03) */
+    ms->setAF(AF_FixedWeightList({0.1, 0.9}));
+    ms->run(k2, false);
+    double leaf2_after = leaf2->getTM()->getPosition(k2[2].datetime, stk2).number;
+    double leaf1_after = leaf1->getTM()->getPosition(k2[2].datetime, stk1).number;
+    double leaf1_before = leaf1->getTM()->getPosition(k2[0].datetime, stk1).number;
+    CHECK_GT(leaf2_after, leaf2_before);
+    CHECK_LT(leaf1_after, leaf1_before);
+}
+
+/** @par Check point: a calendar adjust-mode with trade_on_close=false still records the monthly
+ * rebalancing turnover (the adjust decision comes from the close stage, never re-derived) */
+TEST_CASE("test_MultiSystem_mode_a_calendar_turnover_deferred") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto ms = std::make_shared<MultiSystem>("ms_a_calendar_turnover");
+    ms->setTM(crtTM(Datetime(200001010000LL), 1000000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setAdjustMode("month");
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    size_t i0 = k.size();
+    for (size_t i = 0; i < k.size(); ++i) {
+        if (k[i].datetime >= Datetime(200001010000LL)) {
+            i0 = i;
+            break;
+        }
+    }
+    REQUIRE(i0 < k.size() - 2);
+
+    /** @arg the first monthly rebalance fills at the next open and is recorded */
+    REQUIRE(!ms->getAdjustTurnover().empty());
+    CHECK_EQ(ms->getAdjustTurnover().front().first, k[i0].datetime);
+    CHECK_GE(ms->getAdjustTurnover().size(), 2);
+}
+
+/** @par Check point: the continuous-mirror fills of the non-rebalancing days are not counted into
+ * the turnover (only the batches queued on the explicit rebalancing closes are) */
+TEST_CASE("test_MultiSystem_mode_b_mirror_not_in_turnover") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000121));
+    KQuery q2(Datetime(20000124), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 8);
+    REQUIRE(k2.size() > 8);
+
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto ms = std::make_shared<MultiSystem>("ms_b_mirror_turnover");
+    ms->setTM(crtTM(Datetime(199911010000LL), 1000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k1);
+
+    size_t base = ms->getAdjustTurnover().size();
+
+    /** @arg only the fills of the batches queued on the two rebalancing closes are recorded */
+    ms->setAdjustDates(DatetimeList{k2[3].datetime, k2[7].datetime});
+    ms->run(k2, false);
+    const auto& turnover = ms->getAdjustTurnover();
+    REQUIRE_GE(turnover.size() - base, 2);
+    // The last two records are the two rebalancing batches (an earlier one may carry the last
+    // batch of the first run, executed at the first open of the second run)
+    CHECK_EQ(turnover[turnover.size() - 2].first, k2[3].datetime);
+    CHECK_EQ(turnover[turnover.size() - 1].first, k2[7].datetime);
+}
+
+/** @par Check point: the trade_on_close=true rebalancing records its turnover at the close stage
+ * (the master path of the turnover attribution) */
+TEST_CASE("test_MultiSystem_mode_b_close_turnover") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000121));
+    KQuery q2(Datetime(20000124), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 8);
+    REQUIRE(k2.size() > 8);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto ms = std::make_shared<MultiSystem>("ms_b_close_turnover");
+    ms->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->add(leaf);
+    ms->run(k1);
+
+    size_t base = ms->getAdjustTurnover().size();
+
+    /** @arg the close-stage reduction of the shrunk budget is recorded on its own close day */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    REQUIRE_GT(ms->getAdjustTurnover().size(), base);
+    CHECK_EQ(ms->getAdjustTurnover()[base].first, k2.front().datetime);
+    CHECK_GT(ms->getAdjustTurnover()[base].second, 0.0);
+}
+
+/** @par Check point: a stale injection of an earlier round does not re-inflate a child whose quota
+ * was lowered while a sell leg was still waiting for a quote */
+TEST_CASE("test_MultiSystem_mode_b_stale_inject_purged") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sz000001");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(20000401), Datetime(20000731));
+    KQuery full2(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000626));
+    KQuery q2(Datetime(20000629), Datetime(20000630));
+    KQuery q3(Datetime(20000630), Datetime(20000720));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    KData k3 = market.getKData(q3);
+    REQUIRE(k1.size() > 5);
+    REQUIRE_GE(k2.size(), 1);
+    REQUIRE_GT(k3.size(), 5);
+    // The second run intentionally re-drives the 06-30 close: the next rebalancing round must
+    // happen while the retry of the suspended leg is still pending
+    REQUIRE_EQ(k3.front().datetime, Datetime(200006300000LL));
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_stale_inject");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    // The 06-29 close: leaf1 (suspended on 06-30) is over quota -> a stuck sell leg; leaf2 is
+    // under quota -> an injection with the high quota
+    ms->setAF(AF_FixedWeightList({0.1, 0.9}));
+    ms->run(k2, false);
+
+    double leaf2_before = leaf2->getTM()->getPosition(k3[0].datetime, stk2).number;
+    REQUIRE_GT(leaf2_before, 0.0);
+
+    // The 06-30 close lowers leaf2's quota while leaf1's sell leg still waits: the stale high
+    // injection of leaf2 must be purged, otherwise it re-inflates leaf2 after its own sells.
+    // The weight list is used as given (no normalization): 45% / 5% of the parent assets
+    ms->setAF(AF_FixedWeightList({0.45, 0.05}));
+    ms->run(k3, false);
+
+    // Measured on the day the stuck sell finally fills (07-03): the stale injection would show
+    // up exactly here, re-inflating leaf2 right after its own sells
+    Datetime retry_day(200007030000LL);
+    double leaf2_after = leaf2->getTM()->getPosition(retry_day, stk2).number;
+    double leaf2_nav = leaf2->getTM()->getFunds(retry_day, KQuery::DAY).net_assets();
+
+    /** @arg leaf2 is near its lowered quota on the retry day, not re-inflated by the stale target
+     */
+    CHECK_LT(leaf2_after, leaf2_before);
+    CHECK_LT(leaf2_nav, 100000.0);
+}
+
+/** @par Check point: a selected sub-system with a zero quota is cleared like an unselected one
+ * (the calibrated flow keeps the same liquidation semantics as the legacy flow) */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_clears") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    REQUIRE_GT(leaf2->getTM()->getPosition(k1.back().datetime, stk2).number, 0.0);
+
+    /** @arg a zero quota clears the sub ledger and the parent holdings */
+    ms->setAF(AF_FixedWeightList({1.0, 0.0}));
+    ms->run(k2, false);
+    CHECK_EQ(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_GT(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a pending sell leg whose holding was force-cleared while it waited (a
+ * delisting) is dropped instead of blocking the injections forever */
+TEST_CASE("test_MultiSystem_dead_leg_dropped_after_force_clear") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sz000001");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(20000401), Datetime(20000731));
+    KQuery full2(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000626));
+    KQuery q2(Datetime(20000629), Datetime(20000630));
+    KQuery q3(Datetime(20000630), Datetime(20000701));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    KData k3 = market.getKData(q3);
+    REQUIRE(k1.size() > 5);
+    REQUIRE_GE(k2.size(), 1);
+    REQUIRE_GE(k3.size(), 1);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_dead_leg");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    // The 06-29 close: leaf1 gets a zero quota (a deferred clear), leaf2 stays under quota
+    // (a deferred injection waiting for the sells)
+    ms->setAF(AF_FixedWeightList({0.0, 1.0}));
+    ms->run(k2, false);
+
+    // Simulate the force-clear of a delisting arriving before the suspended open
+    Datetime d = k2.back().datetime;
+    double sub_num = leaf1->getTM()->getPosition(d, stk1).number;
+    double parent_num = ms->getTM()->getPosition(d, stk1).number;
+    REQUIRE_GT(sub_num, 0.0);
+    leaf1->getTM()->sell(d, stk1, 1.0, sub_num, 0.0, 0.0, 1.0, PART_SYSTEM, "force clear");
+    if (parent_num > 0.0) {
+        ms->getTM()->sell(d, stk1, 1.0, parent_num, 0.0, 0.0, 1.0, PART_SYSTEM, "force clear");
+    }
+
+    double pos2_before = leaf2->getTM()->getPosition(d, stk2).number;
+
+    // The 06-30 open: the instrument is suspended and its holding is gone -> the legs are dropped,
+    // the deferred injection is no longer blocked
+    ms->run(k3, false);
+
+    size_t dead_sells = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk1 &&
+            tr.datetime == Datetime(200006300000LL)) {
+            dead_sells++;
+        }
+    }
+    CHECK_EQ(dead_sells, 0);
+    // The freed injection reached leaf2: it bought with the injected cash on the same close
+    CHECK_GT(leaf2->getTM()->getPosition(Datetime(200006300000LL), stk2).number, pos2_before);
+}
+
+/** @par Check point: a zero-quota liquidation in trade_on_close=true does not mirror the cleared
+ * sub open-buffer fills (the parent would buy back what the liquidation just sold) */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_no_rebuy") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000121));
+    KQuery q2(Datetime(20000124), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", true);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota_no_rebuy");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    /** @arg the morning fill of the cleared sub is not mirrored after the liquidation sells */
+    ms->setAF(AF_FixedWeightList({1.0, 0.0}));
+    ms->run(k2, false);
+    Datetime clear_day = k2.front().datetime;
+    bool morning_fill = false;
+    for (const auto& tr : leaf2->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.datetime == clear_day) {
+            morning_fill = true;
+        }
+    }
+    size_t parent_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk2 && tr.datetime == clear_day) {
+            parent_buys++;
+        }
+    }
+    /** @arg the cleared sub did have an open-buffer fill, and it was not mirrored */
+    CHECK_UNARY(morning_fill);
+    CHECK_EQ(parent_buys, 0);
+    CHECK_EQ(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_GT(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a parent-side residual that can never fill (both books flat) is dropped, so
+ * the deferred injections of the later rounds are not blocked forever */
+TEST_CASE("test_MultiSystem_mode_b_residual_terminated") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery q1(Datetime(20000501), Datetime(20000627));
+    KQuery q2(Datetime(20000629), Datetime(20000707));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 3);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+
+    auto ms = std::make_shared<MultiSystem>("ms_residual");
+    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    // Keep only one lot on the parent book: the next reduction leg can only partially fill and
+    // leaves a residual that can never fill on a flat parent book
+    Datetime drain_date = k1.back().datetime;
+    double parent_num = ms->getTM()->getPosition(drain_date, stk1).number;
+    REQUIRE_GT(parent_num, 100.0);
+    price_t drain_price = k1.back().closePrice;
+    ms->getTM()->sell(drain_date, stk1, drain_price, parent_num - 100.0, 0.0, 0.0, drain_price,
+                      PART_SYSTEM, "drain");
+
+    double leaf2_cash_before = leaf2->getTM()->getFunds(drain_date, KQuery::DAY).cash;
+    double leaf1_before = leaf1->getTM()->getPosition(drain_date, stk1).number;
+
+    /** @arg the residual dies on the flat parent book and the injection is not blocked */
+    ms->setAF(AF_FixedWeightList({0.1, 0.7}));
+    ms->run(k2, false);
+
+    size_t late_sells = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk1 &&
+            tr.datetime > Datetime(200006300000LL)) {
+            late_sells++;
+        }
+    }
+    CHECK_LT(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, leaf1_before);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk1).number, 0.0);
+    CHECK_EQ(late_sells, 0);
+    CHECK_GT(leaf2->getTM()->getFunds(Datetime(200006300000LL), KQuery::DAY).cash,
+             leaf2_cash_before);
+}
+
+TEST_CASE("test_MultiSystem_mode_b_legacy_zero_quota") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_legacy_zero_quota");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    REQUIRE_GT(leaf2->getTM()->getPosition(k1.back().datetime, stk2).number, 0.0);
+
+    /** @arg the zero quota clears both books, without replicating the sub same-close fills */
+    ms->setAF(AF_FixedWeightList({1.0, 0.0}));
+    ms->run(k2, false);
+    CHECK_EQ(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_GT(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a nested composite selected with a zero quota is liquidated recursively
+ * (the leaf ledger, the inner account and the outer parent all flat) */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_nested_composite") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_b_zero_quota");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_zero_quota");
+    ms->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner, other}));
+    ms->setSellAtNotSelected(true);
+    ms->add(inner);
+    ms->add(other);
+    ms->run(k1);
+
+    REQUIRE_GT(leaf->getTM()->getPosition(k1.back().datetime, stk).number, 0.0);
+
+    /** @arg the whole nested subtree is cleared together with the outer parent holding */
+    ms->setAF(AF_FixedWeightList({0.0, 1.0}));
+    ms->run(k2, false);
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(inner->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: adjust_running_sys=false keeps a running sub with a zero quota untouched */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_keeps_running") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    // A fixed-count MM keeps cash, so the sub keeps trading while running: the test can tell
+    // "still driven and mirrored" apart from "skipped"
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+    auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota_running");
+    // A large parent budget keeps the fixed-count sub funded through both runs
+    ms->setTM(crtTM(Datetime(199911010000LL), 1000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf, other}));
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf);
+    ms->add(other);
+    ms->run(k1);
+    double pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg the running sub is left untouched despite the zero quota: not liquidated, still
+     * driven and mirrored */
+    auto af = AF_FixedWeightList({0.0, 1.0});
+    af->setParam<bool>("adjust_running_sys", false);
+    ms->setAF(af);
+    ms->run(k2, false);
+    double leaf_pos2 = leaf->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent_pos2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_GT(leaf_pos2, pos1);
+    CHECK_GT(parent_pos2, pos1);
+    CHECK_EQ(leaf_pos2, doctest::Approx(parent_pos2));
+}
+
+class SelectBeforeDateSE : public SelectorBase {
+public:
+    SelectBeforeDateSE(const SystemList& list, Datetime stop_date)
+    : SelectorBase("SelectBeforeDateSE"), m_list(list), m_stop_date(stop_date) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectBeforeDateSE>(m_list, m_stop_date);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime date) override {
+        SystemWeightList ret;
+        if (date < m_stop_date) {
+            for (auto& sys : m_list) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    Datetime m_stop_date;
+};
+
+/** @par Check point: a trade_on_close=false liquidation on a suspended close still queues the
+ * parent leg (the sub side is queued too), so the parent holding is not stranded */
+TEST_CASE("test_MultiSystem_liquidation_parent_leg_on_suspended_close") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE(k2.size() > 2);
+    // Premise: the instrument is suspended on the clearing close
+    REQUIRE_UNARY(stk.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    auto short_sg =
+      make_shared<ScriptedShortSG>(Datetime(200006150000LL), Datetime(203001010000LL));
+    short_sg->setParam<bool>("support_borrow_stock", true);
+    auto short_leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), short_sg);
+    short_leaf->setStock(stk);
+    short_leaf->setParam<bool>("buy_delay", false);
+    short_leaf->setParam<bool>("sell_delay", false);
+    short_leaf->setParam<bool>("support_borrow_stock", true);
+    short_leaf->setTO(stk.getKData(full));
+
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    // From the clearing close on, only `other` stays selected: the two cleared subs are out of
+    // the allocation for good (no re-buying after the liquidation legs fill)
+    class SelectOthersAfterSE : public SelectorBase {
+    public:
+        SelectOthersAfterSE(const SystemList& list, const SystemPtr& keep, Datetime stop_date)
+        : SelectorBase("SelectOthersAfterSE"), m_list(list), m_keep(keep), m_stop_date(stop_date) {
+            m_pro_sys_list = list;
+        }
+
+        SelectorPtr _clone() override {
+            return std::make_shared<SelectOthersAfterSE>(m_list, m_keep, m_stop_date);
+        }
+
+        void _calculate() override {}
+
+        SystemWeightList _getSelected(Datetime date) override {
+            SystemWeightList ret;
+            for (auto& sys : m_list) {
+                if (date >= m_stop_date && sys != m_keep) {
+                    continue;
+                }
+                ret.emplace_back(sys, 1.0);
+            }
+            return ret;
+        }
+
+        SystemList m_list;
+        SystemPtr m_keep;
+        Datetime m_stop_date;
+    };
+
+    auto ms = std::make_shared<MultiSystem>("ms_liq_suspended");
+    ms->setTM(crtTM(Datetime(200005010000LL), 300000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectOthersAfterSE>(SystemList{leaf, short_leaf, other}, other,
+                                                    Datetime(200006300000LL)));
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->setParam<bool>("support_borrow_stock", true);
+    ms->add(leaf);
+    ms->add(short_leaf);
+    ms->add(other);
+    ms->run(k1);
+
+    /** @arg both books are open before the suspended clearing close */
+    double leaf_pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double short_pos1 = short_leaf->getTM()->getShortPosition(stk).number;
+    REQUIRE_GT(leaf_pos1, 0.0);
+    REQUIRE_GT(short_pos1, 0.0);
+    REQUIRE_GT(ms->getTM()->getPosition(k1.back().datetime, stk).number, 0.0);
+    REQUIRE_GT(ms->getTM()->getShortPosition(stk).number, 0.0);
+
+    ms->run(k2, false);
+
+    /** @arg both books of both cleared subs are flat: the parent legs waited for a quote and
+     * retried instead of being dropped on the suspended close */
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(short_leaf->getTM()->getShortPosition(stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getShortPosition(stk).number, 0.0);
+}
+
+TEST_CASE("test_MultiSystem_clear_purges_stale_retry_batch") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000601), Datetime(20000707));
+    KData k = market.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto sg = make_shared<ScriptedBuySellSG>(Datetime(200006290000LL), Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_clear_purge");
+    ms->setTM(crtTM(Datetime(200006010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectBeforeDateSE>(SystemList{leaf}, Datetime(200006300000LL)));
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    /** @arg the queued mirror of the cleared sub is gone: the parent never buys it */
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a mode B outer follows a nested mode A child through its quota account
+ * (the missing topology of the 3x3 matrix) */
+TEST_CASE("test_MultiSystem_mode_b_nested_a_follows_account") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("ba_inner_a");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto outer = std::make_shared<MultiSystem>("ba_outer_b");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("B");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    outer->add(inner);
+    outer->run(k);
+
+    double parent = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double inner_pos = inner->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the parent mirrors the inner account one for one */
+    CHECK_GT(parent, 0.0);
+    CHECK_EQ(parent, doctest::Approx(inner_pos));
+}
+
+/** @par Check point: with sell_at_not_selected=false a selected zero-quota sub keeps running
+ * (no liquidation, no budget) */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_flag_off_keeps") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota_flag_off");
+    ms->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf, other}));
+    ms->add(leaf);
+    ms->add(other);
+    ms->run(k1);
+    double pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg the zero-quota sub is neither liquidated nor reduced */
+    ms->setAF(AF_FixedWeightList({0.0, 1.0}));
+    ms->run(k2, false);
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
+}
+
+/** @par Check point: a trade_on_close=false liquidation covers a short sub book and its parent
+ * mirror at the next open */
+TEST_CASE("test_MultiSystem_liquidation_short_cover_deferred") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto sg = make_shared<ScriptedShortSG>(k[1].datetime, Datetime(203001010000LL));
+    sg->setParam<bool>("support_borrow_stock", true);
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setParam<bool>("sell_delay", false);
+    leaf->setParam<bool>("support_borrow_stock", true);
+    leaf->setStock(stk);
+
+    auto ms = std::make_shared<MultiSystem>("ms_short_clear");
+    ms->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectBeforeDateSE>(SystemList{leaf}, k[6].datetime));
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->setParam<bool>("support_borrow_stock", true);
+    ms->add(leaf);
+    ms->run(k);
+
+    /** @arg the short books are covered after the clear */
+    CHECK_EQ(leaf->getTM()->getShortPosition(stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getShortPosition(stk).number, 0.0);
+}
+
+/** @par Check point: the legacy (no SE) zero-quota path honors adjust_running_sys=false as well:
+ * a running sub with a zero quota is left untouched */
+TEST_CASE("test_MultiSystem_mode_b_legacy_zero_quota_keeps_running") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_legacy_zero_quota_running");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+    double pos1 = leaf1->getTM()->getPosition(k1.back().datetime, stk1).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg the running zero-quota sub is left untouched in the legacy flow */
+    auto af = AF_FixedWeightList({0.0, 1.0});
+    af->setParam<bool>("adjust_running_sys", false);
+    ms->setAF(af);
+    ms->run(k2, false);
+    CHECK_EQ(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, pos1);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk1).number, pos1);
+    CHECK_GT(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+}
+
+/** @par Check point: a trade_on_close=true liquidation on a suspended close falls back to the
+ * deferred legs and completes at the next quoted open (the PF_Simple default path) */
+TEST_CASE("test_MultiSystem_liquidation_suspended_close_trade_on_close") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE(k2.size() > 2);
+    REQUIRE_UNARY(stk.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    class SelectOthersAfterSE : public SelectorBase {
+    public:
+        SelectOthersAfterSE(const SystemList& list, const SystemPtr& keep, Datetime stop_date)
+        : SelectorBase("SelectOthersAfterSE2"), m_list(list), m_keep(keep), m_stop_date(stop_date) {
+            m_pro_sys_list = list;
+        }
+
+        SelectorPtr _clone() override {
+            return std::make_shared<SelectOthersAfterSE>(m_list, m_keep, m_stop_date);
+        }
+
+        void _calculate() override {}
+
+        SystemWeightList _getSelected(Datetime date) override {
+            SystemWeightList ret;
+            for (auto& sys : m_list) {
+                if (date >= m_stop_date && sys != m_keep) {
+                    continue;
+                }
+                ret.emplace_back(sys, 1.0);
+            }
+            return ret;
+        }
+
+        SystemList m_list;
+        SystemPtr m_keep;
+        Datetime m_stop_date;
+    };
+
+    auto ms = std::make_shared<MultiSystem>("ms_liq_suspended_toc");
+    ms->setTM(crtTM(Datetime(200005010000LL), 300000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectOthersAfterSE>(SystemList{leaf, other}, other,
+                                                    Datetime(200006300000LL)));
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf);
+    ms->add(other);
+    ms->run(k1);
+
+    double pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(pos1, 0.0);
+    REQUIRE_GT(ms->getTM()->getPosition(k1.back().datetime, stk).number, 0.0);
+
+    ms->run(k2, false);
+
+    /** @arg the liquidation legs were queued at the suspended close and filled later */
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a trade_on_close=false reduction on a suspended close still queues the
+ * reduction legs and fills them at the next quoted open */
+TEST_CASE("test_MultiSystem_reduction_on_suspended_close_deferred") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000704));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE_GE(k2.size(), 2);
+    REQUIRE_UNARY(stk.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_reduce_suspended");
+    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k1);
+
+    double pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg the suspended close queues the reduction, executed at the next open */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    CHECK_LT(leaf->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
+}
+
+/** @par Check point: a delegated budget above the inner reserve cap (max-total-position) is
+ * capped, so the inner layer keeps its reserved cash */
+TEST_CASE("test_MultiSystem_cascade_b_b_b_delegated_reserve") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("bbb_inner");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->getAF()->setParam<double>("max-total-position", 0.8);
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("bbb_middle");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("bbb_outer");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("B");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k);
+
+    double leaf_nav = leaf->getTM()->getFunds(k.back().datetime, KQuery::DAY).net_assets();
+    double parent_pos = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double leaf_pos = leaf->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the inner layer keeps its 20% reserve: the delegated 100% budget is capped to 80% */
+    CHECK_GT(leaf_pos, 0.0);
+    CHECK_LE(leaf_nav, 86000.0);
+    CHECK_EQ(parent_pos, doctest::Approx(leaf_pos));
+}
+
+/** @par Check point: a three-level mode C chain surfaces the leaf trades once per layer and the
+ * shared account holds exactly one buy and one sell */
+TEST_CASE("test_MultiSystem_cascade_c_c_c_surface_once") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 4].datetime;
+    Datetime sell_date = k[k.size() - 2].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, sell_date);
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setParam<bool>("sell_delay", false);
+
+    auto inner = std::make_shared<MultiSystem>("ccc_inner");
+    inner->setMode("C");
+    inner->add(leaf);
+    auto middle = std::make_shared<MultiSystem>("ccc_middle");
+    middle->setMode("C");
+    middle->add(inner);
+    auto outer = std::make_shared<MultiSystem>("ccc_outer");
+    outer->setTM(crtTM(k[0].datetime, 100000.0));
+    outer->setMode("C");
+    outer->add(middle);
+    outer->run(k);
+
+    size_t buys = 0;
+    size_t sells = 0;
+    for (const auto& tr : outer->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            buys++;
+        } else if (tr.business == BUSINESS_SELL) {
+            sells++;
+        }
+    }
+
+    /** @arg the shared account only sees the leaf trades once */
+    CHECK_EQ(buys, 1);
+    CHECK_EQ(sells, 1);
+    CHECK_EQ(outer->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a zero quota on the middle mode B clears the whole nested subtree and the
+ * outer parent holdings */
+TEST_CASE("test_MultiSystem_cascade_b_b_a_zero_quota_middle") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("bba_inner");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+    auto middle = std::make_shared<MultiSystem>("bba_middle");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    auto outer = std::make_shared<MultiSystem>("bba_outer");
+    outer->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    outer->setMode("B");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle, other}));
+    outer->setSellAtNotSelected(true);
+    outer->add(middle);
+    outer->add(other);
+    outer->run(k1);
+
+    REQUIRE_GT(leaf->getTM()->getPosition(k1.back().datetime, stk).number, 0.0);
+
+    /** @arg the middle zero quota clears the inner A shadow, the middle account and the parent */
+    outer->setAF(AF_FixedWeightList({0.0, 1.0}));
+    outer->run(k2, false);
+    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(inner->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(middle->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+    CHECK_EQ(outer->getTM()->getPosition(k2.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: the A -> B -> A cascade still mirrors a suspended close reduction only once */
+TEST_CASE("test_MultiSystem_cascade_a_b_a_suspended_deferred") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE(k2.size() > 2);
+    REQUIRE_UNARY(stk.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("aba_inner_susp");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+    auto middle = std::make_shared<MultiSystem>("aba_middle_susp");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->setTradeOnClose(false);
+    middle->add(inner);
+    auto outer = std::make_shared<MultiSystem>("aba_outer_susp");
+    outer->setTM(crtTM(Datetime(200005010000LL), 300000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+    REQUIRE_GT(inner1, 0.0);
+
+    /** @arg the suspended close reduction of the middle B reaches the inner A account and the
+     * outer A shadow once (the leaf shadow is the signal book, unaffected by the reduction) */
+    middle->setAF(AF_FixedAmount(30000.0));
+    outer->run(k2, false);
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = outer->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_GT(parent2, 0.0);
+}
+
+/** @par Check point: a trade_on_close=true composite reduction on a suspended close queues the
+ * pro-rata legs (the suspended leaf is valued at its last close) and fills them at the next
+ * quoted open */
+TEST_CASE("test_MultiSystem_composite_reduction_suspended_close") {
+    Stock stk_susp = getStock("sh600005");
+    Stock stk_quote = getStock("sh600000");
+    Stock market = stk_quote;
+    REQUIRE(!stk_susp.isNull());
+    REQUIRE(!stk_quote.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE(k2.size() > 2);
+    REQUIRE_UNARY(stk_susp.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf_susp =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf_susp->setStock(stk_susp);
+    leaf_susp->setParam<bool>("buy_delay", false);
+    leaf_susp->setTO(stk_susp.getKData(full));
+    auto leaf_quote =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf_quote->setStock(stk_quote);
+    leaf_quote->setParam<bool>("buy_delay", false);
+    leaf_quote->setTO(stk_quote.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("comp_red_inner");
+    inner->setMode("A");
+    inner->setSubInitCash(150000.0);
+    inner->add(leaf_susp);
+    inner->add(leaf_quote);
+
+    auto ms = std::make_shared<MultiSystem>("comp_red_outer");
+    ms->setTM(crtTM(Datetime(200005010000LL), 300000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double susp1 = inner->getTM()->getPosition(k1.back().datetime, stk_susp).number;
+    double quote1 = inner->getTM()->getPosition(k1.back().datetime, stk_quote).number;
+    REQUIRE_GT(susp1, 0.0);
+    REQUIRE_GT(quote1, 0.0);
+
+    /** @arg the suspended leaf is valued at its last close: both leaves are reduced pro rata and
+     * the quoted leaf is not liquidated just because its sibling is suspended */
+    ms->setAF(AF_FixedAmount(70000.0));
+    ms->run(k2, false);
+    double susp2 = inner->getTM()->getPosition(k2.back().datetime, stk_susp).number;
+    double quote2 = inner->getTM()->getPosition(k2.back().datetime, stk_quote).number;
+    CHECK_LT(susp2, susp1);
+    CHECK_GT(quote2, 0.0);
+
+    /** @arg the quoted leaf is not fully liquidated at the suspended close: the pro-rata ratio
+     * covers both leaves, so the close-time parent sell stays partial */
+    double sold_quote_at_close = 0.0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.datetime == Datetime(200006300000LL) && tr.business == BUSINESS_SELL &&
+            tr.stock == stk_quote) {
+            sold_quote_at_close += tr.number;
+        }
+    }
+    CHECK_GT(sold_quote_at_close, 0.0);
+    // The lot rounding alone cannot explain the gap: without the suspended leaf in the value base
+    // the ratio clamps to 1.0 and the quoted leaf is sold in full
+    CHECK_LT(sold_quote_at_close, quote1 - 1000.0);
+}
+
+/** @} */ /** @} */

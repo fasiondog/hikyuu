@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include <cmath>
 #include "SignalBase.h"
 
@@ -41,7 +42,9 @@ SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m
 SignalBase::~SignalBase() {}
 
 void SignalBase::initParam() {
-    setParam<bool>("cycle", false);                 // Calculate within the given cycle range only
+    setParam<bool>("cycle", false);  // A marker of the cycle signals: they consume the rebalancing
+                                     // days declared by a MultiSystem (it no longer limits the
+                                     // calculation range)
     setParam<bool>("alternate", true);              // The buy and sell signals appear alternately
     setParam<bool>("support_borrow_stock", false);  // Support issuing a short signal
 }
@@ -49,6 +52,15 @@ void SignalBase::initParam() {
 void SignalBase::baseCheckParam(const string& name) const {}
 void SignalBase::paramChanged() {
     m_calculated = false;
+    _normalizeCycleAlternate();
+}
+
+void SignalBase::_normalizeCycleAlternate() {
+    HKU_IF_RETURN(!tryGetParam<bool>("cycle", false), void());
+    HKU_IF_RETURN(!tryGetParam<bool>("alternate", true), void());
+    HKU_WARN("The cycle signal {} ignores alternate=true: a scheduled signal must not alternate!",
+             m_name);
+    m_params.set<bool>("alternate", false);
 }
 
 SignalPtr SignalBase::clone() {
@@ -69,6 +81,7 @@ SignalPtr SignalBase::clone() {
     p->m_sellSig = m_sellSig;
     p->m_cycle_start = m_cycle_start;
     p->m_cycle_end = m_cycle_end;
+    p->m_cycle_dates = m_cycle_dates;
     return p;
 }
 
@@ -84,12 +97,7 @@ void SignalBase::setTO(const KData& kdata) {
 
     HKU_IF_RETURN(kdata.empty(), void());
 
-    bool cycle = getParam<bool>("cycle");
-    m_cycle_start = kdata[0].datetime;
-
-    if (!cycle) {
-        _calculate(kdata);
-    }
+    _calculate(kdata);
 
     m_calculated = true;
 }
@@ -102,20 +110,41 @@ void SignalBase::reset() {
     m_hold_short = false;
     m_cycle_start = Null<Datetime>();
     m_cycle_end = Null<Datetime>();
+    m_cycle_dates.clear();
     _reset();
 }
 
 void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
+    // Only a cycle signal consumes the declared cycle days; the other signals keep their full-range
+    // calculation untouched
     HKU_IF_RETURN(!getParam<bool>("cycle"), void());
-    HKU_CHECK(start != Null<Datetime>() && close != Null<Datetime>() && start < close, "{}",
-              m_name);
-    HKU_CHECK(start >= m_cycle_end || m_cycle_end == Null<Datetime>(),
-              "curretn start: {}, pre cycle end: {}", start, m_cycle_end);
+    HKU_CHECK(!start.isNull() && !close.isNull() && start < close, "{}", m_name);
+    HKU_CHECK(start >= m_cycle_end || m_cycle_end.isNull(), "curretn start: {}, pre cycle end: {}",
+              start, m_cycle_end);
     m_cycle_start = start;
     m_cycle_end = close;
-    KData kdata = m_kdata.getKData(start, close);
-    if (!kdata.empty()) {
-        _calculate(kdata);
+
+    DatetimeList dates = m_cycle_dates;
+    dates.push_back(start);
+    setCycleDates(dates);
+}
+
+void SignalBase::setCycleDates(const DatetimeList& dates) {
+    DatetimeList sorted;
+    sorted.reserve(dates.size());
+    for (const auto& date : dates) {
+        if (!date.isNull()) {
+            sorted.push_back(date);
+        }
+    }
+    std::sort(sorted.begin(), sorted.end());
+    sorted.erase(std::unique(sorted.begin(), sorted.end()), sorted.end());
+    HKU_IF_RETURN(sorted == m_cycle_dates, void());
+
+    m_cycle_dates = std::move(sorted);
+    m_calculated = false;
+    if (!m_kdata.empty()) {
+        setTO(m_kdata);
     }
 }
 

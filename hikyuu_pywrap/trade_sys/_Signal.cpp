@@ -64,6 +64,14 @@ The custom signal generator interfaces:
       .def_property("to", &SignalBase::getTO, &SignalBase::setTO, py::return_value_policy::copy,
                     "Set or get the trading object")
 
+      .def("get_cycle_dates", &SignalBase::getCycleDates, py::return_value_policy::copy,
+           R"(get_cycle_dates(self)
+
+    Get the rebalancing days declared by the MultiSystem. A custom cycle signal reads them in
+    _calculate to know on which days the scheduled signals must be emitted.
+
+    :return: DatetimeList)")
+
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
 
     Get the specified parameter
@@ -260,7 +268,8 @@ The custom signal generator interfaces:
 
     m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
     
-    A special SG, used together with the PF, with the PF position adjustment period as the buy signal)");
+    A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before
+    the run; it stays silent when no day is injected)");
 
     m.def("SG_OneSide", SG_OneSide, py::arg("ind"), py::arg("is_buy"),
           R"(SG_OneSide(ind, is_buy)

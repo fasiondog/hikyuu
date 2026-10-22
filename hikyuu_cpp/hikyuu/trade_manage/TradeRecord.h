@@ -9,6 +9,7 @@
 #ifndef TRADERECORD_H_
 #define TRADERECORD_H_
 
+#include "../serialization/PriceSerialization.h"
 #include "../StockManager.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "CostRecord.h"
@@ -104,7 +105,8 @@ private:
         ar& bs::make_nvp<string>("business", business_name);
         ar& BOOST_SERIALIZATION_NVP(planPrice);
         ar& BOOST_SERIALIZATION_NVP(realPrice);
-        ar& BOOST_SERIALIZATION_NVP(goalPrice);
+        std::string gp = priceToSerialString(goalPrice);
+        ar& bs::make_nvp("goalPrice", gp);
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
@@ -126,7 +128,9 @@ private:
         business = getBusinessEnum(business_name);
         ar& BOOST_SERIALIZATION_NVP(planPrice);
         ar& BOOST_SERIALIZATION_NVP(realPrice);
-        ar& BOOST_SERIALIZATION_NVP(goalPrice);
+        std::string gp;
+        ar& bs::make_nvp("goalPrice", gp);
+        goalPrice = priceFromSerialString(gp);
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);

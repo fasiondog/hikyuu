@@ -48,7 +48,7 @@ not hold it (see :doc:`../trade_sys/system`):
       - Fund Allocation
       - Independent shadow accounts per sub-system, starting from zero and funded only by quotas
       - The parent account is the **fund allocator**: on the rebalancing day L1 computes each sub-system **quota**
-        (target total assets) and calibrates (recycle the unselected -> liquidate -> reduce the over quota ->
+        (target total assets) and calibrates (zero-quota liquidation -> unselected liquidation / selected recycle -> reduce the over quota ->
         inject the gap); the sub-systems trade autonomously within their quotas and the parent **mirrors
         continuously** their real instructions (the main account = the sum of the sub-system positions)
     * - ``"C"``
@@ -149,8 +149,8 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
       - B only
       - Whether to force-adjust the **running sub-systems** to the new quota on the rebalancing day.
         A running sub-system = one that was funded in a previous period and still holds assets at the
-        calibration time. ``True``: runs the full calibration (recycle the unselected -> liquidate ->
-        reduce the over quota -> inject the gap); ``False``: leaves the running sub-systems untouched
+        calibration time. ``True``: runs the full calibration (zero-quota liquidation -> unselected
+        liquidation / selected recycle -> reduce the over quota -> inject the gap); ``False``: leaves the running sub-systems untouched
         (no recycle, no reduction, no injection) and only the new sub-systems get the remaining parent
         cash (limited by the parent balance, may be underfunded).
         Mode A re-targets every bar and always adjusts; mode C has no quota and never adjusts --

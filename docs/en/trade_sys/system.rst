@@ -10,8 +10,8 @@ For multiple instruments (multiple securities), :class:`MultiSystem` can be used
 
 :class:`MultiSystem` supports three run modes (``set_mode`` / the read-only ``mode`` attribute; the mode is owned by the aggregate system itself and is also configured by the preset PF factories):
 
-- **Mode A "Signal Aggregation" (the default)**: each sub-system holds a signal "shadow account" (the signal cash set via ``set_sub_init_cash``, **never reset**) and runs continuously as an independent signal source; on the rebalancing day the parent reads the **current intent state** (net exposure holdings plus the unfilled requests) of the **selected** sub-systems, synthesizes one **signed net target per instrument** by the AF L2 (weight x net ratio x the parent net assets) and trades the delta on its own account (long and short net out). The unselected sub-systems contribute a zero signal (their instruments drop out of the target and are closed). The shadow bookkeeping never touches the real funds.
-- **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: on every rebalancing day the AF allocates the quota (target total assets) to each selected sub-system first (L1); each selected sub-system is calibrated to its quota BEFORE it is driven (recycle the cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems continuously (L2 pass-through).
+- **Mode A "Signal Aggregation" (the default)**: each sub-system holds a signal "shadow account" (the signal cash set via ``set_sub_init_cash``, run continuously and not reset between bars; ``run(reset=True)`` still resets them with the whole system) and runs continuously as an independent signal source; on the rebalancing day the parent reads the **current intent state** (net exposure holdings plus the unfilled requests) of the **selected** sub-systems, synthesizes one **signed net target per instrument** by the AF L2 (weight x net ratio x the parent net assets) and trades the delta on its own account (long and short net out). The unselected sub-systems contribute a zero signal (their instruments drop out of the target and are closed). The shadow bookkeeping never touches the real funds. The sampling folds the **queued (unfilled) delayed requests of the nested subtree leaves** into the net exposure ratio, so the pending intent of a nested C layer is visible.
+- **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: on every rebalancing day the AF allocates the quota (target total assets) to each selected sub-system first (L1); each selected sub-system is calibrated to its quota BEFORE it is driven (zero-quota liquidation, then the unselected liquidation or the selected cash recycle, then reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems continuously (L2 pass-through). A composite child is reduced pro rata over its leaf holdings (a suspended leaf is valued at its last available close), and the lot-rounding residual together with the unsellable suspended part is covered by selling lots from the largest remaining holdings until the gap is met (below one lot remains). The calibration legs queued by an earlier round count as sold: their value is deducted from the residual base, and when they already cover the whole gap they are trimmed to the gap target (multiple legs of the same instrument keep the front legs greedily), with the lot-rounded residual topped up to the gap by the existing residual loop (below one lot remains). The quota cash is a virtual budget: ``checkin/checkout`` only touch the sub ledger and never move money out of the parent account, and the injections of one rebalancing day are cumulatively capped by the parent's remaining cash, so the mirrored trades stay fundable and the two books (positions / trades) stay matched.
 - **Mode C "Shared Account Compatibility"**: no shadow account is created; the sub-systems trade DIRECTLY on the single real account of the parent (``shared_tm``) and are sized by their own MM, running continuously and exiting on the signal day; the parent only gates the entry (SE) + records + optionally risk-controls, and does no L2 conversion. It keeps the compatibility with the ``Portfolio`` before the refactoring.
 
 .. note::
@@ -24,18 +24,64 @@ For multiple instruments (multiple securities), :class:`MultiSystem` can be used
    (a deliberate exception). With a shared account the sub-systems **compete for the same cash pool**
    (whoever is driven and fills first takes the cash), which mode B does not exhibit.
 
+Nested and mixed modes
+----------------------
+
+A sub-system may itself be a :class:`MultiSystem` (arbitrary depth). Two rules apply when nesting: the **outer mode decides the account topology** (which account the child gets), and the **inner mode decides how its own sub-systems are scheduled and selected**.
+
+.. list-table:: Outer mode x inner mode
+   :header-rows: 1
+   :widths: 14 30 30 26
+
+   * - Outer \\ Inner
+     - A (Signal Aggregation)
+     - B (Fund Allocation)
+     - C (Shared Account)
+   * - A
+     - The child gets a **dedicated shadow account** (initial ``set_sub_init_cash``); the inner layer runs on it as its parent account and executes its L2 net targets there; its leaves build their own shadows
+     - The child gets a **dedicated shadow account**; the inner layer runs its L1 quota on it (quota = weight x the account net assets) and its leaves build quota accounts
+     - The leaves of the inner C share that **dedicated shadow account** (not the outer real account)
+   * - B
+     - The child gets a **dedicated quota account** (starting from zero); the outer injects the quota first, then the inner executes its L2 net targets on it
+     - The child gets a **dedicated quota account** (starting from zero); after the outer injection the inner runs its own quota allocation for its leaves (nested quotas)
+     - The leaves of the inner C share that **dedicated quota account**
+   * - C
+     - **No dedicated account**: the inner uses the shared account as its parent account and executes "weight x shadow net exposure ratio x the shared net assets" directly on it; the orphan / zero targets are limited to its own subtree instruments
+     - quota = weight x the shared net assets; the injection is virtual bookkeeping on the inner leaf quota accounts, only the reduction parent leg acts on the shared account; several children compete for the same cash pool and the holdings are not attributable per child
+     - All levels share the same account (a deeper legacy Portfolio)
+
+**Key points**
+
+- **Account ownership**: an A/B aggregate requires an "exclusive book" -- the outer layer creates a dedicated shadow/quota account for it. Mode C hands the parent account directly to the child (shared semantics). Therefore, with A/B under C the child's "parent account" is the shared account: both the A net asset base and the B quota base are the shared net assets, and several children compete for the same cash pool -- control each size explicitly with the SE weights.
+- **The parent only records the mirror**: an A/B outer layer mirrors the **trades** of the inner layer onto its own real account (B also calibrates the quota); the children of a C outer layer trade directly on the shared account, the parent never orders again.
+- **Same-batch netting**: the opposite legs of the same instrument in one batch are netted before execution (e.g. an open delayed fill plus a close reversal), so no phantom parent position is left behind; a CLEAR only clears the **attributable part** (the sum of the clearing legs, capped by the parent holding plus the same-side same-batch buys), never swallowing a sibling child's same-batch buy or holding.
+- **`trade_on_close=False`**: the mode B quota calibration legs (reduction / liquidation), the quota injections and the signal suggestions are all deferred to the **next open** (sells before the injections), sharing one price basis; the turnover is recorded where the open executions happen. A leg with no quote (a suspension) is **retained and retried**: the deferred calibration legs and the queued suggestions both wait for the next quoted open (a retried suggestion batch is merged into a new rebalancing batch), so nothing fills at a stale price on a suspended day. A deferred injection waits for the deferred sells of the same rebalancing; the continuous-mirror fills on non-rebalancing days are not counted into the turnover. A leg whose holding is already gone (e.g. force-cleared on a delisting) is dropped instead of blocking the injections. A parent-side residual with no sellable quantity left is dropped instead of blocking the injections. With ``trade_on_close=True`` a liquidation/reduction close on a suspended day falls back to the deferred legs of the next open (the executor retries), so nothing fills without a quote.
+- **Two-book matching**: the mode B invariant "shadow book = parent book" holds only with a dedicated account; on a shared account (C) the holdings are not attributable per child.
+- **Liquidation semantics**: ``sell_at_not_selected`` only applies to its own layer. In B, when unselected: ``True`` clears both the parent and the shadow book together; ``False`` keeps both books running (only the quota calibration of the round is skipped; **the child is not driven at the close of a rebalancing day**, only its open fills are mirrored). A selected sub-system with a zero L1 quota is liquidated by the same rules (gated by the switch); a running sub with ``adjust_running_sys=False`` is exempt -- it keeps running without a budget injection. In C, when a child leaves the pool: ``True`` recursively clears the internal books of the subtree and drops the queued mirror batch; ``False`` keeps the child books frozen (matching the untracked holding that stays on the shared account).
+- **Cycle and rebalancing cadence**: the outer pre-injection only covers the own SG of the direct sub-systems (a composite has no SG); the inner A/B layers declare the cycle days at runtime on their own rebalancing days. An inner layer counts **driven days**: when the outer B skips it (``False``) or the outer C does not admit it, its counter does not advance, so an inner ``adjust_cycle=N`` means "every N driven days". The calendar ``adjust_mode`` (week/month/quarter/year) always uses the **runtime period rule** (the N-th calendar day of the period; with ``delay_to_trading_day`` postponed to the first driven day of the period; once per period), shared by the bulk ``run`` and the single-bar live feed; an explicit ``set_adjust_dates`` takes precedence. A nested mode A child already folded its leaf intents into its target on its sampling day: the outer layer folds only its **queued batch**, never its leaves again (no 2x); on a non-sampling day its raw leaf requests are folded.
+- **B under B above the quota**: the outer mode B hands the target quota down to the inner mode B, which reduces its own leaves by its AF weights (the budget model), keeping both book levels matched with the outer parent.
+- **Unadmitted nested aggregates**: not driven, no cycle day declared, no trading (expected).
+- **The shared boundary does not propagate down the chain**: the mode C "holdings are not attributable" rule applies only to its **direct children**; in ``C -> A -> B`` the third layer B gets a dedicated shadow book funded by the A layer's sub_init_cash (attributable again), and only ``C -> C -> *`` stays fully shared. A deferred leg advances **one hop per layer** (toc=false or a suspended close fills at each layer's next open), so a three-level chain lags the leaf by up to 2 trading days.
+- **Overlapping instruments across children**: in B an unselected liquidation caps the parent sell by **both** the parent holding and the **child own book**, while a deferred reduction leg is capped by the **parent holding** at the close. On the shared account (C) the holdings are not attributable -- the orphan / zero targets of A are limited to its own subtree instruments, but the **quantity is executed against the shared net position**, so avoid overlapping instruments across children under C.
+- **SE and warnings**: every layer has its own SE; without an SE in mode C only the **direct** cycle SGs stay silent with a one-time warning (nested aggregates are handled by their own modes).
+- **Cascade example**: ``C -> B -> A`` means a quota sub-portfolio B under a shared account, with a signal-aggregation sub-portfolio A inside; A's shadow only serves the B sampling, the B mirror lands directly on the shared account, and the outer C surfaces it without ordering again.
+
+The SE, ``sell_at_not_selected``, rebalancing cadence and cycle-day declarations of each layer are independent and never inherited.
+
 Aggregated backtesting also supports:
 
 - **AF L1/L2/L3 layering** (see :doc:`../trade_portfolio/allocate_funds` for details): L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B; e.g. equal weight 1/N, fixed weights, weighted by the SE score), L2 performs behavior-level conversion (in A it reads the sub-system's current intent state and synthesizes the **signed net target** per instrument as weight x net ratio x the parent net assets, rebalancing by the delta with the long/short netting out; in B the instructions pass through), and L3 provides portfolio risk control (the concentration limit ``max-single-position``, <=0 means no limit, the default 1.0 caps a single instrument at the total assets; skipped in mode B/C).
 - **Rebalancing cycle** (``set_adjust_cycle``): by default, rebalancing happens on every close day; once the number of days is set to a value greater than 1, rebalancing occurs only on the cycle days.
-- **Instrument selection (SE)** (``set_se``): optional; on a rebalance day, only the selected sub-systems run, and the unselected ones can be force-liquidated (``set_sell_at_not_selected``).
+- **Instrument selection (SE)** (``set_se``): optional; on a rebalance day, only the selected sub-systems are sampled. In modes B/C the unselected ones can be force-liquidated / have their quota recycled (``set_sell_at_not_selected``); in mode A the shadow accounts keep running and the instruments of the unselected ones drop out of the parent target and are closed (regardless of ``sell_at_not_selected``).
 - **Turnover rate** (``get_adjust_turnover``): on each rebalance day, records the ratio of the traded amount to the total assets before rebalancing.
-- **Delisting/suspension**: the parent uniformly force-sells the positions in delisted instruments during the open stage; the sub-systems automatically skip the suspended bars.
+- **Delisting/suspension**: the parent uniformly force-sells the positions in delisted instruments during the open stage (in mode C the shared account is sold by the parent too, the sub-ledger does not sell twice); the sub-systems automatically skip the suspended bars. A liquidation/reduction leg whose close is suspended falls back to the deferred legs of the next open (any ``trade_on_close`` mode) and the holding stays unchanged until a quote appears.
+
+- **Archive and clone** (`save`/`load`, `clone`): the shadow/quota account registry is saved by the child slot index and rebuilt after loading; the scheduling counters (close-day counter, last driven day), the fixed time axis, the external rebalancing day table and the unfilled calibration legs are restored too, so a loaded system can continue with ``run(reset=False)``; the mode C running pools are rebuilt on the next rebalancing day. Price fields that may carry NaN (e.g. ``goalPrice``) are written as strings, because the text/XML archives cannot read NaN back as a number.
 
 Common parameters:
 
-    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar
-    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar
+    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar; the forced short cover triggered by an invalid environment (ev) or condition (cn) follows the same setting
+    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar; the forced long liquidation triggered by an invalid environment (ev) or condition (cn) follows the same setting (liquidated at the next open instead of at the invalidating close)
     * **delay_use_current_price=True** *(bool)* : For a delayed operation, whether to use the price of the bar at the current trading time to calculate the new stop-loss/take-profit/goal price, or to reuse the result calculated previously
     * **max_delay_count=3** *(int)* : The maximum number of consecutive delayed trade requests; must be greater than or equal to 0, and 0 means only one delay is allowed
     * **tp_monotonic=True** *(bool)* : Whether the take-profit level increases monotonically
@@ -207,6 +253,33 @@ System Part Enum Definitions
 
     :param str part_name: the string name of the system part; see: :py:func:`getSystemPartName`
     :rtype: System.Part
+
+
+
+Semantics of Stoploss, Take-profit and Profit Goal
+--------------------------------------------------
+
+All three take part in the "close or not" decision while a position is held, but they differ in state ownership and trigger criteria:
+
+* **Stoploss ST** (``setST``) — a **static** stop price. It is calculated once at entry (including an add-on) and stored in the position record; the per-bar checks during the holding period reuse that value and do not follow the market. A sell recalculates it and writes it back, so the remaining position keeps the stop price taken at the sell. Criteria: a long closes when ``current price <= stoploss``, a short when ``current price >= stoploss``.
+* **Take-profit TP** (``setTP``) — a **moving** exit level. It shares the base class with ST (both are ``StoplossBase``), but System owns the ratchet: a long only rises and a short only falls (``tp_monotonic``), and an add-on never moves it backwards; the exit also requires the position to be in profit (net of the fees). ``tp_delay_n`` sets how many bars must pass after the entry before the level may trigger; after a partial exit the ratchet resets to the current price. Criteria: a long closes when ``current price <= take-profit level``, a short when ``current price >= take-profit level``.
+* **Profit goal PG** (``setPG``) — a pure target price anchored to the **position cost**, recalculated every bar and holding no state across bars. The cost basis is ``buyMoney / totalNumber`` for a long and ``sellMoney / totalNumber`` for a short, not a snapshot of the entry price. Criteria: a long closes when ``current price >= goal``, a short when ``current price <= goal``.
+
+Within one bar the checks run in a fixed order and **only the first matched action is executed** (it returns at once, the remaining checks are not evaluated, and the next bar starts over):
+
+.. code-block:: text
+
+    environment / condition invalidation -> buy signal -> sell signal -> ST -> PG -> TP
+
+Invalid return values are handled differently:
+
+* ST unset or returning an invalid value: the entry still happens, but the position stop price is 0, i.e. no stop-loss; the risk budget then uses the full planned price (the worst case counts as a total loss).
+* PG unset: the goal is ``constant.null_price``, the comparison never holds, and that bar has no PG action.
+* PG returning ``0``: for a long it means sell at once (the forced-exit sentinel); it has no effect on a short (``current price <= 0`` never holds) — to close a short regardless of price, return the current price instead.
+* PG returning a negative or non-finite value: clamped by the base class to ``constant.null_price``, i.e. treated as unset.
+* TP returning ``0``: the bar has no take-profit level, so nothing is closed and the ratchet is not updated.
+
+The return-value contract of the stop price is detailed in the "Return Value Contract and System Behaviour" section of :doc:`stoploss`, and the long/short basis of the profit goal in :doc:`profitgoal`.
 
 
 

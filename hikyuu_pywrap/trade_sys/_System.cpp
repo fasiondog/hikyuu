@@ -14,6 +14,7 @@
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include "../pybind_utils.h"
+#include "../gil_policy.h"
 #include "_System.h"
 
 namespace py = pybind11;
@@ -536,23 +537,71 @@ Common parameters:
 
     The clone operation; it clones according to the sharing attributes of the parts; the shared parts are not actually cloned and remain shared.)")
 
-      .def("run", py::overload_cast<const KQuery&, bool, bool>(&System::run), py::arg("query"),
-           py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", py::overload_cast<const KData&, bool, bool>(&System::run), py::arg("kdata"),
-           py::arg("reset") = true, py::arg("reset_all") = false)
-      .def("run", py::overload_cast<const Stock&, const KQuery&, bool, bool>(&System::run),
-           py::arg("stock"), py::arg("query"), py::arg("reset") = true,
-           py::arg("reset_all") = false,
-           R"(run(self, stock, query[, reset=True])
+      .def(
+        "run",
+        [](System& self, const KQuery& query, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(query, reset, reset_all);
+        },
+        py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, query, reset=True, reset_all=False)
+
+    Run the system on the trading object built from the current security and the given query,
+    performing the backtest.
+
+    :param Query query: the K-line data query condition
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
+
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+      .def(
+        "run",
+        [](System& self, const KData& kdata, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(kdata, reset, reset_all);
+        },
+        py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, kdata, reset=True, reset_all=False)
+
+    Run the system on the given trading object, performing the backtest.
+
+    :param KData kdata: the trading object
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
+
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+      .def(
+        "run",
+        [](System& self, const Stock& stock, const KQuery& query, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(stock, query, reset, reset_all);
+        },
+        py::arg("stock"), py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, stock, query[, reset=True])
 
     Run the system, performing the backtest
 
     :param Stock stock: the security to trade
     :param Query query: the K-line data query condition
     :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
-    :param bool reset_all: forcibly reset all the parts)")
+    :param bool reset_all: forcibly reset all the parts
 
-      .def("ready", &System::readyForRun)
+    The whole run is skipped when reset is False and the system has already calculated on an equal
+    trading object (same security, query and size).)")
+
+      .def(
+        "ready",
+        [](System& self) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.readyForRun();
+        },
+        R"(ready(self)
+
+    Arm the parts for running: the money manager and the profit goal get the account, and the market
+    environment / condition start from an unknown state. run calls it, so it only needs to be
+    called directly before driving with runMoment.)")
 
       .def(
         "last_suggestion",
@@ -581,11 +630,13 @@ Common parameters:
 
 Running modes (held by the aggregate system itself, set via set_mode or the preset PF factories):
 
-- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is never reset, the shadows run continuously); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
+- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the shadows run continuously and are not reset between bars; run(reset=True) still resets them with the whole system); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
 
-- Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account.
+- Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (zero-quota liquidation, then the unselected liquidation or the selected cash recycle, then reduce the over-quota part, inject the gap) and trades with the exact quota; a selected sub-system with a zero quota is cleared together with the parent holdings (gated by sell_at_not_selected, and a running sub is exempt when adjust_running_sys is off); the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account. The quota cash is a virtual budget: the injections only credit the sub ledger (the parent TM is never debited), and the injections of one rebalancing day are cumulatively capped by the parent's remaining cash, so the mirrored buys stay fundable and the two books stay matched. With sell_at_not_selected the unselected sub-systems (and the parent holdings) are cleared together; otherwise both books keep running.
 
 - Mode C "Shared Account Compatibility" (the legacy Portfolio behavior): no shadow account is created, every sub-system trades DIRECTLY on the single real account of the top layer (shared_tm) and is sized by its own MM; the parent only gates the entry with the SE, keeps the running set driven day by day so that a sell signal is realized on the very day it occurs, and performs no L2 conversion. It exists to reproduce the results of the Portfolio before the refactoring.
+
+Nested modes: the outer mode decides the account topology of a nested aggregate (A: a dedicated shadow account, B: a dedicated quota account, C: the shared parent account) and the inner mode decides how its own sub-systems are scheduled; the SE, sell_at_not_selected, rebalancing cadence and cycle-day declarations of each layer are independent.
 
 Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for details):
 
@@ -599,17 +650,27 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("add", &MultiSystem::add, py::arg("sys"),
            "Add a sub-system (with the circular reference detection)")
       .def("get_system_list", &MultiSystem::getSystemList, "Get the sub-system list")
-      .def("run", py::overload_cast<const KData&, bool, bool>(&MultiSystem::run), py::arg("kdata"),
-           py::arg("reset") = true, py::arg("reset_all") = false,
-           R"(run(self, kdata, reset=True, reset_all=False)
+      .def(
+        "run",
+        [](MultiSystem& self, const KData& kdata, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(kdata, reset, reset_all);
+        },
+        py::arg("kdata"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, kdata, reset=True, reset_all=False)
 
     The portfolio backtesting entry. kdata is used as the aligned time axis, it traverses every trading day and drives all the sub-systems (open/close) respectively and aggregates the orders.
     Every sub-system has an independent virtual account, the parent system allocates and orders uniformly on its own account.
 
     :param KData kdata: the aligned time axis (it should cover the trading days of every sub-system))")
-      .def("run", py::overload_cast<const KQuery&, bool, bool>(&MultiSystem::run), py::arg("query"),
-           py::arg("reset") = true, py::arg("reset_all") = false,
-           R"(run(self, query, reset=True, reset_all=False)
+      .def(
+        "run",
+        [](MultiSystem& self, const KQuery& query, bool reset, bool reset_all) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.run(query, reset, reset_all);
+        },
+        py::arg("query"), py::arg("reset") = true, py::arg("reset_all") = false,
+        R"(run(self, query, reset=True, reset_all=False)
 
     [master compatibility] Run with the market trading calendar as the driving axis, equivalent to the master Portfolio.run(query).
 
@@ -620,16 +681,52 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :param Query query: the query condition
     :param bool reset: whether to reset before running
     :param bool reset_all: whether to force a full reset before running)")
-      .def("runMoment", &MultiSystem::runMoment, py::arg("datetime"),
-           R"(runMoment(self, datetime)
+      .def(
+        "runMoment",
+        [](MultiSystem& self, const Datetime& datetime) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.runMoment(datetime);
+        },
+        py::arg("datetime"),
+        R"(runMoment(self, datetime)
 
     Execute one step at the specified moment, drive all the sub-systems (open/close) respectively, and aggregate the trades and suggestions.
 
     :param Datetime datetime: the specified date
     :rtype: MomentResult)")
-      .def("runMomentOnOpen", &MultiSystem::runMomentOnOpen, py::arg("datetime"))
-      .def("runMomentOnClose", &MultiSystem::runMomentOnClose, py::arg("datetime"))
-      .def("ready_for_run", &MultiSystem::readyForRun)
+      .def(
+        "runMomentOnOpen",
+        [](MultiSystem& self, const Datetime& datetime) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.runMomentOnOpen(datetime);
+        },
+        py::arg("datetime"),
+        R"(runMomentOnOpen(self, datetime)
+
+    Execute only the open stage at the specified moment: the requests delayed from the previous
+    close are fulfilled and the sub-systems are driven at the open.
+
+    :param Datetime datetime: the specified date
+    :rtype: MomentResult)")
+      .def(
+        "runMomentOnClose",
+        [](MultiSystem& self, const Datetime& datetime) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.runMomentOnClose(datetime);
+        },
+        py::arg("datetime"),
+        R"(runMomentOnClose(self, datetime)
+
+    Execute only the close stage at the specified moment: the sub-systems generate their signals and
+    close trades, which are aggregated into the parent suggestions.
+
+    :param Datetime datetime: the specified date
+    :rtype: MomentResult)")
+      .def("ready_for_run",
+           [](MultiSystem& self) {
+               ScopeGilRelease gil(!self.hasPythonPart());
+               self.readyForRun();
+           })
       .def("set_mode", &MultiSystem::setMode, py::arg("mode"),
            "Set the running mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation "
            "/ \"C\" Shared Account Compatibility (the legacy Portfolio behavior)")
@@ -708,7 +805,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
     Set the rebalancing mode (taking over the master PF adjust_mode):
       - "query" / "day" (the default): continue the "every N close days" counting judgment of set_adjust_cycle;
-      - "week" / "month" / "quarter" / "year": expand the rebalancing day table by "the adjust_cycle-th day within the cycle" on the driving axis.
+      - "week" / "month" / "quarter" / "year": judge the rebalancing days by the runtime period rule ("the adjust_cycle-th day within the cycle" on the driving axis).
     An invalid value is warned and it falls back to "query".
 
     :param str mode: "query" / "day" / "week" / "month" / "quarter" / "year")")
@@ -716,7 +813,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("set_delay_to_trading_day", &MultiSystem::setDelayToTradingDay, py::arg("delay"),
            "Set whether to postpone to the first trading day within the current cycle when the "
            "rebalancing day is not a trading day (it takes effect only when "
-           "week/month/quarter/year are expanded)")
+           "week/month/quarter/year use the runtime period rule)")
       .def("get_delay_to_trading_day", &MultiSystem::getDelayToTradingDay,
            "Get whether the rebalancing day is postponed to the trading day")
       .def("set_se", &MultiSystem::setSE, py::arg("se"),
@@ -724,7 +821,12 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
            "filtering)")
       .def_property_readonly("se", &MultiSystem::getSE, "The trading object selector")
       .def("set_sell_at_not_selected", &MultiSystem::setSellAtNotSelected, py::arg("on"),
-           "Set whether to force liquidating the unselected sub-systems (SE is required)")
+           "Set whether to force liquidating the unselected sub-systems, and the selected ones "
+           "with a zero "
+           "quota (a running sub is exempt when adjust_running_sys is off), together with their "
+           "shadow/quota accounts (mode B/C; SE is required). In mode B the two books must stay "
+           "matched, so with the default off the unselected sub-systems keep running and only skip "
+           "the quota calibration")
       .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
            "Get the turnover rate of every rebalancing day (a list of (date, turnover amount / "
            "total assets))")
@@ -801,7 +903,10 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         },
         "The portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3; used by the "
         "aggregate system only)")
-      .def("clone", &MultiSystem::clone);
+      .def("clone", &MultiSystem::clone)
+      // The aggregate needs its own pickle: inheriting System.__setstate__ mismatches the dynamic
+      // type and aborts the interpreter on loads
+      DEF_PICKLE(MultiSystem);
 
     //--------------------------------------------------------------------------------------
     // The PF factories pass through to MultiSystem, keeping the master call style unchanged
@@ -816,11 +921,14 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
     Mode B semantics (quota allocation, FOF/MOM style): on every rebalancing day the AF allocates the
     quota to each selected sub-system (L1); each selected sub-system is calibrated to its quota BEFORE
-    it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the
-    gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
+    it is driven (zero-quota liquidation, then the unselected liquidation or the selected cash recycle,
+    then reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
     (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
-    autonomy is respected). The unselected sub-systems are force cleared on the rebalancing day. The
-    sub-system shadow accounts start from zero and follow the cost function of the parent account.
+    autonomy is respected). ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``:
+    ``trade_on_close=True`` and ``sell_at_not_selected=True`` are fixed, so the unselected sub-systems
+    are force cleared together with the parent holdings on the rebalancing day; for the "unselected
+    keep running" semantics use ``MultiSystem(mode="B")`` with ``sell_at_not_selected=False`` directly.
+    The sub-system shadow accounts start from zero and follow the cost function of the parent account.
 
     The rebalancing mode adjust_mode description:
     - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval
@@ -906,7 +1014,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     weight x position ratio x the parent net assets, aggregated per instrument and rebalanced by the
     delta against the current position) and the L3 portfolio risk control applies (e.g.
     max-single-position).
-    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
+    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False);
+    the selected ones with a zero quota follow the same switch.
 
     This is the preset that PF_WithoutAF carried during the beginning of the three-mode
     refactoring; PF_WithoutAF now means mode C (the legacy shared-account Portfolio) again, so the

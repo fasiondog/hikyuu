@@ -10,9 +10,11 @@
 #include <algorithm>
 #include <cstdint>
 #include <map>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
 #include <hikyuu/trade_manage/crt/TC_Zero.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
@@ -134,6 +136,41 @@ public:
         if (kdata.getPos(OPEN_DATE) != Null<size_t>()) {
             _addSellSignal(OPEN_DATE);
         }
+    }
+};
+
+// A short-side goal returning the documented sentinels: 0 (no effect on a short) or the current
+// price (cover at once)
+class Iss029ShortSentinelPG : public ProfitGoalBase {
+public:
+    explicit Iss029ShortSentinelPG(bool force_close) : ProfitGoalBase("ISS029_ShortSentinelPG") {
+        setParam<bool>("force_close", force_close);
+    }
+
+    virtual ProfitGoalPtr _clone() override {
+        return make_shared<Iss029ShortSentinelPG>(getParam<bool>("force_close"));
+    }
+
+    virtual price_t _getGoal(const Datetime&, price_t) override {
+        return Null<price_t>();
+    }
+
+    virtual price_t _getShortGoal(const Datetime&, price_t price) override {
+        return getParam<bool>("force_close") ? price : 0.0;
+    }
+};
+
+// Exposes the short take-profit ratchet for state assertions
+class RatchetProbeSYS : public System {
+public:
+    RatchetProbeSYS() : System("RatchetProbeSYS") {}
+
+    price_t shortRatchet() const {
+        return m_lastShortTakeProfit;
+    }
+
+    void setShortRatchet(price_t value) {
+        m_lastShortTakeProfit = value;
     }
 };
 
@@ -370,6 +407,111 @@ TEST_CASE("test_SYS_Simple_short_for_profitgoal") {
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
 }
 
+/** @par Test points (a forced flatten clears the short take-profit ratchet once the book is flat)
+ */
+TEST_CASE("test_System_sellForce_resets_short_tp_ratchet") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    auto sys = std::make_shared<RatchetProbeSYS>();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(makeShortSG());
+    sys->setMM(MM_FixedCount(100));
+    sys->setTO(src);
+    sys->readyForRun();
+
+    sys->runMoment(OPEN_DATE);
+    REQUIRE_UNARY(sys->getTM()->haveShort(stk));
+    CHECK_GT(sys->shortRatchet(), 0.0);
+
+    TradeRecord tr = sys->sellForceOnClose(src[open_pos + 1].datetime, MAX_DOUBLE, PART_PORTFOLIO);
+    REQUIRE_EQ(tr.business, BUSINESS_BUY_SHORT);
+    CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+
+    /** @arg the ratchet is cleared together with the covered short book */
+    CHECK_EQ(sys->shortRatchet(), 0.0);
+}
+
+/** @par Test points (a zero short ratchet marks a flat book and must not clamp the take-profit
+ *  level down to zero) */
+TEST_CASE("test_System_short_tp_zero_ratchet_does_not_clamp") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+    const Datetime next = src[open_pos + 1].datetime;
+
+    auto tp = make_shared<Iss029ScriptedTP>();
+    tp->addScript(next, 30.0);  // above the price, so that bar has no take-profit
+
+    auto sys = std::make_shared<RatchetProbeSYS>();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(makeShortSG());
+    sys->setMM(MM_FixedCount(100));
+    sys->setTP(tp);
+    sys->setTO(src);
+    sys->readyForRun();
+
+    sys->runMoment(OPEN_DATE);
+    REQUIRE_UNARY(sys->getTM()->haveShort(stk));
+
+    // A ratchet of zero while the book is open (a reset that kept the account, e.g. shared_tm)
+    sys->setShortRatchet(0.0);
+    sys->runMoment(next);
+
+    /** @arg the scripted level is taken as is instead of being clamped to zero */
+    CHECK_UNARY(sys->getTM()->haveShort(stk));
+    CHECK_EQ(sys->shortRatchet(), 30.0);
+}
+
+/** @par Test points (the short-side goal sentinels: 0 never covers, the current price covers at
+ * once) */
+TEST_CASE("test_SYS_Simple_short_profitgoal_sentinels") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    // Returns: whether a PART_PROFITGOAL cover happened, its date, and whether the short is open
+    auto run_with = [&](bool force_close) {
+        SYSPtr sys = makeShortSys(makeShortSG(), StoplossPtr(),
+                                  make_shared<Iss029ShortSentinelPG>(force_close));
+        sys->run(stk, src.getQuery());
+        Datetime cover_date;
+        for (const auto& tr : sys->getTM()->getTradeList()) {
+            if (tr.business == BUSINESS_BUY_SHORT && tr.from == PART_PROFITGOAL) {
+                cover_date = tr.datetime;
+                break;
+            }
+        }
+        return std::make_tuple(!cover_date.isNull(), cover_date, sys->getTM()->haveShort(stk));
+    };
+
+    /** @arg returning 0 has no effect on the short side, so the position is never covered */
+    auto zero = run_with(false);
+    CHECK_UNARY_FALSE(std::get<0>(zero));
+    CHECK_UNARY(std::get<2>(zero));
+
+    /** @arg returning the current price covers the short on the bar after the open */
+    auto forced = run_with(true);
+    CHECK_UNARY(std::get<0>(forced));
+    CHECK_EQ(std::get<1>(forced), src[open_pos + 1].datetime);
+    CHECK_UNARY_FALSE(std::get<2>(forced));
+}
+
 /** @par Test points (the short position is covered by the downward take-profit ratchet, ISS-029) */
 TEST_CASE("test_SYS_Simple_short_for_takeprofit") {
     StockManager& sm = StockManager::instance();
@@ -431,6 +573,54 @@ TEST_CASE("test_SYS_Simple_short_for_takeprofit_ratchet") {
     CHECK_EQ(cover_tr->datetime, Datetime(199912210000LL));
     CHECK_LT(std::fabs(cover_tr->realPrice - 25.24), 0.00001);
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+}
+
+/** @par Test points (the short take-profit is net of the fees, on the same basis as the long side)
+ */
+TEST_CASE("test_SYS_Simple_short_takeprofit_net_of_fees") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    // A level far below the market, so only the profit condition gates the cover
+    auto tp = make_shared<Iss029ScriptedTP>();
+    tp->addScript(src[open_pos + 1].datetime, 1.0);
+    tp->addScript(src[open_pos + 2].datetime, 1.0);
+
+    SYSPtr sys = makeShortSys(makeShortSG(), StoplossPtr(), ProfitGoalPtr(), tp);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_FixedA2017(0.03, 5.0), "TEST_TM"));
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->run(stk, src.getQuery());
+
+    const TradeRecordList& tr_list = sys->getTM()->getTradeList();
+    const TradeRecord* open_tr = findFirstTrade(tr_list, BUSINESS_SELL_SHORT);
+    const TradeRecord* cover_tr = findFirstTrade(tr_list, BUSINESS_BUY_SHORT);
+    REQUIRE_NE(open_tr, nullptr);
+    REQUIRE_NE(cover_tr, nullptr);
+
+    const price_t fee = open_tr->cost.total;
+    size_t gross_pos = Null<size_t>();
+    size_t net_pos = Null<size_t>();
+    for (size_t i = open_pos + 1; i < src.size(); i++) {
+        price_t gross = open_tr->number * stk.unit() * (open_tr->realPrice - src[i].closePrice);
+        if (gross_pos == Null<size_t>() && gross > 0.0) {
+            gross_pos = i;
+        }
+        if (net_pos == Null<size_t>() && gross - fee > 0.0) {
+            net_pos = i;
+        }
+    }
+    REQUIRE_NE(gross_pos, Null<size_t>());
+    REQUIRE_NE(net_pos, Null<size_t>());
+
+    /** @arg the fee window exists: the gross profit turns positive before the net one */
+    CHECK_UNARY(gross_pos != net_pos);
+
+    /** @arg the cover waits until the profit is positive after the fees */
+    CHECK_EQ(cover_tr->from, PART_TAKEPROFIT);
+    CHECK_EQ(cover_tr->datetime, src[net_pos].datetime);
 }
 
 /** @par Test points (the delayed short open stores the short-side stop-loss and quantity, ISS-029)

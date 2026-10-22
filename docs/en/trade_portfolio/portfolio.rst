@@ -19,6 +19,10 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    The execution paradigm of a portfolio is decided by the **running mode** owned by the
    :class:`MultiSystem` (set via ``set_mode``), and the three factories map onto the three modes:
 
+   The PF factories only set the **top-level** mode; a sub-system may nest a :class:`MultiSystem`
+   of any mode. See "Nested and mixed modes" in :doc:`../trade_sys/system` for the account
+   topology, the liquidation semantics and the rebalancing cadence under nesting.
+
    .. list-table::
       :header-rows: 1
 
@@ -88,11 +92,24 @@ Built-in Portfolios
 
     Mode B semantics (quota allocation, FOF/MOM style): on every rebalancing day the AF allocates the
     quota to each selected sub-system (L1); each selected sub-system is calibrated to its quota BEFORE
-    it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the
-    gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
-    (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
-    autonomy is respected). The unselected sub-systems are force cleared on the rebalancing day. The
-    sub-system shadow accounts start from zero and follow the cost function of the parent account.
+    it is driven (zero-quota liquidation, then the unselected liquidation or the quota cash recycle, then reduce the over-quota part, inject the gap) and trades with
+    the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on
+    its own account; the L3 portfolio risk control is skipped (the sub-manager autonomy is respected).
+    ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``: ``trade_on_close=True`` and
+    ``sell_at_not_selected=True`` are fixed, so the unselected ones are cleared together with the
+    parent holdings on the rebalancing day; for the "unselected keep running" semantics use
+    ``MultiSystem(mode="B")`` with ``sell_at_not_selected=False`` directly. The sub-system shadow
+    accounts start from zero and follow the cost function of the parent account.
+
+    The quota cash is a **virtual budget**: ``checkin/checkout`` only touch the sub ledger, the parent
+    account is neither debited nor credited by them; the parent real cash only changes with the
+    mirrored trades. The injections of one rebalancing day are cumulatively capped by the parent's
+    remaining cash, so the mirrored buys are always fundable and the two books (positions / trades)
+    stay matched; an over-allocation (e.g. ``fixed-amount`` beyond the parent cash) is truncated at
+    the injection with a one-time warning instead of creating hidden leverage. The cash of the two
+    ledgers is **not** subject to a conservation constraint (the quota cash is not reconciled against
+    the parent cash); a hard per-sub budget / auditable commitment would be a separate "fund
+    commitment ledger" design.
 
     The rebalancing mode adjust_mode:
     - In "query" mode, rebalancing follows the ktype of the input query, and adjust_cycle determines the interval in units of that ktype;
@@ -150,7 +167,7 @@ Built-in Portfolios
     suggestions into the target positions of the parent account by the AF L2 (target market value =
     weight x net ratio x the parent net assets, aggregated per instrument and rebalanced by the delta
     against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
-    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
+    The unselected sub-systems are excluded from the parent target sampling, so their instruments drop out of the target and are closed; ``sell_at_not_selected`` does not take part in that behavior in mode A (the parent closes its own holdings and never touches the shadow accounts).
 
     This is the preset that ``PF_WithoutAF`` carried at the beginning of the refactoring; since
     ``PF_WithoutAF`` now stands for mode C, the mode A preset is named after what it does.
@@ -164,6 +181,6 @@ Built-in Portfolios
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
     :param bool trade_on_close: whether the trades are executed at the close
-    :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold
+    :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold (ignored in mode A, see above)
     :param float sub_init_cash: the signal cash of every sub-system shadow account (never reset)
     :rtype: MultiSystem
