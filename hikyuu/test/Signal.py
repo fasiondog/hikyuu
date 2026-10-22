@@ -226,6 +226,45 @@ class TestSGTradingObject(unittest.TestCase):
         self.assertEqual(composed.should_buy(kdata[0].datetime), True)
 
 
+class FixedValueSG(SignalBase):
+    """Emits a fixed 2.0 buy on the first bar and a fixed -1.0 sell on the last bar"""
+
+    def __init__(self):
+        super(FixedValueSG, self).__init__("FixedValueSG")
+
+    def _clone(self):
+        return FixedValueSG()
+
+    def _calculate(self, kdata):
+        self._add_buy_signal(kdata[0].datetime, 2.0)
+        self._add_sell_signal(kdata[-1].datetime, -1.0)
+
+
+class TestSGSignalValues(unittest.TestCase):
+    """The signal values are readable and scaled by the value operators"""
+
+    def test_get_value(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        self.assertFalse(kdata.empty())
+        d_buy = kdata[0].datetime
+        d_sell = kdata[-1].datetime
+
+        sg = FixedValueSG()
+        sg.to = kdata
+        self.assertEqual(sg.get_buy_value(d_buy), 2.0)
+        self.assertEqual(sg.get_sell_value(d_buy), 0.0)
+        self.assertEqual(sg.get_value(d_buy), 2.0)
+        self.assertEqual(sg.get_buy_value(d_sell), 0.0)
+        self.assertEqual(sg.get_sell_value(d_sell), -1.0)
+        self.assertEqual(sg.get_value(d_sell), -1.0)
+        self.assertEqual(sg.get_value(Datetime(200101010000)), 0.0)
+
+        doubled = sg * 2.0
+        doubled.to = kdata
+        self.assertEqual(doubled.get_value(d_buy), 2.0 * sg.get_value(d_buy))
+        self.assertEqual(doubled.get_value(d_sell), 2.0 * sg.get_value(d_sell))
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
@@ -240,3 +279,7 @@ def suiteTestCrtSGWithClone():
 
 def suiteTestSGTradingObject():
     return unittest.TestLoader().loadTestsFromTestCase(TestSGTradingObject)
+
+
+def suiteTestSGSignalValues():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGSignalValues)

@@ -360,6 +360,30 @@ Signal Generator Base Class
 
         :rtype: DatetimeList
 
+    .. py:method:: get_buy_value(self, datetime)
+
+        Get the buy signal value at the specified datetime; a value less than or equal to 0 means
+        no buy signal.
+
+        :param Datetime datetime: the specified datetime
+        :rtype: float
+
+    .. py:method:: get_sell_value(self, datetime)
+
+        Get the sell signal value at the specified datetime; a value greater than or equal to 0
+        means no sell signal.
+
+        :param Datetime datetime: the specified datetime
+        :rtype: float
+
+    .. py:method:: get_value(self, datetime)
+
+        Get the net signal value at the specified datetime (the buy value plus the sell value):
+        positive means a buy intent, negative a sell intent, and about zero means no signal.
+
+        :param Datetime datetime: the specified datetime
+        :rtype: float
+
     .. py:method:: _add_signal(self, datetime, value)
 
         Add a signal value; called from within _calculate.

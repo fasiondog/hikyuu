@@ -357,6 +357,28 @@ PF调仓周期买入信号指示器
         获取所有卖出指示日期列表
         
         :rtype: DatetimeList
+
+    .. py:method:: get_buy_value(self, datetime)
+
+        获取指定时刻的买入信号数值；数值小于等于 0 表示无买入信号
+
+        :param Datetime datetime: 指定时刻
+        :rtype: float
+
+    .. py:method:: get_sell_value(self, datetime)
+
+        获取指定时刻的卖出信号数值；数值大于等于 0 表示无卖出信号
+
+        :param Datetime datetime: 指定时刻
+        :rtype: float
+
+    .. py:method:: get_value(self, datetime)
+
+        获取指定时刻的净信号值（买入信号值 + 卖出信号值）：正数表示买入意向，负数表示卖出意向，
+        约等于 0 表示无信号
+
+        :param Datetime datetime: 指定时刻
+        :rtype: float
     
     .. py:method:: _add_signal(self, datetime, value)
 

@@ -134,6 +134,33 @@ The custom signal generator interfaces:
 
     :rtype: DatetimeList)")
 
+      .def("get_buy_value", &SignalBase::getBuyValue, py::arg("datetime"),
+           R"(get_buy_value(self, datetime)
+
+    Get the buy signal value at the specified datetime; a value less than or equal to 0 means no
+    buy signal
+
+    :param Datetime datetime: the specified datetime
+    :rtype: float)")
+
+      .def("get_sell_value", &SignalBase::getSellValue, py::arg("datetime"),
+           R"(get_sell_value(self, datetime)
+
+    Get the sell signal value at the specified datetime; a value greater than or equal to 0 means
+    no sell signal
+
+    :param Datetime datetime: the specified datetime
+    :rtype: float)")
+
+      .def("get_value", &SignalBase::getValue, py::arg("datetime"),
+           R"(get_value(self, datetime)
+
+    Get the net signal value at the specified datetime, the sum of the buy and sell values:
+    positive means a buy intent, negative a sell intent, and about zero means no signal
+
+    :param Datetime datetime: the specified datetime
+    :rtype: float)")
+
       .def("_add_signal", &SignalBase::_addSignal, py::arg("datetime"), py::arg("value"),
            R"(_add_signal(self, datetime, value)
 
