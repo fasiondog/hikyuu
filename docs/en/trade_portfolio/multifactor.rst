@@ -218,12 +218,14 @@ Multi-factor Composition Algorithm Base Class
         Get the composed factor of the specified security.
 
         :param Stock stock: the specified security
+        :raises: when the ``save_all_factors`` parameter is false
 
     .. py:method:: get_all_factors(self)
 
         Get the list of composed factors of all the securities.
 
         :return: [factor1, factor2, ...] in the same order as the reference securities
+        :raises: when the ``save_all_factors`` parameter is false
 
     .. py:method:: get_ic(self[, ndays=0])
 

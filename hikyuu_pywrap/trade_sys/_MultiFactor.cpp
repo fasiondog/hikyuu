@@ -329,7 +329,8 @@ The custom multi-factor model override hooks:
 
     Get the new composed factor of the specified security
 
-    :param Stock stock: the specified security)")
+    :param Stock stock: the specified security
+    :raises Exception: if the parameter "save_all_factors" is false)")
 
       .def(
         "get_all_factors",
@@ -341,7 +342,8 @@ The custom multi-factor model override hooks:
 
     Get the list of the composed factors of all the securities
 
-    :return: [factor1, factor2, ...] in the same order as the reference securities)")
+    :return: [factor1, factor2, ...] in the same order as the reference securities
+    :raises Exception: if the parameter "save_all_factors" is false)")
 
       .def(
         "set_normalize",

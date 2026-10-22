@@ -219,6 +219,29 @@ TEST_CASE("test_MF_Weight_scores_range_overflow") {
     CHECK_UNARY(ret2.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_MF_Weight_get_all_factors_requires_save_all_factors") {
+    StockManager& sm = StockManager::instance();
+    IndicatorList src_inds = {MA(CLOSE())};
+    StockList stks = {sm["sh600004"], sm["sh600005"]};
+    KQuery query = KQuery(-30);
+    Stock ref_stk = sm["sh000001"];
+    auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
+
+    /** @arg save_all_factors defaults to false: both factor getters raise instead of one raising
+     * and the other silently returning an empty list */
+    CHECK_UNARY(!mf->getParam<bool>("save_all_factors"));
+    CHECK_THROWS_AS(mf->getAllFactors(), std::exception);
+    CHECK_THROWS_AS(mf->getFactor(stks[0]), std::exception);
+
+    /** @arg enabled before the calculation, both getters agree on the same factor list */
+    mf->setParam<bool>("save_all_factors", true);
+    const auto& all = mf->getAllFactors();
+    REQUIRE_EQ(all.size(), stks.size());
+    CHECK_UNARY(mf->getFactor(stks[0]).equal(all[0]));
+    CHECK_UNARY(mf->getFactor(stks[1]).equal(all[1]));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

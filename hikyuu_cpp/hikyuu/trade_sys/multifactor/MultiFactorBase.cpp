@@ -334,11 +334,9 @@ const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
 }
 
 const IndicatorList& MultiFactorBase::getAllFactors() {
-    if (getParam<bool>("save_all_factors")) {
-        calculate();
-    } else {
-        HKU_WARN("param \"save_all_factors\" is false, can't get all factors!");
-    }
+    HKU_CHECK(getParam<bool>("save_all_factors"),
+              "param \"save_all_factors\" is false, can't get all factors!");
+    calculate();
     return m_all_factors;
 }
 
