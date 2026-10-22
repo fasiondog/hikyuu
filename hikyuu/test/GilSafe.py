@@ -181,8 +181,9 @@ MF_GIL_RELEASE_PROBE = (
 
 # A Python custom normalizer makes the MF a python-part model. The compute still releases the GIL
 # (the norm callback re-acquires it per call through the pybind11 trampoline), so the background
-# thread must keep running and the call must not deadlock. A small security set keeps the number of
-# Python norm callbacks bounded, so the probe finishes quickly instead of starving the callbacks.
+# thread must keep running and the call must not deadlock. The waiting loop yields every iteration:
+# a spinning thread starves the per-callback GIL handoff (convoy), inflating the few-ms compute to
+# minutes. sys.setswitchinterval(1.0) keeps a held GIL from being masked by the periodic drop.
 MF_PY_PART_GIL_RELEASE_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
     "import os; os.chdir(r'{root}')\n"
@@ -219,12 +220,12 @@ MF_PY_PART_GIL_RELEASE_PROBE = (
     "counter = [0]\n"
     "def compute():\n"
     "    mf.reset(); _ = mf.get_scores(mid)\n"
+    "sys.setswitchinterval(1.0)\n"
     "ta = threading.Thread(target=compute, daemon=True)\n"
     "ta.start()\n"
     "while ta.is_alive():\n"
     "    counter[0] += 1\n"
-    "    if (counter[0] & 0x3FF) == 0:\n"
-    "        time.sleep(0)\n"
+    "    time.sleep(0)\n"
     "ta.join()\n"
     "assert counter[0] > 100, 'GIL not released for python-part MF: B_count=%d' % counter[0]\n"
     "print('OK')\n"
