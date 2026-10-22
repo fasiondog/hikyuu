@@ -30,14 +30,14 @@ NormQuantileUniform::~NormQuantileUniform() {}
 void NormQuantileUniform::_checkParam(const string &name) const {
     if ("quantile_min" == name) {
         double quantile_min = getParam<double>("quantile_min");
-        HKU_ASSERT(quantile_min > 0.0 && quantile_min < 1.0);
+        HKU_ASSERT(quantile_min >= 0.0 && quantile_min <= 1.0);
         if (haveParam("quantile_max")) {
             double quantile_max = getParam<double>("quantile_max");
             HKU_ASSERT(quantile_min < quantile_max);
         }
     } else if ("quantile_max" == name) {
         double quantile_max = getParam<double>("quantile_max");
-        HKU_ASSERT(quantile_max > 0.0 && quantile_max < 1.0);
+        HKU_ASSERT(quantile_max >= 0.0 && quantile_max <= 1.0);
         if (haveParam("quantile_min")) {
             double quantile_min = getParam<double>("quantile_min");
             HKU_ASSERT(quantile_min < quantile_max);

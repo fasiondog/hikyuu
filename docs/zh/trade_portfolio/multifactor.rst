@@ -195,6 +195,10 @@
 
         :param list stks: 指定的证券列表
 
+        .. note::
+            不拒绝重复证券：重复项会在每个日期的截面中各计一条（会改变等权分母），
+            证券索引中只保留最后一次出现的位置。
+
     .. py:method:: get_stock_list_num(self)
 
         获取创建时指定的证券列表中证券数量
@@ -218,12 +222,14 @@
         获取指定证券合成后的新因子
 
         :param Stock stock: 指定证券
+        :raises: 当参数 ``save_all_factors`` 为 False 时抛出异常
 
     .. py:method:: get_all_factors(self)
 
         获取所有证券合成后的因子列表
 
         :return: [factor1, factor2, ...] 顺序与参考证券顺序相同
+        :raises: 当参数 ``save_all_factors`` 为 False 时抛出异常
 
     .. py:method:: get_ic(self[, ndays=0])
 

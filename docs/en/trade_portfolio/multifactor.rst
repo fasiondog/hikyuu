@@ -195,6 +195,11 @@ Multi-factor Composition Algorithm Base Class
 
         :param list stks: the specified security list
 
+        .. note::
+            Duplicates are not rejected: each occurrence is counted separately in the
+            cross-section (it shifts the equal-weight denominator), and the stock index keeps
+            only the last occurrence.
+
     .. py:method:: get_stock_list_num(self)
 
         Get the number of securities in the security list specified at creation.
@@ -218,12 +223,14 @@ Multi-factor Composition Algorithm Base Class
         Get the composed factor of the specified security.
 
         :param Stock stock: the specified security
+        :raises: when the ``save_all_factors`` parameter is false
 
     .. py:method:: get_all_factors(self)
 
         Get the list of composed factors of all the securities.
 
         :return: [factor1, factor2, ...] in the same order as the reference securities
+        :raises: when the ``save_all_factors`` parameter is false
 
     .. py:method:: get_ic(self[, ndays=0])
 

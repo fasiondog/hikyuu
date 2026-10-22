@@ -91,4 +91,6 @@ print(scores.to_df())
 | NORM_MinMax           | 归一化               |                                                                                                                                                     |
 | NORM_Zscore           | 正态分布标准化       | **out_extreme**(false): 去除去除异常值<br />**nsigma**(3.0): 异常值判断界限(西格玛)<br />**recursive**(false): 是否递归去除异常值 |
 | NORM_Quantile         | 分位数标准化         | **quantile_min**(0.01): 最小分位数<br />**quantile_max**(0.99): 最大分位数                                                            |
-| NORM_Quantile_Uniform | 分位数均匀分布标准化 | **quantile_min**(0.01): 最小分位数<br />**quantile_max**(0.99): 最大分位数                                                            |
+| NORM_Quantile_Uniform | 分位数均匀分布标准化 | **quantile_min**(0.01): 最小分位数<br />**quantile_max**(0.99): 最大分位数                                                            |
+
+> 说明：`quantile_min` / `quantile_max` 取值 `[0, 1]` 且 `quantile_min < quantile_max`；取 `(0, 1)` 时表示不做分位截断。

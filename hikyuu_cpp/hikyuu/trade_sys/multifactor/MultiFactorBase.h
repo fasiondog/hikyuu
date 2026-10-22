@@ -44,7 +44,11 @@ public:
         m_name = name;
     }
 
-    /** Get the reference date list */
+    /**
+     * Get the reference date list
+     * @note Returns a reference to the internal list; reset() or a recalculation clears it. Copy it
+     *       if it must outlive the call.
+     */
     const DatetimeList& getDatetimeList();
 
     /** Get the query range */
@@ -68,7 +72,12 @@ public:
         return m_stks;
     }
 
-    /** Set the security list of the calculation range */
+    /**
+     * Set the security list of the calculation range
+     * @note Duplicates are not rejected: each occurrence is counted separately in the
+     *       cross-section (so it shifts the equal-weight denominator), and the last occurrence
+     *       wins in the stock index.
+     */
     void setStockList(const StockList& stks);
 
     /** Get the current number of the securities in the security list */
@@ -84,12 +93,17 @@ public:
     /** Set the original factor set */
     void setRefFactorSet(const FactorSet& factorset);
 
-    /** Get the synthesized factor of the given security */
+    /**
+     * Get the synthesized factor of the given security
+     * @note Returns a reference to an element of the internal list; reset() or a recalculation
+     *       destroys it, so copy the value before either can happen.
+     */
     const Indicator& getFactor(const Stock&);
 
     /**
      * Get the new factors synthesized from all the securities, in the same order as the passed
      * security portfolio
+     * @note Returns a reference to the internal list; reset() or a recalculation clears it.
      */
     const IndicatorList& getAllFactors();
 
@@ -117,8 +131,11 @@ public:
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               const ScoresFilterPtr& filter);
 
-    /** Get all the cross-section data; the order of each date follows the `mode` parameter:
-     *  0-descending, 1-ascending, 2-no sorting */
+    /**
+     * Get all the cross-section data; the order of each date follows the `mode` parameter:
+     *  0-descending, 1-ascending, 2-no sorting
+     * @note Returns a reference to the internal container; reset() or a recalculation clears it.
+     */
     const vector<ScoreRecordList>& getAllScores();
 
     /**
@@ -232,6 +249,8 @@ private:
 
     // Return the whole cross-section of the given date by reference, so the range / filter getters
     // do not copy the full cross-section (with the Stock shared_ptr refcount) on every call
+    // @note The reference points to an element of the internal cross-section; reset() or a
+    //       recalculation destroys it.
     const ScoreRecordList& getScoresRef(const Datetime& date);
 
     void _checkData();

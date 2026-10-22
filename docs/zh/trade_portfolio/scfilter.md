@@ -4,11 +4,19 @@ MF获取时间截面因子数据（评分记录)后，通常需要根据评分�
 
 ```python
 # 如为 SE_MultiFactor2 实例，设置过滤：分值不为Nan|分成10组取第0组|价格大于等于10元|成交金额不在当日排名末尾20%之内|取前10
-se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
+se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)|SCFilter_Price(
             10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
 ```
 
 SCFilter 通过 | 操作符生成新的 Filter，且对评分记录的过滤是按顺序进行的。
+
+`|` 返回一个独立的组合 Filter：左右操作数均会被拷贝，既不会被修改也不会被复用为组合结果的一部分。因此同一个具名过滤器可安全地用于多个组合，组合生成后再修改原过滤器也不会影响已生成的组合，如：
+
+```python
+f = SCFilter_TopN(10)
+se1.set_scores_filter(f | SCFilter_Price(10.))
+se2.set_scores_filter(f | SCFilter_AmountLimit(0.2))  # se1 的过滤链不受影响
+```
 
 | 名称                      | 说明                                                                                     | 参数                                                                                           |
 | ------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |

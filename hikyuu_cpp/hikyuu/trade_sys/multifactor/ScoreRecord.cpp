@@ -10,15 +10,19 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecord& td) {
+    auto oldFlags = out.flags();
+    auto oldPrecision = out.precision();
     out << std::fixed;
     out.precision(4);
-    out << "(" << td.stock.market_code() << ", " << td.value << ")" << std::endl;
-    out.unsetf(std::ostream::floatfield);
-    (void)out.precision();
+    out << "(" << td.stock.market_code() << ", " << td.value << ")" << '\n';
+    out.flags(oldFlags);
+    out.precision(oldPrecision);
     return out;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecordList& td) {
+    auto oldFlags = out.flags();
+    auto oldPrecision = out.precision();
     out << std::fixed;
     out.precision(4);
     size_t total = td.size();
@@ -30,36 +34,37 @@ HKU_API std::ostream& operator<<(std::ostream& out, const ScoreRecordList& td) {
         for (size_t i = 0; i < 5; i++) {
             out << i << ": " << td[i];
         }
-        out << "......" << std::endl;
+        out << "......" << '\n';
         for (size_t i = total - 5; i < total; i++) {
             out << i << ": " << td[i];
         }
     }
-    out.unsetf(std::ostream::floatfield);
-    (void)out.precision();
+    out.flags(oldFlags);
+    out.precision(oldPrecision);
     return out;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& out, const vector<ScoreRecordList>& td) {
+    auto oldFlags = out.flags();
+    auto oldPrecision = out.precision();
     out << std::fixed;
     out.precision(4);
     size_t total = td.size();
     if (total <= 2) {
         for (size_t i = 0; i < total; i++) {
-            out << "========= " << i << " =========" << std::endl;
+            out << "========= " << i << " =========" << '\n';
             out << td[i];
         }
     } else {
-        out << "========= 0 =========" << std::endl;
+        out << "========= 0 =========" << '\n';
         out << td[0];
-        out << "......" << std::endl;
-        out << "......" << std::endl;
-        out << "========= " << total - 1 << " =========" << std::endl;
+        out << "......" << '\n';
+        out << "......" << '\n';
+        out << "========= " << total - 1 << " =========" << '\n';
         out << td[total - 1];
     }
-
-    out.unsetf(std::ostream::floatfield);
-    (void)out.precision();
+    out.flags(oldFlags);
+    out.precision(oldPrecision);
     return out;
 }
 

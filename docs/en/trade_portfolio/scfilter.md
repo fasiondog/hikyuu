@@ -5,11 +5,19 @@ After the MF gets the cross-section factor data (score records), it is usually n
 ```python
 # For an SE_MultiFactor2 instance, set the filter: the score is not Nan | split into 10 groups and take group 0 |
 # the price is greater than or equal to 10 yuan | the amount is not in the last 20% of the daily ranking | take the top 10
-se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
+se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)|SCFilter_Price(
             10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
 ```
 
 SCFilter generates a new Filter with the | operator, and the filtering of the score records is performed in order.
+
+The | operator returns an independent combined Filter: both operands are copied, never modified and never shared as part of the combination. So the same named filter can be safely reused in multiple combinations, and changing an original filter afterwards does not affect combinations already built, e.g.:
+
+```python
+f = SCFilter_TopN(10)
+se1.set_scores_filter(f | SCFilter_Price(10.))
+se2.set_scores_filter(f | SCFilter_AmountLimit(0.2))  # the chain of se1 is not affected
+```
 
 | Name                      | Description                                                                                     | Parameters                                                                                           |
 | ------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |

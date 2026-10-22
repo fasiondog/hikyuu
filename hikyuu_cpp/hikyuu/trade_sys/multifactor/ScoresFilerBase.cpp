@@ -58,18 +58,20 @@ ScoreRecordList ScoresFilterBase::filter(const ScoreRecordList& scores, const Da
 HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b) {
     ScoresFilterPtr ret;
     if (a && b) {
-        auto node = a;
+        // Both operands are cloned so that operator| never aliases or modifies them: a named
+        // filter instance can be reused in multiple combinations and changed afterwards.
+        ret = a->clone();
+        auto node = ret;
         while (node->m_child) {
             node = node->m_child;
         }
-        node->m_child = b;
-        ret = a;
+        node->m_child = b->clone();
     } else if (a) {
         HKU_WARN("filter b is null, will be ignored.");
-        ret = a;
+        ret = a->clone();
     } else if (b) {
         HKU_WARN("filter a is null, will be ignored.");
-        ret = b;
+        ret = b->clone();
     } else {
         HKU_WARN("filter a and b are all null, will be returned null.");
     }

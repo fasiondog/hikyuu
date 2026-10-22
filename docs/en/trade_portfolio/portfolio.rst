@@ -42,6 +42,26 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    Every factory also has a letter-named thin alias (``PF_ModeA`` / ``PF_ModeB`` / ``PF_ModeC``): the
    same implementation, the same parameters and no behavior difference, for lookups and mode comparisons.
 
+   .. list-table:: Defaults of the three modes
+      :header-rows: 1
+
+      * - Factory (mode)
+        - ``trade_on_close``
+        - ``sell_at_not_selected``
+      * - ``PF_SignalAggregate`` (A Signal Aggregation)
+        - configurable, ``True`` by default
+        - configurable, ``False`` by default
+      * - ``PF_Simple`` (B Fund Allocation)
+        - configurable, ``True`` by default
+        - configurable, ``True`` by default (aligned with the legacy ``SimplePortfolio``)
+      * - ``PF_WithoutAF`` (C Shared Account Compatibility)
+        - configurable, ``True`` by default
+        - configurable, ``False`` by default (aligned with the legacy engine)
+
+   Note that the default of ``sell_at_not_selected`` **differs** between the three modes (only mode B
+   defaults to ``True``), so switching the mode switches the liquidation behavior; confirm it
+   explicitly when migrating.
+
    .. warning::
 
       The name ``PF_WithoutAF`` literally means "without a fund allocation algorithm", which is
@@ -86,7 +106,7 @@ The PF parts:
 Built-in Portfolios
 -------------------
 
-.. py:function:: PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+.. py:function:: PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=True])
 
     Create a multi-instrument portfolio with a single system strategy (**returns MultiSystem running in mode B "Fund Allocation"**).
 
@@ -95,11 +115,11 @@ Built-in Portfolios
     it is driven (zero-quota liquidation, then the unselected liquidation or the quota cash recycle, then reduce the over-quota part, inject the gap) and trades with
     the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on
     its own account; the L3 portfolio risk control is skipped (the sub-manager autonomy is respected).
-    ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``: ``trade_on_close=True`` and
-    ``sell_at_not_selected=True`` are fixed, so the unselected ones are cleared together with the
-    parent holdings on the rebalancing day; for the "unselected keep running" semantics use
-    ``MultiSystem(mode="B")`` with ``sell_at_not_selected=False`` directly. The sub-system shadow
-    accounts start from zero and follow the cost function of the parent account.
+    ``PF_Simple`` defaults to the legacy ``SimplePortfolio``: ``trade_on_close=True`` and
+    ``sell_at_not_selected=True``, so the unselected ones are cleared together with the parent
+    holdings on the rebalancing day; set ``sell_at_not_selected=False`` to keep them running (they
+    only skip the quota calibration). The sub-system shadow accounts start from zero and follow the
+    cost function of the parent account.
 
     The quota cash is a **virtual budget**: ``checkin/checkout`` only touch the sub ledger, the parent
     account is neither debited nor credited by them; the parent real cash only changes with the
@@ -122,6 +142,8 @@ Built-in Portfolios
     :param int adjust_cycle: the rebalancing cycle
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
+    :param bool trade_on_close: whether the trades are executed at the close
+    :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold, ``True`` by default to match the legacy ``SimplePortfolio``
     :rtype: MultiSystem
 
 .. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])

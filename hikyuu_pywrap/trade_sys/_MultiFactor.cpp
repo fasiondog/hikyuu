@@ -228,6 +228,9 @@ The custom multi-factor model override hooks:
     - _reset : [Optional] Reset the internal member variables)")
       .def(py::init<>())
       .def(py::init<const MultiFactorBase&>())
+      .def(py::init<const string&>(), R"(The initialization constructor
+
+    :param str name: the name)")
 
       .def("__str__", to_py_str<MultiFactorBase>)
       .def("__repr__", to_py_str<MultiFactorBase>)
@@ -329,7 +332,8 @@ The custom multi-factor model override hooks:
 
     Get the new composed factor of the specified security
 
-    :param Stock stock: the specified security)")
+    :param Stock stock: the specified security
+    :raises Exception: if the parameter "save_all_factors" is false)")
 
       .def(
         "get_all_factors",
@@ -341,7 +345,8 @@ The custom multi-factor model override hooks:
 
     Get the list of the composed factors of all the securities
 
-    :return: [factor1, factor2, ...] in the same order as the reference securities)")
+    :return: [factor1, factor2, ...] in the same order as the reference securities
+    :raises Exception: if the parameter "save_all_factors" is false)")
 
       .def(
         "set_normalize",

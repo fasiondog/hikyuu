@@ -120,6 +120,7 @@ public:                                                                         
 HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const ScoresFilterPtr&);
 
+/// Combine two filters as a new chain; both operands are cloned and never modified.
 HKU_API ScoresFilterPtr operator|(const ScoresFilterPtr& a, const ScoresFilterPtr& b);
 
 }  // namespace hku

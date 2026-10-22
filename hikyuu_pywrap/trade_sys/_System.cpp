@@ -917,11 +917,13 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     //--------------------------------------------------------------------------------------
     // The PF factories pass through to MultiSystem, keeping the master call style unchanged
     // (the return type changes from PortfolioPtr to MultiSystem)
-    m.def("PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-          py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
-          R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    m.def(
+      "PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::arg("trade_on_close") = true, py::arg("sell_at_not_selected") = true,
+      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=True])
 
     Create a multi-instrument, single-system-strategy portfolio (returns MultiSystem running in mode B "Fund Allocation").
 
@@ -930,10 +932,10 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     it is driven (zero-quota liquidation, then the unselected liquidation or the selected cash recycle,
     then reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
     (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
-    autonomy is respected). ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``:
-    ``trade_on_close=True`` and ``sell_at_not_selected=True`` are fixed, so the unselected sub-systems
-    are force cleared together with the parent holdings on the rebalancing day; for the "unselected
-    keep running" semantics use ``MultiSystem(mode="B")`` with ``sell_at_not_selected=False`` directly.
+    autonomy is respected). ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``: the defaults
+    ``trade_on_close=True`` and ``sell_at_not_selected=True`` force clear the unselected sub-systems
+    together with the parent holdings on the rebalancing day; set ``sell_at_not_selected=False`` to
+    keep them running (they only skip the quota calibration).
     The sub-system shadow accounts start from zero and follow the cost function of the parent account.
 
     The rebalancing mode adjust_mode description:
@@ -953,6 +955,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :param int adjust_cycle: the rebalancing cycle
     :param str adjust_mode: the rebalancing mode
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
+    :param bool trade_on_close: whether the trade is executed at the close
+    :param bool sell_at_not_selected: whether to force selling the stocks not selected on the rebalancing day (True by default, aligned with the legacy SimplePortfolio)
     :rtype: MultiSystem)");
 
     m.def(
@@ -1054,11 +1058,13 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     Alias of PF_SignalAggregate (mode A "Signal Aggregation"): the same implementation, the same
     parameters and no behavior difference.)");
 
-    m.def("PF_ModeB", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-          py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
-          R"(PF_ModeB([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    m.def(
+      "PF_ModeB", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::arg("trade_on_close") = true, py::arg("sell_at_not_selected") = true,
+      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+      R"(PF_ModeB([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=True])
 
     Alias of PF_Simple (mode B "Fund Allocation", FOF/MOM style): the same implementation, the same
     parameters and no behavior difference.)");

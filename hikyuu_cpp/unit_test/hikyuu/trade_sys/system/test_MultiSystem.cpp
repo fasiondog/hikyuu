@@ -1029,6 +1029,44 @@ TEST_CASE("test_MultiSystem_adjust_mode") {
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 }
 
+/** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value that can
+ * never reach a driven day of the period is warned but kept, never clamped) */
+TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
+    MultiSystem ms("ms");
+    /** @arg the default cycle is 1 */
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+
+    /** @arg <=0 is treated as 1 (the close-day counting mode) */
+    ms.setAdjustCycle(0);
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+    ms.setAdjustCycle(-5);
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+
+    /** @arg a value that can never reach a driven day of the period is kept as is */
+    ms.setAdjustMode("week");
+    ms.setAdjustCycle(8);
+    CHECK_EQ(ms.getAdjustCycle(), 8);
+    CHECK_EQ(ms.getAdjustMode(), "week");
+    ms.setAdjustCycle(7);
+    CHECK_EQ(ms.getAdjustCycle(), 7);
+
+    /** @arg switching to a period mode does not rewrite an out-of-range cycle */
+    ms.setAdjustMode("query");
+    ms.setAdjustCycle(60);
+    ms.setAdjustMode("month");
+    CHECK_EQ(ms.getAdjustCycle(), 60);
+    CHECK_EQ(ms.getAdjustMode(), "month");
+
+    /** @arg the factory path follows the same rule (only <=0 falls back to 1) */
+    TMPtr tm = crtTM(Datetime(20100101), 100000.0);
+    auto pf = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 0, "month");
+    CHECK_EQ(pf->getAdjustCycle(), 1);
+    CHECK_EQ(pf->getAdjustMode(), "month");
+    auto pf2 = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 32, "month");
+    CHECK_EQ(pf2->getAdjustCycle(), 32);
+    CHECK_EQ(pf2->getAdjustMode(), "month");
+}
+
 /** @par Check point: the calcAdjustDates pure function (week/month/quarter/year × delay
  * true/false + boundaries) */
 TEST_CASE("test_MultiSystem_calc_adjust_dates") {
@@ -1195,6 +1233,13 @@ TEST_CASE("test_PF_factories") {
     CHECK_EQ(pf_def->getDelayToTradingDay(), true);
     REQUIRE(pf_def->getAF() != nullptr);
     CHECK_EQ(pf_def->getAF()->name(), "AF_EqualWeight");
+
+    /** @arg PF_Simple exposes the two switches instead of fixing them: trade_on_close and
+     * sell_at_not_selected are passed through (false keeps the unselected sub-systems running) */
+    auto pf_keep = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 1, "query", true, false, false);
+    CHECK_EQ(pf_keep->getMode(), "B");
+    CHECK_EQ(pf_keep->getTradeOnClose(), false);
+    CHECK_EQ(pf_keep->getSellAtNotSelected(), false);
 
     /** @arg PF_WithoutAF: mode C (the legacy shared-account Portfolio); parameters passed through
      * item by item; sys_use_self_tm is kept for the signature only and must not crash */
@@ -2421,6 +2466,36 @@ TEST_CASE("test_MultiSystem_mode_b_unselected_books_match") {
     double parent_pos = ms->getTM()->getPosition(k.back().datetime, stk).number;
     CHECK_GT(sub_pos, 0.0);
     CHECK_EQ(sub_pos, doctest::Approx(parent_pos));
+}
+
+/** @par Check point: mode B without an SE treats every sub-system as selected (the A/C convention)
+ * -- the quota is allocated and the zero-cash shadow account is funded, instead of an empty run */
+TEST_CASE("test_MultiSystem_mode_b_without_se") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_no_se");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setAF(AF_EqualWeight());
+    auto sys = create_alway_buy_sys();
+    sys->setTO(k);
+    ms->add(sys);
+    ms->run(k);
+
+    /** @arg the shadow account has been funded and the parent mirrors the buy (no empty run) */
+    CHECK_GT(sys->getTM()->getFunds(k.back().datetime, query.kType()).net_assets(), 0.0);
+    size_t parent_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            parent_buys++;
+        }
+    }
+    CHECK_GT(parent_buys, 0);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
 }
 
 /** @par Check point: mode B with the default deferred trading -- the fill of the open on the drop
@@ -4068,6 +4143,11 @@ TEST_CASE("test_MultiSystem_pf_mode_aliases") {
     CHECK_UNARY(b->getTradeOnClose());
     CHECK_UNARY(b->getSellAtNotSelected());
 
+    /** @arg PF_ModeB forwards the two switches exactly as PF_Simple does */
+    auto b2 = PF_ModeB(tm, se_b, AF_EqualWeight(), 2, "query", true, false, false);
+    CHECK_EQ(b2->getTradeOnClose(), false);
+    CHECK_EQ(b2->getSellAtNotSelected(), false);
+
     /** @arg PF_ModeC behaves as PF_WithoutAF (mode C, sell_at_not_selected=false by default) */
     auto c = PF_ModeC(tm, se_b);
     REQUIRE(c != nullptr);
@@ -4900,7 +4980,6 @@ TEST_CASE("test_MultiSystem_mode_b_nested_b_trade_on_close_false") {
 
     double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
     double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
-    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
     REQUIRE_GT(leaf1, 0.0);
 
     /** @arg the delegated budget reaches the leaf through the inner deferred calibration */
@@ -4944,7 +5023,6 @@ TEST_CASE("test_MultiSystem_mode_b_nested_c_pro_rata_reduction") {
     ms->run(k1);
 
     double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
-    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
     REQUIRE_GT(inner1, 0.0);
 
     /** @arg the shrunk budget reduces the shared ledger pro rata and mirrors to the parent */

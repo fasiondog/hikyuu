@@ -454,8 +454,12 @@ void MultiSystem::clearDateAxis() {
 }
 
 void MultiSystem::setAdjustCycle(int cycle) {
+    if (cycle <= 0) {
+        HKU_WARN("Invalid adjust_cycle {} (<=0), treated as 1! [{}]", cycle, name());
+    }
     m_adjust_cycle = cycle > 0 ? cycle : 1;
     _clearCycleDates();
+    _warnAdjustCycleOutOfRange();
 }
 
 void MultiSystem::setDelayToTradingDay(bool v) {
@@ -493,6 +497,28 @@ void MultiSystem::setAdjustMode(const string& mode) {
     }
     setParam<string>("adjust-mode", m);
     _clearCycleDates();
+    _warnAdjustCycleOutOfRange();
+}
+
+void MultiSystem::_warnAdjustCycleOutOfRange() const {
+    string mode = getAdjustMode();
+    to_lower(mode);
+    int max_days = 0;
+    if (mode == "week") {
+        // The week period starts on Monday: Saturday/Sunday are never driven
+        max_days = 5;
+    } else if (mode == "month") {
+        max_days = 31;
+    } else if (mode == "quarter") {
+        max_days = 92;
+    } else if (mode == "year") {
+        max_days = 366;
+    }
+    HKU_IF_RETURN(max_days == 0 || m_adjust_cycle <= max_days, void());
+    HKU_WARN(
+      "adjust_cycle {} can never reach a driven day of the {} period (max {} calendar days), "
+      "that mode never rebalances! [{}]",
+      m_adjust_cycle, mode, max_days, name());
 }
 
 Datetime MultiSystem::_periodStart(const Datetime& date) const {
@@ -629,7 +655,7 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     price_t reduce_base = m_trade_on_close ? sub_total : (sub_total - funds.cash);
     if (sys->isComposite()) {
         auto* inner = dynamic_cast<MultiSystem*>(sys.get());
-        const bool delegatable = inner && inner->getMode() == "B" && inner->m_se && inner->getAF();
+        const bool delegatable = inner && inner->getMode() == "B" && inner->getAF();
         if (delegatable && quota > 0.0) {
             // The inner manages its own leaf ledgers: delegate the budget and let it reduce its
             // leaves (the FOF/MOM semantics, both book levels stay matched)
@@ -640,8 +666,8 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
                 !m_external_delegate_warned) {
                 m_external_delegate_warned = true;
                 HKU_WARN(
-                  "The nested mode B {} has no SE/AF to consume the delegated quota, fall "
-                  "back to the direct pro rata reduction!",
+                  "The nested mode B {} has no AF to consume the delegated quota, fall back to "
+                  "the direct pro rata reduction!",
                   inner->name());
             }
             if (quota > 0.0 && reduce_base > quota) {
@@ -2389,6 +2415,16 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         return _closePhaseModeA(datetime, is_adjust, selected, se_scores, ktype, assets_before);
     }
 
+    // Mode B without an SE: every sub-system is treated as selected (the mode A/C convention).
+    // Otherwise no quota would ever be allocated and the zero-cash shadow accounts would stay
+    // empty for the whole run (an empty backtest)
+    const bool select_all = (getMode() == "B" && !m_se);
+    if (is_adjust && select_all) {
+        for (auto& sys : m_sys_list) {
+            selected.insert(sys.get());
+        }
+    }
+
     // Mode B (master SimplePortfolio compatibility): on the rebalancing day the quota must be
     // allocated BEFORE driving the sub-systems, so every selected sub-system trades with its exact
     // allocated quota (the master AF adjusted the funds first and ran the systems afterwards)
@@ -2401,7 +2437,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     // only by the quota injection, so a context still holding value at the calibration time was
     // funded in a previous period, i.e. it is a running sub-system
     std::set<System*> running_subs;
-    if (is_adjust && getMode() == "B" && m_se && getAF()) {
+    if (is_adjust && getMode() == "B" && getAF()) {
         // adjust_running_sys=false: the running sub-systems keep their current holdings on the
         // rebalancing day; only the new sub-systems get the remaining parent cash (the master
         // _adjust_without_running semantics)
@@ -2472,7 +2508,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     // The injections are re-derived from this round's quotas: drop the stale targets of earlier
     // rounds (a lowered quota must not be re-inflated). This also runs when the SE selected nobody
     // (quota_calibrated is false in that case), so a stale target cannot survive a full clear.
-    if (is_adjust && m_se && !m_trade_on_close) {
+    if (is_adjust && (m_se || select_all) && !m_trade_on_close) {
         m_pending_calibration.erase(
           std::remove_if(
             m_pending_calibration.begin(), m_pending_calibration.end(),
@@ -2614,9 +2650,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         SystemPtr sys = m_sys_list[i];
         const bool is_selected = (selected.count(sys.get()) > 0);
         if (m_se && is_adjust && (!is_selected || liquidated.count(sys.get()) > 0)) {
-            // The unselected sub-system: it has been liquidated (executed immediately) when the
-            // quota was calibrated; in the legacy flow (no SE) the liquidation suggestion is
-            // generated here
+            // The unselected sub-system: it has already been liquidated (executed immediately) when
+            // the quota was calibrated; without a quota pre-calculation (e.g. no AF) the
+            // liquidation suggestion is generated here
             if (m_sell_at_not_selected) {
                 if (!quota_calibrated) {
                     std::set<Stock> stocks;
@@ -2753,9 +2789,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             }
         }
     } else {
-        // No SE (or no quota pre-calculation): keep the suggestion-driven legacy flow, L1 runs
-        // here and the next-period quota is written back on the rebalancing day (lagging one
-        // period behind, quota penetration).
+        // No quota pre-calculation (no AF, or the SE selected nobody): keep the suggestion-driven
+        // legacy flow, L1 runs here and the next-period quota is written back on the rebalancing
+        // day (lagging one period behind, quota penetration).
         getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery(), getMode());
         // A zero quota takes the sub-system out of the allocation: liquidate both books and drop
         // its same-close fills from the mirror batch (the sub ledger is cleared as a whole, so
