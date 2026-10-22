@@ -195,6 +195,11 @@ Multi-factor Composition Algorithm Base Class
 
         :param list stks: the specified security list
 
+        .. note::
+            Duplicates are not rejected: each occurrence is counted separately in the
+            cross-section (it shifts the equal-weight denominator), and the stock index keeps
+            only the last occurrence.
+
     .. py:method:: get_stock_list_num(self)
 
         Get the number of securities in the security list specified at creation.

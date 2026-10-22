@@ -72,7 +72,12 @@ public:
         return m_stks;
     }
 
-    /** Set the security list of the calculation range */
+    /**
+     * Set the security list of the calculation range
+     * @note Duplicates are not rejected: each occurrence is counted separately in the
+     *       cross-section (so it shifts the equal-weight denominator), and the last occurrence
+     *       wins in the stock index.
+     */
     void setStockList(const StockList& stks);
 
     /** Get the current number of the securities in the security list */
