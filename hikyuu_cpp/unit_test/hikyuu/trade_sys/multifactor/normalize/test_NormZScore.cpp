@@ -32,7 +32,7 @@ TEST_CASE("test_NormZScore") {
     CHECK_UNARY(!std::isnan(ret[2]));
     CHECK(ret[0] == doctest::Approx(-ret[2]));
 
-    /** @arg out-extreme clips the outliers into [-nsigma, nsigma] (non-recursive) */
+    /** @arg out_extreme clips the outliers into [-nsigma, nsigma] (non-recursive) */
     norm = NORM_Zscore(true, 1.0, false);
     ret = norm->normalize(PriceList{1.0, 2.0, 3.0, 4.0, 100.0});
     REQUIRE_EQ(ret.size(), 5);

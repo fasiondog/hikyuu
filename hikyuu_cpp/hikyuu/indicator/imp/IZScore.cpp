@@ -15,19 +15,21 @@ namespace hku {
 
 IZScore::IZScore() : IndicatorImp("ZSCORE", 1) {
     setParam<double>("nsigma", 3);
-    setParam<bool>("out-extreme", false);
+    setParam<bool>("out_extreme", false);
     setParam<bool>("recursive", false);
 }
 
 IZScore::IZScore(bool outExtreme, double nsigma, bool recursive) : IndicatorImp("ZSCORE", 1) {
     setParam<double>("nsigma", nsigma);
-    setParam<bool>("out-extreme", outExtreme);
+    setParam<bool>("out_extreme", outExtreme);
     setParam<bool>("recursive", recursive);
 }
 
 IZScore::~IZScore() {}
 
 void IZScore::_checkParam(const string &name) const {
+    HKU_CHECK(name != "out-extreme",
+              "Deprecated parameter name 'out-extreme'! use 'out_extreme' instead");
     if ("nsigma" == name) {
         HKU_ASSERT(getParam<double>("nsigma") > 0.);
     }
@@ -97,7 +99,7 @@ void IZScore::_calculate(const Indicator &data) {
     }
 
     double nsigma = getParam<double>("nsigma");
-    bool outExtreme = getParam<bool>("out-extreme");
+    bool outExtreme = getParam<bool>("out_extreme");
     bool recursive = getParam<bool>("recursive");
     auto const *src = data.data() + m_discard;
     auto *dst = this->data() + m_discard;

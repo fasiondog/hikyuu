@@ -46,6 +46,9 @@ MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
 MoneyManagerBase::~MoneyManagerBase() {}
 
 void MoneyManagerBase::baseCheckParam(const string& name) const {
+    HKU_CHECK(name != "auto-checkin" && name != "max-stock",
+              "Deprecated hyphenated parameter name '{}'! use '{}' instead", name,
+              name == "auto-checkin" ? "auto_checkin" : "max_stock");
     if ("max_stock" == name) {
         HKU_ASSERT(getParam<int>("max_stock") >= 1);
     }

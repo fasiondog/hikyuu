@@ -15,20 +15,22 @@ namespace hku {
 
 NormZScore::NormZScore() : NormalizeBase("NORM_Zscore") {
     setParam<double>("nsigma", 3);         // The multiple used to judge the outliers
-    setParam<bool>("out-extreme", false);  // Remove the outliers
+    setParam<bool>("out_extreme", false);  // Remove the outliers
     setParam<bool>("recursive", false);    // Remove the outliers recursively
 }
 
 NormZScore::NormZScore(bool outExtreme, double nsigma, bool recursive)
 : NormalizeBase("NORM_Zscore") {
     setParam<double>("nsigma", nsigma);
-    setParam<bool>("out-extreme", outExtreme);
+    setParam<bool>("out_extreme", outExtreme);
     setParam<bool>("recursive", recursive);
 }
 
 NormZScore::~NormZScore() {}
 
 void NormZScore::_checkParam(const string& name) const {
+    HKU_CHECK(name != "out-extreme",
+              "Deprecated parameter name 'out-extreme'! use 'out_extreme' instead");
     if ("nsigma" == name) {
         HKU_ASSERT(getParam<double>("nsigma") > 0.);
     }
@@ -124,7 +126,7 @@ PriceList NormZScore::normalize(const PriceList& data) {
         return ret;
     }
 
-    bool outExtreme = getParam<bool>("out-extreme");
+    bool outExtreme = getParam<bool>("out_extreme");
     double nsigma = getParam<double>("nsigma");
     bool recursive = getParam<bool>("recursive");
 
