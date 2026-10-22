@@ -54,7 +54,11 @@ public:
 public:
     void set_norm(py::object norm) {
         py::gil_scoped_acquire gil;
-        setNormalize(norm.cast<NormPtr>());
+        if (norm.is_none()) {
+            setNormalize(NormPtr());
+        } else {
+            setNormalize(norm.cast<NormPtr>());
+        }
     }
 
     void add_special_norm(const string& name, py::object norm, const string& category,

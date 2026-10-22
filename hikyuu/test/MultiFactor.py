@@ -306,6 +306,19 @@ class MultiFactorTest(unittest.TestCase):
         self.assertEqual(len(mf.get_icir(0)), 0)
         self.assertEqual(len(mf.get_icir(-1)), 0)
 
+    def test_set_normalize_none_disables(self):
+        # C16: set_normalize(None) and set_normalize(NORM_NOTHING()) must deterministically disable
+        # global normalization (no TypeError on a None argument) and yield the un-normalized baseline.
+        mf, ref_stk, query = self._build_mf()
+        date = Datetime(201106010000)
+        baseline = [sc.value for sc in mf.get_scores(date)]
+
+        mf.set_normalize(None)
+        self.assertEqual([sc.value for sc in mf.get_scores(date)], baseline)
+
+        mf.set_normalize(NORM_NOTHING())
+        self.assertEqual([sc.value for sc in mf.get_scores(date)], baseline)
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MultiFactorTest)
