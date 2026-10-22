@@ -178,7 +178,7 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(!std::isfinite(value) || std::abs(value) < ZERO_SIGNAL_THRESHOLD, void());
 
-    // A single find per map is reused by both the value merge and the later insert/accumulate
+    // A single find per map is reused by the value merge and the write below
     auto buy_iter = m_buySig.find(datetime);
     auto sell_iter = m_sellSig.find(datetime);
     double buy_value = buy_iter != m_buySig.end() ? buy_iter->second : 0.0;
@@ -186,23 +186,19 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
     double new_value = value + buy_value + sell_value;
     HKU_IF_RETURN(!std::isfinite(new_value) || std::abs(new_value) < ZERO_SIGNAL_THRESHOLD, void());
 
+    // One day carries one direction only: the written table receives the merged net value and the
+    // opposite record of the same day is dropped, otherwise both shouldBuy and shouldSell hold
     bool alternate = getParam<bool>("alternate");
     if (new_value > 0.0) {
         if (!alternate) {
-            if (buy_iter != m_buySig.end()) {
-                buy_iter->second += new_value;
-            } else {
-                m_buySig.insert({datetime, new_value});
-            }
+            m_sellSig.erase(datetime);
+            m_buySig[datetime] = new_value;
             return;
         }
 
         if (!m_hold_long) {
-            if (buy_iter != m_buySig.end()) {
-                buy_iter->second += new_value;
-            } else {
-                m_buySig.insert({datetime, new_value});
-            }
+            m_sellSig.erase(datetime);
+            m_buySig[datetime] = new_value;
             if (getParam<bool>("support_borrow_stock") && m_hold_short) {
                 m_hold_short = false;
             } else {
@@ -212,28 +208,19 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
 
     } else {
         if (!alternate) {
-            if (sell_iter != m_sellSig.end()) {
-                sell_iter->second += new_value;
-            } else {
-                m_sellSig.insert({datetime, new_value});
-            }
+            m_buySig.erase(datetime);
+            m_sellSig[datetime] = new_value;
             return;
         }
 
         if (!m_hold_short) {
             if (m_hold_long) {
-                if (sell_iter != m_sellSig.end()) {
-                    sell_iter->second += new_value;
-                } else {
-                    m_sellSig.insert({datetime, new_value});
-                }
+                m_buySig.erase(datetime);
+                m_sellSig[datetime] = new_value;
                 m_hold_long = false;
             } else if (getParam<bool>("support_borrow_stock")) {
-                if (sell_iter != m_sellSig.end()) {
-                    sell_iter->second += new_value;
-                } else {
-                    m_sellSig.insert({datetime, new_value});
-                }
+                m_buySig.erase(datetime);
+                m_sellSig[datetime] = new_value;
                 m_hold_short = true;
             }
         }

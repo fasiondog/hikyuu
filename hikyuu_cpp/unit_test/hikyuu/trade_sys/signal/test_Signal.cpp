@@ -256,6 +256,47 @@ TEST_CASE("test_Signal") {
 }
 
 /** @par Test points */
+TEST_CASE("test_Signal_same_bar_single_direction") {
+    SignalPtr p(new SignalTest);
+    Datetime d(200202010000);
+
+    /** @arg a positive net drops the same-day sell record and keeps the net value */
+    p->setParam<bool>("alternate", false);
+    p->_addSellSignal(d, -1.0);
+    REQUIRE_UNARY(p->shouldSell(d));
+    p->_addBuySignal(d, 3.0);
+    CHECK_UNARY(p->shouldBuy(d));
+    CHECK_UNARY(!p->shouldSell(d));
+    CHECK_EQ(p->getValue(d), 2.0);
+
+    /** @arg a negative net drops the same-day buy record and keeps the net value */
+    p->reset();
+    p->_addBuySignal(d, 2.0);
+    REQUIRE_UNARY(p->shouldBuy(d));
+    p->_addSellSignal(d, -3.0);
+    CHECK_UNARY(!p->shouldBuy(d));
+    CHECK_UNARY(p->shouldSell(d));
+    CHECK_EQ(p->getValue(d), -1.0);
+
+    /** @arg a repeated same-direction input keeps the net value instead of double counting */
+    p->reset();
+    p->_addBuySignal(d, 1.0);
+    p->_addBuySignal(d, 1.0);
+    CHECK_EQ(p->getBuyValue(d), 2.0);
+
+    /** @arg an alternate short entry flips to a buy when the net turns positive */
+    p->reset();
+    p->setParam<bool>("alternate", true);
+    p->setParam<bool>("support_borrow_stock", true);
+    p->_addSellSignal(d, -1.0);
+    REQUIRE_UNARY(p->shouldSell(d));
+    p->_addBuySignal(d, 3.0);
+    CHECK_UNARY(p->shouldBuy(d));
+    CHECK_UNARY(!p->shouldSell(d));
+    CHECK_EQ(p->getValue(d), 2.0);
+}
+
+/** @par Test points */
 TEST_CASE("test_Signal_clone_cycle_bounds") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
