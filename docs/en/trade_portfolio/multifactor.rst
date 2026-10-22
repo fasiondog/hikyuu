@@ -240,8 +240,11 @@ Multi-factor Composition Algorithm Base Class
 
         Get the ICIR series of the composed factor.
 
+        An ir_n < 1, or an ic_n that resolves to < 1, returns an empty indicator with a warning.
+
         :param int ir_n: the rolling window size used to calculate the IR
-        :param int ic_n: the window used for the IC (the same as ndays in get_ic)
+        :param int ic_n: the window used for the IC (the same as ndays in get_ic); a non-positive
+            value means using the ic_n parameter of the factor
 
     .. py:method:: get_score(self, date[, start=0, end=Null])
 

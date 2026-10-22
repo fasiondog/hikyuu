@@ -34,7 +34,7 @@ ScoreRecordList buildLinearScores(size_t total) {
 }
 
 // Concatenate every group's returned values in group order.
-std::vector<ScoreRecord::value_t> concatGroups(size_t total, int group, const ScoreRecordList& scores) {
+std::vector<ScoreRecord::value_t> concatGroups(int group, const ScoreRecordList& scores) {
     std::vector<ScoreRecord::value_t> all;
     for (int g = 0; g < group; g++) {
         auto filter = SCFilter_Group(group, g);
@@ -89,13 +89,14 @@ TEST_CASE("test_GroupSCFilter_non_divisible_no_empty_group") {
         REQUIRE_FALSE(ret.empty());
         /** @arg sizes differ by at most 1 between adjacent groups */
         if (g > 0) {
-            CHECK_LE(std::abs(static_cast<long long>(ret.size()) - static_cast<long long>(prev_size)), 1);
+            CHECK_LE(
+              std::abs(static_cast<long long>(ret.size()) - static_cast<long long>(prev_size)), 1);
         }
         prev_size = ret.size();
     }
 
     /** @arg concatenating every group in order reconstructs the full ordered cross-section */
-    auto all = concatGroups(total, group, scores);
+    auto all = concatGroups(group, scores);
     REQUIRE_EQ(all.size(), total);
     for (size_t i = 0; i < all.size(); i++) {
         CHECK_EQ(all[i], static_cast<ScoreRecord::value_t>(i));
@@ -110,7 +111,7 @@ TEST_CASE("test_GroupSCFilter_total_less_than_group_partitions") {
     ScoreRecordList scores = buildLinearScores(total);
     REQUIRE_EQ(scores.size(), total);
 
-    std::vector<ScoreRecord::value_t> all = concatGroups(total, group, scores);
+    std::vector<ScoreRecord::value_t> all = concatGroups(group, scores);
 
     /** @arg every stock appears exactly once across all groups (no overlap, no omission) */
     std::sort(all.begin(), all.end());
@@ -126,6 +127,31 @@ TEST_CASE("test_GroupSCFilter_total_less_than_group_partitions") {
           scores, Datetime(201106010000),
           KQueryByDate(Datetime(20110104), Datetime(20111206), KQuery::DAY));
         CHECK_LE(ret.size(), 1);
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_GroupSCFilter_boundaries") {
+    const int group = 10;
+    const auto kquery = KQueryByDate(Datetime(20110104), Datetime(20111206), KQuery::DAY);
+
+    /** @arg an empty cross-section yields an empty list for every group */
+    for (int g = 0; g < group; g++) {
+        auto filter = SCFilter_Group(group, g);
+        CHECK_UNARY(filter->filter(ScoreRecordList(), Datetime(201106010000), kquery).empty());
+    }
+
+    /** @arg a non-positive group or an out-of-range group index is rejected on construction */
+    CHECK_THROWS(SCFilter_Group(0, 0));
+    CHECK_THROWS(SCFilter_Group(-1, 0));
+    CHECK_THROWS(SCFilter_Group(group, group));
+    CHECK_THROWS(SCFilter_Group(group, -1));
+
+    /** @arg total == group puts exactly one stock into each group */
+    auto all = concatGroups(group, buildLinearScores(static_cast<size_t>(group)));
+    REQUIRE_EQ(all.size(), static_cast<size_t>(group));
+    for (size_t i = 0; i < all.size(); i++) {
+        CHECK_EQ(all[i], static_cast<ScoreRecord::value_t>(i));
     }
 }
 

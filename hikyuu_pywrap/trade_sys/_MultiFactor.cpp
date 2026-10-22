@@ -403,8 +403,12 @@ The custom multi-factor model override hooks:
 
     Get the ICIR of the composed factor
 
+    An ir_n < 1, or an ic_n that resolves to < 1, returns an empty indicator with a warning.
+
     :param int ir_n: the n window for calculating the IR
-    :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic))")
+    :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic); a
+           non-positive value means using the ic_n parameter of the factor
+    :rtype: Indicator)")
 
       .def("clone", &MultiFactorBase::clone, "The clone operation")
 

@@ -240,8 +240,10 @@
 
         获取合成因子的 ICIR
 
+        ir_n 小于 1，或 ic_n 解析后小于 1 时，返回空 Indicator 并告警。
+
         :param int ir_n: 计算 IR 的 n 窗口
-        :param int ic_n: 计算 IC 的 n 窗口 (同 get_ic 中的 ndays)
+        :param int ic_n: 计算 IC 的 n 窗口 (同 get_ic 中的 ndays)，非正数表示使用因子的 ic_n 参数
 
     .. py:method:: get_score(self, date[, start=0, end=Null])
 

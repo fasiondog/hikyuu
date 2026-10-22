@@ -971,6 +971,14 @@ msgstr "数据长度不等"
 msgid "Number must be greater than 0"
 msgstr "Number必须大于0"
 
+#: hikyuu_cpp/hikyuu/trade_sys/multifactor/MultiFactorBase.cpp:513
+msgid "ir_n must be >= 1"
+msgstr "ir_n 必须大于等于 1"
+
+#: hikyuu_cpp/hikyuu/trade_sys/multifactor/MultiFactorBase.cpp:515
+msgid "ic_n must be >= 1"
+msgstr "ic_n 必须大于等于 1"
+
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:85
 msgid "Account Initial Capital"
 msgstr "帐户初始金额"
