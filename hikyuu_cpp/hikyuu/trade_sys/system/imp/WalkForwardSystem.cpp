@@ -127,7 +127,6 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, bool isMoment) {
     // m_pre_ev_valid = sys->m_pre_ev_valid;
     // m_pre_cn_valid = sys->m_pre_cn_valid;
 
-    m_sell_short_days = sys->m_sell_short_days;
     m_lastTakeProfit = sys->m_lastTakeProfit;
     m_lastShortTakeProfit = sys->m_lastShortTakeProfit;
 }
@@ -141,7 +140,6 @@ void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
     // sys->m_pre_ev_valid = m_pre_ev_valid;
     // sys->m_pre_cn_valid = m_pre_cn_valid;
 
-    sys->m_sell_short_days = m_sell_short_days;
     sys->m_lastTakeProfit = m_lastTakeProfit;
     sys->m_lastShortTakeProfit = m_lastShortTakeProfit;
 }

@@ -67,7 +67,6 @@ System::System()
   m_calculated(false),
   m_pre_ev_valid(true),  // must true
   m_pre_cn_valid(true),  // must true
-  m_sell_short_days(0),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
     initParam();
@@ -78,7 +77,6 @@ System::System(const string& name)
   m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
-  m_sell_short_days(0),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
     initParam();
@@ -101,7 +99,6 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
-  m_sell_short_days(0),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
     initParam();
@@ -213,7 +210,6 @@ void System::reset() {
     m_pre_ev_valid = m_ev ? false : true;
     m_pre_cn_valid = m_cn ? false : true;
 
-    m_sell_short_days = 0;
     m_trade_list.clear();
     m_lastTakeProfit = 0.0;
     m_lastShortTakeProfit = 0.0;
@@ -255,7 +251,6 @@ void System::forceResetAll() {
     m_pre_ev_valid = m_ev ? false : true;
     m_pre_cn_valid = m_cn ? false : true;
 
-    m_sell_short_days = 0;
     m_trade_list.clear();
     m_lastTakeProfit = 0.0;
     m_lastShortTakeProfit = 0.0;
@@ -365,7 +360,6 @@ SystemPtr System::clone() {
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
 
-    p->m_sell_short_days = m_sell_short_days;
     p->m_trade_list = m_trade_list;
     p->m_lastTakeProfit = m_lastTakeProfit;
     p->m_lastShortTakeProfit = m_lastShortTakeProfit;
@@ -613,7 +607,6 @@ TradeRecord System::_runMomentOnOpen(const KRecord& today, const KRecord& src_to
                     htr("[{}] raw today {}", name(), src_today));
     }
 
-    m_sell_short_days++;
     TradeRecord result;
 
     // Data error
@@ -1441,7 +1434,6 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
         return result;
     }
 
-    m_sell_short_days = 0;
     // The last short take-profit price is initialized to 0 when there is no short position
     if (!m_tm->haveShort(m_stock)) {
         m_lastShortTakeProfit = 0.0;
@@ -1538,7 +1530,6 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             continue;
         }
 
-        m_sell_short_days = 0;
         // The last short take-profit price is initialized to 0 when there is no short position
         if (!m_tm->haveShort(m_stock)) {
             m_lastShortTakeProfit = 0.0;
@@ -1653,7 +1644,6 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
         return result;  // The sell operation failed
     }
 
-    m_sell_short_days = 0;
     // The short take-profit ratchet only falls, so an add-on at a higher price keeps the old level;
     // 0 means the book was flat
     m_lastShortTakeProfit = m_lastShortTakeProfit == 0.0 || realPrice < m_lastShortTakeProfit
@@ -1735,7 +1725,6 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
             continue;  // The sell operation failed
         }
 
-        m_sell_short_days = 0;
         m_lastShortTakeProfit = m_lastShortTakeProfit == 0.0 || realPrice < m_lastShortTakeProfit
                                   ? realPrice
                                   : m_lastShortTakeProfit;

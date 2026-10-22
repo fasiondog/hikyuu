@@ -442,7 +442,6 @@ protected:
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_sell_short_days;          // Cleared on every short sell
     TradeRecordList m_trade_list;   // Saves the actually executed trade records
     price_t m_lastTakeProfit;       // The last long take-profit price, used to guarantee that the
                                     // take-profit price increases monotonically
@@ -485,7 +484,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
@@ -519,7 +517,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
