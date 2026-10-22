@@ -16,6 +16,7 @@
 #include <hikyuu/indicator/crt/ICIR.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/STDEV.h>
 #include <hikyuu/trade_sys/multifactor/crt/MF_ICIRWeight.h>
 
@@ -80,6 +81,26 @@ TEST_CASE("test_MF_ICIRWeight") {
         }
     }
     // HKU_INFO("{}", ind4);
+}
+
+TEST_CASE("test_MF_ICIRWeight_zero_weight") {
+    StockManager& sm = StockManager::instance();
+    Stock ref_stk = sm["sh000001"];
+    // A constant factor has no cross-section dispersion: the IC is exactly 0.0 and its rolling
+    // stdev is 0, so no day carries valid weight information and every score must be NaN
+    IndicatorList src_inds = {CVAL(CLOSE(), 1.0), CVAL(CLOSE(), 2.0)};
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(-50);
+    auto mf = MF_ICIRWeight(src_inds, stks, query, ref_stk, 3, 3);
+    size_t days_total = ref_stk.getKData(query).getDatetimeList().size();
+    const auto& all_scores = mf->getAllScores();
+    CHECK_EQ(all_scores.size(), days_total);
+    for (const auto& scores : all_scores) {
+        CHECK_EQ(scores.size(), stks.size());
+        for (const auto& rec : scores) {
+            CHECK_UNARY(std::isnan(rec.value));
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

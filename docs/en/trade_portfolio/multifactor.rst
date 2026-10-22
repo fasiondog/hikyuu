@@ -13,7 +13,7 @@ Common parameters:
     * **fill_null** *(bool|True)*: whether missing data is filled with NaN; otherwise the most recent available value is carried forward
     * **ic_n** *(int|5)*: the N-day forward return used when calculating the IC of the composed factor
     * **spearman** *(bool|True)*: use Spearman rank correlation; otherwise Pearson
-    * **mode** *(int|2)*: the sorting mode for the cross-section data: 0 descending, 1 ascending, 2 no sorting
+    * **mode** *(int|0)*: the sorting mode for the cross-section data: 0 descending, 1 ascending, 2 no sorting
     * **save_all_factors** *(bool|False)*: whether to retain all factor values; affects the get_actor/get_all_factors methods
 
 
@@ -240,14 +240,17 @@ Multi-factor Composition Algorithm Base Class
 
         Get the ICIR series of the composed factor.
 
+        An ir_n < 1, or an ic_n that resolves to < 1, returns an empty indicator with a warning.
+
         :param int ir_n: the rolling window size used to calculate the IR
-        :param int ic_n: the window used for the IC (the same as ndays in get_ic)
+        :param int ic_n: the window used for the IC (the same as ndays in get_ic); a non-positive
+            value means using the ic_n parameter of the factor
 
     .. py:method:: get_score(self, date[, start=0, end=Null])
 
-        Get all factor values on the cross-section of the specified date, already sorted in descending order; equivalent to the cross-sectional scores of the securities on that date.
+        Get all factor values on the cross-section of the specified date; the order follows the mode parameter: 0-descending, 1-ascending, 2-no sorting. Equivalent to the cross-sectional scores of the securities on that date.
 
-        :param Datetime date: the specified date
+        :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty list is returned and a warning is logged
         :param int start: the start index of the daily ranking slice
         :param int end: the end index of the daily ranking slice (exclusive)
         :param function func: a callable with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
@@ -263,9 +266,9 @@ Multi-factor Composition Algorithm Base Class
 
     .. py:method:: get_scores_np(self, date[, start=0, end=Null])
 
-        Get the cross-section of the specified date as a numpy structured array, already sorted descending. Prefer it over get_scores for the large results: one array is built for the whole cross-section instead of one Python object per record. The field names are market_code, name and score.
+        Get the cross-section of the specified date as a numpy structured array, sorted according to mode (0-descending, 1-ascending, 2-no sorting). Prefer it over get_scores for the large results: one array is built for the whole cross-section instead of one Python object per record. The field names are market_code, name and score.
 
-        :param Datetime date: the specified date
+        :param Datetime date: the specified date; if the date is not in the reference dates (e.g. a non-trading day), an empty array is returned and a warning is logged
         :param int start: the start of the daily ranking to take
         :param int end: the end of the daily ranking to take (excluded)
         :rtype: numpy.ndarray
