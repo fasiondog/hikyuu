@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
 #include <hikyuu/trade_manage/crt/TC_Zero.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
@@ -431,6 +432,54 @@ TEST_CASE("test_SYS_Simple_short_for_takeprofit_ratchet") {
     CHECK_EQ(cover_tr->datetime, Datetime(199912210000LL));
     CHECK_LT(std::fabs(cover_tr->realPrice - 25.24), 0.00001);
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+}
+
+/** @par Test points (the short take-profit is net of the fees, on the same basis as the long side)
+ */
+TEST_CASE("test_SYS_Simple_short_takeprofit_net_of_fees") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    // A level far below the market, so only the profit condition gates the cover
+    auto tp = make_shared<Iss029ScriptedTP>();
+    tp->addScript(src[open_pos + 1].datetime, 1.0);
+    tp->addScript(src[open_pos + 2].datetime, 1.0);
+
+    SYSPtr sys = makeShortSys(makeShortSG(), StoplossPtr(), ProfitGoalPtr(), tp);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_FixedA2017(0.03, 5.0), "TEST_TM"));
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->run(stk, src.getQuery());
+
+    const TradeRecordList& tr_list = sys->getTM()->getTradeList();
+    const TradeRecord* open_tr = findFirstTrade(tr_list, BUSINESS_SELL_SHORT);
+    const TradeRecord* cover_tr = findFirstTrade(tr_list, BUSINESS_BUY_SHORT);
+    REQUIRE_NE(open_tr, nullptr);
+    REQUIRE_NE(cover_tr, nullptr);
+
+    const price_t fee = open_tr->cost.total;
+    size_t gross_pos = Null<size_t>();
+    size_t net_pos = Null<size_t>();
+    for (size_t i = open_pos + 1; i < src.size(); i++) {
+        price_t gross = open_tr->number * stk.unit() * (open_tr->realPrice - src[i].closePrice);
+        if (gross_pos == Null<size_t>() && gross > 0.0) {
+            gross_pos = i;
+        }
+        if (net_pos == Null<size_t>() && gross - fee > 0.0) {
+            net_pos = i;
+        }
+    }
+    REQUIRE_NE(gross_pos, Null<size_t>());
+    REQUIRE_NE(net_pos, Null<size_t>());
+
+    /** @arg the fee window exists: the gross profit turns positive before the net one */
+    CHECK_UNARY(gross_pos != net_pos);
+
+    /** @arg the cover waits until the profit is positive after the fees */
+    CHECK_EQ(cover_tr->from, PART_TAKEPROFIT);
+    CHECK_EQ(cover_tr->datetime, src[net_pos].datetime);
 }
 
 /** @par Test points (the delayed short open stores the short-side stop-loss and quantity, ISS-029)

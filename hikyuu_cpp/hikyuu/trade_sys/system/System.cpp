@@ -829,11 +829,11 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                 size_t bars_since_open = position_pos == Null<size_t>()
                                            ? pos + 1
                                            : (pos >= position_pos ? pos - position_pos : 0);
-                // For a short position buyMoney already contains the fees, so the unrealized
-                // profit is sellMoney - cover value - buyMoney
+                // buyMoney / sellMoney are gross flows and every fee accumulates in totalCost, so
+                // the net condition must subtract the fees (same basis as the long side)
                 price_t profit = shortPosition.sellMoney -
                                  shortPosition.number * src_today.closePrice -
-                                 shortPosition.buyMoney;
+                                 shortPosition.buyMoney - shortPosition.totalCost;
                 // Cover when the current price is not lower than the take-profit price and the
                 // take-profit delay condition is met
                 if (bars_since_open >= tp_delay_n && src_current_price >= current_take_profile &&
