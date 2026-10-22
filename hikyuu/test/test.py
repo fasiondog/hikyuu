@@ -55,6 +55,7 @@ if __name__ == "__main__":
     suite.addTest(Stock.suite())
     suite.addTest(KData.suite())
     suite.addTest(Indicator.suite())
+    suite.addTest(Indicator.suiteTestIndicatorContext())
     suite.addTest(TradeCost.suite())
 
     suite.addTest(Environment.suite())

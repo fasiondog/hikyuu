@@ -135,6 +135,8 @@ public:
     virtual MomentResult runMomentOnClose(const Datetime& datetime) override;
 
     virtual void readyForRun() override;
+
+    virtual bool hasPythonPart() const override;
     virtual void _reset() override;
     virtual void _forceResetAll() override;
     virtual SystemPtr _clone() override;

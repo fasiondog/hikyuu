@@ -847,6 +847,25 @@ void MultiFactorBase::_validateCalculatedFactors() {
     }
 }
 
+bool MultiFactorBase::hasPythonPart() const noexcept {
+    if (m_is_python_object || m_factorset.hasPythonPart() || (m_norm && m_norm->isPythonObject())) {
+        return true;
+    }
+    for (const auto& item : m_special_norms) {
+        if (item.second && item.second->isPythonObject()) {
+            return true;
+        }
+    }
+    for (const auto& item : m_special_style_inds) {
+        for (const auto& ind : item.second) {
+            if (ind.hasPythonPart()) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void MultiFactorBase::calculate() {
     // Fast path: check whether it is already Ready with a lock-free acquire
     if (m_calculated.load(std::memory_order_acquire)) {

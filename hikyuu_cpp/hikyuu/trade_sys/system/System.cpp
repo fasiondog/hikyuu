@@ -309,11 +309,11 @@ void System::setTO(const KData& kdata) {
 }
 
 bool System::hasPythonPart() const {
-    if (m_is_python_object || (m_tm && m_tm->isPythonObject()) ||
-        (m_ev && m_ev->isPythonObject()) || (m_cn && m_cn->isPythonObject()) ||
-        (m_sg && m_sg->hasPythonPart()) || (m_st && m_st->isPythonObject()) ||
-        (m_tp && m_tp->isPythonObject()) || (m_mm && m_mm->isPythonObject()) ||
-        (m_pg && m_pg->isPythonObject()) || (m_sp && m_sp->isPythonObject())) {
+    if (m_is_python_object || (m_tm && m_tm->hasPythonPart()) || (m_ev && m_ev->hasPythonPart()) ||
+        (m_cn && m_cn->hasPythonPart()) || (m_sg && m_sg->hasPythonPart()) ||
+        (m_st && m_st->hasPythonPart()) || (m_tp && m_tp->hasPythonPart()) ||
+        (m_mm && m_mm->hasPythonPart()) || (m_pg && m_pg->hasPythonPart()) ||
+        (m_sp && m_sp->hasPythonPart())) {
         return true;
     }
     for (const auto& sub : getSubSystemList()) {

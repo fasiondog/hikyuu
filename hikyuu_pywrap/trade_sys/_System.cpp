@@ -397,7 +397,13 @@ Common parameters:
       .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy,
                              "The query condition")
 
-      .def_property("to", &System::getTO, &System::setTO, "The trading object KData")
+      .def_property(
+        "to", &System::getTO,
+        [](System& self, const KData& kdata) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.setTO(kdata);
+        },
+        "The trading object KData")
 
       //   .def_property("tm", &System::getTM, &System::setTM, "The associated trade manager
       //   instance")

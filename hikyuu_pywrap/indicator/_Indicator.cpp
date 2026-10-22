@@ -7,6 +7,7 @@
 
 #include <hikyuu/indicator/Indicator.h>
 #include <cstring>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -27,13 +28,6 @@ constexpr const char* indicatorValueNpField<float>() {
 
 string (Indicator::*ind_read_name)() const = &Indicator::name;
 void (Indicator::*ind_write_name)(const string&) = &Indicator::name;
-
-void (Indicator::*setContext_1)(const Stock&, const KQuery&) = &Indicator::setContext;
-void (Indicator::*setContext_2)(const KData&) = &Indicator::setContext;
-
-Indicator (Indicator::*ind_call_1)(const Indicator&) = &Indicator::operator();
-Indicator (Indicator::*ind_call_2)(const KData&) const = &Indicator::operator();
-Indicator (Indicator::*ind_call_3)() = &Indicator::operator();
 
 void (Indicator::*setIndParam1)(const string&, const Indicator&) = &Indicator::setIndParam;
 void (Indicator::*setIndParam2)(const string&, const IndParam&) = &Indicator::setIndParam;
@@ -203,8 +197,18 @@ void export_Indicator(py::module& m) {
     :param int result_idx: the specified result set
     :rtype: bool)")
 
-      .def("set_context", setContext_1)
-      .def("set_context", setContext_2, R"(set_context(self, kdata)
+      .def("set_context",
+           [](Indicator& self, const Stock& stock, const KQuery& query) {
+               ScopeGilRelease gil(!self.hasPythonPart());
+               self.setContext(stock, query);
+           })
+      .def(
+        "set_context",
+        [](Indicator& self, const KData& kdata) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.setContext(kdata);
+        },
+        R"(set_context(self, kdata)
 
     Set the context
 
@@ -223,7 +227,13 @@ set_context(self, stock, query)
 
     :rtype: KData)")
 
-      .def("extend", &Indicator::extend, R"(extend(self)
+      .def(
+        "extend",
+        [](Indicator& self) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.extend();
+        },
+        R"(extend(self)
 
     When there is a context, automatically extend the context to the current latest data and calculate)")
 
@@ -239,9 +249,21 @@ set_context(self, stock, query)
       .def("get_imp", &Indicator::getImp)
       .def("__len__", &Indicator::size)
 
-      .def("__call__", ind_call_1)
-      .def("__call__", ind_call_2)
-      .def("__call__", ind_call_3)
+      .def("__call__",
+           [](Indicator& self, const Indicator& ind) {
+               ScopeGilRelease gil(!self.hasPythonPart() && !ind.hasPythonPart());
+               return self(ind);
+           })
+      .def("__call__",
+           [](const Indicator& self, const KData& kdata) {
+               ScopeGilRelease gil(!self.hasPythonPart());
+               return self(kdata);
+           })
+      .def("__call__",
+           [](Indicator& self) {
+               ScopeGilRelease gil(!self.hasPythonPart());
+               return self();
+           })
 
       .def("__hash__", [](const Indicator& self) { return std::hash<Indicator>()(self); })
 
@@ -394,7 +416,8 @@ set_context(self, stock, query)
             py::array_t<Indicator::value_t> ret;
             ret.resize({self.size(), ret_num});  // The 2D shape: [size, ret_num]
             auto buf = ret.request();
-            auto* buffer = static_cast<Indicator::value_t*>(buf.ptr);  // Get the pointer from the array_t
+            auto* buffer =
+              static_cast<Indicator::value_t*>(buf.ptr);  // Get the pointer from the array_t
 
             std::vector<std::string> names;
             std::vector<std::string> fields;
@@ -429,7 +452,8 @@ set_context(self, stock, query)
                 }
             }
 
-            return py::array(dtype, {self.size()}, {ret_num * sizeof(Indicator::value_t)}, buf.ptr, ret);
+            return py::array(dtype, {self.size()}, {ret_num * sizeof(Indicator::value_t)}, buf.ptr,
+                             ret);
         },
         "Convert only the values to np.array, without the date column")
 

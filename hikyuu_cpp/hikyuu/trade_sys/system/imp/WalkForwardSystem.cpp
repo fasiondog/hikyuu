@@ -492,8 +492,8 @@ MomentResult WalkForwardSystem::runMomentOnClose(const Datetime& datetime) {
 }
 
 bool WalkForwardSystem::hasPythonPart() const {
-    return System::hasPythonPart() || (m_se && m_se->isPythonObject()) ||
-           (m_cur_sys && m_cur_sys->hasPythonPart());
+    return System::hasPythonPart() || (m_se && m_se->hasPythonPart()) ||
+           (m_train_tm && m_train_tm->hasPythonPart()) || (m_cur_sys && m_cur_sys->hasPythonPart());
 }
 
 TradeRecord WalkForwardSystem::sellForceOnOpen(const Datetime& date, double num, Part from) {

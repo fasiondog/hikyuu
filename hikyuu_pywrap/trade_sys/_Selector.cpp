@@ -7,6 +7,7 @@
 
 #include <hikyuu/trade_sys/selector/build_in.h>
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -292,7 +293,13 @@ void export_Selector(py::module& m) {
 
       .def("get_proto_sys_list", &SelectorBase::getProtoSystemList, py::return_value_policy::copy)
       .def("get_real_sys_list", &SelectorBase::getRealSystemList, py::return_value_policy::copy)
-      .def("calculate", &SelectorBase::calculate)
+      .def(
+        "calculate",
+        [](SelectorBase& self, const SystemList& sys_list, const KQuery& query) {
+            ScopeGilRelease gil(!self.hasPythonPart() && !sys_list_has_python_part(sys_list));
+            self.calculate(sys_list, query);
+        },
+        py::arg("sys_list"), py::arg("query"))
 
       .def("_reset", &SelectorBase::_reset, "The subclass reset operation implementation")
       .def("_calculate", &SelectorBase::_calculate,

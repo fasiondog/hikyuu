@@ -22,6 +22,10 @@ public:
     virtual void _calculate() override;
     virtual EnvironmentPtr _clone() override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_ind.hasPythonPart();
+    }
+
 private:
     Indicator m_ind;
 

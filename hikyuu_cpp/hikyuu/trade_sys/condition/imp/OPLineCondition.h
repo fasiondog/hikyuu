@@ -23,6 +23,10 @@ public:
     virtual void _calculate() override;
     virtual ConditionPtr _clone() override;
 
+    virtual bool hasPythonPart() const noexcept override {
+        return m_is_python_object || m_op.hasPythonPart();
+    }
+
 private:
     Indicator m_op;
 

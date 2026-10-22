@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_sys/condition/build_in.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -62,8 +63,13 @@ void export_Condition(py::module& m) {
                     py::overload_cast<const string&>(&ConditionBase::name),
                     py::return_value_policy::copy, "Name")
 
-      .def_property("to", &ConditionBase::getTO, &ConditionBase::setTO,
-                    "Set or get the trading object")
+      .def_property(
+        "to", &ConditionBase::getTO,
+        [](ConditionBase& self, const KData& kdata) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.setTO(kdata);
+        },
+        "Set or get the trading object")
       .def_property("tm", &ConditionBase::getTM, &ConditionBase::setTM,
                     "Set or get the trade manager account")
       .def_property("sg", &ConditionBase::getSG, &ConditionBase::setSG,

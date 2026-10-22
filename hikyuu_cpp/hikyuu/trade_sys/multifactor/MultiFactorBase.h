@@ -183,6 +183,9 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether this multi-factor, its factors, normalizers, or style indicators are Python */
+    virtual bool hasPythonPart() const noexcept;
+
     /**
      * Execute the calculation. It is calculated automatically when the result is got by default.
      *

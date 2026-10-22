@@ -13,6 +13,7 @@
 #include <pybind11/pybind11.h>
 #include <hikyuu/trade_sys/system/System.h>
 #include <hikyuu/trade_manage/TradeManagerBase.h>
+#include <hikyuu/global/sysinfo.h>
 #include "ioredirect.h"
 
 namespace hku {
@@ -30,19 +31,16 @@ inline bool sys_list_has_python_part(const vector<SystemPtr>& sys_list) {
 
 inline bool tm_list_has_python_part(const vector<TMPtr>& tm_list) {
     for (const auto& tm : tm_list) {
-        if (tm && tm->isPythonObject()) {
+        if (tm && tm->hasPythonPart()) {
             return true;
         }
     }
     return false;
 }
 
-// Keep the C++ logging off the Python streams and release the GIL for the current scope.
-// The GIL is always released: the callees may run the tasks on the pool workers, and the
-// pybind11 (>= 3.0) trampolines acquire the GIL per callback, so the calling thread holding it
-// would deadlock the workers against itself. The log streams are redirected to Python only for
-// the python-free inputs: with Python parts the worker threads may log without holding the GIL,
-// and the logs stay on the native streams.
+// Always release the GIL: the callees may run tasks on the pool workers and the pybind11 (>= 3.0)
+// trampolines re-acquire it per callback, so holding it here would deadlock them. In Jupyter the
+// C++ log streams are switched to the native ones for the python-free inputs only.
 // pybind11 types are compiled with hidden visibility, so the class holding them must be marked
 // the same way, otherwise GCC warns that it is declared with greater visibility than its fields.
 #if HKU_OS_LINUX
@@ -52,7 +50,7 @@ class ScopeGilRelease {
 #endif
 public:
     explicit ScopeGilRelease(bool python_free) {
-        if (python_free) {
+        if (python_free && pythonInJupyter()) {
             m_stream_guard = std::make_unique<OStreamToPython>(false);
         }
         m_gil_guard = std::make_unique<pybind11::gil_scoped_release>();
