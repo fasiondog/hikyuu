@@ -37,9 +37,7 @@ ScoreRecordList GroupSCFilter::_filter(const ScoreRecordList& scores, const Date
         return ret;
     }
 
-    // Calculate the number of the stocks every group should contain
     size_t total_count = scores.size();
-    size_t stocks_per_group = (total_count + group - 1) / group;  // Round up
 
     // Check whether the index is valid
     int group_index = getParam<int>("group_index");
@@ -47,9 +45,11 @@ ScoreRecordList GroupSCFilter::_filter(const ScoreRecordList& scores, const Date
         return ret;
     }
 
-    // Calculate the start and the end position of the current group
-    size_t start = group_index * stocks_per_group;
-    size_t end = std::min(start + stocks_per_group, total_count);
+    // Split the cross-section into `group` contiguous quantile segments (sizes total/group,
+    // differing by at most 1), so no group is left empty once total >= group and the trailing
+    // groups are no longer under-filled by the previous round-up-per-group scheme.
+    size_t start = total_count * group_index / group;
+    size_t end = total_count * (group_index + 1) / group;
 
     // Return an empty list when the start position is out of range
     if (start >= total_count) {
