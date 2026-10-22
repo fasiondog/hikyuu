@@ -1029,8 +1029,8 @@ TEST_CASE("test_MultiSystem_adjust_mode") {
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 }
 
-/** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value beyond
- * the period length is warned but kept, never clamped) */
+/** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value that can
+ * never reach a driven day of the period is warned but kept, never clamped) */
 TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
     MultiSystem ms("ms");
     /** @arg the default cycle is 1 */
@@ -1042,7 +1042,7 @@ TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
     ms.setAdjustCycle(-5);
     CHECK_EQ(ms.getAdjustCycle(), 1);
 
-    /** @arg a value beyond the period length is kept as is */
+    /** @arg a value that can never reach a driven day of the period is kept as is */
     ms.setAdjustMode("week");
     ms.setAdjustCycle(8);
     CHECK_EQ(ms.getAdjustCycle(), 8);

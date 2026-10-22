@@ -505,7 +505,8 @@ void MultiSystem::_warnAdjustCycleOutOfRange() const {
     to_lower(mode);
     int max_days = 0;
     if (mode == "week") {
-        max_days = 7;
+        // The week period starts on Monday: Saturday/Sunday are never driven
+        max_days = 5;
     } else if (mode == "month") {
         max_days = 31;
     } else if (mode == "quarter") {
@@ -515,8 +516,8 @@ void MultiSystem::_warnAdjustCycleOutOfRange() const {
     }
     HKU_IF_RETURN(max_days == 0 || m_adjust_cycle <= max_days, void());
     HKU_WARN(
-      "adjust_cycle {} exceeds the {} period (max {} days), that mode never rebalances! "
-      "[{}]",
+      "adjust_cycle {} can never reach a driven day of the {} period (max {} calendar days), "
+      "that mode never rebalances! [{}]",
       m_adjust_cycle, mode, max_days, name());
 }
 
@@ -665,8 +666,8 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
                 !m_external_delegate_warned) {
                 m_external_delegate_warned = true;
                 HKU_WARN(
-                  "The nested mode B {} has no SE/AF to consume the delegated quota, fall "
-                  "back to the direct pro rata reduction!",
+                  "The nested mode B {} has no AF to consume the delegated quota, fall back to "
+                  "the direct pro rata reduction!",
                   inner->name());
             }
             if (quota > 0.0 && reduce_base > quota) {
@@ -2649,9 +2650,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         SystemPtr sys = m_sys_list[i];
         const bool is_selected = (selected.count(sys.get()) > 0);
         if (m_se && is_adjust && (!is_selected || liquidated.count(sys.get()) > 0)) {
-            // The unselected sub-system: it has been liquidated (executed immediately) when the
-            // quota was calibrated; in the legacy flow (no SE) the liquidation suggestion is
-            // generated here
+            // The unselected sub-system: it has already been liquidated (executed immediately) when
+            // the quota was calibrated; without a quota pre-calculation (e.g. no AF) the
+            // liquidation suggestion is generated here
             if (m_sell_at_not_selected) {
                 if (!quota_calibrated) {
                     std::set<Stock> stocks;
@@ -2788,9 +2789,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             }
         }
     } else {
-        // No SE (or no quota pre-calculation): keep the suggestion-driven legacy flow, L1 runs
-        // here and the next-period quota is written back on the rebalancing day (lagging one
-        // period behind, quota penetration).
+        // No quota pre-calculation (no AF, or the SE selected nobody): keep the suggestion-driven
+        // legacy flow, L1 runs here and the next-period quota is written back on the rebalancing
+        // day (lagging one period behind, quota penetration).
         getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery(), getMode());
         // A zero quota takes the sub-system out of the allocation: liquidate both books and drop
         // its same-close fills from the mirror batch (the sub ledger is cleared as a whole, so

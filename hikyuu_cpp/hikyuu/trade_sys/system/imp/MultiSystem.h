@@ -203,9 +203,13 @@ public:
     }
 
     /** Set the rebalancing cycle: in query/day mode the close-day interval (1 = every close day);
-     *  in the period modes (week/month/quarter/year) the n-th calendar day within the period. A
-     *  value <=0 is warned and treated as 1; a value beyond the period length is warned but kept
-     *  (no clamping), and that mode then never rebalances. */
+     *  in the period modes (week/month/quarter/year) the n-th calendar day within the period (the
+     *  week starts on Monday, so only 1..5 can reach a driven day). A value <=0 is warned and
+     *  treated as 1; a value that can never reach a driven day of the period (week >5, month >31,
+     *  quarter >92, year >366) is warned but kept (no clamping), and that mode then never
+     *  rebalances. A value near the period end may still skip a period when the target day is not
+     *  traded (the whole target is computed from the current period start, it never drifts into the
+     *  next period). */
     void setAdjustCycle(int cycle);
 
     /** Get the rebalancing cycle (days) */
@@ -399,8 +403,8 @@ private:
      * the first driven day of the period when delay_to_trading_day is on (once per period) */
     bool _isAdjustDateByPeriod(const Datetime& date, const Datetime& last_period) const;
 
-    /** Warn when m_adjust_cycle exceeds the length of the current adjust-mode period
-     *  (week 7 / month 31 / quarter 92 / year 366 days); the value is kept, not clamped */
+    /** Warn when m_adjust_cycle can never reach a driven day of the current adjust-mode period
+     *  (week 5 / month 31 / quarter 92 / year 366 calendar days); the value is kept, not clamped */
     void _warnAdjustCycleOutOfRange() const;
 
     /** Build the rebalancing-day list on the given driving axis and merge it into m_cycle_dates,
