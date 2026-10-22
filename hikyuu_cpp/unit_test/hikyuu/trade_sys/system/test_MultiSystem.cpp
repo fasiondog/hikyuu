@@ -2468,6 +2468,36 @@ TEST_CASE("test_MultiSystem_mode_b_unselected_books_match") {
     CHECK_EQ(sub_pos, doctest::Approx(parent_pos));
 }
 
+/** @par Check point: mode B without an SE treats every sub-system as selected (the A/C convention)
+ * -- the quota is allocated and the zero-cash shadow account is funded, instead of an empty run */
+TEST_CASE("test_MultiSystem_mode_b_without_se") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_no_se");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setAF(AF_EqualWeight());
+    auto sys = create_alway_buy_sys();
+    sys->setTO(k);
+    ms->add(sys);
+    ms->run(k);
+
+    /** @arg the shadow account has been funded and the parent mirrors the buy (no empty run) */
+    CHECK_GT(sys->getTM()->getFunds(k.back().datetime, query.kType()).net_assets(), 0.0);
+    size_t parent_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            parent_buys++;
+        }
+    }
+    CHECK_GT(parent_buys, 0);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
 /** @par Check point: mode B with the default deferred trading -- the fill of the open on the drop
  * day is still mirrored, so the two books stay matched */
 TEST_CASE("test_MultiSystem_mode_b_unselected_deferred_fill") {

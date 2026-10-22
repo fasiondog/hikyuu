@@ -654,7 +654,7 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     price_t reduce_base = m_trade_on_close ? sub_total : (sub_total - funds.cash);
     if (sys->isComposite()) {
         auto* inner = dynamic_cast<MultiSystem*>(sys.get());
-        const bool delegatable = inner && inner->getMode() == "B" && inner->m_se && inner->getAF();
+        const bool delegatable = inner && inner->getMode() == "B" && inner->getAF();
         if (delegatable && quota > 0.0) {
             // The inner manages its own leaf ledgers: delegate the budget and let it reduce its
             // leaves (the FOF/MOM semantics, both book levels stay matched)
@@ -2414,6 +2414,16 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         return _closePhaseModeA(datetime, is_adjust, selected, se_scores, ktype, assets_before);
     }
 
+    // Mode B without an SE: every sub-system is treated as selected (the mode A/C convention).
+    // Otherwise no quota would ever be allocated and the zero-cash shadow accounts would stay
+    // empty for the whole run (an empty backtest)
+    const bool select_all = (getMode() == "B" && !m_se);
+    if (is_adjust && select_all) {
+        for (auto& sys : m_sys_list) {
+            selected.insert(sys.get());
+        }
+    }
+
     // Mode B (master SimplePortfolio compatibility): on the rebalancing day the quota must be
     // allocated BEFORE driving the sub-systems, so every selected sub-system trades with its exact
     // allocated quota (the master AF adjusted the funds first and ran the systems afterwards)
@@ -2426,7 +2436,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     // only by the quota injection, so a context still holding value at the calibration time was
     // funded in a previous period, i.e. it is a running sub-system
     std::set<System*> running_subs;
-    if (is_adjust && getMode() == "B" && m_se && getAF()) {
+    if (is_adjust && getMode() == "B" && getAF()) {
         // adjust_running_sys=false: the running sub-systems keep their current holdings on the
         // rebalancing day; only the new sub-systems get the remaining parent cash (the master
         // _adjust_without_running semantics)
@@ -2497,7 +2507,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     // The injections are re-derived from this round's quotas: drop the stale targets of earlier
     // rounds (a lowered quota must not be re-inflated). This also runs when the SE selected nobody
     // (quota_calibrated is false in that case), so a stale target cannot survive a full clear.
-    if (is_adjust && m_se && !m_trade_on_close) {
+    if (is_adjust && (m_se || select_all) && !m_trade_on_close) {
         m_pending_calibration.erase(
           std::remove_if(
             m_pending_calibration.begin(), m_pending_calibration.end(),
