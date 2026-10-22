@@ -78,6 +78,42 @@ TEST_CASE("test_NormQuantile_zero_dispersion") {
 }
 
 /** @par Test points */
+TEST_CASE("test_NormQuantile_quantile_boundary") {
+    /** @arg (0, 1) is accepted and means no truncation: all ranks stay strictly increasing */
+    PriceList src = {1.0, 2.0, 3.0, 4.0, 100.0};
+    PriceList ret = NORM_Quantile(0.0, 1.0)->normalize(src);
+    REQUIRE_EQ(ret.size(), src.size());
+    for (size_t i = 1; i < ret.size(); ++i) {
+        CHECK_LT(ret[i - 1], ret[i]);
+    }
+
+    /** @arg a bounded range clamps the upper tail into ties, different from the no-truncation
+     * result */
+    PriceList clamped = NORM_Quantile(0.0, 0.5)->normalize(src);
+    REQUIRE_EQ(clamped.size(), src.size());
+    CHECK(clamped[2] == doctest::Approx(clamped[4]));
+    CHECK(clamped[3] == doctest::Approx(clamped[4]));
+
+    /** @arg the uniform variant accepts the same open boundaries, all ranks stay strictly
+     * increasing */
+    PriceList uni = NORM_Quantile_Uniform(0.0, 1.0)->normalize(src);
+    REQUIRE_EQ(uni.size(), src.size());
+    for (size_t i = 1; i < uni.size(); ++i) {
+        CHECK_LT(uni[i - 1], uni[i]);
+    }
+
+    /** @arg out-of-range boundaries are rejected */
+    CHECK_THROWS_AS(NORM_Quantile(-0.1, 1.0), std::exception);
+    CHECK_THROWS_AS(NORM_Quantile(0.0, 1.1), std::exception);
+    CHECK_THROWS_AS(NORM_Quantile_Uniform(-0.1, 1.0), std::exception);
+    CHECK_THROWS_AS(NORM_Quantile_Uniform(0.0, 1.1), std::exception);
+
+    /** @arg an inverted (equal) boundary is still rejected */
+    CHECK_THROWS_AS(NORM_Quantile(0.5, 0.5), std::exception);
+    CHECK_THROWS_AS(NORM_Quantile_Uniform(0.5, 0.5), std::exception);
+}
+
+/** @par Test points */
 TEST_CASE("test_NormQuantileUniform_nan_preserved") {
     NormPtr norm = NORM_Quantile_Uniform();
 
