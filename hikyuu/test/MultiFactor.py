@@ -9,10 +9,29 @@
 #          exactly once per candidate and exceptions raised inside it propagate.
 # ===============================================================================
 
+import math
 import threading
 import unittest
 
 from test_init import *
+
+
+def _finite(x):
+    return not (math.isnan(x) or math.isinf(x))
+
+
+def _mean_corr(xs, ys):
+    """Return (corr, mean_x, count) over the pairs whose two sides are both finite."""
+    pairs = [(x, y) for x, y in zip(xs, ys) if _finite(x) and _finite(y)]
+    n = len(pairs)
+    if n == 0:
+        return float('nan'), float('nan'), 0
+    mx = sum(p[0] for p in pairs) / n
+    my = sum(p[1] for p in pairs) / n
+    cov = sum((p[0] - mx) * (p[1] - my) for p in pairs)
+    vx = sum((p[0] - mx) ** 2 for p in pairs)
+    vy = sum((p[1] - my) ** 2 for p in pairs)
+    return cov / math.sqrt(vx * vy), mx, n
 
 
 class MultiFactorTest(unittest.TestCase):
@@ -166,6 +185,96 @@ class MultiFactorTest(unittest.TestCase):
         self.assertFalse(t.is_alive(), "get_scores deadlocked with a Python custom normalizer")
         self.assertIn('scores', holder, getattr(holder.get('error'), 'args', None))
         self.assertGreater(len(holder['scores']), 0)
+
+    def test_python_special_normalizer_getters_no_deadlock(self):
+        # A Python special normalizer triggers the same GIL hazard as the global one: every getter
+        # that normalizes internally must run serially on the caller thread instead of blocking on
+        # pool workers.
+        stks = [sm['sh000001'], sm['sz000001']]
+        query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)
+        mf = MF_EqualWeight([MA(CLOSE(), n=5)], stks, query, stks[0])
+        mf.set_param('save_all_factors', True)
+
+        class PyNorm(NormalizeBase):
+            def __init__(self):
+                super().__init__('PyNorm')
+
+            def _clone(self):
+                return PyNorm()
+
+            def normalize(self, data):
+                return data
+
+        mf.add_special_normalize('MA', PyNorm())
+
+        holder = {}
+
+        def run():
+            try:
+                holder['src'] = mf.get_all_src_factors()
+                holder['factor'] = mf.get_factor(stks[0])
+                holder['all'] = mf.get_all_factors()
+                holder['ic'] = mf.get_ic(3)
+                holder['icir'] = mf.get_icir(3)
+            except Exception as e:  # pragma: no cover
+                holder['error'] = e
+
+        t = threading.Thread(target=run)
+        t.start()
+        t.join(timeout=20)
+        self.assertFalse(t.is_alive(), "getters deadlocked with a Python special normalizer")
+        self.assertIn('icir', holder, getattr(holder.get('error'), 'args', None))
+
+    def test_industry_neutralize_removes_block_mean(self):
+        # Industry neutralization removes the block mean of every cross-section, so the residuals
+        # of the stocks sharing one industry block must sum to zero (and are not all zero, i.e. the
+        # group mean is really removed instead of the values being nulled).
+        query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)
+        banks = [sm['sh600000'], sm['sz000001']]  # both belong to the same bank block
+        mf = MF_EqualWeight([MA(CLOSE(), n=5)], banks, query, sm['sh000001'])
+        mf.add_special_normalize('MA', category='行业板块')
+
+        dates = mf.get_datetime_list()
+        self.assertGreater(len(dates), 0)
+        src = mf.get_all_src_factors()
+
+        checked = 0
+        for di in range(len(dates)):
+            vals = [src[i][0][di] for i in range(len(banks))]
+            if not all(_finite(v) for v in vals):
+                continue
+            self.assertAlmostEqual(sum(vals), 0.0, delta=1e-9)
+            self.assertGreater(abs(vals[0]), 1e-6)
+            checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_style_neutralize_residual_is_orthogonal(self):
+        # Style neutralization regresses the factor on the given style factors with an intercept, so
+        # the residual must be orthogonal to the style factor (zero correlation) and, because of the
+        # intercept, its mean over the valid stocks must be zero.
+        query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)
+        stks = [sm['sh600000'], sm['sz000001'], sm['sh600004'], sm['sz000004'],
+                sm['sz000005'], sm['sz000002'], sm['sh600005']]
+        style = LOG(CLOSE() * LIUTONGPAN())
+        mf = MF_EqualWeight([MA(CLOSE(), n=5)], stks, query, sm['sh000001'])
+        mf.add_special_normalize('MA', style_inds=[style])
+
+        dates = mf.get_datetime_list()
+        self.assertGreater(len(dates), 0)
+        src = mf.get_all_src_factors()
+        aligned = [ALIGN(style, dates)(s.get_kdata(query)) for s in stks]
+
+        checked = 0
+        for di in range(len(dates)):
+            vals = [src[i][0][di] for i in range(len(stks))]
+            style_vals = [aligned[i][di] for i in range(len(stks))]
+            corr, mean, n = _mean_corr(vals, style_vals)
+            if n <= 2:  # not enough valid data points for a regression
+                continue
+            self.assertAlmostEqual(mean, 0.0, delta=1e-9)
+            self.assertAlmostEqual(corr, 0.0, delta=1e-8)
+            checked += 1
+        self.assertGreater(checked, 0)
 
 
 def suite():
