@@ -30,7 +30,7 @@ For selectors based on multi-factor scoring, SE_MultiFactor2 is recommended, as 
 
     # For an SE_MultiFactor2 instance, set the filter chain: score is not NaN | split into 10 groups and keep group 0 |
     # price is at least 10 yuan | turnover amount is not in the bottom 20% of the daily ranking | keep the top 10
-    se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
+    se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)|SCFilter_Price(
             10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
 
 
