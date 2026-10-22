@@ -18,6 +18,8 @@
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/system/imp/MultiSystem.h>
+#include <hikyuu/trade_sys/system/imp/WalkForwardSystem.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
@@ -136,6 +138,19 @@ public:
 
     virtual bool hasPythonPart() const override {
         return true;
+    }
+};
+
+// A selector reporting a Python callback; the walk-forward aggregate drives it outside the
+// sub-system list, so the sub-system recursion cannot see it
+class PythonAwareSE : public OptimalSelectorBase {
+public:
+    PythonAwareSE() : OptimalSelectorBase("PythonAwareSE") {
+        m_is_python_object = true;
+    }
+
+    virtual SelectorPtr _clone() override {
+        return std::make_shared<PythonAwareSE>();
     }
 };
 
@@ -486,6 +501,15 @@ TEST_CASE("test_System_hasPythonPart_recurses_into_subsystems") {
     /** @arg an aggregate of C++ systems only still reports none */
     auto clean = std::make_shared<MultiSystem>(SystemList{SYS_Simple(), SYS_Simple()}, "CLEAN");
     CHECK_UNARY_FALSE(clean->hasPythonPart());
+
+    /** @arg the walk-forward form also reports its selector and driven candidate */
+    auto candidate = SYS_Simple();
+    candidate->setTM(crtTM());
+    candidate->setMM(MM_FixedCount(100));
+    candidate->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    auto fw = std::make_shared<WalkForwardSystem>(SystemList{candidate},
+                                                  std::make_shared<PythonAwareSE>(), crtTM());
+    CHECK_UNARY(fw->hasPythonPart());
 }
 
 /** @} */

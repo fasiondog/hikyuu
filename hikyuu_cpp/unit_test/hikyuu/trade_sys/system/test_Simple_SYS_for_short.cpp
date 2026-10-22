@@ -160,6 +160,20 @@ public:
     }
 };
 
+// Exposes the short take-profit ratchet for state assertions
+class RatchetProbeSYS : public System {
+public:
+    RatchetProbeSYS() : System("RatchetProbeSYS") {}
+
+    price_t shortRatchet() const {
+        return m_lastShortTakeProfit;
+    }
+
+    void setShortRatchet(price_t value) {
+        m_lastShortTakeProfit = value;
+    }
+};
+
 // A take-profit whose short-side price is scripted per date; unlisted dates return 30.0
 class Iss029ScriptedTP : public StoplossBase {
 public:
@@ -391,6 +405,75 @@ TEST_CASE("test_SYS_Simple_short_for_profitgoal") {
     CHECK_EQ(cover_tr->datetime, src[expect_pos].datetime);
     CHECK_LE(src[expect_pos].closePrice, open_tr->goalPrice);
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+}
+
+/** @par Test points (a forced flatten clears the short take-profit ratchet once the book is flat)
+ */
+TEST_CASE("test_System_sellForce_resets_short_tp_ratchet") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    auto sys = std::make_shared<RatchetProbeSYS>();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(makeShortSG());
+    sys->setMM(MM_FixedCount(100));
+    sys->setTO(src);
+    sys->readyForRun();
+
+    sys->runMoment(OPEN_DATE);
+    REQUIRE_UNARY(sys->getTM()->haveShort(stk));
+    CHECK_GT(sys->shortRatchet(), 0.0);
+
+    TradeRecord tr = sys->sellForceOnClose(src[open_pos + 1].datetime, MAX_DOUBLE, PART_PORTFOLIO);
+    REQUIRE_EQ(tr.business, BUSINESS_BUY_SHORT);
+    CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+
+    /** @arg the ratchet is cleared together with the covered short book */
+    CHECK_EQ(sys->shortRatchet(), 0.0);
+}
+
+/** @par Test points (a zero short ratchet marks a flat book and must not clamp the take-profit
+ *  level down to zero) */
+TEST_CASE("test_System_short_tp_zero_ratchet_does_not_clamp") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KData src = getQueryData(stk);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+    const Datetime next = src[open_pos + 1].datetime;
+
+    auto tp = make_shared<Iss029ScriptedTP>();
+    tp->addScript(next, 30.0);  // above the price, so that bar has no take-profit
+
+    auto sys = std::make_shared<RatchetProbeSYS>();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setParam<int>("tp_delay_n", 1);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(makeShortSG());
+    sys->setMM(MM_FixedCount(100));
+    sys->setTP(tp);
+    sys->setTO(src);
+    sys->readyForRun();
+
+    sys->runMoment(OPEN_DATE);
+    REQUIRE_UNARY(sys->getTM()->haveShort(stk));
+
+    // A ratchet of zero while the book is open (a reset that kept the account, e.g. shared_tm)
+    sys->setShortRatchet(0.0);
+    sys->runMoment(next);
+
+    /** @arg the scripted level is taken as is instead of being clamped to zero */
+    CHECK_UNARY(sys->getTM()->haveShort(stk));
+    CHECK_EQ(sys->shortRatchet(), 30.0);
 }
 
 /** @par Test points (the short-side goal sentinels: 0 never covers, the current price covers at

@@ -821,8 +821,9 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
             price_t current_take_profile =
               _getShortTakeProfitPrice(today, src_today, today.closePrice);
             if (current_take_profile != 0.0) {
-                // The short take-profit level only lowers and is never raised
-                if (getParam<bool>("tp_monotonic") &&
+                // The short take-profit level only falls and is never raised; a zero ratchet means
+                // the book was flat, so it must not clamp the new level down to 0
+                if (getParam<bool>("tp_monotonic") && m_lastShortTakeProfit > 0.0 &&
                     current_take_profile > m_lastShortTakeProfit) {
                     current_take_profile = m_lastShortTakeProfit;
                 } else {
@@ -1147,9 +1148,13 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record, "[{}] {}: {} by {}", name(),
                        htr("Failed force sell"), num, getSystemPartName(from));
 
-    // The last take-profit price is initialized to 0 when there is no position
+    // The take-profit ratchet is initialized to 0 when its book is flat; the forced flattening
+    // covers whichever side the account holds, so both sides are reset here
     if (!m_tm->have(m_stock)) {
         m_lastTakeProfit = 0.0;
+    }
+    if (!m_tm->haveShort(m_stock)) {
+        m_lastShortTakeProfit = 0.0;
     }
 
     m_trade_list.push_back(record);

@@ -491,6 +491,11 @@ MomentResult WalkForwardSystem::runMomentOnClose(const Datetime& datetime) {
     return driveMoment(datetime, false, true);
 }
 
+bool WalkForwardSystem::hasPythonPart() const {
+    return System::hasPythonPart() || (m_se && m_se->isPythonObject()) ||
+           (m_cur_sys && m_cur_sys->hasPythonPart());
+}
+
 TradeRecord WalkForwardSystem::sellForceOnOpen(const Datetime& date, double num, Part from) {
     TradeRecord ret;
     if (m_cur_sys) {
