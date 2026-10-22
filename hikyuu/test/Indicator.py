@@ -589,3 +589,27 @@ class TestIndicatorContext(unittest.TestCase):
 
 def suiteTestIndicatorContext():
     return unittest.TestLoader().loadTestsFromTestCase(TestIndicatorContext)
+
+
+class TestConcatToDf(unittest.TestCase):
+    def test_concat_to_df(self):
+        query = Query(-100)
+        k_list = [stk.get_kdata(query) for stk in [sm['sh000001'], sm['sz000001']]]
+        ma_list = [MA(CLOSE(k)) for k in k_list]
+        dates = sm.get_trading_calendar(query)
+        df = concat_to_df(dates, ma_list)
+        self.assertEqual(list(df.columns), ['datetime', 'SH000001', 'SZ000001'])
+        self.assertEqual(len(df), len(dates))
+        self.assertTrue(df['SH000001'].notna().any())
+
+    def test_concat_to_df_empty_and_head_ind_name(self):
+        query = Query(-20)
+        dates = sm.get_trading_calendar(query)
+        self.assertEqual(list(concat_to_df(dates, []).columns), ['datetime'])
+        ma = MA(CLOSE(sm['sh000001'].get_kdata(query)))
+        df = concat_to_df(dates, [ma], head_stock_code=False, head_ind_name=True)
+        self.assertEqual(list(df.columns), ['datetime', 'MA0'])
+
+
+def suiteTestConcatToDf():
+    return unittest.TestLoader().loadTestsFromTestCase(TestConcatToDf)

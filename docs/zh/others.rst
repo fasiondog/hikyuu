@@ -78,7 +78,7 @@
         df = concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
         df
 
-                date	SZ000001	SZ000002
+                datetime	SZ000001	SZ000002
         0	2023-05-12 00:00:00	12.620000	15.060000
         1	2023-05-15 00:00:00	12.725000	15.060000
         2	2023-05-16 00:00:00	12.690000	15.010000

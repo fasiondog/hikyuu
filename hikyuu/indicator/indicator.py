@@ -52,7 +52,7 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
         concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
 
     Output:
-                date	SZ000001	SZ000002
+                datetime	SZ000001	SZ000002
         0	2023-05-12 00:00:00	12.620000	15.060000
         1	2023-05-15 00:00:00	12.725000	15.060000
         2	2023-05-16 00:00:00	12.690000	15.010000
@@ -65,7 +65,7 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
         198	2024-03-06 00:00:00	10.070455	9.776818
         199	2024-03-07 00:00:00	10.101364	9.738182
     """
-    df = dates.to_df('ms')
+    df = dates.to_df()
     if not ind_list:
         return df
     for i in range(len(ind_list)):
@@ -76,8 +76,8 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
             name = f'{ind.name}{i}'
         else:
             name = ind.get_context().get_stock().market_code
-        df = pd.merge(df, ind.to_df()[['datetime', 'value1']].rename(
-            columns={'value1': name}), on='datetime', how='left')
+        df = pd.merge(df, ind.to_df()[['datetime', 'value0']].rename(
+            columns={'value0': name}), on='datetime', how='left')
     return df
 
 
