@@ -1846,7 +1846,7 @@ static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
                                   const char* side) {
     if (!std::isfinite(price) || price <= 0.0) {
         HKU_DEBUG("[{}] invalid slippage {} price({}), fallback to the plan price({})", sys_name,
-                 side, price, planPrice);
+                  side, price, planPrice);
         price = planPrice;
     } else {
         // The model price is snapped to the market's minimum price tick; the plan price and the bar
@@ -1855,7 +1855,7 @@ static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
     }
     if (src_today.isValid() && (price < src_today.lowPrice || price > src_today.highPrice)) {
         HKU_DEBUG("[{}] slippage {} price({}) is out of the bar range [{}, {}], clamp it", sys_name,
-                 side, price, src_today.lowPrice, src_today.highPrice);
+                  side, price, src_today.lowPrice, src_today.highPrice);
         price = std::min(std::max(price, src_today.lowPrice), src_today.highPrice);
     }
     return price;

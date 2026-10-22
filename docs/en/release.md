@@ -85,6 +85,16 @@ The money management base-class common parameters `auto-checkin` → `auto_check
 * Only these two common parameters are affected, the per-strategy parameter names are unchanged;
 * Examples: `mm.set_param("auto_checkin", True)`, `mm.get_param("max_stock")`.
 
+**⚠️ Breaking change: same-day signal merging and the single-direction rule**
+
+Multiple signal inputs on the same date are merged into one net value: a positive net keeps only the buy signal, a negative net only the sell signal (the opposite record of that date is removed), and a net of about zero leaves no signal on that date; with `alternate=true`, a same-day record that already points in the same direction is only refreshed with the net value, not treated as a new entry. The new Python bindings `get_value` / `get_buy_value` / `get_sell_value` expose the signal values.
+
+**⚠️ Breaking change: the indicator parameter `out-extreme` renamed to `out_extreme`**
+
+`ZSCORE` / `NORM_Zscore` and the other indicators/normalizers using `out_extreme` follow the lowercase-underscore style, and `set_param` with the old hyphenated name raises an exception.
+
+**⚠️ Archive format changes**: `SignalBase` adds the cycle start/end and cycle-date fields, and the operator signals no longer serialize the base class twice, so old `SG_*` archives (and systems embedding `m_sg`) must be re-saved; hyphenated parameter keys in old archives (`auto-checkin` / `max-stock` / `out-extreme`) are not migrated automatically and fall back to the defaults after deserialization, call `set_param` explicitly to restore them.
+
 **🚀 New Features**
 
 * feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)
@@ -105,6 +115,8 @@ The money management base-class common parameters `auto-checkin` → `auto_check
 * fix(trade_sys): PG_FixedPercent now computes the average cost as buyMoney / totalNumber, so a partial sell no longer inflates the goal price and disables the take-profit; the goal price is rounded to the stock price precision (up for a long, down for a short, after sanitizing the float noise) instead of returning an intransactable price; implement the short goal; return no goal instead of dereferencing a null trade manager
 * fix(trade_sys): PG_FixedHoldDays now counts the held trading days of the traded object itself with a day table built at setTO, replacing the per-bar daily driver query (O(n²) over a run, with locks and IO) by two binary searches; it no longer fails silently when the stock has no daily data
 * fix(trade_sys): ProfitGoalBase::clone no longer carries the traded object, so a clone always re-calculates at setTO (a pre-computing custom subclass used to stay silently stale on the clone); the "no short goal" sentinel of _get_short_goal is unified to constant.null_price, matching the long side
+* fix(signal): same-day signal inputs are merged into one net value with a single direction per date: a zero net no longer leaves a stale signal behind (previously `shouldBuy`/`shouldSell` could both hold), and with `alternate=true` a repeated same-day write refreshes the value instead of dropping it
+* fix(KData): `operator==` / Python `==` now also compares the last record when the stock, query and size match, so a revised or appended realtime tail of a right-open query can trigger the downstream cache recomputation (still not a full element-wise comparison)
 
 ## 2.8.3 - October 1, 2026
 

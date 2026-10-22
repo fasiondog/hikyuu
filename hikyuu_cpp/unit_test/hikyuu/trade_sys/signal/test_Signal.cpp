@@ -205,13 +205,15 @@ TEST_CASE("test_Signal") {
         p->_addSellSignal(Datetime(200201020000));
         CHECK_UNARY(p->shouldSell(Datetime(200201020000)));
 
-        /** @arg Insert a buy date that already has a sell indication */
+        /** @arg A buy that nets the day to zero drops the sell record too */
         p->reset();
         p->setParam<bool>("alternate", false);
         p->_addSellSignal(Datetime(200202010000));
         REQUIRE(p->shouldSell(Datetime(200202010000)));
         p->_addBuySignal(Datetime(200202010000));
         CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
+        CHECK_UNARY(!p->shouldSell(Datetime(200202010000)));
+        CHECK_EQ(p->getValue(Datetime(200202010000)), 0.0);
 
         p->reset();
         p->setParam<bool>("alternate", true);
@@ -220,21 +222,24 @@ TEST_CASE("test_Signal") {
         REQUIRE(p->shouldSell(Datetime(200202010000)));
         p->_addBuySignal(Datetime(200202010000));
         CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
+        CHECK_UNARY(!p->shouldSell(Datetime(200202010000)));
 
-        /** @arg Insert a sell date that already has a buy indication */
+        /** @arg A sell that nets the day to zero drops the buy record too */
         p->reset();
         p->setParam<bool>("alternate", false);
         p->_addBuySignal(Datetime(200202010000));
         p->_addSellSignal(Datetime(200202010000));
-        CHECK_UNARY(p->shouldBuy(Datetime(200202010000)));
+        CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
         CHECK_UNARY(!p->shouldSell(Datetime(200202010000)));
+        CHECK_EQ(p->getValue(Datetime(200202010000)), 0.0);
 
         p->reset();
         p->setParam<bool>("alternate", true);
         p->_addBuySignal(Datetime(200202010000));
         p->_addSellSignal(Datetime(200202010000));
-        CHECK_UNARY(p->shouldBuy(Datetime(200202010000)));
+        CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
         CHECK_UNARY(!p->shouldSell(Datetime(200202010000)));
+        CHECK_EQ(p->getValue(Datetime(200202010000)), 0.0);
     }
 
     SUBCASE("Short sell") {
@@ -294,6 +299,32 @@ TEST_CASE("test_Signal_same_bar_single_direction") {
     CHECK_UNARY(p->shouldBuy(d));
     CHECK_UNARY(!p->shouldSell(d));
     CHECK_EQ(p->getValue(d), 2.0);
+
+    /** @arg a zero net leaves no signal on that day in both alternation modes */
+    for (bool alternate : {false, true}) {
+        p->reset();
+        p->setParam<bool>("alternate", alternate);
+        p->setParam<bool>("support_borrow_stock", false);
+        p->_addBuySignal(d, 1.0);
+        p->_addSellSignal(d, -1.0);
+        CHECK_UNARY(!p->shouldBuy(d));
+        CHECK_UNARY(!p->shouldSell(d));
+        CHECK_EQ(p->getValue(d), 0.0);
+    }
+
+    /** @arg the alternate state does not drop a same-day value refresh */
+    p->reset();
+    p->setParam<bool>("alternate", true);
+    p->_addBuySignal(d, 2.0);
+    p->_addBuySignal(d, 1.0);
+    CHECK_EQ(p->getBuyValue(d), 3.0);
+
+    p->reset();
+    p->_addBuySignal(d, 2.0);
+    p->_addSellSignal(d, -1.0);
+    CHECK_UNARY(p->shouldBuy(d));
+    CHECK_UNARY(!p->shouldSell(d));
+    CHECK_EQ(p->getBuyValue(d), 1.0);
 }
 
 /** @par Test points */

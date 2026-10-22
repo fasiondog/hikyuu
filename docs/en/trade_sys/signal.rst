@@ -390,8 +390,9 @@ Signal Generator Base Class
 
         Multiple inputs on the same date are merged into one net value: a positive net keeps only
         the buy signal, a negative net keeps only the sell signal (the existing opposite record of
-        that date is dropped), and a net of about zero adds no signal. ``_add_buy_signal`` and
-        ``_add_sell_signal`` follow the same merge rule.
+        that date is dropped), and a net of about zero leaves no signal on that date (the records
+        already written for it are removed). ``_add_buy_signal`` and ``_add_sell_signal`` follow
+        the same merge rule.
 
         :param Datetime datetime: the datetime of the signal
         :param float value: the signal value; positive for a buy intent, negative for a sell intent
@@ -402,7 +403,8 @@ Signal Generator Base Class
 
         The value is merged with the same-date signals into one net value: while the net stays
         positive the buy signal is recorded; when it turns negative no buy signal is recorded for
-        that date and the existing sell record is updated to the net.
+        that date and the existing sell record is updated to the net; a net of about zero removes
+        both records of that date.
 
         :param Datetime datetime: the datetime of the buy signal
         :param float value: the signal value, defaults to 1.0
@@ -413,7 +415,8 @@ Signal Generator Base Class
 
         The value is merged with the same-date signals into one net value: while the net stays
         negative the sell signal is recorded; when it turns positive no sell signal is recorded
-        for that date and the existing buy record is updated to the net.
+        for that date and the existing buy record is updated to the net; a net of about zero
+        removes both records of that date.
 
         :param Datetime datetime: the datetime of the sell signal
         :param float value: the signal value, defaults to -1.0

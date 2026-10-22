@@ -168,7 +168,8 @@ The custom signal generator interfaces:
 
     The signals of the same date are merged into one net value: a positive net keeps only the buy
     signal, a negative net keeps only the sell signal (the opposite record of that date is
-    dropped), and a net of about zero adds no signal.
+    dropped), and a net of about zero leaves no signal on that date (the records already written
+    for it are removed).
 
     :param Datetime datetime: the date the signal occurs
     :param float value: the signal value, positive for a buy intent, negative for a sell intent)")
@@ -182,7 +183,8 @@ The custom signal generator interfaces:
     :param Datetime datetime: the date indicating buying
     :param float value: the signal value, must be greater than 0; it is merged with the same-date
                         signals into one net value, so an existing sell signal of the same date is
-                        included and only the net direction is kept)")
+                        included and only the net direction is kept (a net of about zero drops the
+                        records of that date))")
 
       .def("_add_sell_signal", &SignalBase::_addSellSignal, py::arg("datetime"),
            py::arg("value") = -1.0,
@@ -193,7 +195,8 @@ The custom signal generator interfaces:
     :param Datetime datetime: the date indicating selling
     :param float value: the signal value, must be less than 0; it is merged with the same-date
                         signals into one net value, so an existing buy signal of the same date is
-                        included and only the net direction is kept)")
+                        included and only the net direction is kept (a net of about zero drops the
+                        records of that date))")
 
       .def("reset", &SignalBase::reset, "The reset operation")
       .def("clone", &SignalBase::clone, "The clone operation")

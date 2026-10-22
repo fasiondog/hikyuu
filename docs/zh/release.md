@@ -83,6 +83,16 @@
 * 仅上述两个公共参数受影响，各策略自有参数命名不变；
 * 示例：`mm.set_param("auto_checkin", True)`、`mm.get_param("max_stock")`。
 
+**⚠️ 破坏性变更：信号同日合并与单方向语义**
+
+`SignalBase` 同一日期的多次信号写入按数值合并为净额：净额为正时该日仅保留买入信号，为负时仅保留卖出信号（同日相反方向的记录被移除），净额约为 0 时该日不保留信号；`alternate=true` 下同日已有同向记录时只刷新数值，不视为新开仓。新增 Python 绑定 `get_value` / `get_buy_value` / `get_sell_value`，可读取信号数值幅度。
+
+**⚠️ 破坏性变更：指标参数 `out-extreme` → `out_extreme`**
+
+`ZSCORE` / `NORM_Zscore` 等使用 `out_extreme` 的指标与归一化实现统一改为小写下划线命名，旧名 `set_param` 会抛异常。
+
+**⚠️ 归档格式变化**：`SignalBase` 新增周期起止与周期日字段，算子信号不再重复序列化基类，旧 `SG_*`（以及内嵌 `m_sg` 的系统）归档需重新保存；旧归档中的连字符参数键（`auto-checkin` / `max-stock` / `out-extreme`）不会自动迁移，反序列化后取默认值，需显式 `set_param` 补齐。
+
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 C）
@@ -103,6 +113,8 @@
 * fix(trade_sys): PG_FixedPercent 止盈目标价改用 buyMoney / totalNumber 计算平均成本，修复部分减仓后目标价被按比例抬高、止盈永不触发；目标价按标的价格精度取整（多头向上、空头向下，取整前先归化浮点噪声），不再返回不可成交价；补充空头目标实现；未设置账户时返回未限定目标而非空指针崩溃
 * fix(trade_sys): PG_FixedHoldDays 持有天数改为按交易对象自身的交易日统计，并在 setTO 时预建日期表，持仓每根 K 线的日线驱动查询（整轮 O(n²)、带锁与 IO）降为两次二分；标的无日线数据时不再静默失效
 * fix(trade_sys): ProfitGoalBase::clone 不再传播交易对象，克隆体经 setTO 重新计算（原先预计算型自定义子类在克隆体上静默失效）；_get_short_goal「未设置目标」的哨兵由 0 统一为 constant.null_price，与多头口径一致
+* fix(signal): 同日信号写入合并为净额并保持「一日一方向」：净额归零时不再残留旧信号（`shouldBuy`/`shouldSell` 可同时为真），`alternate=true` 下同日重复写入刷新数值而非丢弃
+* fix(KData): `operator==` / Python `==` 在 stock、query、size 相同的前提下追加比较末根记录，右开区间查询下实时尾部的修订或新增 K 线可触发下游缓存重算（仍非全量逐元素比较）
 
 ## 2.8.3 - 2026年10月1日
 

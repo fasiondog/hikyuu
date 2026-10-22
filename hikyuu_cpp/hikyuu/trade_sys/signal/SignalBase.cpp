@@ -178,52 +178,59 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(!std::isfinite(value) || std::abs(value) < ZERO_SIGNAL_THRESHOLD, void());
 
-    // A single find per map is reused by the value merge and the write below
     auto buy_iter = m_buySig.find(datetime);
     auto sell_iter = m_sellSig.find(datetime);
     double buy_value = buy_iter != m_buySig.end() ? buy_iter->second : 0.0;
     double sell_value = sell_iter != m_sellSig.end() ? sell_iter->second : 0.0;
     double new_value = value + buy_value + sell_value;
-    HKU_IF_RETURN(!std::isfinite(new_value) || std::abs(new_value) < ZERO_SIGNAL_THRESHOLD, void());
+    HKU_IF_RETURN(!std::isfinite(new_value), void());
+
+    if (std::abs(new_value) < ZERO_SIGNAL_THRESHOLD) {
+        // A zero net leaves no direction: drop the records already written for the day. The hold
+        // flags keep the alternation sequence and are not derived from the tables
+        m_buySig.erase(datetime);
+        m_sellSig.erase(datetime);
+        return;
+    }
 
     // One day carries one direction only: the written table receives the merged net value and the
-    // opposite record of the same day is dropped, otherwise both shouldBuy and shouldSell hold
+    // opposite record of the same day is dropped, otherwise both shouldBuy and shouldSell hold.
+    // When the alternation state rejects a new entry, a record already flagged for the day is
+    // still refreshed with the net value (it is not a new entry, only a value update)
     bool alternate = getParam<bool>("alternate");
     if (new_value > 0.0) {
-        if (!alternate) {
+        if (!alternate || !m_hold_long) {
             m_sellSig.erase(datetime);
             m_buySig[datetime] = new_value;
-            return;
-        }
-
-        if (!m_hold_long) {
-            m_sellSig.erase(datetime);
-            m_buySig[datetime] = new_value;
-            if (getParam<bool>("support_borrow_stock") && m_hold_short) {
-                m_hold_short = false;
-            } else {
-                m_hold_long = true;
+            if (alternate) {
+                if (getParam<bool>("support_borrow_stock") && m_hold_short) {
+                    m_hold_short = false;
+                } else {
+                    m_hold_long = true;
+                }
             }
+        } else if (buy_iter != m_buySig.end()) {
+            m_sellSig.erase(datetime);
+            m_buySig[datetime] = new_value;
         }
+        return;
+    }
 
-    } else {
-        if (!alternate) {
-            m_buySig.erase(datetime);
-            m_sellSig[datetime] = new_value;
-            return;
-        }
-
-        if (!m_hold_short) {
+    bool allow_sell =
+      !alternate || (!m_hold_short && (m_hold_long || getParam<bool>("support_borrow_stock")));
+    if (allow_sell) {
+        m_buySig.erase(datetime);
+        m_sellSig[datetime] = new_value;
+        if (alternate) {
             if (m_hold_long) {
-                m_buySig.erase(datetime);
-                m_sellSig[datetime] = new_value;
                 m_hold_long = false;
-            } else if (getParam<bool>("support_borrow_stock")) {
-                m_buySig.erase(datetime);
-                m_sellSig[datetime] = new_value;
+            } else {
                 m_hold_short = true;
             }
         }
+    } else if (sell_iter != m_sellSig.end()) {
+        m_buySig.erase(datetime);
+        m_sellSig[datetime] = new_value;
     }
 }
 
