@@ -42,8 +42,10 @@ namespace hku {
  *       AF allocates the quota to every selected sub-system (L1) and the sub-system is calibrated
  *       to the quota before it is driven; the sub-system suggestions are mirrored by the parent
  *       (L2 pass-through) and the L3 portfolio risk control is skipped. The unselected
- *       sub-systems are force cleared on the rebalancing day. adjust_mode / delay_to_trading_day
- *       follow the runtime period rule inside MultiSystem.
+ *       sub-systems are force cleared on the rebalancing day by default (aligned with the legacy
+ *       SimplePortfolio); pass sell_at_not_selected=false to keep them running (they only skip
+ *       the quota calibration). adjust_mode / delay_to_trading_day follow the runtime period rule
+ *       inside MultiSystem.
  * @param tm trade account
  * @param se system selector
  * @param af fund allocation algorithm (AFPtr, carrying the L1/L2/L3 layers, see AllocateFundsBase)
@@ -51,13 +53,17 @@ namespace hku {
  * @param adjust_mode the rebalancing mode "query" | "day" | "week" | "month" | "year"
  * @param delay_to_trading_day when it is true, it is postponed to the first trading day within the
  *                             current cycle if the rebalancing day is not a trading day
+ * @param trade_on_close execute the trade at the close
+ * @param sell_at_not_selected whether to force selling the stocks not selected on the rebalancing
+ *                             day, true by default (aligned with the legacy SimplePortfolio)
  * @return the portfolio instance (MultiSystemPtr)
  * @ingroup Portfolio
  */
 MultiSystemPtr HKU_API PF_Simple(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
                                  const AFPtr& af = AF_EqualWeight(), int adjust_cycle = 1,
                                  const string& adjust_mode = "query",
-                                 bool delay_to_trading_day = true);
+                                 bool delay_to_trading_day = true, bool trade_on_close = true,
+                                 bool sell_at_not_selected = true);
 
 } /* namespace hku */
 

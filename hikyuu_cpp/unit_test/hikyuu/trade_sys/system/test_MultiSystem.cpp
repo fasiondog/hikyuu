@@ -1196,6 +1196,13 @@ TEST_CASE("test_PF_factories") {
     REQUIRE(pf_def->getAF() != nullptr);
     CHECK_EQ(pf_def->getAF()->name(), "AF_EqualWeight");
 
+    /** @arg PF_Simple exposes the two switches instead of fixing them: trade_on_close and
+     * sell_at_not_selected are passed through (false keeps the unselected sub-systems running) */
+    auto pf_keep = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 1, "query", true, false, false);
+    CHECK_EQ(pf_keep->getMode(), "B");
+    CHECK_EQ(pf_keep->getTradeOnClose(), false);
+    CHECK_EQ(pf_keep->getSellAtNotSelected(), false);
+
     /** @arg PF_WithoutAF: mode C (the legacy shared-account Portfolio); parameters passed through
      * item by item; sys_use_self_tm is kept for the signature only and must not crash */
     auto pf2 = PF_WithoutAF(tm, SE_Fixed(), 3, "week", true, false, true, true);
@@ -4067,6 +4074,11 @@ TEST_CASE("test_MultiSystem_pf_mode_aliases") {
     CHECK_EQ(b->getMode(), "B");
     CHECK_UNARY(b->getTradeOnClose());
     CHECK_UNARY(b->getSellAtNotSelected());
+
+    /** @arg PF_ModeB forwards the two switches exactly as PF_Simple does */
+    auto b2 = PF_ModeB(tm, se_b, AF_EqualWeight(), 2, "query", true, false, false);
+    CHECK_EQ(b2->getTradeOnClose(), false);
+    CHECK_EQ(b2->getSellAtNotSelected(), false);
 
     /** @arg PF_ModeC behaves as PF_WithoutAF (mode C, sell_at_not_selected=false by default) */
     auto c = PF_ModeC(tm, se_b);
