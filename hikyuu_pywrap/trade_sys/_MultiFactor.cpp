@@ -6,6 +6,8 @@
  */
 
 #include <hikyuu/trade_sys/multifactor/build_in.h>
+#include <limits>
+#include <memory>
 #include "../pybind_utils.h"
 #include "../gil_policy.h"
 
@@ -121,18 +123,24 @@ py::array score_records_to_np(
   const std::vector<string>& fields = {htr("market_code"), htr("name"), htr("score")}) {
     size_t total = scs.size();
     HKU_IF_RETURN(total == 0, py::array());
+    HKU_CHECK(total <= static_cast<size_t>(std::numeric_limits<Py_ssize_t>::max()) /
+                         sizeof(ScoreRawData),
+              "scorerecords_to_np: the result is too large!");
 
-    auto* data = static_cast<ScoreRawData*>(std::malloc(total * sizeof(ScoreRawData)));
+    auto deleter = [](void* p) { std::free(p); };
+    std::unique_ptr<ScoreRawData[], void (*)(void*)> data(
+      static_cast<ScoreRawData*>(std::malloc(total * sizeof(ScoreRawData))), deleter);
     HKU_CHECK(data != nullptr, "scorerecords_to_np: malloc failed!");
     for (size_t i = 0; i < total; i++) {
         const ScoreRecord& sc = scs[i];
-        utf8_to_utf32(sc.stock.market_code(), data[i].code, 10);
-        utf8_to_utf32(sc.stock.name(), data[i].name, 20);
-        data[i].value = sc.value;
+        utf8_to_utf32(sc.stock.market_code(), data.get()[i].code, 10);
+        utf8_to_utf32(sc.stock.name(), data.get()[i].name, 20);
+        data.get()[i].value = sc.value;
     }
 
-    return py::array(score_np_dtype(fields), total, data,
-                     py::capsule(data, [](void* p) { std::free(p); }));
+    py::capsule owner(data.get(), deleter);
+    ScoreRawData* raw = data.release();
+    return py::array(score_np_dtype(fields), total, raw, owner);
 }
 
 // A lazy per-date iterable: a plain python type, because pybind's make_iterator applies its
