@@ -237,6 +237,30 @@ inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
  */
 size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) noexcept;
 
+// DatetimeList (std::vector<Datetime>) is registered as an independent Python type by
+// py::bind_vector (hikyuu_pywrap/bind_stl.cpp), the registered type takes precedence over the
+// pybind11/stl.h converter, so it only accepts DatetimeList instances and rejects the Python
+// list/tuple. Here the binding layer accepts any iterable Datetime sequence uniformly and converts
+// it manually, which is compatible with the existing DatetimeList argument and also supports the
+// list/tuple syntax.
+inline DatetimeList get_datetime_list_from_python(const py::object& dates) {
+    DatetimeList result;
+    if (dates.is_none()) {
+        return result;
+    }
+    if (!py::hasattr(dates, "__iter__")) {
+        throw py::type_error(
+          "dates must be an iterable sequence of Datetime (list/tuple/DatetimeList)");
+    }
+    if (py::isinstance<py::str>(dates) || py::isinstance<py::bytes>(dates)) {
+        throw py::type_error("dates must be an iterable sequence of Datetime, not str/bytes");
+    }
+    for (auto item : py::iter(dates)) {
+        result.push_back(py::cast<Datetime>(item));
+    }
+    return result;
+}
+
 // Get the StockList from a python object
 inline StockList get_stock_list_from_python(const py::object& stks) {
     StockList ret;

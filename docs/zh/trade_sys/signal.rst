@@ -90,6 +90,11 @@
                 <td>一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号</td>
             </tr>
             <tr>
+                <td><a href="#target-section">SG_Manual</a></td>
+                <td>手工信号指示器</td>
+                <td>信号只能手工加入，用于测试或外部信号导入</td>
+            </tr>
+            <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
                 <td>SG运算辅助</td>
                 <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题</td>
@@ -243,6 +248,15 @@ PF调仓周期买入信号指示器
     Python 自定义周期信号可在 ``_calculate`` 中通过 ``get_cycle_dates()`` 读取注入的调仓日。
 
 
+手工信号指示器
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Manual()
+
+    信号只能手工加入的信号指示器，用于测试或外部信号导入。其 ``_calculate`` 为空：作为逻辑运算的子信号
+    时，手工预置的信号会被保留；直接对其设置交易对象会清空预置信号。
+
+
 自定义信号指示器
 ----------------
 
@@ -379,6 +393,20 @@ PF调仓周期买入信号指示器
 
         :param Datetime datetime: 指定时刻
         :rtype: float
+
+    .. py:method:: get_cycle_dates(self)
+
+        获取 MultiSystem 注入的调仓日列表（已排序去重）。自定义周期信号可在 ``_calculate``
+        中读取，用于确定应在哪些日期发出计划信号。
+
+        :rtype: DatetimeList
+
+    .. py:method:: set_cycle_dates(self, dates)
+
+        声明周期信号消费的调仓日，通常由 MultiSystem 在运行前注入，普通信号忽略。日期会自动
+        排序去重；已设置交易对象时立即重算。
+
+        :param dates: Datetime 序列（list / tuple / DatetimeList 均可）
     
     .. py:method:: _add_signal(self, datetime, value)
 

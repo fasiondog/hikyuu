@@ -265,6 +265,67 @@ class TestSGSignalValues(unittest.TestCase):
         self.assertEqual(doubled.get_value(d_sell), 2.0 * sg.get_value(d_sell))
 
 
+class TestSGCycleDates(unittest.TestCase):
+    """The Python side declares the rebalancing days consumed by a cycle signal"""
+
+    def test_set_cycle_dates(self):
+        kdata = sm['sh000001'].get_kdata(Query(-200))
+        self.assertFalse(kdata.empty())
+        d50 = kdata[50].datetime
+        d100 = kdata[100].datetime
+        d150 = kdata[150].datetime
+
+        sg = SG_Cycle()
+        sg.set_cycle_dates([d150, d50, d50])
+        self.assertEqual(len(sg.get_cycle_dates()), 2)
+
+        sg.to = kdata
+        self.assertEqual(len(sg.get_buy_signal()), 2)
+        self.assertTrue(sg.should_buy(d50))
+        self.assertTrue(sg.should_buy(d150))
+
+        # a declaration after the trading object is set recalculates at once
+        sg.set_cycle_dates([d100])
+        self.assertEqual(len(sg.get_buy_signal()), 1)
+        self.assertTrue(sg.should_buy(d100))
+        self.assertEqual(sg.get_value(d100), 1.0)
+
+    def test_set_cycle_dates_none(self):
+        sg = SG_Cycle()
+        sg.set_cycle_dates(None)
+        self.assertEqual(len(sg.get_cycle_dates()), 0)
+
+
+class TestSGManual(unittest.TestCase):
+    """The manual signal generator accepts pre-seeded signals"""
+
+    def test_manual_signals(self):
+        d_buy = Datetime(201201210000)
+        d_sell = Datetime(201201300000)
+
+        sg = SG_Manual()
+        self.assertEqual(sg.name, "SG_Manual")
+        sg._add_buy_signal(d_buy)
+        sg._add_sell_signal(d_sell)
+        self.assertTrue(sg.should_buy(d_buy))
+        self.assertTrue(sg.should_sell(d_sell))
+        self.assertFalse(sg.should_sell(d_buy))
+        self.assertEqual(sg.get_value(d_buy), 1.0)
+
+    def test_manual_compose(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        self.assertFalse(kdata.empty())
+        d_buy = kdata[10].datetime
+
+        sg = SG_Manual()
+        sg._add_buy_signal(d_buy)
+        composed = SG_Add(sg, SG_AllwaysBuy(), False)
+        composed.to = kdata
+        # a logical operator keeps the preset signals of its manual sub-signal
+        self.assertTrue(composed.should_buy(d_buy))
+        self.assertEqual(composed.get_buy_value(d_buy), 2.0)
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
@@ -283,3 +344,11 @@ def suiteTestSGTradingObject():
 
 def suiteTestSGSignalValues():
     return unittest.TestLoader().loadTestsFromTestCase(TestSGSignalValues)
+
+
+def suiteTestSGCycleDates():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGCycleDates)
+
+
+def suiteTestSGManual():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGManual)

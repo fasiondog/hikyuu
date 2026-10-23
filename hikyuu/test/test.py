@@ -74,6 +74,8 @@ if __name__ == "__main__":
     suite.addTest(Signal.suiteTestCrtSGWithClone())
     suite.addTest(Signal.suiteTestSGTradingObject())
     suite.addTest(Signal.suiteTestSGSignalValues())
+    suite.addTest(Signal.suiteTestSGCycleDates())
+    suite.addTest(Signal.suiteTestSGManual())
 
     suite.addTest(Stoploss.suite())
     suite.addTest(Stoploss.suiteTestCrtST())

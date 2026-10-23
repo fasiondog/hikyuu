@@ -20,34 +20,6 @@
 namespace py = pybind11;
 using namespace hku;
 
-namespace {
-
-// DatetimeList (std::vector<Datetime>) has been registered as an independent Python type by
-// py::bind_vector (hikyuu_pywrap/bind_stl.cpp), the registered type takes precedence over the
-// pybind11/stl.h converter, so it only accepts DatetimeList instances and rejects the Python
-// list/tuple. Here the binding layer accepts any iterable Datetime sequence uniformly and converts
-// it manually, which is compatible with the existing DatetimeList argument and also supports the
-// list/tuple syntax.
-DatetimeList toDatetimeList(const py::object& dates) {
-    DatetimeList result;
-    if (dates.is_none()) {
-        return result;
-    }
-    if (!py::hasattr(dates, "__iter__")) {
-        throw py::type_error(
-          "dates must be an iterable sequence of Datetime (list/tuple/DatetimeList)");
-    }
-    if (py::isinstance<py::str>(dates) || py::isinstance<py::bytes>(dates)) {
-        throw py::type_error("dates must be an iterable sequence of Datetime, not str/bytes");
-    }
-    for (auto item : py::iter(dates)) {
-        result.push_back(py::cast<Datetime>(item));
-    }
-    return result;
-}
-
-}  // namespace
-
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
@@ -757,7 +729,9 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("get_axis_mode", &MultiSystem::getAxisMode, "Get the driving time axis mode")
       .def(
         "set_date_axis",
-        [](MultiSystem& ms, const py::object& dates) { ms.setDateAxis(toDatetimeList(dates)); },
+        [](MultiSystem& ms, const py::object& dates) {
+            ms.setDateAxis(get_datetime_list_from_python(dates));
+        },
         py::arg("dates"),
         "Set the fixed date table (accepting list/tuple/DatetimeList; it is used as the driving "
         "axis only when axis_mode == \"calendar\";"
@@ -766,7 +740,9 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("clear_date_axis", &MultiSystem::clearDateAxis, "Clear the fixed date table")
       .def(
         "set_adjust_dates",
-        [](MultiSystem& ms, const py::object& dates) { ms.setAdjustDates(toDatetimeList(dates)); },
+        [](MultiSystem& ms, const py::object& dates) {
+            ms.setAdjustDates(get_datetime_list_from_python(dates));
+        },
         py::arg("dates"),
         R"(set_adjust_dates(self, dates)
 
@@ -791,8 +767,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         "calc_adjust_dates",
         [](const py::object& dates, const string& mode, int adjust_cycle,
            bool delay_to_trading_day) {
-            return MultiSystem::calcAdjustDates(toDatetimeList(dates), mode, adjust_cycle,
-                                                delay_to_trading_day);
+            return MultiSystem::calcAdjustDates(get_datetime_list_from_python(dates), mode,
+                                                adjust_cycle, delay_to_trading_day);
         },
         py::arg("dates"), py::arg("mode"), py::arg("adjust_cycle") = 1,
         py::arg("delay_to_trading_day") = true,

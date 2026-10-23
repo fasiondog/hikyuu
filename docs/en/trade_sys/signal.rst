@@ -90,6 +90,11 @@ When technical indicators are used to decide entries and exits, the rule almost 
                 <td>A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run</td>
             </tr>
             <tr>
+                <td><a href="#target-section">SG_Manual</a></td>
+                <td>Manual signal generator</td>
+                <td>A special SG whose signals are added by hand, for tests or the external signal import</td>
+            </tr>
+            <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
                 <td>SG operation helpers</td>
                 <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem</td>
@@ -243,6 +248,16 @@ PF Rebalance Cycle Buy Signal Generator
     A custom Python cycle signal can read the injected days in ``_calculate`` via ``get_cycle_dates()``.
 
 
+Manual Signal Generator
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Manual()
+
+    A special SG whose signals are added by hand, for tests or the external signal import. Its
+    ``_calculate`` is empty: the preset signals are kept when it is used as a sub-signal of a
+    logical operator, while assigning the trading object on it directly clears them.
+
+
 Custom Signal Generator
 -----------------------
 
@@ -383,6 +398,23 @@ Signal Generator Base Class
 
         :param Datetime datetime: the specified datetime
         :rtype: float
+
+    .. py:method:: get_cycle_dates(self)
+
+        Get the rebalancing days injected by a MultiSystem (sorted and deduplicated). A custom cycle
+        signal reads them in ``_calculate`` to know on which days the scheduled signals must be
+        emitted.
+
+        :rtype: DatetimeList
+
+    .. py:method:: set_cycle_dates(self, dates)
+
+        Declare the rebalancing days consumed by the cycle signals, usually injected by a
+        MultiSystem before the run; the other signals ignore them. The dates are sorted and
+        deduplicated, and the signal is recalculated at once when the trading object is already
+        set.
+
+        :param dates: the Datetime sequence (list / tuple / DatetimeList are all accepted)
 
     .. py:method:: _add_signal(self, datetime, value)
 
