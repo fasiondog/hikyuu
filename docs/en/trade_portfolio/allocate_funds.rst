@@ -191,6 +191,20 @@ Notes:
         parent book mirrors the sub-system books and does not detect or close positions that no sub-system
         corresponds to (e.g. a manual trade on the parent account, or a sub-system removed from the list
         without liquidation)
+    * - A suggestion without a weight is skipped
+      - The mode A weight table is keyed by the **System instance**: the ``sys`` of a suggestion must be the
+        very instance held by the L1 contexts. When the table is empty, the sub-system is missing from it,
+        or an upstream returns a cloned instance (a different instance from the context one), the
+        suggestion is **skipped with a warning** and never priced by a fabricated equal weight.
+        Parent-synthesized suggestions (an empty ``sys``, e.g. the zero target of an unselected instrument)
+        are not affected. With ``fixed_amount>0`` the weight lookup is skipped entirely (the absolute
+        amount is the target), so this item does not apply
+    * - L3 only shrinks, it never redistributes
+      - ``max_total_position`` (total budget) then ``max_single_position`` (per-instrument concentration)
+        apply in sequence and both only **shrink** the excess: the budget released by the L3 clipping is
+        **not** redistributed to the other instruments, so the final gross exposure may stay well below
+        ``max_total_position`` (e.g. 10 equal-weight instruments with a 0.05 per-instrument cap end up with
+        a gross of only 0.5 x the net assets)
 
 
 Built-in Asset Allocation Algorithms

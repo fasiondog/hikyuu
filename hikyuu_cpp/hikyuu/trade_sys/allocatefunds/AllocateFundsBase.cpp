@@ -292,7 +292,6 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     std::map<Stock, double> target_value;  // instrument -> signed net target market value
     std::map<Stock, double> fixed_dir;  // instrument -> aggregated signed direction (fixed_amount)
     std::map<Stock, price_t> price;     // instrument -> the close price used for the shares
-    double gross = 0.0;
     for (const auto& s : suggestions) {
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
@@ -307,20 +306,19 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
               (s.target_position_ratio > 0.0) ? 1.0 : (s.target_position_ratio < 0.0 ? -1.0 : 0.0);
             continue;
         }
+        // The table is keyed by the System instance: an unlisted sub-system (missing key, empty
+        // table or clone) is dropped, a parent-synthesized one (no sys) keeps 1.0
         double weight = 1.0;
-        auto it = sys_weight.find(s.sys);
-        if (it != sys_weight.end()) {
+        if (s.sys) {
+            auto it = sys_weight.find(s.sys);
+            if (it == sys_weight.end()) {
+                HKU_WARN(
+                  "{}::_toTargets: no weight for the sub-system of {}, the suggestion is "
+                  "skipped!",
+                  m_name, s.stock.market_code());
+                continue;
+            }
             weight = it->second;
-        } else if (s.sys && !sys_weight.empty()) {
-            // The sub-system got no weight (the AF skipped it, e.g. a non-finite weight): never
-            // scale its intent by a fabricated equal weight. Parent-synthesized suggestions carry
-            // no sub-system (e.g. the zero target of an unselected instrument) and must not be
-            // dropped here
-            HKU_WARN(
-              "{}::_toTargets: no weight for the sub-system of {}, the suggestion is "
-              "skipped!",
-              m_name, s.stock.market_code());
-            continue;
         }
         double v = weight * s.target_position_ratio * parent_net;
         if (!std::isfinite(v)) {
@@ -329,7 +327,6 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             continue;
         }
         target_value[s.stock] += v;
-        gross += std::fabs(v);
     }
     if (fixed_amount > 0.0) {
         // The aggregate-then-apply step: one ±fixed_amount target per instrument (a flat aggregate
@@ -340,7 +337,6 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             double target =
               (kv.second > 0.0) ? fixed_amount : (kv.second < 0.0 ? -fixed_amount : 0.0);
             target_value[kv.first] = target;
-            gross += std::fabs(target);
         }
     }
 
@@ -349,7 +345,6 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     const bool support_borrow =
       tm->haveParam("support_borrow_stock") && tm->getParam<bool>("support_borrow_stock");
     if (!support_borrow) {
-        double gross_clamped = 0.0;
         for (auto& kv : target_value) {
             if (kv.second < 0.0) {
                 std::call_once(g_short_unsupported_warn_flag, [this]() {
@@ -361,9 +356,14 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
                 });
                 kv.second = 0.0;
             }
-            gross_clamped += std::fabs(kv.second);
         }
-        gross = gross_clamped;
+    }
+
+    // Measured on the aggregated target so hedging legs of one instrument cannot inflate the
+    // gross; the clamped and the plain path share this computation
+    double gross = 0.0;
+    for (const auto& kv : target_value) {
+        gross += std::fabs(kv.second);
     }
 
     // The total budget cap: the aggregated gross target market value <= net assets x
