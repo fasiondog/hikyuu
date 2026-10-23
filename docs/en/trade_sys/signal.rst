@@ -247,6 +247,7 @@ PF Rebalance Cycle Buy Signal Generator
     A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run; it stays silent when no day is injected.
     A custom Python cycle signal can read the injected days in ``_calculate`` via ``get_cycle_dates()``.
     A cycle signal usually fits the selectors that admit on a schedule (e.g. ``SE_Fixed``); see the **cycle** common-parameter note above for the ``SE_Signal`` combination limit.
+    The days follow the driving axis: when the instrument has no bar on such a day (a halt, or a calendar day without a bar under ``axis_mode=calendar``), the scheduled buy is not filled and is not shifted to the first bar after the halt.
 
 
 Manual Signal Generator

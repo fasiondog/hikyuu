@@ -339,7 +339,8 @@ The custom signal generator interfaces:
     m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
     
     A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before
-    the run; it stays silent when no day is injected)");
+    the run; it stays silent when no day is injected. A day without a bar of the instrument (a
+    halt) keeps the signal but nothing can fill it, it is not shifted to the next bar)");
 
     m.def("SG_Manual", SG_Manual, R"(SG_Manual()
 

@@ -1110,4 +1110,35 @@ TEST_CASE("test_SG_Manual_direct_drive") {
     CHECK_UNARY(sys->getSG()->shouldSell(kdata[3].datetime));
 }
 
+/** @par Test points */
+TEST_CASE("test_SG_Cycle_no_bar_date") {
+    // sh600005 has no bar on 2000-06-30 (halted), the calendar still carries the day
+    Stock stk = getStock("sh600005");
+    REQUIRE(!stk.isNull());
+    KData kdata = stk.getKData(KQuery(Datetime(20000626), Datetime(20000710)));
+    REQUIRE(kdata.size() > 1);
+    const Datetime halted(20000630);
+
+    bool has_halted_bar = false;
+    Datetime next_bar;
+    for (size_t i = 0; i < kdata.size(); i++) {
+        if (kdata[i].datetime == halted) {
+            has_halted_bar = true;
+        } else if (kdata[i].datetime > halted && next_bar.isNull()) {
+            next_bar = kdata[i].datetime;
+        }
+    }
+    REQUIRE_UNARY(!has_halted_bar);
+    REQUIRE_UNARY(!next_bar.isNull());
+
+    auto sg = SG_Cycle();
+    sg->setCycleDates(DatetimeList{halted});
+    sg->setTO(kdata);
+
+    /** @arg the day still holds the scheduled signal */
+    CHECK_UNARY(sg->shouldBuy(halted));
+    /** @arg it is not shifted to the first bar after the halt */
+    CHECK_UNARY(!sg->shouldBuy(next_bar));
+}
+
 /** @} */
