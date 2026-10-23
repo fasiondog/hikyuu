@@ -66,6 +66,10 @@ void MultiFactorSelector::_checkParam(const string& name) const {
         auto mode = getParam<string>("mode");
         HKU_ASSERT("MF_ICIRWeight" == mode || "MF_ICWeight" == mode || "MF_EqualWeight" == mode ||
                    "CUSTOM" == mode);
+    } else if ("mf_recover_type" == name) {
+        int recover_type = getParam<int>("mf_recover_type");
+        HKU_ASSERT(recover_type >= KQuery::NO_RECOVER &&
+                   recover_type <= KQuery::INVALID_RECOVER_TYPE);
     }
 }
 
