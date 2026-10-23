@@ -219,10 +219,20 @@ void OperatorSelector::cloneRebuild(const SelectorPtr& se1, const SelectorPtr& s
 
 void OperatorSelector::_calculate() {
     SystemList se1_list, se2_list;
+    // A large portfolio can leave thousands of systems unbound; one warning per system would flood
+    // the log, so report the count with a few samples once per calculation instead.
+    size_t unbound_count = 0;
+    string unbound_samples;
     for (const auto& sys : m_real_sys_list) {
         auto iter = m_real_to_proto.find(sys);
         if (iter == m_real_to_proto.end() || !iter->second) {
-            HKU_WARN("The system({}) is not bound to a prototype, ignored!", sys->name());
+            ++unbound_count;
+            if (unbound_count <= 3) {
+                if (!unbound_samples.empty()) {
+                    unbound_samples += ", ";
+                }
+                unbound_samples += sys->name();
+            }
             continue;
         }
         const auto& protoSys = iter->second;
@@ -233,6 +243,12 @@ void OperatorSelector::_calculate() {
             se2_list.emplace_back(sys);
         }
     }
+
+    if (unbound_count > 0) {
+        HKU_WARN("{} system(s) are not bound to a prototype and were ignored! e.g. [{}]",
+                 unbound_count, unbound_samples);
+    }
+
     if (m_se1) {
         m_se1->calculate(se1_list, m_query);
     }
