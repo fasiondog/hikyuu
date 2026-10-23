@@ -473,11 +473,8 @@ TEST_CASE("test_AllocateFunds_L1_fixed_weight") {
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
-    /** @arg an empty weight list falls back to equal weight (boundary) */
-    auto afl0 = AF_FixedWeightList(PriceList{});
-    w = afl0->_allocate(date, tm, contexts, KQuery(), "A");
-    CHECK_EQ(w[sys1], doctest::Approx(0.5));
-    CHECK_EQ(w[sys2], doctest::Approx(0.5));
+    /** @arg an empty weight list is rejected at construction (it cannot price anything) */
+    CHECK_THROWS_AS(AF_FixedWeightList(PriceList{}), std::exception);
 
     /** @arg mode B with AF_FixedWeightList: quota = the given weight x parent total assets
      * (0.7/0.3 → 70000/30000) */

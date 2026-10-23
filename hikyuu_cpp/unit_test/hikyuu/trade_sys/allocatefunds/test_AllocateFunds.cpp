@@ -119,8 +119,12 @@ TEST_CASE("test_AF_FixedWeightList_checkParam") {
     /** @arg an overflowing sum (each item finite but the sum is inf) is rejected */
     CHECK_THROWS_AS(AF_FixedWeightList(vector<double>{1e308, 1e308}), std::exception);
 
-    /** @arg an empty weight list returns the equal weight (does not construct a fixed-list AF) */
-    CHECK_EQ(AF_FixedWeightList(PriceList{})->name(), "AF_EqualWeight");
+    /** @arg an empty weight list is rejected instead of degrading to the equal weight */
+    CHECK_THROWS_AS(AF_FixedWeightList(PriceList{}), std::exception);
+
+    /** @arg the same holds through set_param, so a configured instance cannot be emptied either */
+    AFPtr af = AF_FixedWeightList(vector<double>{1.0, 2.0});
+    CHECK_THROWS_AS(af->setParam<PriceList>("weights", PriceList()), std::exception);
 }
 
 /** @par Test points */

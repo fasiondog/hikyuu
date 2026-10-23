@@ -220,7 +220,7 @@ Common parameters:
 
     The fixed proportion list asset allocation (L1 takes weights[i] in order, without normalization)
 
-    The weights must be finite, non-negative and not all zero (an all-zero list would set every target market value to 0 and drive the parent to actively clear the holdings, so the parameter check throws)
+    The weights must be finite, non-negative and not all zero (an all-zero list would set every target market value to 0 and drive the parent to actively clear the holdings, so the parameter check throws). An empty list cannot price anything and is rejected as well
 
     :param list weights: the specified asset proportion list)");
 

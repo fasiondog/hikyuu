@@ -244,6 +244,7 @@ Built-in Asset Allocation Algorithms
     Fixed-weight-list fund allocation: allocates capital to the selected sub-systems according to the specified weight list.
 
     L1 takes ``weights[i]`` in sub-system order, **without normalization**; when the length does not match, it falls back to equal weights.
+    An empty list cannot price anything: both the factory and the parameter check throw instead of falling back to the equal weight.
     The weights must be finite, non-negative and not all zero (an all-zero list sets every sub-system target market value to 0 and drives the parent to actively clear the existing holdings on every rebalance, so the parameter check throws).
 
     :param list weights: the specified list of weight proportions

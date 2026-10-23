@@ -17,7 +17,9 @@ namespace hku {
 
 FixedWeightListAllocateFunds::FixedWeightListAllocateFunds()
 : AllocateFundsBase("AF_FixedWeightList") {
-    setParam<PriceList>("weights", PriceList());
+    // The single-item default keeps the unconfigured instance on the equal-weight path: a length
+    // mismatch falls back to equal weights anyway
+    setParam<PriceList>("weights", PriceList{1.0});
 }
 
 FixedWeightListAllocateFunds::~FixedWeightListAllocateFunds() {}
@@ -30,9 +32,9 @@ void FixedWeightListAllocateFunds::_checkParam(const string& name) const {
             HKU_ASSERT(std::isfinite(w) && w >= 0.0);
             sum += w;
         }
-        // Reject all-zero weights (they would clear the holdings); an empty list falls back to
-        // equal weight. An overflowing sum normalizes every weight to 0 or poisons the quota
-        HKU_ASSERT(ws.empty() || (std::isfinite(sum) && sum > 0.0));
+        // An empty list cannot price anything; an all-zero one would clear the holdings, and an
+        // overflowing sum normalizes every weight to 0 or poisons the quota
+        HKU_ASSERT(!ws.empty() && std::isfinite(sum) && sum > 0.0);
     }
 }
 
