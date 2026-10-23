@@ -255,9 +255,9 @@ Manual Signal Generator
 .. py:function:: SG_Manual()
 
     A special SG whose signals are added by hand, for tests or the external signal import. Its
-    ``_calculate`` is empty: the preset signals are kept when it is used as a sub-signal of an
-    operator (logical or arithmetic), while assigning the trading object on it directly clears
-    them.
+    ``_calculate`` is empty: the preset signals are its input and are kept both when it is used
+    directly and as a sub-signal of an operator, assigning the trading object or resetting does not
+    clear them.
 
 
 Signal Operations

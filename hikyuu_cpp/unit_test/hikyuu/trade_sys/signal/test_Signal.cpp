@@ -17,6 +17,10 @@
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Single.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Logic.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
+#include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
+#include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/KData.h>
@@ -1077,6 +1081,33 @@ TEST_CASE("bench_SG_logic_operator") {
                       << " us/run)" << std::endl;
         }
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Manual_direct_drive") {
+    KData kdata = getStock("sz000001").getKData(KQueryByIndex(-20));
+    REQUIRE(kdata.size() > 3);
+
+    auto sg = SG_Manual();
+    sg->_addBuySignal(kdata[1].datetime);
+    sg->_addSellSignal(kdata[3].datetime);
+
+    /** @arg a new trading object keeps the seeded signals */
+    sg->setTO(kdata);
+    CHECK_EQ(sg->getBuySignal().size(), 1);
+    CHECK_EQ(sg->getSellSignal().size(), 1);
+    CHECK_UNARY(sg->shouldBuy(kdata[1].datetime));
+
+    /** @arg reset keeps them, they are the input of a manual signal */
+    sg->reset();
+    CHECK_EQ(sg->getBuySignal().size(), 1);
+
+    /** @arg as the SG of a system, whose reset and setTO both run */
+    auto sys = SYS_Simple(crtTM(Datetime(200001010000LL), 100000.0), MM_Nothing(), EnvironmentPtr(),
+                          ConditionPtr(), sg);
+    sys->run(kdata);
+    CHECK_UNARY(sys->getSG()->shouldBuy(kdata[1].datetime));
+    CHECK_UNARY(sys->getSG()->shouldSell(kdata[3].datetime));
 }
 
 /** @} */

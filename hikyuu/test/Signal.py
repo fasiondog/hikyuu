@@ -333,6 +333,20 @@ class TestSGManual(unittest.TestCase):
         self.assertTrue(composed.should_buy(d_buy))
         self.assertEqual(composed.get_buy_value(d_buy), 2.0)
 
+    def test_manual_direct_drive(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        self.assertFalse(kdata.empty())
+        d_buy = kdata[10].datetime
+
+        sg = SG_Manual()
+        sg._add_buy_signal(d_buy)
+        # The preset signals are the input of a manual signal: assigning the trading object and
+        # resetting keep them
+        sg.to = kdata
+        self.assertTrue(sg.should_buy(d_buy))
+        sg.reset()
+        self.assertTrue(sg.should_buy(d_buy))
+
 
 @unittest.skipUnless(constant.pickle_support, "pickle support disabled")
 class TestSGPickle(unittest.TestCase):

@@ -13,7 +13,9 @@ BOOST_CLASS_EXPORT(hku::ManualSignal)
 
 namespace hku {
 
-ManualSignal::ManualSignal() : SignalBase("SG_Manual") {}
+ManualSignal::ManualSignal() : SignalBase("SG_Manual") {
+    m_keepSignals = true;
+}
 
 void ManualSignal::_calculate(const KData&) {}
 

@@ -197,6 +197,8 @@ protected:
     KData m_kdata;
     bool m_is_python_object{false};
     bool m_calculated{false};  // It is for the calculation at setTO only
+    // The seeded entries are the input of a manual signal, setTO and reset keep them
+    bool m_keepSignals{false};
 
     /* Long positions */
     bool m_hold_long;

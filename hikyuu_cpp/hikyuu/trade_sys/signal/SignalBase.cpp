@@ -90,10 +90,12 @@ void SignalBase::setTO(const KData& kdata) {
     m_kdata = kdata;
     m_calculated = false;
 
-    m_buySig.clear();
-    m_sellSig.clear();
-    m_hold_long = false;
-    m_hold_short = false;
+    if (!m_keepSignals) {
+        m_buySig.clear();
+        m_sellSig.clear();
+        m_hold_long = false;
+        m_hold_short = false;
+    }
 
     HKU_IF_RETURN(kdata.empty(), void());
 
@@ -104,10 +106,12 @@ void SignalBase::setTO(const KData& kdata) {
 
 void SignalBase::reset() {
     m_kdata = Null<KData>();
-    m_buySig.clear();
-    m_sellSig.clear();
-    m_hold_long = false;
-    m_hold_short = false;
+    if (!m_keepSignals) {
+        m_buySig.clear();
+        m_sellSig.clear();
+        m_hold_long = false;
+        m_hold_short = false;
+    }
     m_cycle_start = Null<Datetime>();
     m_cycle_end = Null<Datetime>();
     m_cycle_dates.clear();

@@ -93,8 +93,8 @@ TEST_CASE("test_SG_Add") {
     check_result(ret, expect);
 
     /** @arg The alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -117,8 +117,8 @@ TEST_CASE("test_SG_Add") {
     check_result(ret, expect);
 
     /** @arg The non-alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -209,8 +209,8 @@ TEST_CASE("test_SG_Sub") {
     check_result(ret, expect);
 
     /** @arg The alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -232,8 +232,8 @@ TEST_CASE("test_SG_Sub") {
     check_result(ret, expect);
 
     /** @arg The non-alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -312,8 +312,8 @@ TEST_CASE("test_SG_Mul") {
     check_result(ret, expect);
 
     /** @arg The alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -335,8 +335,8 @@ TEST_CASE("test_SG_Mul") {
     check_result(ret, expect);
 
     /** @arg The non-alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -414,8 +414,8 @@ TEST_CASE("test_SG_Div") {
     check_result(ret, expect);
 
     /** @arg The alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -437,8 +437,8 @@ TEST_CASE("test_SG_Div") {
     check_result(ret, expect);
 
     /** @arg The non-alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110), 6.0);
@@ -857,8 +857,8 @@ TEST_CASE("test_SG_Or") {
     check_result(ret, expect);
 
     /** @arg The alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -881,8 +881,8 @@ TEST_CASE("test_SG_Or") {
     check_result(ret, expect);
 
     /** @arg The non-alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -906,8 +906,8 @@ TEST_CASE("test_SG_Or") {
     check_result(ret, expect);
 
     /** @arg The input amplitudes are dropped, only the direction is kept */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->_addBuySignal(Datetime(20111110), 3.0);
     sg1->_addSellSignal(Datetime(20111114), -3.0);
     sg2->_addBuySignal(Datetime(20111110), 2.0);
@@ -979,8 +979,8 @@ TEST_CASE("test_SG_And") {
     check_result(ret, expect);
 
     /** @arg The alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -1002,8 +1002,8 @@ TEST_CASE("test_SG_And") {
     check_result(ret, expect);
 
     /** @arg The non-alternate mode, sg1 and sg2 overlap */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->setParam<bool>("alternate", false);
     sg2->setParam<bool>("alternate", false);
     sg1->_addBuySignal(Datetime(20111110));
@@ -1025,8 +1025,8 @@ TEST_CASE("test_SG_And") {
     check_result(ret, expect);
 
     /** @arg The input amplitudes are dropped, only the direction is kept */
-    sg1->reset();
-    sg2->reset();
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
     sg1->_addBuySignal(Datetime(20111110), 3.0);
     sg1->_addSellSignal(Datetime(20111114), -3.0);
     sg2->_addBuySignal(Datetime(20111110), 2.0);
