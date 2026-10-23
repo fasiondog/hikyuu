@@ -292,9 +292,16 @@ class TestSGCycleDates(unittest.TestCase):
         self.assertEqual(sg.get_value(d100), 1.0)
 
     def test_set_cycle_dates_none(self):
+        kdata = sm['sh000001'].get_kdata(Query(-200))
         sg = SG_Cycle()
+        sg.set_cycle_dates([kdata[50].datetime])
+        sg.to = kdata
+        self.assertEqual(len(sg.get_buy_signal()), 1)
+
+        # None clears the declared days and recalculates at once
         sg.set_cycle_dates(None)
         self.assertEqual(len(sg.get_cycle_dates()), 0)
+        self.assertEqual(len(sg.get_buy_signal()), 0)
 
 
 class TestSGManual(unittest.TestCase):
@@ -322,7 +329,7 @@ class TestSGManual(unittest.TestCase):
         sg._add_buy_signal(d_buy)
         composed = SG_Add(sg, SG_AllwaysBuy(), False)
         composed.to = kdata
-        # a logical operator keeps the preset signals of its manual sub-signal
+        # the operator keeps the preset signals of its manual sub-signal: 1.0 + 1.0
         self.assertTrue(composed.should_buy(d_buy))
         self.assertEqual(composed.get_buy_value(d_buy), 2.0)
 
