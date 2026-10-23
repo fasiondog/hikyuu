@@ -7,6 +7,8 @@
 
 #include <hikyuu/trade_sys/selector/build_in.h>
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
+#include <limits>
+#include <memory>
 #include "../gil_policy.h"
 #include "../pybind_utils.h"
 
@@ -139,20 +141,26 @@ void export_Selector(py::module& m) {
             double weight;
         };
 
-        RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        HKU_CHECK(
+          total <= static_cast<size_t>(std::numeric_limits<Py_ssize_t>::max()) / sizeof(RawData),
+          "systemweights_to_np: the result is too large!");
+
+        auto deleter = [](void* p) { std::free(p); };
+        std::unique_ptr<RawData[], void (*)(void*)> data(
+          static_cast<RawData*>(std::malloc(total * sizeof(RawData))), deleter);
         HKU_CHECK(data != nullptr, "systemweights_to_np: malloc failed!");
         for (size_t i = 0, total = swl.size(); i < total; i++) {
             const SystemWeight& sw = swl[i];
             if (sw.sys) {
-                utf8_to_utf32(sw.sys->name(), data[i].sys_name, 20);
-                utf8_to_utf32(sw.sys->getStock().market_code(), data[i].code, 10);
-                utf8_to_utf32(sw.sys->getStock().name(), data[i].name, 20);
+                utf8_to_utf32(sw.sys->name(), data.get()[i].sys_name, 20);
+                utf8_to_utf32(sw.sys->getStock().market_code(), data.get()[i].code, 10);
+                utf8_to_utf32(sw.sys->getStock().name(), data.get()[i].name, 20);
             } else {
-                memset(data[i].sys_name, 0, 20 * sizeof(int32_t));
-                memset(data[i].code, 0, 10 * sizeof(int32_t));
-                memset(data[i].name, 0, 20 * sizeof(int32_t));
+                memset(data.get()[i].sys_name, 0, 20 * sizeof(int32_t));
+                memset(data.get()[i].code, 0, 10 * sizeof(int32_t));
+                memset(data.get()[i].name, 0, 20 * sizeof(int32_t));
             }
-            data[i].weight = sw.weight;
+            data.get()[i].weight = sw.weight;
         }
         // Define the NumPy structured data type
         py::dtype dtype =
@@ -161,8 +169,9 @@ void export_Selector(py::module& m) {
                     vector_to_python_list<string>({"U20", "U10", "U20", "d"}),
                     vector_to_python_list<int64_t>({0, 80, 120, 200}), sizeof(RawData));
 
-        return py::array(dtype, total, static_cast<RawData*>(data),
-                         py::capsule(data, [](void* p) { std::free(p); }));
+        py::capsule owner(data.get(), deleter);
+        RawData* raw = data.release();
+        return py::array(dtype, total, raw, owner);
     });
 
     m.def("systemweights_to_df", [](const SystemWeightList& sws) {
