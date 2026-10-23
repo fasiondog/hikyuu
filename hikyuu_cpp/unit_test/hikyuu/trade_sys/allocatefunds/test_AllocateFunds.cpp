@@ -290,6 +290,49 @@ TEST_CASE("test_AllocateFunds_L2_plan_price_first") {
 }
 
 /** @par Test points */
+TEST_CASE("test_AllocateFunds_fixed_amount_truncation") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no position: net assets = 100000
+    auto af = AF_EqualWeight();
+    af->setParam<double>("fixed_amount", 50000.0);
+    Datetime date(200001010000LL);
+    auto sys1 = create_test_sys(3, 5);
+    auto sys2 = create_test_sys(5, 10);
+    auto sys3 = create_test_sys(7, 15);
+
+    /** @arg mode B: the 100000 budget funds two whole 50000 quotas, the third gets zero */
+    SubSystemContextList contexts(3);
+    contexts[0].sys = sys1;
+    contexts[1].sys = sys2;
+    contexts[2].sys = sys3;
+    af->_allocate(date, tm, contexts, KQuery(), "B");
+    CHECK_EQ(contexts[0].quota, doctest::Approx(50000.0));
+    CHECK_EQ(contexts[1].quota, doctest::Approx(50000.0));
+    CHECK_EQ(contexts[2].quota, doctest::Approx(0.0));
+
+    /** @arg mode A: the same truncation applies per instrument in first-appearance order,
+     *  the unfunded instrument is driven flat (no order while the position is empty) */
+    Stock a = getStock("sz000001");
+    Stock b = getStock("sh600000");
+    REQUIRE(!a.isNull());
+    REQUIRE(!b.isNull());
+    std::unordered_map<SYSPtr, double> weights{{sys1, 1.0}, {sys2, 1.0}};
+    af->setParam<double>("fixed_amount", 60000.0);
+    TradeSuggestion s;
+    s.sys = sys1;
+    s.plan_price = 10.0;
+    s.target_position_ratio = 0.5;
+    TradeSuggestion sa = s;
+    sa.stock = a;
+    TradeSuggestion sb = s;
+    sb.stock = b;
+    TradeSuggestionList suggestions{sa, sb};
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK_UNARY(suggestions[0].stock == a);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(6000.0));  // 60000 / 10
+}
+
+/** @par Test points */
 TEST_CASE("test_AllocateFunds_L3_shrink_only") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();

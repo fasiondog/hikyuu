@@ -414,14 +414,20 @@ TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     CHECK_EQ(ctx3[0].quota, doctest::Approx(70000.0));
     CHECK_EQ(ctx3[1].quota, doctest::Approx(70000.0));
 
-    /** @arg fixed_amount>0 exempts the budget cap: even when the fixed quotas would exceed a
-     * small max_total_position (2 x 30000 > 0.4 x 100000), no proportional scaling happens and
-     * the quota stays the fixed amount */
+    /** @arg fixed_amount>0 is bounded by the budget cap too: the fixed amount is an absolute
+     * amount, so the cap truncates the number of funded sub-systems (2 x 30000 > 0.4 x 100000
+     * funds only the first one, the second gets a zero quota) instead of scaling every quota */
     af_cap->setParam<double>("max_total_position", 0.4);
     af_cap->setParam<double>("fixed_amount", 30000.0);
     SubSystemContextList ctx_fa(2);
     ctx_fa[0].sys = sys1;
     ctx_fa[1].sys = sys2;
+    af_cap->_allocate(date, tm, ctx_fa, KQuery(), "B");
+    CHECK_EQ(ctx_fa[0].quota, doctest::Approx(30000.0));
+    CHECK_EQ(ctx_fa[1].quota, doctest::Approx(0.0));
+
+    /** @arg max_total_position=0 disables the cap: both sub-systems keep the full fixed amount */
+    af_cap->setParam<double>("max_total_position", 0.0);
     af_cap->_allocate(date, tm, ctx_fa, KQuery(), "B");
     CHECK_EQ(ctx_fa[0].quota, doctest::Approx(30000.0));
     CHECK_EQ(ctx_fa[1].quota, doctest::Approx(30000.0));
@@ -2237,8 +2243,9 @@ TEST_CASE("test_MultiSystem_adjust_cycle_accumulate") {
     CHECK_EQ(trades[1].business, BUSINESS_BUY);
 }
 
-/** @par Check point: buy suggestions exceeding cash are scaled down proportionally (previously
- * over-limit orders were silently rejected by the TM) */
+/** @par Check point: fixed_amount targets exceeding the total budget are truncated to whole
+ * quanta (the first instrument in suggestion order takes the affordable quota, the rest are driven
+ * flat) */
 TEST_CASE("test_MultiSystem_buy_cash_scale") {
     Stock stk1 = getStock("sh600000");
     Stock stk2 = getStock("sz000001");
@@ -2252,7 +2259,7 @@ TEST_CASE("test_MultiSystem_buy_cash_scale") {
 
     auto ms = std::make_shared<MultiSystem>("ms");
     ms->setTM(crtTM(Datetime(199001010000LL), 20000.0));
-    ms->getAF()->setParam<double>("fixed_amount", 20000.0);  // total demand 40000 > cash 20000
+    ms->getAF()->setParam<double>("fixed_amount", 15000.0);  // 2 x 15000 > net assets ~20000
     auto sys1 = create_alway_buy_sys();
     sys1->setTO(kdata1);
     ms->add(sys1);
@@ -2261,9 +2268,10 @@ TEST_CASE("test_MultiSystem_buy_cash_scale") {
     ms->add(sys2);
     ms->run(kdata1);
 
-    /** @arg both instruments get positions (each can trade after proportional scaling) */
+    /** @arg only one whole quota fits the budget: the first instrument is funded, the second is
+     *  driven flat (the fixed amount is an absolute amount and is never scaled down) */
     CHECK_UNARY(ms->getTM()->have(stk1));
-    CHECK_UNARY(ms->getTM()->have(stk2));
+    CHECK_UNARY(!ms->getTM()->have(stk2));
     /** @arg cash is not overdrawn */
     CHECK_GE(ms->getTM()->currentCash(), 0.0);
 }
