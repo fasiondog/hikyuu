@@ -58,6 +58,7 @@
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
 #include "create_test_sys.h"
 
 using namespace hku;
@@ -2238,6 +2239,78 @@ TEST_CASE("test_MultiSystem_adjust_cycle_accumulate") {
     REQUIRE_GE(trades.size(), 2);
     CHECK_EQ(trades[1].datetime, kdata.getDatetimeList()[1]);
     CHECK_EQ(trades[1].business, BUSINESS_BUY);
+}
+
+/** @par Check point: the executor uses the margin buying power when the parent supports automatic
+ * cash financing, and the optional auto_checkin tops up the parent cash */
+TEST_CASE("test_MultiSystem_margin_and_auto_checkin") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(19991118));
+    KData kdata1 = stk1.getKData(query);
+    KData kdata2 = stk2.getKData(query);
+    REQUIRE(kdata1.size() > 1);
+    REQUIRE(kdata2.size() > 1);
+
+    auto run_case = [&](bool margin, bool auto_checkin, bool single) {
+        auto ms = std::make_shared<MultiSystem>("ms");
+        auto tm = crtTM(Datetime(199001010000LL), 20000.0, TC_FixedA2017(0.0003, 5.0));
+        ms->setTM(tm);
+        // readyForRun propagates the MultiSystem switch to the parent TM, a value set on the TM
+        // directly would be overwritten
+        ms->setParam<bool>("support_borrow_cash", margin);
+        ms->getAF()->setParam<double>("max_total_position", 0.0);  // no AF budget cap
+        // The single-instrument case checks buying power, so the L3 cap must be off as well
+        ms->getAF()->setParam<double>("max_single_position", single ? 0.0 : 1.0);
+        ms->getAF()->setParam<double>("fixed_amount", single ? 25000.0 : 15000.0);
+        ms->setAutoCheckin(auto_checkin);
+        auto sys1 = create_alway_buy_sys();
+        sys1->setTO(kdata1);
+        ms->add(sys1);
+        if (!single) {
+            auto sys2 = create_alway_buy_sys();
+            sys2->setTO(kdata2);
+            ms->add(sys2);
+        }
+        // Only the first bar rebalances, so the accumulated trades equal this single batch (a
+        // multi-day run would hide a rejected tail leg behind the next day's orders)
+        ms->setAdjustDates({kdata1.getDatetimeList()[0]});
+        ms->run(kdata1);
+        double bought = 0.0;
+        int buys = 0;
+        for (const auto& tr : tm->getTradeList()) {
+            if (tr.business == BUSINESS_BUY) {
+                bought += tr.realPrice * tr.number * tr.stock.unit();
+                ++buys;
+            }
+        }
+        return std::make_pair(bought, buys);
+    };
+
+    /** @arg without financing or the top-up the buys are scaled to the cash */
+    CHECK_LE(run_case(false, false, false).first, 20000.0 * 1.02);
+
+    /** @arg automatic cash financing lets a single order exceed the cash: the buying power is
+     *  cash / margin rate (0.6), so the 25000 target is filled instead of being scaled */
+    CHECK_GT(run_case(true, false, true).first, 24000.0);
+
+    /** @arg a multi-leg financed batch is funded leg by leg (the tail must not be rejected by the
+     *  trade manager): both instruments trade */
+    auto multi = run_case(true, false, false);
+    CHECK_EQ(multi.second, 2);
+    CHECK_GT(multi.first, 21000.0);
+
+    /** @arg auto_checkin deposits the gap including the commission, so both legs are filled (the
+     *  filled value stays below 2 x 15000 because of the board-lot rounding) */
+    CHECK_GT(run_case(false, true, false).first, 26000.0);
+
+    /** @arg financing combined with auto_checkin: the FULL gap is deposited, so every leg is
+     *  cash-covered and filled without borrowing */
+    auto both = run_case(true, true, false);
+    CHECK_EQ(both.second, 2);
+    CHECK_GT(both.first, 26000.0);
 }
 
 /** @par Check point: fixed_amount targets exceeding the total budget are truncated to whole

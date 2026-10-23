@@ -186,9 +186,16 @@ Notes:
         lower ``fixed_amount`` or raise the cap. In mode B a zero-quota sub-system follows the
         ``sell_at_not_selected`` / ``adjust_running_sys`` rules (liquidated and stopped when the former
         is true, a running sub-system stays untouched when the latter is false). Note: AF no longer
-        scales the fixed amount down, but the executor still clips the orders to the **available cash**
-        of the parent account, and the ">1 allows leverage" promise depends on the TradeManager funding
-        capability (``support_borrow_cash``). To run leverage or keep the original amounts, raise
+        scales the fixed amount down, but the executor still respects the parent funding: with automatic
+        cash financing (``support_borrow_cash``, set on the ``MultiSystem`` and propagated to the parent
+        TM by ``readyForRun``) the buying power is derived from the **margin rate per order** -- a single
+        order may exceed the available cash, while a multi-leg batch is funded in order and the later legs
+        may be shrunk (the same leg-by-leg model as the TradeManager); a short cover always needs full cash
+        and is never financed. Without financing the orders are scaled to the available cash. ``MultiSystem``
+        also has ``auto_checkin`` (default ``False``): it deposits **extra principal** for the gap computed
+        from the money plus the commission (combined with financing it deposits the full amount, so every
+        leg is cash-covered), which keeps the planned quantities tradable at the cost of an
+        inflated backtest equity curve; because the targets may change every bar it can top up repeatedly. To run leverage or keep the original amounts, raise
         ``max_total_position`` (0 means no limit)
     * - ``fixed_amount`` is applied once per instrument in mode A
       - In mode A the fixed amount is priced **per instrument**, not per suggestion: when the same instrument

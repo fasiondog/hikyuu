@@ -783,6 +783,19 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :rtype: DatetimeList)")
       .def("set_trade_on_close", &MultiSystem::setTradeOnClose, py::arg("on_close"),
            "Set whether to execute the rebalancing orders at the close stage")
+      .def("set_auto_checkin", &MultiSystem::setAutoCheckin, py::arg("auto_checkin"),
+           R"(set_auto_checkin(self, auto_checkin)
+
+    Set whether the parent account tops up its own cash when the executable suggestions exceed the
+    available cash (aligned with the money manager auto_checkin). It deposits the gap computed from
+    the money plus the commission instead of borrowing, so the backtest principal is inflated; it is
+    meant to keep the planned quantities tradable, not as a funding policy. It only applies to the
+    parent executor of modes A/B (mode C trades on the shared account and ignores it). The value is
+    snapshotted by readyForRun: a change during a run takes effect at the next preparation.
+
+    :param bool auto_checkin: whether to top up the parent cash)")
+      .def("get_auto_checkin", &MultiSystem::getAutoCheckin,
+           "Get whether the parent account tops up its own cash")
       .def("set_adjust_mode", &MultiSystem::setAdjustMode, py::arg("mode"),
            R"(set_adjust_mode(self, mode)
 
