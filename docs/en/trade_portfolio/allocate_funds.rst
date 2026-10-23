@@ -183,6 +183,12 @@ Notes:
         is held by N sub-systems, only the aggregated signed direction is taken and one ``±fixed_amount``
         target is applied per instrument (it is not multiplied by N). Conflicting directions cancel out, so a
         flat aggregate drives the instrument to zero
+    * - The first plan price of an instrument wins
+      - Mode A converts the aggregated target market value into shares by the ``plan_price`` of the
+        suggestions: when several suggestions of one instrument carry different prices the **first one
+        wins** (the others are only logged at debug level). The plan prices should come from the same
+        bar and the same price convention (same adjustment and slippage), otherwise the share count
+        will not match the target market value
     * - Mode A re-targets only the instruments covered by this round's suggestions
       - Mode A takes this round's aggregated suggestions as its target snapshot: only the **instruments
         appearing in the suggestions** (those traded by a sub-system on the day, plus the liquidation legs

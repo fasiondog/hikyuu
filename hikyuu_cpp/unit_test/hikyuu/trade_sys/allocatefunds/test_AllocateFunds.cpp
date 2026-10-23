@@ -255,6 +255,41 @@ TEST_CASE("test_AllocateFunds_L2_reversal_legs") {
 }
 
 /** @par Test points */
+TEST_CASE("test_AllocateFunds_L2_plan_price_first") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no position: net assets = 100000
+    auto af = AF_EqualWeight();
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sys1 = create_test_sys(3, 5);
+    auto sys2 = create_test_sys(5, 10);
+    std::unordered_map<SYSPtr, double> weights{{sys1, 1.0}, {sys2, 1.0}};
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sys1;
+    s.plan_price = 10.0;
+    s.target_position_ratio = 0.25;  // 25000 each, 50000 in total
+    TradeSuggestion s2 = s;
+    s2.sys = sys2;
+    s2.plan_price = 12.0;
+
+    /** @arg the first suggestion fixes the price: 50000 / 10 = 5000 shares */
+    TradeSuggestionList suggestions{s, s2};
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK_EQ(suggestions[0].plan_price, doctest::Approx(10.0));
+    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+
+    /** @arg the position decides, not the value: reversed, 50000 / 12 = 4166.67 shares */
+    TradeSuggestionList reversed{s2, s};
+    af->_toTargets(date, tm, reversed, weights, KQuery(), "A");
+    REQUIRE_EQ(reversed.size(), 1);
+    CHECK_EQ(reversed[0].plan_price, doctest::Approx(12.0));
+    CHECK_EQ(reversed[0].number, doctest::Approx(50000.0 / 12.0));
+}
+
+/** @par Test points */
 TEST_CASE("test_AllocateFunds_L3_shrink_only") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();

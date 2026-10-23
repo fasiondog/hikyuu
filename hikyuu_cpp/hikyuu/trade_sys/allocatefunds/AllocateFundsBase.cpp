@@ -296,7 +296,17 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
         }
-        price[s.stock] = s.plan_price;
+        // The first suggestion of an instrument fixes the price used for the share conversion: a
+        // later one carrying another price is ignored, so the outcome never depends on the order of
+        // the tail. A mismatch means the sub-systems priced different bars, only a debug notice
+        auto pit = price.find(s.stock);
+        if (pit == price.end()) {
+            price[s.stock] = s.plan_price;
+        } else if (std::fabs(pit->second - s.plan_price) >
+                   1e-9 * std::max(std::fabs(pit->second), s.plan_price)) {
+            HKU_DEBUG("{}::_toTargets: {} has conflicting plan prices ({}, {}), the first is used!",
+                      m_name, s.stock.market_code(), pit->second, s.plan_price);
+        }
         if (fixed_amount > 0.0) {
             // fixed_amount: the pricing is per instrument, not per suggestion. The same instrument
             // held by N sub-systems must not be scaled to N x fixed_amount, so only the aggregate
