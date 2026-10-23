@@ -26,6 +26,37 @@ BOOST_CLASS_EXPORT(hku::MultiSystem)
 
 namespace hku {
 
+MultiSystem::MultiSystem() : System() {
+    _initAxisParam();
+    // The default MM of the aggregate parent system is mode A (signal aggregation, the base
+    // allocate implements the equal weight allocation)
+    if (!getMM()) {
+        setMM(MM_Nothing());
+    }
+}
+
+MultiSystem::MultiSystem(const string& name) : System(name) {
+    _initAxisParam();
+    if (!getMM()) {
+        setMM(MM_Nothing());
+    }
+}
+
+MultiSystem::MultiSystem(const SystemPtr& sys) : m_sys_list(sys ? SystemList{sys} : SystemList{}) {
+    _initAxisParam();
+    if (!getMM()) {
+        setMM(MM_Nothing());
+    }
+}
+
+MultiSystem::MultiSystem(const SystemList& sys_list, const string& name)
+: System(name), m_sys_list(sys_list) {
+    _initAxisParam();
+    if (!getMM()) {
+        setMM(MM_Nothing());
+    }
+}
+
 void MultiSystem::_initAxisParam() {
     setParam<string>("axis_mode", "kdata");
     // Aligned with the master PF adjust_mode / delay_to_trading_day

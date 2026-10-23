@@ -65,33 +65,10 @@ class SelectorBase;  // Forward declaration, to avoid a circular include with Se
 
 class HKU_API MultiSystem : public System {
 public:
-    MultiSystem() : System() {
-        _initAxisParam();
-        // The default MM of the aggregate parent system is mode A (signal aggregation, the base
-        // allocate implements the equal weight allocation)
-        if (!getMM()) {
-            setMM(MM_Nothing());
-        }
-    }
-    explicit MultiSystem(const string& name) : System(name) {
-        _initAxisParam();
-        if (!getMM()) {
-            setMM(MM_Nothing());
-        }
-    }
-    explicit MultiSystem(const SystemPtr& sys) : m_sys_list(sys ? SystemList{sys} : SystemList{}) {
-        _initAxisParam();
-        if (!getMM()) {
-            setMM(MM_Nothing());
-        }
-    }
-    explicit MultiSystem(const SystemList& sys_list, const string& name = "MultiSystem")
-    : System(name), m_sys_list(sys_list) {
-        _initAxisParam();
-        if (!getMM()) {
-            setMM(MM_Nothing());
-        }
-    }
+    MultiSystem();
+    explicit MultiSystem(const string& name);
+    explicit MultiSystem(const SystemPtr& sys);
+    explicit MultiSystem(const SystemList& sys_list, const string& name = "MultiSystem");
     virtual ~MultiSystem() = default;
 
     /** Add a sub-system (with the circular reference detection, it rejects the node that contains
