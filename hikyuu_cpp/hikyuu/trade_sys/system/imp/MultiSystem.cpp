@@ -62,6 +62,50 @@ void MultiSystem::_initAxisParam() {
     // Aligned with the master PF adjust_mode / delay_to_trading_day
     setParam<string>("adjust_mode", "query");
     setParam<bool>("delay_to_trading_day", true);
+    // Bound to the runtime members: m_adjust_cycle / m_trade_on_close / m_sell_at_not_selected
+    setParam<int>("adjust_cycle", m_adjust_cycle);
+    setParam<bool>("trade_on_close", m_trade_on_close);
+    setParam<bool>("sell_at_not_selected", m_sell_at_not_selected);
+}
+
+void MultiSystem::_checkParam(const string& name) const {
+    auto* self = const_cast<MultiSystem*>(this);
+    if (name == "adjust_cycle") {
+        int cycle = getParam<int>("adjust_cycle");
+        if (cycle <= 0) {
+            HKU_WARN("Invalid adjust_cycle {} (<=0), treated as 1! [{}]", cycle, this->name());
+            cycle = 1;
+            self->m_params.set<int>("adjust_cycle", cycle);
+        }
+        if (self->m_adjust_cycle != cycle) {
+            self->m_adjust_cycle = cycle;
+        }
+        self->_clearCycleDates();
+        _warnAdjustCycleOutOfRange();
+    } else if (name == "adjust_mode") {
+        string mode = getParam<string>("adjust_mode");
+        string fixed = mode;
+        to_lower(fixed);
+        if (fixed != "query" && fixed != "day" && fixed != "week" && fixed != "month" &&
+            fixed != "quarter" && fixed != "year") {
+            HKU_WARN(
+              "Invalid adjust_mode: {}, only query/day/week/month/quarter/year supported, "
+              "fallback to \"query\"! [{}]",
+              mode, this->name());
+            fixed = "query";
+        }
+        if (fixed != mode) {
+            self->m_params.set<string>("adjust_mode", fixed);
+        }
+        self->_clearCycleDates();
+        _warnAdjustCycleOutOfRange();
+    } else if (name == "delay_to_trading_day") {
+        self->_clearCycleDates();
+    } else if (name == "trade_on_close") {
+        self->m_trade_on_close = getParam<bool>("trade_on_close");
+    } else if (name == "sell_at_not_selected") {
+        self->m_sell_at_not_selected = getParam<bool>("sell_at_not_selected");
+    }
 }
 
 void MultiSystem::setMode(const string& mode) {
@@ -492,17 +536,11 @@ void MultiSystem::clearDateAxis() {
 }
 
 void MultiSystem::setAdjustCycle(int cycle) {
-    if (cycle <= 0) {
-        HKU_WARN("Invalid adjust_cycle {} (<=0), treated as 1! [{}]", cycle, name());
-    }
-    m_adjust_cycle = cycle > 0 ? cycle : 1;
-    _clearCycleDates();
-    _warnAdjustCycleOutOfRange();
+    setParam<int>("adjust_cycle", cycle);
 }
 
 void MultiSystem::setDelayToTradingDay(bool v) {
     setParam<bool>("delay_to_trading_day", v);
-    _clearCycleDates();
 }
 
 void MultiSystem::clearAdjustDates() {
@@ -521,21 +559,7 @@ void MultiSystem::setAdjustDates(const DatetimeList& dates) {
 }
 
 void MultiSystem::setAdjustMode(const string& mode) {
-    string m = mode;
-    to_lower(m);
-    if (m != "query" && m != "day" && m != "week" && m != "month" && m != "quarter" &&
-        m != "year") {
-        HKU_WARN(
-          "Invalid adjust_mode: {}, only query/day/week/month/quarter/year supported, "
-          "fallback to \"query\"! [{}]",
-          mode, name());
-        setParam<string>("adjust_mode", "query");
-        _clearCycleDates();
-        return;
-    }
-    setParam<string>("adjust_mode", m);
-    _clearCycleDates();
-    _warnAdjustCycleOutOfRange();
+    setParam<string>("adjust_mode", mode);
 }
 
 void MultiSystem::_warnAdjustCycleOutOfRange() const {

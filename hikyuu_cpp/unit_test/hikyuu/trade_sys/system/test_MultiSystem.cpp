@@ -1029,6 +1029,56 @@ TEST_CASE("test_MultiSystem_adjust_mode") {
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 }
 
+/** @par Check point: the switch parameters (adjust_cycle / adjust_mode /
+ * delay_to_trading_day / trade_on_close / sell_at_not_selected) keep the parameter, setter
+ * and runtime state in sync */
+TEST_CASE("test_MultiSystem_switch_params") {
+    MultiSystem ms("ms");
+
+    /** @arg all switches are registered as parameters with the member defaults */
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 1);
+    CHECK_EQ(ms.getParam<string>("adjust_mode"), "query");
+    CHECK_EQ(ms.getParam<bool>("delay_to_trading_day"), true);
+    CHECK_EQ(ms.getParam<bool>("trade_on_close"), true);
+    CHECK_EQ(ms.getParam<bool>("sell_at_not_selected"), false);
+
+    /** @arg setting the parameters updates the runtime state */
+    ms.setParam<int>("adjust_cycle", 5);
+    CHECK_EQ(ms.getAdjustCycle(), 5);
+    ms.setParam<string>("adjust_mode", "month");
+    CHECK_EQ(ms.getAdjustMode(), "month");
+    ms.setParam<bool>("delay_to_trading_day", false);
+    CHECK_EQ(ms.getDelayToTradingDay(), false);
+    ms.setParam<bool>("trade_on_close", false);
+    CHECK_EQ(ms.getTradeOnClose(), false);
+    ms.setParam<bool>("sell_at_not_selected", true);
+    CHECK_EQ(ms.getSellAtNotSelected(), true);
+
+    /** @arg the setters write back to the parameters */
+    ms.setAdjustCycle(2);
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 2);
+    ms.setAdjustMode("week");
+    CHECK_EQ(ms.getParam<string>("adjust_mode"), "week");
+    ms.setDelayToTradingDay(true);
+    CHECK_EQ(ms.getParam<bool>("delay_to_trading_day"), true);
+    ms.setTradeOnClose(true);
+    CHECK_EQ(ms.getParam<bool>("trade_on_close"), true);
+    ms.setSellAtNotSelected(false);
+    CHECK_EQ(ms.getParam<bool>("sell_at_not_selected"), false);
+
+    /** @arg an invalid cycle is clamped in both the member and the parameter */
+    ms.setParam<int>("adjust_cycle", 0);
+    CHECK_EQ(ms.getAdjustCycle(), 1);
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 1);
+
+    /** @arg the parameter path keeps the out-of-range policy (warned but not clamped) */
+    ms.setParam<int>("adjust_cycle", 7);
+    CHECK_EQ(ms.getAdjustCycle(), 7);
+    ms.setParam<string>("adjust_mode", "week");
+    CHECK_EQ(ms.getAdjustMode(), "week");
+    CHECK_EQ(ms.getAdjustCycle(), 7);
+}
+
 /** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value that can
  * never reach a driven day of the period is warned but kept, never clamped) */
 TEST_CASE("test_MultiSystem_adjust_cycle_validation") {

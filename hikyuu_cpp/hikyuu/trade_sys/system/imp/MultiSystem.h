@@ -196,7 +196,7 @@ public:
 
     /** Set whether to execute the rebalancing orders at the close stage */
     void setTradeOnClose(bool v) {
-        m_trade_on_close = v;
+        setParam<bool>("trade_on_close", v);
     }
 
     /** Get whether to execute the rebalancing orders at the close stage */
@@ -220,7 +220,7 @@ public:
      *  instruments by the zero-target rebalancing)
      */
     void setSellAtNotSelected(bool v) {
-        m_sell_at_not_selected = v;
+        setParam<bool>("sell_at_not_selected", v);
     }
 
     /** Get whether to force liquidating the unselected sub-systems */
@@ -348,6 +348,10 @@ private:
     // reference detection)
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
 
+    /** Keep the parameter aliases (adjust_cycle / trade_on_close / sell_at_not_selected) in sync
+     * with the runtime members they mirror */
+    virtual void _checkParam(const string& name) const override;
+
 private:
     /** Run by the specified driving axis: when axis is empty the date sequence of the input KData
      * is used as the axis, otherwise axis is the driving axis (when driven by the fixed time axis,
@@ -356,7 +360,8 @@ private:
     void _runAxis(const KData& kdata, const DatetimeList* axis, bool reset, bool resetAll);
 
     /** Register the parameters of the aggregate system itself (axis_mode / adjust_mode /
-     * delay_to_trading_day) */
+     * delay_to_trading_day) and the aliases of the runtime members (adjust_cycle /
+     * trade_on_close / sell_at_not_selected) */
     void _initAxisParam();
 
     /** Aggregate a group of trades into a net suggestion by instrument (marked with the source
@@ -744,6 +749,13 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_adjust_cycle);
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);
         ar& BOOST_SERIALIZATION_NVP(m_sell_at_not_selected);
+        if (Archive::is_loading::value) {
+            // The switches are also exposed as parameters; older archives only carry the members,
+            // so the parameter table must be backfilled here
+            m_params.set<int>("adjust_cycle", m_adjust_cycle);
+            m_params.set<bool>("trade_on_close", m_trade_on_close);
+            m_params.set<bool>("sell_at_not_selected", m_sell_at_not_selected);
+        }
         ar& BOOST_SERIALIZATION_NVP(m_mode);
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_se);
