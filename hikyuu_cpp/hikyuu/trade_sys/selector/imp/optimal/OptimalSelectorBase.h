@@ -23,6 +23,17 @@ struct RunRanges {
     : start(start_), run_start(run_start_), end(end_) {}
 };
 
+// The walk-forward result of one candidate within a window: the index of the prototype (used to map
+// the selection back to the running systems, which the portfolio aggregates match by identity) and
+// the window-local trained copy (returned to the callers that run the selected system directly,
+// such as SYS_WalkForward)
+struct OptimalSelectedItem {
+    size_t index{0};
+    double weight{0.0};
+    SYSPtr trained;
+};
+using OptimalSelectedList = vector<OptimalSelectedItem>;
+
 class HKU_API OptimalSelectorBase : public SelectorBase {
     CLASS_LOGGER_IMP(SE_Optimal)
     SELECTOR_IMP(OptimalSelectorBase)
@@ -71,7 +82,9 @@ protected:
     bool _prepareCalculate(const KQuery& query, DatetimeList& dates,
                            vector<std::pair<size_t, size_t>>& train_ranges) const;
 
-    unordered_map<Datetime, std::shared_ptr<SystemWeightList>> m_sys_dict;
+    SYSPtr _selectedSystem(size_t candIndex, const SYSPtr& trained) const;
+
+    unordered_map<Datetime, std::shared_ptr<OptimalSelectedList>> m_sys_dict;
     vector<RunRanges> m_run_ranges;
 };
 

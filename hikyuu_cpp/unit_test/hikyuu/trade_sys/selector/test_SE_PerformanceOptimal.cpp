@@ -6,6 +6,7 @@
  */
 
 #include "../../test_config.h"
+#include <algorithm>
 #include <stdexcept>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
@@ -395,6 +396,53 @@ TEST_CASE("test_SE_PerformanceOptimal_index_single") {
     CHECK_EQ(after.size(), 1);
     CHECK_EQ(after[0].sys->name(), base[0].sys->name());
     CHECK_EQ(after[0].weight, base[0].weight);
+}
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_real_list_identity") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    // The systems actually run by a portfolio, in the same order as the prototype list
+    SystemList real_list;
+    for (const auto& proto : se->getProtoSystemList()) {
+        auto sys = proto->clone();
+        sys->setStock(stk);
+        real_list.emplace_back(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    se->calculate(real_list, query);
+    auto dates = StockManager::instance().getTradingCalendar(query);
+
+    /** @arg when a real system list is given the selected instances are the running systems
+     *  themselves (matched by identity), not the window-local training copies */
+    size_t selected_count = 0;
+    for (size_t i = 30; i < dates.size(); i++) {
+        auto sw = se->getSelected(dates[i]);
+        if (sw.empty()) {
+            continue;
+        }
+        selected_count++;
+        CHECK_UNARY(std::find(real_list.begin(), real_list.end(), sw[0].sys) != real_list.end());
+    }
+    CHECK_GT(selected_count, 0);
+
+    /** @arg without a real system list the window-local trained copy is returned instead, as
+     *  SYS_WalkForward runs the returned system directly */
+    se->reset();
+    se->calculate(SystemList(), query);
+    auto sw = se->getSelected(dates.back());
+    REQUIRE_UNARY(sw.size() == 1);
+    CHECK_UNARY(std::find(real_list.begin(), real_list.end(), sw[0].sys) == real_list.end());
 }
 
 //-----------------------------------------------------------------------------

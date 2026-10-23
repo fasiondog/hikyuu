@@ -37,6 +37,8 @@
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
+#include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Signal.h>
 #if HKU_SUPPORT_SERIALIZATION
 #include <fstream>
@@ -1667,6 +1669,71 @@ TEST_CASE("test_MultiSystem_combined_se_clone") {
     auto dates = StockManager::instance().getTradingCalendar(query);
     REQUIRE_UNARY(!dates.empty());
     CHECK_EQ(cloned->getSE()->getSelected(dates.back()).size(), 2);
+}
+
+/** @par Check point: an optimal selector maps its ranking back to the running systems, so every
+ *  mode admits the selected sub-system instead of dropping all of them as unselected */
+TEST_CASE("test_MultiSystem_performance_optimal_se") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    REQUIRE_GT(dates.size(), 20);
+
+    for (const string& mode : {"A", "B", "C"}) {
+        auto se = SE_PerformanceOptimal();
+        se->setParam<int>("train_len", 10);
+        se->setParam<int>("test_len", 5);
+        se->addStockList({stk1, stk2}, create_alway_buy_sys());
+
+        auto ms = std::make_shared<MultiSystem>("ms_optimal_" + mode);
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+        ms->setTM(tm);
+        ms->setMode(mode);
+        ms->setSE(se);
+        if (mode != "C") {
+            ms->setAF(AF_EqualWeight());
+        }
+        ms->run(query);
+
+        auto sys_list = ms->getSystemList();
+        REQUIRE_EQ(sys_list.size(), 2);
+
+        /** @arg the selected instance is one of the running systems (identity contract) */
+        size_t selected_count = 0;
+        for (size_t i = dates.size() - 5; i < dates.size(); i++) {
+            auto sw = se->getSelected(dates[i]);
+            if (sw.empty()) {
+                continue;
+            }
+            selected_count++;
+            CHECK_UNARY(sw[0].sys == sys_list[0] || sw[0].sys == sys_list[1]);
+        }
+        CHECK_GT(selected_count, 0);
+
+        /** @arg mode C books the sub-system trades on the shared account of the parent, the
+         *  training windows must not leak into it */
+        if (mode == "C") {
+            for (auto& sys : sys_list) {
+                CHECK(sys->getTM() == tm);
+                CHECK(sys->getParam<bool>("shared_tm"));
+            }
+            CHECK_GT(tm->getTradeList().size(), 1);
+
+            auto* opt = dynamic_cast<OptimalSelectorBase*>(se.get());
+            REQUIRE_UNARY(opt != nullptr);
+            REQUIRE_UNARY(!opt->getRunRanges().empty());
+            const Datetime init_datetime(199001010000LL);
+            const Datetime first_run_start = opt->getRunRanges().front().run_start;
+            for (const auto& tr : tm->getTradeList()) {
+                if (tr.datetime != init_datetime) {
+                    CHECK_GE(tr.datetime, first_run_start);
+                }
+            }
+        }
+    }
 }
 
 /** @par Check point: mode C converges sys_use_self_tm onto the shared account of the parent
