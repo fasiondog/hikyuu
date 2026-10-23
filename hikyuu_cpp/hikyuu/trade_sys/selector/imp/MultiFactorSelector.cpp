@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/trade_sys/multifactor/build_in.h"
+#include "hikyuu/trade_sys/multifactor/buildin_scfilter.h"
 #include "MultiFactorSelector.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -169,10 +170,23 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
     bool only_should_buy = getParam<bool>("only_should_buy");
     bool reverse = getParam<bool>("reverse");
 
-    ScoreRecordList scores = m_mf->getScores(
-      date, 0, Null<size_t>(), [ignore_null, ignore_le_zero](const ScoreRecord& sc) {
-          return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
-      });
+    // ignore_null / ignore_le_zero are expressed as score filters, so the MF drops the filtered
+    // records while copying instead of copying the whole cross-section first
+    ScoreRecordList scores;
+    if (ignore_null) {
+        ScoresFilterPtr flag_filter = SCFilter_IgnoreNan();
+        if (ignore_le_zero) {
+            flag_filter = flag_filter | SCFilter_LessOrEqualValue(0.0);
+        }
+        scores = m_mf->getScores(date, 0, Null<size_t>(), flag_filter);
+    } else if (ignore_le_zero) {
+        // Keep the predicate: SCFilter_LessOrEqualValue also drops NaN, which must survive when
+        // ignore_null is false (the reverse path re-adds it on purpose)
+        scores = m_mf->getScores(date, 0, Null<size_t>(),
+                                 [](const ScoreRecord& sc) { return !(sc.value <= 0.0); });
+    } else {
+        scores = m_mf->getScores(date, 0, Null<size_t>());
+    }
 
     // MultiFactorSelector2 with filters is recommended; this is kept for the old interface
     // compatibility only Apply the user-defined score filters (set_scores_filter /
