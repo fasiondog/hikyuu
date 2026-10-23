@@ -626,6 +626,8 @@ void MultiSystem::_buildCycleDates(const DatetimeList& axis) {
 void MultiSystem::_declareCycleDate(const Datetime& date) {
     // Mode C declares the cycle start day on admission instead (the legacy Portfolio behavior)
     HKU_IF_RETURN(getMode() == "C" || date.isNull(), void());
+    // The days stay sorted: a bulk run declares the whole schedule in advance
+    HKU_IF_RETURN(std::binary_search(m_cycle_dates.begin(), m_cycle_dates.end(), date), void());
 
     DatetimeList dates = m_cycle_dates;
     dates.push_back(date);

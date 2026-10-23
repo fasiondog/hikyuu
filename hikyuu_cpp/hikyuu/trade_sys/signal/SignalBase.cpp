@@ -134,6 +134,8 @@ void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
 }
 
 void SignalBase::setCycleDates(const DatetimeList& dates) {
+    HKU_IF_RETURN(dates == m_cycle_dates, void());
+
     DatetimeList sorted;
     sorted.reserve(dates.size());
     for (const auto& date : dates) {
