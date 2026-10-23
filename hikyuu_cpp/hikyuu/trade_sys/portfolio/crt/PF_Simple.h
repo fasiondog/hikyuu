@@ -49,7 +49,9 @@ namespace hku {
  * @param tm trade account
  * @param se system selector
  * @param af fund allocation algorithm (AFPtr, carrying the L1/L2/L3 layers, see AllocateFundsBase)
- * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default
+ * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default; a negative
+ *                      value throws at set time, 0 is warned and treated as 1 at readyForRun, and a
+ *                      value that can never reach a driven day of the period is warned but kept
  * @param adjust_mode the rebalancing mode "query" | "day" | "week" | "month" | "year"
  * @param delay_to_trading_day when it is true, it is postponed to the first trading day within the
  *                             current cycle if the rebalancing day is not a trading day

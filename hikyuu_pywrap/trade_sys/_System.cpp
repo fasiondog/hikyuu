@@ -717,8 +717,10 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         "once and runs continuously (never reset). In mode B the shadow accounts start from zero "
         "and the quota comes from the L1 allocation, so this value is unused")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
-           "Set the rebalancing cycle (days); 1 means rebalancing on every close day, 0 is treated "
-           "as 1 at readyForRun, and a negative value is rejected")
+           "Set the rebalancing cycle: in query/day mode the close-day interval (1 = every close "
+           "day), in the period modes (week/month/quarter/year) the n-th calendar day of the "
+           "period. A negative value is rejected, 0 is warned and treated as 1 at readyForRun, and "
+           "a value that can never reach a driven day of the period is warned but never clamped")
       .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
            R"(set_axis_mode(self, mode)
 
@@ -939,10 +941,15 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       cycle, e.g. if the rebalancing is specified on the 1st day of every month but the 1st of that month is not a trading day,
       it is postponed to the first trading day of that month.
 
+    adjust_cycle validation: a negative value throws at set time; 0 is warned at readyForRun and
+    treated as 1 (the 1st calendar day of the period in the period modes); in the period modes a
+    value that can never reach a driven day (week > 5 / month > 31 / quarter > 92 / year > 366) is
+    warned but not clamped, and that mode then never triggers a rebalancing.
+
     :param TradeManager tm: the trade manager
     :param SelectorBase se: the trading object selection algorithm
     :param AllocateFundsBase af: the portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3)
-    :param int adjust_cycle: the rebalancing cycle
+    :param int adjust_cycle: the rebalancing cycle (the n-th calendar day of the period in the period modes); a negative value throws, 0 is warned and treated as 1, a value beyond the period length is only warned (never clamped)
     :param str adjust_mode: the rebalancing mode
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close
@@ -987,9 +994,14 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       cycle, e.g. if the rebalancing is specified on the 1st day of every month but the 1st of that month is not a trading day,
       it is postponed to the first trading day of that month.
 
+    adjust_cycle validation: a negative value throws at set time; 0 is warned at readyForRun and
+    treated as 1 (the 1st calendar day of the period in the period modes); in the period modes a
+    value that can never reach a driven day (week > 5 / month > 31 / quarter > 92 / year > 366) is
+    warned but not clamped, and that mode then never triggers a rebalancing.
+
     :param TradeManager tm: the trade manager
     :param SelectorBase se: the trading object selection algorithm
-    :param int adjust_cycle: the rebalancing cycle
+    :param int adjust_cycle: the rebalancing cycle (the n-th calendar day of the period in the period modes); a negative value throws, 0 is warned and treated as 1, a value beyond the period length is only warned (never clamped)
     :param str adjust_mode: the rebalancing mode
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close
@@ -1021,10 +1033,15 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     refactoring; PF_WithoutAF now means mode C (the legacy shared-account Portfolio) again, so the
     mode A preset is named after what it does.
 
+    adjust_cycle validation: a negative value throws at set time; 0 is warned at readyForRun and
+    treated as 1 (the 1st calendar day of the period in the period modes); in the period modes a
+    value that can never reach a driven day (week > 5 / month > 31 / quarter > 92 / year > 366) is
+    warned but not clamped, and that mode then never triggers a rebalancing.
+
     :param TradeManager tm: the trade manager
     :param SelectorBase se: the trading object selection algorithm
     :param AllocateFundsBase af: the portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3)
-    :param int adjust_cycle: the rebalancing cycle
+    :param int adjust_cycle: the rebalancing cycle (the n-th calendar day of the period in the period modes); a negative value throws, 0 is warned and treated as 1, a value beyond the period length is only warned (never clamped)
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close

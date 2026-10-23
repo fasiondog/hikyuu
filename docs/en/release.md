@@ -43,6 +43,16 @@ Migration points:
 
 See the docs: `trade_portfolio/portfolio` and `trade_portfolio/allocate_funds`.
 
+**⚠️ Behavior change: an invalid `adjust_cycle` no longer degrades silently**
+
+`adjust_cycle` on `MultiSystem` (including the value passed through by the `PF_Simple` / `PF_WithoutAF` /
+`PF_SignalAggregate` factories) is now validated: a negative value throws at set time; `0` is kept and
+warned at `ready_for_run`, where it is treated as `1` (i.e. the 1st calendar day of the period in the
+period modes); in the period modes (week/month/quarter/year) a value that can never reach a driven day
+(week > 5 / month > 31 / quarter > 92 / year > 366) is warned but not clamped, and that mode then never
+triggers a rebalancing. Previously `PF_Simple(tm, se, af, 0, "month")` silently degraded to
+"rebalance on every bar".
+
 **⚠️ Breaking change: `AF_FixedWeightList` rejects an empty weight list**
 
 `AF_FixedWeightList([])` no longer degrades silently to an `AF_EqualWeight` instance: like an all-zero or non-finite list it throws at both the factory and `set_param("weights", [])` (an empty list cannot price anything). A length that does not match the number of sub-systems still falls back to the equal weight.

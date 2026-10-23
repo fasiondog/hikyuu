@@ -53,7 +53,9 @@ namespace hku {
  * @param se system selector
  * @param af the portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3), equal weight by
  *           default
- * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default
+ * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default; a negative
+ *                      value throws at set time, 0 is warned and treated as 1 at readyForRun, and a
+ *                      value that can never reach a driven day of the period is warned but kept
  * @param adjust_mode the rebalancing mode "query" | "day" | "week" | "month" | "quarter" |
  *                    "year"
  * @param delay_to_trading_day when it is true, it is postponed to the first trading day within the

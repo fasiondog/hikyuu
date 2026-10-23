@@ -129,10 +129,14 @@ PF 部件说明:
     - "day" 模式，adjust_cycle 为调仓间隔天数；
     - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle 为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true 时，如果当日不是交易日将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月的第一个交易日。
 
+    adjust_cycle 校验：负值在设置阶段即抛异常；``0`` 在 ``readyForRun`` 时告警并按 ``1`` 处理（周期模式下即
+    “周期内第 1 个日历日”）；周期模式下永远无法落在被驱动日的值（周 > 5 / 月 > 31 / 季 > 92 / 年 > 366）
+    只告警、**不做钳制**，此时该模式不会触发调仓。
+
     :param TradeManager tm: 交易管理
     :param SelectorBase se: 交易对象选择算法
     :param AllocateFundsBase af: 资金分配算法（AF，承载 L1/L2/L3，见 :doc:`allocate_funds`）
-    :param int adjust_cycle: 调仓周期
+    :param int adjust_cycle: 调仓周期（周期模式为周期内第 n 个日历日）；负值抛异常，``0`` 告警并按 1 处理，超出周期长度仅告警、不钳制
     :param str adjust_mode: 调仓模式 "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行
@@ -158,7 +162,7 @@ PF 部件说明:
 
     :param TradeManager tm: 交易管理
     :param SelectorBase se: 交易对象选择算法
-    :param int adjust_cycle: 调仓周期
+    :param int adjust_cycle: 调仓周期（周期模式为周期内第 n 个日历日）；负值抛异常，``0`` 告警并按 1 处理，超出周期长度仅告警、不钳制
     :param str adjust_mode: 调仓模式 "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行（同时下发为子系统的 buy_delay/sell_delay 映射）
@@ -182,7 +186,7 @@ PF 部件说明:
     :param TradeManager tm: 交易管理
     :param SelectorBase se: 交易对象选择算法
     :param AllocateFundsBase af: 资金分配算法（AF，承载 L1/L2/L3，默认等权，见 :doc:`allocate_funds`）
-    :param int adjust_cycle: 调仓周期
+    :param int adjust_cycle: 调仓周期（周期模式为周期内第 n 个日历日）；负值抛异常，``0`` 告警并按 1 处理，超出周期长度仅告警、不钳制
     :param str adjust_mode: 调仓模式 "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行

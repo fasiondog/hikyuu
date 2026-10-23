@@ -148,10 +148,15 @@ Built-in Portfolios
     - In "day" mode, adjust_cycle is the number of days between rebalances;
     - In "week" | "month" | "quarter" | "year" mode, adjust_cycle specifies the N-th day of the corresponding week, month, quarter, or year; when delay_to_trading_day is false and that day is not a trading day, the rebalance is skipped; when delay_to_trading_day is true and that day is not a trading day, it is deferred to the first trading day within the current cycle — e.g. if rebalancing is scheduled for the 1st of every month and the 1st of that month is not a trading day, it is deferred to the first trading day of that month.
 
+    adjust_cycle validation: a negative value throws at set time; ``0`` is warned at ``readyForRun`` and
+    treated as ``1`` (the 1st calendar day of the period in the period modes); in the period modes a value
+    that can never reach a driven day (week > 5 / month > 31 / quarter > 92 / year > 366) is warned but
+    **not clamped**, and that mode then never triggers a rebalancing.
+
     :param TradeManager tm: the trade manager
     :param SelectorBase se: the selector (the instrument selection algorithm)
     :param AllocateFundsBase af: the fund allocation algorithm (AF; carries L1/L2/L3, see :doc:`allocate_funds`)
-    :param int adjust_cycle: the rebalancing cycle
+    :param int adjust_cycle: the rebalancing cycle (the n-th calendar day of the period in the period modes); a negative value throws, ``0`` is warned and treated as 1, a value beyond the period length is only warned (never clamped)
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
     :param bool trade_on_close: whether the trades are executed at the close
@@ -184,7 +189,7 @@ Built-in Portfolios
 
     :param TradeManager tm: the trade manager
     :param SelectorBase se: the selector (the instrument selection algorithm)
-    :param int adjust_cycle: the rebalancing cycle
+    :param int adjust_cycle: the rebalancing cycle (the n-th calendar day of the period in the period modes); a negative value throws, ``0`` is warned and treated as 1, a value beyond the period length is only warned (never clamped)
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
     :param bool trade_on_close: whether the trades are executed at the close (also mapped onto the sub-system buy_delay / sell_delay)
@@ -211,7 +216,7 @@ Built-in Portfolios
     :param TradeManager tm: the trade manager
     :param SelectorBase se: the selector (the instrument selection algorithm)
     :param AllocateFundsBase af: the fund allocation algorithm (AF, carrying L1/L2/L3, equal weight by default, see :doc:`allocate_funds`)
-    :param int adjust_cycle: the rebalancing cycle
+    :param int adjust_cycle: the rebalancing cycle (the n-th calendar day of the period in the period modes); a negative value throws, ``0`` is warned and treated as 1, a value beyond the period length is only warned (never clamped)
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
     :param bool trade_on_close: whether the trades are executed at the close

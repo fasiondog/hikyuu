@@ -47,6 +47,14 @@
 
 详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
 
+**⚠️ 行为变更：`adjust_cycle` 非法值不再静默降级**
+
+`MultiSystem` 的 `adjust_cycle`（含 `PF_Simple` / `PF_WithoutAF` / `PF_SignalAggregate` 三个工厂的透传值）
+现在校验取值：负值在设置阶段直接抛异常；`0` 保留原值，在 `ready_for_run` 时告警并按 `1` 处理（周期模式下
+即“周期内第 1 个日历日”）；周期模式（week/month/quarter/year）下永远无法落在被驱动日的值
+（周 > 5 / 月 > 31 / 季 > 92 / 年 > 366）只告警、不钳制，此时该模式不再触发调仓。
+此前 `PF_Simple(tm, se, af, 0, "month")` 会静默退化为“每根 K 线都调仓”。
+
 **⚠️ 破坏性变更：`AF_FixedWeightList` 空权重列表改为抛异常**
 
 `AF_FixedWeightList([])` 不再静默降级为 `AF_EqualWeight` 实例，而是与全零/非有限权重一致，
