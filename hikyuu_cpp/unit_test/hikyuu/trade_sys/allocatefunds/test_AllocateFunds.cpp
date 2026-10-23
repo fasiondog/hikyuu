@@ -8,8 +8,10 @@
  */
 
 #include "doctest/doctest.h"
+#include <cmath>
 #include <limits>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_EqualWeight.h>
+#include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedAmount.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedWeightList.h>
 
 using namespace hku;
@@ -55,6 +57,42 @@ TEST_CASE("test_AllocateFunds_base_params") {
     CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(0.0));
     CHECK_NOTHROW(af->setParam<double>("max_single_position", -1.0));
     CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(-1.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_AllocateFunds_checkParam") {
+    AFPtr af = AF_EqualWeight();
+
+    /** @arg a NaN max_single_position is rejected (it would silently disable the concentration cap)
+     */
+    CHECK_THROWS_AS(af->setParam<double>("max_single_position", std::nan("")), std::exception);
+
+    /** @arg a NaN max_total_position is rejected (it would silently disable the total budget cap)
+     */
+    CHECK_THROWS_AS(af->setParam<double>("max_total_position", std::nan("")), std::exception);
+
+    /** @arg non-positive / >1 values stay valid: <=0 means no limit and >1 is clamped in use */
+    CHECK_NOTHROW(af->setParam<double>("max_single_position", 0.0));
+    CHECK_NOTHROW(af->setParam<double>("max_single_position", -1.0));
+    CHECK_NOTHROW(af->setParam<double>("max_single_position", 2.0));
+    CHECK_NOTHROW(af->setParam<double>("max_total_position", 0.0));
+    CHECK_NOTHROW(af->setParam<double>("max_total_position", 2.0));
+
+    /** @arg fixed_amount: 0 (disabled) and a positive amount are valid */
+    CHECK_NOTHROW(af->setParam<double>("fixed_amount", 0.0));
+    CHECK_NOTHROW(af->setParam<double>("fixed_amount", 30000.0));
+
+    /** @arg fixed_amount: a negative value is rejected (it would silently fall back to weights) */
+    CHECK_THROWS_AS(af->setParam<double>("fixed_amount", -1.0), std::exception);
+
+    /** @arg fixed_amount: NaN / inf are rejected */
+    CHECK_THROWS_AS(af->setParam<double>("fixed_amount", std::nan("")), std::exception);
+    CHECK_THROWS_AS(af->setParam<double>("fixed_amount", std::numeric_limits<double>::infinity()),
+                    std::exception);
+
+    /** @arg the AF_FixedAmount factory goes through the same validation */
+    CHECK_NOTHROW(AF_FixedAmount(20000.0));
+    CHECK_THROWS_AS(AF_FixedAmount(-1.0), std::exception);
 }
 
 /** @par Test points */

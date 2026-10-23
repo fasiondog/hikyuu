@@ -183,6 +183,14 @@ Notes:
         is held by N sub-systems, only the aggregated signed direction is taken and one ``±fixed_amount``
         target is applied per instrument (it is not multiplied by N). Conflicting directions cancel out, so a
         flat aggregate drives the instrument to zero
+    * - Mode A re-targets only the instruments covered by this round's suggestions
+      - Mode A takes this round's aggregated suggestions as its target snapshot: only the **instruments
+        appearing in the suggestions** (those traded by a sub-system on the day, plus the liquidation legs
+        MultiSystem injects for the unselected systems) are converted and traded by the delta; **an
+        instrument that does not appear keeps the parent's current position untouched**. AF assumes the
+        parent book mirrors the sub-system books and does not detect or close positions that no sub-system
+        corresponds to (e.g. a manual trade on the parent account, or a sub-system removed from the list
+        without liquidation)
 
 
 Built-in Asset Allocation Algorithms
@@ -333,6 +341,15 @@ Asset Allocation Algorithm Base Class
 
         The unified entry point for L1/L2/L3 (usually called internally by :class:`MultiSystem`): it first runs ``_allocate`` to obtain the weights,
         then converts them into executable quantities via ``_to_targets``, and finally applies risk-control clipping via ``_check_risk``.
+
+        .. note::
+
+            **Internal to MultiSystem only; it is not part of the user-facing API**. It assumes that
+            ``contexts`` / ``suggestions`` / ``mode`` have been prepared by the aggregate system on a
+            rebalancing day. Calling it directly with hand-built arguments only produces meaningless
+            targets - it places no order and affects no backtest; drive a :class:`MultiSystem`
+            instead. Custom algorithms should override ``_allocate`` / ``_to_targets`` /
+            ``_check_risk`` rather than call this entry.
 
         :param Datetime date: the allocation date
         :param TradeManager tm: the parent-account trade manager

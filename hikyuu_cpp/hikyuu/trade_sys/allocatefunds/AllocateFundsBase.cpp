@@ -90,6 +90,17 @@ void AllocateFundsBase::baseCheckParam(const string& name) const {
     }
     HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
               name, fixed_name);
+
+    if (name == "max_single_position" || name == "max_total_position") {
+        // <=0 disables the cap and >1 is clamped in use, but a NaN silently disables both risk
+        // controls
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if (name == "fixed_amount") {
+        // 0 disables the fixed amount; a negative or non-finite value would silently fall back to
+        // the weight pricing
+        double v = getParam<double>(name);
+        HKU_ASSERT(std::isfinite(v) && v >= 0.0);
+    }
 }
 
 void AllocateFundsBase::paramChanged() {}
@@ -272,6 +283,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // Mode A: the parent synthesizes one net target per instrument from the sub-system snapshots.
     // Each suggestion carries the signed net exposure ratio (target_position_ratio) of one
     // sub-system for one instrument; the parent target value = sum(weight x ratio) x parent net.
+    // Only the instruments present in the suggestions are re-targeted: an instrument with no
+    // suggestion keeps the parent's current position untouched (the parent book is assumed to
+    // mirror the sub books, so AF does not chase orphan holdings).
     double parent_net = tm->getFunds(date, ktype).net_assets();
     double fixed_amount = getParam<double>("fixed_amount");
 

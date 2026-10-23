@@ -45,6 +45,16 @@ TEST_CASE("test_SE_MultiFactor") {
     CHECK_THROWS(ret->setParam<int>("ic_n", 0));
     CHECK_THROWS(ret->setParam<int>("ic_rolling_n", 0));
     CHECK_THROWS(ret->setParam<string>("mode", "MF"));
+    /** @arg mf_recover_type out of the valid range (v1 and v2) */
+    CHECK_THROWS(ret->setParam<int>("mf_recover_type", 999));
+    CHECK_THROWS(ret->setParam<int>("mf_recover_type", -1));
+    /** @arg mf_recover_type on the valid boundaries is accepted */
+    CHECK_NOTHROW(ret->setParam<int>("mf_recover_type", KQuery::NO_RECOVER));
+    CHECK_NOTHROW(ret->setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE));
+
+    auto ret2 = SE_MultiFactor2(src_inds);
+    CHECK_THROWS(ret2->setParam<int>("mf_recover_type", 999));
+    CHECK_THROWS(ret2->setParam<int>("mf_recover_type", -1));
 
     /** @arg src_inds is empty and the others are the default parameters */
     CHECK_THROWS(SE_MultiFactor(IndicatorList{}));
