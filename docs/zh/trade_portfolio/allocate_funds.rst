@@ -314,6 +314,13 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
         L1/L2/L3 统一入口（通常由 :class:`MultiSystem` 内部调用）：先执行 ``_allocate`` 得到权重，
         再经 ``_to_targets`` 换算为可执行数量，最后经 ``_check_risk`` 组合风控裁剪。
 
+        .. note::
+
+            **仅供 MultiSystem 内部调用，不属于面向用户的 API**：它假定 ``contexts`` /
+            ``suggestions`` / ``mode`` 已由聚合系统在调仓日准备就绪。手工构造参数直接调用只会得到
+            无意义的换算结果——既不下单，也不影响任何回测；请改为驱动 :class:`MultiSystem`。
+            自定义算法应重载 ``_allocate`` / ``_to_targets`` / ``_check_risk``，而非调用本入口。
+
         :param Datetime date: 分配日期
         :param TradeManager tm: 父账户交易管理
         :param TradeSuggestionList suggestions: 子系统交易建议（就地改写）

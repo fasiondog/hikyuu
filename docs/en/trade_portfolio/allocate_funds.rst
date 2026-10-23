@@ -334,6 +334,15 @@ Asset Allocation Algorithm Base Class
         The unified entry point for L1/L2/L3 (usually called internally by :class:`MultiSystem`): it first runs ``_allocate`` to obtain the weights,
         then converts them into executable quantities via ``_to_targets``, and finally applies risk-control clipping via ``_check_risk``.
 
+        .. note::
+
+            **Internal to MultiSystem only; it is not part of the user-facing API**. It assumes that
+            ``contexts`` / ``suggestions`` / ``mode`` have been prepared by the aggregate system on a
+            rebalancing day. Calling it directly with hand-built arguments only produces meaningless
+            targets - it places no order and affects no backtest; drive a :class:`MultiSystem`
+            instead. Custom algorithms should override ``_allocate`` / ``_to_targets`` /
+            ``_check_risk`` rather than call this entry.
+
         :param Datetime date: the allocation date
         :param TradeManager tm: the parent-account trade manager
         :param TradeSuggestionList suggestions: the sub-system trade suggestions (rewritten in place)

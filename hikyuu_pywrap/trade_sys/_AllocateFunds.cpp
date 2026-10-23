@@ -144,9 +144,13 @@ Common parameters:
            py::arg("suggestions"), py::arg("contexts"), py::arg("query"), py::arg("mode"),
            R"(allocate(self, date, tm, suggestions, contexts, query, mode)
 
-    The unified entry of the L1/L2/L3 pipeline (L1 _allocate -> L2 _to_targets -> L3 _check_risk),
-    called by MultiSystem internally on the rebalancing day after the sub-system suggestions are
-    collected. Custom algorithms normally only override the three hooks instead of this entry.
+    The unified entry of the L1/L2/L3 pipeline (L1 _allocate -> L2 _to_targets -> L3 _check_risk).
+
+    Internal entry point, not part of the user-facing API: it is called by MultiSystem on the
+    rebalancing day after the sub-system suggestions are collected, and it assumes that contexts /
+    suggestions / mode have been prepared by MultiSystem. Calling it directly with hand-built
+    arguments yields meaningless targets - it places no order and affects no backtest; drive a
+    MultiSystem instead. Custom algorithms normally only override the three hooks.
 
     :param Datetime date: the trade date
     :param TradeManager tm: the real trade account of the parent (aggregate) system
