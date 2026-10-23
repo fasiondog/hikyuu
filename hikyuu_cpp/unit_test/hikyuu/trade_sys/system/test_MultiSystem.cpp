@@ -164,12 +164,6 @@ TEST_CASE("test_MultiSystem_axis_mode") {
     CHECK_EQ(ms.getAxisMode(), "kdata");
     CHECK_EQ(ms.getParam<string>("axis_mode"), "kdata");
 
-    /** @arg the deprecated hyphenated parameter names are rejected instead of registering
-     * dead keys */
-    CHECK_THROWS_AS(ms.setParam<string>("axis-mode", "kdata"), std::exception);
-    CHECK_THROWS_AS(ms.setParam<string>("adjust-mode", "query"), std::exception);
-    CHECK_THROWS_AS(ms.setParam<bool>("delay-to-trading-day", true), std::exception);
-
     /** @arg switchable to calendar (the injected fixed date table drives the axis) */
     ms.setAxisMode("calendar");
     CHECK_EQ(ms.getAxisMode(), "calendar");

@@ -371,9 +371,6 @@ private:
     // reference detection)
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
 
-    /** Reject the deprecated hyphenated parameter names instead of registering dead keys */
-    virtual void _checkParam(const string& name) const override;
-
 private:
     /** Run by the specified driving axis: when axis is empty the date sequence of the input KData
      * is used as the axis, otherwise axis is the driving axis (when driven by the fixed time axis,
@@ -383,12 +380,7 @@ private:
 
     /** Register the parameters of the aggregate system itself (axis_mode / adjust_mode /
      * delay_to_trading_day) */
-    void _initAxisParam() {
-        setParam<string>("axis_mode", "kdata");
-        // Aligned with the master PF adjust_mode / delay_to_trading_day
-        setParam<string>("adjust_mode", "query");
-        setParam<bool>("delay_to_trading_day", true);
-    }
+    void _initAxisParam();
 
     /** Aggregate a group of trades into a net suggestion by instrument (marked with the source
      * sub-system sys). funds_before is the "before-trade" fund snapshot of the sub-system on that

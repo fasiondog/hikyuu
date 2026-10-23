@@ -26,17 +26,11 @@ BOOST_CLASS_EXPORT(hku::MultiSystem)
 
 namespace hku {
 
-void MultiSystem::_checkParam(const string& name) const {
-    string fixed_name;
-    if (name == "axis-mode") {
-        fixed_name = "axis_mode";
-    } else if (name == "adjust-mode") {
-        fixed_name = "adjust_mode";
-    } else if (name == "delay-to-trading-day") {
-        fixed_name = "delay_to_trading_day";
-    }
-    HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
-              name, fixed_name);
+void MultiSystem::_initAxisParam() {
+    setParam<string>("axis_mode", "kdata");
+    // Aligned with the master PF adjust_mode / delay_to_trading_day
+    setParam<string>("adjust_mode", "query");
+    setParam<bool>("delay_to_trading_day", true);
 }
 
 void MultiSystem::setMode(const string& mode) {
