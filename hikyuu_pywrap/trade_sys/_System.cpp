@@ -745,12 +745,13 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         "once and runs continuously (never reset). In mode B the shadow accounts start from zero "
         "and the quota comes from the L1 allocation, so this value is unused")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
-           "Set the rebalancing cycle (days), <=1 means rebalancing on every close day")
+           "Set the rebalancing cycle (days); 1 means rebalancing on every close day, 0 is treated "
+           "as 1 at readyForRun, and a negative value is rejected")
       .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
            R"(set_axis_mode(self, mode)
 
     Set the driving time axis mode: "kdata" (the default, the dates of the input KData of run(kdata) are used as the driving axis)
-    or "calendar" (the fixed date table injected by set_date_axis is used as the driving axis). An invalid value is warned and it falls back to "kdata".
+    or "calendar" (the fixed date table injected by set_date_axis is used as the driving axis). An invalid value is rejected.
 
     :param str mode: "kdata" / "calendar")")
       .def("get_axis_mode", &MultiSystem::getAxisMode, "Get the driving time axis mode")
@@ -812,7 +813,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     Set the rebalancing mode (taking over the master PF adjust_mode):
       - "query" / "day" (the default): continue the "every N close days" counting judgment of set_adjust_cycle;
       - "week" / "month" / "quarter" / "year": judge the rebalancing days by the runtime period rule ("the adjust_cycle-th day within the cycle" on the driving axis).
-    An invalid value is warned and it falls back to "query".
+    An invalid value is rejected.
 
     :param str mode: "query" / "day" / "week" / "month" / "quarter" / "year")")
       .def("get_adjust_mode", &MultiSystem::getAdjustMode, "Get the rebalancing mode")

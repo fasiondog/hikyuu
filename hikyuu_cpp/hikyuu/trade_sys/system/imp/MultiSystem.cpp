@@ -62,49 +62,57 @@ void MultiSystem::_initAxisParam() {
     // Aligned with the master PF adjust_mode / delay_to_trading_day
     setParam<string>("adjust_mode", "query");
     setParam<bool>("delay_to_trading_day", true);
-    // Bound to the runtime members: m_adjust_cycle / m_trade_on_close / m_sell_at_not_selected
-    setParam<int>("adjust_cycle", m_adjust_cycle);
-    setParam<bool>("trade_on_close", m_trade_on_close);
-    setParam<bool>("sell_at_not_selected", m_sell_at_not_selected);
+    // Snapshotted into the run-time switches at readyForRun
+    setParam<int>("adjust_cycle", 1);
+    setParam<bool>("trade_on_close", true);
+    setParam<bool>("sell_at_not_selected", false);
+}
+
+void MultiSystem::_refreshRunConfig() {
+    int cycle = getAdjustCycle();
+    if (cycle <= 0) {
+        HKU_WARN("Invalid adjust_cycle {} (<=0), treated as 1! [{}]", cycle, name());
+        cycle = 1;
+        m_params.set<int>("adjust_cycle", cycle);
+    }
+    string mode = getAdjustMode();
+    string fixed = mode;
+    to_lower(fixed);
+    if (fixed != mode) {
+        m_params.set<string>("adjust_mode", fixed);
+    }
+    const bool delay = getDelayToTradingDay();
+    if (cycle != m_adjust_cycle || fixed != m_adjust_mode || delay != m_delay_to_trading_day) {
+        m_adjust_cycle = cycle;
+        m_adjust_mode = fixed;
+        m_delay_to_trading_day = delay;
+        _clearCycleDates();
+        m_adjust_cycle_warned = false;
+    }
+    m_trade_on_close = getTradeOnClose();
+    m_sell_at_not_selected = getSellAtNotSelected();
+    if (!m_adjust_cycle_warned) {
+        m_adjust_cycle_warned = true;
+        _warnAdjustCycleOutOfRange();
+    }
 }
 
 void MultiSystem::_checkParam(const string& name) const {
-    auto* self = const_cast<MultiSystem*>(this);
+    // Only the fully illegal values are rejected here; the clamping/normalization and the
+    // derived state reset belong to the run-time preparation (_refreshRunConfig)
     if (name == "adjust_cycle") {
-        int cycle = getParam<int>("adjust_cycle");
-        if (cycle <= 0) {
-            HKU_WARN("Invalid adjust_cycle {} (<=0), treated as 1! [{}]", cycle, this->name());
-            cycle = 1;
-            self->m_params.set<int>("adjust_cycle", cycle);
-        }
-        if (self->m_adjust_cycle != cycle) {
-            self->m_adjust_cycle = cycle;
-        }
-        self->_clearCycleDates();
-        _warnAdjustCycleOutOfRange();
+        HKU_ASSERT(getParam<int>("adjust_cycle") >= 0);
     } else if (name == "adjust_mode") {
         string mode = getParam<string>("adjust_mode");
-        string fixed = mode;
-        to_lower(fixed);
-        if (fixed != "query" && fixed != "day" && fixed != "week" && fixed != "month" &&
-            fixed != "quarter" && fixed != "year") {
-            HKU_WARN(
-              "Invalid adjust_mode: {}, only query/day/week/month/quarter/year supported, "
-              "fallback to \"query\"! [{}]",
-              mode, this->name());
-            fixed = "query";
-        }
-        if (fixed != mode) {
-            self->m_params.set<string>("adjust_mode", fixed);
-        }
-        self->_clearCycleDates();
-        _warnAdjustCycleOutOfRange();
-    } else if (name == "delay_to_trading_day") {
-        self->_clearCycleDates();
-    } else if (name == "trade_on_close") {
-        self->m_trade_on_close = getParam<bool>("trade_on_close");
-    } else if (name == "sell_at_not_selected") {
-        self->m_sell_at_not_selected = getParam<bool>("sell_at_not_selected");
+        to_lower(mode);
+        HKU_CHECK(mode == "query" || mode == "day" || mode == "week" || mode == "month" ||
+                    mode == "quarter" || mode == "year",
+                  "Invalid adjust_mode: {}! only query/day/week/month/quarter/year supported",
+                  getParam<string>("adjust_mode"));
+    } else if (name == "axis_mode") {
+        string mode = getParam<string>("axis_mode");
+        HKU_CHECK(mode == "kdata" || mode == "calendar",
+                  "Invalid axis_mode: {}! only \"kdata\" / \"calendar\" supported", mode);
     }
 }
 
@@ -202,6 +210,8 @@ void MultiSystem::readyForRun() {
     // entry, which calls readyForRun before the first run)
     _adoptSEProtos();
     HKU_CHECK(!m_sys_list.empty(), "No subsystem specified! {}", name());
+
+    _refreshRunConfig();
 
     // The rebalancing days are the run-level input of the cycle signals: push the days declared by
     // _runAxis down BEFORE the sub-system trading objects are (re)calculated. The entries without a
@@ -489,9 +499,6 @@ SystemPtr MultiSystem::_clone() {
     }
 
     ret->m_sub_init_cash = m_sub_init_cash;
-    ret->m_adjust_cycle = m_adjust_cycle;
-    ret->m_trade_on_close = m_trade_on_close;
-    ret->m_sell_at_not_selected = m_sell_at_not_selected;
     ret->m_mode = m_mode;            // The running mode is owned by the aggregate system itself
     ret->m_path = m_path;            // The hierarchy path is copied with the configuration
     ret->m_date_axis = m_date_axis;  // The fixed time axis is copied with the configuration (the
@@ -511,20 +518,6 @@ SystemPtr MultiSystem::_clone() {
     return ret;
 }
 
-void MultiSystem::setAxisMode(const string& mode) {
-    if (mode != "kdata" && mode != "calendar") {
-        HKU_WARN(
-          "Invalid axis_mode: {}, only \"kdata\" / \"calendar\" supported, fallback to \"kdata\"! "
-          "[{}]",
-          mode, name());
-        setParam<string>("axis_mode", "kdata");
-        _clearCycleDates();
-        return;
-    }
-    setParam<string>("axis_mode", mode);
-    _clearCycleDates();
-}
-
 void MultiSystem::setDateAxis(const DatetimeList& dates) {
     m_date_axis = dates;
     _clearCycleDates();
@@ -533,14 +526,6 @@ void MultiSystem::setDateAxis(const DatetimeList& dates) {
 void MultiSystem::clearDateAxis() {
     m_date_axis.clear();
     _clearCycleDates();
-}
-
-void MultiSystem::setAdjustCycle(int cycle) {
-    setParam<int>("adjust_cycle", cycle);
-}
-
-void MultiSystem::setDelayToTradingDay(bool v) {
-    setParam<bool>("delay_to_trading_day", v);
 }
 
 void MultiSystem::clearAdjustDates() {
@@ -558,10 +543,6 @@ void MultiSystem::setAdjustDates(const DatetimeList& dates) {
     _clearCycleDates();
 }
 
-void MultiSystem::setAdjustMode(const string& mode) {
-    setParam<string>("adjust_mode", mode);
-}
-
 void MultiSystem::_warnAdjustCycleOutOfRange() const {
     string mode = getAdjustMode();
     to_lower(mode);
@@ -576,15 +557,17 @@ void MultiSystem::_warnAdjustCycleOutOfRange() const {
     } else if (mode == "year") {
         max_days = 366;
     }
-    HKU_IF_RETURN(max_days == 0 || m_adjust_cycle <= max_days, void());
+    HKU_IF_RETURN(max_days == 0, void());
+    const int cycle = getAdjustCycle();
+    HKU_IF_RETURN(cycle <= max_days, void());
     HKU_WARN(
       "adjust_cycle {} can never reach a driven day of the {} period (max {} calendar days), "
       "that mode never rebalances! [{}]",
-      m_adjust_cycle, mode, max_days, name());
+      cycle, mode, max_days, name());
 }
 
 Datetime MultiSystem::_periodStart(const Datetime& date) const {
-    string mode = getAdjustMode();
+    string mode = m_adjust_mode;
     to_lower(mode);
     if (mode == "week") {
         return date.startOfWeek();
@@ -1654,6 +1637,7 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
     _adoptSEProtos();
     HKU_WARN_IF_RETURN(m_sys_list.empty(), void(), "No subsystem specified!");
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
+    _refreshRunConfig();
 
     if (resetAll) {
         this->forceResetAll();
@@ -1914,7 +1898,7 @@ bool MultiSystem::_isAdjustDateByPeriod(const Datetime& date, const Datetime& la
     Datetime period_start = _periodStart(date);
     HKU_IF_RETURN(period_start.isNull(), false);
     Datetime target = period_start + Days(m_adjust_cycle > 0 ? m_adjust_cycle - 1 : 0);
-    if (!getDelayToTradingDay()) {
+    if (!m_delay_to_trading_day) {
         return date.startOfDay() == target;
     }
     return date.startOfDay() >= target && last_period != period_start;

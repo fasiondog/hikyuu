@@ -168,9 +168,8 @@ TEST_CASE("test_MultiSystem_axis_mode") {
     ms.setAxisMode("calendar");
     CHECK_EQ(ms.getAxisMode(), "calendar");
 
-    /** @arg an invalid value falls back to kdata */
-    ms.setAxisMode("month");
-    CHECK_EQ(ms.getAxisMode(), "kdata");
+    /** @arg an invalid value is rejected */
+    CHECK_THROWS_AS(ms.setAxisMode("month"), std::exception);
 
     /** @arg fixed date table injection / read / clear */
     CHECK_EQ(ms.getDateAxis().size(), 0);
@@ -993,8 +992,8 @@ TEST_CASE("test_AllocateFunds_L2_null_tm") {
 // adjust_mode internalization (rebalancing date expansion) and the PF/AF preset factories
 // ============================================================================
 
-/** @par Check point: the adjust_mode parameter (default value, case normalization, invalid
- * fallback) and the delay_to_trading_day switch */
+/** @par Check point: the adjust_mode parameter is stored raw (normalization happens at the run-time
+ * preparation) and the delay_to_trading_day switch */
 TEST_CASE("test_MultiSystem_adjust_mode") {
     MultiSystem ms("ms");
     /** @arg the default adjust_mode is "query", delay_to_trading_day is true */
@@ -1002,25 +1001,17 @@ TEST_CASE("test_MultiSystem_adjust_mode") {
     CHECK_EQ(ms.getParam<string>("adjust_mode"), "query");
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 
-    /** @arg all valid values can be set (case normalized to lowercase) */
+    /** @arg the raw value is kept until the run-time preparation normalizes it */
     ms.setAdjustMode("WEEK");
-    CHECK_EQ(ms.getAdjustMode(), "week");
+    CHECK_EQ(ms.getAdjustMode(), "WEEK");
     ms.setAdjustMode("Month");
-    CHECK_EQ(ms.getAdjustMode(), "month");
+    CHECK_EQ(ms.getAdjustMode(), "Month");
     ms.setAdjustMode("quarter");
     CHECK_EQ(ms.getAdjustMode(), "quarter");
-    ms.setAdjustMode("year");
-    CHECK_EQ(ms.getAdjustMode(), "year");
-    ms.setAdjustMode("day");
-    CHECK_EQ(ms.getAdjustMode(), "day");
-    ms.setAdjustMode("query");
-    CHECK_EQ(ms.getAdjustMode(), "query");
 
-    /** @arg an invalid value falls back to query (no exception thrown) */
-    ms.setAdjustMode("monthly");
-    CHECK_EQ(ms.getAdjustMode(), "query");
-    ms.setAdjustMode("");
-    CHECK_EQ(ms.getAdjustMode(), "query");
+    /** @arg an invalid value is rejected */
+    CHECK_THROWS_AS(ms.setAdjustMode("monthly"), std::exception);
+    CHECK_THROWS_AS(ms.setAdjustMode(""), std::exception);
 
     /** @arg delay_to_trading_day can be toggled independently */
     ms.setDelayToTradingDay(false);
@@ -1066,10 +1057,13 @@ TEST_CASE("test_MultiSystem_switch_params") {
     ms.setSellAtNotSelected(false);
     CHECK_EQ(ms.getParam<bool>("sell_at_not_selected"), false);
 
-    /** @arg an invalid cycle is clamped in both the member and the parameter */
+    /** @arg a fully illegal cycle is rejected at set time */
+    CHECK_THROWS_AS(ms.setParam<int>("adjust_cycle", -1), std::exception);
+
+    /** @arg a non-positive cycle stays raw until the run-time preparation clamps it */
     ms.setParam<int>("adjust_cycle", 0);
-    CHECK_EQ(ms.getAdjustCycle(), 1);
-    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 1);
+    CHECK_EQ(ms.getAdjustCycle(), 0);
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 0);
 
     /** @arg the parameter path keeps the out-of-range policy (warned but not clamped) */
     ms.setParam<int>("adjust_cycle", 7);
@@ -1079,18 +1073,20 @@ TEST_CASE("test_MultiSystem_switch_params") {
     CHECK_EQ(ms.getAdjustCycle(), 7);
 }
 
-/** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value that can
- * never reach a driven day of the period is warned but kept, never clamped) */
+/** @par Check point: the adjust_cycle validation (a negative value is rejected at set time; <=0 is
+ * normalized to 1 by the run-time preparation; a value that can never reach a driven day of the
+ * period is warned but kept, never clamped) */
 TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
     MultiSystem ms("ms");
     /** @arg the default cycle is 1 */
     CHECK_EQ(ms.getAdjustCycle(), 1);
 
-    /** @arg <=0 is treated as 1 (the close-day counting mode) */
+    /** @arg a negative cycle is rejected at set time */
+    CHECK_THROWS_AS(ms.setAdjustCycle(-5), std::exception);
+
+    /** @arg 0 is accepted raw and normalized to 1 by the run-time preparation */
     ms.setAdjustCycle(0);
-    CHECK_EQ(ms.getAdjustCycle(), 1);
-    ms.setAdjustCycle(-5);
-    CHECK_EQ(ms.getAdjustCycle(), 1);
+    CHECK_EQ(ms.getAdjustCycle(), 0);
 
     /** @arg a value that can never reach a driven day of the period is kept as is */
     ms.setAdjustMode("week");
@@ -1107,14 +1103,37 @@ TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
     CHECK_EQ(ms.getAdjustCycle(), 60);
     CHECK_EQ(ms.getAdjustMode(), "month");
 
-    /** @arg the factory path follows the same rule (only <=0 falls back to 1) */
+    /** @arg the factory path keeps the raw value too (normalization happens at run) */
     TMPtr tm = crtTM(Datetime(20100101), 100000.0);
     auto pf = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 0, "month");
-    CHECK_EQ(pf->getAdjustCycle(), 1);
+    CHECK_EQ(pf->getAdjustCycle(), 0);
     CHECK_EQ(pf->getAdjustMode(), "month");
     auto pf2 = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 32, "month");
     CHECK_EQ(pf2->getAdjustCycle(), 32);
     CHECK_EQ(pf2->getAdjustMode(), "month");
+}
+
+/** @par Check point: the run-time preparation normalizes adjust_cycle <= 0 to 1 and lowercases
+ * adjust_mode */
+TEST_CASE("test_MultiSystem_switch_params_normalized_at_run") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 5);
+
+    auto ms = std::make_shared<MultiSystem>("ms_norm");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setAdjustCycle(0);
+    ms->setAdjustMode("WEEK");
+    auto sys = create_alway_buy_sys();
+    sys->setTO(k);
+    ms->add(sys);
+    ms->run(k);
+
+    /** @arg the clamped cycle and the lowercased mode are written back during readyForRun */
+    CHECK_EQ(ms->getAdjustCycle(), 1);
+    CHECK_EQ(ms->getAdjustMode(), "week");
 }
 
 /** @par Check point: the calcAdjustDates pure function (week/month/quarter/year × delay
@@ -2370,9 +2389,10 @@ TEST_CASE("test_MultiSystem_cycle_dates_cleared_on_config") {
     ms->run(k);
     CHECK_UNARY(!sys->getSG()->getCycleDates().empty());
 
-    /** @arg a new cycle configuration retracts the days declared by the previous one */
+    /** @arg a new cycle configuration is applied at the next run, where the previously declared
+     * days are retracted and rebuilt */
     ms->setAdjustCycle(3);
-    CHECK_UNARY(sys->getSG()->getCycleDates().empty());
+    CHECK_UNARY(!sys->getSG()->getCycleDates().empty());
 
     /** @arg the next run rebuilds them with the new configuration */
     ms->run(k);
