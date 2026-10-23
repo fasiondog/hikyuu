@@ -68,7 +68,7 @@ Built-in Selectors
     :param int topn: select only the top topn systems on each cross-section; when it is less than or equal to 0, no limit is applied
     :param int ic_n: the N-day return horizon used in the default IC calculation
     :param int ic_rolling_n: the IC rolling window
-    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000300, the CSI 300)
+    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000001, the Shanghai Composite Index)
     :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
     :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
     :return: the SE selector instance
@@ -102,7 +102,7 @@ Built-in Selectors
     :param input: the factor input: a MultiFactorBase object, a FactorSet object, or an Indicator sequence
     :param int ic_n: the N-day return horizon used in the default IC calculation
     :param int ic_rolling_n: the IC rolling window
-    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000300, the CSI 300)
+    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000001, the Shanghai Composite Index)
     :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
     :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
     :param ScoresFilter filter: the cross-sectional scores filter
@@ -123,17 +123,52 @@ Built-in Selectors
         # From a pre-created MultiFactor object, passed directly
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor2(mf)
-        
+
+Multi-Factor Selector v1 vs v2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SE_MultiFactor`` keeps the legacy interface, while ``SE_MultiFactor2`` offers more flexible control
+through a composable score-filter chain. The main differences:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 41 41
+
+   * - Aspect
+     - SE_MultiFactor (v1)
+     - SE_MultiFactor2 (recommended)
+   * - Score filtering
+     - ``ignore_null`` (True by default), ``ignore_le_zero`` (False by default); extra filters may be appended with ``add_scores_filter``
+     - A filter chain, defaulting to ``SCFilter_IgnoreNan()``; combine with ``set_scores_filter`` / ``add_scores_filter``
+   * - Truncation
+     - The ``topn`` parameter, 10 by default; ``<=0`` means no limit
+     - No ``topn``; truncated by ``get_n``, or controlled by the filters
+   * - Ordering
+     - ``reverse=False`` takes the top N by the highest score; ``True`` takes the last N with the lowest scores
+     - Keeps the cross-sectional order produced by the MF; no ``reverse``
+   * - Buy-signal filtering
+     - ``only_should_buy=True`` keeps only the systems issuing a buy signal on that datetime
+     - Requires a custom filter
+   * - Recovery type
+     - ``mf_recover_type``; with a given MF, ``keep_mf_recover_type`` keeps its original query recovery type
+     - ``mf_recover_type`` only; always overrides the query recovery type of a given MF
+
+.. note:: ``topn`` / ``ignore_null`` / ``ignore_le_zero`` / ``only_should_buy`` / ``reverse`` exist only in v1; v2 expresses the same semantics with the filter chain plus ``get_n``.
+
 Custom Selector Strategy
 ------------------------
 
 The selector strategy interface for customization consists of the following override hooks:
 
-* :py:meth:`SelectorBase.is_match_af` - [Required] Determine whether the selector matches the AF
 * :py:meth:`SelectorBase.get_selected` - [Required] Return the list of system instances at the specified datetime
 * :py:meth:`SelectorBase._calculate` - [Required] The calculation hook
 * :py:meth:`SelectorBase._reset` - [Optional] Reset private attributes
-* :py:meth:`SelectorBase._clone` - [Required] The clone hook
+* :py:meth:`SelectorBase._clone` - [Required] The clone hook; it must return a new instance of the same Python subclass
+
+``_clone`` is invoked by the base ``clone()`` through the trampoline, and the C++ side keeps using the
+returned value as a ``SelectorBase`` instance. It must therefore build and return a new object of the same
+Python subclass (usually by copying the private attributes); returning anything that is not a ``SelectorBase``
+subclass instance (e.g. ``None``) raises a conversion error.
 
 Selector Strategy Base Class
 ----------------------------
@@ -228,8 +263,8 @@ Selector Strategy Base Class
         [Override hook] The subclass reset hook, used to reset internal private state.
     
     .. py:method:: _clone(self)
-    
-        [Override hook] The subclass clone hook.    
+
+        [Override hook] The subclass clone hook; it must return a new instance of the same Python subclass
     
     
     

@@ -128,6 +128,18 @@ public:
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               std::function<bool(const Datetime&, const ScoreRecord&)>&& filter);
 
+    /**
+     * Get the factor values (scores) within the given date cross-section range [start, end],
+     * filtered by filter
+     * @note A pure C++ filter only copies the records it keeps; a Python filter runs after the
+     *       slice is copied out, because it may recalculate the MF and invalidate the internal
+     *       cross-section
+     * @param date the given date; if the date is not in the reference dates (e.g. a non-trading
+     *        day), an empty list is returned and a warning is logged
+     * @param start the sorting start point
+     * @param end the sorting end point (excluded)
+     * @param filter the scores filter
+     */
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               const ScoresFilterPtr& filter);
 

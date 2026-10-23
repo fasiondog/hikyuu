@@ -24,7 +24,7 @@ public:
     }
 
 private:
-    unordered_map<Datetime, SystemWeightList> m_sys_dict;
+    unordered_map<Datetime, vector<SystemPtr>> m_sys_dict;
 };
 
 }  // namespace hku

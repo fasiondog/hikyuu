@@ -62,7 +62,7 @@
     :param int topn: 只选取时间截面中前 topn 个系统, 小于等于0时代表不限制
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000001 上证指数)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则使用 pearson
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :return: SE选择器实例
@@ -96,7 +96,7 @@
     :param input: 因子输入，可以是 MultiFactorBase 对象、FactorSet 对象或 Indicator 序列
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000001 上证指数)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :param ScoresFilter filter: 评分过滤器
@@ -117,17 +117,49 @@
         # 直接使用预创建的MultiFactor对象
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor2(mf)
-        
+
+多因子选择器 v1 与 v2 对照
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SE_MultiFactor`` 保留旧接口，``SE_MultiFactor2`` 通过可组合的评分过滤器链提供更灵活的控制。两者的主要差异：
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 41 41
+
+   * - 维度
+     - SE_MultiFactor（v1）
+     - SE_MultiFactor2（推荐）
+   * - 评分过滤
+     - ``ignore_null``（默认 True）、``ignore_le_zero``（默认 False）；可再叠加 ``add_scores_filter``
+     - 过滤器链，默认 ``SCFilter_IgnoreNan()``；用 ``set_scores_filter`` / ``add_scores_filter`` 组合
+   * - 截断
+     - ``topn`` 参数，默认 10；``<=0`` 表示不限制
+     - 无 ``topn``，由 ``get_n`` 截断；也可用过滤器自行控制
+   * - 排序方向
+     - ``reverse=False`` 取最高分的前 N；``True`` 取最低分的后 N
+     - 保持 MF 输出的截面顺序，无 ``reverse``
+   * - 买入信号过滤
+     - ``only_should_buy=True`` 仅保留当日有买入信号的系统
+     - 需自定义过滤器实现
+   * - 复权类型
+     - ``mf_recover_type``；已指定 MF 时 ``keep_mf_recover_type`` 可保留其原复权类型
+     - 仅 ``mf_recover_type``，始终覆盖已指定 MF 的查询复权类型
+
+.. note:: ``topn`` / ``ignore_null`` / ``ignore_le_zero`` / ``only_should_buy`` / ``reverse`` 仅在 v1 中提供；v2 用过滤器链加 ``get_n`` 表达同一语义。
+
 自定义选择器策略
 --------------------
 
 自定义选择器策略接口：
 
-* :py:meth:`SelectorBase.is_match_af` - 【必须】判断是否和AF匹配
 * :py:meth:`SelectorBase.get_selected` - 【必须】获取指定时刻的系统实例列表
 * :py:meth:`SelectorBase._calculate` - 【必须】计算接口
 * :py:meth:`SelectorBase._reset` - 【可选】重置私有属性
-* :py:meth:`SelectorBase._clone` - 【必须】克隆接口
+* :py:meth:`SelectorBase._clone` - 【必须】克隆接口，须返回同一 Python 子类的新实例
+
+``_clone`` 由基类 ``clone()`` 通过 trampoline 回调，C++ 侧会把返回值当作 ``SelectorBase`` 实例继续使用，
+因此必须构造并返回同一 Python 子类的新对象（通常复制私有属性后返回），返回非 ``SelectorBase`` 子类实例（如 ``None``）会抛出转换异常。
 
 选择器策略基类
 ----------------
@@ -222,8 +254,8 @@
         【重载接口】子类复位接口，复位内部私有变量
     
     .. py:method:: _clone(self)
-    
-        【重载接口】子类克隆接口  
+
+        【重载接口】子类克隆接口，必须返回同一 Python 子类的新实例
     
     
         

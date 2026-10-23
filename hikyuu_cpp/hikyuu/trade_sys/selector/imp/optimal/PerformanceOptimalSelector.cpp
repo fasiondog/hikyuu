@@ -32,56 +32,15 @@ SelectorPtr PerformanceOptimalSelector::_clone() {
     return std::make_shared<PerformanceOptimalSelector>();
 }
 
-void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
-    // SPEND_TIME(OptimalSelector_calculate);
-    HKU_IF_RETURN(m_calculated && m_query == query, void());
-
-    m_query = query;
-    m_real_sys_list = pf_realSysList;
-    // Drop the previous selection first: a second calculate (a new query, a portfolio re-run) must
-    // not append duplicate entries
-    m_sys_dict.clear();
-    m_run_ranges.clear();
-
-    DatetimeList dates;
-    vector<std::pair<size_t, size_t>> train_ranges;
-    HKU_IF_RETURN(!_prepareCalculate(query, dates, train_ranges), void());
-
+void PerformanceOptimalSelector::_calculate_parallel(
+  const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates, size_t test_len,
+  bool trace) {
+    // SPEND_TIME(OptimalSelector_calculate_parallel);
     string key = getParam<string>("key");
     int mode = getParam<int>("mode");
-    bool trace = getParam<bool>("trace");
     CLS_INFO_IF(trace, "statistic key: {}, mode: {}", key, mode);
 
-    _calculate_parallel(train_ranges, dates, key, mode,
-                        static_cast<size_t>(getParam<int>("test_len")), trace);
-
-    m_calculated = true;
-}
-
-void PerformanceOptimalSelector::_calculate_parallel(
-  const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates,
-  const string& key, int mode, size_t test_len, bool trace) {
-    // SPEND_TIME(OptimalSelector_calculate_parallel);
-    // The training runs the candidate clones concurrently and each range has its own query, so the
-    // candidates must not share their EV (shared_ev defaults to true), otherwise the racing
-    // setQuery calls with different queries would cross-clobber the EV state. The local
-    // protos take effect from the next clone level on, leaving the user prototypes untouched.
-    SystemList pro_list;
-    pro_list.reserve(m_pro_sys_list.size());
-    for (const auto& sys : m_pro_sys_list) {
-        auto local = sys->clone();
-        local->setParam<bool>("shared_ev", false);
-        // Mode C shares the parent account, the training copies must not book there
-        local->setParam<bool>("shared_tm", false);
-        pro_list.emplace_back(local);
-    }
-
-    if (!m_real_sys_list.empty() && m_real_sys_list.size() != m_pro_sys_list.size()) {
-        CLS_WARN(
-          "The real system list size ({}) differs from the prototype list size ({}), the selected "
-          "systems cannot be mapped back to the running list!",
-          m_real_sys_list.size(), m_pro_sys_list.size());
-    }
+    SystemList pro_list = _cloneProtosForTraining();
 
     auto sys_list = global_parallel_for_index(
       0, train_ranges.size(),
@@ -158,42 +117,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
           return selected_sys_list;
       });
 
-    size_t dates_len = dates.size();
-    for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-        auto& selected_sys_list = sys_list[i];
-        if (!selected_sys_list->empty()) {
-            // Run directly when no real list is given
-            for (auto& item : *selected_sys_list) {
-                if (item.trained) {
-                    item.trained->reset();
-                }
-            }
-
-            size_t train_start = train_ranges[i].first;
-            size_t test_start = train_ranges[i].second;
-            size_t test_end = test_start + test_len;
-            if (test_end > dates_len) {
-                test_end = dates_len;
-            }
-
-            for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = selected_sys_list;
-            }
-
-            if (test_end < dates_len) {
-                m_run_ranges.emplace_back(
-                  RunRanges(dates[train_start], dates[test_start], dates[test_end]));
-            } else {
-                m_run_ranges.emplace_back(RunRanges(dates[train_start], dates[test_start],
-                                                    dates[test_end - 1] + Minutes(1)));
-            }
-
-            CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1,
-                        selected_sys_list->front().trained
-                          ? selected_sys_list->front().trained->getStock().market_code()
-                          : std::string());
-        }
-    }
+    _applySelected(sys_list, dates, train_ranges, test_len, trace);
 }
 
 SEPtr HKU_API SE_PerformanceOptimal(const string& key, int mode) {

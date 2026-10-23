@@ -456,16 +456,26 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     }
     HKU_IF_RETURN(start >= end, ret);
 
+    if (!filter) {
+        ret.reserve(end - start);
+        for (size_t i = start; i < end; i++) {
+            ret.emplace_back(cross[i]);
+        }
+        return ret;
+    }
+
+    // A pure C++ filter cannot re-enter and invalidate the cross-section, so a full-range filter
+    // consumes the internal list directly and only copies the records it keeps; a Python filter
+    // may trigger a recalculation, so the slice is copied out first to keep the reference valid
+    if (start == 0 && end == cross.size() && !filter->hasPythonPart()) {
+        return filter->filter(cross, date, m_query);
+    }
+
     ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
         ret.emplace_back(cross[i]);
     }
-
-    if (filter) {
-        ret = filter->filter(ret, date, m_query);
-    }
-
-    return ret;
+    return filter->filter(ret, date, m_query);
 }
 
 const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {

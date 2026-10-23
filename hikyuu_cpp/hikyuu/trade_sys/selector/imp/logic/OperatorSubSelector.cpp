@@ -13,6 +13,8 @@ BOOST_CLASS_EXPORT(hku::OperatorSubSelector)
 
 namespace hku {
 
+// A negative weight (e.g. an empty left operand, 0 - w) is intentional: the raw difference is kept
+// for the downstream filter to flip or screen, so it is neither clamped nor dropped here
 SystemWeightList OperatorSubSelector::_getSelected(Datetime date) {
     return getUnionSelected(date, [](double w1, double w2) { return w1 - w2; });
 }

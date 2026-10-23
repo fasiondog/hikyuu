@@ -20,14 +20,12 @@ public:
     virtual ~PerformanceOptimalSelector() = default;
 
     virtual void _checkParam(const string& name) const override;
-    virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
 
     virtual SelectorPtr _clone() override;
 
 private:
     void _calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
-                             const DatetimeList& dates, const string& key, int mode,
-                             size_t test_len, bool trace);
+                             const DatetimeList& dates, size_t test_len, bool trace) override;
 };
 
 }  // namespace hku

@@ -16,6 +16,7 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/trade_sys/multifactor/crt/MF_EqualWeight.h>
 #include <hikyuu/trade_sys/multifactor/crt/MF_Weight.h>
+#include <hikyuu/trade_sys/multifactor/buildin_scfilter.h>
 
 using namespace hku;
 
@@ -217,6 +218,53 @@ TEST_CASE("test_MF_Weight_scores_range_overflow") {
     auto ret2 =
       mf->getScores(dates.back(), 1000, Null<size_t>(), [](const ScoreRecord&) { return true; });
     CHECK_UNARY(ret2.empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_MF_Weight_scores_scores_filter") {
+    StockManager& sm = StockManager::instance();
+    IndicatorList src_inds = {MA(CLOSE())};
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(-30);
+    Stock ref_stk = sm["sh000001"];
+    auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
+    Datetime date = mf->getDatetimeList().back();
+    auto cross = mf->getScores(date);
+    REQUIRE_GT(cross.size(), (size_t)0);
+
+    ScoreRecordList expected;
+    for (const auto& sc : cross) {
+        if (!std::isnan(sc.value)) {
+            expected.emplace_back(sc);
+        }
+    }
+
+    /** @arg a full-range filter (end is Null) keeps exactly the records the predicate keeps */
+    auto full = mf->getScores(date, 0, Null<size_t>(), SCFilter_IgnoreNan());
+    REQUIRE_EQ(full.size(), expected.size());
+    for (size_t i = 0; i < full.size(); i++) {
+        CHECK_EQ(full[i].stock, expected[i].stock);
+    }
+
+    /** @arg an explicit end equal to the cross-section size takes the same full-range path */
+    auto full2 = mf->getScores(date, 0, cross.size(), SCFilter_IgnoreNan());
+    REQUIRE_EQ(full2.size(), expected.size());
+    for (size_t i = 0; i < full2.size(); i++) {
+        CHECK_EQ(full2[i].stock, expected[i].stock);
+    }
+
+    /** @arg a partial range filters only the requested slice */
+    auto part = mf->getScores(date, 1, cross.size(), SCFilter_IgnoreNan());
+    ScoreRecordList expected_part;
+    for (size_t i = 1; i < cross.size(); i++) {
+        if (!std::isnan(cross[i].value)) {
+            expected_part.emplace_back(cross[i]);
+        }
+    }
+    REQUIRE_EQ(part.size(), expected_part.size());
+    for (size_t i = 0; i < part.size(); i++) {
+        CHECK_EQ(part[i].stock, expected_part[i].stock);
+    }
 }
 
 /** @par Test points */
