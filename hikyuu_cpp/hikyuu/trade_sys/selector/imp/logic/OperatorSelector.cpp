@@ -56,6 +56,12 @@ OperatorSelector::OperatorSelector(const string& name, const SelectorPtr& se1,
 OperatorSelector::~OperatorSelector() {}
 
 void OperatorSelector::build() {
+    // Idempotent: the base class load has already restored m_pro_sys_list, build must rebuild
+    // instead of appending, otherwise the prototype list doubles after a round-trip
+    m_pro_sys_list.clear();
+    m_se1_set.clear();
+    m_se2_set.clear();
+
     auto inter = findIntersection(m_se1, m_se2);
     if (m_se1 && m_se2) {
         std::map<System*, SYSPtr> tmpdict;

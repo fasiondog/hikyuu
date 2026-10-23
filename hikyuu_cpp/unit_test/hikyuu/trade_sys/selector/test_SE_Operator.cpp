@@ -6,7 +6,12 @@
  */
 
 #include "../../test_config.h"
+#include <fstream>
+#include <set>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
@@ -983,5 +988,125 @@ TEST_CASE("test_SE_DivValue_byZero") {
         CHECK_UNARY(std::isnan(sw.weight));
     }
 }
+
+#if HKU_SUPPORT_SERIALIZATION
+
+/** @par Test points */
+TEST_CASE("test_SE_Operator_export") {
+    StockManager& sm = StockManager::instance();
+
+    TMPtr tm = crtTM(Datetime(20010101), 100000);
+    SYSPtr sys = SYS_Simple();
+    sys->setTM(tm);
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    sys->setMM(MM_FixedCount(100));
+    sys->reset();
+
+    auto p1 = sys->clone();
+    p1->setStock(sm["sh600000"]);
+    auto p2 = sys->clone();
+    p2->setStock(sm["sz000001"]);
+    auto p3 = sys->clone();
+    p3->setStock(sm["sz000002"]);
+
+    // se1: {p1, p2}, se2: {p2, p3}, p2 is the shared intersection prototype
+    SEPtr se1 = SE_Fixed(0.25);
+    se1->addSystem(p1);
+    se1->addSystem(p2);
+    SEPtr se2 = SE_Fixed(0.5);
+    se2->addSystem(p2);
+    se2->addSystem(p3);
+
+    auto round_trip = [&sm](const SEPtr& se, const string& tag) {
+        string filename(sm.tmpdir());
+        filename += fmt::format("/SE_Operator_{}.xml", tag);
+        {
+            std::ofstream ofs(filename);
+            boost::archive::xml_oarchive oa(ofs);
+            oa << BOOST_SERIALIZATION_NVP(se);
+        }
+
+        SEPtr loaded;
+        {
+            std::ifstream ifs(filename);
+            boost::archive::xml_iarchive ia(ifs);
+            ia >> BOOST_SERIALIZATION_NVP(loaded);
+        }
+        return loaded;
+    };
+
+    auto check_protos = [](const SEPtr& se) {
+        /** @arg The prototype list is rebuilt, not doubled, after the round-trip */
+        const auto& protos = se->getProtoSystemList();
+        REQUIRE_EQ(protos.size(), 3);
+        std::set<string> codes;
+        for (const auto& s : protos) {
+            CHECK_UNARY(codes.insert(s->getStock().market_code()).second);
+        }
+        return protos;
+    };
+
+    /** @arg SE_Add round-trip keeps the union prototypes and the union weights */
+    SEPtr se = round_trip(se1 + se2, "SE_Add");
+    CHECK_EQ(se->name(), "SE_Add");
+    auto protos = check_protos(se);
+    for (const auto& s : protos) {
+        se->bindRealToProto(s, s);
+    }
+    se->calculate(protos, KQuery(-20));
+    auto result = se->getSelected(Datetime(200001010000L));
+    REQUIRE_EQ(result.size(), 3);
+    CHECK_EQ(sm["sz000001"], result[0].sys->getStock());
+    CHECK_EQ(sm["sz000002"], result[1].sys->getStock());
+    CHECK_EQ(sm["sh600000"], result[2].sys->getStock());
+    CHECK_EQ(result[0].weight, 0.75);
+    CHECK_EQ(result[1].weight, 0.5);
+    CHECK_EQ(result[2].weight, 0.25);
+
+    /** @arg SE_Sub round-trip keeps the union prototypes and the difference weights */
+    se = round_trip(se1 - se2, "SE_Sub");
+    CHECK_EQ(se->name(), "SE_Sub");
+    protos = check_protos(se);
+    for (const auto& s : protos) {
+        se->bindRealToProto(s, s);
+    }
+    se->calculate(protos, KQuery(-20));
+    result = se->getSelected(Datetime(200001010000L));
+    REQUIRE_EQ(result.size(), 3);
+    CHECK_EQ(sm["sh600000"], result[0].sys->getStock());
+    CHECK_EQ(sm["sz000001"], result[1].sys->getStock());
+    CHECK_EQ(sm["sz000002"], result[2].sys->getStock());
+    CHECK_EQ(result[0].weight, 0.25);
+    CHECK_EQ(result[1].weight, -0.25);
+    CHECK_EQ(result[2].weight, -0.5);
+
+    /** @arg SE_Multi round-trip keeps the intersection prototype and the product weight */
+    se = round_trip(se1 * se2, "SE_Multi");
+    CHECK_EQ(se->name(), "SE_Multi");
+    protos = check_protos(se);
+    for (const auto& s : protos) {
+        se->bindRealToProto(s, s);
+    }
+    se->calculate(protos, KQuery(-20));
+    result = se->getSelected(Datetime(200001010000L));
+    REQUIRE_EQ(result.size(), 1);
+    CHECK_EQ(sm["sz000001"], result[0].sys->getStock());
+    CHECK_EQ(result[0].weight, 0.125);
+
+    /** @arg SE_Div round-trip keeps the intersection prototype and the quotient weight */
+    se = round_trip(se1 / se2, "SE_Div");
+    CHECK_EQ(se->name(), "SE_Div");
+    protos = check_protos(se);
+    for (const auto& s : protos) {
+        se->bindRealToProto(s, s);
+    }
+    se->calculate(protos, KQuery(-20));
+    result = se->getSelected(Datetime(200001010000L));
+    REQUIRE_EQ(result.size(), 1);
+    CHECK_EQ(sm["sz000001"], result[0].sys->getStock());
+    CHECK_EQ(result[0].weight, 0.5);
+}
+
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

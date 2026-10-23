@@ -85,6 +85,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_se2);
         build();
     }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
 };
 
