@@ -322,20 +322,26 @@ void export_Selector(py::module& m) {
         "set_scores_filter",
         [](SelectorBase& self, py::object filter) {
             py::gil_scoped_acquire gil;
-            self.setScoresFilter(filter.cast<ScoresFilterPtr>());
-            keep_python_part_alive(py::cast(self), filter);
+            if (filter.is_none()) {
+                self.setScoresFilter(SCFilterPtr());
+            } else {
+                self.setScoresFilter(filter.cast<SCFilterPtr>());
+                keep_python_part_alive(py::cast(self), filter);
+            }
         },
         R"(set_scores_filter(self, filter)
            
     Set the ScoresFilter, which will replace the existing filter. It is only applicable to SE_MultiFactor
     
-    :param ScoresFilter filter: ScoresFilter)")
+    :param ScoresFilter filter: ScoresFilter; passing None clears the filter)")
 
       .def(
         "add_scores_filter",
         [](SelectorBase& self, py::object filter) {
             py::gil_scoped_acquire gil;
-            self.addScoresFilter(filter.cast<ScoresFilterPtr>());
+            HKU_WARN_IF_RETURN(filter.is_none(), void(),
+                               "add_scores_filter: the filter is None, ignored.");
+            self.addScoresFilter(filter.cast<SCFilterPtr>());
             keep_python_part_alive(py::cast(self), filter);
         },
         R"(add_scores_filter(self, filter)
@@ -463,25 +469,43 @@ void export_Selector(py::module& m) {
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor(mf, topn=10))");
 
-    m.def("SE_MultiFactor2", py::overload_cast<const MFPtr&, const SCFilterPtr&>(SE_MultiFactor2),
-          py::arg("mf"), py::arg("filter") = SCFilter_IgnoreNan());
+    // The filter default must be None: a py::arg default of SCFilter_IgnoreNan() is evaluated
+    // once at module load and then shared by every call using the default (S03).
+    m.def(
+      "SE_MultiFactor2",
+      [](const MFPtr& mf, const py::object& filter) {
+          SCFilterPtr c_filter =
+            filter.is_none() ? SCFilter_IgnoreNan() : filter.cast<SCFilterPtr>();
+          return SE_MultiFactor2(mf, c_filter);
+      },
+      py::arg("mf"), py::arg("filter") = py::none(),
+      R"(SE_MultiFactor2
+
+    Create a multi-factor scoring based selector
+
+    :param MultiFactorBase mf: the multi-factor composition algorithm
+    :param ScoresFilterBase filter: the scores filter; when None (the default), the built-in
+        SCFilter_IgnoreNan is used)");
     // Add the overloads supporting the FactorSet and the Indicator sequence
     m.def(
       "SE_MultiFactor2",
       [](const py::object& input, int ic_n, int ic_rolling_n, const py::object& ref_stk,
-         bool spearman, const string& mode, const SCFilterPtr& filter) {
+         bool spearman, const string& mode, const py::object& filter) {
           Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
+          SCFilterPtr c_filter =
+            filter.is_none() ? SCFilter_IgnoreNan() : filter.cast<SCFilterPtr>();
 
           // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
               // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return SE_MultiFactor2(factset, ic_n, ic_rolling_n, c_ref_stk, spearman, mode,
-                                     filter);
+                                     c_filter);
           } else if (py::isinstance<py::sequence>(input)) {
               // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
-              return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode, filter);
+              return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode,
+                                     c_filter);
           } else {
               throw std::invalid_argument(
                 "First parameter must be either FactorSet or sequence of Indicator");
@@ -489,7 +513,7 @@ void export_Selector(py::module& m) {
       },
       py::arg("input"), py::arg("ic_n") = 5, py::arg("ic_rolling_n") = 120,
       py::arg("ref_stk") = py::none(), py::arg("spearman") = true,
-      py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = SCFilter_IgnoreNan(),
+      py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = py::none(),
       R"(SE_MultiFactor2
 
     Create a multi-factor scoring based selector, supporting several creation ways

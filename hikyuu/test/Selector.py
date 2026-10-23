@@ -17,6 +17,8 @@ import subprocess
 import sys
 import unittest
 
+from test_init import *
+
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CONFIG = "test_data/hikyuu_win.ini" if sys.platform == "win32" else "test_data/hikyuu_linux.ini"
 
@@ -89,8 +91,46 @@ class SelectorTest(unittest.TestCase):
         self.assertIn("OK", proc.stdout)
 
 
+class SelectorScoresFilterTest(unittest.TestCase):
+    # S03: the pybind default argument SCFilter_IgnoreNan() was evaluated once at module
+    # load and cached as a single Python object shared by every selector created with the
+    # default. Each default call must build its own instance.
+    def test_default_scfilter_not_shared(self):
+        se1 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
+        se2 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
+        self.assertIsNotNone(se1.scfilter)
+        self.assertIsNotNone(se2.scfilter)
+        self.assertIsNot(se1.scfilter, se2.scfilter)
+
+    def test_default_scfilter_not_shared_mf_overload(self):
+        stks = [sm['sh000001'], sm['sz000001']]
+        query = Query(Datetime(20110104), Datetime(20111206), Query.DAY, Query.FORWARD)
+        mf = MF_EqualWeight([MA(CLOSE(), n=5), MA(CLOSE(), n=10)], stks, query, stks[0])
+        se1 = SE_MultiFactor2(mf)
+        se2 = SE_MultiFactor2(mf)
+        self.assertIsNot(se1.scfilter, se2.scfilter)
+
+    def test_set_scores_filter_none_clears(self):
+        se = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)], filter=SCFilter_TopN(3))
+        self.assertEqual(se.scfilter.name, "SCFilter_TopN")
+        se.set_scores_filter(None)
+        self.assertIsNone(se.scfilter)
+
+    def test_add_scores_filter_isolated_between_selectors(self):
+        se1 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
+        se2 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
+        baseline = se2.scfilter
+        se1.add_scores_filter(SCFilter_TopN(2))
+        # se2's chain is untouched; se1 keeps the default head with the new filter appended
+        self.assertIs(se2.scfilter, baseline)
+        self.assertEqual(se1.scfilter.name, "SCFilter_IgnoreNan")
+
+
 def suite():
-    return unittest.TestLoader().loadTestsFromTestCase(SelectorTest)
+    suite = unittest.TestSuite()
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(SelectorTest))
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(SelectorScoresFilterTest))
+    return suite
 
 
 if __name__ == "__main__":
