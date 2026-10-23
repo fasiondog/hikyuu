@@ -650,6 +650,9 @@ void MultiSystem::_clearCycleDates() {
         auto sg = sys->getSG();
         if (sg) {
             sg->setCycleDates(empty);
+        } else if (auto* inner = dynamic_cast<MultiSystem*>(sys.get())) {
+            // A nested aggregate has no signal of its own, its cycle days live one level down
+            inner->_clearCycleDates();
         }
     }
 }

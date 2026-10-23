@@ -1734,6 +1734,39 @@ TEST_CASE("test_MultiSystem_performance_optimal_se") {
     }
 }
 
+/** @par Check point: a configuration change of the outer aggregate retracts the cycle days of a
+ *  nested aggregate as well, otherwise its cycle sub-signals keep buying on the stale days */
+TEST_CASE("test_MultiSystem_nested_clear_cycle_dates") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto cycle_sg = SG_Cycle();
+    auto cycle_sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000.0), MM_Nothing(),
+                                EnvironmentPtr(), ConditionPtr(), cycle_sg);
+    cycle_sys->setStock(stk);
+
+    // The inner aggregate runs once on its own so that its cycle days are established
+    auto inner = std::make_shared<MultiSystem>("inner");
+    inner->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    inner->setMode("A");
+    inner->add(cycle_sys);
+    inner->setSE(SE_Fixed());
+    inner->run(query);
+    REQUIRE_UNARY(!cycle_sg->getCycleDates().empty());
+
+    auto outer = std::make_shared<MultiSystem>("outer");
+    outer->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->add(inner);
+    outer->setSE(SE_Fixed());
+    outer->run(query);
+
+    /** @arg the outer reconfiguration reaches the nested cycle signal */
+    outer->setAdjustDates(DatetimeList{Datetime(19991110)});
+    CHECK_UNARY(cycle_sg->getCycleDates().empty());
+}
+
 /** @par Check point: mode C converges sys_use_self_tm onto the shared account of the parent
  * (C-O3=A): the parameter is kept for the signature compatibility only, every sub-system still ends
  * up trading on the account of the parent */
