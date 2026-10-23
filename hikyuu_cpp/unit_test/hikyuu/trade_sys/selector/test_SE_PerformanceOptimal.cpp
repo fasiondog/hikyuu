@@ -423,8 +423,7 @@ TEST_CASE("test_SE_PerformanceOptimal_real_list_identity") {
     se->calculate(real_list, query);
     auto dates = StockManager::instance().getTradingCalendar(query);
 
-    /** @arg when a real system list is given the selected instances are the running systems
-     *  themselves (matched by identity), not the window-local training copies */
+    /** @arg the selection is the running instance, not the training copy */
     size_t selected_count = 0;
     for (size_t i = 30; i < dates.size(); i++) {
         auto sw = se->getSelected(dates[i]);
@@ -436,8 +435,7 @@ TEST_CASE("test_SE_PerformanceOptimal_real_list_identity") {
     }
     CHECK_GT(selected_count, 0);
 
-    /** @arg without a real system list the window-local trained copy is returned instead, as
-     *  SYS_WalkForward runs the returned system directly */
+    /** @arg without a real list the window-local copy is returned */
     se->reset();
     se->calculate(SystemList(), query);
     auto sw = se->getSelected(dates.back());

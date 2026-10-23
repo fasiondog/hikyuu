@@ -23,10 +23,8 @@ struct RunRanges {
     : start(start_), run_start(run_start_), end(end_) {}
 };
 
-// The walk-forward result of one candidate within a window: the index of the prototype (used to map
-// the selection back to the running systems, which the portfolio aggregates match by identity) and
-// the window-local trained copy (returned to the callers that run the selected system directly,
-// such as SYS_WalkForward)
+// The prototype index (mapped back to the running systems by identity) plus the window-local
+// trained copy (run directly by SYS_WalkForward)
 struct OptimalSelectedItem {
     size_t index{0};
     double weight{0.0};

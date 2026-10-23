@@ -71,10 +71,8 @@ SystemWeightList OptimalSelectorBase::_getSelected(Datetime date) {
 }
 
 SYSPtr OptimalSelectorBase::_selectedSystem(size_t candIndex, const SYSPtr& trained) const {
-    // The portfolio aggregates compare the returned instances with their running list by pointer
-    // identity, so the candidate index must be mapped back to the real system. SYS_WalkForward
-    // passes no real list and runs the returned system directly, there the window-local copy is
-    // the only usable instance
+    // The aggregates match the selection by identity: without a real list (SYS_WalkForward, which
+    // runs the returned system directly) the window-local copy is the only usable instance
     if (m_real_sys_list.size() == m_pro_sys_list.size() && candIndex < m_real_sys_list.size()) {
         return m_real_sys_list[candIndex];
     }
@@ -166,8 +164,7 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
     for (const auto& sys : m_pro_sys_list) {
         auto local = sys->clone();
         local->setParam<bool>("shared_ev", false);
-        // Mode C hands the account of the parent to the running systems, keep the training copies
-        // on their own account, otherwise the walk-forward trades land on the real account
+        // Mode C shares the parent account, the training copies must not book there
         local->setParam<bool>("shared_tm", false);
         pro_list.emplace_back(local);
     }

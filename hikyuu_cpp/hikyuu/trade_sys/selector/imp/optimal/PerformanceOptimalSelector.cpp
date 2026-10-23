@@ -71,8 +71,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
     for (const auto& sys : m_pro_sys_list) {
         auto local = sys->clone();
         local->setParam<bool>("shared_ev", false);
-        // Mode C hands the account of the parent to the running systems, keep the training copies
-        // on their own account, otherwise the walk-forward trades land on the real account
+        // Mode C shares the parent account, the training copies must not book there
         local->setParam<bool>("shared_tm", false);
         pro_list.emplace_back(local);
     }
@@ -163,7 +162,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
         auto& selected_sys_list = sys_list[i];
         if (!selected_sys_list->empty()) {
-            // The window-local copy is run directly by the callers that pass no real list
+            // Run directly when no real list is given
             for (auto& item : *selected_sys_list) {
                 if (item.trained) {
                     item.trained->reset();

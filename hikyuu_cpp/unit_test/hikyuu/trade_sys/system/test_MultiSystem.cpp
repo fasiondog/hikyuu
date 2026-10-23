@@ -1671,8 +1671,7 @@ TEST_CASE("test_MultiSystem_combined_se_clone") {
     CHECK_EQ(cloned->getSE()->getSelected(dates.back()).size(), 2);
 }
 
-/** @par Check point: an optimal selector maps its ranking back to the running systems, so every
- *  mode admits the selected sub-system instead of dropping all of them as unselected */
+/** @par Check point: an optimal selector returns the running systems, so every mode admits one */
 TEST_CASE("test_MultiSystem_performance_optimal_se") {
     Stock stk1 = getStock("sh600000");
     Stock stk2 = getStock("sz000001");
@@ -1713,8 +1712,7 @@ TEST_CASE("test_MultiSystem_performance_optimal_se") {
         }
         CHECK_GT(selected_count, 0);
 
-        /** @arg mode C books the sub-system trades on the shared account of the parent, the
-         *  training windows must not leak into it */
+        /** @arg mode C shares the parent account, no training trade may land on it */
         if (mode == "C") {
             for (auto& sys : sys_list) {
                 CHECK(sys->getTM() == tm);
