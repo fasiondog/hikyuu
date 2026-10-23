@@ -70,6 +70,27 @@ class TestCrtAF(unittest.TestCase):
         AllocateFundsBase._to_targets(af, Datetime(200101010000), tm, lst, {}, Query(-100), "A")
         self.assertEqual(lst[0].number, 999.0)
 
+    def test_mode_a_untouched_held_instrument(self):
+        """Mode A only re-targets the instruments present in the suggestions; a held instrument
+        without any suggestion keeps the parent position untouched"""
+        af = AF_EqualWeight()
+        dt = Datetime(20111201)
+        tm = crtTM(Datetime(201111010000), 100000)
+        held = sm['sh600000']
+        tm.buy(Datetime(201111010000), held, 10.0, 100)
+        lst = TradeSuggestionList()
+        s = TradeSuggestion()
+        s.stock = sm['sz000001']
+        s.type = SuggestionType.BUY
+        s.plan_price = 1.0
+        s.target_position_ratio = 0.5
+        lst.append(s)
+        query = Query(Datetime(20111101), Datetime(20111230), Query.DAY, Query.NO_RECOVER)
+        AllocateFundsBase._to_targets(af, dt, tm, lst, {}, query, "A")
+        self.assertTrue(len(lst) > 0)
+        self.assertTrue(all(x.stock != held for x in lst))
+        self.assertEqual(tm.get_position(dt, held).number, 100)
+
     def test_multisystem_drives_hooks(self):
         """The aggregate system must drive L1/L2/L3 with the trailing mode, matching the hook signatures"""
         calls = []

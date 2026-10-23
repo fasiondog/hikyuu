@@ -283,6 +283,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // Mode A: the parent synthesizes one net target per instrument from the sub-system snapshots.
     // Each suggestion carries the signed net exposure ratio (target_position_ratio) of one
     // sub-system for one instrument; the parent target value = sum(weight x ratio) x parent net.
+    // Only the instruments present in the suggestions are re-targeted: an instrument with no
+    // suggestion keeps the parent's current position untouched (the parent book is assumed to
+    // mirror the sub books, so AF does not chase orphan holdings).
     double parent_net = tm->getFunds(date, ktype).net_assets();
     double fixed_amount = getParam<double>("fixed_amount");
 
