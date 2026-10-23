@@ -129,11 +129,15 @@ Custom Selector Strategy
 
 The selector strategy interface for customization consists of the following override hooks:
 
-* :py:meth:`SelectorBase.is_match_af` - [Required] Determine whether the selector matches the AF
 * :py:meth:`SelectorBase.get_selected` - [Required] Return the list of system instances at the specified datetime
 * :py:meth:`SelectorBase._calculate` - [Required] The calculation hook
 * :py:meth:`SelectorBase._reset` - [Optional] Reset private attributes
-* :py:meth:`SelectorBase._clone` - [Required] The clone hook
+* :py:meth:`SelectorBase._clone` - [Required] The clone hook; it must return a new instance of the same Python subclass
+
+``_clone`` is invoked by the base ``clone()`` through the trampoline, and the C++ side keeps using the
+returned value as a ``SelectorBase`` instance. It must therefore build and return a new object of the same
+Python subclass (usually by copying the private attributes); returning anything that is not a ``SelectorBase``
+subclass instance (e.g. ``None``) raises a conversion error.
 
 Selector Strategy Base Class
 ----------------------------
@@ -228,8 +232,8 @@ Selector Strategy Base Class
         [Override hook] The subclass reset hook, used to reset internal private state.
     
     .. py:method:: _clone(self)
-    
-        [Override hook] The subclass clone hook.    
+
+        [Override hook] The subclass clone hook; it must return a new instance of the same Python subclass
     
     
     

@@ -123,11 +123,13 @@
 
 自定义选择器策略接口：
 
-* :py:meth:`SelectorBase.is_match_af` - 【必须】判断是否和AF匹配
 * :py:meth:`SelectorBase.get_selected` - 【必须】获取指定时刻的系统实例列表
 * :py:meth:`SelectorBase._calculate` - 【必须】计算接口
 * :py:meth:`SelectorBase._reset` - 【可选】重置私有属性
-* :py:meth:`SelectorBase._clone` - 【必须】克隆接口
+* :py:meth:`SelectorBase._clone` - 【必须】克隆接口，须返回同一 Python 子类的新实例
+
+``_clone`` 由基类 ``clone()`` 通过 trampoline 回调，C++ 侧会把返回值当作 ``SelectorBase`` 实例继续使用，
+因此必须构造并返回同一 Python 子类的新对象（通常复制私有属性后返回），返回非 ``SelectorBase`` 子类实例（如 ``None``）会抛出转换异常。
 
 选择器策略基类
 ----------------
@@ -222,8 +224,8 @@
         【重载接口】子类复位接口，复位内部私有变量
     
     .. py:method:: _clone(self)
-    
-        【重载接口】子类克隆接口  
+
+        【重载接口】子类克隆接口，必须返回同一 Python 子类的新实例
     
     
         
