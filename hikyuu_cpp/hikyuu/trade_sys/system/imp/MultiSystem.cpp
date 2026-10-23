@@ -3447,7 +3447,9 @@ void MultiSystem::_closePhaseModeC(const Datetime& datetime, bool is_adjust,
     }
 
     // The admitted ones enter the pool (in the SE order) and ONLY the new ones get the cycle start
-    // declared, as the legacy Portfolio did (modes A/B declare the whole run in advance instead)
+    // declared, as the legacy Portfolio did (modes A/B declare the whole run in advance instead).
+    // A pool member is never re-declared, and an SE that snapshots the buy signals (SE_Signal)
+    // never admits a cycle sub-system at all
     for (auto& sys : se_selected) {
         if (_addToRunning(sys)) {
             // Being admitted again also takes the sub-system out of the force-sell pool: the two

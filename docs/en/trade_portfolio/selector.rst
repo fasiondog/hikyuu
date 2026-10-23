@@ -49,7 +49,9 @@ Built-in Selectors
 .. py:function:: SE_Signal([stk_list, sys])
 
     The signal selector: it selects instruments solely according to the buy signals of their systems
-    
+
+    The selection reads the snapshot of the buy signals computed before the run, so it cannot be combined with a cycle signal (e.g. SG_Cycle) under mode C: the cycle day is declared only when a sub-system is admitted, so the snapshot stays empty. Modes A/B push the whole rebalancing schedule down before the snapshot and do combine.
+
     :param list stk_list: the initially specified instruments
     :param System sys: the system strategy prototype
     :return: the SE selector instance

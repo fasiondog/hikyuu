@@ -23,6 +23,8 @@ SystemWeightList SignalSelector::_getSelected(Datetime date) {
 }
 
 void SignalSelector::_calculate() {
+    // Only the signals the systems already have can be selected, so a mode C cycle sub-system
+    // (declared on admission) is never seen here
     // Drop the previous selection first: a second calculate must not duplicate the systems of
     // the same day
     m_sys_dict.clear();

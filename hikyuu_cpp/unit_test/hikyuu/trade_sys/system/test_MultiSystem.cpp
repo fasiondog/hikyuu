@@ -2341,6 +2341,54 @@ TEST_CASE("test_MultiSystem_mode_c_cycle_start_on_admission") {
     CHECK_EQ(sys->getSG()->getBuyValue(cycle_dates[0]), 1.0);
 }
 
+/** @par Check point: SE_Signal never admits a cycle sub-system under mode C, as it snapshots the
+ * buy signals before any cycle day is declared (mode B declares the days first, so it does work) */
+TEST_CASE("test_MultiSystem_mode_c_cycle_sg_with_se_signal") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 5);
+
+    auto countBuy = [](const TradeRecordList& trades) {
+        size_t ret = 0;
+        for (const auto& tr : trades) {
+            if (tr.business == BUSINESS_BUY) {
+                ++ret;
+            }
+        }
+        return ret;
+    };
+
+    /** @arg mode C: nothing is admitted -- no cycle day, no buy signal, no buy at all */
+    auto proto_c = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto_c->setParam<bool>("buy_delay", false);
+    auto ms = std::make_shared<MultiSystem>("ms_c_cycle_se_signal");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(SE_Signal({stk}, proto_c));
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+    auto csg = ms->getSystemList()[0]->getSG();
+    CHECK_EQ(ms->getRunningSet().size(), 0);
+    CHECK_EQ(csg->getCycleDates().size(), 0);
+    CHECK_EQ(csg->getBuySignal().size(), 0);
+    CHECK_EQ(countBuy(ms->getTM()->getTradeList()), 0);
+
+    /** @arg mode B declares the days before the snapshot, so the cycle buy does get traded */
+    auto proto_b = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto_b->setParam<bool>("buy_delay", false);
+    auto ms_b = std::make_shared<MultiSystem>("ms_b_cycle_se_signal");
+    ms_b->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms_b->setMode("B");
+    ms_b->setSE(SE_Signal({stk}, proto_b));
+    ms_b->run(k);
+    REQUIRE_EQ(ms_b->getSystemList().size(), 1);
+    auto bsg = ms_b->getSystemList()[0]->getSG();
+    CHECK_UNARY(!bsg->getCycleDates().empty());
+    CHECK_GT(countBuy(ms_b->getTM()->getTradeList()), 0);
+}
+
 /** @par Check point: the runMoment* entry (the intraday live driving, no bulk run) declares the
  * rebalancing day at the close stage, so the cycle signals are never silently lost */
 TEST_CASE("test_MultiSystem_cycle_signal_run_moment") {

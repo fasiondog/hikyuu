@@ -43,7 +43,9 @@
 .. py:function:: SE_Signal([stk_list, sys])
 
     信号选择器，仅依靠系统买入信号进行选中
-    
+
+    选中依据是 run 前已算好的买入信号快照，因此不可与模式 C 的周期型信号（如 SG_Cycle）组合：周期日要到子系统入选才声明，快照永远为空。模式 A/B 先注入整段调仓日再快照，可正常组合。
+
     :param list stk_list: 初始划定的标的
     :param System sys: 系统策略原型
     :return: SE选择器实例
