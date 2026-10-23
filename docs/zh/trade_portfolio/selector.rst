@@ -117,7 +117,37 @@
         # 直接使用预创建的MultiFactor对象
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor2(mf)
-        
+
+多因子选择器 v1 与 v2 对照
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SE_MultiFactor`` 保留旧接口，``SE_MultiFactor2`` 通过可组合的评分过滤器链提供更灵活的控制。两者的主要差异：
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 41 41
+
+   * - 维度
+     - SE_MultiFactor（v1）
+     - SE_MultiFactor2（推荐）
+   * - 评分过滤
+     - ``ignore_null``（默认 True）、``ignore_le_zero``（默认 False）；可再叠加 ``add_scores_filter``
+     - 过滤器链，默认 ``SCFilter_IgnoreNan()``；用 ``set_scores_filter`` / ``add_scores_filter`` 组合
+   * - 截断
+     - ``topn`` 参数，默认 10；``<=0`` 表示不限制
+     - 无 ``topn``，由 ``get_n`` 截断；也可用过滤器自行控制
+   * - 排序方向
+     - ``reverse=False`` 取最高分的前 N；``True`` 取最低分的后 N
+     - 保持 MF 输出的截面顺序，无 ``reverse``
+   * - 买入信号过滤
+     - ``only_should_buy=True`` 仅保留当日有买入信号的系统
+     - 需自定义过滤器实现
+   * - 复权类型
+     - ``mf_recover_type``；已指定 MF 时 ``keep_mf_recover_type`` 可保留其原复权类型
+     - 仅 ``mf_recover_type``，始终覆盖已指定 MF 的查询复权类型
+
+.. note:: ``topn`` / ``ignore_null`` / ``ignore_le_zero`` / ``only_should_buy`` / ``reverse`` 仅在 v1 中提供；v2 用过滤器链加 ``get_n`` 表达同一语义。
+
 自定义选择器策略
 --------------------
 

@@ -123,7 +123,38 @@ Built-in Selectors
         # From a pre-created MultiFactor object, passed directly
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor2(mf)
-        
+
+Multi-Factor Selector v1 vs v2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SE_MultiFactor`` keeps the legacy interface, while ``SE_MultiFactor2`` offers more flexible control
+through a composable score-filter chain. The main differences:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 41 41
+
+   * - Aspect
+     - SE_MultiFactor (v1)
+     - SE_MultiFactor2 (recommended)
+   * - Score filtering
+     - ``ignore_null`` (True by default), ``ignore_le_zero`` (False by default); extra filters may be appended with ``add_scores_filter``
+     - A filter chain, defaulting to ``SCFilter_IgnoreNan()``; combine with ``set_scores_filter`` / ``add_scores_filter``
+   * - Truncation
+     - The ``topn`` parameter, 10 by default; ``<=0`` means no limit
+     - No ``topn``; truncated by ``get_n``, or controlled by the filters
+   * - Ordering
+     - ``reverse=False`` takes the top N by the highest score; ``True`` takes the last N with the lowest scores
+     - Keeps the cross-sectional order produced by the MF; no ``reverse``
+   * - Buy-signal filtering
+     - ``only_should_buy=True`` keeps only the systems issuing a buy signal on that datetime
+     - Requires a custom filter
+   * - Recovery type
+     - ``mf_recover_type``; with a given MF, ``keep_mf_recover_type`` keeps its original query recovery type
+     - ``mf_recover_type`` only; always overrides the query recovery type of a given MF
+
+.. note:: ``topn`` / ``ignore_null`` / ``ignore_le_zero`` / ``only_should_buy`` / ``reverse`` exist only in v1; v2 expresses the same semantics with the filter chain plus ``get_n``.
+
 Custom Selector Strategy
 ------------------------
 
