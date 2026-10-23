@@ -41,6 +41,9 @@ public:
     virtual Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
                               SubSystemContextList& contexts, const KQuery& query,
                               const string& mode) override;
+
+private:
+    mutable bool m_warned_zero_score{false};
 };
 
 }  // namespace hku

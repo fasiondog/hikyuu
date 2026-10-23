@@ -95,8 +95,8 @@ trailing mode argument; see the MultiSystem class docstring for the full descrip
 Common parameters:
 
     - max_single_position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); <=0 means no limit, >1 is clamped to 1
-    - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value, scaled down proportionally when exceeded; <=0 disables the cap
-    - fixed_amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system
+    - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value. The weight pricing is scaled down proportionally when exceeded, while the fixed_amount pricing is truncated to whole quanta (see below); <=0 disables the cap, >1 allows leverage
+    - fixed_amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system. The aggregate is still bounded by max_total_position: being an absolute amount it is never scaled down, instead only whole quanta are funded (mode B in sub-system order, mode A in suggestion order) and the rest gets a zero quota / is driven flat
     - adjust_running_sys=True (bool) : whether to force-adjust the running sub-systems to the new quota on the rebalancing day; only effective in mode B (mode A always adjusts, mode C never adjusts); when False the running sub-systems keep their holdings and only the new sub-systems get the remaining cash)")
 
       .def(py::init<>())
@@ -220,7 +220,7 @@ Common parameters:
 
     The fixed proportion list asset allocation (L1 takes weights[i] in order, without normalization)
 
-    The weights must be finite, non-negative and not all zero (an all-zero list would set every target market value to 0 and drive the parent to actively clear the holdings, so the parameter check throws)
+    The weights must be finite, non-negative and not all zero (an all-zero list would set every target market value to 0 and drive the parent to actively clear the holdings, so the parameter check throws). An empty list cannot price anything and is rejected as well
 
     :param list weights: the specified asset proportion list)");
 

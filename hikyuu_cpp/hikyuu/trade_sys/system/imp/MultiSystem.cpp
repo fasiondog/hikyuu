@@ -66,6 +66,7 @@ void MultiSystem::_initAxisParam() {
     setParam<int>("adjust_cycle", 1);
     setParam<bool>("trade_on_close", true);
     setParam<bool>("sell_at_not_selected", false);
+    setParam<bool>("auto_checkin", false);
 }
 
 void MultiSystem::_refreshRunConfig() {
@@ -91,6 +92,7 @@ void MultiSystem::_refreshRunConfig() {
     }
     m_trade_on_close = getTradeOnClose();
     m_sell_at_not_selected = getSellAtNotSelected();
+    m_auto_checkin = getAutoCheckin();
     if (!m_adjust_cycle_warned) {
         m_adjust_cycle_warned = true;
         _warnAdjustCycleOutOfRange();
@@ -2044,9 +2046,19 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
 
     // L3 cash feasibility: the mandatory short covers claim the cash first (a short left open is
     // not the intended target and a cover reduces the wrong-direction exposure); only the long
-    // buys are scaled down proportionally, with the cash left after the covers as their budget
+    // buys are scaled down, with the cash left after the covers as their budget. The covers need
+    // full cash (buyShort has no financing branch), the long buys follow the TradeManager buying
+    // power: cash / margin rate with automatic cash financing, otherwise 1:1. The requirement
+    // always includes the commission, otherwise the last leg of a topped-up batch is rejected
+    const bool margin_trading =
+      m_tm->haveParam("support_borrow_cash") && m_tm->getParam<bool>("support_borrow_cash");
+    auto buy_cost_total = [&](const TradeSuggestion& s, double qty) {
+        return qty * s.plan_price * s.stock.unit() +
+               m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total;
+    };
     double need_cover_cash = 0.0;
-    double need_buy_cash = 0.0;
+    double need_buy_cash = 0.0;  // the scale denominator: the margin when financing, full otherwise
+    double need_buy_full = 0.0;  // the full-cash requirement, used by the auto_checkin top-up
     for (const auto& s : netted) {
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
@@ -2063,19 +2075,38 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             continue;
         }
         if (s.short_side) {
-            need_cover_cash += qty * s.plan_price * s.stock.unit();
+            need_cover_cash += buy_cost_total(s, qty);
         } else {
-            need_buy_cash += qty * s.plan_price * s.stock.unit();
+            need_buy_full += buy_cost_total(s, qty);
+            if (margin_trading) {
+                double rate = m_tm->getMarginRate(date, s.stock);
+                need_buy_cash += buy_cost_total(s, qty) * ((rate > 0.0) ? rate : 1.0);
+            } else {
+                need_buy_cash += buy_cost_total(s, qty);
+            }
+        }
+    }
+    price_t cash = m_tm->getFunds(date, ktype).cash;
+    // The optional top-up (aligned with MoneyManagerBase::auto_checkin): deposit the FULL gap (the
+    // covers plus the unfinanced long buys), so every leg is cash-covered and can be filled at its
+    // planned quantity without borrowing. It raises the parent principal instead of borrowing, so
+    // it is meant to keep the planned quantities tradable, not as a funding policy
+    if (m_auto_checkin && need_cover_cash + need_buy_full > cash) {
+        price_t gap = roundUp(need_cover_cash + need_buy_full - cash, m_tm->precision());
+        if (m_tm->checkin(date, gap)) {
+            cash = m_tm->getFunds(date, ktype).cash;
+        } else {
+            HKU_WARN(
+              "{}: auto_checkin could not deposit the cash gap, the batch is scaled to the current "
+              "cash!",
+              name());
         }
     }
     double cash_scale = 1.0;
     if (need_buy_cash > 0.0) {
-        // The covers are not scaled; the buys only get what is left after them. The margin covers
-        // the commission and the transfer fees (scaling to exactly the cash would be rejected)
-        constexpr double CASH_FEE_MARGIN = 0.995;
-        double available = m_tm->getFunds(date, ktype).cash - need_cover_cash;
+        double available = cash - need_cover_cash;
         if (available < need_buy_cash) {
-            cash_scale = available > 0.0 ? available / need_buy_cash * CASH_FEE_MARGIN : 0.0;
+            cash_scale = available > 0.0 ? available / need_buy_cash : 0.0;
             HKU_WARN(
               "The BUY suggestions need {:.2f} cash but only {:.2f} left after the covers, scale "
               "down by {:.2f}!",
@@ -2111,6 +2142,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
                                         PART_SYSTEM, "MultiSystem");
         if (!tr.isNull()) {
             out_trades.push_back(tr);
+            cash = m_tm->getFunds(date, ktype).cash;
         }
     }
 
@@ -2133,11 +2165,30 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             continue;
         }
         double qty = std::floor(s.number * cash_scale / min_trade) * min_trade;
+        if (margin_trading && qty >= min_trade) {
+            // The TradeManager finances an order only when it exceeds the remaining cash, and a
+            // cash-covered order consumes the cash 1:1: the buying power must be re-evaluated here
+            // leg by leg, otherwise the tail of the batch is rejected by the TM
+            constexpr double BUY_POWER_MARGIN = 0.995;
+            double rate = m_tm->getMarginRate(date, s.stock);
+            double power = (rate > 0.0 ? cash / rate : cash) * BUY_POWER_MARGIN;
+            double unit_price = s.plan_price * s.stock.unit();
+            double cap_qty =
+              (unit_price > 0.0) ? std::floor(power / unit_price / min_trade) * min_trade : 0.0;
+            if (cap_qty < qty) {
+                HKU_WARN(
+                  "The BUY leg of {} is reduced from {:.0f} to {:.0f} by the financing buying "
+                  "power!",
+                  s.stock.market_code(), qty, cap_qty);
+                qty = cap_qty;
+            }
+        }
         if (qty >= min_trade) {
             TradeRecord tr = m_tm->buy(date, s.stock, s.plan_price, qty, 0.0, 0.0, s.plan_price,
                                        PART_SYSTEM, "MultiSystem");
             if (!tr.isNull()) {
                 out_trades.push_back(tr);
+                cash = m_tm->getFunds(date, ktype).cash;
             }
         }
     }

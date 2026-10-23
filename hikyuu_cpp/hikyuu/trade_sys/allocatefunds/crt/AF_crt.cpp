@@ -34,7 +34,7 @@ AFPtr HKU_API AF_FixedWeight(double weight) {
 }
 
 AFPtr HKU_API AF_FixedWeightList(const vector<double>& weights) {
-    HKU_ERROR_IF_RETURN(weights.empty(), AF_EqualWeight(), "Input weights is empty!");
+    HKU_CHECK(!weights.empty(), "The weights list must not be empty!");
     auto p = std::make_shared<FixedWeightListAllocateFunds>();
     p->setParam<PriceList>("weights", PriceList(weights.begin(), weights.end()));
     return p;

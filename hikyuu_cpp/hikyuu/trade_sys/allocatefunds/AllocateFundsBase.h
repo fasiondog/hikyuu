@@ -127,7 +127,10 @@ public:
     //       allocate(); the mode checks inside the hooks are only a defensive pass-through for an
     //       AF invoked in mode C.
 
-    /** Weight table: sub-system -> weight (the L1 output and the L2 input) */
+    /** Weight table: sub-system instance -> weight (the L1 output and the L2 input)
+     *  @note It is keyed by the System instance itself, so a suggestion whose system is not the
+     *        very instance held by the context (e.g. a clone returned by a Selector) has no weight
+     *        and is dropped by L2. */
     using Weights = std::unordered_map<SYSPtr, double>;
 
     /**
@@ -178,7 +181,11 @@ public:
      *  weight x the parent net assets).
      *  @note **No normalization is performed**, the weight semantics is fully decided by the
      *        subclass; the missing index (weights shorter than contexts) falls back to the equal
-     *        weight. */
+     *        weight.
+     *  @note The mode B quota sum (N x fixed_amount included) is bounded by
+     *        max_total_position x net assets: the weight pricing is a proportion and is scaled
+     *        down, while the fixed_amount pricing is an absolute amount and instead truncates the
+     *        number of funded sub-systems (the rest get a zero quota). */
     Weights _applyWeights(const Datetime& date, const TradeManagerPtr& tm,
                           SubSystemContextList& contexts, const KQuery& query,
                           const std::vector<double>& weights, const string& mode) const;
@@ -188,7 +195,14 @@ public:
      *  the number of every suggestion (a positive magnitude, the direction expressed by the
      *  type); in mode B the sub-system number is passed through.
      *  @note The number is always positive; a short suggestion is turned into a SELL to reduce
-     *        to its target, a SELL/CLEAR closes the current holding. */
+     *        to its target, a SELL/CLEAR closes the current holding.
+     *  @note Mode A prices a suggestion only when its system has a weight: a suggestion from a
+     *        system absent from the weight table (a missing key, an empty table, or a cloned
+     *        instance that is not the context one) is dropped with a warning. The weight table is
+     *        produced by the matching L1 call on the same contexts.
+     *  @note fixed_amount > 0 skips the weight lookup entirely: every instrument gets that amount,
+     *        and the total budget truncates the number of funded instruments in first-appearance
+     *        order (the rest are driven flat) instead of shrinking every target. */
     virtual void _toTargets(const Datetime& date, const TradeManagerPtr& tm,
                             TradeSuggestionList& suggestions, const Weights& sys_weight,
                             const KQuery& query, const string& mode);
@@ -198,7 +212,10 @@ public:
      *  check.
      *  @note The single instrument concentration is limited by the parameter max_single_position
      *        (<=0 means no limit, >1 is clamped to 1, so the default 1.0 caps a single instrument
-     *        at the net assets). */
+     *        at the net assets).
+     *  @note The clipping only shrinks: the budget released from a clipped instrument is not
+     *        redistributed to the others, so after the total budget cap and this per-instrument
+     *        cap the final gross exposure may stay well below max_total_position. */
     virtual void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
                             TradeSuggestionList& suggestions, const KQuery& query,
                             const string& mode);
@@ -223,6 +240,11 @@ protected:
     KQuery m_query;
     TradeManagerPtr m_tm;
     bool m_is_python_object{false};
+
+    // The one-shot notices are per instance, not per process: a shared flag would hide the
+    // diagnostics of every other portfolio / backtest once the first instance warned
+    mutable bool m_warned_fixed_amount{false};
+    mutable bool m_warned_short_unsupported{false};
 
 //============================================
 // Serialization support

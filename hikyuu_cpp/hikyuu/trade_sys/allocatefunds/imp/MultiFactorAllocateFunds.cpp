@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <mutex>
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::MultiFactorAllocateFunds)
@@ -49,12 +48,12 @@ AllocateFundsBase::Weights MultiFactorAllocateFunds::_allocate(const Datetime& d
     if (!(sum > 0.0) || !std::isfinite(sum)) {
         // SE is not configured / a non-rebalancing day / all the scores are zero: fall back to the
         // equal weight, to avoid the zero weight causing the failure to allocate (notified once
-        // per process: it is a normal state on the non-rebalancing days)
-        static std::once_flag s_zero_score_warn;
-        std::call_once(s_zero_score_warn, [this]() {
+        // per instance: it is a normal state on the non-rebalancing days)
+        if (!m_warned_zero_score) {
+            m_warned_zero_score = true;
             HKU_WARN("AF_MultiFactor: all SE score is zero/absent, fallback to equal weight! [{}]",
                      name());
-        });
+        }
         if (!contexts.empty()) {
             weights.assign(contexts.size(), 1.0 / contexts.size());
         }

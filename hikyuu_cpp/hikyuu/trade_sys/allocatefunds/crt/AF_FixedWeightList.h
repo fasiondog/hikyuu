@@ -20,7 +20,8 @@ namespace hku {
 /**
  * @brief Fixed proportion asset allocation
  * @details L1 takes weights[i] one by one in order, **without normalization**, equivalent to master
- *          FixedWeightListAllocateFunds with auto_adjust_weight=false
+ *          FixedWeightListAllocateFunds with auto_adjust_weight=false. An empty list is rejected
+ *          (it cannot price anything), a length mismatch falls back to the equal weight
  * @param weights the given asset proportion list
  * @return AFPtr
  * @ingroup AllocateFunds

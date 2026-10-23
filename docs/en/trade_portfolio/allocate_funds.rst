@@ -136,14 +136,16 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
       - A / B
       - The total budget cap: in mode A it bounds the aggregated target market value of all instruments (L2)
         by the net assets x this value; in mode B it bounds the **sum of the sub-system quotas** (L1) by
-        the net assets x this value. Scaled down proportionally with a warning when exceeded.
-        <=0 disables the cap
+        the net assets x this value. Both bounds **include** the ``fixed_amount`` pricing: the weight
+        pricing is scaled down proportionally, while the fixed amounts are truncated to a whole number of
+        quanta (see below). <=0 disables the cap; >1 allows leverage
     * - ``fixed_amount``
       - float, 0.0
       - A / B
       - The pricing switch: when >0 it **takes precedence over the weight pricing** with a warning.
         In mode A it is the target market value per instrument; in mode B the fixed quota per sub-system.
-        The L1 weights then carry only the ranking meaning and take no part in the pricing
+        The L1 weights then carry only the ranking meaning and take no part in the pricing.
+        The aggregate is still bounded by ``max_total_position``
     * - ``adjust_running_sys``
       - bool, True
       - B only
@@ -174,15 +176,38 @@ Notes:
         reduction is never triggered by the normal market movement; the force reduction only happens on a
         real cross-period shrink of the weights or the funds (and never happens when
         ``adjust_running_sys=False``)
-    * - ``fixed_amount`` is exempt from the total budget cap
-      - In mode B, when ``fixed_amount>0`` the sum of the sub-system quotas is **not** scaled down by
-        ``max_total_position``: the fixed amount is the absolute quota the caller asked for, not a proportion
-        to be scaled. The mode A gross-target cap of ``max_total_position`` applies to all instruments alike
+    * - ``fixed_amount`` is bounded by the total budget cap (truncated by whole quanta)
+      - A fixed amount is an **absolute amount**, so an over-budget total is never scaled proportionally
+        (the quota would drift with the net assets and the number of sub-systems); instead **only whole
+        quanta are funded**: mode B hands out the full ``fixed_amount`` in sub-system order and gives a zero
+        quota to the rest once the budget is exhausted, mode A does the same in first-appearance order and
+        drives the unfunded instruments flat. If a single quantum already exceeds the cap (the amount >
+        the net assets x ``max_total_position``) nothing is funded at all (the warning reports 0/N), so
+        lower ``fixed_amount`` or raise the cap. In mode B a zero-quota sub-system follows the
+        ``sell_at_not_selected`` / ``adjust_running_sys`` rules (liquidated and stopped when the former
+        is true, a running sub-system stays untouched when the latter is false). Note: AF no longer
+        scales the fixed amount down, but the executor still respects the parent funding: with automatic
+        cash financing (``support_borrow_cash``, set on the ``MultiSystem`` and propagated to the parent
+        TM by ``readyForRun``) the buying power is derived from the **margin rate per order** -- a single
+        order may exceed the available cash, while a multi-leg batch is funded in order and the later legs
+        may be shrunk (the same leg-by-leg model as the TradeManager); a short cover always needs full cash
+        and is never financed. Without financing the orders are scaled to the available cash. ``MultiSystem``
+        also has ``auto_checkin`` (default ``False``): it deposits **extra principal** for the gap computed
+        from the money plus the commission (combined with financing it deposits the full amount, so every
+        leg is cash-covered), which keeps the planned quantities tradable at the cost of an
+        inflated backtest equity curve; because the targets may change every bar it can top up repeatedly. To run leverage or keep the original amounts, raise
+        ``max_total_position`` (0 means no limit)
     * - ``fixed_amount`` is applied once per instrument in mode A
       - In mode A the fixed amount is priced **per instrument**, not per suggestion: when the same instrument
         is held by N sub-systems, only the aggregated signed direction is taken and one ``±fixed_amount``
         target is applied per instrument (it is not multiplied by N). Conflicting directions cancel out, so a
         flat aggregate drives the instrument to zero
+    * - The first plan price of an instrument wins
+      - Mode A converts the aggregated target market value into shares by the ``plan_price`` of the
+        suggestions: when several suggestions of one instrument carry different prices the **first one
+        wins** (the others are only logged at debug level). The plan prices should come from the same
+        bar and the same price convention (same adjustment and slippage), otherwise the share count
+        will not match the target market value
     * - Mode A re-targets only the instruments covered by this round's suggestions
       - Mode A takes this round's aggregated suggestions as its target snapshot: only the **instruments
         appearing in the suggestions** (those traded by a sub-system on the day, plus the liquidation legs
@@ -191,6 +216,20 @@ Notes:
         parent book mirrors the sub-system books and does not detect or close positions that no sub-system
         corresponds to (e.g. a manual trade on the parent account, or a sub-system removed from the list
         without liquidation)
+    * - A suggestion without a weight is skipped
+      - The mode A weight table is keyed by the **System instance**: the ``sys`` of a suggestion must be the
+        very instance held by the L1 contexts. When the table is empty, the sub-system is missing from it,
+        or an upstream returns a cloned instance (a different instance from the context one), the
+        suggestion is **skipped with a warning** and never priced by a fabricated equal weight.
+        Parent-synthesized suggestions (an empty ``sys``, e.g. the zero target of an unselected instrument)
+        are not affected. With ``fixed_amount>0`` the weight lookup is skipped entirely (the absolute
+        amount is the target), so this item does not apply
+    * - L3 only shrinks, it never redistributes
+      - ``max_total_position`` (total budget) then ``max_single_position`` (per-instrument concentration)
+        apply in sequence and both only **shrink** the excess: the budget released by the L3 clipping is
+        **not** redistributed to the other instruments, so the final gross exposure may stay well below
+        ``max_total_position`` (e.g. 10 equal-weight instruments with a 0.05 per-instrument cap end up with
+        a gross of only 0.5 x the net assets)
 
 
 Built-in Asset Allocation Algorithms
@@ -217,6 +256,7 @@ Built-in Asset Allocation Algorithms
     Fixed-weight-list fund allocation: allocates capital to the selected sub-systems according to the specified weight list.
 
     L1 takes ``weights[i]`` in sub-system order, **without normalization**; when the length does not match, it falls back to equal weights.
+    An empty list cannot price anything: both the factory and the parameter check throw instead of falling back to the equal weight.
     The weights must be finite, non-negative and not all zero (an all-zero list sets every sub-system target market value to 0 and drives the parent to actively clear the existing holdings on every rebalance, so the parameter check throws).
 
     :param list weights: the specified list of weight proportions

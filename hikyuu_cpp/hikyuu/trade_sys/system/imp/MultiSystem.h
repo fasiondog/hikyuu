@@ -206,6 +206,18 @@ public:
         return tryGetParam<bool>("trade_on_close", true);
     }
 
+    /** Set whether the parent account tops up its own cash when the executable suggestions exceed
+     *  the available cash (aligned with MoneyManagerBase::auto_checkin). It deposits the gap
+     *  instead of borrowing, so it inflates the principal of the backtest. */
+    void setAutoCheckin(bool v) {
+        setParam<bool>("auto_checkin", v);
+    }
+
+    /** Get whether the parent account tops up its own cash */
+    bool getAutoCheckin() const {
+        return tryGetParam<bool>("auto_checkin", false);
+    }
+
     /** Set the trading object selector (optional; after it is set only the sub-systems selected by
      * SE run, the unselected ones can be liquidated) */
     void setSE(const std::shared_ptr<SelectorBase>& se) {
@@ -631,6 +643,7 @@ private:
     string m_adjust_mode{"query"};      // The rebalancing mode; snapshotted at readyForRun
     bool m_delay_to_trading_day{true};  // Whether a non-trading rebalancing day is postponed
     bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
+    bool m_auto_checkin{false};   // Whether the parent tops up its own cash to fill the suggestions
     AllocateFundsPtr m_af{AF_EqualWeight()};  // The portfolio-level fund allocation (AF, including
                                               // L1/L2/L3), owned by the aggregate system
     string m_mode{"A"};  // The running mode ("A"/"B"/"C"), owned by the aggregate system itself
