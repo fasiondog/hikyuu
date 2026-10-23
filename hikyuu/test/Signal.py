@@ -7,6 +7,7 @@
 # History: 1)20130321, Added by fasiondog
 # ===============================================================================
 
+import pickle as pl
 import threading
 import time
 import unittest
@@ -326,6 +327,69 @@ class TestSGManual(unittest.TestCase):
         self.assertEqual(composed.get_buy_value(d_buy), 2.0)
 
 
+@unittest.skipUnless(constant.pickle_support, "pickle support disabled")
+class TestSGPickle(unittest.TestCase):
+    """pickle round-trips keep the signal tables, the cycle days and the composition"""
+
+    def test_pickle_roundtrip(self):
+        kdata = sm['sh000001'].get_kdata(Query(-500))
+        self.assertFalse(kdata.empty())
+
+        cross = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10))
+        cross.to = kdata
+        restored = pl.loads(pl.dumps(cross))
+        self.assertEqual(restored.get_buy_signal(), cross.get_buy_signal())
+        self.assertEqual(restored.get_sell_signal(), cross.get_sell_signal())
+
+        cycle = SG_Cycle()
+        cycle.set_cycle_dates([kdata[10].datetime, kdata[20].datetime])
+        cycle.to = kdata
+        restored = pl.loads(pl.dumps(cycle))
+        self.assertEqual(list(restored.get_cycle_dates()), list(cycle.get_cycle_dates()))
+        self.assertEqual(restored.get_buy_signal(), cycle.get_buy_signal())
+
+        composed = SG_Add(cross, SG_AllwaysBuy(), False)
+        composed.to = kdata
+        restored = pl.loads(pl.dumps(composed))
+        self.assertEqual(restored.get_buy_signal(), composed.get_buy_signal())
+
+        manual = SG_Manual()
+        manual._add_buy_signal(kdata[3].datetime)
+        restored = pl.loads(pl.dumps(manual))
+        self.assertTrue(restored.should_buy(kdata[3].datetime))
+        self.assertEqual(restored.get_value(kdata[3].datetime), 1.0)
+
+
+class TestSGConcurrentSetTO(unittest.TestCase):
+    """Driving C++ and Python SG instances from several threads must not deadlock"""
+
+    def test_concurrent_setTO_clone_reset(self):
+        kdata = sm['sh000001'].get_kdata(Query(-100))
+        self.assertFalse(kdata.empty())
+        py_signals = [CountingSG(), CountingSG()]
+        signals = [SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)),
+                   SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10))] + py_signals
+        errors = []
+
+        def work(sg):
+            try:
+                for _ in range(50):
+                    sg.to = kdata
+                    sg.clone()
+                    sg.reset()
+            except Exception as e:  # noqa: BLE001
+                errors.append(e)
+
+        threads = [threading.Thread(target=work, args=(sg,)) for sg in signals]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=60)
+            self.assertFalse(t.is_alive(), "deadlock detected in setTO/clone/reset")
+        self.assertEqual(errors, [])
+        self.assertEqual([sg.called for sg in py_signals], [50, 50])
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
@@ -352,3 +416,11 @@ def suiteTestSGCycleDates():
 
 def suiteTestSGManual():
     return unittest.TestLoader().loadTestsFromTestCase(TestSGManual)
+
+
+def suiteTestSGPickle():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGPickle)
+
+
+def suiteTestSGConcurrentSetTO():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGConcurrentSetTO)
