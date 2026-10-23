@@ -443,6 +443,43 @@ TEST_CASE("test_SE_PerformanceOptimal_real_list_identity") {
     CHECK_UNARY(std::find(real_list.begin(), real_list.end(), sw[0].sys) == real_list.end());
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_bound_identity") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    // The running systems are built in the reverse order of the prototypes and bound by identity
+    SystemList real_list;
+    auto protos = se->getProtoSystemList();
+    for (size_t i = 0; i < protos.size(); i++) {
+        auto sys = protos[protos.size() - 1 - i]->clone();
+        sys->setStock(stk);
+        sys->name("real_" + protos[protos.size() - 1 - i]->name());
+        real_list.emplace_back(sys);
+    }
+    for (size_t i = 0; i < protos.size(); i++) {
+        se->bindRealToProto(real_list[protos.size() - 1 - i], protos[i]);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    se->calculate(real_list, query);
+    auto dates = StockManager::instance().getTradingCalendar(query);
+
+    /** @arg the identity binding wins over the positional order: the first window picks the bound
+     *  running system of the winning prototype (test_sys_3_10), not the one sitting at its index */
+    auto sw = se->getSelected(dates[40]);
+    REQUIRE_UNARY(sw.size() == 1);
+    CHECK_EQ(sw[0].sys->name(), "real_test_sys_3_10");
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

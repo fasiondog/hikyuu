@@ -1722,13 +1722,21 @@ TEST_CASE("test_MultiSystem_performance_optimal_se") {
 
             auto* opt = dynamic_cast<OptimalSelectorBase*>(se.get());
             REQUIRE_UNARY(opt != nullptr);
-            REQUIRE_UNARY(!opt->getRunRanges().empty());
+            const auto& ranges = opt->getRunRanges();
+            REQUIRE_UNARY(!ranges.empty());
             const Datetime init_datetime(199001010000LL);
-            const Datetime first_run_start = opt->getRunRanges().front().run_start;
             for (const auto& tr : tm->getTradeList()) {
-                if (tr.datetime != init_datetime) {
-                    CHECK_GE(tr.datetime, first_run_start);
+                if (tr.datetime == init_datetime) {
+                    continue;
                 }
+                bool in_test_window = false;
+                for (const auto& range : ranges) {
+                    if (tr.datetime >= range.run_start && tr.datetime < range.end) {
+                        in_test_window = true;
+                        break;
+                    }
+                }
+                CHECK_UNARY(in_test_window);
             }
         }
     }
@@ -1765,6 +1773,42 @@ TEST_CASE("test_MultiSystem_nested_clear_cycle_dates") {
     /** @arg the outer reconfiguration reaches the nested cycle signal */
     outer->setAdjustDates(DatetimeList{Datetime(19991110)});
     CHECK_UNARY(cycle_sg->getCycleDates().empty());
+
+    /** @arg the nested layer is rescheduled by the next run instead of staying silent */
+    outer->run(query);
+    CHECK_UNARY(!cycle_sg->getCycleDates().empty());
+    CHECK_UNARY(!cycle_sg->getBuySignal().empty());
+}
+
+/** @par Check point: a nested aggregate that never runs on its own takes its cycle schedule from
+ * the parent, so its snapshot-based selector still admits the sub-systems on the first run */
+TEST_CASE("test_MultiSystem_nested_cycle_schedule_from_parent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto cycle_sg = SG_Cycle();
+    auto cycle_sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000.0), MM_Nothing(),
+                                EnvironmentPtr(), ConditionPtr(), cycle_sg);
+    cycle_sys->setStock(stk);
+
+    // Never run on its own: the schedule can only come from the parent
+    auto inner = std::make_shared<MultiSystem>("inner");
+    inner->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    inner->setMode("A");
+    inner->add(cycle_sys);
+    inner->setSE(SE_Signal());
+
+    auto outer = std::make_shared<MultiSystem>("outer");
+    outer->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->add(inner);
+    outer->setSE(SE_Fixed());
+    outer->run(query);
+
+    /** @arg the parent pushes its schedule down before the nested selector snapshots the signals */
+    CHECK_UNARY(!cycle_sg->getCycleDates().empty());
+    CHECK_GT(inner->getSE()->getSelected(Datetime(19991110)).size(), 0);
 }
 
 /** @par Check point: mode C converges sys_use_self_tm onto the shared account of the parent

@@ -71,12 +71,25 @@ SystemWeightList OptimalSelectorBase::_getSelected(Datetime date) {
 }
 
 SYSPtr OptimalSelectorBase::_selectedSystem(size_t candIndex, const SYSPtr& trained) const {
-    // The aggregates match the selection by identity: without a real list (SYS_WalkForward, which
-    // runs the returned system directly) the window-local copy is the only usable instance
+    // The aggregates bind every running system to its prototype: that mapping is the only reliable
+    // identity source. The positional fallback keeps the same-order contract for the callers that
+    // pass a real list without binding
+    if (candIndex < m_pro_sys_list.size()) {
+        auto iter = m_proto_to_real.find(m_pro_sys_list[candIndex].get());
+        if (iter != m_proto_to_real.end()) {
+            return iter->second;
+        }
+    }
     if (m_real_sys_list.size() == m_pro_sys_list.size() && candIndex < m_real_sys_list.size()) {
         return m_real_sys_list[candIndex];
     }
     return trained;
+}
+
+void OptimalSelectorBase::bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {
+    if (real && proto) {
+        m_proto_to_real[proto.get()] = real;
+    }
 }
 
 void OptimalSelectorBase::_reset() {

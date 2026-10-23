@@ -44,6 +44,7 @@ public:
 
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
+    virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override;
 
     virtual void _reset() override;
 
@@ -82,6 +83,7 @@ protected:
 
     SYSPtr _selectedSystem(size_t candIndex, const SYSPtr& trained) const;
 
+    unordered_map<const System*, SYSPtr> m_proto_to_real;
     unordered_map<Datetime, std::shared_ptr<OptimalSelectedList>> m_sys_dict;
     vector<RunRanges> m_run_ranges;
 };
