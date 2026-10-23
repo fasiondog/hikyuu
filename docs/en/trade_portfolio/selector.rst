@@ -68,7 +68,7 @@ Built-in Selectors
     :param int topn: select only the top topn systems on each cross-section; when it is less than or equal to 0, no limit is applied
     :param int ic_n: the N-day return horizon used in the default IC calculation
     :param int ic_rolling_n: the IC rolling window
-    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000300, the CSI 300)
+    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000001, the Shanghai Composite Index)
     :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
     :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
     :return: the SE selector instance
@@ -102,7 +102,7 @@ Built-in Selectors
     :param input: the factor input: a MultiFactorBase object, a FactorSet object, or an Indicator sequence
     :param int ic_n: the N-day return horizon used in the default IC calculation
     :param int ic_rolling_n: the IC rolling window
-    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000300, the CSI 300)
+    :param Stock ref_stk: the reference security (when unspecified, defaults to sh000001, the Shanghai Composite Index)
     :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
     :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
     :param ScoresFilter filter: the cross-sectional scores filter

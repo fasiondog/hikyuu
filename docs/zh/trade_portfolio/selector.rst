@@ -62,7 +62,7 @@
     :param int topn: 只选取时间截面中前 topn 个系统, 小于等于0时代表不限制
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000001 上证指数)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则使用 pearson
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :return: SE选择器实例
@@ -96,7 +96,7 @@
     :param input: 因子输入，可以是 MultiFactorBase 对象、FactorSet 对象或 Indicator 序列
     :param int ic_n: 默认 IC 对应的 N 日收益率
     :param int ic_rolling_n: IC 滚动周期
-    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000300 沪深300)
+    :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000001 上证指数)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
     :param ScoresFilter filter: 评分过滤器
