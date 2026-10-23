@@ -11,6 +11,16 @@
 
 namespace hku {
 
+/**
+ * Transforms only the weight of each selected system and keeps the order returned by the
+ * wrapped
+ * selector: the sign and the ordering are part of the expression semantics and are left
+ * to the
+ * concrete selector or the downstream filter (e.g. get_n / top-N consumers), so no
+ * re-sort, clamp
+ * or drop is done here.
+ * @ingroup Selector
+ */
 class HKU_API OperatorValueSelector : public SelectorBase {
 public:
     OperatorValueSelector();

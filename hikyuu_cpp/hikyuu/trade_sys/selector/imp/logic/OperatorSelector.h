@@ -42,6 +42,10 @@ protected:
         }
     }
 
+    // The weight is the raw func result and may be negative (e.g. 0 - w in SE_Sub): it is an
+    // intermediate value for the downstream filter to flip or screen, not an invalid state. The
+    // list is sorted by weight only; the tie order stays undefined on purpose (getSelected runs
+    // per bar by default, a market_code tie-break would cost more than it is worth).
     SystemWeightList getUnionSelected(Datetime date,
                                       const std::function<double(double, double)>&& func);
 
