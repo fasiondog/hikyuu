@@ -904,6 +904,23 @@ TEST_CASE("test_SG_Or") {
     ret->setParam<bool>("alternate", false);
     ret->setTO(k);
     check_result(ret, expect);
+
+    /** @arg The input amplitudes are dropped, only the direction is kept */
+    sg1->reset();
+    sg2->reset();
+    sg1->_addBuySignal(Datetime(20111110), 3.0);
+    sg1->_addSellSignal(Datetime(20111114), -3.0);
+    sg2->_addBuySignal(Datetime(20111110), 2.0);
+    sg2->_addSellSignal(Datetime(20111114), -2.0);
+
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = -1.0;
+
+    ret = sg1 | sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    check_result(ret, expect);
 }
 
 /** @par Test points */
@@ -1005,6 +1022,23 @@ TEST_CASE("test_SG_And") {
     expect[Datetime(20111114)] = 0.0;
     expect[Datetime(20111115)] = 0.0;
     expect[Datetime(20111116)] = -1.0;
+    check_result(ret, expect);
+
+    /** @arg The input amplitudes are dropped, only the direction is kept */
+    sg1->reset();
+    sg2->reset();
+    sg1->_addBuySignal(Datetime(20111110), 3.0);
+    sg1->_addSellSignal(Datetime(20111114), -3.0);
+    sg2->_addBuySignal(Datetime(20111110), 2.0);
+    sg2->_addSellSignal(Datetime(20111114), -2.0);
+
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 1.0;
+    expect[Datetime(20111114)] = -1.0;
+
+    ret = sg1 & sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
     check_result(ret, expect);
 }
 

@@ -465,6 +465,9 @@ The custom signal generator interfaces:
 
     Generate the signal of the AND of the two indicators
 
+    Only the direction is kept: a hit is written as 1.0 for a buy and -1.0 for a sell, dropping the
+    amplitudes of the sub-signals
+
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
@@ -484,6 +487,9 @@ The custom signal generator interfaces:
           R"(SG_Or(sg1, sg2, alternate)
 
     Generate the signal of the logical OR of the two signal generators
+
+    Only the direction is kept: a hit is written as 1.0 for a buy and -1.0 for a sell, dropping the
+    amplitudes of the sub-signals; on a same-day conflict the sell wins
 
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem

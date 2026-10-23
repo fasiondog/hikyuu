@@ -95,9 +95,9 @@
                 <td>信号只能手工加入，用于测试或外部信号导入</td>
             </tr>
             <tr>
-                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
+                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG运算辅助</td>
-                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题</td>
+                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题<br>加减乘除保留信号数值，与/或只保留方向（见下文信号运算）</td>
             </tr>        
         </tbody>
     </table>
@@ -256,6 +256,15 @@ PF调仓周期买入信号指示器
 
     信号只能手工加入的信号指示器，用于测试或外部信号导入。其 ``_calculate`` 为空：作为逻辑运算的子信号
     时，手工预置的信号会被保留；直接对其设置交易对象会清空预置信号。
+
+
+信号运算
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SG 支持 ``+ - * /``（``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``）和 ``& |``（``SG_And`` / ``SG_Or``）两类运算。
+
+- 算术运算保留信号的数值幅度：``sg * 2`` 使每日信号值翻倍，``sg1 + sg2`` 同日按净额合并。
+- 逻辑运算只保留方向，幅度被丢弃：命中时买入信号恒为 ``1.0``、卖出信号恒为 ``-1.0``（如 ``(sg1 * 3) & sg2`` 得 1.0 而不是 3.0）；需保留幅度请用算术运算。``|`` 在同一买卖冲突日卖出优先。
 
 
 自定义信号指示器

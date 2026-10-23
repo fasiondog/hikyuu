@@ -95,9 +95,9 @@ When technical indicators are used to decide entries and exits, the rule almost 
                 <td>A special SG whose signals are added by hand, for tests or the external signal import</td>
             </tr>
             <tr>
-                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
+                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG operation helpers</td>
-                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem</td>
+                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem<br>Add / sub / mul / div keep the signal amplitudes, and / or keep the direction only (see Signal operations below)</td>
             </tr>
         </tbody>
     </table>
@@ -257,6 +257,15 @@ Manual Signal Generator
     A special SG whose signals are added by hand, for tests or the external signal import. Its
     ``_calculate`` is empty: the preset signals are kept when it is used as a sub-signal of a
     logical operator, while assigning the trading object on it directly clears them.
+
+
+Signal Operations
+^^^^^^^^^^^^^^^^^
+
+An SG supports two kinds of operations: ``+ - * /`` (``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``) and ``& |`` (``SG_And`` / ``SG_Or``).
+
+- The arithmetic operations keep the amplitude of the signals: ``sg * 2`` doubles every daily signal value, and ``sg1 + sg2`` merges the signals of the same day into one net value.
+- The logic operations keep the direction only and drop the amplitudes: a hit is written as ``1.0`` for a buy and ``-1.0`` for a sell ( ``(sg1 * 3) & sg2`` gives 1.0, not 3.0). Use the arithmetic operations to keep an amplitude. On a same-day conflict ``|`` lets the sell win.
 
 
 Custom Signal Generator
