@@ -17,6 +17,8 @@
 #include <map>
 #include <mutex>
 
+#include "../../utilities/arithmetic.h"
+
 namespace hku {
 
 // The one-shot notice flag: the fixed_amount pricing silently overrides the weights, so the
@@ -302,8 +304,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         auto pit = price.find(s.stock);
         if (pit == price.end()) {
             price[s.stock] = s.plan_price;
-        } else if (std::fabs(pit->second - s.plan_price) >
-                   1e-9 * std::max(std::fabs(pit->second), s.plan_price)) {
+        } else if (!nearly_equal(pit->second, s.plan_price)) {
             HKU_DEBUG("{}::_toTargets: {} has conflicting plan prices ({}, {}), the first is used!",
                       m_name, s.stock.market_code(), pit->second, s.plan_price);
         }
