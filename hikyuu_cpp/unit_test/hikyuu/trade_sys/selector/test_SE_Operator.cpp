@@ -814,6 +814,12 @@ TEST_CASE("test_SE_Operator_clone_combined") {
     CHECK_EQ(clone->name(), "SE_Add");
     CHECK_EQ(clone->getProtoSystemList().size(), 3);
 
+    /** @arg The cloned prototype list contains no duplicate instances */
+    std::set<const System*> uniq;
+    for (const auto& s : clone->getProtoSystemList()) {
+        CHECK_UNARY(uniq.insert(s.get()).second);
+    }
+
     /** @arg The intersection survives the reset that rebuilds the two operand sets */
     clone->reset();
     for (const auto& s : clone->getProtoSystemList()) {
