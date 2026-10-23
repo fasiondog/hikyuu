@@ -90,6 +90,17 @@ void AllocateFundsBase::baseCheckParam(const string& name) const {
     }
     HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
               name, fixed_name);
+
+    if (name == "max_single_position" || name == "max_total_position") {
+        // <=0 disables the cap and >1 is clamped in use, but a NaN silently disables both risk
+        // controls
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if (name == "fixed_amount") {
+        // 0 disables the fixed amount; a negative or non-finite value would silently fall back to
+        // the weight pricing
+        double v = getParam<double>(name);
+        HKU_ASSERT(std::isfinite(v) && v >= 0.0);
+    }
 }
 
 void AllocateFundsBase::paramChanged() {}
