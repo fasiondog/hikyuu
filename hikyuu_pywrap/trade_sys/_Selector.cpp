@@ -87,6 +87,7 @@ public:
 
 public:
     virtual SelectorPtr _clone() override {
+        py::gil_scoped_acquire gil;
         return std::make_shared<PyOptimalSelector>(*m_evaluate);
     }
 
