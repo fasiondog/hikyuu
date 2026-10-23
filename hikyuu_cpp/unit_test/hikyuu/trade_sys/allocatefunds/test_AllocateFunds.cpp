@@ -337,6 +337,82 @@ TEST_CASE("test_AllocateFunds_fixed_amount_truncation") {
 }
 
 /** @par Test points */
+TEST_CASE("test_AllocateFunds_fixed_amount_short_clamp_order") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no securities lending by default
+    auto af = AF_EqualWeight();
+    af->setParam<double>("fixed_amount", 60000.0);  // one quota fits the 100000 budget
+    Datetime date(200001010000LL);
+    Stock a = getStock("sz000001");
+    Stock b = getStock("sh600000");
+    REQUIRE(!a.isNull());
+    REQUIRE(!b.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.sys = sys;
+    s.plan_price = 10.0;
+    TradeSuggestion a_short = s;
+    a_short.stock = a;
+    a_short.target_position_ratio = -0.5;
+    TradeSuggestion b_long = s;
+    b_long.stock = b;
+    b_long.target_position_ratio = 0.5;
+
+    /** @arg the short leg is unexecutable and is zeroed before the budget is charged: the long
+     *  instrument still gets the whole quota (60000 / 10 = 6000 shares) */
+    TradeSuggestionList suggestions{a_short, b_long};
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK_UNARY(suggestions[0].stock == b);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(6000.0));
+
+    /** @arg with a securities-lending account both legs consume the budget in order: only the
+     *  first one is funded */
+    auto tm_borrow = crtTM(Datetime(200001010000LL), 100000.0);
+    tm_borrow->setParam<bool>("support_borrow_stock", true);
+    TradeSuggestionList both{a_short, b_long};
+    af->_toTargets(date, tm_borrow, both, weights, KQuery(), "A");
+    REQUIRE_EQ(both.size(), 1);
+    CHECK_UNARY(both[0].stock == a);
+    CHECK_EQ(both[0].number, doctest::Approx(6000.0));
+    CHECK_UNARY(both[0].short_side);
+}
+
+/** @par Test points */
+TEST_CASE("test_AllocateFunds_fixed_amount_lot_filter_order") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // budget 100000 funds one 60000 quota
+    auto af = AF_EqualWeight();
+    af->setParam<double>("fixed_amount", 60000.0);
+    Datetime date(200001010000LL);
+    Stock a = getStock("sz000001");
+    Stock b = getStock("sh600000");
+    REQUIRE(!a.isNull());
+    REQUIRE(!b.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.sys = sys;
+    TradeSuggestion a_lot = s;
+    a_lot.stock = a;
+    a_lot.plan_price = 1000.0;  // one board lot costs 100000 > the 60000 quota
+    a_lot.target_position_ratio = 0.5;
+    TradeSuggestion b_lot = s;
+    b_lot.stock = b;
+    b_lot.plan_price = 10.0;
+    b_lot.target_position_ratio = 0.5;
+
+    /** @arg a target below one board lot is not charged against the budget: the other instrument
+     *  still gets the whole quota (60000 / 10 = 6000 shares) */
+    TradeSuggestionList suggestions{a_lot, b_lot};
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK_UNARY(suggestions[0].stock == b);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(6000.0));
+}
+
+/** @par Test points */
 TEST_CASE("test_AllocateFunds_L3_shrink_only") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();

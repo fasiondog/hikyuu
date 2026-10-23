@@ -44,12 +44,21 @@ AllocateFundsBase::Weights FixedWeightListAllocateFunds::_allocate(const Datetim
                                                                    const KQuery& query,
                                                                    const string& mode) {
     PriceList ws = getParam<PriceList>("weights");
-    if (ws.size() != contexts.size()) {
-        HKU_WARN("weights size({}) != subsystems({}), fallback to equal weight! [{}]", ws.size(),
-                 contexts.size(), name());
+    auto equal_weight = [&]() {
         return _applyWeights(
           date, tm, contexts, query,
           std::vector<double>(contexts.size(), 1.0 / std::max<size_t>(contexts.size(), 1)), mode);
+    };
+    if (ws.empty()) {
+        // The factory and set_param reject the empty list: only a deserialized archive can carry
+        // it, the equal weight fallback keeps the run alive but the archived state stays invalid
+        HKU_WARN("{}: empty weights list (invalid state), fallback to equal weight!", name());
+        return equal_weight();
+    }
+    if (ws.size() != contexts.size()) {
+        HKU_WARN("weights size({}) != subsystems({}), fallback to equal weight! [{}]", ws.size(),
+                 contexts.size(), name());
+        return equal_weight();
     }
     // Without normalization: take the fixed proportions one by one in order
     return _applyWeights(date, tm, contexts, query, std::vector<double>(ws.begin(), ws.end()),

@@ -183,7 +183,12 @@ Notes:
         quota to the rest once the budget is exhausted, mode A does the same in first-appearance order and
         drives the unfunded instruments flat. If a single quantum already exceeds the cap (the amount >
         the net assets x ``max_total_position``) nothing is funded at all (the warning reports 0/N), so
-        lower ``fixed_amount`` or raise the cap. To run leverage or keep the original amounts, raise
+        lower ``fixed_amount`` or raise the cap. In mode B a zero-quota sub-system follows the
+        ``sell_at_not_selected`` / ``adjust_running_sys`` rules (liquidated and stopped when the former
+        is true, a running sub-system stays untouched when the latter is false). Note: AF no longer
+        scales the fixed amount down, but the executor still clips the orders to the **available cash**
+        of the parent account, and the ">1 allows leverage" promise depends on the TradeManager funding
+        capability (``support_borrow_cash``). To run leverage or keep the original amounts, raise
         ``max_total_position`` (0 means no limit)
     * - ``fixed_amount`` is applied once per instrument in mode A
       - In mode A the fixed amount is priced **per instrument**, not per suggestion: when the same instrument

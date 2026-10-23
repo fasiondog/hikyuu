@@ -199,17 +199,23 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
         // amount (<=0 disables the cap)
         double max_total = getParam<double>("max_total_position");
         double cap = (max_total > 0.0 && net_assets > 0.0) ? net_assets * max_total : -1.0;
-        size_t fixed_fit = contexts.size();
+        size_t quota_count = 0;
+        for (const auto& ctx : contexts) {
+            if (ctx.sys) {
+                ++quota_count;
+            }
+        }
+        size_t fixed_fit = quota_count;
         if (cap >= 0.0) {
             if (fixed_amount > 0.0) {
                 // The epsilon keeps an exact multiple from losing a slot to the float noise
                 double n = std::floor(cap / fixed_amount + 1e-9);
-                if (n < static_cast<double>(contexts.size())) {
+                if (n < static_cast<double>(quota_count)) {
                     fixed_fit = static_cast<size_t>(n);
                     HKU_WARN(
                       "{}: max_total_position({}) x net assets({:.2f}) funds only {} of the {} "
                       "sub-systems at fixed_amount({}), the rest get a zero quota!",
-                      m_name, max_total, net_assets, fixed_fit, contexts.size(), fixed_amount);
+                      m_name, max_total, net_assets, fixed_fit, quota_count, fixed_amount);
                 }
             } else if (std::isfinite(sum_w) && sum_w * net_assets > cap * (1.0 + 1e-9)) {
                 double scale = cap / (sum_w * net_assets);
@@ -337,42 +343,68 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         }
         target_value[s.stock] += v;
     }
+    // The parent cannot run a short book without a securities-lending facility: clamp the negative
+    // net targets to zero and warn, so a short order is never silently rejected by the TM
+    const bool support_borrow =
+      tm->haveParam("support_borrow_stock") && tm->getParam<bool>("support_borrow_stock");
+
     if (fixed_amount > 0.0) {
         // The aggregate-then-apply step: one ±fixed_amount target per instrument (a flat aggregate
         // means the conflicting intents cancel out, so the instrument is driven to zero). The cap
-        // is an absolute amount per instrument, so it truncates the number of funded instruments
-        // in first-appearance order instead of shrinking every target
+        // truncates the number of funded instruments in first-appearance order instead of shrinking
+        // every target. Only executable targets are charged: an unexecutable short leg (clamped
+        // away below) and a target below one board lot (dropped by the opening-leg filter later)
+        // must not consume a quota that another instrument could use
         double remaining = (max_total > 0.0 && parent_net > 0.0) ? parent_net * max_total : -1.0;
-        size_t unfunded = 0;
+        size_t eligible = 0;
+        size_t funded = 0;
         for (const auto& stk : fixed_order) {
             double dir = fixed_dir[stk];
             if (dir == 0.0) {
                 target_value[stk] = 0.0;
                 continue;
             }
-            double target = (dir > 0.0) ? fixed_amount : -fixed_amount;
-            if (remaining >= 0.0) {
-                if (std::fabs(target) > remaining * (1.0 + 1e-9)) {
-                    target = 0.0;
-                    ++unfunded;
-                } else {
-                    remaining -= std::fabs(target);
+            if (dir < 0.0 && !support_borrow) {
+                if (!m_warned_short_unsupported) {
+                    m_warned_short_unsupported = true;
+                    HKU_WARN(
+                      "{}::_toTargets: the parent account does not support borrowing securities, "
+                      "the negative net targets are clamped to zero! Set support_borrow_stock=true "
+                      "on the system to allow shorting.",
+                      m_name);
                 }
+                target_value[stk] = 0.0;
+                continue;
             }
+            auto pit = price.find(stk);
+            double p = (pit != price.end()) ? pit->second : 0.0;
+            double unit = stk.unit();
+            double min_trade = stk.minTradeNumber();
+            if (p <= 0.0 || unit <= 0.0 ||
+                (min_trade > 0.0 && fixed_amount < min_trade * p * unit)) {
+                target_value[stk] = 0.0;
+                continue;
+            }
+            ++eligible;
+            double target = (dir > 0.0) ? fixed_amount : -fixed_amount;
+            if (remaining >= 0.0 && std::fabs(target) > remaining * (1.0 + 1e-9)) {
+                target_value[stk] = 0.0;
+                continue;
+            }
+            if (remaining >= 0.0) {
+                remaining -= std::fabs(target);
+            }
+            ++funded;
             target_value[stk] = target;
         }
-        if (unfunded > 0) {
+        if (funded < eligible) {
             HKU_WARN(
               "{}::_toTargets: max_total_position({}) x net assets({:.2f}) funds only {} of the "
               "{} fixed_amount targets, the rest are driven flat!",
-              m_name, max_total, parent_net, fixed_order.size() - unfunded, fixed_order.size());
+              m_name, max_total, parent_net, funded, eligible);
         }
     }
 
-    // The parent cannot run a short book without a securities-lending facility: clamp the negative
-    // net targets to zero and warn, so a short order is never silently rejected by the TM
-    const bool support_borrow =
-      tm->haveParam("support_borrow_stock") && tm->getParam<bool>("support_borrow_stock");
     if (!support_borrow) {
         for (auto& kv : target_value) {
             if (kv.second < 0.0) {
