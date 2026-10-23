@@ -648,7 +648,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
 - L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);
 - L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x position ratio x the parent net assets, aggregated per instrument; mode B: the sub-system instruction passes through);
-- L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max-single-position); mode B skips the clipping.)")
+- L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max_single_position); mode B skips the clipping.)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
       .def(py::init<const SystemList&, const string&>(), py::arg("sys_list"),
@@ -1023,7 +1023,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     suggestions into the target positions of the parent account by the AF L2 (target market value =
     weight x position ratio x the parent net assets, aggregated per instrument and rebalanced by the
     delta against the current position) and the L3 portfolio risk control applies (e.g.
-    max-single-position).
+    max_single_position).
     The unselected sub-systems are not force cleared by default (sell_at_not_selected=False);
     the selected ones with a zero quota follow the same switch.
 

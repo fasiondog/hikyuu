@@ -20,7 +20,7 @@ MultiFactorAllocateFunds::MultiFactorAllocateFunds() : AllocateFundsBase("AF_Mul
     // The scores are treated as the mutual ratios of the sub-systems and normalized to sum 1 by
     // default (the 2.8.3 auto_adjust_weight semantics, so the allocation is full-scale whatever
     // the raw score range is); when false the score itself is taken as the final weight and the
-    // over-quota part relies on max-total-position to scale down
+    // over-quota part relies on max_total_position to scale down
     setParam<bool>("auto_adjust_weight", true);
 }
 

@@ -125,7 +125,7 @@ Built-in Portfolios
     account is neither debited nor credited by them; the parent real cash only changes with the
     mirrored trades. The injections of one rebalancing day are cumulatively capped by the parent's
     remaining cash, so the mirrored buys are always fundable and the two books (positions / trades)
-    stay matched; an over-allocation (e.g. ``fixed-amount`` beyond the parent cash) is truncated at
+    stay matched; an over-allocation (e.g. ``fixed_amount`` beyond the parent cash) is truncated at
     the injection with a one-time warning instead of creating hidden leverage. The cash of the two
     ledgers is **not** subject to a conservation constraint (the quota cash is not reconciled against
     the parent cash); a hard per-sub budget / auditable commitment would be a separate "fund
@@ -188,7 +188,7 @@ Built-in Portfolios
     accounts (the signal cash is never reset, the shadows run continuously); the parent converts the
     suggestions into the target positions of the parent account by the AF L2 (target market value =
     weight x net ratio x the parent net assets, aggregated per instrument and rebalanced by the delta
-    against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
+    against the current position) and the L3 portfolio risk control applies (e.g. max_single_position).
     The unselected sub-systems are excluded from the parent target sampling, so their instruments drop out of the target and are closed; ``sell_at_not_selected`` does not take part in that behavior in mode A (the parent closes its own holdings and never touches the shadow accounts).
 
     This is the preset that ``PF_WithoutAF`` carried at the beginning of the refactoring; since

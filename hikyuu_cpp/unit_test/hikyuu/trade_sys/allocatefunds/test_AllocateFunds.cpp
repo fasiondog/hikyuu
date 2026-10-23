@@ -25,30 +25,36 @@ TEST_CASE("test_AllocateFunds_base_params") {
     AFPtr af = AF_EqualWeight();
 
     /** @arg the base parameter family and their defaults */
-    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(1.0));
-    CHECK_EQ(af->getParam<double>("max-total-position"), doctest::Approx(1.0));
-    CHECK_EQ(af->getParam<double>("fixed-amount"), doctest::Approx(0.0));
+    CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(1.0));
+    CHECK_EQ(af->getParam<double>("max_total_position"), doctest::Approx(1.0));
+    CHECK_EQ(af->getParam<double>("fixed_amount"), doctest::Approx(0.0));
     CHECK_EQ(af->getParam<bool>("adjust_running_sys"), true);
 
     /** @arg the legacy base-class weight-list parameter has been removed (the fixed weights go
      * through AF_FixedWeightList) */
     CHECK_UNARY(!af->haveParam("weight-list"));
 
+    /** @arg the deprecated hyphenated parameter names are rejected instead of registering
+     * dead keys */
+    CHECK_THROWS_AS(af->setParam<double>("max-single-position", 0.5), std::exception);
+    CHECK_THROWS_AS(af->setParam<double>("max-total-position", 0.5), std::exception);
+    CHECK_THROWS_AS(af->setParam<double>("fixed-amount", 0.5), std::exception);
+
     /** @arg non-default values are accepted and read back unchanged */
-    af->setParam<double>("max-single-position", 0.5);
-    af->setParam<double>("max-total-position", 0.8);
-    af->setParam<double>("fixed-amount", 30000.0);
+    af->setParam<double>("max_single_position", 0.5);
+    af->setParam<double>("max_total_position", 0.8);
+    af->setParam<double>("fixed_amount", 30000.0);
     af->setParam<bool>("adjust_running_sys", false);
-    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(0.5));
-    CHECK_EQ(af->getParam<double>("max-total-position"), doctest::Approx(0.8));
-    CHECK_EQ(af->getParam<double>("fixed-amount"), doctest::Approx(30000.0));
+    CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(0.5));
+    CHECK_EQ(af->getParam<double>("max_total_position"), doctest::Approx(0.8));
+    CHECK_EQ(af->getParam<double>("fixed_amount"), doctest::Approx(30000.0));
     CHECK_EQ(af->getParam<bool>("adjust_running_sys"), false);
 
-    /** @arg max-single-position is not bounded from below (<=0 means no limit, no clamp on set) */
-    CHECK_NOTHROW(af->setParam<double>("max-single-position", 0.0));
-    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(0.0));
-    CHECK_NOTHROW(af->setParam<double>("max-single-position", -1.0));
-    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(-1.0));
+    /** @arg max_single_position is not bounded from below (<=0 means no limit, no clamp on set) */
+    CHECK_NOTHROW(af->setParam<double>("max_single_position", 0.0));
+    CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(0.0));
+    CHECK_NOTHROW(af->setParam<double>("max_single_position", -1.0));
+    CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(-1.0));
 }
 
 /** @par Test points */

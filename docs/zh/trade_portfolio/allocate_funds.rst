@@ -69,8 +69,8 @@ AF 自身不持有该模式（见 :doc:`../trade_sys/system`）：
       - 透传子系统指令（多空均透传）
       - 直通，免换算
     * - L3 组合风控
-      - 组合风控裁剪（``max-single-position`` 集中度上限等）
-      - 关闭或仅总量（``max-total-position`` 配额总和上限在 L1 承载）
+      - 组合风控裁剪（``max_single_position`` 集中度上限等）
+      - 关闭或仅总量（``max_total_position`` 配额总和上限在 L1 承载）
       - 关闭且不可启用
 
 .. note::
@@ -100,7 +100,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
       - 权重 → 父账户可执行数量（模式 A 按「权重 × 带符号净目标比重 × 父净值」合成每标的净目标并 trade-the-delta；模式 B 透传子系统指令）
     * - L3 组合风控
       - ``_check_risk(date, tm, suggestions, query, mode)``
-      - 组合级风控裁剪（如 ``max-single-position`` 集中度上限）
+      - 组合级风控裁剪（如 ``max_single_position`` 集中度上限）
 
 ``_to_targets`` 与 ``_check_risk`` 均有默认实现，通常只需重载 ``_allocate``。
 
@@ -116,17 +116,17 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
       - 类型与默认值
       - 生效模式
       - 说明
-    * - ``max-single-position``
+    * - ``max_single_position``
       - float，1.0
       - 仅 A
       - L3 单标的集中度上限：单标的目标持仓市值 ≤ 净资产 × 该值。≤0 表示不限制；大于 1 时按 1.0 生效
-    * - ``max-total-position``
+    * - ``max_total_position``
       - float，1.0
       - A / B
       - 总预算上限：模式 A 下限定 L2 全部标的聚合目标市值 ≤ 净资产 × 该值；
         模式 B 下限定 L1 各子系统**配额总和** ≤ 净资产 × 该值。
         超出时按比例等比缩减并告警。≤0 表示不限制
-    * - ``fixed-amount``
+    * - ``fixed_amount``
       - float，0.0
       - A / B
       - 定价开关：大于 0 时**优先于权重定价**并告警。模式 A 下为每标的目标市值；
@@ -150,18 +150,18 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     * - 评分归一化后**满仓分配**
       - ``AF_MultiFactor`` 默认（``auto_adjust_weight=True``）将评分**归一化为和为 1** 后再分配，
         因此**评分总和小于 1 时也会满仓分配**（评分仅表达子系统间的相对比例）。
-        设为 ``False`` 时评分即最终权重，超出总预算的部分依赖 ``max-total-position`` 等比缩减
+        设为 ``False`` 时评分即最终权重，超出总预算的部分依赖 ``max_total_position`` 等比缩减
     * - 恒定权重不触发减仓
       - 恒定权重类 AF（如 ``AF_FixedWeightList``）每期按**当期父净资产**重算配额，
         子账户净值与配额同比例增长，正常行情下不会触发减仓；
         强制减仓只在权重或资金**跨期收缩**时发生（或 ``adjust_running_sys=False`` 时完全不发生）
-    * - ``fixed-amount`` 豁免总预算上限
-      - 模式 B 下 ``fixed-amount>0`` 时，各子系统配额总和不参与 ``max-total-position`` 的等比缩减：
-        固定额是调用方要求的绝对额度，而非待缩放的比例。模式 A 的 ``max-total-position`` 聚合总目标市值上限
+    * - ``fixed_amount`` 豁免总预算上限
+      - 模式 B 下 ``fixed_amount>0`` 时，各子系统配额总和不参与 ``max_total_position`` 的等比缩减：
+        固定额是调用方要求的绝对额度，而非待缩放的比例。模式 A 的 ``max_total_position`` 聚合总目标市值上限
         对全部标的同等生效
-    * - 模式 A 下 ``fixed-amount`` 按标的只应用一次
+    * - 模式 A 下 ``fixed_amount`` 按标的只应用一次
       - 模式 A 的固定额**按标的**定价而非按建议条数：同一标的被 N 个子持有时只取聚合后的带符号方向，
-        每个标的仅应用一次 ``±fixed-amount`` 目标（不会放大成 N 倍）。方向冲突时相消，
+        每个标的仅应用一次 ``±fixed_amount`` 目标（不会放大成 N 倍）。方向冲突时相消，
         净额为零则驱动该标的平仓
 
 
@@ -199,7 +199,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
     固定金额资产分配（L1 等权 + L2 固定金额），对选中的资产进行等金额分配。
 
-    当前实现要求 ``fixed-amount >= 0``，且按净额调仓。
+    当前实现要求 ``fixed_amount >= 0``，且按净额调仓。
 
     :param float amount: 交易最大金额
     :return: 资产分配算法实例（``AFPtr``）
@@ -211,7 +211,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
     :param bool auto_adjust_weight: 评分归一化开关（默认 ``True``）。``True`` 时将评分归一化为
         和为 1 再分配（评分总和小于 1 时同样满仓分配，见上文注意事项）；
-        ``False`` 时评分即最终权重（不归一化），超出总预算的部分依赖 ``max-total-position`` 缩减
+        ``False`` 时评分即最终权重（不归一化），超出总预算的部分依赖 ``max_total_position`` 缩减
     :return: 资产分配算法实例（``AFPtr``）
 
 
@@ -344,7 +344,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
         【重载接口】L3 组合风控裁剪，就地改写 ``suggestions`` 数量。
 
-        基类默认实现按 ``max-single-position`` 限制单标的集中度（模式 B 下跳过）。
+        基类默认实现按 ``max_single_position`` 限制单标的集中度（模式 B 下跳过）。
         未重载时使用基类默认实现。
 
         :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有

@@ -24,7 +24,7 @@ namespace hku {
  * @param auto_adjust_weight when true (the default) the scores are treated as the mutual ratios
  * and normalized to sum 1, so the total allocation is full-scale whatever the raw score range is
  * (the 2.8.3 semantics: a score sum less than 1 also allocates fully); when false the score itself
- * is the final weight and the part exceeding the budget relies on max-total-position to scale down.
+ * is the final weight and the part exceeding the budget relies on max_total_position to scale down.
  * @note It depends on MultiSystem backfilling score with the result of SelectorBase::getSelected()
  * before L1
  *

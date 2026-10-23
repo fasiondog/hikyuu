@@ -23,7 +23,7 @@
  *    sub-system passes through unchanged.
  *
  *  - **L3 portfolio risk control** `_checkRisk`: clip the suggestions at the portfolio
- *    dimension (e.g. the single instrument concentration cap `max-single-position`); mode B
+ *    dimension (e.g. the single instrument concentration cap `max_single_position`); mode B
  *    respects the sub-manager autonomy and skips the clipping.
  *
  *  The overall entry is `allocate()` = L1 -> L2 -> L3. When the quota is needed before driving
@@ -174,7 +174,7 @@ public:
                               const string& mode);
 
     /** L1 skeleton: fill the L1 result by "sub-system index -> weight", and in mode B write
-     *  contexts[i].quota (when fixed-amount>0 the fixed quota takes precedence, otherwise
+     *  contexts[i].quota (when fixed_amount>0 the fixed quota takes precedence, otherwise
      *  weight x the parent net assets).
      *  @note **No normalization is performed**, the weight semantics is fully decided by the
      *        subclass; the missing index (weights shorter than contexts) falls back to the equal
@@ -184,7 +184,7 @@ public:
                           const std::vector<double>& weights, const string& mode) const;
 
     /** L2 behavior-level conversion: in mode A it converts the parent account quantity by the
-     *  budget (weight / assets_ratio / fixed-amount, capped by max-total-position) and rewrites
+     *  budget (weight / assets_ratio / fixed_amount, capped by max_total_position) and rewrites
      *  the number of every suggestion (a positive magnitude, the direction expressed by the
      *  type); in mode B the sub-system number is passed through.
      *  @note The number is always positive; a short suggestion is turned into a SELL to reduce
@@ -196,7 +196,7 @@ public:
     /** L3 portfolio risk control clipping: mode A performs the portfolio dimension risk control
      *  (concentration / turnover, etc.); mode B can be disabled or only performs the total amount
      *  check.
-     *  @note The single instrument concentration is limited by the parameter max-single-position
+     *  @note The single instrument concentration is limited by the parameter max_single_position
      *        (<=0 means no limit, >1 is clamped to 1, so the default 1.0 caps a single instrument
      *        at the net assets). */
     virtual void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,

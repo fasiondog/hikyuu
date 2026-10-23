@@ -63,7 +63,7 @@ namespace hku {
  * @note Live replay and adjust_cycle: the rebalancing-day counting persists across the daily
  *       reset=false replays. A strategy process restart restarts the counting, so the first driven
  *       day after a restart is treated as a rebalancing day; if the exact cycle semantics matter,
- *       inject an explicit rebalancing-day table via setAdjustDates (or axis-mode=calendar)
+ *       inject an explicit rebalancing-day table via setAdjustDates (or axis_mode=calendar)
  *       instead of relying on adjust_cycle counting.
  */
 class HKU_API RunMultiSystemInStrategy {

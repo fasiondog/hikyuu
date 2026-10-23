@@ -14,7 +14,7 @@ the portfolio-level fund allocation is split out of `MoneyManagerBase` and carri
   factories are kept, but they **return `AllocateFundsBase` instances** (`AFPtr`);
 * `MoneyManagerBase` is **restricted to the single-system / single-security** form: the portfolio-level interfaces
   are removed (`allocate` / `set_mode` / `_allocate_system_weight` / `_allocate_suggestions` / `_check_risk`
-  and the `max-single-position` / `weight-list` / `fixed-amount` parameters with the `mode` attribute);
+  and the `mode` attribute);
 * The `Portfolio` class and its methods are **no longer provided**; the Python `crtAF` is **kept**, its callback
   contract updated from `_allocateWeight(date, se_list)` to `_allocate(date, tm, contexts, query)`, with the
   optional `_to_targets` / `_check_risk` injection.
@@ -39,7 +39,7 @@ Migration points:
   to sum 1 before allocating, and a score sum below 1 also allocates fully; with `False` the score itself is the
   final weight).
 
-**⚠️ AF risk control is active by default**: `max-single-position` defaults to 1.0, i.e. a single instrument position value <= the net assets (`<=0` disables the limit, `>1` takes effect as 1.0); `max-total-position` defaults to 1.0, in mode A the aggregated target market value of all instruments <= the net assets, in mode B the sum of the sub-system quotas <= the net assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`. The base class also carries the `fixed-amount` parameter (when >0 it overrides the weight pricing with a warning) and `adjust_running_sys` (default `True`, mode B only; when `False` the running sub-systems keep their holdings and only the new sub-systems get the remaining cash).
+**⚠️ AF risk control is active by default**: `max_single_position` defaults to 1.0, i.e. a single instrument position value <= the net assets (`<=0` disables the limit, `>1` takes effect as 1.0); `max_total_position` defaults to 1.0, in mode A the aggregated target market value of all instruments <= the net assets, in mode B the sum of the sub-system quotas <= the net assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`. The base class also carries the `fixed_amount` parameter (when >0 it overrides the weight pricing with a warning) and `adjust_running_sys` (default `True`, mode B only; when `False` the running sub-systems keep their holdings and only the new sub-systems get the remaining cash).
 
 See the docs: `trade_portfolio/portfolio` and `trade_portfolio/allocate_funds`.
 
@@ -100,7 +100,7 @@ Multiple signal inputs on the same date are merged into one net value: a positiv
 * feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)
 * feat(allocatefunds): the standalone `AllocateFundsBase` base class with the `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` factories (carrying the portfolio-level L1/L2/L3)
 * feat(allocatefunds): restore the Python `crtAF` quick construction (L1 `_allocate`, with the optional L2 `_to_targets` / L3 `_check_risk` injection)
-* feat(MultiSystem): new `adjust-mode` / `delay-to-trading-day` parameters, supporting internalizing the adjust mode into an adjust-date table
+* feat(MultiSystem): new `adjust_mode` / `delay_to_trading_day` parameters, supporting internalizing the adjust mode into an adjust-date table
 * feat(slippage): the four random slippages (`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`) gain an `adverse_only` parameter (default `true` keeps the one-sided unfavorable cost; `false` applies the raw signed sample as zero-mean execution noise)
 * feat(slippage): asymmetric long/short slippage is now supported: `SlippageBase` gains `get_real_buy_short_price` (covering a short) and `get_real_sell_short_price` (opening a short) with their overridable hooks, which delegate to the long-side hooks by default so an existing implementation keeps its behavior; `SP_FixedPercent` / `SP_FixedValue` gain `short_p` / `short_value`, the four random models gain `short_mean` / `short_stddev` / `short_min_value` / `short_max_value` (each taking its long-side counterpart value at construction when left `None`); `crtSP` gains the optional `get_real_buy_short_price` / `get_real_sell_short_price` arguments (note: an archive serialized by an older version carries no `short_*` key, so after deserialization the short side takes the class default instead of the matching long-side value; call `set_param` explicitly to restore it)
 * feat(moneymanager): `MM_Nothing` now supports opening shorts, sized by the account net assets (the net assets ÷ (price × unit)), consistent with the net-assets based strategies (`MM_FixedCapital` / `MM_FixedCapitalFunds` / `MM_FixedPercent`) in using the net assets as the short base, so the borrowed proceeds no longer inflate the short size; a new `if_have_short_will_not_sell_short` parameter (default `False`) controls whether an open short blocks a further short entry (previously the base default forbade short entry; the behavior changes to silently allowing it)

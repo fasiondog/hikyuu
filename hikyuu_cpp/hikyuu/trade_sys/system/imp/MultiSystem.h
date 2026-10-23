@@ -114,19 +114,19 @@ public:
 
     /** master compatibility overload: equivalent to master `Portfolio::run(query)`, it runs with
      * the market trading calendar as the driving axis.
-     *  - Driving axis: the explicitly injected fixed time axis (axis-mode == "calendar" and not
+     *  - Driving axis: the explicitly injected fixed time axis (axis_mode == "calendar" and not
      * empty) takes precedence, otherwise the StockManager market trading calendar
      * `get_trading_calendar(query)` is used (the SH market by default);
      *  - Context KData: it only provides the query/ktype and the price query context, its own
      * instrument `getStock()` takes precedence, then the first (recursive) sub-system instrument,
      * and finally it degenerates to the KData of the calendar benchmark index (e.g. sh000001);
-     *  - The axis-mode / fixed time axis parameters are not modified, the calendar axis only drives
+     *  - The axis_mode / fixed time axis parameters are not modified, the calendar axis only drives
      * this run.
      *  @param query the query condition (also used as the query context of the sub-systems and the
      * prices)
      *  @param reset whether to reset before running (forwarded to every sub-system)
      *  @param resetAll whether to force a full reset before running
-     *  @note when ktype is not the daily line, consistent with master, adjust-mode is required to
+     *  @note when ktype is not the daily line, consistent with master, adjust_mode is required to
      * be query/day (the calendar axis is a daily line sequence). */
     void run(const KQuery& query, bool reset = true, bool resetAll = false);
 
@@ -257,7 +257,7 @@ public:
         return m_adjust_turnover;
     }
 
-    /** Set the driving time axis mode (the axis-mode parameter):
+    /** Set the driving time axis mode (the axis_mode parameter):
      *  - "kdata" (the default): the date sequence of the input KData of run(kdata) is used as the
      * driving axis (the existing behavior)
      *  - "calendar": the fixed date table (e.g. the market-wide trading calendar) injected by
@@ -268,7 +268,7 @@ public:
 
     /** Get the driving time axis mode */
     string getAxisMode() const {
-        return tryGetParam<string>("axis-mode", "kdata");
+        return tryGetParam<string>("axis_mode", "kdata");
     }
 
     /** Set the rebalancing mode (aligned with the master PF adjust_mode):
@@ -281,7 +281,7 @@ public:
 
     /** Get the rebalancing mode */
     string getAdjustMode() const {
-        return tryGetParam<string>("adjust-mode", "query");
+        return tryGetParam<string>("adjust_mode", "query");
     }
 
     /** Set whether to postpone to the first trading day within the current cycle when the
@@ -291,7 +291,7 @@ public:
 
     /** Get whether to postpone to the trading day */
     bool getDelayToTradingDay() const {
-        return tryGetParam<bool>("delay-to-trading-day", true);
+        return tryGetParam<bool>("delay_to_trading_day", true);
     }
 
     /** Calculate the rebalancing day set on the given trading day axis by the master Portfolio
@@ -310,7 +310,7 @@ public:
     static DatetimeList calcAdjustDates(const DatetimeList& dates, const string& mode,
                                         int adjust_cycle, bool delay_to_trading_day);
 
-    /** Set the fixed time axis (it is used as the driving axis only when axis-mode == "calendar";
+    /** Set the fixed time axis (it is used as the driving axis only when axis_mode == "calendar";
      * when the axis is empty it falls back to the kdata axis with a warning) */
     void setDateAxis(const DatetimeList& dates);
 
@@ -371,6 +371,9 @@ private:
     // reference detection)
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
 
+    /** Reject the deprecated hyphenated parameter names instead of registering dead keys */
+    virtual void _checkParam(const string& name) const override;
+
 private:
     /** Run by the specified driving axis: when axis is empty the date sequence of the input KData
      * is used as the axis, otherwise axis is the driving axis (when driven by the fixed time axis,
@@ -378,13 +381,13 @@ private:
      * constitute a gap) */
     void _runAxis(const KData& kdata, const DatetimeList* axis, bool reset, bool resetAll);
 
-    /** Register the parameters of the aggregate system itself (axis-mode / adjust-mode /
-     * delay-to-trading-day) */
+    /** Register the parameters of the aggregate system itself (axis_mode / adjust_mode /
+     * delay_to_trading_day) */
     void _initAxisParam() {
-        setParam<string>("axis-mode", "kdata");
+        setParam<string>("axis_mode", "kdata");
         // Aligned with the master PF adjust_mode / delay_to_trading_day
-        setParam<string>("adjust-mode", "query");
-        setParam<bool>("delay-to-trading-day", true);
+        setParam<string>("adjust_mode", "query");
+        setParam<bool>("delay_to_trading_day", true);
     }
 
     /** Aggregate a group of trades into a net suggestion by instrument (marked with the source
@@ -395,15 +398,15 @@ private:
                                        const Datetime& datetime) const;
 
     /** Judge whether the given date is a rebalancing day (the rebalancing is executed only on the
-     * rebalancing day): the external rebalancing day table takes precedence, then the adjust-mode
+     * rebalancing day): the external rebalancing day table takes precedence, then the adjust_mode
      * period rule, and finally the close-day counting of m_adjust_cycle */
     bool _isAdjustDate(const Datetime& date) const;
 
-    /** The adjust-mode period rule: the adjust_cycle-th calendar day of the period, postponed to
+    /** The adjust_mode period rule: the adjust_cycle-th calendar day of the period, postponed to
      * the first driven day of the period when delay_to_trading_day is on (once per period) */
     bool _isAdjustDateByPeriod(const Datetime& date, const Datetime& last_period) const;
 
-    /** Warn when m_adjust_cycle can never reach a driven day of the current adjust-mode period
+    /** Warn when m_adjust_cycle can never reach a driven day of the current adjust_mode period
      *  (week 5 / month 31 / quarter 92 / year 366 calendar days); the value is kept, not clamped */
     void _warnAdjustCycleOutOfRange() const;
 
@@ -411,7 +414,7 @@ private:
      * the run-level input injected into the cycle signals of the sub-systems */
     void _buildCycleDates(const DatetimeList& axis);
 
-    /** The start of the adjust-mode period containing the date (Null for query/day) */
+    /** The start of the adjust_mode period containing the date (Null for query/day) */
     Datetime _periodStart(const Datetime& date) const;
 
     /** Declare one rebalancing day at the close stage and push it down to the sub-system signals.
@@ -718,14 +721,14 @@ private:
                                     // dropped as soon as the driving KData advances (live sessions
                                     // reuse the same query while the data grows daily)
     DatetimeList m_date_axis;       // The fixed time axis: the driving date table when
-                                    // axis-mode="calendar" (configuration, serialized)
+                                    // axis_mode="calendar" (configuration, serialized)
     DatetimeList m_cycle_dates;     // The rebalancing days declared so far, the run-level input
                                     // injected into the sub-system signals (runtime state,
                                     // not serialized)
     Datetime m_last_close_date;     // The trading day of the last close-stage drive, used to
                                     // advance the close-day counter once per day (runtime
                                     // state, not serialized)
-    Datetime m_last_adjust_period;  // The adjust-mode period of the last driven rebalancing day,
+    Datetime m_last_adjust_period;  // The adjust_mode period of the last driven rebalancing day,
                                     // used by the runtime period rule of the entries without a
                                     // precomputed table (runtime state, not serialized)
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the

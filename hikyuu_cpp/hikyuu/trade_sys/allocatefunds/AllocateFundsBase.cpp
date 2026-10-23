@@ -19,12 +19,12 @@
 
 namespace hku {
 
-// The one-shot notice flag: the fixed-amount pricing silently overrides the weights, so the
+// The one-shot notice flag: the fixed_amount pricing silently overrides the weights, so the
 // surprise is worth exactly one log line per process instead of one per rebalance
 static std::once_flag g_fixed_amount_warn_flag;
 
-// The one-shot notice of the exempted fixed-amount budget cap (the absolute targets can exceed
-// the max-total-position budget: the user asked for absolute amounts, warned once per process)
+// The one-shot notice of the exempted fixed_amount budget cap (the absolute targets can exceed
+// the max_total_position budget: the user asked for absolute amounts, warned once per process)
 static std::once_flag g_fixed_amount_cap_warn_flag;
 
 // The one-shot notice flag of the mode A short clamp: a parent account without a securities-lending
@@ -48,18 +48,18 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsPtr& af) {
 AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // L3 single instrument concentration cap: the target market value <= total assets x this
     // value (<=0 means no limit, >1 is clamped to 1)
-    setParam<double>("max-single-position", 1.0);
+    setParam<double>("max_single_position", 1.0);
 
     // The total budget cap: in mode A the aggregated gross target market value of all instruments
     // <= net assets x this value, scaled down proportionally when exceeded; in mode B the sum of
     // the sub-system quotas <= total assets x this value (<=0 disables the cap). The reserved /
     // unallocated asset ratio of the master reserve_percent is expressed by setting it to 1 - r.
-    setParam<double>("max-total-position", 1.0);
+    setParam<double>("max_total_position", 1.0);
 
     // The pricing policy switch: when >0 the fixed amount takes precedence over the weights --
     // the per-instrument target in mode A / the per sub-system quota in mode B are both this
     // absolute value, and the L1 weights are ignored in the pricing
-    setParam<double>("fixed-amount", 0.0);
+    setParam<double>("fixed_amount", 0.0);
 
     // Whether to force-adjust the running sub-systems (the ones still holding value funded in a
     // previous period) to the new quota on the rebalancing day. Only effective in mode B: mode A
@@ -71,15 +71,26 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
-    setParam<double>("max-single-position", 1.0);
-    setParam<double>("max-total-position", 1.0);
-    setParam<double>("fixed-amount", 0.0);
+    setParam<double>("max_single_position", 1.0);
+    setParam<double>("max_total_position", 1.0);
+    setParam<double>("fixed_amount", 0.0);
     setParam<bool>("adjust_running_sys", true);
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
 
-void AllocateFundsBase::baseCheckParam(const string&) const {}
+void AllocateFundsBase::baseCheckParam(const string& name) const {
+    string fixed_name;
+    if (name == "max-single-position") {
+        fixed_name = "max_single_position";
+    } else if (name == "max-total-position") {
+        fixed_name = "max_total_position";
+    } else if (name == "fixed-amount") {
+        fixed_name = "fixed_amount";
+    }
+    HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
+              name, fixed_name);
+}
 
 void AllocateFundsBase::paramChanged() {}
 
@@ -150,12 +161,12 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
     if (contexts.empty()) {
         return result;
     }
-    // The pricing policy: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount),
+    // The pricing policy: a fixed quota per sub-system when fixed_amount>0 (AF_FixedAmount),
     // otherwise weight x the parent net assets (the parent valuation is needed only there).
-    double fixed_amount = getParam<double>("fixed-amount");
+    double fixed_amount = getParam<double>("fixed_amount");
     if (fixed_amount > 0.0) {
         std::call_once(g_fixed_amount_warn_flag, [this]() {
-            HKU_WARN("{}: fixed-amount > 0 takes precedence over the weights in the pricing!",
+            HKU_WARN("{}: fixed_amount > 0 takes precedence over the weights in the pricing!",
                      m_name);
         });
     }
@@ -183,18 +194,18 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
     // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
     // MM working directly on the shared real account.
     if (mode == "B" && tm) {
-        // The mode B budget cap: the sum of the quotas <= net assets x max-total-position,
-        // scaled down proportionally when exceeded (<=0 disables the cap). The fixed-amount
+        // The mode B budget cap: the sum of the quotas <= net assets x max_total_position,
+        // scaled down proportionally when exceeded (<=0 disables the cap). The fixed_amount
         // pricing is exempt: the quota there is the absolute amount the user asked for, not a
         // proportion to be scaled.
-        double max_total = getParam<double>("max-total-position");
+        double max_total = getParam<double>("max_total_position");
         // The relative epsilon absorbs the floating-point noise of a legitimate full allocation
         // (a sum of normalized weights worth 1.0 + 2.2e-16 must not trigger a spurious scaling)
         if (fixed_amount <= 0.0 && max_total > 0.0 && std::isfinite(sum_w) &&
             sum_w > max_total * (1.0 + 1e-9)) {
             double scale = max_total / sum_w;
             HKU_WARN(
-              "{}: the aggregated quota weights({:.4f}) exceed max-total-position({}), scaled by "
+              "{}: the aggregated quota weights({:.4f}) exceed max_total_position({}), scaled by "
               "{:.4f}!",
               m_name, sum_w, max_total, scale);
             for (auto& kv : result) {
@@ -206,7 +217,7 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
             // because the sum of the quotas can exceed what the parent account can fund
             std::call_once(g_fixed_amount_cap_warn_flag, [this]() {
                 HKU_WARN(
-                  "{}: the fixed-amount quotas exceed max-total-position x net assets, "
+                  "{}: the fixed_amount quotas exceed max_total_position x net assets, "
                   "they are kept as absolute amounts!",
                   m_name);
             });
@@ -262,10 +273,10 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // Each suggestion carries the signed net exposure ratio (target_position_ratio) of one
     // sub-system for one instrument; the parent target value = sum(weight x ratio) x parent net.
     double parent_net = tm->getFunds(date, ktype).net_assets();
-    double fixed_amount = getParam<double>("fixed-amount");
+    double fixed_amount = getParam<double>("fixed_amount");
 
     std::map<Stock, double> target_value;  // instrument -> signed net target market value
-    std::map<Stock, double> fixed_dir;  // instrument -> aggregated signed direction (fixed-amount)
+    std::map<Stock, double> fixed_dir;  // instrument -> aggregated signed direction (fixed_amount)
     std::map<Stock, price_t> price;     // instrument -> the close price used for the shares
     double gross = 0.0;
     for (const auto& s : suggestions) {
@@ -274,9 +285,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         }
         price[s.stock] = s.plan_price;
         if (fixed_amount > 0.0) {
-            // fixed-amount: the pricing is per instrument, not per suggestion. The same instrument
-            // held by N sub-systems must not be scaled to N x fixed-amount, so only the aggregate
-            // signed direction is accumulated here and the ±fixed-amount target is applied once
+            // fixed_amount: the pricing is per instrument, not per suggestion. The same instrument
+            // held by N sub-systems must not be scaled to N x fixed_amount, so only the aggregate
+            // signed direction is accumulated here and the ±fixed_amount target is applied once
             // per instrument below.
             fixed_dir[s.stock] +=
               (s.target_position_ratio > 0.0) ? 1.0 : (s.target_position_ratio < 0.0 ? -1.0 : 0.0);
@@ -307,7 +318,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         gross += std::fabs(v);
     }
     if (fixed_amount > 0.0) {
-        // The aggregate-then-apply step: one ±fixed-amount target per instrument (a flat aggregate
+        // The aggregate-then-apply step: one ±fixed_amount target per instrument (a flat aggregate
         // means the conflicting intents cancel out, so the instrument is driven to zero)
         for (const auto& kv : fixed_dir) {
             // A flat aggregate (conflicting intents cancel out, or a zero target from an unselected
@@ -342,15 +353,15 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     }
 
     // The total budget cap: the aggregated gross target market value <= net assets x
-    // max-total-position, scaled down proportionally (<=0 disables the cap). The fixed-amount
+    // max_total_position, scaled down proportionally (<=0 disables the cap). The fixed_amount
     // pricing is exempt exactly as in the L1 quota pricing: an absolute amount asked by the user
     // must not be silently scaled (a notice is logged when it exceeds the budget)
-    double max_total = getParam<double>("max-total-position");
+    double max_total = getParam<double>("max_total_position");
     if (fixed_amount > 0.0 && max_total > 0.0 && parent_net > 0.0 &&
         gross > parent_net * max_total) {
         std::call_once(g_fixed_amount_cap_warn_flag, [this]() {
             HKU_WARN(
-              "{}::_toTargets: the fixed-amount targets exceed max-total-position x net "
+              "{}::_toTargets: the fixed_amount targets exceed max_total_position x net "
               "assets, they are kept as absolute amounts!",
               m_name);
         });
@@ -359,7 +370,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         gross > parent_net * max_total) {
         double scale = parent_net * max_total / gross;
         HKU_WARN(
-          "{}::_toTargets: the aggregated gross target({:.2f}) exceeds max-total-position({}) x "
+          "{}::_toTargets: the aggregated gross target({:.2f}) exceeds max_total_position({}) x "
           "net assets({:.2f}), scaled by {:.4f}!",
           m_name, gross, max_total, parent_net, scale);
         for (auto& kv : target_value) {
@@ -459,10 +470,10 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
         return;
     }
     // The concentration upper limit: the target position market value of a single instrument <=
-    // net assets x max-single-position (<=0 means no limit; >1 is clamped to 1). The net assets
+    // net assets x max_single_position (<=0 means no limit; >1 is clamped to 1). The net assets
     // are the denominator so that a levered account is not granted a larger cap by the borrowed
     // funds.
-    double max_ratio = getParam<double>("max-single-position");
+    double max_ratio = getParam<double>("max_single_position");
     if (max_ratio <= 0.0) {
         return;
     }

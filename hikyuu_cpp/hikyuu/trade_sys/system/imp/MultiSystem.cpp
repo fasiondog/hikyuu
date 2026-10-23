@@ -26,6 +26,19 @@ BOOST_CLASS_EXPORT(hku::MultiSystem)
 
 namespace hku {
 
+void MultiSystem::_checkParam(const string& name) const {
+    string fixed_name;
+    if (name == "axis-mode") {
+        fixed_name = "axis_mode";
+    } else if (name == "adjust-mode") {
+        fixed_name = "adjust_mode";
+    } else if (name == "delay-to-trading-day") {
+        fixed_name = "delay_to_trading_day";
+    }
+    HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
+              name, fixed_name);
+}
+
 void MultiSystem::setMode(const string& mode) {
     string m = mode;
     to_upper(m);
@@ -413,7 +426,7 @@ SystemPtr MultiSystem::_clone() {
     ret->m_mode = m_mode;            // The running mode is owned by the aggregate system itself
     ret->m_path = m_path;            // The hierarchy path is copied with the configuration
     ret->m_date_axis = m_date_axis;  // The fixed time axis is copied with the configuration (the
-                                     // axis-mode parameter is copied by System::clone)
+                                     // axis_mode parameter is copied by System::clone)
     ret->m_adjust_dates =
       m_adjust_dates;  // The external rebalancing day table is copied with the configuration
     if (getMM()) {
@@ -432,14 +445,14 @@ SystemPtr MultiSystem::_clone() {
 void MultiSystem::setAxisMode(const string& mode) {
     if (mode != "kdata" && mode != "calendar") {
         HKU_WARN(
-          "Invalid axis-mode: {}, only \"kdata\" / \"calendar\" supported, fallback to \"kdata\"! "
+          "Invalid axis_mode: {}, only \"kdata\" / \"calendar\" supported, fallback to \"kdata\"! "
           "[{}]",
           mode, name());
-        setParam<string>("axis-mode", "kdata");
+        setParam<string>("axis_mode", "kdata");
         _clearCycleDates();
         return;
     }
-    setParam<string>("axis-mode", mode);
+    setParam<string>("axis_mode", mode);
     _clearCycleDates();
 }
 
@@ -463,7 +476,7 @@ void MultiSystem::setAdjustCycle(int cycle) {
 }
 
 void MultiSystem::setDelayToTradingDay(bool v) {
-    setParam<bool>("delay-to-trading-day", v);
+    setParam<bool>("delay_to_trading_day", v);
     _clearCycleDates();
 }
 
@@ -488,14 +501,14 @@ void MultiSystem::setAdjustMode(const string& mode) {
     if (m != "query" && m != "day" && m != "week" && m != "month" && m != "quarter" &&
         m != "year") {
         HKU_WARN(
-          "Invalid adjust-mode: {}, only query/day/week/month/quarter/year supported, "
+          "Invalid adjust_mode: {}, only query/day/week/month/quarter/year supported, "
           "fallback to \"query\"! [{}]",
           mode, name());
-        setParam<string>("adjust-mode", "query");
+        setParam<string>("adjust_mode", "query");
         _clearCycleDates();
         return;
     }
-    setParam<string>("adjust-mode", m);
+    setParam<string>("adjust_mode", m);
     _clearCycleDates();
     _warnAdjustCycleOutOfRange();
 }
@@ -1524,16 +1537,16 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
 }
 
 void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
-    // The driving axis selection (the axis-mode parameter, see MultiSystem.h):
+    // The driving axis selection (the axis_mode parameter, see MultiSystem.h):
     //   "kdata"    -- the date sequence of the input KData is used as the axis (the default,
     //   keeping the existing behavior) "calendar" -- the fixed date table (e.g. the market-wide
     //   trading calendar) injected by setDateAxis() is used as the axis;
     //                 the input KData degenerates into the query/ktype and the price query context
     //                 (runMoment/_closePhase only take its query)
-    string axis_mode = tryGetParam<string>("axis-mode", "kdata");
+    string axis_mode = tryGetParam<string>("axis_mode", "kdata");
     bool use_calendar_axis = (axis_mode == "calendar");
     if (use_calendar_axis && m_date_axis.empty()) {
-        HKU_WARN("axis-mode=calendar but date axis is empty, fallback to kdata axis! [{}]", name());
+        HKU_WARN("axis_mode=calendar but date axis is empty, fallback to kdata axis! [{}]", name());
         use_calendar_axis = false;
     }
     _runAxis(kdata, use_calendar_axis ? &m_date_axis : nullptr, reset, resetAll);
@@ -1555,15 +1568,15 @@ void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
     // trading calendar as the driving axis
     auto& sm = StockManager::instance();
 
-    // Consistent with master: when ktype is not the daily line, it is only allowed when adjust-mode
+    // Consistent with master: when ktype is not the daily line, it is only allowed when adjust_mode
     // is query/day (the calendar axis is a daily line sequence)
     string mode = getAdjustMode();
     to_lower(mode);
     HKU_CHECK(mode == "query" || mode == "day" || query.kType() == KQuery::DAY,
-              "The kType of query must be DAY when adjust-mode is not \"query\"! [{}]", name());
+              "The kType of query must be DAY when adjust_mode is not \"query\"! [{}]", name());
 
     // The driving axis: the explicitly injected fixed time axis takes precedence (respecting the
-    // injection of the axis-mode=calendar users), otherwise the market trading calendar is used
+    // injection of the axis_mode=calendar users), otherwise the market trading calendar is used
     DatetimeList dates = (getAxisMode() == "calendar" && !m_date_axis.empty())
                            ? m_date_axis
                            : sm.getTradingCalendar(query);
@@ -2470,15 +2483,15 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             }
             // The outer mode B layer may have assigned this aggregate a budget: scale the leaf
             // quotas to that total (the FOF/MOM budget semantics), capped by the inner reserve
-            // (max-total-position x the inner net assets)
+            // (max_total_position x the inner net assets)
             if (m_external_quota_set) {
                 price_t total = 0.0;
                 for (const auto& kv : quota_map) {
                     total += kv.second;
                 }
                 price_t budget = m_external_quota;
-                double fixed_amount = m_af->getParam<double>("fixed-amount");
-                double max_total = m_af->getParam<double>("max-total-position");
+                double fixed_amount = m_af->getParam<double>("fixed_amount");
+                double max_total = m_af->getParam<double>("max_total_position");
                 if (fixed_amount <= 0.0 && max_total > 0.0 && max_total < 1.0) {
                     price_t cap = max_total * m_tm->getFunds(datetime, ktype).net_assets();
                     if (budget > cap) {
@@ -2486,7 +2499,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                             m_external_quota_capped_warned = true;
                             HKU_WARN(
                               "The delegated quota {:.2f} exceeds the inner reserve cap "
-                              "{:.2f} (max-total-position), capped!",
+                              "{:.2f} (max_total_position), capped!",
                               budget, cap);
                         }
                         budget = cap;
