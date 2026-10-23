@@ -76,8 +76,8 @@ Mode x algorithm-part mapping:
       - Passes the sub-system instructions through (both long and short)
       - Pass-through, no conversion
     * - L3 portfolio risk control
-      - Portfolio risk-control clipping (e.g. the ``max-single-position`` concentration cap)
-      - Off or total-only (the ``max-total-position`` quota-sum cap is carried at L1)
+      - Portfolio risk-control clipping (e.g. the ``max_single_position`` concentration cap)
+      - Off or total-only (the ``max_total_position`` quota-sum cap is carried at L1)
       - Off and cannot be enabled
 
 .. note::
@@ -110,7 +110,7 @@ and :meth:`AllocateFundsBase.allocate` chains them together into a pipeline:
       - Weights -> executable quantities for the parent account (in mode A, the per-instrument net target is synthesized by ``weight x signed net ratio x the parent net assets`` and traded by the delta; in mode B, sub-system instructions are passed through)
     * - L3 portfolio risk control
       - ``_check_risk(date, tm, suggestions, query, mode)``
-      - Portfolio-level risk-control clipping (e.g. the ``max-single-position`` concentration cap)
+      - Portfolio-level risk-control clipping (e.g. the ``max_single_position`` concentration cap)
 
 Both ``_to_targets`` and ``_check_risk`` come with default implementations, so usually only ``_allocate`` needs to be overridden.
 
@@ -126,19 +126,19 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
       - Type and default
       - Effective modes
       - Description
-    * - ``max-single-position``
+    * - ``max_single_position``
       - float, 1.0
       - A only
       - The L3 per-instrument concentration cap: the target market value of one instrument must not exceed
         the net assets x this value. <=0 disables the limit; a value above 1 takes effect as 1.0
-    * - ``max-total-position``
+    * - ``max_total_position``
       - float, 1.0
       - A / B
       - The total budget cap: in mode A it bounds the aggregated target market value of all instruments (L2)
         by the net assets x this value; in mode B it bounds the **sum of the sub-system quotas** (L1) by
         the net assets x this value. Scaled down proportionally with a warning when exceeded.
         <=0 disables the cap
-    * - ``fixed-amount``
+    * - ``fixed_amount``
       - float, 0.0
       - A / B
       - The pricing switch: when >0 it **takes precedence over the weight pricing** with a warning.
@@ -167,20 +167,20 @@ Notes:
       - ``AF_MultiFactor`` by default (``auto_adjust_weight=True``) **normalizes the scores to sum 1**
         before allocating, so **a score sum less than 1 also allocates fully** (the scores only express
         the relative ratios between the sub-systems). When ``False`` the score itself is the final weight
-        and the part exceeding the total budget relies on ``max-total-position`` to scale down
+        and the part exceeding the total budget relies on ``max_total_position`` to scale down
     * - Constant weights never trigger a reduction
       - The constant-weight AFs (e.g. ``AF_FixedWeightList``) recompute the quota from the **current** parent
         net assets on every period, so the sub value and the quota grow in the same proportion and the
         reduction is never triggered by the normal market movement; the force reduction only happens on a
         real cross-period shrink of the weights or the funds (and never happens when
         ``adjust_running_sys=False``)
-    * - ``fixed-amount`` is exempt from the total budget cap
-      - In mode B, when ``fixed-amount>0`` the sum of the sub-system quotas is **not** scaled down by
-        ``max-total-position``: the fixed amount is the absolute quota the caller asked for, not a proportion
-        to be scaled. The mode A gross-target cap of ``max-total-position`` applies to all instruments alike
-    * - ``fixed-amount`` is applied once per instrument in mode A
+    * - ``fixed_amount`` is exempt from the total budget cap
+      - In mode B, when ``fixed_amount>0`` the sum of the sub-system quotas is **not** scaled down by
+        ``max_total_position``: the fixed amount is the absolute quota the caller asked for, not a proportion
+        to be scaled. The mode A gross-target cap of ``max_total_position`` applies to all instruments alike
+    * - ``fixed_amount`` is applied once per instrument in mode A
       - In mode A the fixed amount is priced **per instrument**, not per suggestion: when the same instrument
-        is held by N sub-systems, only the aggregated signed direction is taken and one ``±fixed-amount``
+        is held by N sub-systems, only the aggregated signed direction is taken and one ``±fixed_amount``
         target is applied per instrument (it is not multiplied by N). Conflicting directions cancel out, so a
         flat aggregate drives the instrument to zero
 
@@ -218,7 +218,7 @@ Built-in Asset Allocation Algorithms
 
     Fixed-amount fund allocation (L1 equal weight + L2 fixed amount): allocates an equal amount of capital to each selected instrument.
 
-    The current implementation requires ``fixed-amount >= 0`` and rebalances by the net amount.
+    The current implementation requires ``fixed_amount >= 0`` and rebalances by the net amount.
 
     :param float amount: the maximum trade amount
     :return: the fund allocation algorithm instance (``AFPtr``)
@@ -231,7 +231,7 @@ Built-in Asset Allocation Algorithms
     :param bool auto_adjust_weight: the score normalization switch (default ``True``). When ``True`` the scores are
         normalized to sum 1 before allocating (a score sum less than 1 also allocates fully; see the notes above);
         when ``False`` the score itself is the final weight (no normalization) and
-        the part exceeding the total budget relies on ``max-total-position`` to scale down
+        the part exceeding the total budget relies on ``max_total_position`` to scale down
     :return: the fund allocation algorithm instance (``AFPtr``)
 
 
@@ -363,7 +363,7 @@ Asset Allocation Algorithm Base Class
 
         [Override hook] L3 portfolio risk-control clipping: rewrites the quantities in ``suggestions`` in place.
 
-        The default base-class implementation caps the per-instrument concentration by ``max-single-position`` (skipped in mode B).
+        The default base-class implementation caps the per-instrument concentration by ``max_single_position`` (skipped in mode B).
         It is used when this hook is not overridden.
 
         :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system

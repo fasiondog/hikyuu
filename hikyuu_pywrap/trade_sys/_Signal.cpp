@@ -78,6 +78,23 @@ The custom signal generator interfaces:
 
     :return: DatetimeList)")
 
+      .def(
+        "set_cycle_dates",
+        [](SignalBase* self, const py::object& dates) {
+            // Convert before releasing the GIL: the iterator and the cast both need it
+            auto cycle_dates = get_datetime_list_from_python(dates);
+            ScopeGilRelease gil(!self->hasPythonPart());
+            self->setCycleDates(cycle_dates);
+        },
+        py::arg("dates"),
+        R"(set_cycle_dates(self, dates)
+
+    Declare the rebalancing days consumed by the cycle signals, usually injected by a MultiSystem
+    before the run; the other signals ignore them. The dates are sorted and deduplicated, and the
+    signal is recalculated at once when the trading object is already set.
+
+    :param dates: the Datetime sequence (list/tuple/DatetimeList are all accepted))")
+
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
 
     Get the specified parameter
@@ -324,6 +341,13 @@ The custom signal generator interfaces:
     A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before
     the run; it stays silent when no day is injected)");
 
+    m.def("SG_Manual", SG_Manual, R"(SG_Manual()
+
+    A signal generator whose signals are added manually, for tests or the external signal import.
+    Its _calculate is empty: the preset signals are kept when it is used as a sub-signal of an
+    operator (logical or arithmetic), while assigning the trading object on it directly clears
+    them)");
+
     m.def("SG_OneSide", SG_OneSide, py::arg("ind"), py::arg("is_buy"),
           R"(SG_OneSide(ind, is_buy)
           
@@ -442,6 +466,9 @@ The custom signal generator interfaces:
 
     Generate the signal of the AND of the two indicators
 
+    Only the direction is kept: a hit is written as 1.0 for a buy and -1.0 for a sell, dropping the
+    amplitudes of the sub-signals
+
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
@@ -461,6 +488,9 @@ The custom signal generator interfaces:
           R"(SG_Or(sg1, sg2, alternate)
 
     Generate the signal of the logical OR of the two signal generators
+
+    Only the direction is kept: a hit is written as 1.0 for a buy and -1.0 for a sell, dropping the
+    amplitudes of the sub-signals; on a same-day conflict the sell wins
 
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem

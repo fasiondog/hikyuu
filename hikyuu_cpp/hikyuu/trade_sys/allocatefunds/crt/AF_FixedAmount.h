@@ -19,7 +19,7 @@ namespace hku {
 
 /**
  * @brief Fixed amount allocation, the trade of every selected asset cannot exceed this amount
- * @details L1 equal weight + L2 reads the parameter fixed-amount (mode A: a fixed amount per
+ * @details L1 equal weight + L2 reads the parameter fixed_amount (mode A: a fixed amount per
  *          instrument / mode B: a fixed quota per sub-system). There are boundary differences with
  *          master FixedAmountFunds: master asserts amount>500 and stops when the remaining cash is
  *          less than 0.6×amount, while the new system uses >=0 and rebalances by the net amount.

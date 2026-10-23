@@ -9,7 +9,7 @@ A signal generator (SG) produces the buy and sell signals used by a trading syst
 Common parameters:
 
     * **alternate** *(bool|True)* : Whether buy and sell signals must alternate. Single-line generators typically derive their signals from curve inflection points, slope changes, and similar rules, so they can emit several consecutive buy signals or several consecutive sell signals; this parameter forces the two to alternate. Two-line crossover generators already alternate buys and sells by construction, in which case this parameter has no effect.
-    * **cycle** *(bool|False)* : Marks the signal as consuming the rebalancing days injected by a MultiSystem (e.g. SG_Cycle); it no longer changes the calculation range -- the signal is always calculated once over the whole KData, so it stays stable within the backtest. A cycle signal is a scheduled signal: ``cycle=true`` and ``alternate=true`` are mutually exclusive, setting cycle forces alternate to false (with a warning); a combination that contains a cycle child inherits both the cycle marker and ``alternate=False``, so the later cycle buys are not dropped by the alternation rule. Modes A/B inject the whole run before it starts, while mode C declares the start day when a sub-system is admitted (an already running sub-system is not re-declared, keeping the legacy Portfolio semantics). Only the signals with ``cycle=true`` consume the days; the plain signals are neither affected nor recalculated by a declaration. Note that a cycle buy is a scheduled entry / re-entry of the sub-system (the first entry, after its own exit, or after the SE dropped it and its shadow was cleared), not a portfolio-level rebalancing action -- the portfolio rebalancing is done by the SE/AF. When the sub-system already holds, whether a cycle buy adds to the position depends on the MM (e.g. MM_Nothing cannot trade again once the cash is used up)
+    * **cycle** *(bool|False)* : Marks the signal as consuming the rebalancing days injected by a MultiSystem (e.g. SG_Cycle); it no longer changes the calculation range -- the signal is always calculated once over the whole KData, so it stays stable within the backtest. A cycle signal is a scheduled signal: ``cycle=true`` and ``alternate=true`` are mutually exclusive, setting cycle forces alternate to false (with a warning); a combination that contains a cycle child inherits both the cycle marker and ``alternate=False``, so the later cycle buys are not dropped by the alternation rule. Modes A/B inject the whole run before it starts, while mode C declares the start day when a sub-system is admitted (an already running sub-system is not re-declared, keeping the legacy Portfolio semantics). Only the signals with ``cycle=true`` consume the days; the plain signals are neither affected nor recalculated by a declaration. Note that a cycle buy is a scheduled entry / re-entry of the sub-system (the first entry, after its own exit, or after the SE dropped it and its shadow was cleared), not a portfolio-level rebalancing action -- the portfolio rebalancing is done by the SE/AF. When the sub-system already holds, whether a cycle buy adds to the position depends on the MM (e.g. MM_Nothing cannot trade again once the cash is used up). **Combination limit**: under mode C a cycle signal cannot be combined with ``SE_Signal`` -- the SE snapshots the buy signals already computed by the sub-systems before the run, while mode C declares the cycle day only on admission, so the snapshot stays empty and the sub-system is never admitted (it enters neither the running pool nor a single trade). A selector that admits by a fixed instrument list or rebalancing schedule (e.g. ``SE_Fixed``) is unaffected, and modes A/B push the whole schedule down before the snapshot, so they do work with ``SE_Signal``. Note also that mode C declares the cycle day on admission only: a stop-loss exit inside the same cycle does not re-open by itself, the SE has to drop the sub-system and admit it again.
     * **support_borrow_stock** *(bool|False)* : Allow short-sale signals to be emitted
 
 
@@ -90,9 +90,14 @@ When technical indicators are used to decide entries and exits, the rule almost 
                 <td>A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run</td>
             </tr>
             <tr>
-                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
+                <td><a href="#target-section">SG_Manual</a></td>
+                <td>Manual signal generator</td>
+                <td>A special SG whose signals are added by hand, for tests or the external signal import</td>
+            </tr>
+            <tr>
+                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG operation helpers</td>
-                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem</td>
+                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem<br>Add / sub / mul / div keep the signal amplitudes, and / or keep the direction only (see Signal operations below)</td>
             </tr>
         </tbody>
     </table>
@@ -241,6 +246,27 @@ PF Rebalance Cycle Buy Signal Generator
 
     A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run; it stays silent when no day is injected.
     A custom Python cycle signal can read the injected days in ``_calculate`` via ``get_cycle_dates()``.
+    A cycle signal usually fits the selectors that admit on a schedule (e.g. ``SE_Fixed``); see the **cycle** common-parameter note above for the ``SE_Signal`` combination limit.
+
+
+Manual Signal Generator
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Manual()
+
+    A special SG whose signals are added by hand, for tests or the external signal import. Its
+    ``_calculate`` is empty: the preset signals are kept when it is used as a sub-signal of an
+    operator (logical or arithmetic), while assigning the trading object on it directly clears
+    them.
+
+
+Signal Operations
+^^^^^^^^^^^^^^^^^
+
+An SG supports two kinds of operations: ``+ - * /`` (``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``) and ``& |`` (``SG_And`` / ``SG_Or``).
+
+- The arithmetic operations keep the amplitude of the signals: ``sg * 2`` doubles every daily signal value, and ``sg1 + sg2`` merges the signals of the same day into one net value.
+- The logic operations keep the direction only and drop the amplitudes: a hit is written as ``1.0`` for a buy and ``-1.0`` for a sell ( ``(sg1 * 3) & sg2`` gives 1.0, not 3.0). Use the arithmetic operations to keep an amplitude. On a same-day conflict ``|`` lets the sell win.
 
 
 Custom Signal Generator
@@ -383,6 +409,23 @@ Signal Generator Base Class
 
         :param Datetime datetime: the specified datetime
         :rtype: float
+
+    .. py:method:: get_cycle_dates(self)
+
+        Get the rebalancing days injected by a MultiSystem (sorted and deduplicated). A custom cycle
+        signal reads them in ``_calculate`` to know on which days the scheduled signals must be
+        emitted.
+
+        :rtype: DatetimeList
+
+    .. py:method:: set_cycle_dates(self, dates)
+
+        Declare the rebalancing days consumed by the cycle signals, usually injected by a
+        MultiSystem before the run; the other signals ignore them. The dates are sorted and
+        deduplicated, and the signal is recalculated at once when the trading object is already
+        set.
+
+        :param dates: the Datetime sequence (list / tuple / DatetimeList are all accepted)
 
     .. py:method:: _add_signal(self, datetime, value)
 

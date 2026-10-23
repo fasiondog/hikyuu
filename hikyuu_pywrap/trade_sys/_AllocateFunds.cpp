@@ -84,7 +84,7 @@ executed by allocate() in the L1 -> L2 -> L3 order:
                   per instrument and rebalanced by the delta against the current position; in mode B
                   or mode C the real instruction of the sub-system passes through unchanged.
     - _check_risk [Optional] L3 portfolio risk control: clip the suggestions at the portfolio dimension
-                  (e.g. the single instrument concentration cap max-single-position); mode B and mode C
+                  (e.g. the single instrument concentration cap max_single_position); mode B and mode C
                   respect the sub-strategy autonomy and skip the clipping.
 
 The running mode is held by the aggregate system (MultiSystem::set_mode): "A" Signal Aggregation (the
@@ -94,9 +94,9 @@ trailing mode argument; see the MultiSystem class docstring for the full descrip
 
 Common parameters:
 
-    - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); <=0 means no limit, >1 is clamped to 1
-    - max-total-position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value, scaled down proportionally when exceeded; <=0 disables the cap
-    - fixed-amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system
+    - max_single_position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); <=0 means no limit, >1 is clamped to 1
+    - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value, scaled down proportionally when exceeded; <=0 disables the cap
+    - fixed_amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system
     - adjust_running_sys=True (bool) : whether to force-adjust the running sub-systems to the new quota on the rebalancing day; only effective in mode B (mode A always adjusts, mode C never adjusts); when False the running sub-systems keep their holdings and only the new sub-systems get the remaining cash)")
 
       .def(py::init<>())
@@ -183,7 +183,7 @@ Common parameters:
            R"(_check_risk(self, date, tm, suggestions, query, mode)
 
     [Overload interface] L3 portfolio risk control: clip the suggestions at the portfolio dimension
-    (e.g. the single instrument concentration cap max-single-position); mode B skips the clipping
+    (e.g. the single instrument concentration cap max_single_position); mode B skips the clipping
     (the sub-manager autonomy is respected), rewrite the quantity of suggestions in place)")
 
       .def(

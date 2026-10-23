@@ -61,22 +61,34 @@
 - **未入选的嵌套聚合**：不驱动、不声明周期日、不交易（预期行为）。
 - **共享边界不沿链传递**：C 的“持仓不可归属”只作用于其**直接子层**；``C → A → B`` 的第三层 B 由中层 A 创建专用影子账本并以 A 层 ``sub_init_cash`` 注资（重新可归属），只有 ``C → C → *`` 才是全链共享。级联下的延后是**每层一跳**（toc=false/停牌回落逐层次日开盘执行），三层链路最外层最多滞后 2 个交易日。
 - **同标的多子层**：B 下未选中清仓时，父侧卖出量同时受**父账本持仓**与**子层自身账本持仓**约束；延后减持腿在收盘时按**父账本持仓**封顶。C 共享账户下按标的不区分归属——A 的孤儿/补零目标虽然只限自身子树标的，但**数量按共享账户净持仓执行**，同标的多子层请避免交叉重叠。
-- **SE 与告警**：每层有自己的 SE；模式 C 无 SE 时仅**直接** cycle SG 静默并一次性告警（嵌套聚合由内层自身模式处理）。
+- **SE 与告警**：每层有自己的 SE；模式 C 无 SE 时仅**直接** cycle SG 静默并一次性告警（嵌套聚合由内层自身模式处理）。模式 C 下 cycle SG 也**不可与 ``SE_Signal`` 组合**：SE 在 run 前快照已算好的买入信号，而周期日要到入选才声明，因此永远选不中；且模式 C 仅在入选时声明周期日，同一周期内被止损平仓不会重开。
 - **级联示例**：``C → B → A`` 表示共享账户下挂配额型子组合 B，B 内部再挂信号汇总子组合 A；A 的影子只服务 B 的采样，B 的镜像直接落共享账户，外层 C 表面化、不二次下单。
 
 各层 SE、``sell_at_not_selected``、调仓节拍与周期日声明互不继承、各自独立。
 
 聚合回测还支持：
 
-- **AF L1/L2/L3 分层**（详见 :doc:`../trade_portfolio/allocate_funds`）：L1 系统级分配（模式 A 名义权重 / 模式 B 真实额度，例：等权 1/N、固定权重、按 SE 得分加权）、L2 行为级换算（A 读子当前意图态、按「权重 × 净敞口比重 × 父净值」合成每标的**带符号净目标**并按差额再平衡，多空净额相互抵消 / B 透传）、L3 组合风控（集中度上限 ``max-single-position``，≤0 不限制；默认 1.0 即单标的不超过总资产；模式 B/C 跳过）。
-- **调仓周期**（``set_adjust_cycle``）：默认每个收盘日都再平衡；设置大于 1 的天数后仅在周期日调仓。周期模式（week/month/quarter/year）下该值是"周期内第 n 个日历日"（周自周一起算，故 1~5 才可能落在交易日内）：``<= 0`` 会告警并按 1 处理；永远无法落在该周期任一被驱动日的值（周 > 5 / 月 > 31 / 季度 > 92 / 年 > 366）只告警、**不做钳制**，此时该模式不会触发调仓。目标日按**当前周期的首日**计算，非交易日延后也不会跨入下一个周期，因此靠近周期末尾的值（如 31 日的月份、季末、年末）可能整周期不调仓。
+- **AF L1/L2/L3 分层**（详见 :doc:`../trade_portfolio/allocate_funds`）：L1 系统级分配（模式 A 名义权重 / 模式 B 真实额度，例：等权 1/N、固定权重、按 SE 得分加权）、L2 行为级换算（A 读子当前意图态、按「权重 × 净敞口比重 × 父净值」合成每标的**带符号净目标**并按差额再平衡，多空净额相互抵消 / B 透传）、L3 组合风控（集中度上限 ``max_single_position``，≤0 不限制；默认 1.0 即单标的不超过总资产；模式 B/C 跳过）。
+- **调仓周期**（``set_adjust_cycle``）：默认每个收盘日都再平衡；设置大于 1 的天数后仅在周期日调仓。周期模式（week/month/quarter/year）下该值是"周期内第 n 个日历日"（周自周一起算，故 1~5 才可能落在交易日内）：``0`` 在 ``readyForRun`` 时告警并按 1 处理（负值在设置时抛异常）；永远无法落在该周期任一被驱动日的值（周 > 5 / 月 > 31 / 季度 > 92 / 年 > 366）只告警、**不做钳制**，此时该模式不会触发调仓。目标日按**当前周期的首日**计算，非交易日延后也不会跨入下一个周期，因此靠近周期末尾的值（如 31 日的月份、季末、年末）可能整周期不调仓。
+- **参数别名**：``adjust_cycle``（int，默认 1）、``trade_on_close``（bool，默认 True）、``sell_at_not_selected``（bool，默认 False）同时以参数形式暴露，``set_param`` 与对应 setter 等价（完全非法值在设置时抛异常，如 ``adjust_cycle < 0``、非法 ``adjust_mode`` / ``axis_mode``；``adjust_cycle == 0`` 归一为 1（负值在设置时抛异常）、``adjust_mode`` 大小写归一、周期日缓存清理与越界告警均在 ``readyForRun`` 时处理）。
 - **交易对象选择（SE）**（``set_se``）：可选设置，调仓日仅采样选中子系统；模式 B/C 中未选中者可强制清仓/回收额度（``set_sell_at_not_selected``），模式 A 中影子账户恒运行，未选中的标的从父目标中消失而被平仓（与 ``sell_at_not_selected`` 无关）。
 - **换手率**（``get_adjust_turnover``）：记录各调仓日的成交金额与调仓前总资产之比。
 - **退市/停牌**：父在开盘阶段统一强制卖出已退市标的持仓（模式 C 的共享账户也由父层执行，子层不重复卖出）；停牌日子系统自动跳过。收盘清算/减持遇停牌的腿回落为次日开盘的延后腿（任意 `trade_on_close` 模式），持仓保持不变直至有报价。
 
 - **归档与克隆**（`save`/`load`、`clone`）：影子/配额账户注册表按子层槽位随系统一并保存并在载入后重建，调度计数（close-day 计数、最后驱动日）、固定时间轴、外部调仓日表与未成交的校准腿也会恢复，载入后可用 ``run(reset=False)`` 续跑；模式 C 的运行池在下一个调仓日重建。`goalPrice` 等可能为 NaN 的价格字段以字符串写入归档（文本/XML 归档无法回读 NaN）。
 
-公共参数：
+MultiSystem 公共参数：
+
+    * **axis_mode="kdata"** *(str)* : 驱动时间轴模式。"kdata" 使用 run(kdata) 输入 KData 的日期序列；"calendar" 使用 set_date_axis 注入的固定日期表（输入 KData 仅提供 query/ktype 与价格上下文）。非法值在设置时抛异常
+    * **adjust_cycle=1** *(int)* : 调仓周期。query/day 模式下为收盘日间隔；week/month/quarter/year 模式下为周期内第 n 个日历日。必须 >= 0（负值在设置时抛异常）；0 在 readyForRun 时告警并按 1 处理；永远无法落在该周期任一被驱动日的值只告警、不钳制，此时该模式不会触发调仓
+    * **adjust_mode="query"** *(str)* : 调仓模式 query / day / week / month / quarter / year。完全非法值在设置时抛异常，大小写归一在 readyForRun 时完成
+    * **delay_to_trading_day=True** *(bool)* : 调仓日为非交易日时，是否顺延到当前周期内的首个交易日（仅 week/month/quarter/year 模式生效）
+    * **trade_on_close=True** *(bool)* : 调仓指令是否在收盘阶段执行；False 时整批延后到次日开盘（按开盘价重估、先卖后买、停牌腿保留重试）
+    * **sell_at_not_selected=False** *(bool)* : 模式 B/C 下是否对未选中（或 L1 配额为 0）的子系统强制清仓并回收其账户
+
+    运行期开关（adjust_cycle / adjust_mode / delay_to_trading_day / trade_on_close / sell_at_not_selected）在 readyForRun 时快照生效（批量 run 每次运行刷新；直接调用 runMoment* 需先 readyForRun）。:class:`System` 的单证券交易参数（buy_delay / sell_delay / delay_use_current_price / max_delay_count / tp_* / ignore_sell_sg 等）属于各子系统，聚合父层不使用；父层自身的 trace、shared_*、support_borrow_* 仍然生效。模式 C 例外——父层按 trade_on_close 向子系统下发 buy_delay / sell_delay。
+
+System 公共参数：
 
     * **buy_delay=True** *(bool)* : 买入操作是否延迟到下一个bar开盘时进行交易；市场环境（ev）或系统有效条件（cn）失效触发的空头强制平仓（买回）同样遵守该参数
     * **sell_delay=True** *(bool)* : 卖出操作是否延迟到下一个bar开盘时进行交易；市场环境（ev）或系统有效条件（cn）失效触发的多头强制平仓同样遵守该参数（True 时在下一根开盘平仓，而非失效当日收盘）
@@ -386,6 +398,33 @@
         克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享
 
 
+
+聚合系统类定义
+--------------
+
+.. py:class:: MultiSystem([name="MultiSystem"])
+
+    聚合交易系统（组合回测）。将多个 :class:`System`（单证券或嵌套的 :class:`MultiSystem`）聚合为一个组合，统一在同一交易账户下回测；各子系统保留自身的 SG/MM/EV/CN/ST/TP/PG/SP，仅由父系统统一记账与下单。支持任意嵌套与循环引用检测；三种运行模式、嵌套规则与关键事项见上文。
+
+    继承 :class:`System` 的 ``get_param`` / ``set_param``，参数见“MultiSystem 公共参数”。重载 ``MultiSystem(sys_list, name="MultiSystem")``：直接以子系统列表构造。
+
+    .. py:attribute:: mode
+
+        运行模式（只读）："A" 信号汇总 / "B" 资金配置 / "C" 共享账户兼容
+
+    .. py:method:: add(self, sys)
+
+        添加子系统（含循环引用检测；同一实例重复添加被忽略）
+
+    .. py:method:: set_mode(self, mode)
+
+        设置运行模式（"A" / "B" / "C"，不区分大小写）
+
+    .. py:method:: run(self, kdata[, reset=True, reset_all=False])
+
+        组合回测入口：以给定 KData 为驱动轴，逐日驱动所有子系统（开盘/收盘阶段），并在父账户上统一记账与下单。
+
+        重载 ``run(self, query[, reset=True, reset_all=False])``：以交易日历为驱动轴（等价于旧 ``Portfolio.run(query)``），详见上文。
 
 交易请求记录
 --------------

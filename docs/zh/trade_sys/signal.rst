@@ -9,7 +9,7 @@
 公共参数：
 
     * **alternate** *(bool|True)* ：买入和卖出信号是否交替出现。单线型的信号通常通过拐点、斜率等判断信号的产生，此种情况下可能出现连续出现买入信号或连续出现卖出信号的情况，此时可通过该参数控制买入、卖出信号是否交替出现。而双线交叉型的信号通常本身买入和卖出已经是交替出现，此时该参数无效。
-    * **cycle** *(bool|False)* : 标记该信号依赖 MultiSystem 注入的调仓日（如 SG_Cycle），不再改变计算范围：信号始终按完整 K 线数据一次性计算，回测期内结果保持不变。周期信号是计划性信号，``cycle=true`` 与 ``alternate=true`` 互斥，设置 cycle 时 alternate 会被强制为 false（并给出告警）；组合运算中只要包含周期子信号，组合结果同样继承 cycle 标记与 alternate=False，避免后续调仓日的买入被交替规则丢弃。模式 A/B 在运行前注入整段调仓日，模式 C 在子系统入选日声明（已运行的系统不再重复声明，沿用 legacy Portfolio 语义）。仅 ``cycle=true`` 的信号会消费这些调仓日，普通信号不受影响、也不会因声明而重算。注意：周期买入是子系统的“计划入场/再入场”信号（首次建仓、自身平仓后、被 SE 取消选中清仓后再入选），不是组合层调仓动作；组合层调仓由 SE/AF 完成。已持仓时周期买入能否加仓取决于 MM（如 MM_Nothing 在现金用尽后不会再成交）。
+    * **cycle** *(bool|False)* : 标记该信号依赖 MultiSystem 注入的调仓日（如 SG_Cycle），不再改变计算范围：信号始终按完整 K 线数据一次性计算，回测期内结果保持不变。周期信号是计划性信号，``cycle=true`` 与 ``alternate=true`` 互斥，设置 cycle 时 alternate 会被强制为 false（并给出告警）；组合运算中只要包含周期子信号，组合结果同样继承 cycle 标记与 alternate=False，避免后续调仓日的买入被交替规则丢弃。模式 A/B 在运行前注入整段调仓日，模式 C 在子系统入选日声明（已运行的系统不再重复声明，沿用 legacy Portfolio 语义）。仅 ``cycle=true`` 的信号会消费这些调仓日，普通信号不受影响、也不会因声明而重算。注意：周期买入是子系统的“计划入场/再入场”信号（首次建仓、自身平仓后、被 SE 取消选中清仓后再入选），不是组合层调仓动作；组合层调仓由 SE/AF 完成。已持仓时周期买入能否加仓取决于 MM（如 MM_Nothing 在现金用尽后不会再成交）。**组合限制**：模式 C 下 cycle 信号不可与 ``SE_Signal`` 组合——``SE_Signal`` 在 run 前一次性快照子系统已算好的买入信号，而模式 C 要到入选才声明周期日，快照恒为空，因此永远选不中（不进运行池、不成交）；按固定标的/调仓日入选的选择器（如 ``SE_Fixed``）不受影响，模式 A/B 先注入整段调仓日再快照，可与 ``SE_Signal`` 组合。另：模式 C 只在入选时声明周期日，同一周期内被止损平仓不会自动重开，需等 SE 取消其选中再重新入选。
     * **support_borrow_stock** *(bool|False)* : 支持发出空头信号
 
 
@@ -90,9 +90,14 @@
                 <td>一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号</td>
             </tr>
             <tr>
-                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
+                <td><a href="#target-section">SG_Manual</a></td>
+                <td>手工信号指示器</td>
+                <td>信号只能手工加入，用于测试或外部信号导入</td>
+            </tr>
+            <tr>
+                <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG运算辅助</td>
-                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题</td>
+                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题<br>加减乘除保留信号数值，与/或只保留方向（见下文信号运算）</td>
             </tr>        
         </tbody>
     </table>
@@ -241,6 +246,25 @@ PF调仓周期买入信号指示器
     
     一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号；未注入调仓日时保持静默。
     Python 自定义周期信号可在 ``_calculate`` 中通过 ``get_cycle_dates()`` 读取注入的调仓日。
+    周期信号通常用于按日程入选的选择器（如 ``SE_Fixed``），与 ``SE_Signal`` 的组合限制见上文 **cycle** 公共参数说明。
+
+
+手工信号指示器
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Manual()
+
+    信号只能手工加入的信号指示器，用于测试或外部信号导入。其 ``_calculate`` 为空：作为运算（逻辑与算术）
+    的子信号时，手工预置的信号会被保留；直接对其设置交易对象会清空预置信号。
+
+
+信号运算
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SG 支持 ``+ - * /``（``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``）和 ``& |``（``SG_And`` / ``SG_Or``）两类运算。
+
+- 算术运算保留信号的数值幅度：``sg * 2`` 使每日信号值翻倍，``sg1 + sg2`` 同日按净额合并。
+- 逻辑运算只保留方向，幅度被丢弃：命中时买入信号恒为 ``1.0``、卖出信号恒为 ``-1.0``（如 ``(sg1 * 3) & sg2`` 得 1.0 而不是 3.0）；需保留幅度请用算术运算。``|`` 在同一买卖冲突日卖出优先。
 
 
 自定义信号指示器
@@ -379,6 +403,20 @@ PF调仓周期买入信号指示器
 
         :param Datetime datetime: 指定时刻
         :rtype: float
+
+    .. py:method:: get_cycle_dates(self)
+
+        获取 MultiSystem 注入的调仓日列表（已排序去重）。自定义周期信号可在 ``_calculate``
+        中读取，用于确定应在哪些日期发出计划信号。
+
+        :rtype: DatetimeList
+
+    .. py:method:: set_cycle_dates(self, dates)
+
+        声明周期信号消费的调仓日，通常由 MultiSystem 在运行前注入，普通信号忽略。日期会自动
+        排序去重；已设置交易对象时立即重算。
+
+        :param dates: Datetime 序列（list / tuple / DatetimeList 均可）
     
     .. py:method:: _add_signal(self, datetime, value)
 

@@ -64,22 +64,34 @@ A sub-system may itself be a :class:`MultiSystem` (arbitrary depth). Two rules a
 - **Unadmitted nested aggregates**: not driven, no cycle day declared, no trading (expected).
 - **The shared boundary does not propagate down the chain**: the mode C "holdings are not attributable" rule applies only to its **direct children**; in ``C -> A -> B`` the third layer B gets a dedicated shadow book funded by the A layer's sub_init_cash (attributable again), and only ``C -> C -> *`` stays fully shared. A deferred leg advances **one hop per layer** (toc=false or a suspended close fills at each layer's next open), so a three-level chain lags the leaf by up to 2 trading days.
 - **Overlapping instruments across children**: in B an unselected liquidation caps the parent sell by **both** the parent holding and the **child own book**, while a deferred reduction leg is capped by the **parent holding** at the close. On the shared account (C) the holdings are not attributable -- the orphan / zero targets of A are limited to its own subtree instruments, but the **quantity is executed against the shared net position**, so avoid overlapping instruments across children under C.
-- **SE and warnings**: every layer has its own SE; without an SE in mode C only the **direct** cycle SGs stay silent with a one-time warning (nested aggregates are handled by their own modes).
+- **SE and warnings**: every layer has its own SE; without an SE in mode C only the **direct** cycle SGs stay silent with a one-time warning (nested aggregates are handled by their own modes). In mode C a cycle SG cannot be combined with ``SE_Signal`` either: the SE snapshots the already computed buy signals before the run, while the cycle day is declared only on admission, so such a sub-system is never admitted; and because mode C declares the cycle day on admission only, a stop-loss exit inside the same cycle does not re-open by itself.
 - **Cascade example**: ``C -> B -> A`` means a quota sub-portfolio B under a shared account, with a signal-aggregation sub-portfolio A inside; A's shadow only serves the B sampling, the B mirror lands directly on the shared account, and the outer C surfaces it without ordering again.
 
 The SE, ``sell_at_not_selected``, rebalancing cadence and cycle-day declarations of each layer are independent and never inherited.
 
 Aggregated backtesting also supports:
 
-- **AF L1/L2/L3 layering** (see :doc:`../trade_portfolio/allocate_funds` for details): L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B; e.g. equal weight 1/N, fixed weights, weighted by the SE score), L2 performs behavior-level conversion (in A it reads the sub-system's current intent state and synthesizes the **signed net target** per instrument as weight x net ratio x the parent net assets, rebalancing by the delta with the long/short netting out; in B the instructions pass through), and L3 provides portfolio risk control (the concentration limit ``max-single-position``, <=0 means no limit, the default 1.0 caps a single instrument at the total assets; skipped in mode B/C).
-- **Rebalancing cycle** (``set_adjust_cycle``): by default, rebalancing happens on every close day; once the number of days is set to a value greater than 1, rebalancing occurs only on the cycle days. In the period modes (week/month/quarter/year) the value is the n-th calendar day within the period (the week starts on Monday, so only 1..5 can hit a driven day): ``<= 0`` is warned and treated as 1; a value that can never reach a driven day of the period (week >5 / month >31 / quarter >92 / year >366) is warned but **not clamped**, and that mode then never rebalances. The target is computed from the **start of the current period**, so a non-trading target is postponed only within that period and never drifts into the next one; a value near the period end (e.g. the 31st in a short month, the quarter/year end) may therefore skip a whole period.
+- **AF L1/L2/L3 layering** (see :doc:`../trade_portfolio/allocate_funds` for details): L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B; e.g. equal weight 1/N, fixed weights, weighted by the SE score), L2 performs behavior-level conversion (in A it reads the sub-system's current intent state and synthesizes the **signed net target** per instrument as weight x net ratio x the parent net assets, rebalancing by the delta with the long/short netting out; in B the instructions pass through), and L3 provides portfolio risk control (the concentration limit ``max_single_position``, <=0 means no limit, the default 1.0 caps a single instrument at the total assets; skipped in mode B/C).
+- **Rebalancing cycle** (``set_adjust_cycle``): by default, rebalancing happens on every close day; once the number of days is set to a value greater than 1, rebalancing occurs only on the cycle days. In the period modes (week/month/quarter/year) the value is the n-th calendar day within the period (the week starts on Monday, so only 1..5 can hit a driven day): ``0`` is warned and treated as 1 at ``readyForRun`` (a negative value is rejected at set time); a value that can never reach a driven day of the period (week >5 / month >31 / quarter >92 / year >366) is warned but **not clamped**, and that mode then never rebalances. The target is computed from the **start of the current period**, so a non-trading target is postponed only within that period and never drifts into the next one; a value near the period end (e.g. the 31st in a short month, the quarter/year end) may therefore skip a whole period.
+- **Parameter aliases**: ``adjust_cycle`` (int, default 1), ``trade_on_close`` (bool, default True) and ``sell_at_not_selected`` (bool, default False) are also exposed as parameters equivalent to their setters (fully illegal values are rejected at set time, e.g. ``adjust_cycle < 0`` and an invalid ``adjust_mode`` / ``axis_mode``; the ``adjust_cycle == 0`` normalization to 1 (a negative value is rejected at set time), the ``adjust_mode`` case normalization, the cycle-date cache reset and the out-of-range warning are all handled at ``readyForRun``).
 - **Instrument selection (SE)** (``set_se``): optional; on a rebalance day, only the selected sub-systems are sampled. In modes B/C the unselected ones can be force-liquidated / have their quota recycled (``set_sell_at_not_selected``); in mode A the shadow accounts keep running and the instruments of the unselected ones drop out of the parent target and are closed (regardless of ``sell_at_not_selected``).
 - **Turnover rate** (``get_adjust_turnover``): on each rebalance day, records the ratio of the traded amount to the total assets before rebalancing.
 - **Delisting/suspension**: the parent uniformly force-sells the positions in delisted instruments during the open stage (in mode C the shared account is sold by the parent too, the sub-ledger does not sell twice); the sub-systems automatically skip the suspended bars. A liquidation/reduction leg whose close is suspended falls back to the deferred legs of the next open (any ``trade_on_close`` mode) and the holding stays unchanged until a quote appears.
 
 - **Archive and clone** (`save`/`load`, `clone`): the shadow/quota account registry is saved by the child slot index and rebuilt after loading; the scheduling counters (close-day counter, last driven day), the fixed time axis, the external rebalancing day table and the unfilled calibration legs are restored too, so a loaded system can continue with ``run(reset=False)``; the mode C running pools are rebuilt on the next rebalancing day. Price fields that may carry NaN (e.g. ``goalPrice``) are written as strings, because the text/XML archives cannot read NaN back as a number.
 
-Common parameters:
+MultiSystem common parameters:
+
+    * **axis_mode="kdata"** *(str)* : the driving time axis mode. "kdata" uses the dates of the input KData of run(kdata); "calendar" uses the fixed date table injected by set_date_axis (the input KData only provides the query/ktype and the price context). An invalid value is rejected at set time
+    * **adjust_cycle=1** *(int)* : the rebalancing cycle. In the query/day modes it is the close-day interval; in the week/month/quarter/year modes it is the n-th calendar day within the period. It must be >= 0 (a negative value is rejected at set time); 0 is warned and treated as 1 at readyForRun; a value that can never reach a driven day of the period is warned but not clamped, and that mode then never rebalances
+    * **adjust_mode="query"** *(str)* : the rebalancing mode query / day / week / month / quarter / year. A fully illegal value is rejected at set time; the case normalization is done at readyForRun
+    * **delay_to_trading_day=True** *(bool)* : whether a non-trading rebalancing day is postponed to the first trading day within the current period (week/month/quarter/year only)
+    * **trade_on_close=True** *(bool)* : whether the rebalancing orders execute at the close; when False the whole batch is deferred to the next open (re-priced at the open, sells before buys, suspended legs retried)
+    * **sell_at_not_selected=False** *(bool)* : whether the unselected (or zero L1 quota) sub-systems are force-liquidated and their accounts recycled in modes B/C
+
+    The run-time switches above (adjust_cycle / adjust_mode / delay_to_trading_day / trade_on_close / sell_at_not_selected) are snapshotted at readyForRun (the bulk run refreshes them on every run; a direct runMoment* entry requires readyForRun first). The single-instrument trading parameters of :class:`System` (buy_delay / sell_delay / delay_use_current_price / max_delay_count / tp_* / ignore_sell_sg, ...) belong to the sub-systems and are not used by the aggregate parent; the parent's own trace, shared_* and support_borrow_* still take effect. Mode C is the exception — the parent maps trade_on_close onto the sub-system buy_delay / sell_delay.
+
+System common parameters:
 
     * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar; the forced short cover triggered by an invalid environment (ev) or condition (cn) follows the same setting
     * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar; the forced long liquidation triggered by an invalid environment (ev) or condition (cn) follows the same setting (liquidated at the next open instead of at the invalidating close)
@@ -394,6 +406,33 @@ System Base Class Definition
         Clone the system according to the shared attributes of the parts; the shared parts are not actually duplicated and remain shared
 
 
+
+Aggregate System Class Definition
+---------------------------------
+
+.. py:class:: MultiSystem([name="MultiSystem"])
+
+    The aggregate trading system (portfolio backtesting). It aggregates multiple :class:`System` instances (single-instrument or nested :class:`MultiSystem`) into one portfolio backtested on a single trading account; every sub-system keeps its own SG/MM/EV/CN/ST/TP/PG/SP and only the parent books the trades and places the orders. Arbitrary nesting and circular-reference detection are supported; see the sections above for the three run modes, the nesting rules and the key notes.
+
+    It inherits ``get_param`` / ``set_param`` from :class:`System`; see "MultiSystem common parameters". Overload ``MultiSystem(sys_list, name="MultiSystem")``: construct directly from a sub-system list.
+
+    .. py:attribute:: mode
+
+        The run mode (read-only): "A" signal aggregation / "B" fund allocation / "C" shared-account compatibility
+
+    .. py:method:: add(self, sys)
+
+        Add a sub-system (with the circular-reference detection; adding the same instance twice is ignored)
+
+    .. py:method:: set_mode(self, mode)
+
+        Set the run mode ("A" / "B" / "C", case-insensitive)
+
+    .. py:method:: run(self, kdata[, reset=True, reset_all=False])
+
+        The portfolio backtesting entry: drive all the sub-systems day by day (the open/close stages) along the given KData and book/place the orders uniformly on the parent account.
+
+        Overload ``run(self, query[, reset=True, reset_all=False])``: drive along the trading calendar (equivalent to the legacy ``Portfolio.run(query)``); see the sections above.
 
 Trade Request Records
 ---------------------

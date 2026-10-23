@@ -14,14 +14,14 @@
  *    2. Portfolio-level funds allocation engine AllocateFundsBase (AF L1/L2/L3):
  *       - L1 system-level allocation: equal weight / fixed weights (AF_FixedWeight /
  *                        AF_FixedWeightList subclasses) / mode B real quota (including
- *                        fixed-amount migrated from AF_FixedAmount) / max-total-position
+ *                        fixed_amount migrated from AF_FixedAmount) / max_total_position
  *                        budget cap;
  *       - L2 behavior-level conversion: mode A synthesis of the signed net target from the
  *                        sub-system intent state (target_position_ratio) and trade-the-delta /
- *                        fixed-amount / SELL-CLEAR closing the whole position / over-allocation
+ *                        fixed_amount / SELL-CLEAR closing the whole position / over-allocation
  *                        converted to position reduction / the short clamp without a securities-
  *                        lending facility / mode B pass-through clipping;
- *       - L3 portfolio risk control: max-single-position concentration clipping / skipped
+ *       - L3 portfolio risk control: max_single_position concentration clipping / skipped
  *                        in mode B.
  *  @note MM has been restricted to the single-system form; the portfolio-level allocation
  *        (L1/L2/L3) is migrated entirely to AF (see docs/design/pf_af_compat/design.md §5).
@@ -162,15 +162,14 @@ TEST_CASE("test_MultiSystem_axis_mode") {
     /** @arg the default driving axis is kdata (the input KData carries its own dates; existing
      * behavior kept) */
     CHECK_EQ(ms.getAxisMode(), "kdata");
-    CHECK_EQ(ms.getParam<string>("axis-mode"), "kdata");
+    CHECK_EQ(ms.getParam<string>("axis_mode"), "kdata");
 
     /** @arg switchable to calendar (the injected fixed date table drives the axis) */
     ms.setAxisMode("calendar");
     CHECK_EQ(ms.getAxisMode(), "calendar");
 
-    /** @arg an invalid value falls back to kdata */
-    ms.setAxisMode("month");
-    CHECK_EQ(ms.getAxisMode(), "kdata");
+    /** @arg an invalid value is rejected */
+    CHECK_THROWS_AS(ms.setAxisMode("month"), std::exception);
 
     /** @arg fixed date table injection / read / clear */
     CHECK_EQ(ms.getDateAxis().size(), 0);
@@ -376,7 +375,7 @@ TEST_CASE("test_AllocateFunds_L1_equal_weight") {
     CHECK_EQ(w_null[sys1], doctest::Approx(0.5));
 }
 
-/** @par Check point: L1 mode B real quota (equal weight / fixed-amount / budget cap) */
+/** @par Check point: L1 mode B real quota (equal weight / fixed_amount / budget cap) */
 TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
@@ -390,16 +389,16 @@ TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     af->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(100000.0));
 
-    /** @arg fixed-amount>0: quota = the fixed amount (migrated from AF_FixedAmount) */
-    af->setParam<double>("fixed-amount", 30000.0);
+    /** @arg fixed_amount>0: quota = the fixed amount (migrated from AF_FixedAmount) */
+    af->setParam<double>("fixed_amount", 30000.0);
     af->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(30000.0));
-    af->setParam<double>("fixed-amount", 0.0);
+    af->setParam<double>("fixed_amount", 0.0);
 
-    /** @arg max-total-position caps the quota sum (AF_FixedWeight 0.7 x2, sum 1.4 > 0.5 ->
+    /** @arg max_total_position caps the quota sum (AF_FixedWeight 0.7 x2, sum 1.4 > 0.5 ->
      * scaled to 0.25 each, the sum equals 0.5 x 100000) */
     auto af_cap = AF_FixedWeight(0.7);
-    af_cap->setParam<double>("max-total-position", 0.5);
+    af_cap->setParam<double>("max_total_position", 0.5);
     SubSystemContextList ctx3(2);
     ctx3[0].sys = sys1;
     ctx3[1].sys = sys2;
@@ -407,17 +406,17 @@ TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     CHECK_EQ(ctx3[0].quota, doctest::Approx(25000.0));
     CHECK_EQ(ctx3[1].quota, doctest::Approx(25000.0));
 
-    /** @arg max-total-position=0 disables the cap (sum 1.4 stays uncapped) */
-    af_cap->setParam<double>("max-total-position", 0.0);
+    /** @arg max_total_position=0 disables the cap (sum 1.4 stays uncapped) */
+    af_cap->setParam<double>("max_total_position", 0.0);
     af_cap->_allocate(date, tm, ctx3, KQuery(), "B");
     CHECK_EQ(ctx3[0].quota, doctest::Approx(70000.0));
     CHECK_EQ(ctx3[1].quota, doctest::Approx(70000.0));
 
-    /** @arg fixed-amount>0 exempts the budget cap: even when the fixed quotas would exceed a
-     * small max-total-position (2 x 30000 > 0.4 x 100000), no proportional scaling happens and
+    /** @arg fixed_amount>0 exempts the budget cap: even when the fixed quotas would exceed a
+     * small max_total_position (2 x 30000 > 0.4 x 100000), no proportional scaling happens and
      * the quota stays the fixed amount */
-    af_cap->setParam<double>("max-total-position", 0.4);
-    af_cap->setParam<double>("fixed-amount", 30000.0);
+    af_cap->setParam<double>("max_total_position", 0.4);
+    af_cap->setParam<double>("fixed_amount", 30000.0);
     SubSystemContextList ctx_fa(2);
     ctx_fa[0].sys = sys1;
     ctx_fa[1].sys = sys2;
@@ -614,7 +613,7 @@ TEST_CASE("test_AllocateFunds_L2_modeA_net_target") {
 TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setParam<double>("fixed-amount",
+    af->setParam<double>("fixed_amount",
                          5000.0);  // pin the target value (independent of the marks)
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
@@ -629,7 +628,7 @@ TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     s.stock = stk;
     s.sys = sys;
     s.plan_price = 10.0;
-    s.target_position_ratio = 0.9;  // positive => the fixed-amount target (500)
+    s.target_position_ratio = 0.9;  // positive => the fixed_amount target (500)
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
@@ -667,12 +666,12 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     CHECK_UNARY(suggestions.empty());
 }
 
-/** @par Check point: L2 fixed-amount per instrument (the sign decides the side, the value is the
+/** @par Check point: L2 fixed_amount per instrument (the sign decides the side, the value is the
  * fixed market value) */
 TEST_CASE("test_AllocateFunds_L2_fixed_amount") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setParam<double>("fixed-amount", 20000.0);
+    af->setParam<double>("fixed_amount", 20000.0);
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -773,7 +772,7 @@ TEST_CASE("test_AllocateFunds_L2_below_lot_clearance") {
 // Portfolio allocation engine L3: portfolio risk-control clipping
 // ============================================================================
 
-/** @par Check point: L3 concentration risk control (max-single-position clipping / no limit /
+/** @par Check point: L3 concentration risk control (max_single_position clipping / no limit /
  * mode B skips) */
 TEST_CASE("test_AllocateFunds_L3_check_risk") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no position yet, total_assets=100000
@@ -789,27 +788,27 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
     s.plan_price = 10.0;
     s.number = 20000;  // target value 200000
 
-    /** @arg max-single-position=0.5: clipped to a value of 50000 = 5000 shares */
-    af->setParam<double>("max-single-position", 0.5);
+    /** @arg max_single_position=0.5: clipped to a value of 50000 = 5000 shares */
+    af->setParam<double>("max_single_position", 0.5);
     TradeSuggestionList suggestions{s};
     af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 
-    /** @arg max-single-position=1.0: takes effect as the 100% cap, target 200000 > 100000 is
+    /** @arg max_single_position=1.0: takes effect as the 100% cap, target 200000 > 100000 is
      * clipped to 10000 shares */
-    af->setParam<double>("max-single-position", 1.0);
+    af->setParam<double>("max_single_position", 1.0);
     suggestions[0] = s;
     af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
-    /** @arg max-single-position>1.0: clamped to 1.0 */
-    af->setParam<double>("max-single-position", 3.0);
+    /** @arg max_single_position>1.0: clamped to 1.0 */
+    af->setParam<double>("max_single_position", 3.0);
     suggestions[0] = s;
     af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
     /** @arg mode B: risk control is skipped (respecting sub-manager autonomy, number unchanged) */
-    af->setParam<double>("max-single-position", 0.5);
+    af->setParam<double>("max_single_position", 0.5);
     suggestions[0] = s;
     af->_checkRisk(date, tm, suggestions, KQuery(), "B");
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
@@ -819,7 +818,7 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
 TEST_CASE("test_AllocateFunds_L3_short_concentration") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setParam<double>("max-single-position", 0.5);  // cap 50000
+    af->setParam<double>("max_single_position", 0.5);  // cap 50000
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -846,7 +845,7 @@ TEST_CASE("test_AllocateFunds_L3_short_concentration") {
     CHECK_EQ(suggestions2[0].number, doctest::Approx(20000.0));
 }
 
-/** @par Check point: L2 total budget cap (max-total-position proportional scaling) */
+/** @par Check point: L2 total budget cap (max_total_position proportional scaling) */
 TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
@@ -869,15 +868,15 @@ TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
-    /** @arg max-total-position=0 disables the cap: the full 20000 shares */
-    af->setParam<double>("max-total-position", 0.0);
+    /** @arg max_total_position=0 disables the cap: the full 20000 shares */
+    af->setParam<double>("max_total_position", 0.0);
     suggestions = TradeSuggestionList{s, s};
     af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
 
     /** @arg within the budget: no scaling */
-    af->setParam<double>("max-total-position", 1.0);
+    af->setParam<double>("max_total_position", 1.0);
     s.target_position_ratio = 0.5;
     suggestions = TradeSuggestionList{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
@@ -885,11 +884,11 @@ TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 }
 
-/** @par Check point: L2 fixed-amount target below the current position reduces it (SELL delta) */
+/** @par Check point: L2 fixed_amount target below the current position reduces it (SELL delta) */
 TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setParam<double>("fixed-amount", 5000.0);
+    af->setParam<double>("fixed_amount", 5000.0);
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -901,7 +900,7 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
     s.stock = stk;
     s.sys = sys;
     s.plan_price = 10.0;
-    s.target_position_ratio = 0.9;  // positive => the fixed-amount target (5000)
+    s.target_position_ratio = 0.9;  // positive => the fixed_amount target (5000)
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
 
@@ -917,7 +916,7 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
 TEST_CASE("test_AllocateFunds_L2_multi_contrib") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setParam<double>("max-total-position", 0.0);  // isolate from the budget cap
+    af->setParam<double>("max_total_position", 0.0);  // isolate from the budget cap
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -990,57 +989,104 @@ TEST_CASE("test_AllocateFunds_L2_null_tm") {
 }
 
 // ============================================================================
-// adjust-mode internalization (rebalancing date expansion) and the PF/AF preset factories
+// adjust_mode internalization (rebalancing date expansion) and the PF/AF preset factories
 // ============================================================================
 
-/** @par Check point: the adjust-mode parameter (default value, case normalization, invalid
- * fallback) and the delay-to-trading-day switch */
+/** @par Check point: the adjust_mode parameter is stored raw (normalization happens at the run-time
+ * preparation) and the delay_to_trading_day switch */
 TEST_CASE("test_MultiSystem_adjust_mode") {
     MultiSystem ms("ms");
-    /** @arg the default adjust-mode is "query", delay-to-trading-day is true */
+    /** @arg the default adjust_mode is "query", delay_to_trading_day is true */
     CHECK_EQ(ms.getAdjustMode(), "query");
-    CHECK_EQ(ms.getParam<string>("adjust-mode"), "query");
+    CHECK_EQ(ms.getParam<string>("adjust_mode"), "query");
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 
-    /** @arg all valid values can be set (case normalized to lowercase) */
+    /** @arg the raw value is kept until the run-time preparation normalizes it */
     ms.setAdjustMode("WEEK");
-    CHECK_EQ(ms.getAdjustMode(), "week");
+    CHECK_EQ(ms.getAdjustMode(), "WEEK");
     ms.setAdjustMode("Month");
-    CHECK_EQ(ms.getAdjustMode(), "month");
+    CHECK_EQ(ms.getAdjustMode(), "Month");
     ms.setAdjustMode("quarter");
     CHECK_EQ(ms.getAdjustMode(), "quarter");
-    ms.setAdjustMode("year");
-    CHECK_EQ(ms.getAdjustMode(), "year");
-    ms.setAdjustMode("day");
-    CHECK_EQ(ms.getAdjustMode(), "day");
-    ms.setAdjustMode("query");
-    CHECK_EQ(ms.getAdjustMode(), "query");
 
-    /** @arg an invalid value falls back to query (no exception thrown) */
-    ms.setAdjustMode("monthly");
-    CHECK_EQ(ms.getAdjustMode(), "query");
-    ms.setAdjustMode("");
-    CHECK_EQ(ms.getAdjustMode(), "query");
+    /** @arg an invalid value is rejected */
+    CHECK_THROWS_AS(ms.setAdjustMode("monthly"), std::exception);
+    CHECK_THROWS_AS(ms.setAdjustMode(""), std::exception);
 
-    /** @arg delay-to-trading-day can be toggled independently */
+    /** @arg delay_to_trading_day can be toggled independently */
     ms.setDelayToTradingDay(false);
     CHECK_EQ(ms.getDelayToTradingDay(), false);
     ms.setDelayToTradingDay(true);
     CHECK_EQ(ms.getDelayToTradingDay(), true);
 }
 
-/** @par Check point: the adjust_cycle validation (<=0 is warned and treated as 1; a value that can
- * never reach a driven day of the period is warned but kept, never clamped) */
+/** @par Check point: the switch parameters (adjust_cycle / adjust_mode /
+ * delay_to_trading_day / trade_on_close / sell_at_not_selected) keep the parameter, setter
+ * and runtime state in sync */
+TEST_CASE("test_MultiSystem_switch_params") {
+    MultiSystem ms("ms");
+
+    /** @arg all switches are registered as parameters with the member defaults */
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 1);
+    CHECK_EQ(ms.getParam<string>("adjust_mode"), "query");
+    CHECK_EQ(ms.getParam<bool>("delay_to_trading_day"), true);
+    CHECK_EQ(ms.getParam<bool>("trade_on_close"), true);
+    CHECK_EQ(ms.getParam<bool>("sell_at_not_selected"), false);
+
+    /** @arg setting the parameters updates the runtime state */
+    ms.setParam<int>("adjust_cycle", 5);
+    CHECK_EQ(ms.getAdjustCycle(), 5);
+    ms.setParam<string>("adjust_mode", "month");
+    CHECK_EQ(ms.getAdjustMode(), "month");
+    ms.setParam<bool>("delay_to_trading_day", false);
+    CHECK_EQ(ms.getDelayToTradingDay(), false);
+    ms.setParam<bool>("trade_on_close", false);
+    CHECK_EQ(ms.getTradeOnClose(), false);
+    ms.setParam<bool>("sell_at_not_selected", true);
+    CHECK_EQ(ms.getSellAtNotSelected(), true);
+
+    /** @arg the setters write back to the parameters */
+    ms.setAdjustCycle(2);
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 2);
+    ms.setAdjustMode("week");
+    CHECK_EQ(ms.getParam<string>("adjust_mode"), "week");
+    ms.setDelayToTradingDay(true);
+    CHECK_EQ(ms.getParam<bool>("delay_to_trading_day"), true);
+    ms.setTradeOnClose(true);
+    CHECK_EQ(ms.getParam<bool>("trade_on_close"), true);
+    ms.setSellAtNotSelected(false);
+    CHECK_EQ(ms.getParam<bool>("sell_at_not_selected"), false);
+
+    /** @arg a fully illegal cycle is rejected at set time */
+    CHECK_THROWS_AS(ms.setParam<int>("adjust_cycle", -1), std::exception);
+
+    /** @arg a non-positive cycle stays raw until the run-time preparation clamps it */
+    ms.setParam<int>("adjust_cycle", 0);
+    CHECK_EQ(ms.getAdjustCycle(), 0);
+    CHECK_EQ(ms.getParam<int>("adjust_cycle"), 0);
+
+    /** @arg the parameter path keeps the out-of-range policy (warned but not clamped) */
+    ms.setParam<int>("adjust_cycle", 7);
+    CHECK_EQ(ms.getAdjustCycle(), 7);
+    ms.setParam<string>("adjust_mode", "week");
+    CHECK_EQ(ms.getAdjustMode(), "week");
+    CHECK_EQ(ms.getAdjustCycle(), 7);
+}
+
+/** @par Check point: the adjust_cycle validation (a negative value is rejected at set time; <=0 is
+ * normalized to 1 by the run-time preparation; a value that can never reach a driven day of the
+ * period is warned but kept, never clamped) */
 TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
     MultiSystem ms("ms");
     /** @arg the default cycle is 1 */
     CHECK_EQ(ms.getAdjustCycle(), 1);
 
-    /** @arg <=0 is treated as 1 (the close-day counting mode) */
+    /** @arg a negative cycle is rejected at set time */
+    CHECK_THROWS_AS(ms.setAdjustCycle(-5), std::exception);
+
+    /** @arg 0 is accepted raw and normalized to 1 by the run-time preparation */
     ms.setAdjustCycle(0);
-    CHECK_EQ(ms.getAdjustCycle(), 1);
-    ms.setAdjustCycle(-5);
-    CHECK_EQ(ms.getAdjustCycle(), 1);
+    CHECK_EQ(ms.getAdjustCycle(), 0);
 
     /** @arg a value that can never reach a driven day of the period is kept as is */
     ms.setAdjustMode("week");
@@ -1057,14 +1103,37 @@ TEST_CASE("test_MultiSystem_adjust_cycle_validation") {
     CHECK_EQ(ms.getAdjustCycle(), 60);
     CHECK_EQ(ms.getAdjustMode(), "month");
 
-    /** @arg the factory path follows the same rule (only <=0 falls back to 1) */
+    /** @arg the factory path keeps the raw value too (normalization happens at run) */
     TMPtr tm = crtTM(Datetime(20100101), 100000.0);
     auto pf = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 0, "month");
-    CHECK_EQ(pf->getAdjustCycle(), 1);
+    CHECK_EQ(pf->getAdjustCycle(), 0);
     CHECK_EQ(pf->getAdjustMode(), "month");
     auto pf2 = PF_Simple(tm, SE_Fixed(), AF_EqualWeight(), 32, "month");
     CHECK_EQ(pf2->getAdjustCycle(), 32);
     CHECK_EQ(pf2->getAdjustMode(), "month");
+}
+
+/** @par Check point: the run-time preparation normalizes adjust_cycle <= 0 to 1 and lowercases
+ * adjust_mode */
+TEST_CASE("test_MultiSystem_switch_params_normalized_at_run") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 5);
+
+    auto ms = std::make_shared<MultiSystem>("ms_norm");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setAdjustCycle(0);
+    ms->setAdjustMode("WEEK");
+    auto sys = create_alway_buy_sys();
+    sys->setTO(k);
+    ms->add(sys);
+    ms->run(k);
+
+    /** @arg the clamped cycle and the lowercased mode are written back during readyForRun */
+    CHECK_EQ(ms->getAdjustCycle(), 1);
+    CHECK_EQ(ms->getAdjustMode(), "week");
 }
 
 /** @par Check point: the calcAdjustDates pure function (week/month/quarter/year × delay
@@ -1316,11 +1385,11 @@ TEST_CASE("test_AF_factories") {
     CHECK_EQ(ws[0], doctest::Approx(0.3));
     CHECK_EQ(ws[1], doctest::Approx(0.7));
 
-    /** @arg AF_FixedAmount → fixed amount (the fixed-amount parameter passed through) */
+    /** @arg AF_FixedAmount → fixed amount (the fixed_amount parameter passed through) */
     auto af4 = AF_FixedAmount(30000.0);
     REQUIRE(af4 != nullptr);
     CHECK_EQ(af4->name(), "AF_FixedAmount");
-    CHECK_EQ(af4->getParam<double>("fixed-amount"), doctest::Approx(30000.0));
+    CHECK_EQ(af4->getParam<double>("fixed_amount"), doctest::Approx(30000.0));
 
     /** @arg AF_MultiFactor → multi-factor */
     auto af5 = AF_MultiFactor();
@@ -2041,7 +2110,7 @@ TEST_CASE("test_MultiSystem_buy_cash_scale") {
 
     auto ms = std::make_shared<MultiSystem>("ms");
     ms->setTM(crtTM(Datetime(199001010000LL), 20000.0));
-    ms->getAF()->setParam<double>("fixed-amount", 20000.0);  // total demand 40000 > cash 20000
+    ms->getAF()->setParam<double>("fixed_amount", 20000.0);  // total demand 40000 > cash 20000
     auto sys1 = create_alway_buy_sys();
     sys1->setTO(kdata1);
     ms->add(sys1);
@@ -2067,7 +2136,7 @@ TEST_CASE("test_MultiSystem_open_buffer_consume") {
 
     auto ms = std::make_shared<MultiSystem>("ms");
     ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
-    ms->getAF()->setParam<double>("fixed-amount", 20000.0);
+    ms->getAF()->setParam<double>("fixed_amount", 20000.0);
     auto sys = create_alway_buy_sys();
     sys->setTO(kdata);
     ms->add(sys);
@@ -2109,7 +2178,7 @@ TEST_CASE("test_MultiSystem_clone_path") {
 TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setParam<double>("fixed-amount", 5000.0);
+    af->setParam<double>("fixed_amount", 5000.0);
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -2121,11 +2190,11 @@ TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     s1.stock = stk;
     s1.sys = sys1;
     s1.plan_price = 10.0;
-    s1.target_position_ratio = 0.9;  // positive => the fixed-amount direction
+    s1.target_position_ratio = 0.9;  // positive => the fixed_amount direction
     TradeSuggestion s2 = s1;
     s2.sys = sys2;
 
-    /** @arg no position: the aggregate signed direction is positive, so the +/-fixed-amount target
+    /** @arg no position: the aggregate signed direction is positive, so the +/-fixed_amount target
      * is applied ONCE per instrument (not summed per contribution): 5000 -> a BUY of 500 shares */
     TradeSuggestionList suggestions{s1, s2};
     af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
@@ -2272,6 +2341,54 @@ TEST_CASE("test_MultiSystem_mode_c_cycle_start_on_admission") {
     CHECK_EQ(sys->getSG()->getBuyValue(cycle_dates[0]), 1.0);
 }
 
+/** @par Check point: SE_Signal never admits a cycle sub-system under mode C, as it snapshots the
+ * buy signals before any cycle day is declared (mode B declares the days first, so it does work) */
+TEST_CASE("test_MultiSystem_mode_c_cycle_sg_with_se_signal") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 5);
+
+    auto countBuy = [](const TradeRecordList& trades) {
+        size_t ret = 0;
+        for (const auto& tr : trades) {
+            if (tr.business == BUSINESS_BUY) {
+                ++ret;
+            }
+        }
+        return ret;
+    };
+
+    /** @arg mode C: nothing is admitted -- no cycle day, no buy signal, no buy at all */
+    auto proto_c = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto_c->setParam<bool>("buy_delay", false);
+    auto ms = std::make_shared<MultiSystem>("ms_c_cycle_se_signal");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(SE_Signal({stk}, proto_c));
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+    auto csg = ms->getSystemList()[0]->getSG();
+    CHECK_EQ(ms->getRunningSet().size(), 0);
+    CHECK_EQ(csg->getCycleDates().size(), 0);
+    CHECK_EQ(csg->getBuySignal().size(), 0);
+    CHECK_EQ(countBuy(ms->getTM()->getTradeList()), 0);
+
+    /** @arg mode B declares the days before the snapshot, so the cycle buy does get traded */
+    auto proto_b = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    proto_b->setParam<bool>("buy_delay", false);
+    auto ms_b = std::make_shared<MultiSystem>("ms_b_cycle_se_signal");
+    ms_b->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms_b->setMode("B");
+    ms_b->setSE(SE_Signal({stk}, proto_b));
+    ms_b->run(k);
+    REQUIRE_EQ(ms_b->getSystemList().size(), 1);
+    auto bsg = ms_b->getSystemList()[0]->getSG();
+    CHECK_UNARY(!bsg->getCycleDates().empty());
+    CHECK_GT(countBuy(ms_b->getTM()->getTradeList()), 0);
+}
+
 /** @par Check point: the runMoment* entry (the intraday live driving, no bulk run) declares the
  * rebalancing day at the close stage, so the cycle signals are never silently lost */
 TEST_CASE("test_MultiSystem_cycle_signal_run_moment") {
@@ -2320,9 +2437,10 @@ TEST_CASE("test_MultiSystem_cycle_dates_cleared_on_config") {
     ms->run(k);
     CHECK_UNARY(!sys->getSG()->getCycleDates().empty());
 
-    /** @arg a new cycle configuration retracts the days declared by the previous one */
+    /** @arg a new cycle configuration is applied at the next run, where the previously declared
+     * days are retracted and rebuilt */
     ms->setAdjustCycle(3);
-    CHECK_UNARY(sys->getSG()->getCycleDates().empty());
+    CHECK_UNARY(!sys->getSG()->getCycleDates().empty());
 
     /** @arg the next run rebuilds them with the new configuration */
     ms->run(k);
@@ -2528,7 +2646,7 @@ TEST_CASE("test_MultiSystem_mode_b_unselected_deferred_fill") {
 }
 
 /** @par Check point: the mode B quota injections are capped by the remaining parent cash, so a
- * fixed-amount over-allocation cannot make the shadow buy more than the parent can fund */
+ * fixed_amount over-allocation cannot make the shadow buy more than the parent can fund */
 TEST_CASE("test_MultiSystem_mode_b_injection_capped_by_parent_cash") {
     Stock stk1 = getStock("sh600000");
     Stock stk2 = getStock("sz000001");
@@ -2564,7 +2682,7 @@ TEST_CASE("test_MultiSystem_mode_b_injection_capped_by_parent_cash") {
     CHECK_GE(ms->getTM()->cash(k.back().datetime, KQuery::DAY), 0.0);
 }
 
-/** @par Check point: the declared cycle days match the adjust-mode table (month), not the plain
+/** @par Check point: the declared cycle days match the adjust_mode table (month), not the plain
  * close-day counting */
 TEST_CASE("test_MultiSystem_cycle_dates_match_adjust_mode") {
     Stock stk = getStock("sh600000");
@@ -2874,7 +2992,8 @@ TEST_CASE("test_MultiSystem_mode_b_composite_unselected_clear") {
 }
 
 /** @par Check point: the removal of a composite from the mode C running pool clears its internal
- * ledgers (a nested mode B child) and drops the pending mirror batch */
+ * ledgers (a nested mode B child with deferred mirrors), leaving both the leaf book and the
+ * shared account flat */
 TEST_CASE("test_MultiSystem_mode_c_removed_composite_clears_internal_books") {
     Stock stk = getStock("sh600000");
     REQUIRE(!stk.isNull());
@@ -2887,7 +3006,7 @@ TEST_CASE("test_MultiSystem_mode_c_removed_composite_clears_internal_books") {
     leaf->setParam<bool>("buy_delay", false);
     auto inner = std::make_shared<MultiSystem>("inner_b_removed");
     inner->setMode("B");
-    inner->setParam<bool>("trade_on_close", false);
+    inner->setTradeOnClose(false);
     inner->add(leaf);
 
     auto se = std::make_shared<SelectFirstCallOnlySE>(SystemList{inner});
@@ -3017,7 +3136,7 @@ TEST_CASE("test_MultiSystem_mode_b_overlapping_instruments_keep_sibling") {
     CHECK_EQ(pp, doctest::Approx(p1));
 }
 
-/** @par Check point: the runMoment* entry (live) honours adjust-mode without a precomputed table */
+/** @par Check point: the runMoment* entry (live) honours adjust_mode without a precomputed table */
 TEST_CASE("test_MultiSystem_adjust_mode_run_moment") {
     Stock stk = getStock("sh600000");
     REQUIRE(!stk.isNull());
@@ -3046,7 +3165,7 @@ TEST_CASE("test_MultiSystem_adjust_mode_run_moment") {
     CHECK_LT(dates.size(), 5);
 }
 
-/** @par Check point: the live single-bar replay honours adjust-mode (one rebalancing day per
+/** @par Check point: the live single-bar replay honours adjust_mode (one rebalancing day per
  * period) */
 TEST_CASE("test_MultiSystem_adjust_mode_live_replay") {
     Stock stk = getStock("sh600000");
@@ -3191,7 +3310,7 @@ TEST_CASE("test_MultiSystem_mode_a_sees_nested_c_pending") {
     CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
 }
 
-/** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
+/** @par Check point: a nested aggregate / runMoment* entry expands the adjust_mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {
     Stock stk = getStock("sh600000");
@@ -3424,7 +3543,7 @@ TEST_CASE("test_MultiSystem_mode_b_adjust_running_sys") {
         ms->setTM(tm);
         ms->setMode("B");
         ms->setSE(se);
-        ms->getAF()->setParam<double>("fixed-amount", 30000.0);
+        ms->getAF()->setParam<double>("fixed_amount", 30000.0);
         ms->getAF()->setParam<bool>("adjust_running_sys", false);
         ms->setAdjustCycle(2);
         ms->setTradeOnClose(true);
@@ -3660,7 +3779,7 @@ TEST_CASE("test_MultiSystem_cascade_a_b_a_deferred_intent") {
     auto inner = std::make_shared<MultiSystem>("inner_a_deferred");
     inner->setMode("A");
     inner->setSubInitCash(100000.0);
-    inner->setParam<bool>("trade_on_close", false);
+    inner->setTradeOnClose(false);
     inner->add(leaf);
 
     auto middle = std::make_shared<MultiSystem>("middle_b");
@@ -5248,7 +5367,7 @@ TEST_CASE("test_MultiSystem_mode_b_deferred_inject_waits_for_retry") {
     CHECK_LT(leaf1_after, leaf1_before);
 }
 
-/** @par Check point: a calendar adjust-mode with trade_on_close=false still records the monthly
+/** @par Check point: a calendar adjust_mode with trade_on_close=false still records the monthly
  * rebalancing turnover (the adjust decision comes from the close stage, never re-derived) */
 TEST_CASE("test_MultiSystem_mode_a_calendar_turnover_deferred") {
     Stock stk = getStock("sh600000");
@@ -6206,7 +6325,7 @@ TEST_CASE("test_MultiSystem_reduction_on_suspended_close_deferred") {
     CHECK_LT(leaf->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
 }
 
-/** @par Check point: a delegated budget above the inner reserve cap (max-total-position) is
+/** @par Check point: a delegated budget above the inner reserve cap (max_total_position) is
  * capped, so the inner layer keeps its reserved cash */
 TEST_CASE("test_MultiSystem_cascade_b_b_b_delegated_reserve") {
     Stock stk = getStock("sh600000");
@@ -6221,7 +6340,7 @@ TEST_CASE("test_MultiSystem_cascade_b_b_b_delegated_reserve") {
     auto inner = std::make_shared<MultiSystem>("bbb_inner");
     inner->setMode("B");
     inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
-    inner->getAF()->setParam<double>("max-total-position", 0.8);
+    inner->getAF()->setParam<double>("max_total_position", 0.8);
     inner->add(leaf);
 
     auto middle = std::make_shared<MultiSystem>("bbb_middle");

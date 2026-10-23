@@ -20,34 +20,6 @@
 namespace py = pybind11;
 using namespace hku;
 
-namespace {
-
-// DatetimeList (std::vector<Datetime>) has been registered as an independent Python type by
-// py::bind_vector (hikyuu_pywrap/bind_stl.cpp), the registered type takes precedence over the
-// pybind11/stl.h converter, so it only accepts DatetimeList instances and rejects the Python
-// list/tuple. Here the binding layer accepts any iterable Datetime sequence uniformly and converts
-// it manually, which is compatible with the existing DatetimeList argument and also supports the
-// list/tuple syntax.
-DatetimeList toDatetimeList(const py::object& dates) {
-    DatetimeList result;
-    if (dates.is_none()) {
-        return result;
-    }
-    if (!py::hasattr(dates, "__iter__")) {
-        throw py::type_error(
-          "dates must be an iterable sequence of Datetime (list/tuple/DatetimeList)");
-    }
-    if (py::isinstance<py::str>(dates) || py::isinstance<py::bytes>(dates)) {
-        throw py::type_error("dates must be an iterable sequence of Datetime, not str/bytes");
-    }
-    for (auto item : py::iter(dates)) {
-        result.push_back(py::cast<Datetime>(item));
-    }
-    return result;
-}
-
-}  // namespace
-
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #endif
@@ -648,7 +620,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
 - L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);
 - L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x position ratio x the parent net assets, aggregated per instrument; mode B: the sub-system instruction passes through);
-- L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max-single-position); mode B skips the clipping.)")
+- L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max_single_position); mode B skips the clipping.)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
       .def(py::init<const SystemList&, const string&>(), py::arg("sys_list"),
@@ -745,18 +717,21 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         "once and runs continuously (never reset). In mode B the shadow accounts start from zero "
         "and the quota comes from the L1 allocation, so this value is unused")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
-           "Set the rebalancing cycle (days), <=1 means rebalancing on every close day")
+           "Set the rebalancing cycle (days); 1 means rebalancing on every close day, 0 is treated "
+           "as 1 at readyForRun, and a negative value is rejected")
       .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
            R"(set_axis_mode(self, mode)
 
     Set the driving time axis mode: "kdata" (the default, the dates of the input KData of run(kdata) are used as the driving axis)
-    or "calendar" (the fixed date table injected by set_date_axis is used as the driving axis). An invalid value is warned and it falls back to "kdata".
+    or "calendar" (the fixed date table injected by set_date_axis is used as the driving axis). An invalid value is rejected.
 
     :param str mode: "kdata" / "calendar")")
       .def("get_axis_mode", &MultiSystem::getAxisMode, "Get the driving time axis mode")
       .def(
         "set_date_axis",
-        [](MultiSystem& ms, const py::object& dates) { ms.setDateAxis(toDatetimeList(dates)); },
+        [](MultiSystem& ms, const py::object& dates) {
+            ms.setDateAxis(get_datetime_list_from_python(dates));
+        },
         py::arg("dates"),
         "Set the fixed date table (accepting list/tuple/DatetimeList; it is used as the driving "
         "axis only when axis_mode == \"calendar\";"
@@ -765,7 +740,9 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("clear_date_axis", &MultiSystem::clearDateAxis, "Clear the fixed date table")
       .def(
         "set_adjust_dates",
-        [](MultiSystem& ms, const py::object& dates) { ms.setAdjustDates(toDatetimeList(dates)); },
+        [](MultiSystem& ms, const py::object& dates) {
+            ms.setAdjustDates(get_datetime_list_from_python(dates));
+        },
         py::arg("dates"),
         R"(set_adjust_dates(self, dates)
 
@@ -790,8 +767,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         "calc_adjust_dates",
         [](const py::object& dates, const string& mode, int adjust_cycle,
            bool delay_to_trading_day) {
-            return MultiSystem::calcAdjustDates(toDatetimeList(dates), mode, adjust_cycle,
-                                                delay_to_trading_day);
+            return MultiSystem::calcAdjustDates(get_datetime_list_from_python(dates), mode,
+                                                adjust_cycle, delay_to_trading_day);
         },
         py::arg("dates"), py::arg("mode"), py::arg("adjust_cycle") = 1,
         py::arg("delay_to_trading_day") = true,
@@ -812,7 +789,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     Set the rebalancing mode (taking over the master PF adjust_mode):
       - "query" / "day" (the default): continue the "every N close days" counting judgment of set_adjust_cycle;
       - "week" / "month" / "quarter" / "year": judge the rebalancing days by the runtime period rule ("the adjust_cycle-th day within the cycle" on the driving axis).
-    An invalid value is warned and it falls back to "query".
+    An invalid value is rejected.
 
     :param str mode: "query" / "day" / "week" / "month" / "quarter" / "year")")
       .def("get_adjust_mode", &MultiSystem::getAdjustMode, "Get the rebalancing mode")
@@ -1023,7 +1000,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     suggestions into the target positions of the parent account by the AF L2 (target market value =
     weight x position ratio x the parent net assets, aggregated per instrument and rebalanced by the
     delta against the current position) and the L3 portfolio risk control applies (e.g.
-    max-single-position).
+    max_single_position).
     The unselected sub-systems are not force cleared by default (sell_at_not_selected=False);
     the selected ones with a zero quota follow the same switch.
 

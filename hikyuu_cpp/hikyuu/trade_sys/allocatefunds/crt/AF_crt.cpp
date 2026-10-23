@@ -42,7 +42,7 @@ AFPtr HKU_API AF_FixedWeightList(const vector<double>& weights) {
 
 AFPtr HKU_API AF_FixedAmount(double amount) {
     auto p = std::make_shared<FixedAmountAllocateFunds>();
-    p->setParam<double>("fixed-amount", amount);
+    p->setParam<double>("fixed_amount", amount);
     return p;
 }
 

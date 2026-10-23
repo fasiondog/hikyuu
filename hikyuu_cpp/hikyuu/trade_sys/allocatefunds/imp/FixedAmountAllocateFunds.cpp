@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::FixedAmountAllocateFunds)
 namespace hku {
 
 FixedAmountAllocateFunds::FixedAmountAllocateFunds() : AllocateFundsBase("AF_FixedAmount") {
-    setParam<double>("fixed-amount", 20000.0);
+    setParam<double>("fixed_amount", 20000.0);
 }
 
 FixedAmountAllocateFunds::~FixedAmountAllocateFunds() {}
