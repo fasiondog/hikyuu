@@ -65,9 +65,6 @@ public:
 private:
     void _initParams();
 
-    void _calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
-                             const DatetimeList& dates, size_t test_len, bool trace);
-
 protected:
     /**
      * Validate the candidate list and split the back-test range into the walk-forward train/test
@@ -82,6 +79,29 @@ protected:
                            vector<std::pair<size_t, size_t>>& train_ranges) const;
 
     SYSPtr _selectedSystem(size_t candIndex, const SYSPtr& trained) const;
+
+    /**
+     * Clone the candidate prototypes for the training so that the parallel back-tests do not share
+     * the EV / TM of the prototypes. Shared by the optimal selectors to keep the isolation rule in
+     * one place.
+     */
+    SystemList _cloneProtosForTraining() const;
+
+    /**
+     * Fill m_sys_dict / m_run_ranges from the per-range selection result and log the picked system.
+     */
+    void _applySelected(const vector<std::shared_ptr<OptimalSelectedList>>& sys_list,
+                        const DatetimeList& dates,
+                        const vector<std::pair<size_t, size_t>>& train_ranges, size_t test_len,
+                        bool trace);
+
+    /**
+     * Run the parallel training over the train ranges. The subclasses override it only to supply
+     * their evaluation input (e.g. the performance key / mode); the range splitting and the result
+     * bookkeeping stay in the base class.
+     */
+    virtual void _calculate_parallel(const vector<std::pair<size_t, size_t>>& train_ranges,
+                                     const DatetimeList& dates, size_t test_len, bool trace);
 
     unordered_map<const System*, SYSPtr> m_proto_to_real;
     unordered_map<Datetime, std::shared_ptr<OptimalSelectedList>> m_sys_dict;

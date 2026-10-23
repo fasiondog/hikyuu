@@ -169,26 +169,7 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
                                               const DatetimeList& dates, size_t test_len,
                                               bool trace) {
     // SPEND_TIME(OptimalSelectorBase_calculate_parallel);
-    // The training runs the candidate clones concurrently and each range has its own query, so the
-    // candidates must not share their EV (shared_ev defaults to true), otherwise the racing
-    // setQuery calls with different queries would cross-clobber the EV state. The local
-    // protos take effect from the next clone level on, leaving the user prototypes untouched.
-    SystemList pro_list;
-    pro_list.reserve(m_pro_sys_list.size());
-    for (const auto& sys : m_pro_sys_list) {
-        auto local = sys->clone();
-        local->setParam<bool>("shared_ev", false);
-        // Mode C shares the parent account, the training copies must not book there
-        local->setParam<bool>("shared_tm", false);
-        pro_list.emplace_back(local);
-    }
-
-    if (!m_real_sys_list.empty() && m_real_sys_list.size() != m_pro_sys_list.size()) {
-        CLS_WARN(
-          "The real system list size ({}) differs from the prototype list size ({}), the selected "
-          "systems cannot be mapped back to the running list!",
-          m_real_sys_list.size(), m_pro_sys_list.size());
-    }
+    SystemList pro_list = _cloneProtosForTraining();
 
     auto sys_list = global_parallel_for_index(
       0, train_ranges.size(),
@@ -227,29 +208,68 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
           return selected_sys_list;
       });
 
+    _applySelected(sys_list, dates, train_ranges, test_len, trace);
+}
+
+SystemList OptimalSelectorBase::_cloneProtosForTraining() const {
+    SystemList pro_list;
+    pro_list.reserve(m_pro_sys_list.size());
+    for (const auto& sys : m_pro_sys_list) {
+        auto local = sys->clone();
+        local->setParam<bool>("shared_ev", false);
+        // Mode C shares the parent account, the training copies must not book there
+        local->setParam<bool>("shared_tm", false);
+        pro_list.emplace_back(local);
+    }
+
+    if (!m_real_sys_list.empty() && m_real_sys_list.size() != m_pro_sys_list.size()) {
+        CLS_WARN(
+          "The real system list size ({}) differs from the prototype list size ({}), the selected "
+          "systems cannot be mapped back to the running list!",
+          m_real_sys_list.size(), m_pro_sys_list.size());
+    }
+    return pro_list;
+}
+
+void OptimalSelectorBase::_applySelected(
+  const vector<std::shared_ptr<OptimalSelectedList>>& sys_list, const DatetimeList& dates,
+  const vector<std::pair<size_t, size_t>>& train_ranges, size_t test_len, bool trace) {
     size_t dates_len = dates.size();
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-        auto& selected_sys_list = sys_list[i];
-        if (!selected_sys_list->empty()) {
-            size_t train_start = train_ranges[i].first;
-            size_t test_start = train_ranges[i].second;
-            size_t test_end = test_start + test_len;
-            if (test_end > dates_len) {
-                test_end = dates_len;
-            }
-
-            for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = selected_sys_list;
-            }
-
-            if (test_end < dates_len) {
-                m_run_ranges.emplace_back(
-                  RunRanges(dates[train_start], dates[test_start], dates[test_end]));
-            } else {
-                m_run_ranges.emplace_back(RunRanges(dates[train_start], dates[test_start],
-                                                    dates[test_end - 1] + Minutes(1)));
+        const auto& selected_sys_list = sys_list[i];
+        if (selected_sys_list->empty()) {
+            continue;
+        }
+        // Run directly when no real list is given
+        for (auto& item : *selected_sys_list) {
+            if (item.trained) {
+                item.trained->reset();
             }
         }
+
+        size_t train_start = train_ranges[i].first;
+        size_t test_start = train_ranges[i].second;
+        size_t test_end = test_start + test_len;
+        if (test_end > dates_len) {
+            test_end = dates_len;
+        }
+
+        for (size_t pos = test_start; pos < test_end; pos++) {
+            m_sys_dict[dates[pos]] = selected_sys_list;
+        }
+
+        if (test_end < dates_len) {
+            m_run_ranges.emplace_back(
+              RunRanges(dates[train_start], dates[test_start], dates[test_end]));
+        } else {
+            m_run_ranges.emplace_back(
+              RunRanges(dates[train_start], dates[test_start], dates[test_end - 1] + Minutes(1)));
+        }
+
+        CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1,
+                    selected_sys_list->front().trained
+                      ? selected_sys_list->front().trained->getStock().market_code()
+                      : std::string());
     }
 }
 
