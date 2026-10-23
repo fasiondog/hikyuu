@@ -15,19 +15,10 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
-#include <mutex>
 
 #include "../../utilities/arithmetic.h"
 
 namespace hku {
-
-// The one-shot notice flag: the fixed_amount pricing silently overrides the weights, so the
-// surprise is worth exactly one log line per process instead of one per rebalance
-static std::once_flag g_fixed_amount_warn_flag;
-
-// The one-shot notice flag of the mode A short clamp: a parent account without a securities-lending
-// facility cannot run the negative net targets, they are clamped to zero (once per process)
-static std::once_flag g_short_unsupported_warn_flag;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsBase& af) {
     os << "AllocateFunds(" << af.name() << ", " << af.getParameter() << ")";
@@ -174,11 +165,9 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
     // The pricing policy: a fixed quota per sub-system when fixed_amount>0 (AF_FixedAmount),
     // otherwise weight x the parent net assets (the parent valuation is needed only there).
     double fixed_amount = getParam<double>("fixed_amount");
-    if (fixed_amount > 0.0) {
-        std::call_once(g_fixed_amount_warn_flag, [this]() {
-            HKU_WARN("{}: fixed_amount > 0 takes precedence over the weights in the pricing!",
-                     m_name);
-        });
+    if (fixed_amount > 0.0 && !m_warned_fixed_amount) {
+        m_warned_fixed_amount = true;
+        HKU_WARN("{}: fixed_amount > 0 takes precedence over the weights in the pricing!", m_name);
     }
     double eq = 1.0 / contexts.size();
     double net_assets = (mode == "B" && tm) ? tm->getFunds(date, query.kType()).net_assets() : 0.0;
@@ -387,13 +376,14 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     if (!support_borrow) {
         for (auto& kv : target_value) {
             if (kv.second < 0.0) {
-                std::call_once(g_short_unsupported_warn_flag, [this]() {
+                if (!m_warned_short_unsupported) {
+                    m_warned_short_unsupported = true;
                     HKU_WARN(
                       "{}::_toTargets: the parent account does not support borrowing securities, "
                       "the negative net targets are clamped to zero! Set support_borrow_stock=true "
                       "on the system to allow shorting.",
                       m_name);
-                });
+                }
                 kv.second = 0.0;
             }
         }
