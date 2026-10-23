@@ -104,7 +104,7 @@ bool OptimalSelectorBase::_prepareCalculate(const KQuery& query, DatetimeList& d
     bool trace = getParam<bool>("trace");
     CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
     if (m_pro_sys_list.empty()) {
-        CLS_WARN("candidate sys list is empty!");
+        CLS_WARN("candidate sys list is empty, the selection will be empty!");
         return false;
     }
 
@@ -112,7 +112,8 @@ bool OptimalSelectorBase::_prepareCalculate(const KQuery& query, DatetimeList& d
     // system list without a given security directly
     for (const auto& sys : m_pro_sys_list) {
         if (sys->getStock().isNull()) {
-            CLS_ERROR("The candidate sys ({}) was specified stock!", sys->name());
+            CLS_ERROR("The candidate sys ({}) has no stock specified, the selection will be empty!",
+                      sys->name());
             return false;
         }
     }
