@@ -23,6 +23,15 @@ struct RunRanges {
     : start(start_), run_start(run_start_), end(end_) {}
 };
 
+// The prototype index (mapped back to the running systems by identity) plus the window-local
+// trained copy (run directly by SYS_WalkForward)
+struct OptimalSelectedItem {
+    size_t index{0};
+    double weight{0.0};
+    SYSPtr trained;
+};
+using OptimalSelectedList = vector<OptimalSelectedItem>;
+
 class HKU_API OptimalSelectorBase : public SelectorBase {
     CLASS_LOGGER_IMP(SE_Optimal)
     SELECTOR_IMP(OptimalSelectorBase)
@@ -35,6 +44,7 @@ public:
 
     virtual void _checkParam(const string& name) const override;
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query) override;
+    virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override;
 
     virtual void _reset() override;
 
@@ -71,7 +81,10 @@ protected:
     bool _prepareCalculate(const KQuery& query, DatetimeList& dates,
                            vector<std::pair<size_t, size_t>>& train_ranges) const;
 
-    unordered_map<Datetime, std::shared_ptr<SystemWeightList>> m_sys_dict;
+    SYSPtr _selectedSystem(size_t candIndex, const SYSPtr& trained) const;
+
+    unordered_map<const System*, SYSPtr> m_proto_to_real;
+    unordered_map<Datetime, std::shared_ptr<OptimalSelectedList>> m_sys_dict;
     vector<RunRanges> m_run_ranges;
 };
 

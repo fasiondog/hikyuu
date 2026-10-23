@@ -173,7 +173,7 @@
     
     .. py:method:: clone(self)
     
-        克隆操作        
+        克隆操作。不复制运行时选中缓存，克隆后需重新 calculate。
         
     .. py:method:: add_stock(self, stock, sys)
 

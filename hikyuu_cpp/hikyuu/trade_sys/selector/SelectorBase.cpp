@@ -112,10 +112,8 @@ SelectorPtr SelectorBase::clone() {
     p->m_calculated = false;
     p->m_proto_calculated = false;
 
-    p->m_real_sys_list.reserve(m_real_sys_list.size());
-    for (const auto& sys : m_real_sys_list) {
-        p->m_real_sys_list.emplace_back(sys->clone());
-    }
+    // Runtime cache, rebuilt by calculate
+    p->m_real_sys_list.clear();
 
     // A subclass may have already filled the prototype list in _clone (sharing its inner
     // selector's instances); only clone the prototypes here when the list is still empty

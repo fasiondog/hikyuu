@@ -56,15 +56,40 @@ void OptimalSelectorBase::_checkParam(const string& name) const {
 SystemWeightList OptimalSelectorBase::_getSelected(Datetime date) {
     SystemWeightList ret;
     auto iter = m_sys_dict.find(date);
-    if (iter != m_sys_dict.end()) {
-        int index = getParam<int>("index");
-        if (index < iter->second->size()) {
-            ret.emplace_back(iter->second->at(index));
-        } else {
-            ret.emplace_back(iter->second->at(iter->second->size() - 1));
-        }
+    if (iter == m_sys_dict.end() || iter->second->empty()) {
+        return ret;
+    }
+
+    const auto& items = *(iter->second);
+    size_t index = static_cast<size_t>(getParam<int>("index"));
+    const auto& item = index < items.size() ? items[index] : items.back();
+    auto sys = _selectedSystem(item.index, item.trained);
+    if (sys) {
+        ret.emplace_back(SystemWeight(sys, item.weight));
     }
     return ret;
+}
+
+SYSPtr OptimalSelectorBase::_selectedSystem(size_t candIndex, const SYSPtr& trained) const {
+    // The aggregates bind every running system to its prototype: that mapping is the only reliable
+    // identity source. The positional fallback keeps the same-order contract for the callers that
+    // pass a real list without binding
+    if (candIndex < m_pro_sys_list.size()) {
+        auto iter = m_proto_to_real.find(m_pro_sys_list[candIndex].get());
+        if (iter != m_proto_to_real.end()) {
+            return iter->second;
+        }
+    }
+    if (m_real_sys_list.size() == m_pro_sys_list.size() && candIndex < m_real_sys_list.size()) {
+        return m_real_sys_list[candIndex];
+    }
+    return trained;
+}
+
+void OptimalSelectorBase::bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {
+    if (real && proto) {
+        m_proto_to_real[proto.get()] = real;
+    }
 }
 
 void OptimalSelectorBase::_reset() {
@@ -152,7 +177,16 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
     for (const auto& sys : m_pro_sys_list) {
         auto local = sys->clone();
         local->setParam<bool>("shared_ev", false);
+        // Mode C shares the parent account, the training copies must not book there
+        local->setParam<bool>("shared_tm", false);
         pro_list.emplace_back(local);
+    }
+
+    if (!m_real_sys_list.empty() && m_real_sys_list.size() != m_pro_sys_list.size()) {
+        CLS_WARN(
+          "The real system list size ({}) differs from the prototype list size ({}), the selected "
+          "systems cannot be mapped back to the running list!",
+          m_real_sys_list.size(), m_pro_sys_list.size());
     }
 
     auto sys_list = global_parallel_for_index(
@@ -163,15 +197,16 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
           KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
           CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, train_ranges.size(), q);
 
-          auto selected_sys_list = std::make_shared<SystemWeightList>();
-          for (const auto& sys : pro_list) {
+          auto selected_sys_list = std::make_shared<OptimalSelectedList>();
+          for (size_t j = 0, total = pro_list.size(); j < total; j++) {
+              const auto& sys = pro_list[j];
               try {
                   auto nsys = sys->clone();
                   nsys->run(q, true);
                   double value = evaluate(nsys, end_date);
                   nsys->reset();
                   if (!std::isnan(value)) {
-                      selected_sys_list->emplace_back(SystemWeight(nsys->clone(), value));
+                      selected_sys_list->emplace_back(OptimalSelectedItem{j, value, nsys});
                   }
               } catch (const std::exception& e) {
                   CLS_ERROR("{}! {}", e.what(), sys->name());
@@ -183,9 +218,10 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
           if (!selected_sys_list->empty()) {
               // Sort in the descending order; on equality the one earlier in the candidates is
               // taken
-              std::stable_sort(
-                selected_sys_list->begin(), selected_sys_list->end(),
-                [](const SystemWeight& a, const SystemWeight& b) { return a.weight > b.weight; });
+              std::stable_sort(selected_sys_list->begin(), selected_sys_list->end(),
+                               [](const OptimalSelectedItem& a, const OptimalSelectedItem& b) {
+                                   return a.weight > b.weight;
+                               });
           }
           return selected_sys_list;
       });

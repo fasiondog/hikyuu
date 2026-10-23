@@ -17,6 +17,10 @@
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Single.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Logic.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
+#include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
+#include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/KData.h>
@@ -1077,6 +1081,64 @@ TEST_CASE("bench_SG_logic_operator") {
                       << " us/run)" << std::endl;
         }
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Manual_direct_drive") {
+    KData kdata = getStock("sz000001").getKData(KQueryByIndex(-20));
+    REQUIRE(kdata.size() > 3);
+
+    auto sg = SG_Manual();
+    sg->_addBuySignal(kdata[1].datetime);
+    sg->_addSellSignal(kdata[3].datetime);
+
+    /** @arg a new trading object keeps the seeded signals */
+    sg->setTO(kdata);
+    CHECK_EQ(sg->getBuySignal().size(), 1);
+    CHECK_EQ(sg->getSellSignal().size(), 1);
+    CHECK_UNARY(sg->shouldBuy(kdata[1].datetime));
+
+    /** @arg reset keeps them, they are the input of a manual signal */
+    sg->reset();
+    CHECK_EQ(sg->getBuySignal().size(), 1);
+
+    /** @arg as the SG of a system, whose reset and setTO both run */
+    auto sys = SYS_Simple(crtTM(Datetime(200001010000LL), 100000.0), MM_Nothing(), EnvironmentPtr(),
+                          ConditionPtr(), sg);
+    sys->run(kdata);
+    CHECK_UNARY(sys->getSG()->shouldBuy(kdata[1].datetime));
+    CHECK_UNARY(sys->getSG()->shouldSell(kdata[3].datetime));
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Cycle_no_bar_date") {
+    // sh600005 has no bar on 2000-06-30 (halted), the calendar still carries the day
+    Stock stk = getStock("sh600005");
+    REQUIRE(!stk.isNull());
+    KData kdata = stk.getKData(KQuery(Datetime(20000626), Datetime(20000710)));
+    REQUIRE(kdata.size() > 1);
+    const Datetime halted(20000630);
+
+    bool has_halted_bar = false;
+    Datetime next_bar;
+    for (size_t i = 0; i < kdata.size(); i++) {
+        if (kdata[i].datetime == halted) {
+            has_halted_bar = true;
+        } else if (kdata[i].datetime > halted && next_bar.isNull()) {
+            next_bar = kdata[i].datetime;
+        }
+    }
+    REQUIRE_UNARY(!has_halted_bar);
+    REQUIRE_UNARY(!next_bar.isNull());
+
+    auto sg = SG_Cycle();
+    sg->setCycleDates(DatetimeList{halted});
+    sg->setTO(kdata);
+
+    /** @arg the day still holds the scheduled signal */
+    CHECK_UNARY(sg->shouldBuy(halted));
+    /** @arg it is not shifted to the first bar after the halt */
+    CHECK_UNARY(!sg->shouldBuy(next_bar));
 }
 
 /** @} */

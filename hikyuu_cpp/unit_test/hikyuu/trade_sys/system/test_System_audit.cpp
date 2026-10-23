@@ -22,10 +22,13 @@
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
+#include <hikyuu/trade_sys/moneymanager/MoneyManagerBase.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/profitgoal/ProfitGoalBase.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
+#include <hikyuu/trade_sys/stoploss/StoplossBase.h>
 
 using namespace hku;
 
@@ -112,6 +115,12 @@ public:
     virtual price_t _getRealSellPrice(const Datetime&, price_t) override {
         return raw;
     }
+    virtual price_t _getRealBuyShortPrice(const Datetime&, price_t) override {
+        return raw;
+    }
+    virtual price_t _getRealSellShortPrice(const Datetime&, price_t) override {
+        return raw;
+    }
     virtual void _calculate() override {}
     virtual SlippagePtr _clone() override {
         auto p = std::make_shared<FixedRawPriceSP>();
@@ -167,6 +176,108 @@ public:
         _addBuySignal(kdata[0].datetime);
     }
 };
+
+// Emits one buy or sell signal on the given date
+class SingleSignalSG : public SignalBase {
+public:
+    SingleSignalSG(const Datetime& date, bool buy)
+    : SignalBase("SingleSignalSG"), m_date(date), m_buy(buy) {}
+
+    virtual SignalPtr _clone() override {
+        return std::make_shared<SingleSignalSG>(m_date, m_buy);
+    }
+
+    virtual void _calculate(const KData&) override {
+        if (m_buy) {
+            _addBuySignal(m_date);
+        } else {
+            _addSellSignal(m_date);
+        }
+    }
+
+private:
+    Datetime m_date;
+    bool m_buy;
+};
+
+// Records the price each sizing interface receives and returns a fixed quantity, so a test can pin
+// which price the system used, independently of any money manager formula
+class PriceProbeMM : public MoneyManagerBase {
+public:
+    PriceProbeMM() : MoneyManagerBase("PriceProbeMM") {
+        setParam<double>("n", 100.0);
+    }
+
+    price_t buy_price{0.0};
+    price_t sell_price{0.0};
+    price_t buy_short_price{0.0};
+    price_t sell_short_price{0.0};
+
+    virtual MoneyManagerPtr _clone() override {
+        auto p = std::make_shared<PriceProbeMM>();
+        p->setParam<double>("n", getParam<double>("n"));
+        return p;
+    }
+
+    virtual double _getBuyNumber(const Datetime&, const Stock&, price_t price, price_t,
+                                 SystemPart) override {
+        buy_price = price;
+        return getParam<double>("n");
+    }
+
+    virtual double _getSellNumber(const Datetime&, const Stock&, price_t price, price_t,
+                                  SystemPart) override {
+        sell_price = price;
+        return getParam<double>("n");
+    }
+
+    virtual double _getBuyShortNumber(const Datetime&, const Stock&, price_t price, price_t,
+                                      SystemPart) override {
+        buy_short_price = price;
+        return getParam<double>("n");
+    }
+
+    virtual double _getSellShortNumber(const Datetime&, const Stock&, price_t price, price_t,
+                                       SystemPart) override {
+        sell_short_price = price;
+        return getParam<double>("n");
+    }
+};
+
+// A short-side stop-loss 10% above the entry, so the cover path gets a positive risk and reaches
+// the money manager instead of falling back to covering everything
+class FixedShortST : public StoplossBase {
+public:
+    FixedShortST() : StoplossBase("FixedShortST") {}
+
+    virtual StoplossPtr _clone() override {
+        return std::make_shared<FixedShortST>();
+    }
+
+    virtual price_t _getPrice(const Datetime&, price_t price) override {
+        return price * 0.9;
+    }
+
+    virtual price_t _getShortPrice(const Datetime&, price_t price) override {
+        return price * 1.1;
+    }
+};
+
+// The bar whose high (above == true) or low sits farthest from its close, so a fixed raw price
+// produces a fill clearly away from the plan price
+static size_t widest_span_pos(const KData& kdata, bool above) {
+    size_t best = 0;
+    double best_span = -1.0;
+    for (size_t i = 0; i < kdata.size(); ++i) {
+        double span = above ? kdata[i].highPrice - kdata[i].closePrice
+                            : kdata[i].closePrice - kdata[i].lowPrice;
+        if (span > best_span) {
+            best_span = span;
+            best = i;
+        }
+    }
+    return best;
+}
 
 // Only the given date is valid, so the market environment turns invalid on the next bar and forces
 // a liquidation regardless of the money manager's price check
@@ -297,6 +408,302 @@ TEST_CASE("test_System_slippage_price_fixup") {
             CHECK_LE(tr.realPrice, k.highPrice + 1e-9);
         });
     }
+}
+
+/** @par Check point: the buy size is derived from the fill price, so a full-cash money manager is
+ *  still filled when the fill price is above the plan price; sizing at the plan price overflowed
+ *  the cash and the whole order was rejected */
+TEST_CASE("test_System_buy_size_follows_fill_price") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    // The plan price comes from the original (unadjusted) bar, so the same coordinate is used here
+    KQuery raw_query = query;
+    raw_query.recoverType(KQuery::NO_RECOVER);
+    KData raw_kdata = stk.getKData(raw_query);
+    REQUIRE(raw_kdata.size() > 2);
+
+    const double init_cash = 100000.0;
+    // The bar with the widest high-close span, so the fill price is clearly above the plan price
+    const size_t pos = widest_span_pos(raw_kdata, true);
+    const price_t fill_price = raw_kdata[pos].highPrice;
+    REQUIRE_LT(raw_kdata[pos].closePrice, fill_price);
+
+    auto sp = std::make_shared<FixedRawPriceSP>();
+    sp->raw = fill_price;
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setTM(crtTM(Datetime(199001010000LL), init_cash, TC_Zero()));
+    sys->setSG(std::make_shared<SingleSignalSG>(raw_kdata[pos].datetime, true));
+    sys->setMM(MM_Nothing());
+    sys->setSP(sp);
+    sys->run(stk, query);
+
+    TradeRecord tr;
+    for (const auto& record : sys->getTM()->getTradeList()) {
+        if (record.business == BUSINESS_BUY) {
+            tr = record;
+            break;
+        }
+    }
+    REQUIRE_UNARY(tr.business == BUSINESS_BUY);
+
+    /** @arg the fill price is the slippage result */
+    CHECK_EQ(tr.realPrice, fill_price);
+
+    const double lot = stk.minTradeNumber();
+    const double unit = stk.unit();
+
+    /** @arg the size is the whole cash evaluated at the fill price */
+    CHECK_EQ(tr.number, std::floor(init_cash / (fill_price * unit) / lot) * lot);
+
+    /** @arg the same size evaluated at the plan price would have needed more cash than available */
+    const double plan_number = std::floor(init_cash / (tr.planPrice * unit) / lot) * lot;
+    CHECK_GT(plan_number * fill_price * unit, init_cash);
+
+    /** @arg the account is not overdrawn */
+    CHECK_GE(sys->getTM()->currentCash(), 0.0);
+}
+
+/** @par Check point: the short-opening size is derived from the fill price as well, so the short is
+ *  opened at the quantity the fill price can afford instead of the plan price */
+TEST_CASE("test_System_sellShort_size_follows_fill_price") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KQuery raw_query = query;
+    raw_query.recoverType(KQuery::NO_RECOVER);
+    KData raw_kdata = stk.getKData(raw_query);
+    REQUIRE(raw_kdata.size() > 2);
+
+    const double init_cash = 100000.0;
+    // The bar with the widest close-low span, so the fill price is clearly below the plan price
+    const size_t pos = widest_span_pos(raw_kdata, false);
+    const price_t fill_price = raw_kdata[pos].lowPrice;
+    REQUIRE_LT(fill_price, raw_kdata[pos].closePrice);
+
+    auto sp = std::make_shared<FixedRawPriceSP>();
+    sp->raw = fill_price;
+
+    auto tm = crtTM(Datetime(199001010000LL), init_cash, TC_Zero());
+    tm->setParam<bool>("support_borrow_stock", true);
+
+    // The alternate signal state only admits a short entry from a flat book when borrowing is
+    // enabled on the signal generator as well
+    auto sg = std::make_shared<SingleSignalSG>(raw_kdata[pos].datetime, false);
+    sg->setParam<bool>("support_borrow_stock", true);
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setTM(tm);
+    sys->setSG(sg);
+    sys->setMM(MM_Nothing());
+    sys->setSP(sp);
+    sys->run(stk, query);
+
+    TradeRecord tr;
+    for (const auto& record : sys->getTM()->getTradeList()) {
+        if (record.business == BUSINESS_SELL_SHORT) {
+            tr = record;
+            break;
+        }
+    }
+    REQUIRE_UNARY(tr.business == BUSINESS_SELL_SHORT);
+
+    /** @arg the fill price is the slippage result */
+    CHECK_EQ(tr.realPrice, fill_price);
+
+    const double lot = stk.minTradeNumber();
+    const double unit = stk.unit();
+
+    /** @arg the size is the net assets evaluated at the fill price */
+    CHECK_EQ(tr.number, std::floor(init_cash / (fill_price * unit) / lot) * lot);
+
+    /** @arg sizing at the plan price would have opened a smaller short */
+    CHECK_LT(std::floor(init_cash / (tr.planPrice * unit) / lot) * lot, tr.number);
+}
+
+/** @par Check point: the delayed buy asks the money manager for the quantity with the price it is
+ *  actually filled at, not with the plan price */
+TEST_CASE("test_System_delay_buy_number_uses_fill_price") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KQuery raw_query = query;
+    raw_query.recoverType(KQuery::NO_RECOVER);
+    KData raw_kdata = stk.getKData(raw_query);
+    REQUIRE(raw_kdata.size() > 3);
+
+    const price_t fill_price = raw_kdata[1].highPrice;
+    auto sp = std::make_shared<FixedRawPriceSP>();
+    sp->raw = fill_price;
+
+    auto mm = std::make_shared<PriceProbeMM>();
+    auto sys = SYS_Simple();
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+    sys->setSG(std::make_shared<SingleSignalSG>(raw_kdata[0].datetime, true));
+    sys->setMM(mm);
+    sys->setSP(sp);
+    // buy_delay defaults to true: the signal on the first bar fills at the next bar's open
+    sys->run(stk, query);
+
+    TradeRecord tr;
+    for (const auto& record : sys->getTM()->getTradeList()) {
+        if (record.business == BUSINESS_BUY) {
+            tr = record;
+            break;
+        }
+    }
+    REQUIRE_UNARY(tr.business == BUSINESS_BUY);
+
+    /** @arg the delayed fill uses the slippage price */
+    CHECK_EQ(tr.realPrice, fill_price);
+
+    /** @arg the quantity was requested with the fill price, not with the plan price */
+    CHECK_EQ(mm->buy_price, tr.realPrice);
+    CHECK_EQ(tr.number, 100.0);
+}
+
+/** @par Check point: with delay_use_current_price=false the size decided at the signal bar's close
+ *  is re-sized at the fill price when it no longer fits the cash, instead of being rejected by the
+ *  trade manager as a whole */
+TEST_CASE("test_System_delay_stale_size_is_resized") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KQuery raw_query = query;
+    raw_query.recoverType(KQuery::NO_RECOVER);
+    KData raw_kdata = stk.getKData(raw_query);
+    REQUIRE(raw_kdata.size() > 3);
+
+    // The bar whose high sits farthest above the previous close, so the size decided at that close
+    // can no longer afford the fill
+    size_t gap_pos = 1;
+    double best_gap = -1.0;
+    for (size_t i = 1; i < raw_kdata.size(); ++i) {
+        double gap = raw_kdata[i].highPrice - raw_kdata[i - 1].closePrice;
+        if (gap > best_gap) {
+            best_gap = gap;
+            gap_pos = i;
+        }
+    }
+    REQUIRE_GT(best_gap, 0.0);
+
+    const double init_cash = 100000.0;
+    const price_t fill_price = raw_kdata[gap_pos].highPrice;
+    auto sp = std::make_shared<FixedRawPriceSP>();
+    sp->raw = fill_price;
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("delay_use_current_price", false);
+    sys->setTM(crtTM(Datetime(199001010000LL), init_cash, TC_Zero()));
+    sys->setSG(std::make_shared<SingleSignalSG>(raw_kdata[gap_pos - 1].datetime, true));
+    sys->setMM(MM_Nothing());
+    sys->setSP(sp);
+    sys->run(stk, query);
+
+    TradeRecord tr;
+    for (const auto& record : sys->getTM()->getTradeList()) {
+        if (record.business == BUSINESS_BUY) {
+            tr = record;
+            break;
+        }
+    }
+    REQUIRE_UNARY(tr.business == BUSINESS_BUY);
+
+    const double lot = stk.minTradeNumber();
+    const double unit = stk.unit();
+    const double stale =
+      std::floor(init_cash / (raw_kdata[gap_pos - 1].closePrice * unit) / lot) * lot;
+
+    /** @arg the stale size evaluated at the fill price would have been rejected */
+    CHECK_GT(stale * fill_price * unit, init_cash);
+
+    /** @arg the order is re-sized to what the fill price can afford */
+    CHECK_EQ(tr.number, std::floor(init_cash / (fill_price * unit) / lot) * lot);
+    CHECK_LT(tr.number, stale);
+    CHECK_GE(sys->getTM()->currentCash(), 0.0);
+}
+
+/** @par Check point: the long sell and both short-side covers receive the price they are actually
+ *  filled at */
+TEST_CASE("test_System_sell_and_cover_number_use_fill_price") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KQuery raw_query = query;
+    raw_query.recoverType(KQuery::NO_RECOVER);
+    KData raw_kdata = stk.getKData(raw_query);
+    REQUIRE(raw_kdata.size() > 5);
+
+    const Datetime open_date = raw_kdata[0].datetime;
+    const Datetime exit_date = raw_kdata[3].datetime;
+    const price_t raw_price = raw_kdata[3].lowPrice;
+
+    // A fixed raw price keeps the fill independent of the plan price
+    auto run = [&](bool short_side) {
+        auto sp = std::make_shared<FixedRawPriceSP>();
+        sp->raw = raw_price;
+
+        auto mm = std::make_shared<PriceProbeMM>();
+        // Long: buy on the first bar, sell on the fourth. Short: open on the first, cover on the
+        // fourth, so each side exercises one entry and one exit
+        auto sg = std::make_shared<FixedDatesSG>(short_side ? exit_date : open_date,
+                                                 short_side ? open_date : exit_date);
+        sg->setParam<bool>("support_borrow_stock", short_side);
+
+        auto sys = SYS_Simple();
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setParam<bool>("support_borrow_stock", short_side);
+        sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+        sys->setSG(sg);
+        sys->setMM(mm);
+        sys->setSP(sp);
+        if (short_side) {
+            // A positive short-side risk makes the cover go through the money manager instead of
+            // the "cover everything" fallback
+            sys->setST(std::make_shared<FixedShortST>());
+        }
+        sys->run(stk, query);
+        return std::make_pair(mm, sys->getTM()->getTradeList());
+    };
+
+    auto long_run = run(false);
+    TradeRecord buy_tr, sell_tr;
+    for (const auto& tr : long_run.second) {
+        if (tr.business == BUSINESS_BUY) {
+            buy_tr = tr;
+        } else if (tr.business == BUSINESS_SELL) {
+            sell_tr = tr;
+        }
+    }
+    REQUIRE_UNARY(buy_tr.business == BUSINESS_BUY);
+    REQUIRE_UNARY(sell_tr.business == BUSINESS_SELL);
+
+    /** @arg the long entry and exit receive their own fill price */
+    CHECK_EQ(long_run.first->buy_price, buy_tr.realPrice);
+    CHECK_EQ(long_run.first->sell_price, sell_tr.realPrice);
+
+    auto short_run = run(true);
+    TradeRecord open_tr, cover_tr;
+    for (const auto& tr : short_run.second) {
+        if (tr.business == BUSINESS_SELL_SHORT) {
+            open_tr = tr;
+        } else if (tr.business == BUSINESS_BUY_SHORT) {
+            cover_tr = tr;
+        }
+    }
+    REQUIRE_UNARY(open_tr.business == BUSINESS_SELL_SHORT);
+    REQUIRE_UNARY(cover_tr.business == BUSINESS_BUY_SHORT);
+
+    /** @arg the short opening and the cover receive their own fill price */
+    CHECK_EQ(short_run.first->sell_short_price, open_tr.realPrice);
+    CHECK_EQ(short_run.first->buy_short_price, cover_tr.realPrice);
 }
 
 /** @par Check point: a stale or zero-price original kdata (plan price 0) never produces a

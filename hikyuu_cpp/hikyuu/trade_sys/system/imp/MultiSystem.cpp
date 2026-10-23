@@ -626,6 +626,8 @@ void MultiSystem::_buildCycleDates(const DatetimeList& axis) {
 void MultiSystem::_declareCycleDate(const Datetime& date) {
     // Mode C declares the cycle start day on admission instead (the legacy Portfolio behavior)
     HKU_IF_RETURN(getMode() == "C" || date.isNull(), void());
+    // The days stay sorted: a bulk run declares the whole schedule in advance
+    HKU_IF_RETURN(std::binary_search(m_cycle_dates.begin(), m_cycle_dates.end(), date), void());
 
     DatetimeList dates = m_cycle_dates;
     dates.push_back(date);
@@ -638,11 +640,12 @@ void MultiSystem::_declareCycleDate(const Datetime& date) {
 }
 
 void MultiSystem::_clearCycleDates() {
-    m_cycle_dates.clear();
-    m_last_adjust_period = Datetime();
     // Mode C declares the cycle days on admission: they are entry events rather than a schedule and
     // a running sub-system never re-declares, so a configuration change must not retract them
     HKU_IF_RETURN(getMode() == "C", void());
+
+    m_cycle_dates.clear();
+    m_last_adjust_period = Datetime();
     // Retract the declared days from the sub-system signals: the whole list is replaced, so an
     // empty list clears them
     DatetimeList empty;
@@ -650,6 +653,9 @@ void MultiSystem::_clearCycleDates() {
         auto sg = sys->getSG();
         if (sg) {
             sg->setCycleDates(empty);
+        } else if (auto* inner = dynamic_cast<MultiSystem*>(sys.get())) {
+            // A nested aggregate has no signal of its own, its cycle days live one level down
+            inner->_clearCycleDates();
         }
     }
 }
@@ -663,6 +669,12 @@ void MultiSystem::_injectCycleDates() {
         auto sg = sys->getSG();
         if (sg && sg->getParam<bool>("cycle")) {
             sg->setCycleDates(m_cycle_dates);
+        } else if (auto* inner = dynamic_cast<MultiSystem*>(sys.get())) {
+            // The parent is the scheduler of a nested aggregate (it never runs its own _runAxis)
+            if (inner->getMode() != "C") {
+                inner->m_cycle_dates = m_cycle_dates;
+                inner->_injectCycleDates();
+            }
         }
     }
 }

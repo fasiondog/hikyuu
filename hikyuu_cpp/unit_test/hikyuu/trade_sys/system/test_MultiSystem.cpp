@@ -37,6 +37,8 @@
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
+#include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
+#include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Signal.h>
 #if HKU_SUPPORT_SERIALIZATION
 #include <fstream>
@@ -1667,6 +1669,146 @@ TEST_CASE("test_MultiSystem_combined_se_clone") {
     auto dates = StockManager::instance().getTradingCalendar(query);
     REQUIRE_UNARY(!dates.empty());
     CHECK_EQ(cloned->getSE()->getSelected(dates.back()).size(), 2);
+}
+
+/** @par Check point: an optimal selector returns the running systems, so every mode admits one */
+TEST_CASE("test_MultiSystem_performance_optimal_se") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    REQUIRE_GT(dates.size(), 20);
+
+    for (const string& mode : {"A", "B", "C"}) {
+        auto se = SE_PerformanceOptimal();
+        se->setParam<int>("train_len", 10);
+        se->setParam<int>("test_len", 5);
+        se->addStockList({stk1, stk2}, create_alway_buy_sys());
+
+        auto ms = std::make_shared<MultiSystem>("ms_optimal_" + mode);
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+        ms->setTM(tm);
+        ms->setMode(mode);
+        ms->setSE(se);
+        if (mode != "C") {
+            ms->setAF(AF_EqualWeight());
+        }
+        ms->run(query);
+
+        auto sys_list = ms->getSystemList();
+        REQUIRE_EQ(sys_list.size(), 2);
+
+        /** @arg the selected instance is one of the running systems (identity contract) */
+        size_t selected_count = 0;
+        for (size_t i = dates.size() - 5; i < dates.size(); i++) {
+            auto sw = se->getSelected(dates[i]);
+            if (sw.empty()) {
+                continue;
+            }
+            selected_count++;
+            CHECK_UNARY(sw[0].sys == sys_list[0] || sw[0].sys == sys_list[1]);
+        }
+        CHECK_GT(selected_count, 0);
+
+        /** @arg mode C shares the parent account, no training trade may land on it */
+        if (mode == "C") {
+            for (auto& sys : sys_list) {
+                CHECK(sys->getTM() == tm);
+                CHECK(sys->getParam<bool>("shared_tm"));
+            }
+            CHECK_GT(tm->getTradeList().size(), 1);
+
+            auto* opt = dynamic_cast<OptimalSelectorBase*>(se.get());
+            REQUIRE_UNARY(opt != nullptr);
+            const auto& ranges = opt->getRunRanges();
+            REQUIRE_UNARY(!ranges.empty());
+            const Datetime init_datetime(199001010000LL);
+            for (const auto& tr : tm->getTradeList()) {
+                if (tr.datetime == init_datetime) {
+                    continue;
+                }
+                bool in_test_window = false;
+                for (const auto& range : ranges) {
+                    if (tr.datetime >= range.run_start && tr.datetime < range.end) {
+                        in_test_window = true;
+                        break;
+                    }
+                }
+                CHECK_UNARY(in_test_window);
+            }
+        }
+    }
+}
+
+/** @par Check point: a configuration change of the outer aggregate retracts the cycle days of a
+ *  nested aggregate as well, otherwise its cycle sub-signals keep buying on the stale days */
+TEST_CASE("test_MultiSystem_nested_clear_cycle_dates") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto cycle_sg = SG_Cycle();
+    auto cycle_sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000.0), MM_Nothing(),
+                                EnvironmentPtr(), ConditionPtr(), cycle_sg);
+    cycle_sys->setStock(stk);
+
+    // The inner aggregate runs once on its own so that its cycle days are established
+    auto inner = std::make_shared<MultiSystem>("inner");
+    inner->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    inner->setMode("A");
+    inner->add(cycle_sys);
+    inner->setSE(SE_Fixed());
+    inner->run(query);
+    REQUIRE_UNARY(!cycle_sg->getCycleDates().empty());
+
+    auto outer = std::make_shared<MultiSystem>("outer");
+    outer->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->add(inner);
+    outer->setSE(SE_Fixed());
+    outer->run(query);
+
+    /** @arg the outer reconfiguration reaches the nested cycle signal */
+    outer->setAdjustDates(DatetimeList{Datetime(19991110)});
+    CHECK_UNARY(cycle_sg->getCycleDates().empty());
+
+    /** @arg the nested layer is rescheduled by the next run instead of staying silent */
+    outer->run(query);
+    CHECK_UNARY(!cycle_sg->getCycleDates().empty());
+    CHECK_UNARY(!cycle_sg->getBuySignal().empty());
+}
+
+/** @par Check point: a nested aggregate that never runs on its own takes its cycle schedule from
+ * the parent, so its snapshot-based selector still admits the sub-systems on the first run */
+TEST_CASE("test_MultiSystem_nested_cycle_schedule_from_parent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto cycle_sg = SG_Cycle();
+    auto cycle_sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000.0), MM_Nothing(),
+                                EnvironmentPtr(), ConditionPtr(), cycle_sg);
+    cycle_sys->setStock(stk);
+
+    // Never run on its own: the schedule can only come from the parent
+    auto inner = std::make_shared<MultiSystem>("inner");
+    inner->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    inner->setMode("A");
+    inner->add(cycle_sys);
+    inner->setSE(SE_Signal());
+
+    auto outer = std::make_shared<MultiSystem>("outer");
+    outer->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->add(inner);
+    outer->setSE(SE_Fixed());
+    outer->run(query);
+
+    /** @arg the parent pushes its schedule down before the nested selector snapshots the signals */
+    CHECK_UNARY(!cycle_sg->getCycleDates().empty());
+    CHECK_GT(inner->getSE()->getSelected(Datetime(19991110)).size(), 0);
 }
 
 /** @par Check point: mode C converges sys_use_self_tm onto the shared account of the parent

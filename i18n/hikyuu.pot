@@ -292,7 +292,7 @@ msgstr ""
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:785
 #, c++-format
-msgid "[{}] buy failed, planPrice: {} <= stoploss: {}"
+msgid "[{}] buy failed, price: {} <= stoploss: {}"
 msgstr ""
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:797

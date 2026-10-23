@@ -378,8 +378,8 @@ msgstr "[{}] 当前成交金额或成交量为0，延迟至下一开盘时买入
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:785
 #, c++-format
-msgid "[{}] buy failed, planPrice: {} <= stoploss: {}"
-msgstr "[{}] 买入失败, 计划买入价格: {} <= 止损价: {}"
+msgid "[{}] buy failed, price: {} <= stoploss: {}"
+msgstr "[{}] 买入失败, 买入价格: {} <= 止损价: {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:797
 msgid "buy failed"

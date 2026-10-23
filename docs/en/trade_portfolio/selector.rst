@@ -181,7 +181,7 @@ Selector Strategy Base Class
     
     .. py:method:: clone(self)
     
-        Return a clone of the selector.        
+        Return a clone of the selector. The runtime selection cache is not cloned: calculate again before selecting.
         
     .. py:method:: add_stock(self, stock, sys)
 

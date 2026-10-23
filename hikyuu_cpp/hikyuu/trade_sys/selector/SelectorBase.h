@@ -126,6 +126,11 @@ public:
     void removeAll();
 
     typedef shared_ptr<SelectorBase> SelectorPtr;
+
+    /**
+     * Clone the selector. The runtime selection cache is not cloned: calculate again before
+     * getSelected
+     */
     SelectorPtr clone();
 
     /** Subclass reset interface */

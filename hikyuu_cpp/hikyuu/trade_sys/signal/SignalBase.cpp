@@ -71,6 +71,7 @@ SignalPtr SignalBase::clone() {
     p->m_name = m_name;
     p->m_params = m_params;
     p->m_is_python_object = m_is_python_object;
+    p->m_keepSignals = m_keepSignals;
     p->m_kdata = m_kdata;
     // The clone recalculates lazily so the subclass runtime state (e.g. the Python subclass
     // cache) is rebuilt on the next setTO instead of keeping the stale snapshot
@@ -90,10 +91,12 @@ void SignalBase::setTO(const KData& kdata) {
     m_kdata = kdata;
     m_calculated = false;
 
-    m_buySig.clear();
-    m_sellSig.clear();
-    m_hold_long = false;
-    m_hold_short = false;
+    if (!m_keepSignals) {
+        m_buySig.clear();
+        m_sellSig.clear();
+        m_hold_long = false;
+        m_hold_short = false;
+    }
 
     HKU_IF_RETURN(kdata.empty(), void());
 
@@ -104,10 +107,12 @@ void SignalBase::setTO(const KData& kdata) {
 
 void SignalBase::reset() {
     m_kdata = Null<KData>();
-    m_buySig.clear();
-    m_sellSig.clear();
-    m_hold_long = false;
-    m_hold_short = false;
+    if (!m_keepSignals) {
+        m_buySig.clear();
+        m_sellSig.clear();
+        m_hold_long = false;
+        m_hold_short = false;
+    }
     m_cycle_start = Null<Datetime>();
     m_cycle_end = Null<Datetime>();
     m_cycle_dates.clear();
@@ -130,6 +135,8 @@ void SignalBase::startCycle(const Datetime& start, const Datetime& close) {
 }
 
 void SignalBase::setCycleDates(const DatetimeList& dates) {
+    HKU_IF_RETURN(dates == m_cycle_dates, void());
+
     DatetimeList sorted;
     sorted.reserve(dates.size());
     for (const auto& date : dates) {

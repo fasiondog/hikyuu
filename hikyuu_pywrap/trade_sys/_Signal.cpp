@@ -339,14 +339,15 @@ The custom signal generator interfaces:
     m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
     
     A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before
-    the run; it stays silent when no day is injected)");
+    the run; it stays silent when no day is injected. A day without a bar of the instrument (a
+    halt) keeps the signal but nothing can fill it, it is not shifted to the next bar)");
 
     m.def("SG_Manual", SG_Manual, R"(SG_Manual()
 
     A signal generator whose signals are added manually, for tests or the external signal import.
-    Its _calculate is empty: the preset signals are kept when it is used as a sub-signal of an
-    operator (logical or arithmetic), while assigning the trading object on it directly clears
-    them)");
+    Its _calculate is empty: the preset signals are its input and are kept both when it is used
+    directly and as a sub-signal of an operator, assigning the trading object or resetting does not
+    clear them)");
 
     m.def("SG_OneSide", SG_OneSide, py::arg("ind"), py::arg("is_buy"),
           R"(SG_OneSide(ind, is_buy)

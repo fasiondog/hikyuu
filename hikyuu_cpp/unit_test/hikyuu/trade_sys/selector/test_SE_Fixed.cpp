@@ -68,12 +68,16 @@ TEST_CASE("test_SE_Fixed") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_EQ(result.size(), 0);
 
-    /** @arg The clone operation */
+    /** @arg The clone drops the runtime cache, it must calculate again to select */
     proto_sys_list = se->getProtoSystemList();
     se->calculate(proto_sys_list, KQuery(-20));
-    SEPtr se2;
-    se2 = se->clone();
+    SEPtr se2 = se->clone();
     CHECK_NE(se2.get(), se.get());
+    CHECK_UNARY(!se2->getProtoSystemList().empty());
+    CHECK_UNARY(se2->getRealSystemList().empty());
+    CHECK_EQ(se2->getSelected(Datetime(200001010000L)).size(), 0);
+
+    se2->calculate(se2->getProtoSystemList(), KQuery(-20));
     result = se2->getSelected(Datetime(200001010000L));
     CHECK_EQ(result.size(), 3);
     CHECK_EQ(sm["sh600000"], result[0].sys->getStock());

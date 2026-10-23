@@ -71,7 +71,16 @@ void PerformanceOptimalSelector::_calculate_parallel(
     for (const auto& sys : m_pro_sys_list) {
         auto local = sys->clone();
         local->setParam<bool>("shared_ev", false);
+        // Mode C shares the parent account, the training copies must not book there
+        local->setParam<bool>("shared_tm", false);
         pro_list.emplace_back(local);
+    }
+
+    if (!m_real_sys_list.empty() && m_real_sys_list.size() != m_pro_sys_list.size()) {
+        CLS_WARN(
+          "The real system list size ({}) differs from the prototype list size ({}), the selected "
+          "systems cannot be mapped back to the running list!",
+          m_real_sys_list.size(), m_pro_sys_list.size());
     }
 
     auto sys_list = global_parallel_for_index(
@@ -82,13 +91,17 @@ void PerformanceOptimalSelector::_calculate_parallel(
           KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
           CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, train_ranges.size(), q);
 
+          auto selected_sys_list = std::make_shared<OptimalSelectedList>();
           Performance per;
+          size_t selected_index = Null<size_t>();
           SYSPtr selected_sys;
           if (pro_list.size() == 1) {
+              selected_index = 0;
               selected_sys = pro_list.back()->clone();
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
-              for (const auto& sys : pro_list) {
+              for (size_t j = 0, total = pro_list.size(); j < total; j++) {
+                  const auto& sys = pro_list[j];
                   try {
                       // Cut off all the shared parts to avoid a parallel conflict
                       auto new_sys = sys->clone();
@@ -102,6 +115,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
                                    sys->getStock().market_code());
                       if (value > max_value) {
                           max_value = value;
+                          selected_index = j;
                           selected_sys = new_sys;
                       }
                   } catch (const std::exception& e) {
@@ -112,7 +126,8 @@ void PerformanceOptimalSelector::_calculate_parallel(
               }
           } else if (1 == mode) {
               double min_value = std::numeric_limits<double>::max();
-              for (const auto& sys : pro_list) {
+              for (size_t j = 0, total = pro_list.size(); j < total; j++) {
+                  const auto& sys = pro_list[j];
                   try {
                       auto new_sys = sys->clone();
                       new_sys->run(q, true);
@@ -125,6 +140,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
                                    sys->getStock().market_code());
                       if (value < min_value) {
                           min_value = value;
+                          selected_index = j;
                           selected_sys = new_sys;
                       }
                   } catch (const std::exception& e) {
@@ -135,14 +151,23 @@ void PerformanceOptimalSelector::_calculate_parallel(
               }
           }
 
-          return selected_sys;
+          if (selected_sys) {
+              selected_sys_list->emplace_back(
+                OptimalSelectedItem{selected_index, 1.0, selected_sys});
+          }
+          return selected_sys_list;
       });
 
     size_t dates_len = dates.size();
     for (size_t i = 0, total = train_ranges.size(); i < total; i++) {
-        auto& selected_sys = sys_list[i];
-        if (selected_sys) {
-            selected_sys->reset();
+        auto& selected_sys_list = sys_list[i];
+        if (!selected_sys_list->empty()) {
+            // Run directly when no real list is given
+            for (auto& item : *selected_sys_list) {
+                if (item.trained) {
+                    item.trained->reset();
+                }
+            }
 
             size_t train_start = train_ranges[i].first;
             size_t test_start = train_ranges[i].second;
@@ -152,8 +177,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
             }
 
             for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] =
-                  std::make_shared<SystemWeightList>(1, SystemWeight(selected_sys, 1.0));
+                m_sys_dict[dates[pos]] = selected_sys_list;
             }
 
             if (test_end < dates_len) {
@@ -165,7 +189,9 @@ void PerformanceOptimalSelector::_calculate_parallel(
             }
 
             CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1,
-                        selected_sys->getStock().market_code());
+                        selected_sys_list->front().trained
+                          ? selected_sys_list->front().trained->getStock().market_code()
+                          : std::string());
         }
     }
 }

@@ -913,20 +913,27 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     // Take the current close price as the planned price
     price_t planPrice = src_today.closePrice;
 
+    // The price actually filled: the slippage result snapped to the market tick, which can differ
+    // from the plan price, so the checks and the size below must use it
+    price_t realPrice = _getRealBuyPrice(src_today, planPrice);
+    HKU_WARN_IF_RETURN(!(realPrice > 0.0), result, "[{}] {}: invalid buy price!", name(),
+                       today.datetime);
+
     // Calculate the stop-loss price
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
-    // Give up the trade when the planned price is not higher than the stop-loss price; an invalid
+    // Give up the trade when the fill price is not higher than the stop-loss price; an invalid
     // level has already been turned into 0 (no stop-loss) by _getStoplossPrice
     bool trace = getParam<bool>("trace");
-    if (planPrice <= stoploss) {
-        HKU_INFO_IF(trace, htr("[{}] buy failed, planPrice: {} <= stoploss: {}", name(), planPrice,
-                               stoploss));
+    if (realPrice <= stoploss) {
+        HKU_INFO_IF(trace,
+                    htr("[{}] buy failed, price: {} <= stoploss: {}", name(), realPrice, stoploss));
         return result;
     }
 
-    // Get the buyable quantity
-    double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
+    // Get the buyable quantity at the fill price: the cash clamp of the money manager is then
+    // exact, because the trade manager charges that same price
+    double number = _getBuyNumber(today.datetime, realPrice, realPrice - stoploss, from);
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);
     // Guard the int64 cast below: a NaN/inf or out-of-range raw number makes it undefined
@@ -942,7 +949,6 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
         return result;
     }
 
-    price_t realPrice = _getRealBuyPrice(src_today, planPrice);
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
     _autoCheckin(today.datetime, realPrice, number);
     TradeRecord record =
@@ -1002,6 +1008,14 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
         // A delayed operation, take the open price of the current moment
         price_t planPrice = src_today.openPrice;  // Take the open price of the current moment
 
+        // The price actually filled, see _buyNow: the size and the checks below must use it
+        price_t realPrice = _getRealBuyPrice(src_today, planPrice);
+        if (!(realPrice > 0.0)) {
+            HKU_WARN("[{}] {}: invalid delay buy price!", name(), today.datetime);
+            m_buyRequestList.erase(m_buyRequestList.begin());
+            continue;
+        }
+
         // Calculate the stop-loss price and the buyable quantity
         price_t stoploss = 0.0;
         double number = 0.0;
@@ -1009,20 +1023,34 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
         if (getParam<bool>("delay_use_current_price")) {
             // Calculate the stop-loss price and the buyable quantity with the current planned price
             stoploss = _getStoplossPrice(today, src_today, today.openPrice);
-            number = planPrice <= stoploss
+            number = realPrice <= stoploss
                        ? 0.0
-                       : _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, req.from);
+                       : _getBuyNumber(today.datetime, realPrice, realPrice - stoploss, req.from);
             goalPrice = _getGoalPrice(today.datetime, planPrice);
 
         } else {
             stoploss = req.stoploss;
             number = req.number;
             goalPrice = req.goal;
+
+            // The quantity was decided at the signal bar's close while the fill happens at this
+            // bar's open: when the fill price no longer fits the cash, re-size at the fill price
+            // instead of letting the trade manager reject the whole stale order
+            if (number > 0.0 && m_mm && !m_mm->getParam<bool>("auto_checkin")) {
+                int precision = m_tm->precision();
+                CostRecord cost = m_tm->getBuyCost(today.datetime, m_stock, realPrice, number);
+                price_t need = roundEx(
+                  roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
+                if (m_tm->cash(today.datetime, m_kdata.getQuery().kType()) < need) {
+                    number =
+                      _getBuyNumber(today.datetime, realPrice, realPrice - stoploss, req.from);
+                }
+            }
         }
 
-        // Drop the request when the planned buy price is not higher than the stop-loss price or
-        // when the buy quantity is 0
-        if (planPrice <= stoploss || number <= 0) {
+        // Drop the request when the fill price is not higher than the stop-loss price or when the
+        // buy quantity is 0
+        if (realPrice <= stoploss || number <= 0) {
             m_buyRequestList.erase(m_buyRequestList.begin());
             continue;
         }
@@ -1043,7 +1071,6 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        price_t realPrice = _getRealBuyPrice(src_today, planPrice);
         _autoCheckin(today.datetime, realPrice, number);
         TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
                                        goalPrice, planPrice, req.from);
@@ -1212,20 +1239,22 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
     price_t planPrice = src_today.closePrice;
     double number = 0;
 
+    // The price actually filled, which can differ from the plan price
+    price_t realPrice = _getRealSellPrice(src_today, planPrice);
+    HKU_WARN_IF_RETURN(!(realPrice > 0.0), result, "[{}] {}: invalid sell price!", name(),
+                       today.datetime);
+
     // Calculate the new stop-loss price
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
-    // When the new planned price is not higher than the new stop-loss price, the whole position is
-    // to be sold
-    number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss, from);
+    // When the fill price is not higher than the new stop-loss price, the whole position is to be
+    // sold
+    number = _getSellNumber(today.datetime, realPrice, realPrice - stoploss, from);
     if (number <= 0) {
         return result;
     }
 
     price_t goalPrice = std::isfinite(goal) ? goal : _getGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealSellPrice(src_today, planPrice);
-    HKU_WARN_IF_RETURN(!(realPrice > 0.0), result, "[{}] {}: invalid sell price!", name(),
-                       today.datetime);
     TradeRecord record =
       m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_SELL != record.business) {
@@ -1289,24 +1318,29 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
         double number = 0.0;
         price_t goalPrice = 0.0;
 
+        // The price actually filled, which can differ from the plan price
+        price_t realPrice = _getRealSellPrice(src_today, planPrice);
+        if (!(realPrice > 0.0)) {
+            HKU_WARN("[{}] {}: invalid delay sell price!", name(), today.datetime);
+            m_sellRequestList.erase(m_sellRequestList.begin());
+            continue;
+        }
+
         if (getParam<bool>("delay_use_current_price")) {
             stoploss = _getStoplossPrice(today, src_today, today.openPrice);
-            number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss, req.from);
+            number = _getSellNumber(today.datetime, realPrice, realPrice - stoploss, req.from);
             goalPrice = _getGoalPrice(today.datetime, planPrice);
         } else {
             stoploss = req.stoploss;
             number = req.number;
             goalPrice = req.goal;
+
+            // Never ask for more than the current holding: the position may have changed since
+            // the signal bar, and the trade manager rejects such a sell outright
+            number = std::min(number, m_tm->getHoldNumber(today.datetime, m_stock));
         }
 
         if (number <= 0) {
-            m_sellRequestList.erase(m_sellRequestList.begin());
-            continue;
-        }
-
-        price_t realPrice = _getRealSellPrice(src_today, planPrice);
-        if (!(realPrice > 0.0)) {
-            HKU_WARN("[{}] {}: invalid delay sell price!", name(), today.datetime);
             m_sellRequestList.erase(m_sellRequestList.begin());
             continue;
         }
@@ -1403,11 +1437,19 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     TradeRecord result;
     price_t planPrice = src_today.closePrice;  // Take the close price of the current moment
 
+    // The price actually filled, which can differ from the plan price
+    price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
+    if (!(realPrice > 0.0)) {
+        HKU_WARN("[{}] {}: invalid short cover price!", name(), today.datetime);
+        m_buyShortRequestList.clear();
+        return result;
+    }
+
     // Take the stop-loss price corresponding to the close price of the current moment
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
     // Determine the quantity
-    double number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
+    double number = _getBuyShortNumber(today.datetime, realPrice, stoploss - realPrice, from);
     if (number <= 0) {
         m_buyShortRequestList.clear();
         return result;
@@ -1425,12 +1467,6 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     }
 
     price_t goalPrice = std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
-    if (!(realPrice > 0.0)) {
-        HKU_WARN("[{}] {}: invalid short cover price!", name(), today.datetime);
-        m_buyShortRequestList.clear();
-        return result;
-    }
 
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
@@ -1494,10 +1530,19 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         price_t stoploss = 0.0;
         double number = 0.0;
         price_t goalPrice = 0.0;
+
+        // The price actually filled, which can differ from the plan price
+        price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
+        if (!(realPrice > 0.0)) {
+            HKU_WARN("[{}] {}: invalid delay short cover price!", name(), today.datetime);
+            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+            continue;
+        }
+
         if (getParam<bool>("delay_use_current_price")) {
             // Take the stop-loss price corresponding to the close price of the current moment
             stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-            number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, req.from);
+            number = _getBuyShortNumber(today.datetime, realPrice, stoploss - realPrice, req.from);
             goalPrice = _getShortGoalPrice(today.datetime, planPrice);
 
         } else {
@@ -1522,12 +1567,6 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             number = pos.number;
         }
 
-        price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
-        if (!(realPrice > 0.0)) {
-            HKU_WARN("[{}] {}: invalid delay short cover price!", name(), today.datetime);
-            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
-            continue;
-        }
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {
@@ -1620,28 +1659,35 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
 
     price_t planPrice = src_today.closePrice;
 
+    // The price actually filled, which drives the size, the risk and the check below
+    price_t realPrice = _getRealSellShortPrice(src_today, planPrice);
+    if (!(realPrice > 0.0)) {
+        HKU_WARN("[{}] {}: invalid sell short price!", name(), today.datetime);
+        m_sellShortRequestList.clear();
+        return result;
+    }
+
     // Calculate the stop-loss price
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
-    // Give up the trade when the short stop-loss is not above the planned price (the cover would
-    // trigger immediately, symmetric with the long-side planPrice <= stoploss check)
+    // Give up the trade when the short stop-loss is not above the fill price (the cover would
+    // trigger immediately, symmetric with the long-side price <= stoploss check)
     bool trace = getParam<bool>("trace");
-    if (stoploss > 0.0 && stoploss <= planPrice) {
-        HKU_INFO_IF(trace, "[{}] sell short failed, stoploss: {} <= planPrice: {}", name(),
-                    stoploss, planPrice);
+    if (stoploss > 0.0 && stoploss <= realPrice) {
+        HKU_INFO_IF(trace, "[{}] sell short failed, stoploss: {} <= price: {}", name(), stoploss,
+                    realPrice);
         m_sellShortRequestList.clear();
         return result;
     }
 
     double number =
-      _getSellShortNumber(today.datetime, planPrice, _getShortOpenRisk(stoploss, planPrice), from);
+      _getSellShortNumber(today.datetime, realPrice, _getShortOpenRisk(stoploss, realPrice), from);
     if (number <= 0) {
         m_sellShortRequestList.clear();
         return result;
     }
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealSellShortPrice(src_today, planPrice);
     TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                          goalPrice, planPrice, from);
     if (BUSINESS_SELL_SHORT != record.business) {
@@ -1703,10 +1749,19 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
         price_t stoploss = 0.0;
         double number = 0;
         price_t goalPrice = 0.0;
+
+        // The price actually filled, which drives the size and the check below
+        price_t realPrice = _getRealSellShortPrice(src_today, planPrice);
+        if (!(realPrice > 0.0)) {
+            HKU_WARN("[{}] {}: invalid delay sell short price!", name(), today.datetime);
+            m_sellShortRequestList.erase(m_sellShortRequestList.begin());
+            continue;
+        }
+
         if (getParam<bool>("delay_use_current_price")) {
             stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-            number = _getSellShortNumber(today.datetime, planPrice,
-                                         _getShortOpenRisk(stoploss, planPrice), req.from);
+            number = _getSellShortNumber(today.datetime, realPrice,
+                                         _getShortOpenRisk(stoploss, realPrice), req.from);
             goalPrice = _getShortGoalPrice(today.datetime, planPrice);
         } else {
             stoploss = req.stoploss;
@@ -1714,14 +1769,12 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
             goalPrice = req.goal;
         }
 
-        // Drop the request when the short stop-loss is not above the planned price, symmetric
-        // with the long-side planPrice <= stoploss check
-        if ((stoploss > 0.0 && stoploss <= planPrice) || number <= 0) {
+        // Drop the request when the short stop-loss is not above the fill price, symmetric with
+        // the long-side price <= stoploss check
+        if ((stoploss > 0.0 && stoploss <= realPrice) || number <= 0) {
             m_sellShortRequestList.erase(m_sellShortRequestList.begin());
             continue;
         }
-
-        price_t realPrice = _getRealSellShortPrice(src_today, planPrice);
 
         TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                              goalPrice, planPrice, req.from);
