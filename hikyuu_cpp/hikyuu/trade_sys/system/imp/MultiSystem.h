@@ -53,7 +53,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
-#include "hikyuu/utilities/log.h"
+#include "hikyuu/utilities/Log.h"
 #include "../System.h"
 #include "../../../trade_manage/crt/crtTM.h"
 #include "../../moneymanager/crt/MM_Nothing.h"
