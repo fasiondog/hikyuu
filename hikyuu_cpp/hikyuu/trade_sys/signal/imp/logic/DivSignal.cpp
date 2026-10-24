@@ -18,6 +18,8 @@ void DivSignal::_calculate(const KData& kdata) {
 
     sub_sg_calculate(m_sg1, kdata);
     sub_sg_calculate(m_sg2, kdata);
+    // A zero divisor means no signal in that direction: the leg is dropped instead of producing
+    // inf/nan
     sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy1, double sell1,
                                        double buy2, double sell2) {
         double buy_value = (buy2 != 0.0) ? buy1 / buy2 : 0.0;

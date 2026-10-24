@@ -447,6 +447,9 @@ The custom signal generator interfaces:
 
     Generate the signal of the quotient of the two signal generators
 
+    A zero divisor on a given day means no signal in that direction instead of inf/nan: the buy
+    leg is dropped when sg2 has no buy signal that day, and the sell leg likewise.
+
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 

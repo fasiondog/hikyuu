@@ -268,6 +268,7 @@ An SG supports two kinds of operations: ``+ - * /`` (``SG_Add`` / ``SG_Sub`` / `
 
 - The arithmetic operations keep the amplitude of the signals: ``sg * 2`` doubles every daily signal value, and ``sg1 + sg2`` merges the signals of the same day into one net value.
 - The logic operations keep the direction only and drop the amplitudes: a hit is written as ``1.0`` for a buy and ``-1.0`` for a sell ( ``(sg1 * 3) & sg2`` gives 1.0, not 3.0). Use the arithmetic operations to keep an amplitude. On a same-day conflict ``|`` lets the sell win.
+- Division treats a zero divisor as no signal in that direction instead of producing inf/nan: when ``sg2`` has no buy signal on a day, ``sg1 / sg2`` produces no buy that day, and the sell leg works the same way; a day whose divisors are zero on both directions fires nothing. A constant zero divisor such as ``sg / 0`` is an invalid parameter and yields an empty result.
 
 
 Custom Signal Generator
