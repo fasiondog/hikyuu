@@ -394,13 +394,14 @@ void export_Selector(py::module& m) {
           return SE_Fixed(stks, sys, weight);
       },
       py::arg("stk_list"), py::arg("sys"), py::arg("weight") = 1.0,
-      R"(SE_Fixed([stk_list, sys])
+      R"(SE_Fixed([stk_list, sys, weight])
 
     The fixed selector, i.e. always selecting the initially defined targets and their system strategy prototypes
 
     :param list stk_list: the initially defined targets
     :param System sys: the system strategy prototype
-    :param float weight: the default weight
+    :param float weight: the default weight; the value is interpreted by the downstream consumer
+        (e.g. the AllocateFunds part), not restricted to [0, 1]
     :return: the SE selector instance)");
 
     m.def("SE_Signal", py::overload_cast<>(SE_Signal));

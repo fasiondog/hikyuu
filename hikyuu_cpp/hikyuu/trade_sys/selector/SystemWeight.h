@@ -14,7 +14,8 @@
 namespace hku {
 
 /**
- * System weight, the valid range of the weight is [0.0, 1.0]
+ * System weight; the value is interpreted by the consumer (e.g. the AllocateFunds part), not
+ * restricted to [0.0, 1.0] (SE logic/value operators may legitimately produce other values)
  * @details It is used to give the corresponding weight of a system to the asset allocation
  * algorithm
  * @ingroup Selector

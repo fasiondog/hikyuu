@@ -32,12 +32,13 @@
 内建选择器
 -----------
 
-.. py:function:: SE_Fixed([stk_list, sys])
+.. py:function:: SE_Fixed([stk_list, sys, weight])
 
     固定选择器，即始终选择初始划定的标的及其系统策略原型
     
     :param list stk_list: 初始划定的标的
     :param System sys: 系统策略原型
+    :param float weight: 默认权重；权重取值由下游消费方（如资产分配组件）自行解释，不限于 [0, 1]
     :return: SE选择器实例
 
 .. py:function:: SE_Signal([stk_list, sys])

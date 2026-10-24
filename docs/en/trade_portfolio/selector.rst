@@ -38,12 +38,13 @@ For selectors based on multi-factor scoring, SE_MultiFactor2 is recommended, as 
 Built-in Selectors
 ------------------
 
-.. py:function:: SE_Fixed([stk_list, sys])
+.. py:function:: SE_Fixed([stk_list, sys, weight])
 
     The fixed selector: it always selects the initially specified instruments along with their system strategy prototypes
     
     :param list stk_list: the initially specified instruments
     :param System sys: the system strategy prototype
+    :param float weight: the default weight; the weight value is interpreted by the downstream consumer (e.g. the AllocateFunds part) and is not restricted to [0, 1]
     :return: the SE selector instance
 
 .. py:function:: SE_Signal([stk_list, sys])
