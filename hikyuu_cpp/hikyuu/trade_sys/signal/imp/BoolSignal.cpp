@@ -31,9 +31,19 @@ SignalPtr BoolSignal::_clone() {
 }
 
 void BoolSignal::_calculate(const KData& kdata) {
-    Indicator buy = ALIGN(m_bool_buy(kdata), kdata);
-    Indicator sell = ALIGN(m_bool_sell(kdata), kdata);
-    HKU_ERROR_IF_RETURN(buy.size() != sell.size(), void(), "buy.size() != sell.size()");
+    // Align only on a size mismatch: ALIGN always rebuilds the buffer
+    Indicator buy = m_bool_buy(kdata);
+    if (buy.size() != kdata.size()) {
+        buy = ALIGN(buy, kdata);
+    }
+    Indicator sell = m_bool_sell(kdata);
+    if (sell.size() != kdata.size()) {
+        sell = ALIGN(sell, kdata);
+    }
+    HKU_WARN_IF_RETURN(buy.size() != sell.size() || buy.size() != kdata.size(), void(),
+                       "Failed to align! buy.size()({}), sell.size()({}), kdata.size()({})! "
+                       "The signal calculation will be ignored.",
+                       buy.size(), sell.size(), kdata.size());
 
     size_t discard = buy.discard() > sell.discard() ? buy.discard() : sell.discard();
     size_t total = buy.size();

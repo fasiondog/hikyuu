@@ -82,11 +82,11 @@ When technical indicators are used to decide entries and exits, the rule almost 
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
                 <td>Always-buy signal generator</td>
-                <td>A special SG that keeps emitting a buy signal on every bar, usually used together with a PF</td>
+                <td>A special SG that keeps emitting a buy signal on every bar, usually used together with a MultiSystem</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF rebalance cycle buy signal generator</td>
+                <td>Rebalance cycle buy signal generator</td>
                 <td>A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run</td>
             </tr>
             <tr>
@@ -97,7 +97,7 @@ When technical indicators are used to decide entries and exits, the rule almost 
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG operation helpers</td>
-                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem<br>Add / sub / mul / div keep the signal amplitudes, and / or keep the direction only (see Signal operations below)</td>
+                <td>alternate is optional and defaults to True, the same as sg1 + sg2<br>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem<br>Add / sub / mul / div keep the signal amplitudes, and / or keep the direction only (see Signal operations below)</td>
             </tr>
         </tbody>
     </table>
@@ -236,10 +236,10 @@ Always-buy Signal Generator
 
 .. py:function:: SG_AllwaysBuy()
 
-    A special SG that keeps emitting a buy signal on every bar, usually used together with a PF.
+    A special SG that keeps emitting a buy signal on every bar, usually used together with a MultiSystem.
 
 
-PF Rebalance Cycle Buy Signal Generator
+Rebalance Cycle Buy Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()
@@ -268,6 +268,11 @@ An SG supports two kinds of operations: ``+ - * /`` (``SG_Add`` / ``SG_Sub`` / `
 
 - The arithmetic operations keep the amplitude of the signals: ``sg * 2`` doubles every daily signal value, and ``sg1 + sg2`` merges the signals of the same day into one net value.
 - The logic operations keep the direction only and drop the amplitudes: a hit is written as ``1.0`` for a buy and ``-1.0`` for a sell ( ``(sg1 * 3) & sg2`` gives 1.0, not 3.0). Use the arithmetic operations to keep an amplitude. On a same-day conflict ``|`` lets the sell win.
+- Division treats a zero divisor as no signal in that direction instead of producing inf/nan: when ``sg2`` has no buy signal on a day, ``sg1 / sg2`` produces no buy that day, and the sell leg works the same way; a day whose divisors are zero on both directions fires nothing. A constant zero divisor such as ``sg / 0`` is an invalid parameter and yields an empty result.
+- A non-finite constant is resolved at construction: ``NaN`` (the value of ``Null<double>()``,
+  meaning "no value") is treated as 0, so add / sub act as identity and mul / div yield nothing;
+  ``±Inf`` is rejected with an exception instead of producing inf signals that ``_add_signal``
+  would silently drop.
 
 
 Custom Signal Generator

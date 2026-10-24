@@ -78,6 +78,8 @@ if __name__ == "__main__":
     suite.addTest(Signal.suiteTestSGManual())
     suite.addTest(Signal.suiteTestSGPickle())
     suite.addTest(Signal.suiteTestSGConcurrentSetTO())
+    suite.addTest(Signal.suiteTestSGLogicFactoryAlternate())
+    suite.addTest(Signal.suiteTestSGValueNonFinite())
 
     suite.addTest(Stoploss.suite())
     suite.addTest(Stoploss.suiteTestCrtST())

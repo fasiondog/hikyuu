@@ -55,7 +55,7 @@
 - **同批净额**：同一批建议中同标的的反向腿先净额再执行（如开盘延迟成交买入 + 当日收盘反向卖出），不会在父账户留下“幽灵持仓”；CLEAR 只清**可归属部分**（各清除腿的数量之和，且不超过父持仓 + 同批同侧买入），不会吞掉兄弟子层的同批买入或持仓。
 - **`trade_on_close=False`**：模式 B 的配额校准腿（减持/清仓）与配额注资、以及信号建议一起**延后到次日开盘**执行（先卖出后注资），统一价格基准；换手率在开盘执行处补记。无报价腿（停牌）**保留重试**：延后校准腿与排队建议都保留到下一个有报价的开盘执行（排队建议重试批与新的调仓批次合并），不会在停牌日按陈旧价格成交。延后注资与同批延后卖出一起等待报价；连续镜像（非调仓日）的成交不计入换手率。若对应持仓已清零（如停牌期间退市强平），该死腿直接丢弃，不再阻塞注资。父侧已无可卖数量的残量直接丢弃，不阻塞后续注资。``trade_on_close=True`` 时若清算/减持的收盘遇停牌，同样回落为次日开盘的延后腿（执行端重试），不会在无报价日成交。
 - **两本账匹配**：模式 B 的“影子账本 = 父账本”仅在专用账户下成立；共享账户（C）下持仓按标的不可区分，不存在逐笔归属。
-- **清仓语义**：``sell_at_not_selected`` 只作用于本层。B 未选中时：``True`` 父子两本账同步清仓；``False`` 两本账保持运行（仅跳过本轮配额校准；**调仓日收盘不驱动该子系统**，只镜像其开盘已成交的延迟单）。选中但 L1 配额为 0 时同样按上述规则清算（受该开关控制；其中 ``adjust_running_sys=False`` 的运行中子豁免——不清算、继续运行但无预算注入）。C 出池时：``True`` 递归清空子树内部账本并丢弃排队镜像批；``False`` 保持子账本冻结（对应仍留在共享账户上的未跟踪持仓）。
+- **清仓语义**：``sell_at_not_selected`` 只作用于本层。B 未选中时：``True`` 父子两本账同步清仓；``False`` 两本账保持运行（仅跳过本轮配额校准；**调仓日收盘不驱动该子系统**，只镜像其开盘已成交的延迟单）。选中但 L1 配额为 0 时同样按上述规则清算（受该开关控制；其中 ``adjust_running_sys=False`` 的运行中子豁免——不清算、继续运行但无预算注入）。C 出池时：``True`` 递归清空子树内部账本并丢弃排队镜像批；``False`` 保持子账本冻结（对应仍留在共享账户上的未跟踪持仓），除非 ``keep_watch_force_sell=True``——此时池成员仍被每日驱动（仅盯盘、不强平，由其自身止损/止盈/卖出信号平仓，归零后自动出池）；开盘阶段该池同样被驱动以承接其延迟单，但强制清仓仍只由 ``sell_at_not_selected`` 控制。
 - **cycle 与调仓节拍**：外层预注入只覆盖**直接子系统**的自身 SG（composite 无 SG）；内层 A/B 在自身调仓日运行期声明周期日。内层按**被驱动日**计数：外层 B 未选中（``False``）或外层 C 未入选时内层不推进，因此内层 ``adjust_cycle=N`` 表示“每 N 个被驱动日”。日历型 ``adjust_mode``（week/month/quarter/year）一律按**运行期周期规则**判定（周期第 N 个自然日；``delay_to_trading_day`` 时顺延到该周期首个驱动日；每周期一次），批量 ``run`` 与 live 单 bar 同源；显式 ``set_adjust_dates`` 优先。嵌套 A 子层在自身采样日已把叶子的延迟意图折入目标，外层不会重复折叠（避免 2×）。
 - **B→B 超配额**：外层模式 B 把目标配额下发给内层模式 B，由内层按自身 AF 权重减持其叶子（预算制），两层账本与外层父账保持匹配。
 - **未入选的嵌套聚合**：不驱动、不声明周期日、不交易（预期行为）。
@@ -64,13 +64,13 @@
 - **SE 与告警**：每层有自己的 SE；模式 C 无 SE 时仅**直接** cycle SG 静默并一次性告警（嵌套聚合由内层自身模式处理）。模式 C 下 cycle SG 也**不可与 ``SE_Signal`` 组合**：SE 在 run 前快照已算好的买入信号，而周期日要到入选才声明，因此永远选不中；且模式 C 仅在入选时声明周期日，同一周期内被止损平仓不会重开。
 - **级联示例**：``C → B → A`` 表示共享账户下挂配额型子组合 B，B 内部再挂信号汇总子组合 A；A 的影子只服务 B 的采样，B 的镜像直接落共享账户，外层 C 表面化、不二次下单。
 
-各层 SE、``sell_at_not_selected``、调仓节拍与周期日声明互不继承、各自独立。
+各层 SE、``sell_at_not_selected``、``keep_watch_force_sell``、调仓节拍与周期日声明互不继承、各自独立。
 
 聚合回测还支持：
 
 - **AF L1/L2/L3 分层**（详见 :doc:`../trade_portfolio/allocate_funds`）：L1 系统级分配（模式 A 名义权重 / 模式 B 真实额度，例：等权 1/N、固定权重、按 SE 得分加权）、L2 行为级换算（A 读子当前意图态、按「权重 × 净敞口比重 × 父净值」合成每标的**带符号净目标**并按差额再平衡，多空净额相互抵消 / B 透传）、L3 组合风控（集中度上限 ``max_single_position``，≤0 不限制；默认 1.0 即单标的不超过总资产；模式 B/C 跳过）。
 - **调仓周期**（``set_adjust_cycle``）：默认每个收盘日都再平衡；设置大于 1 的天数后仅在周期日调仓。周期模式（week/month/quarter/year）下该值是"周期内第 n 个日历日"（周自周一起算，故 1~5 才可能落在交易日内）：``0`` 在 ``readyForRun`` 时告警并按 1 处理（负值在设置时抛异常）；永远无法落在该周期任一被驱动日的值（周 > 5 / 月 > 31 / 季度 > 92 / 年 > 366）只告警、**不做钳制**，此时该模式不会触发调仓。目标日按**当前周期的首日**计算，非交易日延后也不会跨入下一个周期，因此靠近周期末尾的值（如 31 日的月份、季末、年末）可能整周期不调仓。
-- **参数别名**：``adjust_cycle``（int，默认 1）、``trade_on_close``（bool，默认 True）、``sell_at_not_selected``（bool，默认 False）同时以参数形式暴露，``set_param`` 与对应 setter 等价（完全非法值在设置时抛异常，如 ``adjust_cycle < 0``、非法 ``adjust_mode`` / ``axis_mode``；``adjust_cycle == 0`` 归一为 1（负值在设置时抛异常）、``adjust_mode`` 大小写归一、周期日缓存清理与越界告警均在 ``readyForRun`` 时处理）。
+- **参数别名**：``adjust_cycle``（int，默认 1）、``trade_on_close``（bool，默认 True）、``sell_at_not_selected``（bool，默认 False）、``keep_watch_force_sell``（bool，默认 False）同时以参数形式暴露，``set_param`` 与对应 setter 等价（完全非法值在设置时抛异常，如 ``adjust_cycle < 0``、非法 ``adjust_mode`` / ``axis_mode``；``adjust_cycle == 0`` 归一为 1（负值在设置时抛异常）、``adjust_mode`` 大小写归一、周期日缓存清理与越界告警均在 ``readyForRun`` 时处理）。
 - **交易对象选择（SE）**（``set_se``）：可选设置，调仓日仅采样选中子系统；模式 B/C 中未选中者可强制清仓/回收额度（``set_sell_at_not_selected``），模式 A 中影子账户恒运行，未选中的标的从父目标中消失而被平仓（与 ``sell_at_not_selected`` 无关）。
 - **换手率**（``get_adjust_turnover``）：记录各调仓日的成交金额与调仓前总资产之比。
 - **退市/停牌**：父在开盘阶段统一强制卖出已退市标的持仓（模式 C 的共享账户也由父层执行，子层不重复卖出）；停牌日子系统自动跳过。收盘清算/减持遇停牌的腿回落为次日开盘的延后腿（任意 `trade_on_close` 模式），持仓保持不变直至有报价。
@@ -85,8 +85,9 @@ MultiSystem 公共参数：
     * **delay_to_trading_day=True** *(bool)* : 调仓日为非交易日时，是否顺延到当前周期内的首个交易日（仅 week/month/quarter/year 模式生效）
     * **trade_on_close=True** *(bool)* : 调仓指令是否在收盘阶段执行；False 时整批延后到次日开盘（按开盘价重估、先卖后买、停牌腿保留重试）
     * **sell_at_not_selected=False** *(bool)* : 模式 B/C 下是否对未选中（或 L1 配额为 0）的子系统强制清仓并回收其账户
+    * **keep_watch_force_sell=False** *(bool)* : 模式 C 下 ``sell_at_not_selected=False`` 时，是否继续每日驱动已出池但仍持仓的子系统（仅盯盘、不强平，凭其自身止损/止盈/卖出信号平仓，归零后自动出池）。调仓日收盘、非调仓日收盘与开盘阶段均会驱动（开盘仅承接其延迟单）；强制清仓仍只由 ``sell_at_not_selected`` 控制。其余模式无效果
 
-    运行期开关（adjust_cycle / adjust_mode / delay_to_trading_day / trade_on_close / sell_at_not_selected）在 readyForRun 时快照生效（批量 run 每次运行刷新；直接调用 runMoment* 需先 readyForRun）。:class:`System` 的单证券交易参数（buy_delay / sell_delay / delay_use_current_price / max_delay_count / tp_* / ignore_sell_sg 等）属于各子系统，聚合父层不使用；父层自身的 trace、shared_*、support_borrow_* 仍然生效。模式 C 例外——父层按 trade_on_close 向子系统下发 buy_delay / sell_delay。
+    运行期开关（adjust_cycle / adjust_mode / delay_to_trading_day / trade_on_close / sell_at_not_selected / keep_watch_force_sell）在 readyForRun 时快照生效（批量 run 每次运行刷新；直接调用 runMoment* 需先 readyForRun）。:class:`System` 的单证券交易参数（buy_delay / sell_delay / delay_use_current_price / max_delay_count / tp_* / ignore_sell_sg 等）属于各子系统，聚合父层不使用；父层自身的 trace、shared_*、support_borrow_* 仍然生效。模式 C 例外——父层按 trade_on_close 向子系统下发 buy_delay / sell_delay。
 
 System 公共参数：
 

@@ -82,11 +82,11 @@
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
                 <td>持续买入信号指示器</td>
-                <td>一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用</td>
+                <td>一个特殊的SG，持续每天发出买入信号，通常配合 MultiSystem 使用</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF调仓周期买入信号指示器</td>
+                <td>调仓周期买入信号指示器</td>
                 <td>一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号</td>
             </tr>
             <tr>
@@ -97,7 +97,7 @@
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG运算辅助</td>
-                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题<br>加减乘除保留信号数值，与/或只保留方向（见下文信号运算）</td>
+                <td>alternate 为可选参数，省略即 True，与 sg1 + sg2 等价<br>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题<br>加减乘除保留信号数值，与/或只保留方向（见下文信号运算）</td>
             </tr>        
         </tbody>
     </table>
@@ -236,10 +236,10 @@
 
 .. py:function:: SG_AllwaysBuy()
     
-    一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用
+    一个特殊的SG，持续每天发出买入信号，通常配合 MultiSystem 使用
 
 
-PF调仓周期买入信号指示器
+调仓周期买入信号指示器
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()
@@ -267,6 +267,8 @@ SG 支持 ``+ - * /``（``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``）和 
 
 - 算术运算保留信号的数值幅度：``sg * 2`` 使每日信号值翻倍，``sg1 + sg2`` 同日按净额合并。
 - 逻辑运算只保留方向，幅度被丢弃：命中时买入信号恒为 ``1.0``、卖出信号恒为 ``-1.0``（如 ``(sg1 * 3) & sg2`` 得 1.0 而不是 3.0）；需保留幅度请用算术运算。``|`` 在同一买卖冲突日卖出优先。
+- 除法的分母为 0 时按“无该方向信号”处理，不产生 inf/nan：``sg1 / sg2`` 中 ``sg2`` 当日无买入信号则该日没有买入，卖出方向同理，两个方向的分母都为 0 的日子不产生任何信号；``sg / 0`` 这类常量除数为 0 视为无效参数，整个结果为空。
+- 非有限常量在构造时即被处理：``NaN``（即 ``Null<double>()``，表示“无值”）按 0 处理，加减成为恒等运算、乘除结果为空；``±Inf`` 直接抛出异常，不会产生被 ``_add_signal`` 静默丢弃的 inf 信号。
 
 
 自定义信号指示器

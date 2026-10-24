@@ -29,11 +29,11 @@ public:
     }
 
     void _calculate(const KData& kdata) override {
-        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, kdata);
+        PYBIND11_OVERRIDE_PURE(void, SignalBase, _calculate, kdata);
     }
 
     void _reset() override {
-        PYBIND11_OVERLOAD(void, SignalBase, _reset, );
+        PYBIND11_OVERRIDE(void, SignalBase, _reset, );
     }
 };
 
@@ -334,7 +334,8 @@ The custom signal generator interfaces:
 
     m.def("SG_AllwaysBuy", SG_AllwaysBuy, R"(SG_AllwaysBuy()
     
-    A special SG that issues the buy signal every day continuously, usually used together with the PF)");
+    A special SG that issues the buy signal every day continuously, usually used together
+    with a MultiSystem)");
 
     m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
     
@@ -378,10 +379,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Add(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Add", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Add),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Add(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Add(sg1, sg2, alternate=True)
 
     Generate the signal of the sum of the two indicators
 
@@ -399,10 +400,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Sub(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Sub", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Sub),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Sub(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Sub(sg1, sg2, alternate=True)
 
     Generate the signal of the difference of the two indicators
 
@@ -420,10 +421,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Mul(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Mul", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Mul),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Mul(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Mul(sg1, sg2, alternate=True)
 
     Generate the signal of the product of the two signal generators
 
@@ -440,12 +441,15 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Div(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Div", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Div),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Div(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Div(sg1, sg2, alternate=True)
 
     Generate the signal of the quotient of the two signal generators
+
+    A zero divisor on a given day means no signal in that direction instead of inf/nan: the buy
+    leg is dropped when sg2 has no buy signal that day, and the sell leg likewise.
 
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
@@ -460,10 +464,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_And(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_And", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_And),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_And(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_And(sg1, sg2, alternate=True)
 
     Generate the signal of the AND of the two indicators
 
@@ -483,10 +487,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Or(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Or", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Or),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Or(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Or(sg1, sg2, alternate=True)
 
     Generate the signal of the logical OR of the two signal generators
 

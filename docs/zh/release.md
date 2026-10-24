@@ -55,6 +55,24 @@
 （周 > 5 / 月 > 31 / 季 > 92 / 年 > 366）只告警、不钳制，此时该模式不再触发调仓。
 此前 `PF_Simple(tm, se, af, 0, "month")` 会静默退化为“每根 K 线都调仓”。
 
+**⚠️ 行为变更：模式 B 未设置 SE 时视为全部选中**
+
+`MultiSystem` 模式 B 此前在未设置 SE（`se=None`）时跳过配额校准：子账户从零现金起步且再无注资，
+整个回测一笔交易都不会产生（仅工厂构造期一句告警）。现与模式 A/C 对齐——无 SE 时全部子系统
+视同选中，照常分配额度并交易；嵌套的模式 B（FOF/MOM）无 SE 时也可接受外层下发的额度。
+注意区分：SE **存在**但调仓日选中为空是「全不选」，仍由 `sell_at_not_selected` 决定是否清仓。
+详见 `trade_sys/system` 的「模式 B 的 SE 约定」与 `trade_portfolio/portfolio`。        
+
+**新增：模式 C 出池持仓盯盘开关 `keep_watch_force_sell`（默认 `False`）**
+
+模式 C 默认 `sell_at_not_selected=False` 时，被 SE 剔除但仍持仓的子系统只在出池当日补驱动一次，
+此后不再被驱动（止损/止盈/卖出信号全部失效，持仓冻结到人工干预）。新增 `MultiSystem` 参数
+`keep_watch_force_sell`（默认 `False`）：开启后出池仍持仓者继续被驱动（仅盯盘、不强平，由其自身
+止损/止盈/卖出信号平仓，归零后自动出池），调仓日与非调仓日收盘、开盘阶段均生效（开盘仅承接其延迟单）；强制清仓仍
+只由 `sell_at_not_selected` 控制。`PF_WithoutAF` / `PF_ModeC` 在末尾追加形参
+`keep_watch_force_sell=False`（既有位置传参不受影响），Python 侧另有 `set_keep_watch_force_sell`。
+默认值保持 `False`，既有回测结果不变。        
+
 **⚠️ 破坏性变更：`AF_FixedWeightList` 空权重列表改为抛异常**
 
 `AF_FixedWeightList([])` 不再静默降级为 `AF_EqualWeight` 实例，而是与全零/非有限权重一致，

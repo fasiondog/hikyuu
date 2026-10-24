@@ -6,6 +6,8 @@
  */
 
 #include "../../test_config.h"
+#include <cmath>
+#include <limits>
 #include "hikyuu/trade_sys/signal/crt/SG_Logic.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Manual.h"
 
@@ -458,6 +460,45 @@ TEST_CASE("test_SG_Div") {
     expect[Datetime(20111115)] = 0.0;
     expect[Datetime(20111116)] = -3.0;
     check_result(ret, expect);
+
+    /** @arg A zero divisor drops that direction instead of producing inf/nan */
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
+    sg1->setParam<bool>("alternate", false);
+    sg2->setParam<bool>("alternate", false);
+    sg1->_addBuySignal(Datetime(20111110), 2.0);
+    sg1->_addSellSignal(Datetime(20111115), -6.0);
+    sg2->_addBuySignal(Datetime(20111110), 4.0);  // sg2 has no sell leg at all
+
+    ret = sg1 / sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    expect[Datetime(20111110)] = 0.5;
+    check_result(ret, expect);
+    CHECK_UNARY(std::isfinite(ret->getValue(Datetime(20111115))));
+    CHECK_EQ(ret->getValue(Datetime(20111115)), 0.0);
+    CHECK_UNARY(!ret->shouldSell(Datetime(20111115)));
+
+    /** @arg A zero divisor on both directions of the same day fires no signal */
+    sg1 = SG_Manual();
+    sg2 = SG_Manual();
+    sg1->setParam<bool>("alternate", false);
+    sg2->setParam<bool>("alternate", false);
+    sg1->_addBuySignal(Datetime(20111114), 3.0);
+    sg1->_addSellSignal(Datetime(20111116), -3.0);
+    sg2->_addBuySignal(Datetime(20111116), 2.0);
+    sg2->_addSellSignal(Datetime(20111114), -2.0);
+
+    ret = sg1 / sg2;
+    ret->setParam<bool>("alternate", false);
+    ret->setTO(k);
+    reset_expect(expect);
+    check_result(ret, expect);
+    CHECK_UNARY(!ret->shouldBuy(Datetime(20111114)));
+    CHECK_UNARY(!ret->shouldSell(Datetime(20111114)));
+    CHECK_UNARY(!ret->shouldBuy(Datetime(20111116)));
+    CHECK_UNARY(!ret->shouldSell(Datetime(20111116)));
 }
 
 /** @par Test points */
@@ -492,6 +533,7 @@ TEST_CASE("test_SG_AddValue") {
     expect[Datetime(20111115)] = -1.0;
     check_result(ret, expect);
 
+    /** @arg A NaN constant (Null<double>()) is treated as 0 and acts as an identity */
     ret = sg + Null<double>();
     ret->setTO(k);
     reset_expect(expect);
@@ -527,6 +569,10 @@ TEST_CASE("test_SG_AddValue") {
     expect[Datetime(20111110)] = 2.0;
     expect[Datetime(20111115)] = -2.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg + std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() + sg);
 }
 
 /** @par Test points */
@@ -598,6 +644,10 @@ TEST_CASE("test_SG_MulValue") {
     expect[Datetime(20111110)] = 2.0;
     expect[Datetime(20111115)] = -2.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg * std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() * sg);
 }
 
 /** @par Test points */
@@ -721,6 +771,10 @@ TEST_CASE("test_SG_SubValue") {
     expect[Datetime(20111110)] = -4.0;
     expect[Datetime(20111115)] = 1.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg - std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() - sg);
 }
 
 /** @par Test points */
@@ -792,6 +846,10 @@ TEST_CASE("test_SG_DivValue") {
     expect[Datetime(20111110)] = 2.0;
     expect[Datetime(20111115)] = -2.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg / std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() / sg);
 }
 
 /** @par Test points */

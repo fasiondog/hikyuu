@@ -53,6 +53,29 @@ period modes); in the period modes (week/month/quarter/year) a value that can ne
 triggers a rebalancing. Previously `PF_Simple(tm, se, af, 0, "month")` silently degraded to
 "rebalance on every bar".
 
+**⚠️ Behavior change: mode B treats every sub-system as selected when no SE is set**
+
+Previously a mode B `MultiSystem` without an SE (`se=None`) skipped the quota calibration: the sub-accounts
+started from zero cash and were never funded again, so the whole backtest produced no trade at all (only
+a single warning at factory construction). It is now aligned with the modes A/C -- without an SE every
+sub-system is treated as selected and gets its quota as usual; a nested mode B (FOF/MOM) without an SE
+also accepts the quota delegated by the outer layer. Note the difference: an SE **present** but selecting
+nobody on the rebalancing day means "nothing selected", and `sell_at_not_selected` still decides whether
+those are cleared. See "the SE convention of mode B" in `trade_sys/system` and `trade_portfolio/portfolio`.
+
+**New: the mode C force-sell pool watch switch `keep_watch_force_sell` (default `False`)**
+
+With the mode C default `sell_at_not_selected=False`, a sub-system that the SE stops admitting while it
+still holds is driven one last time and then never again (its stop-loss / profit goal / sell signals all
+stop working and the position stays frozen until it is handled manually). The new `MultiSystem` parameter
+`keep_watch_force_sell` (default `False`) keeps driving those removed holdings: watch-only, nothing is
+force-sold -- their own stop-loss / profit goal / sell signal closes them and they leave the pool once
+flat. It applies to the rebalancing close, the non-rebalancing close and the open (the open only carries
+their delayed legs), while the forced liquidation is still owned by `sell_at_not_selected` alone. `PF_WithoutAF` / `PF_ModeC` take
+`keep_watch_force_sell=False` as a trailing parameter (existing positional calls are unaffected), and
+Python exposes `set_keep_watch_force_sell` as well. The default stays `False`, so existing backtests keep
+their results.
+
 **⚠️ Breaking change: `AF_FixedWeightList` rejects an empty weight list**
 
 `AF_FixedWeightList([])` no longer degrades silently to an `AF_EqualWeight` instance: like an all-zero or non-finite list it throws at both the factory and `set_param("weights", [])` (an empty list cannot price anything). A length that does not match the number of sub-systems still falls back to the equal weight.

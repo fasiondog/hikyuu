@@ -17,7 +17,7 @@ DivValueSignal::DivValueSignal(double value, const SignalPtr& sg)
 : OperatorValueSignal("SG_DivValue", sg, value, 1) {}
 
 void DivValueSignal::_calculate(const KData& kdata) {
-    HKU_IF_RETURN(!m_sg || m_value == 0.0 || std::isnan(m_value), void());
+    HKU_IF_RETURN(!m_sg || m_value == 0.0, void());
 
     auto const* ks = kdata.data();
     size_t total = kdata.size();

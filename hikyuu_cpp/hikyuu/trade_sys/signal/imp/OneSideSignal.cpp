@@ -43,7 +43,13 @@ SignalPtr OneSideSignal::_clone() {
 
 void OneSideSignal::_calculate(const KData& kdata) {
     Indicator ind = m_ind(kdata);
-    HKU_IF_RETURN(ind.empty() || ind.size() != kdata.size(), void());
+    if (ind.size() != kdata.size()) {
+        ind = ALIGN(ind, kdata);
+        HKU_WARN_IF_RETURN(ind.size() != kdata.size(), void(),
+                           "Failed to align ind.size()({}) to kdata.size()({})! The signal "
+                           "calculation will be ignored.",
+                           ind.size(), kdata.size());
+    }
 
     bool is_buy = getParam<bool>("is_buy");
     const auto* src = ind.data();
