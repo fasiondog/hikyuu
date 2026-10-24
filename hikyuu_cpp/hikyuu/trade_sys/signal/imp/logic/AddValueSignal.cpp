@@ -16,26 +16,23 @@ namespace hku {
 void AddValueSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
-
     sub_sg_calculate(kdata);
     if (m_value == 0.0) {
-        for (size_t i = 0; i < total; ++i) {
-            _addSignal(ks[i].datetime, m_sg->getValue(ks[i].datetime));
-        }
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+            _addSignal(datetime, buy + sell);
+        });
     } else {
-        for (size_t i = 0; i < total; ++i) {
-            double buy_value = m_sg->getBuyValue(ks[i].datetime);
-            if (buy_value > 0.0) {
-                buy_value += m_value;
+        // buy is recorded iff positive and sell iff negative, so the constant only shifts the
+        // existing directions and the days without any entry stay silent, as in the per-bar loop
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+            if (buy > 0.0) {
+                buy += m_value;
             }
-            double sell_value = m_sg->getSellValue(ks[i].datetime);
-            if (sell_value < 0.0) {
-                sell_value -= m_value;
+            if (sell < 0.0) {
+                sell -= m_value;
             }
-            _addSignal(ks[i].datetime, buy_value + sell_value);
-        }
+            _addSignal(datetime, buy + sell);
+        });
     }
 }
 

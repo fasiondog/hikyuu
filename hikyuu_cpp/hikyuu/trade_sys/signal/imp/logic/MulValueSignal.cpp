@@ -16,13 +16,10 @@ namespace hku {
 void MulValueSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg || m_value == 0.0, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
-
     sub_sg_calculate(kdata);
-    for (size_t i = 0; i < total; ++i) {
-        _addSignal(ks[i].datetime, m_sg->getValue(ks[i].datetime) * m_value);
-    }
+    sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+        _addSignal(datetime, (buy + sell) * m_value);
+    });
 }
 
 HKU_API SignalPtr operator*(const SignalPtr& sg, double value) {

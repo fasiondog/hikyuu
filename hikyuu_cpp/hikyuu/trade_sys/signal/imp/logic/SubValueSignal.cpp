@@ -19,47 +19,34 @@ SubValueSignal::SubValueSignal(double value, const SignalPtr& sg)
 void SubValueSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
-
     sub_sg_calculate(kdata);
     if (m_value == 0.0) {
-        if (m_mode == 0) {
-            for (size_t i = 0; i < total; ++i) {
-                _addSignal(ks[i].datetime, m_sg->getValue(ks[i].datetime));
+        // mode 0: sg - 0 keeps the values, mode 1: 0 - sg negates them
+        double sign = (m_mode == 0) ? 1.0 : -1.0;
+        sub_merged_calculate(kdata,
+                             [this, sign](const Datetime& datetime, double buy, double sell) {
+                                 _addSignal(datetime, sign * (buy + sell));
+                             });
+    } else if (m_mode == 0) {
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+            if (buy > 0.0) {
+                buy -= m_value;
             }
-        } else {
-            for (size_t i = 0; i < total; ++i) {
-                _addSignal(ks[i].datetime, 0.0 - (m_sg->getValue(ks[i].datetime)));
+            if (sell < 0.0) {
+                sell -= m_value;
             }
-        }
-
+            _addSignal(datetime, buy + sell);
+        });
     } else {
-        if (m_mode == 0) {
-            for (size_t i = 0; i < total; ++i) {
-                double buy_value = m_sg->getBuyValue(ks[i].datetime);
-                if (buy_value > 0.0) {
-                    buy_value -= m_value;
-                }
-                double sell_value = m_sg->getSellValue(ks[i].datetime);
-                if (sell_value < 0.0) {
-                    sell_value -= m_value;
-                }
-                _addSignal(ks[i].datetime, buy_value + sell_value);
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+            if (buy > 0.0) {
+                buy = m_value - buy;
             }
-        } else {
-            for (size_t i = 0; i < total; ++i) {
-                double buy_value = m_sg->getBuyValue(ks[i].datetime);
-                if (buy_value > 0.0) {
-                    buy_value = m_value - buy_value;
-                }
-                double sell_value = m_sg->getSellValue(ks[i].datetime);
-                if (sell_value < 0.0) {
-                    sell_value = m_value - sell_value;
-                }
-                _addSignal(ks[i].datetime, buy_value + sell_value);
+            if (sell < 0.0) {
+                sell = m_value - sell;
             }
-        }
+            _addSignal(datetime, buy + sell);
+        });
     }
 }
 

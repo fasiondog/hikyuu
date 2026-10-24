@@ -19,21 +19,18 @@ DivValueSignal::DivValueSignal(double value, const SignalPtr& sg)
 void DivValueSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg || m_value == 0.0, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
-
     sub_sg_calculate(kdata);
     if (m_mode == 0) {
-        for (size_t i = 0; i < total; ++i) {
-            _addSignal(ks[i].datetime, m_sg->getValue(ks[i].datetime) / m_value);
-        }
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+            _addSignal(datetime, (buy + sell) / m_value);
+        });
     } else {
-        for (size_t i = 0; i < total; ++i) {
-            double sg_value = m_sg->getValue(ks[i].datetime);
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy, double sell) {
+            double sg_value = buy + sell;
             if (sg_value != 0.0) {
-                _addSignal(ks[i].datetime, m_value / sg_value);
+                _addSignal(datetime, m_value / sg_value);
             }
-        }
+        });
     }
 }
 
