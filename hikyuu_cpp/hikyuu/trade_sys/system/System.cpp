@@ -1261,11 +1261,11 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
         return result;  // The sell operation failed
     }
 
-    // The last take-profit price is initialized to 0 when there is no position
+    // The take-profit ratchet is reset to 0 only when the book is flat: a partial
+    // close keeps the high-water mark, so the protection level of the remaining
+    // position never drops below it (tp_monotonic)
     if (!m_tm->have(m_stock)) {
         m_lastTakeProfit = 0.0;
-    } else {
-        m_lastTakeProfit = src_today.closePrice;
     }
 
     m_trade_list.push_back(record);
@@ -1351,11 +1351,10 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
             continue;  // The sell operation failed
         }
 
-        // The last take-profit price is initialized to 0 when there is no position
+        // The take-profit ratchet is reset to 0 only when the book is flat: a partial
+        // close keeps the high-water mark (tp_monotonic)
         if (!m_tm->have(m_stock)) {
             m_lastTakeProfit = 0.0;
-        } else {
-            m_lastTakeProfit = src_today.openPrice;
         }
 
         m_trade_list.push_back(record);
@@ -1449,7 +1448,11 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
     // Determine the quantity
-    double number = _getBuyShortNumber(today.datetime, realPrice, stoploss - realPrice, from);
+    // The cover risk is the distance up to the short stop; without a stop-loss the full
+    // price is taken as the worst-case risk (a negative risk would be read by the money
+    // manager as a breached stop and cover the whole position at once)
+    double number =
+      _getBuyShortNumber(today.datetime, realPrice, _getShortOpenRisk(stoploss, realPrice), from);
     if (number <= 0) {
         m_buyShortRequestList.clear();
         return result;
@@ -1475,11 +1478,11 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
         return result;
     }
 
-    // The last short take-profit price is initialized to 0 when there is no short position
+    // The short take-profit ratchet is reset to 0 only when the short book is flat: a
+    // partial cover keeps the low-water mark, so the protection level of the remaining
+    // short never rises above it (tp_monotonic)
     if (!m_tm->haveShort(m_stock)) {
         m_lastShortTakeProfit = 0.0;
-    } else {
-        m_lastShortTakeProfit = src_today.closePrice;
     }
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
@@ -1542,7 +1545,8 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         if (getParam<bool>("delay_use_current_price")) {
             // Take the stop-loss price corresponding to the close price of the current moment
             stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-            number = _getBuyShortNumber(today.datetime, realPrice, stoploss - realPrice, req.from);
+            number = _getBuyShortNumber(today.datetime, realPrice,
+                                        _getShortOpenRisk(stoploss, realPrice), req.from);
             goalPrice = _getShortGoalPrice(today.datetime, planPrice);
 
         } else {
@@ -1574,11 +1578,10 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             continue;
         }
 
-        // The last short take-profit price is initialized to 0 when there is no short position
+        // The short take-profit ratchet is reset to 0 only when the short book is flat:
+        // a partial cover keeps the low-water mark (tp_monotonic)
         if (!m_tm->haveShort(m_stock)) {
             m_lastShortTakeProfit = 0.0;
-        } else {
-            m_lastShortTakeProfit = src_today.openPrice;
         }
         m_trade_list.push_back(record);
         _buyNotifyAll(record);
@@ -1601,7 +1604,7 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
     req.goal =
       std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, src_today.closePrice);
     req.number = _getBuyShortNumber(today.datetime, src_today.closePrice,
-                                    req.stoploss - src_today.closePrice, from);
+                                    _getShortOpenRisk(req.stoploss, src_today.closePrice), from);
     m_buyShortRequestList.push_back(req);
 }
 

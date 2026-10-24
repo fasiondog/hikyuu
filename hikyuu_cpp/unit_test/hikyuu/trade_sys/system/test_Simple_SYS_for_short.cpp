@@ -174,13 +174,14 @@ public:
     }
 };
 
-// A take-profit whose short-side price is scripted per date; unlisted dates return 30.0
+// A take-profit whose short-side price is scripted per date; unlisted dates return the default
 class Iss029ScriptedTP : public StoplossBase {
 public:
-    Iss029ScriptedTP() : StoplossBase("ISS029_ScriptedTP") {}
+    explicit Iss029ScriptedTP(price_t defaultPrice = 30.0)
+    : StoplossBase("ISS029_ScriptedTP"), m_defaultPrice(defaultPrice) {}
 
     virtual StoplossPtr _clone() override {
-        return make_shared<Iss029ScriptedTP>();
+        return make_shared<Iss029ScriptedTP>(m_defaultPrice);
     }
 
     virtual price_t _getPrice(const Datetime&, price_t) override {
@@ -189,7 +190,7 @@ public:
 
     virtual price_t _getShortPrice(const Datetime& datetime, price_t) override {
         auto iter = m_script.find(datetime);
-        return iter != m_script.end() ? iter->second : 30.0;
+        return iter != m_script.end() ? iter->second : m_defaultPrice;
     }
 
     void addScript(const Datetime& datetime, price_t price) {
@@ -197,13 +198,56 @@ public:
     }
 
 private:
+    price_t m_defaultPrice;
     std::map<Datetime, price_t> m_script;
+};
+
+// A money manager opening 200 shares short once and covering 100 per exit, so a TP cover is partial
+class TpCoverPartialMM : public MoneyManagerBase {
+public:
+    TpCoverPartialMM() : MoneyManagerBase("TP_COVER_PARTIAL_MM") {}
+
+    virtual MoneyManagerPtr _clone() override {
+        return make_shared<TpCoverPartialMM>();
+    }
+
+    // The pure-virtual long-side hook is never reached: the system only shorts
+    virtual double _getBuyNumber(const Datetime&, const Stock&, price_t, price_t,
+                                 SystemPart) override {
+        return 0.0;
+    }
+
+    virtual double _getSellShortNumber(const Datetime&, const Stock&, price_t, price_t,
+                                       SystemPart) override {
+        return 200.0;
+    }
+
+    virtual double _getBuyShortNumber(const Datetime&, const Stock&, price_t, price_t,
+                                      SystemPart) override {
+        return 100.0;
+    }
 };
 
 SignalPtr makeShortSG() {
     SignalPtr sg = make_shared<Iss029SG>();
     sg->setParam<bool>("support_borrow_stock", true);
     return sg;
+}
+
+// The probe system with the short-side parts set up for the partial cover cases
+std::shared_ptr<RatchetProbeSYS> makeShortRatchetProbeSys(const KData& k, const StoplossPtr& tp,
+                                                          bool buyDelay) {
+    auto sys = std::make_shared<RatchetProbeSYS>();
+    sys->setParam<bool>("buy_delay", buyDelay);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(makeShortSG());
+    sys->setMM(make_shared<TpCoverPartialMM>());
+    sys->setTP(tp);
+    sys->setTO(k);
+    sys->readyForRun();
+    return sys;
 }
 
 KData getQueryData(const Stock& stk) {
@@ -244,6 +288,17 @@ const TradeRecord* findFirstTrade(const TradeRecordList& trs, BUSINESS business)
     auto iter = std::find_if(trs.begin(), trs.end(),
                              [&](const TradeRecord& tr) { return tr.business == business; });
     return iter == trs.end() ? nullptr : &(*iter);
+}
+
+// The short covers of the trade list, ignoring the borrow / return stock records
+std::vector<const TradeRecord*> shortCovers(const TradeRecordList& trs) {
+    std::vector<const TradeRecord*> covers;
+    for (const auto& tr : trs) {
+        if (tr.business == BUSINESS_BUY_SHORT) {
+            covers.push_back(&tr);
+        }
+    }
+    return covers;
 }
 
 // Mirror System::fixupSlippagePrice: round to the market price precision, then clamp into the bar
@@ -847,6 +902,146 @@ TEST_CASE("test_SYS_Simple_short_for_force_cover_slippage") {
     CHECK(force_tr.realPrice >= rec.closePrice);
     CHECK(force_tr.realPrice == doctest::Approx(expectSlipped(rec.closePrice, 1.02, rec, stock)));
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stock));
+}
+
+//-----------------------------------------------------------------------------
+// The short take-profit ratchet on a partial cover: a partial cover keeps the
+// low-water mark; only a flat short book resets the ratchet to 0
+//-----------------------------------------------------------------------------
+
+/** @par Check points (the short take-profit ratchet on a partial cover):
+ *  the first partial cover keeps the ratchet at its level instead of resetting it to the fill, so
+ *  a later mild fall above that level still covers the second tranche */
+TEST_CASE("test_SYS_Simple_short_tp_partial_cover_keeps_ratchet") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k = getQueryData(stock);
+    REQUIRE(k.size() > 10);
+    size_t open_pos = k.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    // t1: the first tradable fall under the open close; the level l1 = close[t1] * 0.94 covers
+    // there and lowers the ratchet to l1. t2 (> t1): a mild further fall, close[t1] * 0.96 <
+    // close[t2] <= close[t1] * 0.98; the level l2 = close[t1] * 0.999 sits between the t1 fill
+    // and the ratchet l1, so with the kept ratchet the fall covers the second tranche, while a
+    // reset-to-fill ratchet (min(l2, fill) = l2) stays silent. Both outcomes keep a margin of
+    // about 3% to the level that decides them
+    size_t t1 = 0;
+    size_t t2 = 0;
+    for (size_t i = open_pos + 1; i + 1 < k.size() && t2 == 0; ++i) {
+        const KRecord& r1 = k[i];
+        if (r1.closePrice >= k[open_pos].closePrice || r1.highPrice == r1.lowPrice ||
+            r1.transAmount == 0.0) {
+            continue;
+        }
+        for (size_t j = i + 1; j < k.size(); ++j) {
+            const KRecord& r2 = k[j];
+            if (r2.highPrice == r2.lowPrice || r2.transAmount == 0.0) {
+                continue;
+            }
+            if (r2.closePrice < r1.closePrice * 0.98 && r2.closePrice > r1.closePrice * 0.96) {
+                t1 = i;
+                t2 = j;
+                break;
+            }
+        }
+    }
+    REQUIRE_UNARY(t2 != 0);
+
+    const price_t l1 = k[t1].closePrice * 0.94;
+    auto tp = make_shared<Iss029ScriptedTP>(0.0);
+    tp->addScript(k[t1].datetime, l1);
+    tp->addScript(k[t2].datetime, k[t1].closePrice * 0.999);
+
+    auto sys = makeShortRatchetProbeSys(k, tp, false);
+    for (size_t i = 0; i <= t1; ++i) {
+        sys->runMoment(k[i].datetime);
+    }
+
+    // The borrow records share this list, so the trades are filtered by business type
+    TradeRecordList tr_list = sys->getTM()->getTradeList();
+    const TradeRecord* open_tr = findFirstTrade(tr_list, BUSINESS_SELL_SHORT);
+    REQUIRE_UNARY(open_tr != nullptr);
+    CHECK_EQ(open_tr->number, 200.0);
+
+    std::vector<const TradeRecord*> covers = shortCovers(tr_list);
+    REQUIRE_EQ(covers.size(), 1);
+    /** @arg the first partial cover fires on the l1 bar */
+    CHECK_EQ(covers[0]->datetime, k[t1].datetime);
+    CHECK_EQ(covers[0]->number, 100.0);
+    CHECK_EQ(covers[0]->from, PART_TAKEPROFIT);
+
+    /** @arg the ratchet after the partial cover is the level that fired, not the fill price */
+    CHECK_LT(std::fabs(sys->shortRatchet() - l1), l1 * 0.005);
+
+    for (size_t i = t1 + 1; i <= t2; ++i) {
+        sys->runMoment(k[i].datetime);
+    }
+
+    tr_list = sys->getTM()->getTradeList();
+    covers = shortCovers(tr_list);
+    REQUIRE_EQ(covers.size(), 2);
+    /** @arg the second partial cover still fires on the fall above the kept ratchet */
+    CHECK_EQ(covers[1]->datetime, k[t2].datetime);
+    CHECK_EQ(covers[1]->number, 100.0);
+    CHECK_EQ(covers[1]->from, PART_TAKEPROFIT);
+    CHECK_UNARY_FALSE(sys->getTM()->haveShort(stock));
+
+    /** @arg a flat short book resets the ratchet to 0 */
+    CHECK_EQ(sys->shortRatchet(), 0.0);
+}
+
+/** @par Check points (a delayed partial cover keeps the ratchet):
+ *  the cover request submitted on the take-profit bar is filled at the next open, which must
+ * neither cover the whole position nor reset the ratchet to the open price */
+TEST_CASE("test_SYS_Simple_short_tp_partial_cover_keeps_ratchet_when_delayed") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k = getQueryData(stock);
+    REQUIRE(k.size() > 10);
+    size_t open_pos = k.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+
+    // The first tradable fall under the open close, so the short profit gate is met
+    size_t t1 = 0;
+    for (size_t i = open_pos + 1; i + 1 < k.size(); ++i) {
+        const KRecord& r = k[i];
+        if (r.closePrice < k[open_pos].closePrice && r.highPrice != r.lowPrice &&
+            r.transAmount != 0.0) {
+            t1 = i;
+            break;
+        }
+    }
+    REQUIRE_UNARY(t1 != 0);
+
+    const price_t l1 = k[t1].closePrice * 0.94;
+    auto tp = make_shared<Iss029ScriptedTP>(0.0);
+    tp->addScript(k[t1].datetime, l1);
+
+    auto sys = makeShortRatchetProbeSys(k, tp, true);  // the covers are delayed to the next open
+    for (size_t i = 0; i <= t1; ++i) {
+        sys->runMoment(k[i].datetime);
+    }
+
+    TradeRecordList tr_list = sys->getTM()->getTradeList();
+    REQUIRE_EQ(shortCovers(tr_list).size(), 0);  // the cover is still only a pending request
+    CHECK_UNARY(sys->getTM()->haveShort(stock));
+    CHECK_LT(std::fabs(sys->shortRatchet() - l1), l1 * 0.005);
+
+    sys->runMoment(k[t1 + 1].datetime);
+
+    tr_list = sys->getTM()->getTradeList();
+    std::vector<const TradeRecord*> covers = shortCovers(tr_list);
+    REQUIRE_EQ(covers.size(), 1);
+    CHECK_EQ(covers[0]->datetime, k[t1 + 1].datetime);
+    CHECK_EQ(covers[0]->number, 100.0);
+    CHECK_EQ(covers[0]->from, PART_TAKEPROFIT);
+
+    /** @arg the delayed partial cover covers a tranche instead of the whole short position */
+    CHECK_UNARY(sys->getTM()->haveShort(stock));
+
+    /** @arg the delayed partial fill keeps the ratchet instead of resetting it to the open price */
+    CHECK_LT(std::fabs(sys->shortRatchet() - l1), l1 * 0.005);
 }
 
 /** @} */

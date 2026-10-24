@@ -665,8 +665,8 @@ TEST_CASE("test_System_sell_and_cover_number_use_fill_price") {
         sys->setMM(mm);
         sys->setSP(sp);
         if (short_side) {
-            // A positive short-side risk makes the cover go through the money manager instead of
-            // the "cover everything" fallback
+            // The cover risk is the distance up to the short stop-loss; without a stop-loss it
+            // falls back to the full price, so this case keeps a stop-loss set on the short side
             sys->setST(std::make_shared<FixedShortST>());
         }
         sys->run(stk, query);

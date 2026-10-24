@@ -114,8 +114,9 @@ but 0 or an invalid level only means "no take-profit on this bar"; the trade is 
 the position record; it is **not updated with the market** while the position is held (this also
 applies to ``ST_Indicator`` / ``ST_Saftyloss`` used as a stop-loss). A trailing exit must use the
 take-profit (TP): its level is maintained by a ratchet (only rises for a long, only lowers for a
-short) and only exits in profit. After a partial sell/cover that leaves a position open, the ratchet
-restarts from the current price.
+short) and only exits in profit. A partial sell/cover does not move the ratchet: the protection
+level of the remaining position never drops below its high-water mark for a long, nor rises above
+its low-water mark for a short; the ratchet resets to 0 only when the book is flat.
 
 Stop-loss/Take-profit Strategy Base Class
 -----------------------------------------
