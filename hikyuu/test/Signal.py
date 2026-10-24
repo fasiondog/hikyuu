@@ -423,6 +423,24 @@ class TestSGLogicFactoryAlternate(unittest.TestCase):
             self.assertFalse(factory([sg1, sg2], False).get_param('alternate'), factory.__name__)
 
 
+class TestSGValueNonFinite(unittest.TestCase):
+    """A non-finite constant: NaN is treated as 0, an infinite one is rejected"""
+
+    def test_nan_behaves_as_zero(self):
+        sg = SG_Manual()
+        sg._add_buy_signal(Datetime(20111110))
+        self.assertIsInstance(sg + float('nan'), SignalBase)
+
+    def test_inf_raises(self):
+        sg = SG_Manual()
+        sg._add_buy_signal(Datetime(20111110))
+        inf = float('inf')
+        for expr in (lambda: sg + inf, lambda: inf + sg, lambda: sg - inf, lambda: inf - sg,
+                     lambda: sg * inf, lambda: inf * sg, lambda: sg / inf, lambda: inf / sg):
+            with self.assertRaises(HKUException):
+                expr()
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
@@ -461,3 +479,7 @@ def suiteTestSGConcurrentSetTO():
 
 def suiteTestSGLogicFactoryAlternate():
     return unittest.TestLoader().loadTestsFromTestCase(TestSGLogicFactoryAlternate)
+
+
+def suiteTestSGValueNonFinite():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGValueNonFinite)

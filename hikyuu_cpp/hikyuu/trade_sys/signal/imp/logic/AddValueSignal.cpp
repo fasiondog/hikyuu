@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::AddValueSignal)
 namespace hku {
 
 void AddValueSignal::_calculate(const KData& kdata) {
-    HKU_IF_RETURN(!m_sg || std::isnan(m_value), void());
+    HKU_IF_RETURN(!m_sg, void());
 
     auto const* ks = kdata.data();
     size_t total = kdata.size();

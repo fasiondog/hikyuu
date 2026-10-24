@@ -7,6 +7,7 @@
 
 #include "../../test_config.h"
 #include <cmath>
+#include <limits>
 #include "hikyuu/trade_sys/signal/crt/SG_Logic.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Manual.h"
 
@@ -532,6 +533,7 @@ TEST_CASE("test_SG_AddValue") {
     expect[Datetime(20111115)] = -1.0;
     check_result(ret, expect);
 
+    /** @arg A NaN constant (Null<double>()) is treated as 0 and acts as an identity */
     ret = sg + Null<double>();
     ret->setTO(k);
     reset_expect(expect);
@@ -567,6 +569,10 @@ TEST_CASE("test_SG_AddValue") {
     expect[Datetime(20111110)] = 2.0;
     expect[Datetime(20111115)] = -2.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg + std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() + sg);
 }
 
 /** @par Test points */
@@ -638,6 +644,10 @@ TEST_CASE("test_SG_MulValue") {
     expect[Datetime(20111110)] = 2.0;
     expect[Datetime(20111115)] = -2.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg * std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() * sg);
 }
 
 /** @par Test points */
@@ -761,6 +771,10 @@ TEST_CASE("test_SG_SubValue") {
     expect[Datetime(20111110)] = -4.0;
     expect[Datetime(20111115)] = 1.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg - std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() - sg);
 }
 
 /** @par Test points */
@@ -832,6 +846,10 @@ TEST_CASE("test_SG_DivValue") {
     expect[Datetime(20111110)] = 2.0;
     expect[Datetime(20111115)] = -2.0;
     check_result(ret, expect);
+
+    /** @arg An infinite constant is rejected at construction */
+    CHECK_THROWS(sg / std::numeric_limits<double>::infinity());
+    CHECK_THROWS(std::numeric_limits<double>::infinity() / sg);
 }
 
 /** @par Test points */

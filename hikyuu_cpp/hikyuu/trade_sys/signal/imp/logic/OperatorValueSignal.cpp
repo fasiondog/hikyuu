@@ -29,6 +29,8 @@ OperatorValueSignal::OperatorValueSignal(const string& name, const SignalPtr& sg
             setParam<bool>("cycle", true);
         }
     }
+    HKU_CHECK(!std::isinf(m_value), "The value must be finite! value: {}, mode: {}", m_value,
+              m_mode);
     if (std::isnan(m_value)) {
         m_value = 0.0;
     }
