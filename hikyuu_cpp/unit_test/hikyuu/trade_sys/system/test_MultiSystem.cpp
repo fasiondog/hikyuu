@@ -1336,8 +1336,16 @@ TEST_CASE("test_PF_factories") {
     CHECK_EQ(pf2_def->getMode(), "C");
     CHECK_EQ(pf2_def->getTradeOnClose(), true);
     CHECK_EQ(pf2_def->getSellAtNotSelected(), false);
+    CHECK_EQ(pf2_def->getKeepWatchForceSell(), false);
     REQUIRE(pf2_def->getAF() != nullptr);
     CHECK_EQ(pf2_def->getAF()->name(), "AF_EqualWeight");
+
+    /** @arg PF_WithoutAF passes keep_watch_force_sell through: the watch-only driving of the
+     * force-sell pool while the forced liquidation stays off */
+    auto pf2_watch = PF_WithoutAF(tm, SE_Fixed(), 1, "query", true, true, false, false, true);
+    CHECK_EQ(pf2_watch->getMode(), "C");
+    CHECK_EQ(pf2_watch->getSellAtNotSelected(), false);
+    CHECK_UNARY(pf2_watch->getKeepWatchForceSell());
 
     /** @arg PF_SignalAggregate: mode A (the preset PF_WithoutAF carried before); the af and the
      * shadow signal cash are mapped item by item */
@@ -4566,6 +4574,12 @@ TEST_CASE("test_MultiSystem_pf_mode_aliases") {
     REQUIRE(c != nullptr);
     CHECK_EQ(c->getMode(), "C");
     CHECK_UNARY(!c->getSellAtNotSelected());
+
+    /** @arg PF_ModeC forwards keep_watch_force_sell exactly as PF_WithoutAF does */
+    auto c2 = PF_ModeC(tm, se_b, 1, "query", true, true, false, false, true);
+    CHECK_EQ(c2->getMode(), "C");
+    CHECK_EQ(c2->getSellAtNotSelected(), false);
+    CHECK_UNARY(c2->getKeepWatchForceSell());
 }
 
 /** @par Check point: a non-positive sub_init_cash is warned and ignored (the previous value, the
