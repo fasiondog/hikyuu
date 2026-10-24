@@ -123,11 +123,22 @@ class SelectorScoresFilterTest(unittest.TestCase):
     def test_add_scores_filter_isolated_between_selectors(self):
         se1 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
         se2 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
-        baseline = se2.scfilter
+        # S35: assert the isolation by behavior instead of wrapper identity - the Python
+        # object returned for the same C++ filter is a pybind11 instance-reuse detail,
+        # an assertIs on it would break on a pybind11 upgrade
+        scores = ScoreRecordList()
+        for stk, value in [(sm['sh000001'], 0.5), (sm['sz000001'], 1.5),
+                           (sm['sh600004'], 2.5), (sm['sh600005'], 3.5),
+                           (sm['sz000002'], 4.5)]:
+            scores.append(ScoreRecord(stk, value))
+        date = Datetime(20200101)
+        query = Query(-5)
+        self.assertEqual(len(se2.scfilter.filter(scores, date, query)), 5)
         se1.add_scores_filter(SCFilter_TopN(2))
-        # se2's chain is untouched; se1 keeps the default head with the new filter appended
-        self.assertIs(se2.scfilter, baseline)
-        self.assertEqual(se1.scfilter.name, "SCFilter_IgnoreNan")
+        # se1's chain gains the TopN (truncates to 2), se2's chain is untouched (keeps all 5)
+        self.assertEqual(len(se1.scfilter.filter(scores, date, query)), 2)
+        self.assertEqual(len(se2.scfilter.filter(scores, date, query)), 5)
+        self.assertEqual(se2.scfilter.name, "SCFilter_IgnoreNan")
 
 
 def suite():

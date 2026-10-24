@@ -267,6 +267,77 @@ TEST_CASE("test_MF_Weight_scores_scores_filter") {
     }
 }
 
+// Simulates a Python-defined filter: getScores must take the copy-first path for it, since a
+// Python filter may re-enter and invalidate the internal cross-section reference
+class MockPythonScoresFilter : public ScoresFilterBase {
+public:
+    MockPythonScoresFilter() : ScoresFilterBase("MockPythonFilter") {
+        m_is_python_object = true;
+    }
+
+    virtual ScoresFilterPtr _clone() override {
+        return std::make_shared<MockPythonScoresFilter>();
+    }
+
+    virtual ScoreRecordList _filter(const ScoreRecordList& scores, const Datetime& date,
+                                    const KQuery& query) override {
+        ScoreRecordList ret;
+        for (const auto& sc : scores) {
+            if (!std::isnan(sc.value)) {
+                ret.emplace_back(sc);
+            }
+        }
+        return ret;
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_MF_Weight_scores_filter_python_part") {
+    StockManager& sm = StockManager::instance();
+    IndicatorList src_inds = {MA(CLOSE())};
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(-30);
+    Stock ref_stk = sm["sh000001"];
+    auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
+    Datetime date = mf->getDatetimeList().back();
+    auto cross = mf->getScores(date);
+    REQUIRE_GT(cross.size(), (size_t)0);
+
+    ScoreRecordList expected;
+    for (const auto& sc : cross) {
+        if (!std::isnan(sc.value)) {
+            expected.emplace_back(sc);
+        }
+    }
+
+    auto pylike = std::make_shared<MockPythonScoresFilter>();
+
+    /** @arg a "Python" filter over the full range takes the copy-first path and keeps exactly
+     *         the records the predicate keeps (the internal cross-section is not handed out) */
+    auto full = mf->getScores(date, 0, Null<size_t>(), pylike);
+    REQUIRE_EQ(full.size(), expected.size());
+    for (size_t i = 0; i < full.size(); i++) {
+        CHECK_EQ(full[i].stock, expected[i].stock);
+    }
+
+    /** @arg a "Python" filter over a partial range copies the slice first and filters only it */
+    auto part = mf->getScores(date, 1, cross.size(), pylike);
+    ScoreRecordList expected_part;
+    for (size_t i = 1; i < cross.size(); i++) {
+        if (!std::isnan(cross[i].value)) {
+            expected_part.emplace_back(cross[i]);
+        }
+    }
+    REQUIRE_EQ(part.size(), expected_part.size());
+    for (size_t i = 0; i < part.size(); i++) {
+        CHECK_EQ(part[i].stock, expected_part[i].stock);
+    }
+
+    /** @arg a chain headed by the "Python" filter is also judged as having a Python part */
+    auto chained = mf->getScores(date, 0, Null<size_t>(), pylike | SCFilter_TopN(10));
+    CHECK_EQ(chained.size(), expected.size());
+}
+
 /** @par Test points */
 TEST_CASE("test_MF_Weight_get_all_factors_requires_save_all_factors") {
     StockManager& sm = StockManager::instance();

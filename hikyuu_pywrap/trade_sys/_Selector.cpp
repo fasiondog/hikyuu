@@ -74,10 +74,8 @@ class PyOptimalSelector : public OptimalSelectorBase {
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    PyOptimalSelector() : OptimalSelectorBase("SE_PyOptimal") {
-        m_is_python_object = false;
-    }
-
+    // No default constructor: m_evaluate must be set at construction, evaluate/_clone
+    // dereference it unconditionally
     explicit PyOptimalSelector(const py::function& evalfunc)
     : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(make_gil_safe(evalfunc)) {
         m_is_python_object = false;
@@ -133,7 +131,6 @@ void export_Selector(py::module& m) {
 
     m.def("systemweights_to_np", [](const SystemWeightList& swl) {
         size_t total = swl.size();
-        HKU_IF_RETURN(total == 0, py::array());
 
         struct alignas(8) RawData {
             int32_t sys_name[20];
@@ -146,6 +143,15 @@ void export_Selector(py::module& m) {
           total <= static_cast<size_t>(std::numeric_limits<Py_ssize_t>::max()) / sizeof(RawData),
           "systemweights_to_np: the result is too large!");
 
+        // Built before the empty-list return so the empty result keeps the structured dtype,
+        // consistent with systemweights_to_df
+        py::dtype dtype =
+          py::dtype(vector_to_python_list<string>(
+                      {htr("sys_name"), htr("market_code"), htr("stock_name"), htr("weight")}),
+                    vector_to_python_list<string>({"U20", "U10", "U20", "d"}),
+                    vector_to_python_list<int64_t>({0, 80, 120, 200}), sizeof(RawData));
+        HKU_IF_RETURN(total == 0, py::array(dtype, std::vector<py::ssize_t>{0}));
+
         auto deleter = [](void* p) { std::free(p); };
         std::unique_ptr<RawData[], void (*)(void*)> data(
           static_cast<RawData*>(std::malloc(total * sizeof(RawData))), deleter);
@@ -156,19 +162,15 @@ void export_Selector(py::module& m) {
                 utf8_to_utf32(sw.sys->name(), data.get()[i].sys_name, 20);
                 utf8_to_utf32(sw.sys->getStock().market_code(), data.get()[i].code, 10);
                 utf8_to_utf32(sw.sys->getStock().name(), data.get()[i].name, 20);
+                data.get()[i].weight = sw.weight;
             } else {
                 memset(data.get()[i].sys_name, 0, 20 * sizeof(int32_t));
                 memset(data.get()[i].code, 0, 10 * sizeof(int32_t));
                 memset(data.get()[i].name, 0, 20 * sizeof(int32_t));
+                // Aligned with systemweights_to_df: a null sys is a null weight
+                data.get()[i].weight = Null<double>();
             }
-            data.get()[i].weight = sw.weight;
         }
-        // Define the NumPy structured data type
-        py::dtype dtype =
-          py::dtype(vector_to_python_list<string>(
-                      {htr("sys_name"), htr("market_code"), htr("stock_name"), htr("weight")}),
-                    vector_to_python_list<string>({"U20", "U10", "U20", "d"}),
-                    vector_to_python_list<int64_t>({0, 80, 120, 200}), sizeof(RawData));
 
         py::capsule owner(data.get(), deleter);
         RawData* raw = data.release();
@@ -276,12 +278,30 @@ void export_Selector(py::module& m) {
 
       .def("have_param", &SelectorBase::haveParam, "Whether the specified parameter exists")
 
-      .def("reset", &SelectorBase::reset, "The reset operation")
+      .def(
+        "reset",
+        [](SelectorBase& self) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.reset();
+        },
+        "The reset operation")
       .def("clone", &SelectorBase::clone, "The clone operation")
-      .def("remove_all", &SelectorBase::removeAll, "Remove all the added prototype systems")
+      .def(
+        "remove_all",
+        [](SelectorBase& self) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.removeAll();
+        },
+        "Remove all the added prototype systems")
 
-      .def("add_stock", &SelectorBase::addStock, py::arg("stock"), py::arg("sys"),
-           R"(add_stock(self, stock, sys)
+      .def(
+        "add_stock",
+        [](SelectorBase& self, const Stock& stock, const SYSPtr& sys) {
+            ScopeGilRelease gil(!self.hasPythonPart() && !(sys && sys->hasPythonPart()));
+            self.addStock(stock, sys);
+        },
+        py::arg("stock"), py::arg("sys"),
+        R"(add_stock(self, stock, sys)
 
     Add the initial target and its corresponding system strategy prototype
 
@@ -291,6 +311,7 @@ void export_Selector(py::module& m) {
       .def(
         "add_stock_list",
         [](SelectorBase& self, py::object stk_list, const SYSPtr& sys) {
+            ScopeGilRelease gil(!self.hasPythonPart() && !(sys && sys->hasPythonPart()));
             self.addStockList(get_stock_list_from_python(stk_list), sys);
         },
         py::arg("stk_list"), py::arg("sys"),
@@ -325,8 +346,16 @@ void export_Selector(py::module& m) {
     :return: the list of the selected system instances
     :rtype: SystemList)")
 
-      .def("add_sys", &SelectorBase::addSystem)
-      .def("add_sys_list", &SelectorBase::addSystemList)
+      .def("add_sys",
+           [](SelectorBase& self, const SYSPtr& sys) {
+               ScopeGilRelease gil(!self.hasPythonPart() && !(sys && sys->hasPythonPart()));
+               self.addSystem(sys);
+           })
+      .def("add_sys_list",
+           [](SelectorBase& self, const SystemList& sys_list) {
+               ScopeGilRelease gil(!self.hasPythonPart() && !sys_list_has_python_part(sys_list));
+               self.addSystemList(sys_list);
+           })
 
       .def(
         "set_scores_filter",
