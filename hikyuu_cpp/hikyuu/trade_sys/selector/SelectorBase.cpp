@@ -82,6 +82,18 @@ void SelectorBase::removeAll() {
     reset();
 }
 
+void SelectorBase::replaceProtoSystem(const SYSPtr& from, const SYSPtr& to) {
+    if (!from || !to || from == to) {
+        return;
+    }
+    for (auto& sys : m_pro_sys_list) {
+        if (sys == from) {
+            sys = to;
+        }
+    }
+    _replaceProtoSystem(from, to);
+}
+
 void SelectorBase::reset() {
     SystemList::const_iterator iter = m_pro_sys_list.begin();
     for (; iter != m_pro_sys_list.end(); ++iter) {

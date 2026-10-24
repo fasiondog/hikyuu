@@ -207,6 +207,11 @@ protected:
     /* Short positions */
     bool m_hold_short;
 
+    // Runtime only: hold state before the current date's first write, restored on a zero net
+    Datetime m_holdSnapshotDate;
+    bool m_holdLongSnapshot{false};
+    bool m_holdShortSnapshot{false};
+
     // A map is used for the storage, so that the order can be kept when getting
     std::map<Datetime, double> m_buySig;
     std::map<Datetime, double> m_sellSig;
@@ -239,6 +244,8 @@ private:
         // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
+        // The hold snapshot is rebuilt by the first _addSignal after load
+        // ar & BOOST_SERIALIZATION_NVP(m_holdSnapshotDate);
     }
 
     template <class Archive>
@@ -256,6 +263,8 @@ private:
         // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
+        // The hold snapshot is rebuilt by the first _addSignal after load
+        // ar & BOOST_SERIALIZATION_NVP(m_holdSnapshotDate);
         _normalizeCycleAlternate();
     }
 
@@ -344,13 +353,13 @@ inline double SignalBase::getValue(const Datetime& datetime) const {
 
 inline void SignalBase::_addBuySignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(std::isnan(value), void());
-    HKU_CHECK(value > 0.0, "buy value muse be > 0", value);
+    HKU_CHECK(value > 0.0, "buy value({}) must be > 0", value);
     _addSignal(datetime, value);
 }
 
 inline void SignalBase::_addSellSignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(std::isnan(value), void());
-    HKU_CHECK(value < 0.0, "sell value muse be > 0", value);
+    HKU_CHECK(value < 0.0, "sell value({}) must be < 0", value);
     _addSignal(datetime, value);
 }
 

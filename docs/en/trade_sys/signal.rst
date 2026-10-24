@@ -266,7 +266,7 @@ Signal Operations
 
 An SG supports two kinds of operations: ``+ - * /`` (``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``) and ``& |`` (``SG_And`` / ``SG_Or``).
 
-- The arithmetic operations keep the amplitude of the signals: ``sg * 2`` doubles every daily signal value, and ``sg1 + sg2`` merges the signals of the same day into one net value.
+- The arithmetic operations keep the amplitude of the signals: ``sg * 2`` doubles every daily signal value, and ``sg1 + sg2`` merges the signals of the same bar into one net value.
 - The logic operations keep the direction only and drop the amplitudes: a hit is written as ``1.0`` for a buy and ``-1.0`` for a sell ( ``(sg1 * 3) & sg2`` gives 1.0, not 3.0). Use the arithmetic operations to keep an amplitude. On a same-day conflict ``|`` lets the sell win.
 - Division treats a zero divisor as no signal in that direction instead of producing inf/nan: when ``sg2`` has no buy signal on a day, ``sg1 / sg2`` produces no buy that day, and the sell leg works the same way; a day whose divisors are zero on both directions fires nothing. A constant zero divisor such as ``sg / 0`` is an invalid parameter and yields an empty result.
 - A non-finite constant is resolved at construction: ``NaN`` (the value of ``Null<double>()``,
@@ -280,7 +280,7 @@ Custom Signal Generator
 
 Quickly create a custom signal generator that holds no private attributes.
 
-.. py:function:: crtSG(func, params={}, name='crtSG')
+.. py:function:: crtSG(func, params=None, name='crtSG')
 
     Quickly create a custom signal generator without private attributes.
 
@@ -431,17 +431,24 @@ Signal Generator Base Class
         deduplicated, and the signal is recalculated at once when the trading object is already
         set.
 
+        This setter is an injection entry, not a subclass hook: a Python override is not dispatched
+        by the MultiSystem injection path, a cycle signal reads ``get_cycle_dates()`` in
+        ``_calculate`` instead.
+
         :param dates: the Datetime sequence (list / tuple / DatetimeList are all accepted)
 
     .. py:method:: _add_signal(self, datetime, value)
 
         Add a signal value; called from within _calculate.
 
-        Multiple inputs on the same date are merged into one net value: a positive net keeps only
-        the buy signal, a negative net keeps only the sell signal (the existing opposite record of
-        that date is dropped), and a net of about zero leaves no signal on that date (the records
-        already written for it are removed). ``_add_buy_signal`` and ``_add_sell_signal`` follow
-        the same merge rule.
+        Multiple inputs on the same date (that is, the same bar; one trading day on daily data)
+        are merged into one net value: a positive net keeps only the buy signal, a negative net
+        keeps only the sell signal (the existing opposite record of that bar is dropped), and a
+        net of about zero leaves no signal on that bar (the records already written for it are
+        removed). A zero net also rolls the alternation state back to what it was before the first
+        write of that bar (the position state carried over from the earlier bars stays untouched),
+        so a later write on the same bar still fires.
+        ``_add_buy_signal`` and ``_add_sell_signal`` follow the same merge rule.
 
         The signal date is not validated against the trading object: a date without a bar (e.g. a
         halt day) may be written, and ``should_buy`` / ``should_sell`` answer by a direct date
@@ -455,10 +462,10 @@ Signal Generator Base Class
 
         Add a buy signal; called from within _calculate. ``value`` must be greater than 0.
 
-        The value is merged with the same-date signals into one net value: while the net stays
-        positive the buy signal is recorded; when it turns negative no buy signal is recorded for
-        that date and the existing sell record is updated to the net; a net of about zero removes
-        both records of that date.
+        The value is merged with the signals of the same bar into one net value: while the net
+        stays positive the buy signal is recorded; when it turns negative no buy signal is
+        recorded for that bar and the existing sell record is updated to the net; a net of about
+        zero removes both records of that bar.
 
         :param Datetime datetime: the datetime of the buy signal
         :param float value: the signal value, defaults to 1.0
@@ -467,10 +474,10 @@ Signal Generator Base Class
 
         Add a sell signal; called from within _calculate. ``value`` must be less than 0.
 
-        The value is merged with the same-date signals into one net value: while the net stays
-        negative the sell signal is recorded; when it turns positive no sell signal is recorded
-        for that date and the existing buy record is updated to the net; a net of about zero
-        removes both records of that date.
+        The value is merged with the signals of the same bar into one net value: while the net
+        stays negative the sell signal is recorded; when it turns positive no sell signal is
+        recorded for that bar and the existing buy record is updated to the net; a net of about
+        zero removes both records of that bar.
 
         :param Datetime datetime: the datetime of the sell signal
         :param float value: the signal value, defaults to -1.0

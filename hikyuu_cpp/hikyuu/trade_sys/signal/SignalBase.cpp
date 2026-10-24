@@ -78,6 +78,9 @@ SignalPtr SignalBase::clone() {
     p->m_calculated = false;
     p->m_hold_long = m_hold_long;
     p->m_hold_short = m_hold_short;
+    p->m_holdSnapshotDate = m_holdSnapshotDate;
+    p->m_holdLongSnapshot = m_holdLongSnapshot;
+    p->m_holdShortSnapshot = m_holdShortSnapshot;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
     p->m_cycle_start = m_cycle_start;
@@ -96,6 +99,9 @@ void SignalBase::setTO(const KData& kdata) {
         m_sellSig.clear();
         m_hold_long = false;
         m_hold_short = false;
+        m_holdSnapshotDate = Null<Datetime>();
+        m_holdLongSnapshot = false;
+        m_holdShortSnapshot = false;
     }
 
     HKU_IF_RETURN(kdata.empty(), void());
@@ -112,6 +118,9 @@ void SignalBase::reset() {
         m_sellSig.clear();
         m_hold_long = false;
         m_hold_short = false;
+        m_holdSnapshotDate = Null<Datetime>();
+        m_holdLongSnapshot = false;
+        m_holdShortSnapshot = false;
     }
     m_cycle_start = Null<Datetime>();
     m_cycle_end = Null<Datetime>();
@@ -192,11 +201,21 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
     double new_value = value + buy_value + sell_value;
     HKU_IF_RETURN(!std::isfinite(new_value), void());
 
+    // Remember the hold state the date starts from: a zero net rolls the day back
+    if (datetime != m_holdSnapshotDate) {
+        m_holdSnapshotDate = datetime;
+        m_holdLongSnapshot = m_hold_long;
+        m_holdShortSnapshot = m_hold_short;
+    }
+
     if (std::abs(new_value) < ZERO_SIGNAL_THRESHOLD) {
-        // A zero net leaves no direction: drop the records already written for the day. The hold
-        // flags keep the alternation sequence and are not derived from the tables
+        // A zero net leaves no direction: drop the day's records and roll its hold state back
         m_buySig.erase(datetime);
         m_sellSig.erase(datetime);
+        if (datetime == m_holdSnapshotDate) {
+            m_hold_long = m_holdLongSnapshot;
+            m_hold_short = m_holdShortSnapshot;
+        }
         return;
     }
 

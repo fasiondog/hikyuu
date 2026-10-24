@@ -40,6 +40,7 @@ public:
     // would never learn its prototypes and select nothing
     virtual void _addSystem(const SYSPtr& sys) override;
     virtual void _removeAll() override;
+    virtual void _replaceProtoSystem(const SYSPtr& from, const SYSPtr& to) override;
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override;
 
 protected:

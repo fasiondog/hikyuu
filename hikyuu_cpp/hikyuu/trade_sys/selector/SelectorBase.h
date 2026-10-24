@@ -112,12 +112,7 @@ public:
      */
     void reset();
 
-    /**
-     * Drop the cached selection result only, keeping the prototypes and their real-to-prototype
-     * bindings: the next calculate re-runs against the current running systems. The aggregate
-     * system uses it on reset, because a full reset would also drop the bindings it cannot
-     * rebuild afterwards
-     */
+    /** Drop the cached selection only, the prototypes and their bindings are kept */
     void invalidateCache();
 
     /**
@@ -152,6 +147,12 @@ public:
     /** Add a prototype system in the subclass used for the logical operations; it generally does
      *  not need to be implemented by the subclass */
     virtual void _removeAll() {}
+
+    /** Replace a prototype instance with another one, updating the subclass containers too */
+    void replaceProtoSystem(const SYSPtr& from, const SYSPtr& to);
+
+    /** Subclass hook of replaceProtoSystem, it generally does not need to be implemented */
+    virtual void _replaceProtoSystem(const SYSPtr& from, const SYSPtr& to) {}
 
     /* Called by PF only; PF notifies it of the system list it actually runs and starts the
      * calculation */

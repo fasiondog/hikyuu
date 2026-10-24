@@ -22,7 +22,7 @@ class SystemWeightTest(unittest.TestCase):
         # print(x)
 
     def test_to_np(self):
-        # S32: the empty list yields a typed empty array, consistent with to_df
+        # The empty list yields a typed empty array, consistent with to_df
         arr = SystemWeightList().to_np()
         self.assertEqual(len(arr), 0)
         self.assertEqual(len(arr.dtype.names), 4)
@@ -36,11 +36,11 @@ class SystemWeightTest(unittest.TestCase):
         self.assertEqual(len(arr.dtype.names), 4)
         weight = arr[arr.dtype.names[3]]
         self.assertAlmostEqual(weight[0], 0.3)
-        # S32: a null sys is written as the null weight (NaN), aligned with to_df
+        # A null sys is written as the null weight (NaN), aligned with to_df
         self.assertTrue(math.isnan(weight[1]))
 
     def test_systemweights_np_df(self):
-        # S32: to_np and to_df must agree on the weight semantics (including the null sys)
+        # to_np and to_df must agree on the weight semantics (including the null sys)
         swl = SystemWeightList()
         swl.append(SystemWeight(SYS_Simple(), 0.5))
         swl.append(SystemWeight())

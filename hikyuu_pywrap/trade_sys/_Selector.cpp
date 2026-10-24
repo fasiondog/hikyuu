@@ -311,8 +311,10 @@ void export_Selector(py::module& m) {
       .def(
         "add_stock_list",
         [](SelectorBase& self, py::object stk_list, const SYSPtr& sys) {
+            // The conversion touches Python objects, it must run before the GIL is released
+            StockList stks = get_stock_list_from_python(stk_list);
             ScopeGilRelease gil(!self.hasPythonPart() && !(sys && sys->hasPythonPart()));
-            self.addStockList(get_stock_list_from_python(stk_list), sys);
+            self.addStockList(stks, sys);
         },
         py::arg("stk_list"), py::arg("sys"),
         R"(add_stock_list(self, stk_list, sys)
@@ -510,7 +512,7 @@ void export_Selector(py::module& m) {
         selector3 = SE_MultiFactor(mf, topn=10))");
 
     // The filter default must be None: a py::arg default of SCFilter_IgnoreNan() is evaluated
-    // once at module load and then shared by every call using the default (S03).
+    // once at module load and then shared by every call that keeps the default.
     m.def(
       "SE_MultiFactor2",
       [](const MFPtr& mf, const py::object& filter) {

@@ -941,6 +941,40 @@ TEST_CASE("test_SE_Nested_logic_bind") {
 }
 
 /** @par Test points */
+TEST_CASE("test_SE_Operator_clone_nested") {
+    StockManager& sm = StockManager::instance();
+
+    SYSPtr sys = SYS_Simple();
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    sys->setMM(MM_FixedCount(100));
+
+    SEPtr se1 = SE_Fixed();
+    se1->addStockList({sm["sh600000"]}, sys);
+    SEPtr se2 = SE_Fixed();
+    se2->addStockList({sm["sz000001"]}, sys);
+    SEPtr se3 = SE_Fixed();
+    se3->addStockList({sm["sz000002"]}, sys);
+
+    SEPtr se = (se1 + se2) + se3;
+    SEPtr clone = se->clone();
+
+    /** @arg A nested logical selector is cloned with the whole prototype list */
+    REQUIRE_EQ(clone->getProtoSystemList().size(), 3);
+
+    for (const auto& s : clone->getProtoSystemList()) {
+        clone->bindRealToProto(s, s);
+    }
+    clone->calculate(clone->getProtoSystemList(), KQuery(-20));
+    auto result = clone->getSelected(Datetime(200001010000L));
+
+    /** @arg The nested operand keeps its own prototypes, so no weight is doubled */
+    REQUIRE_EQ(result.size(), 3);
+    for (const auto& sw : result) {
+        CHECK_EQ(sw.weight, 1.0);
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_SE_DivValue_byZero") {
     StockManager& sm = StockManager::instance();
 

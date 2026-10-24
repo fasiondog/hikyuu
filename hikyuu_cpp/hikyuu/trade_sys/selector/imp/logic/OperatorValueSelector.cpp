@@ -57,6 +57,12 @@ void OperatorValueSelector::_removeAll() {
     }
 }
 
+void OperatorValueSelector::_replaceProtoSystem(const SYSPtr& from, const SYSPtr& to) {
+    if (m_se) {
+        m_se->replaceProtoSystem(from, to);
+    }
+}
+
 void OperatorValueSelector::bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {
     if (m_se) {
         m_se->bindRealToProto(real, proto);
