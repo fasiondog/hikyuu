@@ -97,7 +97,7 @@
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG运算辅助</td>
-                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题<br>加减乘除保留信号数值，与/或只保留方向（见下文信号运算）</td>
+                <td>alternate 为可选参数，省略即 True，与 sg1 + sg2 等价<br>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题<br>加减乘除保留信号数值，与/或只保留方向（见下文信号运算）</td>
             </tr>        
         </tbody>
     </table>

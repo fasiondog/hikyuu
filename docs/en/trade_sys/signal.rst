@@ -97,7 +97,7 @@ When technical indicators are used to decide entries and exits, the rule almost 
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div<br>SG_And<br>SG_Or</td>
                 <td>SG operation helpers</td>
-                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem<br>Add / sub / mul / div keep the signal amplitudes, and / or keep the direction only (see Signal operations below)</td>
+                <td>alternate is optional and defaults to True, the same as sg1 + sg2<br>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem<br>Add / sub / mul / div keep the signal amplitudes, and / or keep the direction only (see Signal operations below)</td>
             </tr>
         </tbody>
     </table>

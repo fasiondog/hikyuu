@@ -378,10 +378,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Add(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Add", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Add),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Add(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Add(sg1, sg2, alternate=True)
 
     Generate the signal of the sum of the two indicators
 
@@ -399,10 +399,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Sub(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Sub", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Sub),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Sub(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Sub(sg1, sg2, alternate=True)
 
     Generate the signal of the difference of the two indicators
 
@@ -420,10 +420,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Mul(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Mul", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Mul),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Mul(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Mul(sg1, sg2, alternate=True)
 
     Generate the signal of the product of the two signal generators
 
@@ -440,10 +440,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Div(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Div", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Div),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Div(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Div(sg1, sg2, alternate=True)
 
     Generate the signal of the quotient of the two signal generators
 
@@ -463,10 +463,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_And(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_And", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_And),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_And(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_And(sg1, sg2, alternate=True)
 
     Generate the signal of the AND of the two indicators
 
@@ -486,10 +486,10 @@ The custom signal generator interfaces:
           vector<SignalPtr> sg_vec = python_list_to_vector<SignalPtr>(sg_list);
           return SG_Or(sg_vec, alternate);
       },
-      py::arg("sg_list"), py::arg("alternate"));
+      py::arg("sg_list"), py::arg("alternate") = true);
     m.def("SG_Or", py::overload_cast<const SignalPtr&, const SignalPtr&, bool>(SG_Or),
-          py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
-          R"(SG_Or(sg1, sg2, alternate)
+          py::arg("sg1"), py::arg("sg2"), py::arg("alternate") = true,
+          R"(SG_Or(sg1, sg2, alternate=True)
 
     Generate the signal of the logical OR of the two signal generators
 

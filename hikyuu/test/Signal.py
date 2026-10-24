@@ -411,6 +411,18 @@ class TestSGConcurrentSetTO(unittest.TestCase):
         self.assertEqual([sg.called for sg in py_signals], [50, 50])
 
 
+class TestSGLogicFactoryAlternate(unittest.TestCase):
+    """The logic factories take alternate=True by default, as the docstring states"""
+
+    def test_default_alternate(self):
+        for factory in (SG_Add, SG_Sub, SG_Mul, SG_Div, SG_And, SG_Or):
+            sg1, sg2 = SG_AllwaysBuy(), SG_AllwaysBuy()
+            self.assertTrue(factory(sg1, sg2).get_param('alternate'), factory.__name__)
+            self.assertFalse(factory(sg1, sg2, False).get_param('alternate'), factory.__name__)
+            self.assertTrue(factory([sg1, sg2]).get_param('alternate'), factory.__name__)
+            self.assertFalse(factory([sg1, sg2], False).get_param('alternate'), factory.__name__)
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)
 
@@ -445,3 +457,7 @@ def suiteTestSGPickle():
 
 def suiteTestSGConcurrentSetTO():
     return unittest.TestLoader().loadTestsFromTestCase(TestSGConcurrentSetTO)
+
+
+def suiteTestSGLogicFactoryAlternate():
+    return unittest.TestLoader().loadTestsFromTestCase(TestSGLogicFactoryAlternate)
