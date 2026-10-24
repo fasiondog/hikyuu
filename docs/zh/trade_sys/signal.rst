@@ -430,6 +430,10 @@ SG 支持 ``+ - * /``（``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``）和 
         同日相反方向的已有记录会被移除；净额约为 0 时该日不保留信号（已有记录会被清除）。
         ``_add_buy_signal`` 与 ``_add_sell_signal`` 走同一合并逻辑。
 
+        信号日期不校验是否属于交易对象的 K 线：允许写入非 bar 日期（如停牌日），
+        ``should_buy`` / ``should_sell`` 等查询按日期直接命中；但系统只在真实 bar 上驱动信号，
+        非 bar 日期上的信号不会成交、也不会顺延。
+
         :param Datetime datetime: 信号日期
         :param float value: 信号值，正数表示买入意向，负数表示卖出意向
 

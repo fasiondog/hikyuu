@@ -83,7 +83,8 @@ public:
     /**
      * Add a signal, it is called in _calculate. The inputs of the same date are merged into one net
      * value: a positive net keeps only the buy record, a negative net only the sell record, the
-     * opposite record of the same date is dropped, and a net of about zero drops both records
+     * opposite record of the same date is dropped, and a net of about zero drops both records. The
+     * date is not validated against the trading object: a non-bar date is a legal write
      * @param datetime the date when the signal occurs
      * @param value the signal value, positive for a buy intent, negative for a sell intent
      */

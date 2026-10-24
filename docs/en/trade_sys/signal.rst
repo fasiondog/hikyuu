@@ -443,6 +443,11 @@ Signal Generator Base Class
         already written for it are removed). ``_add_buy_signal`` and ``_add_sell_signal`` follow
         the same merge rule.
 
+        The signal date is not validated against the trading object: a date without a bar (e.g. a
+        halt day) may be written, and ``should_buy`` / ``should_sell`` answer by a direct date
+        lookup; the system drives signals on real bars only, so a signal on a non-bar date never
+        fills and is not shifted.
+
         :param Datetime datetime: the datetime of the signal
         :param float value: the signal value; positive for a buy intent, negative for a sell intent
 
