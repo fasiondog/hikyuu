@@ -18,6 +18,7 @@
 #include <hikyuu/trade_sys/signal/crt/SG_Single.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Logic.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
+#include <hikyuu/trade_sys/signal/crt/SG_OneSide.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
@@ -90,22 +91,24 @@ private:
 // ind.size() != kdata.size() input
 class FixedLenInd : public IndicatorImp {
 public:
-    FixedLenInd(size_t len) : IndicatorImp("FIXEDLEN", 1), m_len(len) {}
+    FixedLenInd(size_t len, double value = 1.0)
+    : IndicatorImp("FIXEDLEN", 1), m_len(len), m_value(value) {}
 
     virtual void _calculate(const Indicator &) override {
         _readyBuffer(m_len, 1);
         for (size_t i = 0; i < m_len; ++i) {
-            _set(1.0, i, 0);
+            _set(m_value, i, 0);
         }
         m_discard = 0;
     }
 
     virtual IndicatorImpPtr _clone() override {
-        return make_shared<FixedLenInd>(m_len);
+        return make_shared<FixedLenInd>(m_len, m_value);
     }
 
 private:
     size_t m_len;
+    double m_value;
 };
 
 class BuyAtFirstSig : public SignalBase {
@@ -970,6 +973,24 @@ TEST_CASE("test_SG_kdata_size_mismatch") {
     sg->setTO(k);
     CHECK_UNARY(sg->getBuySignal().empty());
     CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_OneSide with an indicator longer than the KData is aligned, no signal fires */
+    sg = SG_OneSide(Indicator(make_shared<FixedLenInd>(k.size() + 10, 0.0)), true);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_OneSide with an indicator shorter than the KData is aligned, no signal fires */
+    sg = SG_OneSide(Indicator(make_shared<FixedLenInd>(5, 0.0)), false);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_OneSide keeps firing on the aligned bars when the ind is misaligned but positive */
+    sg = SG_OneSide(Indicator(make_shared<FixedLenInd>(k.size() + 10)), true);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getSellSignal().empty());
+    CHECK_EQ(sg->getBuySignal().size(), k.size());
 }
 
 // A step signal generator for the SG-008 operator benchmark: emits buy/sell signals at fixed bar

@@ -53,8 +53,9 @@ void SingleSignal::_calculate(const KData& kdata) {
     if (ind.size() != kdata.size()) {
         ind = ALIGN(ind, kdata);
         HKU_WARN_IF_RETURN(ind.size() != kdata.size(), void(),
-                           "Failed to align ind.size()({}) to kdata.size()({})!", ind.size(),
-                           kdata.size());
+                           "Failed to align ind.size()({}) to kdata.size()({})! The signal "
+                           "calculation will be ignored.",
+                           ind.size(), kdata.size());
     }
     Indicator dev = STDEV(DIFF(ind), filter_n);
 

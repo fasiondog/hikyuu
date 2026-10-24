@@ -40,7 +40,8 @@ void CrossSignal::_calculate(const KData& kdata) {
         slow = ALIGN(slow, kdata);
     }
     HKU_WARN_IF_RETURN(fast.size() != slow.size() || fast.size() != kdata.size(), void(),
-                       "Failed to align! fast.size()({}), slow.size()({}), kdata.size()({})!",
+                       "Failed to align! fast.size()({}), slow.size()({}), kdata.size()({})! "
+                       "The signal calculation will be ignored.",
                        fast.size(), slow.size(), kdata.size());
 
     size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();

@@ -47,7 +47,7 @@ void BandSignal2::_calculate(const KData& kdata) {
       ind.size() != kdata.size() || upper.size() != kdata.size() || lower.size() != kdata.size(),
       void(),
       "Failed to align! ind.size()({}), upper.size()({}), lower.size()({}), "
-      "kdata.size()({})!",
+      "kdata.size()({})! The signal calculation will be ignored.",
       ind.size(), upper.size(), lower.size(), kdata.size());
 
     size_t discard = ind.discard();
