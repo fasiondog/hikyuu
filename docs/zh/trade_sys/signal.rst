@@ -420,6 +420,9 @@ SG 支持 ``+ - * /``（``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``）和 
         声明周期信号消费的调仓日，通常由 MultiSystem 在运行前注入，普通信号忽略。日期会自动
         排序去重；已设置交易对象时立即重算。
 
+        该接口是注入入口而非子类钩子：Python 子类覆写 ``set_cycle_dates`` 不会被 MultiSystem
+        的注入路径分派，周期信号应在 ``_calculate`` 中读取 ``get_cycle_dates()``。
+
         :param dates: Datetime 序列（list / tuple / DatetimeList 均可）
     
     .. py:method:: _add_signal(self, datetime, value)

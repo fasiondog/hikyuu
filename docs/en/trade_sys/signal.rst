@@ -431,6 +431,10 @@ Signal Generator Base Class
         deduplicated, and the signal is recalculated at once when the trading object is already
         set.
 
+        This setter is an injection entry, not a subclass hook: a Python override is not dispatched
+        by the MultiSystem injection path, a cycle signal reads ``get_cycle_dates()`` in
+        ``_calculate`` instead.
+
         :param dates: the Datetime sequence (list / tuple / DatetimeList are all accepted)
 
     .. py:method:: _add_signal(self, datetime, value)

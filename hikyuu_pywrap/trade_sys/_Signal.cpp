@@ -93,6 +93,9 @@ The custom signal generator interfaces:
     before the run; the other signals ignore them. The dates are sorted and deduplicated, and the
     signal is recalculated at once when the trading object is already set.
 
+    This setter is an injection entry, not a subclass hook: a Python override is not dispatched by
+    the MultiSystem injection path, a cycle signal reads get_cycle_dates in _calculate instead.
+
     :param dates: the Datetime sequence (list/tuple/DatetimeList are all accepted))")
 
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
