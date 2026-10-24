@@ -96,9 +96,7 @@ class SelectorTest(unittest.TestCase):
 
 
 class SelectorScoresFilterTest(unittest.TestCase):
-    # S03: the pybind default argument SCFilter_IgnoreNan() was evaluated once at module
-    # load and cached as a single Python object shared by every selector created with the
-    # default. Each default call must build its own instance.
+    # The pybind default is evaluated once at module load, so each call must build its own filter.
     def test_default_scfilter_not_shared(self):
         se1 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
         se2 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
@@ -123,9 +121,7 @@ class SelectorScoresFilterTest(unittest.TestCase):
     def test_add_scores_filter_isolated_between_selectors(self):
         se1 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
         se2 = SE_MultiFactor2([MA(CLOSE(), n=5), MA(CLOSE(), n=10)])
-        # S35: assert the isolation by behavior instead of wrapper identity - the Python
-        # object returned for the same C++ filter is a pybind11 instance-reuse detail,
-        # an assertIs on it would break on a pybind11 upgrade
+        # Assert the isolation by behavior, not by the pybind11 wrapper identity.
         scores = ScoreRecordList()
         for stk, value in [(sm['sh000001'], 0.5), (sm['sz000001'], 1.5),
                            (sm['sh600004'], 2.5), (sm['sh600005'], 3.5),
@@ -139,6 +135,15 @@ class SelectorScoresFilterTest(unittest.TestCase):
         self.assertEqual(len(se1.scfilter.filter(scores, date, query)), 2)
         self.assertEqual(len(se2.scfilter.filter(scores, date, query)), 5)
         self.assertEqual(se2.scfilter.name, "SCFilter_IgnoreNan")
+
+    def test_add_stock_list(self):
+        # The python list must be converted before the GIL is released.
+        proto = SYS_Simple()
+        proto.sg = SG_Cross(MA(CLOSE(), n=5), MA(CLOSE(), n=10))
+        proto.mm = MM_FixedCount(100)
+        se = SE_Fixed()
+        se.add_stock_list([sm['sh000001'], sm['sz000001']], proto)
+        self.assertEqual(len(se.proto_sys_list), 2)
 
 
 def suite():

@@ -28,6 +28,7 @@ public:
 
     virtual void _addSystem(const SYSPtr& sys) override;
     virtual void _removeAll() override;
+    virtual void _replaceProtoSystem(const SYSPtr& from, const SYSPtr& to) override;
 
 protected:
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override {
@@ -42,10 +43,8 @@ protected:
         }
     }
 
-    // The weight is the raw func result and may be negative (e.g. 0 - w in SE_Sub): it is an
-    // intermediate value for the downstream filter to flip or screen, not an invalid state. The
-    // list is sorted by weight only; the tie order stays undefined on purpose (getSelected runs
-    // per bar by default, a market_code tie-break would cost more than it is worth).
+    // The weight is the raw func result and may be negative; the list is sorted by weight only and
+    // the tie order, including the single-operand order, is left undefined on purpose
     SystemWeightList getUnionSelected(Datetime date,
                                       const std::function<double(double, double)>&& func);
 

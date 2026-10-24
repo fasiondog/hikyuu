@@ -158,62 +158,75 @@ SelectorPtr OperatorSelector::_clone() {
     return p;
 }
 
+void OperatorSelector::_replaceProtoSystem(const SYSPtr& from, const SYSPtr& to) {
+    auto replaceInSet = [&from, &to](std::unordered_set<SYSPtr>& container) {
+        auto iter = container.find(from);
+        if (iter != container.end()) {
+            container.erase(iter);
+            container.insert(to);
+        }
+    };
+    replaceInSet(m_se1_set);
+    replaceInSet(m_se2_set);
+    for (auto& item : m_real_to_proto) {
+        if (item.second == from) {
+            item.second = to;
+        }
+    }
+    if (m_se1) {
+        m_se1->replaceProtoSystem(from, to);
+    }
+    if (m_se2) {
+        m_se2->replaceProtoSystem(from, to);
+    }
+}
+
 void OperatorSelector::cloneRebuild(const SelectorPtr& se1, const SelectorPtr& se2) {
     auto inter = findIntersection(se1, se2);
-    if (se1 && se2) {
-        m_se1 = se1->clone();
-        // Take over the prototypes cloned by the operand's clone instead of re-cloning them (the
-        // old code discarded them via removeAll and cloned every prototype again)
-        SystemList proto1 = m_se1->getProtoSystemList();
-        m_se1->removeAll();
-        m_se2 = se2->clone();
-        SystemList proto2 = m_se2->getProtoSystemList();
-        m_se2->removeAll();
 
-        std::map<System*, SYSPtr> tmpdict;
-        const auto& raw_sys_list1 = se1->getProtoSystemList();
+    // Take over the operand clone's prototypes: rebuilding a nested operand would corrupt its sets
+    m_se1 = se1 ? se1->clone() : SelectorPtr();
+    m_se2 = se2 ? se2->clone() : SelectorPtr();
+
+    if (m_se1 && m_se2) {
+        const SystemList& proto1 = m_se1->getProtoSystemList();
+        const SystemList& raw_list1 = se1->getProtoSystemList();
+        const SystemList& proto2 = m_se2->getProtoSystemList();
+        const SystemList& raw_list2 = se2->getProtoSystemList();
+
+        // The shared prototype must be the very instance adopted on the se1 side, otherwise the
+        // clone loses the intersection and a later reset would split the two sets
+        std::map<System*, SYSPtr> shared_proto;
         for (size_t i = 0, total = proto1.size(); i < total; i++) {
-            const SYSPtr& tmpsys = proto1[i];
-            m_pro_sys_list.emplace_back(tmpsys);
-            m_se1->addSystem(tmpsys);
-            m_se1_set.insert(tmpsys);
-            if (inter.find(raw_sys_list1[i].get()) != inter.end()) {
-                tmpdict[raw_sys_list1[i].get()] = tmpsys;
+            m_pro_sys_list.emplace_back(proto1[i]);
+            m_se1_set.insert(proto1[i]);
+            if (i < raw_list1.size() && inter.find(raw_list1[i].get()) != inter.end()) {
+                shared_proto[raw_list1[i].get()] = proto1[i];
             }
         }
 
-        const auto& raw_sys_list2 = se2->getProtoSystemList();
         for (size_t i = 0, total = proto2.size(); i < total; i++) {
-            auto iter = inter.find(raw_sys_list2[i].get());
-            if (iter == inter.end()) {
-                const SYSPtr& tmpsys = proto2[i];
-                m_pro_sys_list.emplace_back(tmpsys);
-                m_se2_set.insert(tmpsys);
-                m_se2->addSystem(tmpsys);
-            } else {
-                // The shared prototype must be the very instance adopted on the se1 side, otherwise
-                // the clone loses the intersection and a later reset would split the two sets
-                const SYSPtr& tmpsys = tmpdict[raw_sys_list2[i].get()];
-                m_se2_set.insert(tmpsys);
-                m_se2->addSystem(tmpsys);
+            if (i >= raw_list2.size() || inter.find(raw_list2[i].get()) == inter.end()) {
+                m_pro_sys_list.emplace_back(proto2[i]);
+                m_se2_set.insert(proto2[i]);
+                continue;
+            }
+            auto iter = shared_proto.find(raw_list2[i].get());
+            if (iter != shared_proto.end()) {
+                m_se2->replaceProtoSystem(proto2[i], iter->second);
+                m_se2_set.insert(iter->second);
             }
         }
 
-    } else if (se1) {
-        m_se1 = se1->clone();
-        auto sys_list = m_se1->getProtoSystemList();
-        for (auto& sys : sys_list) {
-            m_se1_set.insert(sys);
-        }
-        m_pro_sys_list = std::move(sys_list);
+    } else if (m_se1) {
+        const SystemList& proto1 = m_se1->getProtoSystemList();
+        m_pro_sys_list.assign(proto1.begin(), proto1.end());
+        m_se1_set.insert(proto1.begin(), proto1.end());
 
-    } else if (se2) {
-        m_se2 = se2->clone();
-        auto sys_list = m_se2->getProtoSystemList();
-        for (auto& sys : sys_list) {
-            m_se2_set.insert(sys);
-            m_pro_sys_list.emplace_back(std::move(sys));
-        }
+    } else if (m_se2) {
+        const SystemList& proto2 = m_se2->getProtoSystemList();
+        m_pro_sys_list.assign(proto2.begin(), proto2.end());
+        m_se2_set.insert(proto2.begin(), proto2.end());
     }
 }
 
