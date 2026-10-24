@@ -280,7 +280,7 @@ Custom Signal Generator
 
 Quickly create a custom signal generator that holds no private attributes.
 
-.. py:function:: crtSG(func, params={}, name='crtSG')
+.. py:function:: crtSG(func, params=None, name='crtSG')
 
     Quickly create a custom signal generator without private attributes.
 

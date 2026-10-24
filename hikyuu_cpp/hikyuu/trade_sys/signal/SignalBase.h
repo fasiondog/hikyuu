@@ -344,13 +344,13 @@ inline double SignalBase::getValue(const Datetime& datetime) const {
 
 inline void SignalBase::_addBuySignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(std::isnan(value), void());
-    HKU_CHECK(value > 0.0, "buy value muse be > 0", value);
+    HKU_CHECK(value > 0.0, "buy value({}) must be > 0", value);
     _addSignal(datetime, value);
 }
 
 inline void SignalBase::_addSellSignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(std::isnan(value), void());
-    HKU_CHECK(value < 0.0, "sell value muse be > 0", value);
+    HKU_CHECK(value < 0.0, "sell value({}) must be < 0", value);
     _addSignal(datetime, value);
 }
 

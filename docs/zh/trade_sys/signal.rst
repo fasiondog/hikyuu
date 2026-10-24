@@ -276,7 +276,7 @@ SG 支持 ``+ - * /``（``SG_Add`` / ``SG_Sub`` / ``SG_Mul`` / ``SG_Div``）和 
 
 快速创建不带私有属性的自定义信号指示器
 
-.. py:function:: crtSG(func, params={}, name='crtSG')
+.. py:function:: crtSG(func, params=None, name='crtSG')
 
     快速创建自定义不带私有属性的信号指示器
     
