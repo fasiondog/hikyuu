@@ -183,6 +183,7 @@ private:
 
 protected:
     friend class OperatorSignal;
+    friend class OperatorValueSignal;
 
     /** Get the buy signal table, for the composed operator signals to iterate directly */
     const std::map<Datetime, double>& getBuySignalMap() const {

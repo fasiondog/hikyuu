@@ -8,6 +8,8 @@
 #include "OperatorValueSignal.h"
 #include "../ManualSignal.h"
 
+#include <functional>
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::OperatorValueSignal)
 #endif
@@ -52,6 +54,60 @@ void OperatorValueSignal::sub_sg_calculate(const KData& kdata) {
         return;
     }
     m_sg->setTO(kdata);
+}
+
+void OperatorValueSignal::sub_merged_calculate(const KData& kdata, const MergedEmitFunc& emit) {
+    auto const* ks = kdata.data();
+    size_t total = kdata.size();
+    HKU_IF_RETURN(total == 0 || !m_sg, void());
+
+    typedef std::map<Datetime, double> SigMap;
+    // Two ordered candidate sources: the buy and the sell tables of the sub-signal
+    const SigMap* maps[2] = {&m_sg->getBuySignalMap(), &m_sg->getSellSignalMap()};
+
+    SigMap::const_iterator its[2];
+    SigMap::const_iterator ends[2];
+    for (int i = 0; i < 2; ++i) {
+        its[i] = maps[i]->cbegin();
+        ends[i] = maps[i]->cend();
+    }
+
+    size_t bar_pos = 0;
+    while (true) {
+        // The next candidate datetime is the minimum head of the active tables
+        bool has_candidate = false;
+        Datetime candidate;
+        for (int i = 0; i < 2; ++i) {
+            if (its[i] != ends[i] && (!has_candidate || its[i]->first < candidate)) {
+                candidate = its[i]->first;
+                has_candidate = true;
+            }
+        }
+        if (!has_candidate) {
+            break;
+        }
+
+        double buy = 0.0, sell = 0.0;
+        for (int i = 0; i < 2; ++i) {
+            if (its[i] != ends[i] && its[i]->first == candidate) {
+                if (i == 0) {
+                    buy = its[i]->second;
+                } else {
+                    sell = its[i]->second;
+                }
+                ++its[i];
+            }
+        }
+
+        // The old per-bar loop only touches real bars; a manual pre-seeded entry may sit at a
+        // non-bar datetime or outside the current window, it must be dropped the same way
+        while (bar_pos < total && ks[bar_pos].datetime < candidate) {
+            ++bar_pos;
+        }
+        if (bar_pos < total && ks[bar_pos].datetime == candidate) {
+            emit(candidate, buy, sell);
+        }
+    }
 }
 
 void OperatorValueSignal::setCycleDates(const DatetimeList& dates) {
