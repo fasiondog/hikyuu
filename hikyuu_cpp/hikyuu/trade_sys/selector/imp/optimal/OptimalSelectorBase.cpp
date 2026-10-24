@@ -93,8 +93,14 @@ void OptimalSelectorBase::bindRealToProto(const SYSPtr& real, const SYSPtr& prot
 }
 
 void OptimalSelectorBase::_reset() {
+    // Keep the bindings: the prototypes are kept and cannot be re-bound by the aggregate
     m_sys_dict.clear();
     m_run_ranges.clear();
+}
+
+void OptimalSelectorBase::_removeAll() {
+    // The prototypes are gone, so are their bindings
+    m_proto_to_real.clear();
 }
 
 void OptimalSelectorBase::_calculate() {}

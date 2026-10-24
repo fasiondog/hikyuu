@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::OperatorValueSelector)
 
 namespace hku {
 
-OperatorValueSelector::OperatorValueSelector() : SelectorBase("SE_OpearatorValue") {}
+OperatorValueSelector::OperatorValueSelector() : SelectorBase("SE_OperatorValue") {}
 
 OperatorValueSelector::OperatorValueSelector(const string& name) : SelectorBase(name) {}
 

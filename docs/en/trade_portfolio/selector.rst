@@ -38,12 +38,13 @@ For selectors based on multi-factor scoring, SE_MultiFactor2 is recommended, as 
 Built-in Selectors
 ------------------
 
-.. py:function:: SE_Fixed([stk_list, sys])
+.. py:function:: SE_Fixed([stk_list, sys, weight])
 
     The fixed selector: it always selects the initially specified instruments along with their system strategy prototypes
     
     :param list stk_list: the initially specified instruments
     :param System sys: the system strategy prototype
+    :param float weight: the default weight; the weight value is interpreted by the downstream consumer (e.g. the AllocateFunds part) and is not restricted to [0, 1]
     :return: the SE selector instance
 
 .. py:function:: SE_Signal([stk_list, sys])
@@ -89,7 +90,7 @@ Built-in Selectors
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor(mf, topn=10)
 
-.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan()])
+.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=None])
 
     Create a selector based on multi-factor scoring; it supports several forms of input. See :doc:`scfilter`.
 
@@ -105,7 +106,7 @@ Built-in Selectors
     :param Stock ref_stk: the reference security (when unspecified, defaults to sh000001, the Shanghai Composite Index)
     :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
     :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
-    :param ScoresFilter filter: the cross-sectional scores filter
+    :param ScoresFilter filter: the cross-sectional scores filter; None (the default) means a fresh built-in ``SCFilter_IgnoreNan()`` (never shared between selectors)
     :return: the SE selector instance
 
     .. code-block:: python

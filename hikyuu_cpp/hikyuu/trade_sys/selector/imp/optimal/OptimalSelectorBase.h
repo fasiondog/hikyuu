@@ -47,6 +47,7 @@ public:
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override;
 
     virtual void _reset() override;
+    virtual void _removeAll() override;
 
     virtual string str() const override;
 

@@ -19,6 +19,7 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Logic.h>
+#include <hikyuu/trade_sys/selector/imp/logic/OperatorValueSelector.h>
 
 using namespace hku;
 
@@ -132,7 +133,7 @@ TEST_CASE("test_SE_SubValue") {
 
     /** @arg A number - a null pointer */
     se = 3.0 - SEPtr();
-    CHECK_EQ(se->name(), "SE_SubValue");
+    CHECK_EQ(se->name(), "SE_SubInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     auto proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -174,7 +175,7 @@ TEST_CASE("test_SE_SubValue") {
 
     /** @arg A number - a selector (a fresh inner selector, see the note in test_SE_AddValue) */
     se = 3.0 - SE_Fixed();
-    CHECK_EQ(se->name(), "SE_SubValue");
+    CHECK_EQ(se->name(), "SE_SubInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -292,7 +293,7 @@ TEST_CASE("test_SE_DivValue") {
 
     /** @arg A number / a null pointer */
     se = 3.0 / SEPtr();
-    CHECK_EQ(se->name(), "SE_DivValue");
+    CHECK_EQ(se->name(), "SE_DivInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     auto proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -334,7 +335,7 @@ TEST_CASE("test_SE_DivValue") {
 
     /** @arg A number / a selector (a fresh inner selector, see the note in test_SE_AddValue) */
     se = 3.0 / SE_Fixed();
-    CHECK_EQ(se->name(), "SE_DivValue");
+    CHECK_EQ(se->name(), "SE_DivInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -595,7 +596,7 @@ TEST_CASE("test_SE_Sub") {
 }
 
 /** @par Test points */
-TEST_CASE("test_SE_Multi") {
+TEST_CASE("test_SE_Mul") {
     StockManager& sm = StockManager::instance();
 
     SYSPtr sys = SYS_Simple();
@@ -617,7 +618,7 @@ TEST_CASE("test_SE_Multi") {
 
     /** @arg A null pointer * a null pointer */
     se = SEPtr() * SEPtr();
-    CHECK_EQ(se->name(), "SE_Multi");
+    CHECK_EQ(se->name(), "SE_Mul");
     se->addStock(sm["sh600000"], sys);
     se->addStock(sm["sz000001"], sys);
     se->addStock(sm["sz000002"], sys);
@@ -631,7 +632,7 @@ TEST_CASE("test_SE_Multi") {
     /** @arg A selector * a null pointer */
     se1->removeAll();
     se = se1 * SEPtr();
-    CHECK_EQ(se->name(), "SE_Multi");
+    CHECK_EQ(se->name(), "SE_Mul");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -645,7 +646,7 @@ TEST_CASE("test_SE_Multi") {
     /** @arg A null pointer * a selector */
     se1->removeAll();
     se = SEPtr() * se1;
-    CHECK_EQ(se->name(), "SE_Multi");
+    CHECK_EQ(se->name(), "SE_Mul");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -660,7 +661,7 @@ TEST_CASE("test_SE_Multi") {
     se1->removeAll();
     se2->removeAll();
     se = se1 * se2;
-    CHECK_EQ(se->name(), "SE_Multi");
+    CHECK_EQ(se->name(), "SE_Mul");
     sys->setSG(sg);
     sys->setMM(mm);
     se->addStock(sm["sh600000"], sys);
@@ -684,7 +685,7 @@ TEST_CASE("test_SE_Multi") {
 
     /** @arg A combined selector is clonable and keeps its prototypes */
     SEPtr se_clone = se->clone();
-    CHECK_EQ(se_clone->name(), "SE_Multi");
+    CHECK_EQ(se_clone->name(), "SE_Mul");
     CHECK_EQ(se_clone->getProtoSystemList().size(), 3);
 }
 
@@ -995,6 +996,27 @@ TEST_CASE("test_SE_DivValue_byZero") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_ValueSelector_names") {
+    /** @arg The base-class default name (the old SE_OpearatorValue typo corrected) */
+    OperatorValueSelector base;
+    CHECK_EQ(base.name(), "SE_OperatorValue");
+
+    /** @arg The sub value selectors have distinct names in both directions */
+    SEPtr se = 3.0 - SE_Fixed();
+    CHECK_EQ(se->name(), "SE_SubInvValue");
+    CHECK_EQ(se->clone()->name(), "SE_SubInvValue");
+    se = SE_Fixed() - 3.0;
+    CHECK_EQ(se->name(), "SE_SubValue");
+
+    /** @arg The div value selectors have distinct names in both directions */
+    se = 3.0 / SE_Fixed();
+    CHECK_EQ(se->name(), "SE_DivInvValue");
+    CHECK_EQ(se->clone()->name(), "SE_DivInvValue");
+    se = SE_Fixed() / 3.0;
+    CHECK_EQ(se->name(), "SE_DivValue");
+}
+
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par Test points */
@@ -1086,9 +1108,9 @@ TEST_CASE("test_SE_Operator_export") {
     CHECK_EQ(result[1].weight, -0.25);
     CHECK_EQ(result[2].weight, -0.5);
 
-    /** @arg SE_Multi round-trip keeps the intersection prototype and the product weight */
-    se = round_trip(se1 * se2, "SE_Multi");
-    CHECK_EQ(se->name(), "SE_Multi");
+    /** @arg SE_Mul round-trip keeps the intersection prototype and the product weight */
+    se = round_trip(se1 * se2, "SE_Mul");
+    CHECK_EQ(se->name(), "SE_Mul");
     protos = check_protos(se);
     for (const auto& s : protos) {
         se->bindRealToProto(s, s);

@@ -32,19 +32,19 @@ public:
     }
 
     void _reset() override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _reset, );
+        PYBIND11_OVERRIDE(void, SelectorBase, _reset);
     }
 
     void _calculate() override {
-        PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
+        PYBIND11_OVERRIDE_PURE(void, SelectorBase, _calculate);
     }
 
     void _addSystem(const SystemPtr& sys) override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _addSystem, sys);
+        PYBIND11_OVERRIDE(void, SelectorBase, _addSystem, sys);
     }
 
     void _removeAll() override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
+        PYBIND11_OVERRIDE(void, SelectorBase, _removeAll);
     }
 
     // The subclass interfaces that must be implemented
@@ -87,6 +87,7 @@ public:
 
 public:
     virtual SelectorPtr _clone() override {
+        py::gil_scoped_acquire gil;
         return std::make_shared<PyOptimalSelector>(*m_evaluate);
     }
 
@@ -393,13 +394,14 @@ void export_Selector(py::module& m) {
           return SE_Fixed(stks, sys, weight);
       },
       py::arg("stk_list"), py::arg("sys"), py::arg("weight") = 1.0,
-      R"(SE_Fixed([stk_list, sys])
+      R"(SE_Fixed([stk_list, sys, weight])
 
     The fixed selector, i.e. always selecting the initially defined targets and their system strategy prototypes
 
     :param list stk_list: the initially defined targets
     :param System sys: the system strategy prototype
-    :param float weight: the default weight
+    :param float weight: the default weight; the value is interpreted by the downstream consumer
+        (e.g. the AllocateFunds part), not restricted to [0, 1]
     :return: the SE selector instance)");
 
     m.def("SE_Signal", py::overload_cast<>(SE_Signal));

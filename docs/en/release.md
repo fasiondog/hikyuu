@@ -109,6 +109,8 @@ Multiple signal inputs on the same date are merged into one net value: a positiv
 
 **⚠️ Archive format changes**: `SignalBase` adds the cycle start/end and cycle-date fields, and the operator signals no longer serialize the base class twice, so old `SG_*` archives (and systems embedding `m_sg`) must be re-saved; hyphenated parameter keys in old archives (`auto-checkin` / `max-stock` / `out-extreme`) are not migrated automatically and fall back to the defaults after deserialization, call `set_param` explicitly to restore them.
 
+**⚠️ Behavior change: the selector default names corrected (spelling)**: the default name of `SE_Signal` (the old typo `SE_Sigal`) and the default name of the multiplication combinator selector (`se1 * se2`), changed from `SE_Multi` to `SE_Mul` (to avoid confusion with the multi-factor selectors `SE_MultiFactor*`). The value-operator selectors: the base-class default name spelling corrected to `SE_OperatorValue` (the old `SE_OpearatorValue`), and the sub / div forward and inverted forms, which shared one name, are now distinguished - the inverted form (the number as the left operand, e.g. `3.0 - se`, `3.0 / se`) is named `SE_SubInvValue` / `SE_DivInvValue`. Only the displayed values of `name()` / `str()` are affected; class identification in serialized archives is based on the class name, not the name field, so old archives still load normally (an instance restored from an old archive keeps its old name).
+
 **🚀 New Features**
 
 * feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)
