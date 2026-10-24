@@ -51,7 +51,8 @@ private:
         uint64_t datetime_num = datetime.number();
         ar& bs::make_nvp("datetime", datetime_num);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
-        ar& BOOST_SERIALIZATION_NVP(goal);
+        std::string goal_str = priceToSerialString(goal);
+        ar& bs::make_nvp("goal", goal_str);
         ar& BOOST_SERIALIZATION_NVP(number);
         string from_name(getSystemPartName(from));
         ar& bs::make_nvp<string>("from", from_name);
@@ -71,7 +72,9 @@ private:
         ar& bs::make_nvp("datetime", datetime_num);
         datetime = Datetime(datetime_num);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
-        ar& BOOST_SERIALIZATION_NVP(goal);
+        std::string goal_str;
+        ar& bs::make_nvp("goal", goal_str);
+        goal = priceFromSerialString(goal_str);
         ar& BOOST_SERIALIZATION_NVP(number);
         string from_name;
         ar& bs::make_nvp<string>("from", from_name);
