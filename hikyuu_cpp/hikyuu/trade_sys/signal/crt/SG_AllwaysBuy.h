@@ -12,7 +12,7 @@ namespace hku {
 
 /**
  * A system that always issues a buy signal, it is mainly used for the MultiFactor stock selection
- * matching in PF
+ * matching in MultiSystem
  * @return SignalPtr
  * @ingroup Signal
  */

@@ -82,11 +82,11 @@ When technical indicators are used to decide entries and exits, the rule almost 
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
                 <td>Always-buy signal generator</td>
-                <td>A special SG that keeps emitting a buy signal on every bar, usually used together with a PF</td>
+                <td>A special SG that keeps emitting a buy signal on every bar, usually used together with a MultiSystem</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF rebalance cycle buy signal generator</td>
+                <td>Rebalance cycle buy signal generator</td>
                 <td>A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run</td>
             </tr>
             <tr>
@@ -236,10 +236,10 @@ Always-buy Signal Generator
 
 .. py:function:: SG_AllwaysBuy()
 
-    A special SG that keeps emitting a buy signal on every bar, usually used together with a PF.
+    A special SG that keeps emitting a buy signal on every bar, usually used together with a MultiSystem.
 
 
-PF Rebalance Cycle Buy Signal Generator
+Rebalance Cycle Buy Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()

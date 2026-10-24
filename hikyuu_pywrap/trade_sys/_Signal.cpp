@@ -29,11 +29,11 @@ public:
     }
 
     void _calculate(const KData& kdata) override {
-        PYBIND11_OVERLOAD_PURE(void, SignalBase, _calculate, kdata);
+        PYBIND11_OVERRIDE_PURE(void, SignalBase, _calculate, kdata);
     }
 
     void _reset() override {
-        PYBIND11_OVERLOAD(void, SignalBase, _reset, );
+        PYBIND11_OVERRIDE(void, SignalBase, _reset, );
     }
 };
 
@@ -334,7 +334,8 @@ The custom signal generator interfaces:
 
     m.def("SG_AllwaysBuy", SG_AllwaysBuy, R"(SG_AllwaysBuy()
     
-    A special SG that issues the buy signal every day continuously, usually used together with the PF)");
+    A special SG that issues the buy signal every day continuously, usually used together
+    with a MultiSystem)");
 
     m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
     

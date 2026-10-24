@@ -82,11 +82,11 @@
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
                 <td>持续买入信号指示器</td>
-                <td>一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用</td>
+                <td>一个特殊的SG，持续每天发出买入信号，通常配合 MultiSystem 使用</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF调仓周期买入信号指示器</td>
+                <td>调仓周期买入信号指示器</td>
                 <td>一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号</td>
             </tr>
             <tr>
@@ -236,10 +236,10 @@
 
 .. py:function:: SG_AllwaysBuy()
     
-    一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用
+    一个特殊的SG，持续每天发出买入信号，通常配合 MultiSystem 使用
 
 
-PF调仓周期买入信号指示器
+调仓周期买入信号指示器
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()
