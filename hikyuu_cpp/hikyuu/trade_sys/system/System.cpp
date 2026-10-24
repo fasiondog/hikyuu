@@ -65,8 +65,8 @@ string System::str() const {
 System::System()
 : m_name("SYS_Simple"),
   m_calculated(false),
-  m_pre_ev_valid(true),  // must true
-  m_pre_cn_valid(true),  // must true
+  m_pre_ev_valid(false),  // no prior evidence: the first valid bar counts as a transition
+  m_pre_cn_valid(false),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
     initParam();
@@ -75,8 +75,8 @@ System::System()
 System::System(const string& name)
 : m_name(name),
   m_calculated(false),
-  m_pre_ev_valid(true),
-  m_pre_cn_valid(true),
+  m_pre_ev_valid(false),
+  m_pre_cn_valid(false),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
     initParam();
@@ -97,8 +97,8 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_sp(sp),
   m_name(name),
   m_calculated(false),
-  m_pre_ev_valid(true),
-  m_pre_cn_valid(true),
+  m_pre_ev_valid(false),
+  m_pre_cn_valid(false),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
     initParam();
@@ -391,16 +391,11 @@ void System::readyForRun() {
     HKU_CHECK(m_mm, "Not setMoneyManager! {}", name());
     HKU_CHECK(m_sg, "Not setSignal! {}", name());
 
-    // When a market environment (EV) strategy exists, the default previous-day market valid
-    // flag must be set to false, because whether the market is valid must be judged entirely by the
-    // market environment strategy
-    if (m_ev)
-        m_pre_ev_valid = false;
-
+    // The pre-flags are initialized by the constructors and re-forced by reset / forceResetAll;
+    // forcing here would let a run(reset=false) re-entry misfire the ev/cn open-position build
     if (m_cn) {
         m_cn->setTM(m_tm);
         m_cn->setSG(m_sg);
-        m_pre_cn_valid = false;  // The default previous-day market valid flag is set to false
     }
 
     m_mm->setTM(m_tm);
@@ -629,7 +624,15 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     // Process the market environment strategy
     //----------------------------------------------------------
     bool trace = getParam<bool>("trace");
+    bool pre_ev_valid = m_pre_ev_valid;
+    bool pre_cn_valid = m_pre_cn_valid;
     bool current_ev_valid = _environmentIsValid(today.datetime);
+    bool current_cn_valid = _conditionIsValid(today.datetime);
+
+    // Keep both flags current on every return path, so a run(reset=false) re-entry resumes from
+    // the real last state of the previous run
+    m_pre_ev_valid = current_ev_valid;
+    m_pre_cn_valid = current_cn_valid;
 
     // If the current environment is invalid
     if (!current_ev_valid) {
@@ -647,30 +650,24 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
             HKU_INFO_IF(trace, htr("[{}] EV to buy short", name()));
         }
 
-        m_pre_ev_valid = current_ev_valid;
         return tr.isNull() ? result : tr;
     }
 
-    // When the environment changes from invalid to valid
-    if (!m_pre_ev_valid) {
+    // When the environment changes from invalid to valid; without an EV the flag alone must not
+    // build a position
+    if (m_ev && !pre_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] EV status from invalid to valid", name()));
 
         // If the EV is used for the initial position building
         if (getParam<bool>("ev_open_position")) {
             HKU_INFO_IF(trace, htr("[{}] EV to buy", name()));
-            TradeRecord tr = _buy(today, src_today, PART_ENVIRONMENT);
-            m_pre_ev_valid = current_ev_valid;
-            return tr.isNull() ? result : tr;
+            return _buy(today, src_today, PART_ENVIRONMENT);
         }
     }
-
-    m_pre_ev_valid = current_ev_valid;
 
     //----------------------------------------------------------
     // Process the system valid condition judgment strategy
     //----------------------------------------------------------
-
-    bool current_cn_valid = _conditionIsValid(today.datetime);
 
     // If the system is currently invalid
     if (!current_cn_valid) {
@@ -687,24 +684,19 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
             HKU_INFO_IF(trace, htr("[{}] CN to buy short", name()));
         }
 
-        m_pre_cn_valid = current_cn_valid;
         return tr.isNull() ? result : tr;
     }
 
-    // If the system changes from invalid to valid
-    if (!m_pre_cn_valid) {
+    // If the system changes from invalid to valid; the same as the EV, no CN means no build
+    if (m_cn && !pre_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] CN status from invalid to valid", name()));
 
-        // If the EV is used for the initial position building
+        // If the CN is used for the initial position building
         if (getParam<bool>("cn_open_position")) {
             HKU_INFO_IF(trace, htr("[{}] CN to buy", name()));
-            TradeRecord tr = _buy(today, src_today, PART_CONDITION);
-            m_pre_cn_valid = current_cn_valid;
-            return tr.isNull() ? result : tr;
+            return _buy(today, src_today, PART_CONDITION);
         }
     }
-
-    m_pre_cn_valid = current_cn_valid;
 
     //----------------------------------------------------------
     // Process the buy and sell signals

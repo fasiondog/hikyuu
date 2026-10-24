@@ -299,4 +299,92 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     }*/
 }
 
+//-----------------------------------------------------------------------------
+// The invalid→valid transition open must not misfire on a run(reset=false) re-entry
+//-----------------------------------------------------------------------------
+
+/** @par Check points (the cn_open_position transition on a run(reset=false) re-entry):
+ *  the initial position is built once; the re-entry run must not buy again */
+TEST_CASE("test_SYS_Simple_cn_open_position_no_reopen_on_rerun") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY);
+    KData k = stk.getKData(query);
+    REQUIRE_GE(k.size(), 10);
+
+    // The CN is invalid on the first bar only, valid on every bar afterwards
+    DatetimeList valid(k.size() - 1);
+    for (size_t i = 1; i < k.size(); ++i) {
+        valid[i - 1] = k[i].datetime;
+    }
+
+    // The re-entry window starts well after the initial position was built
+    KQuery query2 = KQueryByDate(k[8].datetime, Datetime(200002250000LL), KQuery::DAY);
+    KData k2 = stk.getKData(query2);
+    REQUIRE_GE(k2.size(), 5);
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("cn_open_position", true);
+    // buy_delay default true: the transition buy fills long before the re-entry window
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(make_shared<NoSignalSG>());
+    sys->setMM(MM_FixedCount(100));
+    sys->setCN(make_shared<RangeCN>(valid));
+
+    sys->run(stk, query);
+
+    /** @arg the invalid→valid transition at the second bar builds the initial position once */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 1);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 100.0);
+
+    sys->run(stk, query2, false, false);
+
+    /** @arg the re-entry's invalid→valid transition must not buy again on top of the holding */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 1);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 100.0);
+
+    sys->run(stk, query2, false, true);
+
+    /** @arg the forced full reset re-forces the pre-flags: the transition builds again */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 1);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 100.0);
+    CHECK_GE(sys->getTM()->getTradeList().back().datetime, k2.front().datetime);
+}
+
+/** @par Check points (the CN pre-flag while the EV stays invalid): the CN validity is tracked on
+ *  every bar, the early return of an invalid EV included, so no stale transition build happens */
+TEST_CASE("test_SYS_Simple_cn_transition_not_replayed_after_ev_invalid") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY);
+    KData k = stk.getKData(query);
+    REQUIRE_GE(k.size(), 10);
+
+    // The EV is invalid on the first three bars, the CN on the first bar only: the CN becomes
+    // valid while the EV still blocks every trade
+    DatetimeList ev_valid;
+    for (size_t i = 3; i < k.size(); ++i) {
+        ev_valid.push_back(k[i].datetime);
+    }
+
+    DatetimeList cn_valid;
+    for (size_t i = 1; i < k.size(); ++i) {
+        cn_valid.push_back(k[i].datetime);
+    }
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("cn_open_position", true);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(make_shared<NoSignalSG>());
+    sys->setMM(MM_FixedCount(100));
+    sys->setEV(make_shared<RangeEV>(ev_valid));
+    sys->setCN(make_shared<RangeCN>(cn_valid));
+
+    sys->run(stk, query);
+
+    /** @arg the CN transition is consumed while the EV is invalid: no build on the EV recovery */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 0);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
 /** @} */

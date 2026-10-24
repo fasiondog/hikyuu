@@ -394,4 +394,79 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     }*/
 }
 
+//-----------------------------------------------------------------------------
+// The invalid→valid transition open must not misfire on a run(reset=false) re-entry
+//-----------------------------------------------------------------------------
+
+/** @par Check points (the ev_open_position transition on a run(reset=false) re-entry):
+ *  the initial position is built once; the re-entry run must not buy again */
+TEST_CASE("test_SYS_Simple_ev_open_position_no_reopen_on_rerun") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY);
+    KData k = stk.getKData(query);
+    REQUIRE_GE(k.size(), 10);
+
+    // The EV is invalid on the first bar only, valid on every bar afterwards
+    DatetimeList valid(k.size() - 1);
+    for (size_t i = 1; i < k.size(); ++i) {
+        valid[i - 1] = k[i].datetime;
+    }
+
+    // The re-entry window starts well after the initial position was built
+    KQuery query2 = KQueryByDate(k[8].datetime, Datetime(200002250000LL), KQuery::DAY);
+    KData k2 = stk.getKData(query2);
+    REQUIRE_GE(k2.size(), 5);
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("ev_open_position", true);
+    // buy_delay default true: the transition buy fills long before the re-entry window
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(make_shared<NoSignalSG>());
+    sys->setMM(MM_FixedCount(100));
+    EVPtr ev = make_shared<RangeEV>(valid);
+    ev->setQuery(query);
+    sys->setEV(ev);
+
+    sys->run(stk, query);
+
+    /** @arg the invalid→valid transition at the second bar builds the initial position once */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 1);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 100.0);
+
+    sys->run(stk, query2, false, false);
+
+    /** @arg the re-entry's invalid→valid transition must not buy again on top of the holding */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 1);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 100.0);
+
+    sys->run(stk, query2, false, true);
+
+    /** @arg the forced full reset re-forces the pre-flags: the transition builds again */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 1);
+    CHECK_EQ(sys->getTM()->getPosition(k.back().datetime, stk).number, 100.0);
+    CHECK_GE(sys->getTM()->getTradeList().back().datetime, k2.front().datetime);
+}
+
+/** @par Check points (the *_open_position parameters without the matching part): the transition
+ *  flag alone must not build a position when no EV or CN is attached */
+TEST_CASE("test_SYS_Simple_open_position_without_part_no_build") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY);
+
+    auto sys = SYS_Simple();
+    sys->setParam<bool>("ev_open_position", true);
+    sys->setParam<bool>("cn_open_position", true);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(make_shared<NoSignalSG>());
+    sys->setMM(MM_FixedCount(100));
+
+    // An incremental run on a fresh system: the pre-flags are still the constructor defaults
+    sys->run(stk, query, false, false);
+
+    /** @arg no EV/CN attached: the first bar must not count as an invalid→valid transition */
+    CHECK_EQ(countBusiness(sys->getTM()->getTradeList(), BUSINESS_BUY), 0);
+}
+
 /** @} */

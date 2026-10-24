@@ -10,6 +10,8 @@
 
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
+#include <hikyuu/trade_sys/signal/SignalBase.h>
+#include <hikyuu/trade_manage/TradeRecord.h>
 
 using namespace hku;
 
@@ -116,5 +118,69 @@ public:
         _addValid(Datetime(200001060000LL));
     }
 };
+
+/** An environment valid on every date of the list given at construction */
+class RangeEV : public EnvironmentBase {
+public:
+    explicit RangeEV(const DatetimeList& valid)
+    : EnvironmentBase("TEST_RANGE_EV"), m_valid(valid) {}
+    virtual ~RangeEV() {}
+
+    virtual EnvironmentPtr _clone() {
+        return make_shared<RangeEV>(m_valid);
+    }
+
+    virtual void _calculate() {
+        for (const auto& d : m_valid) {
+            _addValid(d);
+        }
+    }
+
+private:
+    DatetimeList m_valid;
+};
+
+/** A condition valid on every date of the list given at construction */
+class RangeCN : public ConditionBase {
+public:
+    explicit RangeCN(const DatetimeList& valid) : ConditionBase("TEST_RANGE_CN"), m_valid(valid) {}
+    virtual ~RangeCN() {}
+
+    virtual ConditionPtr _clone() {
+        return make_shared<RangeCN>(m_valid);
+    }
+
+    virtual void _calculate() {
+        for (const auto& d : m_valid) {
+            _addValid(d);
+        }
+    }
+
+private:
+    DatetimeList m_valid;
+};
+
+/** Emits no signal at all: the only entry path is the *_open_position transition */
+class NoSignalSG : public SignalBase {
+public:
+    NoSignalSG() : SignalBase("TEST_NO_SIGNAL_SG") {}
+    virtual ~NoSignalSG() {}
+
+    virtual SignalPtr _clone() {
+        return make_shared<NoSignalSG>();
+    }
+
+    virtual void _calculate(const KData&) {}
+};
+
+inline int countBusiness(const TradeRecordList& trs, BUSINESS business) {
+    int count = 0;
+    for (const auto& tr : trs) {
+        if (tr.business == business) {
+            count++;
+        }
+    }
+    return count;
+}
 
 #endif /* LIBS_HIKYUU_TRADE_SYS_SYSTEM_TEST_SYS_H_ */
