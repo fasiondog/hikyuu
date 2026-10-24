@@ -49,7 +49,7 @@ Validity rule: a bar is valid when its value is finite and ``> 0``, otherwise in
      - pass through cond2
      - all 0 (invalid)
    * - ``cn1 - cn2`` (Sub)
-     - difference of both; NaN if either is non-finite
+     - difference of both (arithmetic/union semantics, two invalid sides emit the raw difference); NaN if either is non-finite
      - pass through cond1
      - ``-cond2``
      - all 0 (invalid)
@@ -64,15 +64,17 @@ Validity rule: a bar is valid when its value is finite and ``> 0``, otherwise in
      - all 0 (invalid)
      - all 0 (invalid)
    * - ``cn1 * cn2`` (Multi)
-     - product of both; NaN if either is non-finite
+     - product of both; two negative (both invalid) sides yield ``-(abs(cn1) * abs(cn2))`` to stay invalid; NaN if either is non-finite
      - all 0 (invalid)
      - all 0 (invalid)
      - all 0 (invalid)
    * - ``cn1 / cn2`` (Div)
-     - quotient of both; NaN if ``cn2 == 0`` or either is non-finite
+     - quotient of both; two negative (both invalid) sides yield ``-(abs(cn1) / abs(cn2))`` to stay invalid; NaN if ``cn2 == 0`` or either is non-finite
      - all NaN (invalid)
      - all 0 (invalid)
      - all 0 (invalid)
+
+``cn1 * cn2`` and ``cn1 / cn2`` are valid only when both sides are finite and positive: two negative (both invalid) sides would cancel the sign in the raw product/quotient, so the negative value is kept instead, which leaves the bar invalid (matching ``EV_Multi``/``EV_Div``); a chained operator still reads it as invalid. ``cn1 - cn2`` keeps the arithmetic semantics and emits the raw difference of two invalid sides, which may come out positive.
 
 Note: when either operand is a null pointer, the factory operator logs a warning (Add/Sub/Or: "the single-side mode will be used"; And/Multi/Div: "the result is always invalid") and still constructs per the matrix above.
 
@@ -147,7 +149,7 @@ System Validity Condition Base Class
 
     .. py:method:: get_values(self)
 
-        Return the actual values as an indicator, aligned bar-by-bar with the trading object (TO). A date is valid when its value is finite and ``> 0``. Boolean/And/Or conditions emit ``1.0`` for valid bars; arithmetic conditions (Add/Sub/Multi/Div) emit the operation result, which can be any real number, and NaN when an operand is missing or non-finite
+        Return the actual values as an indicator, aligned bar-by-bar with the trading object (TO). A date is valid when its value is finite and ``> 0``. Boolean/And/Or conditions emit ``1.0`` for valid bars; arithmetic conditions (Add/Sub/Multi/Div) emit the operation result, which can be any real number, and NaN when an operand is missing or non-finite. Multi/Div emit a negative value to stay invalid when both sides are invalid, while Sub emits the raw difference
 
     .. py:method:: _add_valid(self, datetime[, value=1.0])
     

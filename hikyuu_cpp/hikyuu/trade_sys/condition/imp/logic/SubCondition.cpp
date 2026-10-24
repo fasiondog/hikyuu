@@ -62,6 +62,8 @@ void SubCondition::_calculate() {
     size_t total = m_kdata.size();
     HKU_ASSERT(m_cond1->size() == total && m_cond2->size() == total);
 
+    // Arithmetic (union) semantics like EV_Sub: two invalid sides may cancel to a positive value;
+    // do not turn it into the And/Multi/Div intersection filtering.
     price_t null_price = Null<price_t>();
     auto const* data1 = m_cond1->data();
     auto const* data2 = m_cond2->data();

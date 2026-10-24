@@ -188,7 +188,7 @@ TEST_CASE("test_LogicCondition_single_side") {
     CHECK_EQ(r->getDatetimeList().size(), 0);
 }
 
-/** @par Test point: two invalid operands stay invalid instead of cancelling to valid (CN-02) */
+/** @par Test point: two invalid operands stay invalid instead of cancelling to valid (CN-002) */
 TEST_CASE("test_LogicCondition_both_invalid_stays_invalid") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -205,11 +205,14 @@ TEST_CASE("test_LogicCondition_both_invalid_stays_invalid") {
     ConditionPtr m = inv1 * inv2;
     m->setTO(kdata);
     CHECK_EQ(m->getDatetimeList().size(), 0);
+    /** @arg the stored value stays negative, so a chained operator keeps reading it as invalid */
+    CHECK_UNARY(m->at(0) < 0.0);
 
     /** @arg CN_Div of two invalid conditions: the raw ratio would be positive */
     ConditionPtr d = inv1 / inv2;
     d->setTO(kdata);
     CHECK_EQ(d->getDatetimeList().size(), 0);
+    CHECK_UNARY(d->at(0) < 0.0);
 
     /** @arg a mixed sign pair stays invalid (the natural product is negative) */
     ConditionPtr mx = val2 * inv1;
@@ -220,6 +223,16 @@ TEST_CASE("test_LogicCondition_both_invalid_stays_invalid") {
     ConditionPtr dx = val2 / inv1;
     dx->setTO(kdata);
     CHECK_EQ(dx->getDatetimeList().size(), 0);
+
+    /** @arg a zero operand is invalid on either side (0.0 is the default invalid value) */
+    ConditionPtr zero = std::make_shared<ConstCondition>(0.0);
+    ConditionPtr mz = inv1 * zero;
+    mz->setTO(kdata);
+    CHECK_EQ(mz->getDatetimeList().size(), 0);
+    ConditionPtr dz = val2 / zero;
+    dz->setTO(kdata);
+    CHECK_EQ(dz->getDatetimeList().size(), 0);
+    CHECK_UNARY(std::isnan(dz->at(0)));
 
     /** @arg both valid stays valid (guard against over-fixing) */
     ConditionPtr mv = std::make_shared<ConstCondition>(3.0) * std::make_shared<ConstCondition>(2.0);

@@ -5,6 +5,8 @@
  *    1. 20240223 added by fasiondog
  */
 
+#include <cmath>
+
 #include "DivCondition.h"
 
 #if HKU_SUPPORT_SERIALIZATION
