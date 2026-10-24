@@ -62,6 +62,13 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    defaults to ``True``), so switching the mode switches the liquidation behavior; confirm it
    explicitly when migrating.
 
+   The three factories share one convention for **no ``se``** (passing ``None``): **every sub-system
+   is treated as selected** -- mode A samples all of them, mode B allocates the quota as usual, and
+   mode C drives all of them. An ``se`` present but selecting nobody on the rebalancing day means
+   "nothing selected": in mode A the unselected sub-systems contribute a zero signal and their
+   instruments drop out of the target and are closed, while in modes B/C ``sell_at_not_selected``
+   decides whether to clear them. See the mode descriptions in :doc:`../trade_sys/system`.
+
    There is also an executor switch ``auto_checkin`` (default ``False``): when the parent cash cannot
    fill this batch of suggestions it deposits extra principal to cover the gap computed from the money
    plus the commission (it only keeps the planned quantities tradable, at the cost of an inflated
