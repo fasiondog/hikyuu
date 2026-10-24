@@ -991,6 +991,27 @@ TEST_CASE("test_SG_kdata_size_mismatch") {
     sg->setTO(k);
     CHECK_UNARY(sg->getSellSignal().empty());
     CHECK_EQ(sg->getBuySignal().size(), k.size());
+
+    /** @arg SG_Bool with a buy ind longer than the KData is aligned, no signal fires */
+    sg = SG_Bool(Indicator(make_shared<FixedLenInd>(k.size() + 10, 0.0)),
+                 Indicator(make_shared<FixedLenInd>(k.size(), 0.0)), false);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Bool with both inds shorter than the KData is aligned, no signal fires */
+    sg = SG_Bool(Indicator(make_shared<FixedLenInd>(5, 0.0)),
+                 Indicator(make_shared<FixedLenInd>(5, 0.0)), false);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Bool skips ALIGN on the matching buy ind and keeps its signals */
+    sg = SG_Bool(Indicator(make_shared<FixedLenInd>(k.size())),
+                 Indicator(make_shared<FixedLenInd>(5, 0.0)), false);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getSellSignal().empty());
+    CHECK_EQ(sg->getBuySignal().size(), k.size());
 }
 
 // A step signal generator for the SG-008 operator benchmark: emits buy/sell signals at fixed bar
