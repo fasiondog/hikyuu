@@ -320,6 +320,21 @@ class TestSGManual(unittest.TestCase):
         self.assertFalse(sg.should_sell(d_buy))
         self.assertEqual(sg.get_value(d_buy), 1.0)
 
+    def test_same_day_net_zero_rollback(self):
+        """A same-day net of zero rolls the alternation state back, so a re-buy still fires"""
+        d = Datetime(201201210000)
+        for alternate in (True, False):
+            sg = SG_Manual()
+            sg.set_param("alternate", alternate)
+            sg._add_buy_signal(d)
+            sg._add_sell_signal(d)
+            self.assertFalse(sg.should_buy(d))
+            self.assertEqual(sg.get_value(d), 0.0)
+            sg._add_buy_signal(d)
+            self.assertTrue(sg.should_buy(d))
+            self.assertFalse(sg.should_sell(d))
+            self.assertEqual(sg.get_value(d), 1.0)
+
     def test_manual_compose(self):
         kdata = sm['sh000001'].get_kdata(Query(-100))
         self.assertFalse(kdata.empty())

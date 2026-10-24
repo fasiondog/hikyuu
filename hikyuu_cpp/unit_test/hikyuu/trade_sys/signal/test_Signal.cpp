@@ -319,6 +319,36 @@ TEST_CASE("test_Signal_same_bar_single_direction") {
         CHECK_EQ(p->getValue(d), 0.0);
     }
 
+    /** @arg a zero net rolls the alternation state back, so a later buy still fires */
+    for (bool alternate : {false, true}) {
+        p->reset();
+        p->setParam<bool>("alternate", alternate);
+        p->setParam<bool>("support_borrow_stock", false);
+        p->_addBuySignal(d, 1.0);
+        p->_addSellSignal(d, -1.0);
+        REQUIRE_UNARY(!p->shouldBuy(d));
+        p->_addBuySignal(d, 1.0);
+        CHECK_UNARY(p->shouldBuy(d));
+        CHECK_UNARY(!p->shouldSell(d));
+        CHECK_EQ(p->getValue(d), 1.0);
+    }
+
+    /** @arg the rollback keeps the long state carried over from an earlier day */
+    p->reset();
+    p->setParam<bool>("alternate", true);
+    p->setParam<bool>("support_borrow_stock", false);
+    Datetime d1(200202040000), d2(200202050000);
+    p->_addBuySignal(d1, 1.0);
+    REQUIRE_UNARY(p->shouldBuy(d1));
+    p->_addSellSignal(d2, -1.0);
+    REQUIRE_UNARY(p->shouldSell(d2));
+    p->_addBuySignal(d2, 1.0);
+    REQUIRE_UNARY(!p->shouldBuy(d2));
+    REQUIRE_UNARY(!p->shouldSell(d2));
+    p->_addSellSignal(d2, -1.0);
+    CHECK_UNARY(p->shouldSell(d2));
+    CHECK_EQ(p->getValue(d2), -1.0);
+
     /** @arg the alternate state does not drop a same-day value refresh */
     p->reset();
     p->setParam<bool>("alternate", true);
