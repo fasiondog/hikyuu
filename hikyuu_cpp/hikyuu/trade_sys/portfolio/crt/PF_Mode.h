@@ -6,8 +6,11 @@
  *  Created on: 2026-10-17
  *      Author: fasiondog
  *
- *  The alphabetical alias factories of the three running modes (inline forwarders of the
- *  semantic-name factories, no behavioral difference).
+ *  The alphabetical alias factories of the three running modes. Pure forwarders: the default
+ *  arguments live only in the semantic-name factories (single source, no per-alias sync), so an
+ *  alias accepts exactly the argument list of its real factory, partial calls included. See the
+ *  real factory for the parameters; the Python bindings expose the real factories under the same
+ *  alias names.
  */
 
 #pragma once
@@ -21,34 +24,21 @@
 namespace hku {
 
 /** Alias of PF_SignalAggregate: mode A "Signal Aggregation" @ingroup Portfolio */
-inline MultiSystemPtr PF_ModeA(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
-                               const AFPtr& af = AF_EqualWeight(), int adjust_cycle = 1,
-                               const string& adjust_mode = "query",
-                               bool delay_to_trading_day = true, bool trade_on_close = true,
-                               bool sell_at_not_selected = false,
-                               price_t sub_init_cash = 100000.0) {
-    return PF_SignalAggregate(tm, se, af, adjust_cycle, adjust_mode, delay_to_trading_day,
-                              trade_on_close, sell_at_not_selected, sub_init_cash);
+template <typename... Args>
+inline MultiSystemPtr PF_ModeA(Args&&... args) {
+    return PF_SignalAggregate(std::forward<Args>(args)...);
 }
 
 /** Alias of PF_Simple: mode B "Fund Allocation" @ingroup Portfolio */
-inline MultiSystemPtr PF_ModeB(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
-                               const AFPtr& af = AF_EqualWeight(), int adjust_cycle = 1,
-                               const string& adjust_mode = "query",
-                               bool delay_to_trading_day = true, bool trade_on_close = true,
-                               bool sell_at_not_selected = true) {
-    return PF_Simple(tm, se, af, adjust_cycle, adjust_mode, delay_to_trading_day, trade_on_close,
-                     sell_at_not_selected);
+template <typename... Args>
+inline MultiSystemPtr PF_ModeB(Args&&... args) {
+    return PF_Simple(std::forward<Args>(args)...);
 }
 
 /** Alias of PF_WithoutAF: mode C "Shared Account Compatibility" @ingroup Portfolio */
-inline MultiSystemPtr PF_ModeC(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
-                               int adjust_cycle = 1, const string& adjust_mode = "query",
-                               bool delay_to_trading_day = true, bool trade_on_close = true,
-                               bool sys_use_self_tm = false, bool sell_at_not_selected = false,
-                               bool keep_watch_force_sell = false) {
-    return PF_WithoutAF(tm, se, adjust_cycle, adjust_mode, delay_to_trading_day, trade_on_close,
-                        sys_use_self_tm, sell_at_not_selected, keep_watch_force_sell);
+template <typename... Args>
+inline MultiSystemPtr PF_ModeC(Args&&... args) {
+    return PF_WithoutAF(std::forward<Args>(args)...);
 }
 
 } /* namespace hku */

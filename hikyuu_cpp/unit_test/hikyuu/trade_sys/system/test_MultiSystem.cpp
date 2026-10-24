@@ -4568,6 +4568,77 @@ TEST_CASE("test_MultiSystem_pf_mode_aliases") {
     CHECK_UNARY(!c->getSellAtNotSelected());
 }
 
+/** @par Check point: a non-positive sub_init_cash is warned and ignored (the previous value, the
+ * default otherwise, is kept), both on the setter and through the PF_SignalAggregate factory */
+TEST_CASE("test_MultiSystem_sub_init_cash_validation") {
+    auto ms = std::make_shared<MultiSystem>("ms_sic");
+    CHECK_EQ(ms->getSubInitCash(), doctest::Approx(100000.0));
+
+    /** @arg a negative and a zero value are ignored, the default is kept */
+    ms->setSubInitCash(-1.0);
+    CHECK_EQ(ms->getSubInitCash(), doctest::Approx(100000.0));
+    ms->setSubInitCash(0.0);
+    CHECK_EQ(ms->getSubInitCash(), doctest::Approx(100000.0));
+
+    /** @arg a positive value is taken, and a later non-positive one does not reset it */
+    ms->setSubInitCash(50000.0);
+    CHECK_EQ(ms->getSubInitCash(), doctest::Approx(50000.0));
+    ms->setSubInitCash(-7.0);
+    CHECK_EQ(ms->getSubInitCash(), doctest::Approx(50000.0));
+
+    /** @arg the factory path goes through the same guard */
+    auto pf = PF_SignalAggregate(crtTM(), SE_Fixed(), AF_EqualWeight(), 1, "query", true, true,
+                                 false, -5.0);
+    CHECK_EQ(pf->getSubInitCash(), doctest::Approx(100000.0));
+}
+
+/** @par Check point: the same group of sub-systems with the same data behaves characteristically
+ * differently across the three presets -- the account topology is the fingerprint: A/B give every
+ * sub-system its own shadow/quota account (the parent trades on its own real account), while C
+ * shares the single real account of the parent. The empty-SE convention (no SE = all selected, the
+ * mode A/C convention, see the PF02 fix) is pinned for all three modes in one place. */
+TEST_CASE("test_MultiSystem_three_modes_same_inputs") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto run_mode = [&](const char* mode) {
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+        MultiSystemPtr ms;
+        if (std::string(mode) == "A") {
+            ms = PF_SignalAggregate(tm, SEPtr());
+        } else if (std::string(mode) == "B") {
+            ms = PF_Simple(tm, SEPtr(), AF_EqualWeight());
+        } else {
+            ms = PF_WithoutAF(tm, SEPtr());
+        }
+        REQUIRE(ms != nullptr);
+        CHECK_EQ(ms->getMode(), std::string(mode));
+        auto sys = create_alway_buy_sys();
+        sys->setTO(stk.getKData(query));
+        ms->add(sys);
+        ms->run(query);
+        return std::make_tuple(ms, tm, sys);
+    };
+
+    /** @arg mode A: the sub-system keeps its own shadow account, the parent trades on its own
+     * real account (both buy the stock) */
+    auto [ms_a, tm_a, sys_a] = run_mode("A");
+    CHECK(sys_a->getTM() != tm_a);
+    CHECK_UNARY(tm_a->have(stk));
+
+    /** @arg mode B: the sub-system has its own quota-funded account, the parent mirrors the trades
+     * on its own real account */
+    auto [ms_b, tm_b, sys_b] = run_mode("B");
+    CHECK(sys_b->getTM() != tm_b);
+    CHECK_UNARY(tm_b->have(stk));
+
+    /** @arg mode C: the sub-system trades DIRECTLY on the shared real account of the parent */
+    auto [ms_c, tm_c, sys_c] = run_mode("C");
+    CHECK(sys_c->getTM() == tm_c);
+    CHECK_UNARY(tm_c->have(stk));
+}
+
 /** @par Check point: the intent state of a nested aggregate child includes its already-converted
  * but not yet executed open pending suggestions (the intent state = the net exposure + the
  * unfilled requests; the parent snapshot must not miss the target the child has queued for its

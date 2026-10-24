@@ -42,6 +42,10 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    Every factory also has a letter-named thin alias (``PF_ModeA`` / ``PF_ModeB`` / ``PF_ModeC``): the
    same implementation, the same parameters and no behavior difference, for lookups and mode comparisons.
 
+   The returned object of every factory is named after the factory itself (the object returned by
+   ``PF_ModeA()`` is also named ``PF_SignalAggregate``): tell the modes apart with ``get_mode()``,
+   and rename the returned object when several portfolios live in one process.
+
    .. list-table:: Defaults of the three modes
       :header-rows: 1
 

@@ -53,6 +53,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include "hikyuu/utilities/log.h"
 #include "../System.h"
 #include "../../../trade_manage/crt/crtTM.h"
 #include "../../moneymanager/crt/MM_Nothing.h"
@@ -126,7 +127,9 @@ public:
         }
     }
 
-    /** Get the fund allocation instance */
+    /** Get the fund allocation instance. In mode C it is only the mode carrier: the L1/L2/L3 of
+     *  the AF are all no-ops there (the sub-systems trade on the shared real account and are sized
+     *  by their own MM), so the returned instance must not be read as a working allocator. */
     const AllocateFundsPtr& getAF() const {
         return m_af;
     }
@@ -170,9 +173,15 @@ public:
 
     /** Set the initial signal cash of the sub-system shadow account (mode A Signal Aggregation).
      *  In mode B (Fund Allocation) the shadow accounts start from zero and the quota comes from
-     *  the L1 allocation, so this value is unused. A non-positive value is ignored. */
+     *  the L1 allocation, so this value is unused. A non-positive value is warned and ignored
+     *  (the previous value, the default otherwise, is kept). */
     void setSubInitCash(price_t cash) {
-        m_sub_init_cash = cash > 0.0 ? cash : m_sub_init_cash;
+        if (cash <= 0.0) {
+            HKU_WARN("Invalid sub_init_cash {} (<= 0), ignored, keep {}! [{}]", cash,
+                     m_sub_init_cash, name());
+            return;
+        }
+        m_sub_init_cash = cash;
     }
 
     /** Get the initial fund of the sub-system shadow account */
