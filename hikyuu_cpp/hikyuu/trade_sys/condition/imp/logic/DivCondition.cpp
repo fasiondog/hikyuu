@@ -52,8 +52,14 @@ void DivCondition::_calculate() {
     auto const* data1 = m_cond1->data();
     auto const* data2 = m_cond2->data();
     for (size_t i = 0; i < total; i++) {
-        m_values[i] = (std::isfinite(data1[i]) && std::isfinite(data2[i]) && data2[i] != 0.0)
-                        ? data1[i] / data2[i] : null_price;
+        if (std::isfinite(data1[i]) && std::isfinite(data2[i]) && data2[i] != 0.0) {
+            // Both invalid: keep the combined strength negative so the day stays invalid
+            m_values[i] = (data1[i] < 0.0 && data2[i] < 0.0)
+                            ? -(std::abs(data1[i]) / std::abs(data2[i]))
+                            : data1[i] / data2[i];
+        } else {
+            m_values[i] = null_price;
+        }
     }
 }
 

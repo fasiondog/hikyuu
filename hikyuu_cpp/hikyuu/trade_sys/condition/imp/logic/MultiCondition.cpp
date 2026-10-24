@@ -45,9 +45,14 @@ void MultiCondition::_calculate() {
     auto const* data1 = m_cond1->data();
     auto const* data2 = m_cond2->data();
     for (size_t i = 0; i < total; i++) {
-        m_values[i] = (std::isfinite(data1[i]) && std::isfinite(data2[i]))
-                        ? data1[i] * data2[i]
-                        : null_price;
+        if (std::isfinite(data1[i]) && std::isfinite(data2[i])) {
+            // Both invalid: keep the combined strength negative so the day stays invalid
+            m_values[i] = (data1[i] < 0.0 && data2[i] < 0.0)
+                            ? -(std::abs(data1[i]) * std::abs(data2[i]))
+                            : data1[i] * data2[i];
+        } else {
+            m_values[i] = null_price;
+        }
     }
 }
 
@@ -72,7 +77,8 @@ ConditionPtr MultiCondition::_clone() {
 }
 
 HKU_API ConditionPtr operator*(const ConditionPtr& cond1, const ConditionPtr& cond2) {
-    HKU_WARN_IF(!cond1 || !cond2, "MultiCondition: one side is null, the result is always invalid.");
+    HKU_WARN_IF(!cond1 || !cond2,
+                "MultiCondition: one side is null, the result is always invalid.");
     return make_shared<MultiCondition>(cond1, cond2);
 }
 

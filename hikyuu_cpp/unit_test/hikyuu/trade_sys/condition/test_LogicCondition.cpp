@@ -188,4 +188,48 @@ TEST_CASE("test_LogicCondition_single_side") {
     CHECK_EQ(r->getDatetimeList().size(), 0);
 }
 
+/** @par Test point: two invalid operands stay invalid instead of cancelling to valid (CN-02) */
+TEST_CASE("test_LogicCondition_both_invalid_stays_invalid") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    ConditionPtr inv1 = std::make_shared<ConstCondition>(-1.0);
+    ConditionPtr inv2 = std::make_shared<ConstCondition>(-2.0);
+    ConditionPtr val2 = std::make_shared<ConstCondition>(2.0);
+
+    /** @arg CN_Multi of two invalid conditions: the raw product would be positive */
+    ConditionPtr m = inv1 * inv2;
+    m->setTO(kdata);
+    CHECK_EQ(m->getDatetimeList().size(), 0);
+
+    /** @arg CN_Div of two invalid conditions: the raw ratio would be positive */
+    ConditionPtr d = inv1 / inv2;
+    d->setTO(kdata);
+    CHECK_EQ(d->getDatetimeList().size(), 0);
+
+    /** @arg a mixed sign pair stays invalid (the natural product is negative) */
+    ConditionPtr mx = val2 * inv1;
+    mx->setTO(kdata);
+    CHECK_EQ(mx->getDatetimeList().size(), 0);
+
+    /** @arg CN_Div with a mixed sign pair stays invalid */
+    ConditionPtr dx = val2 / inv1;
+    dx->setTO(kdata);
+    CHECK_EQ(dx->getDatetimeList().size(), 0);
+
+    /** @arg both valid stays valid (guard against over-fixing) */
+    ConditionPtr mv = std::make_shared<ConstCondition>(3.0) * std::make_shared<ConstCondition>(2.0);
+    mv->setTO(kdata);
+    CHECK_EQ(mv->getDatetimeList().size(), kdata.size());
+
+    /** @arg CN_Div of two valid conditions stays valid */
+    ConditionPtr dv = val2 / std::make_shared<ConstCondition>(2.0);
+    dv->setTO(kdata);
+    CHECK_EQ(dv->getDatetimeList().size(), kdata.size());
+}
+
 /** @} */
