@@ -480,6 +480,62 @@ TEST_CASE("test_SE_PerformanceOptimal_bound_identity") {
     CHECK_EQ(sw[0].sys->name(), "real_test_sys_3_10");
 }
 
+// A minimal optimal selector exposing the prototype-to-running bindings
+class BindingProbeSelector : public OptimalSelectorBase {
+public:
+    BindingProbeSelector() : OptimalSelectorBase("SE_BindingProbe") {}
+
+    virtual SelectorPtr _clone() override {
+        return std::make_shared<BindingProbeSelector>();
+    }
+
+    virtual SystemWeightList _getSelected(Datetime date) override {
+        return SystemWeightList();
+    }
+
+    virtual void _calculate() override {}
+
+    size_t bindingCount() const {
+        return m_proto_to_real.size();
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_SE_Optimal_bindings_lifecycle") {
+    BindingProbeSelector se;
+    auto proto = create_test_sys(3, 5);
+    proto->setStock(getStock("sz000001"));
+    se.addSystem(proto);
+
+    auto real = proto->clone();
+    real->setStock(getStock("sz000001"));
+    std::weak_ptr<System> weak_real = real;
+    se.bindRealToProto(real, proto);
+    real = nullptr;
+
+    /** @arg The binding registers and holds the running system */
+    CHECK_EQ(se.bindingCount(), 1);
+    CHECK_UNARY(!weak_real.expired());
+
+    /** @arg A reset keeps the prototypes, hence the bindings */
+    se.reset();
+    CHECK_EQ(se.bindingCount(), 1);
+    CHECK_UNARY(!weak_real.expired());
+
+    /** @arg remove_all drops the prototypes and their bindings */
+    se.removeAll();
+    CHECK_EQ(se.bindingCount(), 0);
+    CHECK_UNARY(weak_real.expired());
+    CHECK_UNARY(se.getProtoSystemList().empty());
+
+    /** @arg A new prototype can be bound again after remove_all */
+    auto proto2 = create_test_sys(3, 10);
+    proto2->setStock(getStock("sz000001"));
+    se.addSystem(proto2);
+    se.bindRealToProto(proto2, proto2);
+    CHECK_EQ(se.bindingCount(), 1);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

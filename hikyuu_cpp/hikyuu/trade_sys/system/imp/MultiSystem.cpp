@@ -384,8 +384,7 @@ void MultiSystem::_reset() {
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
-        // Only the cached selection is dropped: a full SE reset would also drop the
-        // real-to-prototype bindings (the aggregate cannot rebuild them)
+        // Drop the cached selection only: the prototypes and their bindings stay valid
         m_se->invalidateCache();
     }
 }
@@ -447,8 +446,7 @@ void MultiSystem::_forceResetAll() {
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
-        // Only the cached selection is dropped: a full SE reset would also drop the
-        // real-to-prototype bindings (the aggregate cannot rebuild them)
+        // Drop the cached selection only: the prototypes and their bindings stay valid
         m_se->invalidateCache();
     }
 

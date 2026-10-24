@@ -84,7 +84,7 @@
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor(mf, topn=10)
 
-.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan()])
+.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=None])
 
     创建基于多因子评分的选择器，支持多种创建方式。:doc:`scfilter`
 
@@ -100,7 +100,7 @@
     :param Stock ref_stk: 参考证券 (未指定时，默认为 sh000001 上证指数)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
-    :param ScoresFilter filter: 评分过滤器
+    :param ScoresFilter filter: 评分过滤器；默认 None 表示使用内置的 ``SCFilter_IgnoreNan()``（每次调用新建，实例不共享）
     :return: SE选择器实例
 
     .. code-block:: python

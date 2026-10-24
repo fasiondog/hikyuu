@@ -90,7 +90,7 @@ Built-in Selectors
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor(mf, topn=10)
 
-.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan()])
+.. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=None])
 
     Create a selector based on multi-factor scoring; it supports several forms of input. See :doc:`scfilter`.
 
@@ -106,7 +106,7 @@ Built-in Selectors
     :param Stock ref_stk: the reference security (when unspecified, defaults to sh000001, the Shanghai Composite Index)
     :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
     :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
-    :param ScoresFilter filter: the cross-sectional scores filter
+    :param ScoresFilter filter: the cross-sectional scores filter; None (the default) means a fresh built-in ``SCFilter_IgnoreNan()`` (never shared between selectors)
     :return: the SE selector instance
 
     .. code-block:: python

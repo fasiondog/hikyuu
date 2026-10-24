@@ -13,6 +13,7 @@
 # ===============================================================================
 
 import os
+import re
 import subprocess
 import sys
 import unittest
@@ -87,8 +88,11 @@ class SelectorTest(unittest.TestCase):
         )
         if proc.returncode != 0:
             self.fail("parallel Python evaluate crashed:\n%s" % proc.stderr[-2000:])
-        self.assertIn("EVAL_COUNT", proc.stdout)
         self.assertIn("OK", proc.stdout)
+        matched = re.search(r"EVAL_COUNT\s+(\d+)", proc.stdout)
+        self.assertIsNotNone(matched, proc.stdout[-2000:])
+        # The probe prints OK even when evaluate never fired, so check the count
+        self.assertGreater(int(matched.group(1)), 0, proc.stdout[-2000:])
 
 
 class SelectorScoresFilterTest(unittest.TestCase):
