@@ -32,19 +32,19 @@ public:
     }
 
     void _reset() override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _reset, );
+        PYBIND11_OVERRIDE(void, SelectorBase, _reset);
     }
 
     void _calculate() override {
-        PYBIND11_OVERLOAD_PURE(void, SelectorBase, _calculate, );
+        PYBIND11_OVERRIDE_PURE(void, SelectorBase, _calculate);
     }
 
     void _addSystem(const SystemPtr& sys) override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _addSystem, sys);
+        PYBIND11_OVERRIDE(void, SelectorBase, _addSystem, sys);
     }
 
     void _removeAll() override {
-        PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
+        PYBIND11_OVERRIDE(void, SelectorBase, _removeAll);
     }
 
     // The subclass interfaces that must be implemented

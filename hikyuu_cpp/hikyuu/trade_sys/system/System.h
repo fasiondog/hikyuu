@@ -175,6 +175,9 @@ public:
 
     /**
      * Clone operation, the clone operation of every part is called in turn
+     * @note The clone reads the source system only and writes nothing to it, so cloning the
+     * same source concurrently from several threads is safe (e.g. the parallel training
+     * windows of OptimalSelectorBase)
      */
     SystemPtr clone();
 

@@ -19,6 +19,7 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Logic.h>
+#include <hikyuu/trade_sys/selector/imp/logic/OperatorValueSelector.h>
 
 using namespace hku;
 
@@ -132,7 +133,7 @@ TEST_CASE("test_SE_SubValue") {
 
     /** @arg A number - a null pointer */
     se = 3.0 - SEPtr();
-    CHECK_EQ(se->name(), "SE_SubValue");
+    CHECK_EQ(se->name(), "SE_SubInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     auto proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -174,7 +175,7 @@ TEST_CASE("test_SE_SubValue") {
 
     /** @arg A number - a selector (a fresh inner selector, see the note in test_SE_AddValue) */
     se = 3.0 - SE_Fixed();
-    CHECK_EQ(se->name(), "SE_SubValue");
+    CHECK_EQ(se->name(), "SE_SubInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -292,7 +293,7 @@ TEST_CASE("test_SE_DivValue") {
 
     /** @arg A number / a null pointer */
     se = 3.0 / SEPtr();
-    CHECK_EQ(se->name(), "SE_DivValue");
+    CHECK_EQ(se->name(), "SE_DivInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     auto proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -334,7 +335,7 @@ TEST_CASE("test_SE_DivValue") {
 
     /** @arg A number / a selector (a fresh inner selector, see the note in test_SE_AddValue) */
     se = 3.0 / SE_Fixed();
-    CHECK_EQ(se->name(), "SE_DivValue");
+    CHECK_EQ(se->name(), "SE_DivInvValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
     proto_sys_list = se->getProtoSystemList();
     CHECK_EQ(proto_sys_list.size(), 3);
@@ -993,6 +994,27 @@ TEST_CASE("test_SE_DivValue_byZero") {
     for (const auto& sw : result4) {
         CHECK_UNARY(std::isnan(sw.weight));
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_SE_ValueSelector_names") {
+    /** @arg The base-class default name (the old SE_OpearatorValue typo corrected) */
+    OperatorValueSelector base;
+    CHECK_EQ(base.name(), "SE_OperatorValue");
+
+    /** @arg The sub value selectors have distinct names in both directions */
+    SEPtr se = 3.0 - SE_Fixed();
+    CHECK_EQ(se->name(), "SE_SubInvValue");
+    CHECK_EQ(se->clone()->name(), "SE_SubInvValue");
+    se = SE_Fixed() - 3.0;
+    CHECK_EQ(se->name(), "SE_SubValue");
+
+    /** @arg The div value selectors have distinct names in both directions */
+    se = 3.0 / SE_Fixed();
+    CHECK_EQ(se->name(), "SE_DivInvValue");
+    CHECK_EQ(se->clone()->name(), "SE_DivInvValue");
+    se = SE_Fixed() / 3.0;
+    CHECK_EQ(se->name(), "SE_DivValue");
 }
 
 #if HKU_SUPPORT_SERIALIZATION

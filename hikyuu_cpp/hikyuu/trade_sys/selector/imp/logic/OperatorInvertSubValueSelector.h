@@ -12,7 +12,7 @@
 namespace hku {
 
 class HKU_API OperatorInvertSubValueSelector : public OperatorValueSelector {
-    OPERATOR_VALUE_SELECTOR_IMP(OperatorInvertSubValueSelector, "SE_SubValue")
+    OPERATOR_VALUE_SELECTOR_IMP(OperatorInvertSubValueSelector, "SE_SubInvValue")
     OPERATOR_VALUE_SELECTOR_SERIALIZATION
 };
 
