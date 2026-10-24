@@ -103,6 +103,8 @@
 
 **⚠️ 归档格式变化**：`SignalBase` 新增周期起止与周期日字段，算子信号不再重复序列化基类，旧 `SG_*`（以及内嵌 `m_sg` 的系统）归档需重新保存；旧归档中的连字符参数键（`auto-checkin` / `max-stock` / `out-extreme`）不会自动迁移，反序列化后取默认值，需显式 `set_param` 补齐。
 
+**⚠️ 行为变化：选择器默认名称拼写修正**：`SE_Signal` 的默认名（旧拼写错误 `SE_Sigal`）与乘法组合选择器（`se1 * se2`）的默认名由 `SE_Multi` 改为 `SE_Mul`（避免与多因子选择器 `SE_MultiFactor*` 混淆）。仅影响 `name()` / `str()` 的显示值；序列化归档的类识别基于类名而非名称字段，旧归档仍可正常加载（旧归档恢复出的实例名称仍为旧名）。
+
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 C）

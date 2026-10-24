@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::SignalSelector)
 
 namespace hku {
 
-SignalSelector::SignalSelector() : SelectorBase("SE_Sigal") {}
+SignalSelector::SignalSelector() : SelectorBase("SE_Signal") {}
 
 SignalSelector::~SignalSelector() {}
 
