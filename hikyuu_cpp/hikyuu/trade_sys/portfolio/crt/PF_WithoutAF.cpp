@@ -18,7 +18,7 @@ namespace hku {
 MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust_cycle,
                                     const string& adjust_mode, bool delay_to_trading_day,
                                     bool trade_on_close, bool sys_use_self_tm,
-                                    bool sell_at_not_selected) {
+                                    bool sell_at_not_selected, bool keep_watch_force_sell) {
     auto sys = std::make_shared<MultiSystem>("PF_WithoutAF");
     // The preset: MultiSystem mode C "Shared Account Compatibility" (the legacy Portfolio: the
     // sub-systems trade on the shared real account and are sized by their own MM). The mode is
@@ -33,6 +33,7 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust
     sys->setDelayToTradingDay(delay_to_trading_day);
     sys->setTradeOnClose(trade_on_close);
     sys->setSellAtNotSelected(sell_at_not_selected);
+    sys->setKeepWatchForceSell(keep_watch_force_sell);
 
     // Mode C always shares the real account of the parent, so the "own tm of the prototype
     // system" branch of the legacy engine is not exposed as a per-layer capability (C-O3=A)

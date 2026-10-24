@@ -45,9 +45,10 @@ inline MultiSystemPtr PF_ModeB(const TMPtr& tm = TradeManagerPtr(), const SEPtr&
 inline MultiSystemPtr PF_ModeC(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
                                int adjust_cycle = 1, const string& adjust_mode = "query",
                                bool delay_to_trading_day = true, bool trade_on_close = true,
-                               bool sys_use_self_tm = false, bool sell_at_not_selected = false) {
+                               bool sys_use_self_tm = false, bool sell_at_not_selected = false,
+                               bool keep_watch_force_sell = false) {
     return PF_WithoutAF(tm, se, adjust_cycle, adjust_mode, delay_to_trading_day, trade_on_close,
-                        sys_use_self_tm, sell_at_not_selected);
+                        sys_use_self_tm, sell_at_not_selected, keep_watch_force_sell);
 }
 
 } /* namespace hku */

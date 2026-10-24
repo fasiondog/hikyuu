@@ -148,7 +148,7 @@ PF 部件说明:
     :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出，默认 ``True`` 对齐旧 ``SimplePortfolio``
     :rtype: MultiSystem
 
-.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
+.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False, keep_watch_force_sell=False])
 
     创建无资金分配算法的投资组合（**返回 MultiSystem，运行于模式 C「共享账户兼容」（Shared Account
     Compatibility）**），即重构前 ``WithoutAFPortfolio`` 的行为，用于复现重构**前**的回测结果。
@@ -159,9 +159,17 @@ PF 部件说明:
     （L1 不分配额度、L2 无需换算、L3 默认关闭）。
 
     驱动集由 SE 语义决定（SE 可自由替换）：调仓日被选中者进入运行池；**未被选中即出池**（与是否
-    持仓无关）。出池仍持仓者：``sell_at_not_selected=True`` 时父立即强平；为 ``False``（默认，对齐
-    旧引擎）时只在出池日补驱动一次，其后转入 ``force_sell`` 池——该池仅在非调仓日且
-    ``sell_at_not_selected=True`` 时才继续被驱动，故默认配置下残余持仓不再被盯盘（旧引擎既定行为）。
+    持仓无关）。出池仍持仓者：``sell_at_not_selected=True`` 时出池日立即强平（当日未能成交者转入
+    ``force_sell`` 池，此后每日开盘持续强扫直至清空）；为 ``False``（默认，对齐旧引擎）时只在出池日
+    补驱动一次，其后转入 ``force_sell`` 池。
+
+    .. warning::
+
+       默认配置（``sell_at_not_selected=False`` 且 ``keep_watch_force_sell=False``）下，
+       ``force_sell`` 池中的残余持仓**不再被盯盘**：止损、止盈与卖出信号全部失效，永不平仓（旧引擎
+       既定行为）。需要继续管理该持仓时：设 ``keep_watch_force_sell=True``，恢复对池的每日驱动（仅
+       盯盘、不强平，由持仓自身的卖出信号/止损/止盈平仓，归零后自动出池）；或设
+       ``sell_at_not_selected=True`` 立即强平。
 
     调仓模式 adjust_mode 说明同上。
 
@@ -173,6 +181,7 @@ PF 部件说明:
     :param bool trade_on_close: 交易是否在收盘时进行（同时下发为子系统的 buy_delay/sell_delay 映射）
     :param bool sys_use_self_tm: 仅为签名兼容保留（模式 C 一律共享父真实账户，**忽略并告警**）
     :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出，默认 ``False`` 对齐旧引擎
+    :param bool keep_watch_force_sell: 强制清仓关闭时是否继续驱动出池仍持仓者（仅盯盘、不强平，由其自身的卖出信号/止损/止盈平仓，归零后自动出池），默认 ``False``
     :rtype: MultiSystem
 
 .. py:function:: PF_SignalAggregate([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=False, sub_init_cash=100000.0])

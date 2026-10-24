@@ -170,7 +170,7 @@ Built-in Portfolios
     :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold, ``True`` by default to match the legacy ``SimplePortfolio``
     :rtype: MultiSystem
 
-.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
+.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False, keep_watch_force_sell=False])
 
     Create a portfolio without a fund allocation algorithm (**returns MultiSystem running in mode C
     "Shared Account Compatibility"**), i.e. the behavior of the ``WithoutAFPortfolio`` from before the
@@ -186,11 +186,21 @@ Built-in Portfolios
     The driven set follows the SE semantics (the SE is freely replaceable): a sub-system admitted by the
     SE on the rebalancing day enters the running pool, and it **leaves as soon as it is not selected
     again** (no matter whether it still holds). For a leaving system that still holds: with
-    ``sell_at_not_selected=True`` the parent liquidates it at once, while with the default ``False``
-    (aligned with the legacy engine) it gets one last drive on that day and is then handed to the
-    ``force_sell`` pool, which is only driven again on the non-rebalancing days and only when
-    ``sell_at_not_selected`` is on. Under the default the residual position is therefore no longer
-    followed (the established behavior of the legacy engine).
+    ``sell_at_not_selected=True`` the parent liquidates it at once on the removal day (whatever cannot
+    be filled that day enters the ``force_sell`` pool and is force-swept at every following open until
+    flat); with the default ``False`` (aligned with the legacy engine) it gets one last drive on that
+    day and is then handed to the ``force_sell`` pool.
+
+    .. warning::
+
+       Under the default configuration (``sell_at_not_selected=False`` and
+       ``keep_watch_force_sell=False``), the residual position in the ``force_sell`` pool **stops being
+       watched**: its stop-loss, profit goal and sell signals stop working and it is never closed (the
+       established behavior of the legacy engine). To keep managing it: set
+       ``keep_watch_force_sell=True`` to restore the daily driving of the pool (watch-only, nothing is
+       force-sold; the position is closed by its own sell signal / stop-loss / profit goal and the
+       sub-system leaves the pool once flat), or set ``sell_at_not_selected=True`` to liquidate it at
+       once.
 
     The rebalancing mode adjust_mode is the same as described above.
 
@@ -202,6 +212,7 @@ Built-in Portfolios
     :param bool trade_on_close: whether the trades are executed at the close (also mapped onto the sub-system buy_delay / sell_delay)
     :param bool sys_use_self_tm: kept for the signature compatibility only (mode C always shares the real account of the parent; **ignored with a warning**)
     :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold, ``False`` by default to match the legacy engine
+    :param bool keep_watch_force_sell: keep driving the removed still-holding sub-systems when the forced liquidation is off (watch-only: their own sell signal / stop-loss / profit goal keeps running until they are flat; nothing is force-sold), ``False`` by default
     :rtype: MultiSystem
 
 .. py:function:: PF_SignalAggregate([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=False, sub_init_cash=100000.0])

@@ -66,6 +66,7 @@ void MultiSystem::_initAxisParam() {
     setParam<int>("adjust_cycle", 1);
     setParam<bool>("trade_on_close", true);
     setParam<bool>("sell_at_not_selected", false);
+    setParam<bool>("keep_watch_force_sell", false);
     setParam<bool>("auto_checkin", false);
 }
 
@@ -92,6 +93,7 @@ void MultiSystem::_refreshRunConfig() {
     }
     m_trade_on_close = getTradeOnClose();
     m_sell_at_not_selected = getSellAtNotSelected();
+    m_keep_watch_force_sell = getKeepWatchForceSell();
     m_auto_checkin = getAutoCheckin();
     if (!m_adjust_cycle_warned) {
         m_adjust_cycle_warned = true;
@@ -2350,7 +2352,9 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     // the golden case (trade_on_close=true produces no delayed request at all).
     SystemList drive_list;
     if (mode_c) {
-        if (m_sell_at_not_selected) {
+        // The forced liquidation drives the pool to mirror its open sweep; the watch-only opt-in
+        // drives it so the removed holding keeps running its own exit logic (no forced selling)
+        if (m_sell_at_not_selected || m_keep_watch_force_sell) {
             drive_list.insert(drive_list.end(), m_force_sell_list.begin(), m_force_sell_list.end());
         }
         if (m_se) {
@@ -3473,8 +3477,10 @@ void MultiSystem::_closePhaseModeC(const Datetime& datetime, bool is_adjust,
 
     if (!is_adjust) {
         // Non-rebalancing day (legacy): the pools are not updated; the force-sell pool is driven
-        // only when the forced liquidation is on, then the running pool is driven.
-        if (m_sell_at_not_selected) {
+        // when the forced liquidation is on (to mirror its open sweep), or under the watch-only
+        // opt-in (the removed holding keeps running its own exit logic), then the running pool is
+        // driven.
+        if (m_sell_at_not_selected || m_keep_watch_force_sell) {
             for (auto& sys : m_force_sell_list) {
                 _runModeCClose(sys, datetime, suggestions, executed);
             }
@@ -3531,6 +3537,17 @@ void MultiSystem::_closePhaseModeC(const Datetime& datetime, bool is_adjust,
             if (sg) {
                 sg->startCycle(datetime, _getCycleEnd(datetime));
             }
+        }
+    }
+
+    // Watch-only drive of the force-sell pool on the rebalancing day (keep_watch_force_sell with
+    // the forced liquidation off -- otherwise the members were force-sold at the open sweep): the
+    // removed holdings keep running their own exit logic every day. Driven before the running pool
+    // so the cash freed by their sells is available to the admitted systems; the re-admitted ones
+    // have left the pool above and are driven once as running members.
+    if (m_keep_watch_force_sell && !m_sell_at_not_selected) {
+        for (auto& sys : m_force_sell_list) {
+            _runModeCClose(sys, datetime, suggestions, executed);
         }
     }
 

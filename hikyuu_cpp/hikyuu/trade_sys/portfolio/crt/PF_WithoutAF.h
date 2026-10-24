@@ -53,12 +53,18 @@ namespace hku {
  *       their own MM (so they compete for the same cash, in the pool admission order), the AF is
  *       only the mode carrier here (L1 takes no quota, L2 needs no conversion, L3 is off by
  *       default) and the parent never places an extra order.
+ * @warning With the default sell_at_not_selected=false, a sub-system that the SE stops admitting
+ *          while it still holds is driven ONE last time and then FROZEN: its stop-loss, profit
+ *          goal and sell signals stop working and the position is never closed (the legacy engine
+ *          behavior). Set keep_watch_force_sell=true to keep driving it until it is flat, or
+ *          sell_at_not_selected=true to liquidate it at once.
  * @note On a rebalancing day a sub-system that the SE stops admitting leaves the running pool no
  *       matter whether it still holds: sell_at_not_selected=true liquidates it at once, while the
  *       default false gives it ONE last drive (so a sell signal of that very day is still realized)
- *       and then stops following it (the position is left as the legacy engine did). The driven set
- *       follows the SE semantics: an "all selected" SE (e.g. SE_Fixed) degenerates mode C into
- *       driving every sub-system every day.
+ *       and then stops following it (the position is left as the legacy engine did), unless
+ *       keep_watch_force_sell keeps it driven. The driven set follows the SE semantics: an
+ *       "all selected" SE (e.g. SE_Fixed) degenerates mode C into driving every sub-system every
+ *       day.
  * @note sys_use_self_tm is kept for the signature compatibility only: in mode C the sub-systems
  *       always share the real account of the parent, so it is ignored with a warning.
  * @param tm trade account
@@ -75,6 +81,9 @@ namespace hku {
  *                        warning
  * @param sell_at_not_selected whether to force selling the stocks not selected on the rebalancing
  *                             day, false by default
+ * @param keep_watch_force_sell keep driving the removed still-holding sub-systems when the forced
+ *                             liquidation is off (watch-only: their own exit logic keeps running
+ *                             until they are flat; nothing is force-sold), false by default
  * @return the portfolio instance (MultiSystemPtr)
  * @ingroup Portfolio
  */
@@ -82,8 +91,8 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm = TradeManagerPtr(),
                                     const SEPtr& se = SE_Fixed(), int adjust_cycle = 1,
                                     const string& adjust_mode = "query",
                                     bool delay_to_trading_day = true, bool trade_on_close = true,
-                                    bool sys_use_self_tm = false,
-                                    bool sell_at_not_selected = false);
+                                    bool sys_use_self_tm = false, bool sell_at_not_selected = false,
+                                    bool keep_watch_force_sell = false);
 
 } /* namespace hku */
 

@@ -2026,6 +2026,80 @@ TEST_CASE("test_MultiSystem_mode_c_sell_at_not_selected") {
     }
 }
 
+/** @par Check point: the watch-only opt-in keep_watch_force_sell keeps the mode C force-sell pool
+ * driven while the forced liquidation is off, so a removed holding can still be closed by its own
+ * exit logic (the manual sell signal here stands in for the stop-loss / profit goal -- all of them
+ * execute inside the same close drive, which is what the opt-in re-enables). The default stays the
+ * legacy frozen behavior. */
+TEST_CASE("test_MultiSystem_mode_c_keep_watch_force_sell") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 30);
+
+    // The manual buy signal on bar 1 admits the system via SE_Signal on that rebalancing day
+    // (adjust_cycle=1: every close day is a rebalancing day) and it buys at the same close; from
+    // bar 2 on the SE selects nobody, so the holding leaves the running pool and enters the
+    // force-sell pool. The manual sell on bar 20 can only be executed by a watch drive of the pool.
+    auto make_sys = [&](bool with_late_sell) {
+        auto sg = SG_Manual();
+        sg->_addBuySignal(k[1].datetime);
+        if (with_late_sell) {
+            sg->_addSellSignal(k[20].datetime);
+        }
+        auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), sg);
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setTO(k);
+        return sys;
+    };
+
+    auto run_once = [&](bool keep_watch) {
+        // The selection prototype needs the buy signal only (SE_Signal selects on the buy days)
+        auto se = SE_Signal({stk}, make_sys(false));
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+        auto ms = std::make_shared<MultiSystem>("ms_c_keep_watch");
+        ms->setTM(tm);
+        ms->setMode("C");
+        ms->setSE(se);
+        ms->setAdjustCycle(1);
+        ms->setTradeOnClose(true);
+        ms->setSellAtNotSelected(false);
+        ms->setKeepWatchForceSell(keep_watch);
+        ms->add(make_sys(true));
+        ms->run(query);
+        return std::make_pair(ms, tm);
+    };
+
+    /** @arg the default (watch off): the removed holding stays frozen in the force-sell pool, no
+     * sell is ever executed */
+    auto off = run_once(false);
+    REQUIRE(off.first->getForceSellList().size() == 1);
+    CHECK(off.first->getForceSellList().front()->getStock() == stk);
+    CHECK(off.second->have(stk));
+    bool off_sold = false;
+    for (const auto& tr : off.second->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
+            off_sold = true;
+        }
+    }
+    CHECK_FALSE(off_sold);
+
+    /** @arg keep_watch_force_sell on: the pool keeps being driven, the late sell signal closes the
+     * holding and the sub-system leaves the pool once flat */
+    auto on = run_once(true);
+    bool on_sold = false;
+    for (const auto& tr : on.second->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
+            on_sold = true;
+        }
+    }
+    CHECK(on_sold);
+    CHECK_FALSE(on.second->have(stk));
+    CHECK(on.first->getForceSellList().empty());
+}
+
 /** @par Check point: delisting removes the sub-system from the mode C pools (the design 9.3
  * delisting rule): the delisted holding is force liquidated at the last bar close of the
  * instrument, the sub-system leaves both pools and is not re-admitted (its SG emits no signal past

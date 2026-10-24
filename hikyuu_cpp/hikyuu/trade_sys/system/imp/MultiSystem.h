@@ -159,10 +159,11 @@ public:
     }
 
     /** Mode C only: the force-sell pool, i.e. the sub-systems that left the running pool while
-     *  still holding (the legacy m_force_sell_sys_list). They are driven again only on the
-     *  non-rebalancing days and only when sell_at_not_selected is on, and they leave the pool once
-     *  the holding is gone. With sell_at_not_selected off their position stays unfollowed (the
-     *  legacy semantics, see the design 9.3). */
+     *  still holding (the legacy m_force_sell_sys_list). With sell_at_not_selected on they are
+     *  force-sold (the open sweep) and driven on the non-rebalancing days; with it off they are
+     *  driven only under the keep_watch_force_sell opt-in (watch-only: their own exit logic keeps
+     *  running, no forced selling), otherwise they stay unfollowed (the legacy semantics, see the
+     *  design 9.3). They leave the pool once the holding is gone. */
     const SystemList& getForceSellList() const {
         return m_force_sell_list;
     }
@@ -240,6 +241,19 @@ public:
     /** Get whether to force liquidating the unselected sub-systems */
     bool getSellAtNotSelected() const {
         return tryGetParam<bool>("sell_at_not_selected", false);
+    }
+
+    /** Set the watch-only driving of the mode C force-sell pool (works when the forced liquidation
+     *  is off): the removed holding keeps being driven so its own exit logic (the sell signal, the
+     *  stop-loss, the profit goal) can close it; nothing is force-sold. It leaves the pool once
+     *  flat. */
+    void setKeepWatchForceSell(bool v) {
+        setParam<bool>("keep_watch_force_sell", v);
+    }
+
+    /** Get whether the mode C force-sell pool is driven when the forced liquidation is off */
+    bool getKeepWatchForceSell() const {
+        return tryGetParam<bool>("keep_watch_force_sell", false);
     }
 
     /** Get the turnover rate of every rebalancing day (the turnover amount / the total assets
@@ -381,7 +395,7 @@ private:
 
     /** Register the parameters of the aggregate system itself (axis_mode / adjust_mode /
      * delay_to_trading_day) and the parameter aliases of the run-time switches (adjust_cycle /
-     * trade_on_close / sell_at_not_selected) */
+     * trade_on_close / sell_at_not_selected / keep_watch_force_sell) */
     void _initAxisParam();
 
     /** Snapshot the run-time switches from the parameters at the session start (readyForRun) */
@@ -652,6 +666,9 @@ private:
     // L1 quota, together with their accounts (mode B/C only, requires SE; mode A ignores it -- the
     // unselected instruments are flattened by the zero-target rebalancing)
     bool m_sell_at_not_selected{false};
+    // Whether the mode C force-sell pool keeps being driven (watch-only, no forced selling) while
+    // the forced liquidation is off
+    bool m_keep_watch_force_sell{false};
     std::vector<std::pair<Datetime, double>>
       m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
                           // assets before rebalancing)

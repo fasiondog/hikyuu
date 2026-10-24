@@ -825,6 +825,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
            "shadow/quota accounts (mode B/C; SE is required). In mode B the two books must stay "
            "matched, so with the default off the unselected sub-systems keep running and only skip "
            "the quota calibration")
+      .def("set_keep_watch_force_sell", &MultiSystem::setKeepWatchForceSell, py::arg("on"),
+           "Set the watch-only driving of the mode C force-sell pool (works when the forced "
+           "liquidation is off): the removed still-holding sub-system keeps being driven so its "
+           "own exit logic (sell signal / stop-loss / profit goal) can close it; nothing is "
+           "force-sold and it leaves the pool once flat")
       .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
            "Get the turnover rate of every rebalancing day (a list of (date, turnover amount / "
            "total assets))")
@@ -961,8 +966,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
       py::arg("delay_to_trading_day") = true, py::arg("trade_on_close") = true,
       py::arg("sys_use_self_tm") = false, py::arg("sell_at_not_selected") = false,
-      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
-      R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
+      py::arg("keep_watch_force_sell") = false, py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
+      R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False, keep_watch_force_sell=False])
 
     Create a portfolio without a fund allocation algorithm (returns MultiSystem running in mode C
     "Shared Account Compatibility", i.e. the legacy Portfolio behavior).
@@ -971,17 +976,23 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     on the single real account of the parent (shared_tm) and is sized by its own MM, so the
     sub-systems compete for the same cash in the pool admission order. The parent keeps the legacy
     DUAL-POOL driving: the running pool (admitted by the SE) and the force-sell pool (the ones that
-    left the running pool while still holding, driven on the non-rebalancing days only when
-    sell_at_not_selected is on); the two pools stay mutually exclusive. No L2 conversion is done; the
-    AF is only the mode carrier here (L1 takes no quota, L3 is off by default).
+    left the running pool while still holding); the two pools stay mutually exclusive. No L2
+    conversion is done; the AF is only the mode carrier here (L1 takes no quota, L3 is off by
+    default).
+
+    WARNING: with the default sell_at_not_selected=False, a sub-system that the SE stops admitting
+    while it still holds is driven ONE last time and then FROZEN: its stop-loss, profit goal and
+    sell signals stop working and the position is never closed (the legacy engine behavior). Set
+    keep_watch_force_sell=True to keep driving it until it is flat, or sell_at_not_selected=True to
+    liquidate it at once.
 
     On a rebalancing day a sub-system that the SE stops admitting leaves the running pool no matter
     whether it still holds: sell_at_not_selected=True liquidates it at once, while the default False
     gives it ONE last drive (so a sell signal of that very day is still realized) and then stops
-    following it, exactly as the Portfolio before the refactoring did. The driven set follows the SE
-    semantics: an "all selected" SE (e.g. SE_Fixed) degenerates mode C into driving every sub-system
-    every day. Use this factory when the results of the previous release have to be reproduced; the
-    mode A preset now lives in PF_SignalAggregate.
+    following it, exactly as the Portfolio before the refactoring did -- unless keep_watch_force_sell
+    keeps it driven. The driven set follows the SE semantics: an "all selected" SE (e.g. SE_Fixed)
+    degenerates mode C into driving every sub-system every day. Use this factory when the results of
+    the previous release have to be reproduced; the mode A preset now lives in PF_SignalAggregate.
 
     The rebalancing mode adjust_mode description:
     - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval
@@ -1007,6 +1018,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :param bool trade_on_close: whether the trade is executed at the close
     :param bool sys_use_self_tm: kept for the signature compatibility only; mode C always shares the real account of the parent, so it is ignored with a warning
     :param bool sell_at_not_selected: whether to force selling the stocks not selected on the rebalancing day
+    :param bool keep_watch_force_sell: keep driving the removed still-holding sub-systems when the forced liquidation is off (watch-only: their own exit logic keeps running until they are flat; nothing is force-sold)
     :rtype: MultiSystem)");
 
     m.def(
@@ -1081,8 +1093,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
       py::arg("delay_to_trading_day") = true, py::arg("trade_on_close") = true,
       py::arg("sys_use_self_tm") = false, py::arg("sell_at_not_selected") = false,
-      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
-      R"(PF_ModeC([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
+      py::arg("keep_watch_force_sell") = false, py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
+      R"(PF_ModeC([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False, keep_watch_force_sell=False])
 
     Alias of PF_WithoutAF (mode C "Shared Account Compatibility", i.e. the Portfolio of the previous
     release): the same implementation, the same parameters and no behavior difference.)");
