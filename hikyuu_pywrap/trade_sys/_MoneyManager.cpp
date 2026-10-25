@@ -78,7 +78,7 @@ void export_MoneyManager(py::module& m) {
 
 Common parameters:
 
-    - auto_checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money management strategy, automatically deposit (checkin) enough cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
+    - auto_checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money management strategy, or to buy back a short position, automatically deposit (checkin) enough cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
     - max_stock=20000 (int): the maximum number of the kinds of the held securities (i.e. how many stocks are held, not the position size of each stock)
     - disable_ev_force_clean_position=False (bool): disable forcibly clearing the positions when the market environment becomes invalid
     - disable_cn_force_clean_position=False (bool): disable forcibly clearing the positions when the system valid condition becomes invalid

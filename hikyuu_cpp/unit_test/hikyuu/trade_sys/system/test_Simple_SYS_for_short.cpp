@@ -234,6 +234,31 @@ SignalPtr makeShortSG() {
     return sg;
 }
 
+// A scripted short flow: the sell signal opens the short on the open date, the buy signal covers
+// it on the cover date; a Null cover date leaves the short open until a forced cover
+class ShortOpenCoverSG : public SignalBase {
+public:
+    explicit ShortOpenCoverSG(Datetime open_date, Datetime cover_date = Null<Datetime>())
+    : SignalBase("ShortOpenCoverSG"), m_open_date(open_date), m_cover_date(cover_date) {}
+
+    virtual SignalPtr _clone() override {
+        return make_shared<ShortOpenCoverSG>(m_open_date, m_cover_date);
+    }
+
+    virtual void _calculate(const KData& kdata) override {
+        if (kdata.getPos(m_open_date) != Null<size_t>()) {
+            _addSellSignal(m_open_date);
+        }
+        if (!m_cover_date.isNull() && kdata.getPos(m_cover_date) != Null<size_t>()) {
+            _addBuySignal(m_cover_date);
+        }
+    }
+
+private:
+    Datetime m_open_date;
+    Datetime m_cover_date;
+};
+
 // The probe system with the short-side parts set up for the partial cover cases
 std::shared_ptr<RatchetProbeSYS> makeShortRatchetProbeSys(const KData& k, const StoplossPtr& tp,
                                                           bool buyDelay) {
@@ -326,6 +351,68 @@ public:
         _addBuySignal(Datetime(200001060000LL));
     }
 };
+
+// Emits one buy signal on the given date, so the system opens a long position
+class ScriptedBuySG : public SignalBase {
+public:
+    explicit ScriptedBuySG(Datetime buy_date) : SignalBase("ScriptedBuySG"), m_buy_date(buy_date) {}
+
+    virtual SignalPtr _clone() override {
+        return make_shared<ScriptedBuySG>(m_buy_date);
+    }
+
+    virtual void _calculate(const KData& kdata) override {
+        if (kdata.getPos(m_buy_date) != Null<size_t>()) {
+            _addBuySignal(m_buy_date);
+        }
+    }
+
+private:
+    Datetime m_buy_date;
+};
+
+// The cash-gap short scenario: 13.58 -> 23.63 between the open and the cover is a 74% rise, more
+// than the 1 / 60% margin allowed at the short opening, so the proceeds cannot pay the buyback
+const Datetime SHORT_GAP_OPEN(200611060000LL);
+const Datetime SHORT_GAP_COVER(200701100000LL);
+const Datetime SHORT_GAP_COVER_FILL(200701110000LL);
+const double SHORT_GAP_NUM = 1000.0;
+
+KData getShortGapKData(const Stock& stk) {
+    return stk.getKData(
+      KQueryByDate(Datetime(200610010000LL), Datetime(200703010000LL), KQuery::DAY));
+}
+
+// 9000 cash: 13.58 x 1000 x 60% = 8148 passes the opening margin, while the 23.63 buyback of
+// 23630 exceeds the 22580 cash left after the short
+SYSPtr makeShortGapSys(bool auto_checkin, bool buy_delay, const SignalPtr& sg) {
+    SYSPtr sys = SYS_Simple();
+    sys->setParam<bool>("buy_delay", buy_delay);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setTM(crtTM(Datetime(199001010000LL), 9000, TC_Zero(), "TEST_TM"));
+    // The short opening needs a stop-loss above the entry; 190% keeps it above every close of the
+    // holding window so it never covers before the end
+    sys->setST(make_shared<Iss029PercentST>(1.9));
+    sg->setParam<bool>("support_borrow_stock", true);
+    sys->setSG(sg);
+    MMPtr mm = MM_FixedCount(SHORT_GAP_NUM);
+    mm->setParam<bool>("auto_checkin", auto_checkin);
+    sys->setMM(mm);
+    return sys;
+}
+
+struct ShortCaseResult {
+    TradeRecordList trades;
+    double short_left{0.0};
+};
+
+ShortCaseResult collectShortCase(const SYSPtr& sys, const Stock& stk) {
+    ShortCaseResult result;
+    result.trades = sys->getTM()->getTradeList();
+    result.short_left = sys->getTM()->getShortPosition(stk).number;
+    return result;
+}
 
 }  // namespace
 
@@ -1042,6 +1129,139 @@ TEST_CASE("test_SYS_Simple_short_tp_partial_cover_keeps_ratchet_when_delayed") {
 
     /** @arg the delayed partial fill keeps the ratchet instead of resetting it to the open price */
     CHECK_LT(std::fabs(sys->shortRatchet() - l1), l1 * 0.005);
+}
+
+/** @par Test point (the auto_checkin also funds the short cover: the buyback needs cash like the
+ * long buy) */
+TEST_CASE("test_SYS_Simple_short_auto_checkin_cover") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    REQUIRE_UNARY(!stk.isNull());
+    KData k = getShortGapKData(stk);
+    REQUIRE_UNARY(k.getPos(SHORT_GAP_OPEN) != Null<size_t>());
+    REQUIRE_UNARY(k.getPos(SHORT_GAP_COVER) != Null<size_t>());
+    REQUIRE_UNARY(k.getPos(SHORT_GAP_COVER_FILL) != Null<size_t>());
+
+    auto run_case = [&](bool auto_checkin, bool buy_delay) {
+        SYSPtr sys = makeShortGapSys(
+          auto_checkin, buy_delay, make_shared<ShortOpenCoverSG>(SHORT_GAP_OPEN, SHORT_GAP_COVER));
+        sys->run(k);
+        return collectShortCase(sys, stk);
+    };
+
+    for (bool buy_delay : {false, true}) {
+        // The immediate cover fills on the signal close, the delayed one on the next open: both
+        // are beyond the cash left after the short
+        const Datetime fill_date = buy_delay ? SHORT_GAP_COVER_FILL : SHORT_GAP_COVER;
+
+        /** @arg without the top-up the buyback is rejected for lack of cash: the short stays open
+         */
+        const ShortCaseResult no_top_up = run_case(false, buy_delay);
+        CHECK_UNARY(findFirstTrade(no_top_up.trades, BUSINESS_SELL_SHORT) != nullptr);
+        CHECK_UNARY(findFirstTrade(no_top_up.trades, BUSINESS_BUY_SHORT) == nullptr);
+        CHECK_EQ(no_top_up.short_left, SHORT_GAP_NUM);
+
+        /** @arg with the top-up the cover fills in full on the cash-poor account */
+        const ShortCaseResult topped = run_case(true, buy_delay);
+        const TradeRecord* open_tr = findFirstTrade(topped.trades, BUSINESS_SELL_SHORT);
+        const TradeRecord* cover_tr = findFirstTrade(topped.trades, BUSINESS_BUY_SHORT);
+        REQUIRE_NE(open_tr, nullptr);
+        REQUIRE_NE(cover_tr, nullptr);
+        CHECK_EQ(cover_tr->datetime, fill_date);
+        CHECK_EQ(cover_tr->number, open_tr->number);
+        CHECK_EQ(topped.short_left, 0.0);
+
+        /** @arg the scenario was really cash-poor: the buyback exceeds the cash after the short */
+        const price_t cover_money = cover_tr->realPrice * cover_tr->number * stk.unit();
+        CHECK_GT(cover_money, open_tr->cash);
+
+        /** @arg the deposit happens at the fill bar and covers exactly the gap */
+        const TradeRecord* checkin_tr = nullptr;
+        for (const auto& tr : topped.trades) {
+            if (tr.business == BUSINESS_CHECKIN) {
+                checkin_tr = &tr;
+            }
+        }
+        REQUIRE_NE(checkin_tr, nullptr);
+        CHECK_EQ(checkin_tr->datetime, fill_date);
+        CHECK_LT(std::fabs(checkin_tr->realPrice - (cover_money - open_tr->cash)), 0.01);
+    }
+}
+
+/** @par Test point (the forced cover of a short gets the same top-up: a liquidation must not be
+ * blocked on a cash-poor account) */
+TEST_CASE("test_SYS_Simple_short_auto_checkin_forced_cover") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    REQUIRE_UNARY(!stk.isNull());
+    KData k = getShortGapKData(stk);
+    REQUIRE_UNARY(k.getPos(SHORT_GAP_OPEN) != Null<size_t>());
+    REQUIRE_UNARY(k.getPos(SHORT_GAP_COVER) != Null<size_t>());
+
+    // No cover signal: the short stays open until the portfolio forces it
+    auto run_case = [&](bool auto_checkin) {
+        SYSPtr sys =
+          makeShortGapSys(auto_checkin, false, make_shared<ShortOpenCoverSG>(SHORT_GAP_OPEN));
+        sys->run(k);
+        sys->sellForceOnClose(SHORT_GAP_COVER, MAX_DOUBLE, PART_PORTFOLIO);
+        return collectShortCase(sys, stk);
+    };
+
+    /** @arg without the top-up the forced cover is rejected for lack of cash: the short stays open
+     */
+    const ShortCaseResult no_top_up = run_case(false);
+    CHECK_UNARY(findFirstTrade(no_top_up.trades, BUSINESS_SELL_SHORT) != nullptr);
+    CHECK_UNARY(findFirstTrade(no_top_up.trades, BUSINESS_BUY_SHORT) == nullptr);
+    CHECK_EQ(no_top_up.short_left, SHORT_GAP_NUM);
+
+    /** @arg with the top-up the forced cover fills in full on the cash-poor account */
+    const ShortCaseResult topped = run_case(true);
+    const TradeRecord* open_tr = findFirstTrade(topped.trades, BUSINESS_SELL_SHORT);
+    const TradeRecord* cover_tr = findFirstTrade(topped.trades, BUSINESS_BUY_SHORT);
+    REQUIRE_NE(open_tr, nullptr);
+    REQUIRE_NE(cover_tr, nullptr);
+    CHECK_EQ(cover_tr->datetime, SHORT_GAP_COVER);
+    CHECK_EQ(cover_tr->number, open_tr->number);
+    CHECK_EQ(topped.short_left, 0.0);
+
+    /** @arg the scenario was really cash-poor: the buyback exceeds the cash after the short */
+    const price_t cover_money = cover_tr->realPrice * cover_tr->number * stk.unit();
+    CHECK_GT(cover_money, open_tr->cash);
+
+    /** @arg the deposit happens at the forced cover bar and covers exactly the gap */
+    const TradeRecord* checkin_tr = nullptr;
+    for (const auto& tr : topped.trades) {
+        if (tr.business == BUSINESS_CHECKIN) {
+            checkin_tr = &tr;
+        }
+    }
+    REQUIRE_NE(checkin_tr, nullptr);
+    CHECK_EQ(checkin_tr->datetime, SHORT_GAP_COVER);
+    CHECK_LT(std::fabs(checkin_tr->realPrice - (cover_money - open_tr->cash)), 0.01);
+
+    /** @arg a forced long sell needs no cash: no deposit happens at the force bar (the entry top-up
+     * is the only one) */
+    SYSPtr long_sys = SYS_Simple();
+    long_sys->setParam<bool>("buy_delay", false);
+    long_sys->setParam<bool>("sell_delay", false);
+    long_sys->setTM(crtTM(Datetime(199001010000LL), 9000, TC_Zero(), "TEST_TM"));
+    long_sys->setSG(make_shared<ScriptedBuySG>(SHORT_GAP_OPEN));
+    MMPtr long_mm = MM_FixedCount(SHORT_GAP_NUM);
+    long_mm->setParam<bool>("auto_checkin", true);
+    long_sys->setMM(long_mm);
+    long_sys->run(k);
+    REQUIRE_UNARY(long_sys->getTM()->getPosition(SHORT_GAP_COVER, stk).number > 0.0);
+
+    long_sys->sellForceOnClose(SHORT_GAP_COVER, MAX_DOUBLE, PART_PORTFOLIO);
+    const TradeRecordList& long_trades = long_sys->getTM()->getTradeList();
+    CHECK_UNARY(findFirstTrade(long_trades, BUSINESS_SELL) != nullptr);
+    CHECK_EQ(long_sys->getTM()->getPosition(SHORT_GAP_COVER, stk).number, 0.0);
+    bool force_deposit = false;
+    for (const auto& tr : long_trades) {
+        force_deposit =
+          force_deposit || (tr.business == BUSINESS_CHECKIN && tr.datetime == SHORT_GAP_COVER);
+    }
+    CHECK_UNARY(!force_deposit);
 }
 
 /** @} */

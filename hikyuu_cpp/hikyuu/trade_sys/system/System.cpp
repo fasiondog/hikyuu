@@ -1096,7 +1096,7 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
 }
 
 void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number) {
-    HKU_IF_RETURN(!m_mm->getParam<bool>("auto_checkin"), void());
+    HKU_IF_RETURN(!m_mm || !m_mm->getParam<bool>("auto_checkin"), void());
     HKU_IF_RETURN(datetime < m_tm->lastDatetime(), void());
 
     // Deposit once per trade with the affordability formula of TradeManager::buy; the gap is
@@ -1158,6 +1158,12 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
         if (position.number - real_sell_num < min_num) {
             real_sell_num = position.number;
         }
+    }
+
+    // A short cover pays cash like a buy, so it gets the same top-up: a forced liquidation must
+    // not be blocked on a cash-poor account
+    if (cover_short) {
+        _autoCheckin(date, realPrice, real_sell_num);
     }
 
     record = cover_short ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num,
@@ -1463,6 +1469,8 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
 
     price_t goalPrice = std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, planPrice);
 
+    // A cover pays cash like a buy: top up the gap, or a cash-poor account cannot close its short
+    _autoCheckin(today.datetime, realPrice, number);
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
     if (BUSINESS_BUY_SHORT != record.business) {
@@ -1545,6 +1553,8 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             stoploss = req.stoploss;
             number = req.number;
             goalPrice = req.goal;
+            // A cover is never scaled by the cash: it fills in full (with the optional top-up) or
+            // not at all, as _getBuyShortNumber has no cash clamp of its own
         }
 
         if (number <= 0) {
@@ -1563,6 +1573,9 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             number = pos.number;
         }
 
+        // A cover pays cash like a buy: top up the gap, or a cash-poor account cannot close its
+        // short
+        _autoCheckin(today.datetime, realPrice, number);
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {

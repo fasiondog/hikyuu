@@ -1037,6 +1037,7 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             } else {
                 double num = std::min(a.number, sub_tm->getShortPosition(a.stock).number);
                 if (num > 0.0) {
+                    _topUpCoverCash(sub_tm, _mmAutoCheckin(a.sys), date, a.stock, price, num);
                     sub_tm->buyShort(date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
                                      "MultiSystem");
                 }
@@ -1070,6 +1071,7 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             double need = a.number;
             double num = std::min(need, m_tm->getShortPosition(a.stock).number);
             if (num > 0.0) {
+                _topUpCoverCash(m_tm, m_auto_checkin, date, a.stock, price, num);
                 TradeRecord tr = m_tm->buyShort(date, a.stock, price, num, 0.0, 0.0, price,
                                                 PART_PORTFOLIO, "MultiSystem");
                 if (!tr.isNull()) {
@@ -1174,7 +1176,9 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
             if (num > 0.0) {
                 sub_tm->sell(date, stk, p, num, 0.0, 0.0, p, PART_PORTFOLIO, "MultiSystem");
             }
-            if (sub_tm->getShortPosition(stk).number > 0.0) {
+            double short_num = sub_tm->getShortPosition(stk).number;
+            if (short_num > 0.0) {
+                _topUpCoverCash(sub_tm, _mmAutoCheckin(sys), date, stk, p, short_num);
                 sub_tm->buyShort(date, stk, p, MAX_DOUBLE, 0.0, 0.0, p, PART_PORTFOLIO,
                                  "MultiSystem");
             }
@@ -1265,6 +1269,7 @@ void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
         }
         if (short_num > 0.0) {
             // Cover the short book (MAX_DOUBLE is capped at the actual short)
+            _topUpCoverCash(m_tm, m_auto_checkin, date, stk, price, short_num);
             TradeRecord tr = m_tm->buyShort(date, stk, price, short_num, 0.0, 0.0, price,
                                             PART_PORTFOLIO, "MultiSystem");
             if (!tr.isNull()) {
@@ -3788,6 +3793,36 @@ price_t MultiSystem::_getOpenPrice(const Datetime& date, const Stock& stock) {
     return pos == Null<size_t>() ? 0.0 : kdata.getKRecord(pos).openPrice;
 }
 
+bool MultiSystem::_mmAutoCheckin(const SystemPtr& sys) {
+    if (!sys) {
+        return false;
+    }
+    // The account owner's own switch: a nested aggregate carries it as its parameter, a leaf in
+    // the money manager
+    if (auto* ms = dynamic_cast<MultiSystem*>(sys.get())) {
+        return ms->getAutoCheckin();
+    }
+    auto mm = sys->getMM();
+    return mm && mm->getParam<bool>("auto_checkin");
+}
+
+void MultiSystem::_topUpCoverCash(const TMPtr& tm, bool enabled, const Datetime& date,
+                                  const Stock& stock, price_t price, double number) {
+    HKU_IF_RETURN(!enabled || !tm || !(price > 0.0) || !(number > 0.0), void());
+    HKU_IF_RETURN(date < tm->lastDatetime(), void());
+
+    // The gap is rounded up so that the following cover always passes the cash check of
+    // TradeManager::buyShort
+    int precision = tm->precision();
+    CostRecord cost = tm->getBuyCost(date, stock, price, number);
+    price_t needed =
+      roundEx(roundEx(price * number * stock.unit(), precision) + cost.total, precision);
+    price_t cash = tm->cash(date);
+    if (cash < needed) {
+        tm->checkin(date, roundUp(needed - cash, precision));
+    }
+}
+
 TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
     TradeRecordList result;
     if (!m_tm) {
@@ -3844,6 +3879,7 @@ TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
         for (auto& sys : m_sys_list) {
             _clearDelistedInSubTree(sys, pos.stock, date, price);
         }
+        _topUpCoverCash(m_tm, m_auto_checkin, date, pos.stock, price, pos.number);
         TradeRecord tr = m_tm->buyShort(date, pos.stock, price, MAX_DOUBLE, 0.0, 0.0, price,
                                         PART_SYSTEM, "DELIST");
         if (!tr.isNull()) {
@@ -3863,7 +3899,9 @@ void MultiSystem::_clearDelistedInSubTree(const SystemPtr& sys, const Stock& sto
         if (tm->getPosition(date, stock).number > 0.0) {
             tm->sell(date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
         }
-        if (tm->getShortPosition(stock).number > 0.0) {
+        double short_num = tm->getShortPosition(stock).number;
+        if (short_num > 0.0) {
+            _topUpCoverCash(tm, _mmAutoCheckin(sys), date, stock, price, short_num);
             tm->buyShort(date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
         }
     }

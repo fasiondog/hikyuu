@@ -142,7 +142,9 @@ System common parameters:
         management strategy, the System deposits the missing amount once, right before the actual buy,
         based on the real trade price and quantity. A delayed buy sizes the quantity twice (the signal-day
         close and the next-day open) but the deposit still happens only once; a cancelled trade deposits
-        nothing. The quantity query itself never changes the account.
+        nothing. The quantity query itself never changes the account. The same applies to covering a
+        short: when the cash cannot pay the buyback and its cost, the System deposits the gap right
+        before the cover fills.
 
 
 .. raw:: html

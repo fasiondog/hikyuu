@@ -76,10 +76,14 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    There is also an executor switch ``auto_checkin`` (default ``False``): when the parent cash cannot
    fill this batch of suggestions it deposits extra principal to cover the gap computed from the money
    plus the commission (it only keeps the planned quantities tradable, at the cost of an inflated
-   backtest equity curve, and it may top up on every bar whose targets change). It only applies to the
-   parent executor of modes A/B: mode C lets the sub-systems trade on the shared account, so it has no
-   effect there; in mode B the quota injection is already limited by the parent cash before this step,
-   so the switch cannot recover a truncated quota. The financing switches ``support_borrow_cash`` /
+   backtest equity curve, and it may top up on every bar whose targets change). For the suggestion
+   batch it only applies to the parent executor of modes A/B: mode C lets the sub-systems trade on the
+   shared account, so it has no effect there; in mode B the quota injection is already limited by the
+   parent cash before this step, so the switch cannot recover a truncated quota. The parent side short
+   covers of the portfolio-level executions (calibration, zero-quota liquidation, delisting) are funded
+   by the same switch, while the covers on a sub account (the sub-system accounts of modes B/C) follow
+   the ``auto_checkin`` of that sub-system's own money manager. The financing switches
+   ``support_borrow_cash`` /
    ``support_borrow_stock`` must be set on the ``MultiSystem`` and are propagated to the parent TM by
    ``readyForRun``; with financing enabled the executor derives the buying power from the margin rate
    **per order** (a multi-leg batch is funded in order, so later legs may be shrunk). The switch must be

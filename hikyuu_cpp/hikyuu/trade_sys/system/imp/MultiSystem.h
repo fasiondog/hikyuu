@@ -234,7 +234,9 @@ public:
 
     /** Set whether the parent account tops up its own cash when the executable suggestions exceed
      *  the available cash (aligned with MoneyManagerBase::auto_checkin). It deposits the gap
-     *  instead of borrowing, so it inflates the principal of the backtest. */
+     *  instead of borrowing, so it inflates the principal of the backtest. It also funds the parent
+     *  side short covers of the portfolio-level executions (calibration, liquidation, delisting).
+     */
     void setAutoCheckin(bool v) {
         setParam<bool>("auto_checkin", v);
     }
@@ -684,6 +686,16 @@ private:
     /** Whether the parent may trade the instrument on the date: false when there is no bar or the
      *  bar itself is not tradable @see _isTradableBar */
     bool _isTradableAt(const Datetime& date, const Stock& stock);
+
+    /** Whether the sub account tops up its own cash: the switch of the leaf money manager, or of
+     * the nested aggregate itself */
+    static bool _mmAutoCheckin(const SystemPtr& sys);
+
+    /** Top up the account when a short cover cannot be paid from its cash, using the switch and the
+     *  formula of MoneyManagerBase::auto_checkin: a cover pays cash like a buy, so without it a
+     *  cash-poor account could never close its short */
+    static void _topUpCoverCash(const TMPtr& tm, bool enabled, const Datetime& date,
+                                const Stock& stock, price_t price, double number);
 
     /** Get the KData of the instrument within the run query (with the per-run cache) */
     KData _getStockKData(const Stock& stock);
