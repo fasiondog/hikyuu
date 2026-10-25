@@ -46,7 +46,9 @@ void BoolEnvironment::_calculate() {
 
     Stock stock = sm.getStock(market + market_info.code());
     KData kdata = stock.getKData(m_query);
-    HKU_IF_RETURN(kdata.empty(), void());
+    HKU_WARN_IF_RETURN(kdata.empty(), void(),
+                       "{}: no kdata of {} in the query {}, the environment stays invalid", name(),
+                       stock.market_code(), m_query);
 
     m_ind.setContext(kdata);
     auto const* ind_data = m_ind.data();

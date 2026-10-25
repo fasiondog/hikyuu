@@ -53,7 +53,9 @@ void TwoLineEnvironment::_calculate() {
 
     Stock stock = sm.getStock(market + market_info.code());
     KData kdata = stock.getKData(m_query);
-    HKU_IF_RETURN(kdata.empty(), void());
+    HKU_WARN_IF_RETURN(kdata.empty(), void(),
+                       "{}: no kdata of {} in the query {}, the environment stays invalid", name(),
+                       stock.market_code(), m_query);
 
     Indicator close = CLOSE(kdata);
     Indicator fast = m_fast(close);

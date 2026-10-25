@@ -269,6 +269,17 @@ TEST_CASE("test_Environment_param_change_recomputes_on_set_query") {
 }
 
 /** @par Test points */
+TEST_CASE("test_EV_Bool_no_market_data_stays_invalid") {
+    // An index without any bar in the query window leaves the environment invalid: the case is
+    // reported instead of failing silently
+    const KQuery query = KQueryByDate(Datetime(209901010000LL), Datetime(209902010000LL), KQuery::DAY);
+    EVPtr ev = EV_Bool(PRICELIST(10, 1.0), "SH");
+    CHECK_NOTHROW(ev->setQuery(query));
+    CHECK_FALSE(ev->isValid(Datetime(209901010000LL)));
+    CHECK_FALSE(ev->isValid(Datetime(209901150000LL)));
+}
+
+/** @par Test points */
 TEST_CASE("test_EV_Bool_does_not_rebind_source_indicator") {
     StockManager &sm = StockManager::instance();
     KQuery query(-100);
