@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/factor/Factor.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 using namespace hku;
@@ -141,9 +142,14 @@ save_special_values_to_db(self, stock, dates, values[, replace=False])
     :note: delete with name + ktype as the unique identifier)")
 
       .def(
-        "get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
-        py::arg("fill_null") = false, py::arg("tovalue") = false,
-        py::arg("align_dates") = DatetimeList{},
+        "get_all_values",
+        [](Factor& self, const KQuery& query, bool align, bool fill_null, bool tovalue,
+           const DatetimeList& align_dates) {
+            ScopeGilRelease gil(!self.formula().hasPythonPart());
+            return self.getAllValues(query, align, fill_null, tovalue, align_dates);
+        },
+        py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
+        py::arg("tovalue") = false, py::arg("align_dates") = DatetimeList{},
         R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=False[, align_dates=DatetimeList()]]]])
     
     Get all the calculation results of the specified query parameters
@@ -187,8 +193,10 @@ save_special_values_to_db(self, stock, dates, values[, replace=False])
         "get_values",
         [](Factor& self, const py::object& stks, const KQuery& query, bool align, bool fill_null,
            bool tovalue, bool check, const DatetimeList& align_dates) {
-            return self.getValues(get_stock_list_from_python(stks), query, align, fill_null,
-                                  tovalue, check, align_dates);
+            // The conversion touches Python objects, it must run before the GIL is released
+            StockList stock_list = get_stock_list_from_python(stks);
+            ScopeGilRelease gil(!self.formula().hasPythonPart());
+            return self.getValues(stock_list, query, align, fill_null, tovalue, check, align_dates);
         },
         py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
         py::arg("tovalue") = false, py::arg("check") = false,

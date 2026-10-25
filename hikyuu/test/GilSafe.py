@@ -231,6 +231,38 @@ MF_PY_PART_GIL_RELEASE_PROBE = (
     "print('OK')\n"
 ).format(root=REPO_ROOT, config=CONFIG)
 
+# A Python custom indicator as the factor formula makes the factor a python-part model. The
+# values are computed on the thread-pool workers, so the binding must release the GIL before
+# entering the parallel section: otherwise the workers block on the GIL held by the waiting
+# caller and the call never returns.
+FACTOR_PARALLEL_PY_PART_PROBE = (
+    "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
+    "from hikyuu import *\n"
+    "set_log_level(LOG_LEVEL.OFF)\n"
+    "hikyuu_init('{config}')\n"
+    "class PyAdd(IndicatorImp):\n"
+    "    def __init__(self):\n"
+    "        super().__init__('PyAdd')\n"
+    "    def _clone(self):\n"
+    "        return PyAdd()\n"
+    "    def _calculate(self, ind):\n"
+    "        self._ready_buffer(len(ind), 1)\n"
+    "        self.set_discard(0)\n"
+    "        for i in range(len(ind)):\n"
+    "            self._set(ind[i] + 1.0, i)\n"
+    "sm = StockManager.instance()\n"
+    "stks = [sm['sh000001'], sm['sz000001'], sm['sz000002']]\n"
+    "q = Query(-20)\n"
+    "formula = Indicator(PyAdd())\n"
+    "f = Factor('PYTEST', formula)\n"
+    "assert len(f.get_values(stks, q)) == 3\n"
+    "fs = FactorSet()\n"
+    "fs.add(formula)\n"
+    "assert len(fs.get_values(stks, q)) == 3\n"
+    "print('OK')\n"
+).format(root=REPO_ROOT, config=CONFIG)
+
 
 class GilSafeTest(unittest.TestCase):
     def test_exit_clean_after_gil_safe_use(self):
@@ -324,6 +356,24 @@ class GilSafeTest(unittest.TestCase):
         )
         self.assertEqual(
             proc.returncode, 0, "MF python-part GIL-release probe failed:\n%s" % proc.stderr[-2000:]
+        )
+        self.assertIn("OK", proc.stdout)
+
+    def test_factor_parallel_with_python_part(self):
+        # A Python custom indicator as the factor formula makes the factor a python-part model.
+        # The values are computed on the thread-pool workers, so the binding must release the GIL
+        # before the parallel section; otherwise the workers wait for the GIL held by the blocked
+        # caller and the call never returns.
+        proc = subprocess.run(
+            [sys.executable, "-c", FACTOR_PARALLEL_PY_PART_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
+        )
+        self.assertEqual(
+            proc.returncode, 0, "factor parallel probe hung/crashed:\n%s" % proc.stderr[-2000:]
         )
         self.assertIn("OK", proc.stdout)
 

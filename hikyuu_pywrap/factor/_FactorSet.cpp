@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/factor/FactorSet.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 using namespace hku;
@@ -93,9 +94,14 @@ void export_FactorSet(py::module& m) {
            "Get the factor list")
 
       .def(
-        "get_all_values", &FactorSet::getAllValues, py::arg("query"), py::arg("align") = false,
-        py::arg("fill_null") = false, py::arg("tovalue") = true,
-        py::arg("align_dates") = DatetimeList{},
+        "get_all_values",
+        [](FactorSet& self, const KQuery& query, bool align, bool fill_null, bool tovalue,
+           const DatetimeList& align_dates) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getAllValues(query, align, fill_null, tovalue, align_dates);
+        },
+        py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
+        py::arg("tovalue") = true, py::arg("align_dates") = DatetimeList{},
         R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=True[, align_dates=DatetimeList()]]]])
     
     Get the calculation results of all the factors with the specified query parameters
@@ -113,8 +119,10 @@ void export_FactorSet(py::module& m) {
         [](FactorSet& self, const py::object& stks, const KQuery& query, bool align = false,
            bool fill_null = false, bool tovalue = true, bool check = false,
            const DatetimeList& align_dates = DatetimeList{}) {
-            return self.getValues(get_stock_list_from_python(stks), query, align, fill_null,
-                                  tovalue, check, align_dates);
+            // The conversion touches Python objects, it must run before the GIL is released
+            StockList stock_list = get_stock_list_from_python(stks);
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getValues(stock_list, query, align, fill_null, tovalue, check, align_dates);
         },
         py::arg("stocks"), py::arg("query"), py::arg("align") = false, py::arg("fill_null") = false,
         py::arg("tovalue") = false, py::arg("check") = false,
