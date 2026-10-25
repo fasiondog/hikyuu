@@ -103,6 +103,8 @@ public:
      * below the stop loss price), the MMs which do not support multi-trading will liquidate the
      * whole position directly (return MAX_DOUBLE), otherwise the subclass _getSellNumber is left
      * to decide
+     * @note A finite size is capped at maxTradeNumber; it is not aligned to minTradeNumber,
+     * because a dividend or a stock gift may leave an odd lot
      */
     double getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                          SystemPart from);

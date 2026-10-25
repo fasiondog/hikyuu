@@ -262,6 +262,9 @@ Money Management Strategy Base Class
 
         Return the share quantity that can be sold for the specified instrument.
 
+        A finite size is capped at ``maxTradeNumber``; it is not aligned to ``minTradeNumber``, because a
+        dividend or a stock gift may leave an odd lot below one lot.
+
         :param Datetime datetime: the trade time
         :param Stock stock: the instrument (security)
         :param float price: the trade price

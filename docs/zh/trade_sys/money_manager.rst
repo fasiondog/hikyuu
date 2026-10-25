@@ -243,6 +243,8 @@
 
         获取指定交易对象可卖出的数量
 
+        返回结果按 ``maxTradeNumber`` 封顶，但不按 ``minTradeNumber`` 对齐——分红送股可能留下不足一手的零股，需保留可卖。
+
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格

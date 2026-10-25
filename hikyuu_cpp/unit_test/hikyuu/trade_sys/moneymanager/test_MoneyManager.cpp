@@ -164,6 +164,30 @@ private:
     double m_number;
 };
 
+class ConfigurableSellNumberMMTest : public MoneyManagerBase {
+public:
+    explicit ConfigurableSellNumberMMTest(double number)
+    : MoneyManagerBase("ConfigurableSellNumberMMTest"), m_number(number) {}
+    virtual ~ConfigurableSellNumberMMTest() {}
+
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
+        return 0;
+    }
+
+    virtual double _getSellNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                  price_t risk, SystemPart from) {
+        return m_number;
+    }
+
+    virtual MoneyManagerPtr _clone() {
+        return MoneyManagerPtr(new ConfigurableSellNumberMMTest(m_number));
+    }
+
+private:
+    double m_number;
+};
+
 /**
  * @defgroup test_MoneyManager test_MoneyManager
  * @ingroup test_hikyuu_trade_sys_suite
@@ -200,6 +224,44 @@ TEST_CASE("test_MoneyManager") {
     CHECK_EQ(p->name(), "MoneyManagerTest");
     // CHECK_EQ(p_src->getTM() == tm);
     CHECK_EQ(p_src->getX(), 10);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getSellNumber_clamp") {
+    // The sell size is capped at maxTradeNumber but never aligned to minTradeNumber: an odd lot
+    // left by a dividend or a stock gift must stay sellable
+    Stock stock("TEST", "MMSELL", "MM Sell Clamp", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 1.0, 1.0, 2, 100, 10000);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!stock.isNull());
+    const Datetime dt(200001010000);
+    constexpr double nan{std::numeric_limits<double>::quiet_NaN()};
+
+    auto makeMM = [&](double number) {
+        MoneyManagerPtr mm(new ConfigurableSellNumberMMTest(number));
+        mm->setTM(crtTM(dt, 1000000.0));
+        return mm;
+    };
+
+    /** @arg a size within the cap is returned unchanged */
+    CHECK_EQ(makeMM(300.0)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 300.0);
+
+    /** @arg a size above maxTradeNumber is capped instead of being rejected as a whole */
+    CHECK_EQ(makeMM(12000.0)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+
+    /** @arg a size below one lot is not aligned up or down: the trade manager reports a real config
+     *  error instead of the money manager silently dropping it */
+    CHECK_EQ(makeMM(50.0)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 50.0);
+
+    /** @arg the sell-everything sentinel passes through untouched */
+    CHECK_UNARY(makeMM(MAX_DOUBLE)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE);
+
+    /** @arg a non-finite or non-positive size is rejected */
+    CHECK_EQ(makeMM(nan)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(makeMM(-100.0)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(makeMM(0.0)->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 0.0);
 }
 
 /** @par Test points */

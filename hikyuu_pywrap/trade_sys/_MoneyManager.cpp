@@ -188,6 +188,9 @@ The custom money management strategy interfaces:
 
     Get the quantity that can be sold of the specified trading object
 
+    A finite size is capped at maxTradeNumber; it is not aligned to minTradeNumber, because a dividend
+    or a stock gift may leave an odd lot.
+
     :param Datetime datetime: the trading time
     :param Stock stock: the trading object
     :param float price: the trading price

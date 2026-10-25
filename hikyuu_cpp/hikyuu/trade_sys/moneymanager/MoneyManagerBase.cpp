@@ -102,7 +102,26 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
     // position directly, otherwise the subclass _getSellNumber is left to decide
     HKU_IF_RETURN(!(risk > 0.0) && !m_support_mult_buy_sell, MAX_DOUBLE);
 
-    return _getSellNumber(datetime, stock, price, risk, from);
+    double n = _getSellNumber(datetime, stock, price, risk, from);
+    // The "sell everything" sentinel is resolved to the position by the trade manager
+    HKU_IF_RETURN(n == MAX_DOUBLE, MAX_DOUBLE);
+    HKU_WARN_IF_RETURN(!std::isfinite(n) || n <= 0.0, 0.0,
+                       "Invalid sell number({})! Datetime({}) Stock({} {}) price({:<.3f})", n,
+                       datetime, stock.market_code(), stock.name(), price);
+
+    // Reject a dirty maxTradeNumber (NaN / +-Inf / negative) before the cap comparison, following
+    // getBuyNumber
+    double max_trade = stock.maxTradeNumber();
+    HKU_WARN_IF_RETURN(!std::isfinite(max_trade) || !(max_trade > 0.0), 0.0,
+                       "Invalid stock.maxTradeNumber({})! Stock({} {})", max_trade,
+                       stock.market_code(), stock.name());
+    if (n > max_trade) {
+        HKU_WARN("Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
+        n = max_trade;
+    }
+    // The size is neither clamped to the holding (the caller sells against the position it holds)
+    // nor aligned to minTradeNumber: a dividend or a stock gift may leave an odd lot
+    return n;
 }
 
 double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
