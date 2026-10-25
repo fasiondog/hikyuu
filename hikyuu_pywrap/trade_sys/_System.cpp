@@ -608,7 +608,7 @@ Common parameters:
 
 Running modes (held by the aggregate system itself, set via set_mode or the preset PF factories):
 
-- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the shadows run continuously and are not reset between bars; run(reset=True) still resets them with the whole system); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
+- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the shadows run continuously and are not reset between bars; run(reset=True) still resets them with the whole system); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x net exposure ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
 
 - Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (zero-quota liquidation, then the unselected liquidation or the selected cash recycle, then reduce the over-quota part, inject the gap) and trades with the exact quota; a selected sub-system with a zero quota is cleared together with the parent holdings (gated by sell_at_not_selected, and a running sub is exempt when adjust_running_sys is off); the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account. The quota cash is a virtual budget: the injections only credit the sub ledger (the parent TM is never debited), and the injections of one rebalancing day are cumulatively capped by the parent's remaining cash, so the mirrored buys stay fundable and the two books stay matched. With sell_at_not_selected the unselected sub-systems (and the parent holdings) are cleared together; otherwise both books keep running.
 
@@ -619,7 +619,7 @@ Nested modes: the outer mode decides the account topology of a nested aggregate 
 Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for details):
 
 - L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);
-- L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x position ratio x the parent net assets, aggregated per instrument; mode B: the sub-system instruction passes through);
+- L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x net exposure ratio x the parent net assets, aggregated per instrument; mode B: the sub-system instruction passes through);
 - L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max_single_position); mode B skips the clipping.)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
@@ -1035,7 +1035,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
     accounts (the signal cash is never reset, the shadows run continuously); the parent converts the
     suggestions into the target positions of the parent account by the AF L2 (target market value =
-    weight x position ratio x the parent net assets, aggregated per instrument and rebalanced by the
+    weight x net exposure ratio x the parent net assets, aggregated per instrument and rebalanced by the
     delta against the current position) and the L3 portfolio risk control applies (e.g.
     max_single_position).
     The unselected sub-systems are not force cleared by default (sell_at_not_selected=False);

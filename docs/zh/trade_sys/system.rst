@@ -239,6 +239,9 @@ System 公共参数：
     - System.Part.MONEYMANAGER - 资金管理策略
     - System.Part.PROFITGOAL   - 盈利目标策略
     - System.Part.SLIPPAGE     - 移滑价差算法
+    - System.Part.ALLOCATEFUNDS - 资产分配算法（已废弃，仅保留枚举值以兼容旧存档）
+    - System.Part.PORTFOLIO    - 组合（已废弃，仅保留枚举值以兼容旧存档）
+    - System.Part.SYS          - 聚合子系统（递归组合重构新增）
     - System.Part.INVALID      - 无效值边界，大于等于该值时为无效部件
 
 
@@ -254,6 +257,9 @@ System 公共参数：
         - System.Part.MONEYMANAGER - "MM"
         - System.Part.PROFITGOAL   - "PG"
         - System.Part.SLIPPAGE     - "SP"
+        - System.Part.ALLOCATEFUNDS - "AF"（已废弃）
+        - System.Part.PORTFOLIO    - "PF"（已废弃）
+        - System.Part.SYS          - "SYS"
         - System.Part.INVALID      - "--"
 
     :param int part: System.Part 枚举值

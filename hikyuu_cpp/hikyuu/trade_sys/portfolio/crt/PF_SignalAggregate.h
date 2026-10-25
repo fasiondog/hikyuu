@@ -45,7 +45,7 @@ namespace hku {
  * </pre>
  * @note The sub-systems always use their own shadow accounts (TM_SUB, shared_tm=false), so the real
  *       account of the parent is only touched by the orders of the parent itself. The suggestions
- *       are converted into the target positions by the AF L2 (weight x position ratio x the parent
+ *       are converted into the target positions by the AF L2 (weight x net exposure ratio x the parent
  *       net assets, aggregated per instrument) and the L3 portfolio risk control applies. On a
  *       rebalancing day a sub-system the SE does not admit contributes a zero signal (its
  *       instruments drop out of the parent target); the shadow itself keeps running.

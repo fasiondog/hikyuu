@@ -18,7 +18,7 @@
  *  - **L2 behavior-level conversion** `_toTargets`: convert the sub-system suggestions into the
  *    executable quantity of the parent account (the folding point from the sub-system space to
  *    the individual instrument space). In mode A (Signal Aggregation) the target position market
- *    value = weight x position ratio x the parent net assets, aggregated per instrument and
+ *    value = weight x net exposure ratio x the parent net assets, aggregated per instrument and
  *    rebalanced by the delta to the current position; in mode B the real instruction of the
  *    sub-system passes through unchanged.
  *

@@ -97,7 +97,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
       - 子系统上下文 → 权重 ``{System: weight}``；模式 B 下就地回写 ``contexts[i].quota``（真实额度）
     * - L2 行为级换算
       - ``_to_targets(date, tm, suggestions, sys_weight, query, mode)``
-      - 权重 → 父账户可执行数量（模式 A 按「权重 × 带符号净目标比重 × 父净值」合成每标的净目标并 trade-the-delta；模式 B 透传子系统指令）
+      - 权重 → 父账户可执行数量（模式 A 按「权重 × 净敞口比重 × 父净值」合成每标的净目标并 trade-the-delta；模式 B 透传子系统指令）
     * - L3 组合风控
       - ``_check_risk(date, tm, suggestions, query, mode)``
       - 组合级风控裁剪（如 ``max_single_position`` 集中度上限）

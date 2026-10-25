@@ -9,15 +9,17 @@ the portfolio-level fund allocation is split out of `MoneyManagerBase` and carri
 
 * The `PF_Simple` / `PF_WithoutAF` factories are kept (the function names, the parameter names, the parameter order
   and the defaults unchanged), but they **return `MultiSystem`**, with the `af` parameter type changed from
-  `MMPtr` to `AFPtr`;
+  `MMPtr` to `AFPtr`; the added `trade_on_close` / `sell_at_not_selected` / `keep_watch_force_sell` are all trailing
+  parameters, so an existing positional call is unaffected;
 * The `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor`
   factories are kept, but they **return `AllocateFundsBase` instances** (`AFPtr`);
 * `MoneyManagerBase` is **restricted to the single-system / single-security** form: the portfolio-level interfaces
   are removed (`allocate` / `set_mode` / `_allocate_system_weight` / `_allocate_suggestions` / `_check_risk`
   and the `mode` attribute);
-* The `Portfolio` class and its methods are **no longer provided**; the Python `crtAF` is **kept**, its callback
-  contract updated from `_allocateWeight(date, se_list)` to `_allocate(date, tm, contexts, query)`, with the
-  optional `_to_targets` / `_check_risk` injection.
+* The `Portfolio` class and its methods are **no longer provided** (Python keeps only the import-compatibility
+  alias `Portfolio = MultiSystem`, without the old methods); the Python `crtAF` is **kept**, its callback contract
+  updated from `_allocateWeight(date, se_list)` to `_allocate(date, tm, contexts, query)`, with the optional
+  `_to_targets` / `_check_risk` injection.
 
 Migration points:
 
@@ -137,6 +139,7 @@ Multiple signal inputs on the same date are merged into one net value: a positiv
 **🚀 New Features**
 
 * feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)
+* feat(portfolio): new `PF_SignalAggregate` (mode A signal aggregation) and the letter-named aliases `PF_ModeA` / `PF_ModeB` / `PF_ModeC`
 * feat(allocatefunds): the standalone `AllocateFundsBase` base class with the `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` factories (carrying the portfolio-level L1/L2/L3)
 * feat(allocatefunds): restore the Python `crtAF` quick construction (L1 `_allocate`, with the optional L2 `_to_targets` / L3 `_check_risk` injection)
 * feat(MultiSystem): new `axis_mode` / `adjust_cycle` / `adjust_mode` / `delay_to_trading_day` / `trade_on_close` / `sell_at_not_selected` parameters; the run-time switches are snapshotted at `readyForRun` and fully illegal values are rejected at set time, supporting internalizing the adjust mode into an adjust-date table

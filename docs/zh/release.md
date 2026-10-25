@@ -10,14 +10,16 @@
 组合级资金分配从 `MoneyManagerBase` 剥离，改由独立基类 `AllocateFundsBase`（AF）承载：
 
 * `PF_Simple` / `PF_WithoutAF` 工厂保留（函数名、参数名、参数顺序、默认值不变），但**返回 `MultiSystem`**，
-  其中 `af` 参数类型由 `MMPtr` 改为 `AFPtr`；
+  其中 `af` 参数类型由 `MMPtr` 改为 `AFPtr`；新增的 `trade_on_close` / `sell_at_not_selected` /
+  `keep_watch_force_sell` 均为末尾追加形参，按位置传参的旧调用不受影响；
 * `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor`
   工厂保留，但**返回 `AllocateFundsBase` 实例**（`AFPtr`）；
 * `MoneyManagerBase` **限定为单系统 / 单证券**形态：移除组合级接口
   （`allocate` / `set_mode` / `_allocate_system_weight` / `_allocate_suggestions` / `_check_risk`
   与 `mode` 属性）；
-* `Portfolio` 类及其方法**不再提供**；Python `crtAF` **保留**，回调契约由 `_allocateWeight(date, se_list)`
-  更新为 `_allocate(date, tm, contexts, query)`，并可选注入 `_to_targets` / `_check_risk`。
+* `Portfolio` 类及其方法**不再提供**（Python 层仅保留导入兼容别名 `Portfolio = MultiSystem`，不提供旧方法）；
+  Python `crtAF` **保留**，回调契约由 `_allocateWeight(date, se_list)` 更新为
+  `_allocate(date, tm, contexts, query)`，并可选注入 `_to_targets` / `_check_risk`。
 
 迁移要点：
 
@@ -134,6 +136,7 @@
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 C）
+* feat(portfolio): 新增 `PF_SignalAggregate`（模式 A 信号聚合工厂）与 `PF_ModeA` / `PF_ModeB` / `PF_ModeC` 模式字母别名
 * feat(allocatefunds): 独立 `AllocateFundsBase` 基类与 `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` 工厂（承载组合级 L1/L2/L3）
 * feat(allocatefunds): 恢复 Python `crtAF` 便捷构造（L1 `_allocate`，可选注入 L2 `_to_targets` / L3 `_check_risk`）
 * feat(MultiSystem): 新增 `axis_mode` / `adjust_cycle` / `adjust_mode` / `delay_to_trading_day` / `trade_on_close` / `sell_at_not_selected` 参数，运行期开关在 `readyForRun` 时快照生效，完全非法值在设置时抛异常；支持将调仓模式内化为调仓日表

@@ -36,7 +36,7 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
         - A Signal Aggregation
         - the sub-systems are pure signal sources, the parent converts and orders uniformly
       * - ``PF_WithoutAF``
-        - C Shared Account
+        - C Shared Account Compatibility
         - the sub-systems trade on the real account of the parent (the legacy Portfolio behavior)
 
    Every factory also has a letter-named thin alias (``PF_ModeA`` / ``PF_ModeB`` / ``PF_ModeC``): the
@@ -230,7 +230,7 @@ Built-in Portfolios
     Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
     accounts (the signal cash is never reset, the shadows run continuously); the parent converts the
     suggestions into the target positions of the parent account by the AF L2 (target market value =
-    weight x net ratio x the parent net assets, aggregated per instrument and rebalanced by the delta
+    weight x net exposure ratio x the parent net assets, aggregated per instrument and rebalanced by the delta
     against the current position) and the L3 portfolio risk control applies (e.g. max_single_position).
     The unselected sub-systems are excluded from the parent target sampling, so their instruments drop out of the target and are closed; ``sell_at_not_selected`` does not take part in that behavior in mode A (the parent closes its own holdings and never touches the shadow accounts).
 

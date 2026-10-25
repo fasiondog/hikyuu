@@ -84,7 +84,6 @@ The custom market environment strategy interfaces:
                     py::return_value_policy::copy,
                     R"(Set or get the query condition
 
-    For a Python subclass the _calculate callback acquires the GIL while the mutex is held, so
     The calculation is re-run only when the query differs from the current one: a right-open query
     (no end time or end index given) is not recalculated when new data arrives, so call ``reset`` or
     pass a query with an explicit end to refresh. For a Python subclass the calculation takes the

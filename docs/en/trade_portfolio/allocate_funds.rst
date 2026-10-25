@@ -107,7 +107,7 @@ and :meth:`AllocateFundsBase.allocate` chains them together into a pipeline:
       - Sub-system context -> weight ``{System: weight}``; in mode B it writes the actual quota back to ``contexts[i].quota`` in place
     * - L2 behavior-level conversion
       - ``_to_targets(date, tm, suggestions, sys_weight, query, mode)``
-      - Weights -> executable quantities for the parent account (in mode A, the per-instrument net target is synthesized by ``weight x signed net ratio x the parent net assets`` and traded by the delta; in mode B, sub-system instructions are passed through)
+      - Weights -> executable quantities for the parent account (in mode A, the per-instrument net target is synthesized by ``weight x net exposure ratio x the parent net assets`` and traded by the delta; in mode B, sub-system instructions are passed through)
     * - L3 portfolio risk control
       - ``_check_risk(date, tm, suggestions, query, mode)``
       - Portfolio-level risk-control clipping (e.g. the ``max_single_position`` concentration cap)

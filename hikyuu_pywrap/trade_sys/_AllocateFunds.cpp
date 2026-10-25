@@ -80,7 +80,7 @@ executed by allocate() in the L1 -> L2 -> L3 order:
     - _to_targets [Optional] L2 behavior-level conversion: convert the sub-system suggestions into the
                   executable quantity of the parent account (the folding point from the sub-system space
                   to the individual instrument space). In mode A ("Signal Aggregation") the target
-                  position market value = weight x position ratio x the parent net assets, aggregated
+                  position market value = weight x net exposure ratio x the parent net assets, aggregated
                   per instrument and rebalanced by the delta against the current position; in mode B
                   or mode C the real instruction of the sub-system passes through unchanged.
     - _check_risk [Optional] L3 portfolio risk control: clip the suggestions at the portfolio dimension
@@ -178,7 +178,7 @@ Common parameters:
            R"(_to_targets(self, date, tm, suggestions, sys_weight, query, mode)
 
     [Overload interface] L2 behavior-level conversion: convert the sub-system suggestions into the
-    executable quantity of the parent account (mode A: target market value = weight x position ratio x
+    executable quantity of the parent account (mode A: target market value = weight x net exposure ratio x
     the parent net assets, aggregated per instrument and rebalanced by the delta against the current
     position; mode B: pass the real instruction through), rewrite suggestions in place)")
 
