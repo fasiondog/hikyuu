@@ -138,8 +138,8 @@ void TruncNormalSlippage::_checkRange(const string& min_name, const string& max_
     HKU_CHECK(min_v <= max_v, "SP_TruncNormal: param {} must be <= {}, got {} > {}", min_name,
               max_name, min_v, max_v);
     HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
-                "The amplitude of SP_TruncNormal is too large (>{:.2f}), the slippage may "
-                "move the price by more than 100%",
+                "The amplitude of SP_TruncNormal is too large (>{:.2f}); the bounds are absolute "
+                "price offsets, not percentages",
                 1.0);
 }
 
