@@ -345,7 +345,12 @@ public:
     }
 
 public:
-    bool run_available_task_once() {
+    /**
+     * Try to run one task that is available now
+     * @param local_only skip the queues the other threads can reach as well, so that the caller
+     *        only runs the tasks that no one else can take over (the ones it submitted itself)
+     */
+    bool run_available_task_once(bool local_only = false) {
         HKU_IF_RETURN(m_done.load(std::memory_order_acquire) || thread_need_stop().isSet(), false);
         bool task_run = false;
         task_type task;
@@ -358,11 +363,11 @@ public:
                 } else {
                     thread_need_stop().set();
                 }
-            } else if (pop_task_from_other_thread_queue(task)) {
+            } else if (!local_only && pop_task_from_other_thread_queue(task)) {
                 RunningTaskGuard guard(*this);
                 task();
                 task_run = true;
-            } else if (pop_task_from_master_queue(task)) {
+            } else if (!local_only && pop_task_from_master_queue(task)) {
                 if (!task.isNullTask()) {
                     RunningTaskGuard guard(*this);
                     task();
@@ -371,7 +376,7 @@ public:
                     thread_need_stop().set();
                 }
             }
-        } else if (pop_task_from_master_queue(task)) {
+        } else if (!local_only && pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
                 RunningTaskGuard guard(*this);
                 task();

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <future>
 #include <functional>
 #include <vector>
@@ -198,6 +199,40 @@ inline GlobalStealThreadPool* get_global_task_group() {
 
 size_t HKU_UTILS_API get_global_task_group_work_num();
 
+namespace detail {
+/** Remaining usable stack of the current thread in bytes, 0 when it cannot be determined */
+size_t HKU_UTILS_API remaining_stack_size(size_t* total_size = nullptr);
+
+/** Whether the current thread still has enough stack to run a task taken from a foreign queue */
+inline bool has_stack_for_foreign_task() {
+    size_t total_size = 0;
+    size_t remaining = remaining_stack_size(&total_size);
+    // Keep the original behavior when the stack range is unknown
+    HKU_IF_RETURN(remaining == 0 || total_size == 0, true);
+
+    // Keeps a quarter of the stack, at least 256KB, free for the task to be executed
+    constexpr size_t kMinReserve = 256 * 1024;
+    size_t reserve = std::max(total_size / 4, kMinReserve);
+    return remaining > reserve;
+}
+
+// Non-worker threads only help from the outermost wait, otherwise a task waiting for its own nested
+// tasks recurses without bound
+inline int& help_reentry_depth() {
+    static thread_local int depth = 0;
+    return depth;
+}
+
+struct HelpReentryGuard {
+    HelpReentryGuard() {
+        help_reentry_depth()++;
+    }
+    ~HelpReentryGuard() {
+        help_reentry_depth()--;
+    }
+};
+}  // namespace detail
+
 template <typename FutureContainer>
 void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& futures) {
     // If the current thread is a worker thread, its child tasks are added to the front of its own
@@ -226,7 +261,14 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
 
         // If not all the tasks are finished, try to execute the accumulated tasks
         if (!all_ready) {
-            if (pool.run_available_task_once()) {
+            bool helped = false;
+            if (is_work_thread) {
+                helped = pool.run_available_task_once(!detail::has_stack_for_foreign_task());
+            } else if (detail::help_reentry_depth() == 0 && detail::has_stack_for_foreign_task()) {
+                detail::HelpReentryGuard guard;
+                helped = pool.run_available_task_once();
+            }
+            if (helped) {
                 delay = init_delay;
                 spin_count = 0;
             } else if (pool.done()) {
@@ -284,7 +326,14 @@ void global_wait_task(FutureType& future) {
 
         // If the task is not finished, try to execute the local tasks
         if (!ready) {
-            if (tg->run_available_task_once()) {
+            bool helped = false;
+            if (GlobalStealThreadPool::is_work_thread()) {
+                helped = tg->run_available_task_once(!detail::has_stack_for_foreign_task());
+            } else if (detail::help_reentry_depth() == 0 && detail::has_stack_for_foreign_task()) {
+                detail::HelpReentryGuard guard;
+                helped = tg->run_available_task_once();
+            }
+            if (helped) {
                 delay = init_delay;
             } else if (tg->done()) {
                 break;
