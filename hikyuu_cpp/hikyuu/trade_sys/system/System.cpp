@@ -634,9 +634,21 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     m_pre_ev_valid = current_ev_valid;
     m_pre_cn_valid = current_cn_valid;
 
+    // The entry intent is void once the environment or the condition turns invalid: a queued
+    // delayed buy would re-enter right after the forced exit (the queued covers are kept, they
+    // cut the risk instead of adding it)
+    auto drop_pending_buys = [&]() {
+        if (!m_buyRequestList.empty()) {
+            HKU_INFO_IF(trace, "[{}] drop {} pending buy request(s)", name(),
+                        m_buyRequestList.size());
+            m_buyRequestList.clear();
+        }
+    };
+
     // If the current environment is invalid
     if (!current_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] current EV is invalid", name()));
+        drop_pending_buys();
         TradeRecord tr;
         // If a long position is held, liquidate it; sell_delay decides the fill timing (this close
         // or the next open)
@@ -672,6 +684,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     // If the system is currently invalid
     if (!current_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] current CN is invalid", name()));
+        drop_pending_buys();
         TradeRecord tr;
         // If a long position is held, liquidate it (the fill timing follows sell_delay)
         if (m_tm->have(m_stock)) {

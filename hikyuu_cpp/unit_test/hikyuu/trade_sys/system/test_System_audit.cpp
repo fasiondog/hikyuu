@@ -865,6 +865,63 @@ TEST_CASE("test_System_delay_request_priority") {
     CHECK_GT(sys->getTM()->getHoldNumber(kdata[suspended + 2].datetime, stk), 0.0);
 }
 
+/** @par Check point: when the environment or the condition turns invalid, a queued delayed buy is
+ *  dropped instead of re-entering at the next open (the exit was just forced, the entry intent is
+ *  void from then on) */
+TEST_CASE("test_System_invalid_ev_drops_pending_buy") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(201112060000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 10);
+
+    // A suspended bar (no volume) keeps the delayed buy queued, so the invalidation close can still
+    // find it pending
+    size_t suspended = Null<size_t>();
+    for (size_t i = 2; i + 2 < kdata.size(); i++) {
+        if (kdata[i].transAmount == 0.0 || kdata[i].transCount == 0.0) {
+            suspended = i;
+            break;
+        }
+    }
+    REQUIRE_UNARY(suspended != Null<size_t>());
+
+    auto run_case = [&](const EnvironmentPtr& ev) {
+        auto sys = SYS_Simple();
+        sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+        sys->setSG(
+          make_shared<FixedDatesSG>(kdata[suspended - 1].datetime, Datetime(299901010000LL)));
+        sys->setMM(MM_FixedCount(100));
+        sys->setEV(ev);
+        sys->setParam<bool>("buy_delay", true);
+        sys->setTO(kdata);
+        sys->readyForRun();
+
+        sys->runMoment(kdata[suspended - 1].datetime);                // the buy request is queued
+        MomentResult rs = sys->runMoment(kdata[suspended].datetime);  // nothing fills here
+        MomentResult r1 = sys->runMoment(kdata[suspended + 1].datetime);
+        return std::make_tuple(rs, r1,
+                               sys->getTM()->getHoldNumber(kdata[suspended + 1].datetime, stk));
+    };
+
+    /** @arg the control: with a valid environment the queue survives the suspended bar and fills */
+    const DatetimeList all_valid{kdata[suspended - 1].datetime, kdata[suspended].datetime,
+                                 kdata[suspended + 1].datetime};
+    auto control = run_case(make_shared<RangeEV>(all_valid));
+    CHECK_UNARY(std::get<1>(control).tradesOnOpen.size() == 1);
+    CHECK_GT(std::get<2>(control), 0.0);
+
+    /** @arg the environment turns invalid on the suspended close: the queued buy is dropped */
+    const DatetimeList ev_valid{kdata[suspended - 1].datetime};
+    auto invalidated = run_case(make_shared<RangeEV>(ev_valid));
+    CHECK_UNARY(std::get<0>(invalidated).tradesOnOpen.empty());
+    CHECK_UNARY(std::get<0>(invalidated).delayOnNextOpen.empty());
+
+    /** @arg the next open does not re-enter (the request was dropped, not deferred) */
+    CHECK_UNARY(std::get<1>(invalidated).tradesOnOpen.empty());
+    CHECK_EQ(std::get<2>(invalidated), 0.0);
+}
+
 /** @par Check point: the profit goal price is queried once per bar even on the bar where it
  *  triggers - the exit check and the trade record share the same value */
 TEST_CASE("test_System_profit_goal_called_once_per_bar") {
