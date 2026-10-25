@@ -351,6 +351,51 @@ TEST_CASE("test_MoneyManager_getBuyNumber_max_trade_clamped_before_cash") {
 }
 
 /** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_dirty_max_trade") {
+    // The dirty maxTradeNumber guard runs before the cap comparison: against NaN or +Inf that
+    // comparison is always false, so the old guard nested in the cap branch could never fire
+    constexpr double nan{std::numeric_limits<double>::quiet_NaN()};
+    constexpr double inf{std::numeric_limits<double>::infinity()};
+    const Datetime dt(200001010000);
+
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    auto makeStock = [&](double max_trade) {
+        Stock stock("TEST", "MMMAX", "MM Max Trade Guard", 1, true, Datetime(199001010000),
+                    Datetime(209901010000), 1.0, 1.0, 2, 1, 1000000);
+        // The constructor takes size_t, so the dirty values go in through the double setter
+        stock.maxTradeNumber(max_trade);
+        stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+        return stock;
+    };
+
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(1000.0));
+    mm->setTM(crtTM(dt, 100000.0));
+
+    /** @arg a NaN cap is rejected instead of slipping through the never-firing comparison */
+    CHECK_EQ(mm->getBuyNumber(dt, makeStock(nan), 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg an infinite cap is rejected the same way */
+    CHECK_EQ(mm->getBuyNumber(dt, makeStock(inf), 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg a negative cap is rejected too */
+    CHECK_EQ(mm->getBuyNumber(dt, makeStock(-1.0), 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg a valid cap below the request still caps the order */
+    CHECK_EQ(mm->getBuyNumber(dt, makeStock(500.0), 10.0, 1.0, PART_SIGNAL), 500.0);
+
+    MoneyManagerPtr short_mm(new MultSellMoneyManagerTest(true));
+    short_mm->setTM(crtTM(dt, 100000.0));
+
+    /** @arg the short sell side shares the same guard */
+    CHECK_EQ(short_mm->getSellShortNumber(dt, makeStock(nan), 10.0, 1.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(short_mm->getSellShortNumber(dt, makeStock(inf), 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg a valid cap above the request leaves the money manager sizing untouched (200) */
+    CHECK_EQ(short_mm->getSellShortNumber(dt, makeStock(500.0), 10.0, 1.0, PART_SIGNAL), 200.0);
+}
+
+/** @par Test points */
 TEST_CASE("test_MoneyManager_getBuyNumber_auto_checkin_no_side_effect") {
     // The auto_checkin top-up is done by System at the actual trade: the query stays side-effect
     // free and the number is not constrained by the current cash
