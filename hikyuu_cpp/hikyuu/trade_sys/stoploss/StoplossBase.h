@@ -205,7 +205,7 @@ private:                                                       \
 #define STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define STOPLOSS_IMP(classname, str_name)     \
+#define STOPLOSS_IMP(classname)               \
 public:                                       \
     virtual StoplossPtr _clone() override {   \
         return std::make_shared<classname>(); \

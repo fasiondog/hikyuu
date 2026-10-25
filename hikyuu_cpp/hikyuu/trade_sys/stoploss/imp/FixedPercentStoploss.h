@@ -18,7 +18,7 @@ namespace hku {
  * the buy price by a certain percentage
  */
 class FixedPercentStoploss : public StoplossBase {
-    STOPLOSS_IMP(FixedPercentStoploss, "FixedPercentSL")
+    STOPLOSS_IMP(FixedPercentStoploss)
     STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
