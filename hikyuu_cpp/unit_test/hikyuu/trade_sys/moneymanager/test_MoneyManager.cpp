@@ -322,6 +322,35 @@ TEST_CASE("test_MoneyManager_getBuyNumber_cash_shortage_binary_search") {
 }
 
 /** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_max_trade_clamped_before_cash") {
+    // The maxTradeNumber cap must not end the sizing: the cash clamp has to run on the capped
+    // quantity, otherwise an unaffordable cap goes to the trade manager and is rejected as a whole
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+    const double max_trade = stock.maxTradeNumber();
+    REQUIRE_UNARY(max_trade > 0.0);
+    const Datetime datetime(200001010000);
+
+    /** @arg a request above maxTradeNumber is capped first, then shrunk to the affordable 1000
+     * (cash 10000 at price 10, cost free) */
+    MoneyManagerPtr mm1(new ConfigurableBuyNumberMMTest(max_trade * 2.0));
+    mm1->setTM(crtTM(datetime, 10000.0));
+    CHECK_EQ(mm1->getBuyNumber(datetime, stock, 10.0, 1.0, PART_SIGNAL), 1000.0);
+
+    /** @arg cash affording more than the cap: the cap itself bounds the order */
+    MoneyManagerPtr mm2(new ConfigurableBuyNumberMMTest(max_trade * 2.0));
+    mm2->setTM(crtTM(datetime, max_trade * 100.0));
+    CHECK_EQ(mm2->getBuyNumber(datetime, stock, 10.0, 1.0, PART_SIGNAL), max_trade);
+
+    /** @arg auto_checkin keeps the cap and skips the cash clamp (the System deposits the gap) */
+    MoneyManagerPtr mm3(new ConfigurableBuyNumberMMTest(max_trade * 2.0));
+    mm3->setTM(crtTM(datetime, 10000.0));
+    mm3->setParam<bool>("auto_checkin", true);
+    CHECK_EQ(mm3->getBuyNumber(datetime, stock, 10.0, 1.0, PART_SIGNAL), max_trade);
+}
+
+/** @par Test points */
 TEST_CASE("test_MoneyManager_getBuyNumber_auto_checkin_no_side_effect") {
     // The auto_checkin top-up is done by System at the actual trade: the query stays side-effect
     // free and the number is not constrained by the current cash
@@ -410,8 +439,9 @@ TEST_CASE("test_MoneyManager_getBuyNumber_nonfinite_number") {
     /** @arg A finite size out of the int64_t range is rejected */
     CHECK_EQ(buyNumber(1.0e30), 0.0);
 
-    /** @arg The boundary itself is accepted: the size falls through to the maxTradeNumber clamp */
-    CHECK_EQ(buyNumber(cast_limit), stock.maxTradeNumber());
+    /** @arg The boundary itself is accepted: the size is capped at maxTradeNumber and the cap is
+     * then clamped by the cash (100000 / 10 = 10000) */
+    CHECK_EQ(buyNumber(cast_limit), 10000.0);
 
     /** @arg One representable double above the boundary is rejected */
     CHECK_EQ(buyNumber(std::nextafter(cast_limit, inf)), 0.0);
@@ -547,13 +577,13 @@ TEST_CASE("test_MoneyManager_short_side_defaults") {
     auto mm2 = MM_FixedCountTps({100.0}, {100.0});
     mm2->setTM(crtTM(Datetime(200001010000), 10000.0, TC_Zero()));
     CHECK_EQ(mm2->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
-    CHECK_UNARY(
-      (mm2->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
+    CHECK_UNARY((mm2->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) ==
+                 MAX_DOUBLE));
 }
 
 /** @par Test points */
 TEST_CASE("test_MoneyManager_getSellShortNumber_lot_align") {
-    StockManager& sm = StockManager::instance();
+    StockManager &sm = StockManager::instance();
 
     /** @arg sh600000 has minTradeNumber == 100: a fractional size is aligned down to the lot
      * size (cash 10000 / capital 7 = 1428.57 -> 1400) */

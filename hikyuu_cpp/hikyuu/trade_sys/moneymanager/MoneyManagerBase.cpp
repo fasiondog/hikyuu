@@ -149,12 +149,12 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
     double max_trade = stock.maxTradeNumber();
     if (n > max_trade) {
         // Reject a dirty maxTradeNumber (NaN / +-Inf / negative) instead of returning an illegal
-        // size; a valid one falls back to it directly
+        // size; a valid one caps the order, and the cash clamp below still applies to the cap
         HKU_WARN_IF_RETURN(!std::isfinite(max_trade) || !(max_trade > 0.0), 0.0,
                            "Invalid stock.maxTradeNumber({})! Stock({} {})", max_trade,
                            stock.market_code(), stock.name());
         HKU_WARN("Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
-        return max_trade;
+        n = max_trade;
     }
 
     // With auto_checkin System deposits the cash at the actual trade, so the number is not
