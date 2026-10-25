@@ -263,6 +263,43 @@ FACTOR_PARALLEL_PY_PART_PROBE = (
     "print('OK')\n"
 ).format(root=REPO_ROOT, config=CONFIG)
 
+# The trade manager value queries replay the trade history and may take long; the bindings must
+# release the GIL so a background Python thread keeps running while the account is processed.
+TM_VALUE_GIL_RELEASE_PROBE = (
+    "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
+    "import threading, time\n"
+    "from hikyuu import *\n"
+    "set_log_level(LOG_LEVEL.OFF)\n"
+    "hikyuu_init('{config}')\n"
+    "sm = StockManager.instance()\n"
+    "k = sm['sh000001'].get_kdata(Query(Datetime(20100101), Datetime(20121231)))\n"
+    "tm = crtTM(Datetime(20100101), 100000)\n"
+    "stg = SYS_Simple(tm=tm, mm=MM_FixedCount(100),"
+    " sg=SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)))\n"
+    "stg.run(k, True, True)\n"
+    "dates = sm.get_trading_calendar(k.get_query())\n"
+    "def released(fn, n=20):\n"
+    "    counter = [0]; stop = [False]\n"
+    "    def bg():\n"
+    "        while not stop[0]:\n"
+    "            counter[0] += 1\n"
+    "            time.sleep(0)\n"
+    "    t = threading.Thread(target=bg, daemon=True); t.start(); time.sleep(0.01)\n"
+    "    old = sys.getswitchinterval(); sys.setswitchinterval(1.0)\n"
+    "    c0 = counter[0]\n"
+    "    for _ in range(n):\n"
+    "        fn()\n"
+    "    c1 = counter[0]\n"
+    "    sys.setswitchinterval(old); stop[0] = True; t.join(1)\n"
+    "    return c1 - c0\n"
+    "d1 = released(lambda: tm.get_funds_list(dates, Query.DAY))\n"
+    "d2 = released(lambda: tm.get_funds_curve(dates, Query.DAY))\n"
+    "d3 = released(lambda: tm.get_performance(None, Query.DAY, False))\n"
+    "assert min(d1, d2, d3) > 0, 'GIL not released: %s' % [d1, d2, d3]\n"
+    "print('OK')\n"
+).format(root=REPO_ROOT, config=CONFIG)
+
 
 class GilSafeTest(unittest.TestCase):
     def test_exit_clean_after_gil_safe_use(self):
@@ -374,6 +411,23 @@ class GilSafeTest(unittest.TestCase):
         )
         self.assertEqual(
             proc.returncode, 0, "factor parallel probe hung/crashed:\n%s" % proc.stderr[-2000:]
+        )
+        self.assertIn("OK", proc.stdout)
+
+    def test_trade_manager_value_queries_release_gil(self):
+        # The trade manager value queries replay the trade history; a background Python thread
+        # must keep running while they are in flight, otherwise the account processing blocks
+        # every other Python thread.
+        proc = subprocess.run(
+            [sys.executable, "-c", TM_VALUE_GIL_RELEASE_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=180,
+        )
+        self.assertEqual(
+            proc.returncode, 0, "trade manager GIL-release probe failed:\n%s" % proc.stderr[-2000:]
         )
         self.assertIn("OK", proc.stdout)
 

@@ -8,6 +8,7 @@
 #include <hikyuu/trade_manage/build_in.h>
 #include <hikyuu/trade_manage/Performance.h>
 #include <optional>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -249,10 +250,6 @@ public:
     }
 };
 
-FundsRecord (TradeManagerBase::*getFunds_1)(KQuery::KType) const = &TradeManagerBase::getFunds;
-FundsRecord (TradeManagerBase::*getFunds_2)(const Datetime&,
-                                            KQuery::KType) = &TradeManagerBase::getFunds;
-
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
@@ -445,9 +442,21 @@ Common parameters:
     :param ktype: the K-line type
     :rtype: float)")
 
-      .def("get_funds", getFunds_1, py::arg("ktype") = KQuery::DAY)
-      .def("get_funds", getFunds_2, py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
-           R"(get_funds(self, [datetime, ktype = Query.DAY])
+      .def(
+        "get_funds",
+        [](TradeManagerBase& self, const KQuery::KType& ktype) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getFunds(ktype);
+        },
+        py::arg("ktype") = KQuery::DAY)
+      .def(
+        "get_funds",
+        [](TradeManagerBase& self, const Datetime& datetime, const KQuery::KType& ktype) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getFunds(datetime, ktype);
+        },
+        py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
+        R"(get_funds(self, [datetime, ktype = Query.DAY])
 
     Get the asset market value details at the specified moment
 
@@ -455,17 +464,28 @@ Common parameters:
     :param Query.KType ktype: the K-line type
     :rtype: FundsRecord)")
 
-      .def("get_funds_list", &TradeManagerBase::getFundsList, py::arg("dates"),
-           py::arg("ktype") = KQuery::DAY, R"(get_funds_list(self, dates[, ktype = Query.DAY])
+      .def(
+        "get_funds_list",
+        [](TradeManagerBase& self, const DatetimeList& dates, const KQuery::KType& ktype) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getFundsList(dates, ktype);
+        },
+        py::arg("dates"), py::arg("ktype") = KQuery::DAY,
+        R"(get_funds_list(self, dates[, ktype = Query.DAY])
 
     Get the daily asset records of the specified date list
     :param DatetimeList dates:  the specified moments
     :param Query.KType ktype: the K-line type
     :rtype: FundsList)")
 
-      .def("get_funds_curve", &TradeManagerBase::getFundsCurve, py::arg("dates"),
-           py::arg("ktype") = KQuery::DAY,
-           R"(get_funds_curve(self, dates[, ktype = Query.DAY])
+      .def(
+        "get_funds_curve",
+        [](TradeManagerBase& self, const DatetimeList& dates, const KQuery::KType& ktype) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.getFundsCurve(dates, ktype);
+        },
+        py::arg("dates"), py::arg("ktype") = KQuery::DAY,
+        R"(get_funds_curve(self, dates[, ktype = Query.DAY])
 
     Get the net asset value curve
 
@@ -595,8 +615,13 @@ Common parameters:
 
     :param str path: the directory of the output files)")
 
-      .def("update_with_weight", &TradeManagerBase::updateWithWeight,
-           R"(update_with_weight(self, date)
+      .def(
+        "update_with_weight",
+        [](TradeManagerBase& self, const Datetime& date) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            return self.updateWithWeight(date);
+        },
+        R"(update_with_weight(self, date)
 
       Update the current positions and the trade records according to the equity/dividend adjustment information; it must be called in the chronological order
 
@@ -615,6 +640,7 @@ Common parameters:
         "get_performance",
         [](TradeManagerBase& self, std::optional<Datetime> datetime, const KQuery::KType& ktype,
            bool ext) {
+            ScopeGilRelease gil(!self.hasPythonPart());
             return self.getPerformance(datetime.value_or(Datetime::now()), ktype, ext);
         },
         py::arg("datetime") = py::none(), py::arg("ktype") = KQuery::DAY, py::arg("ext") = true,
