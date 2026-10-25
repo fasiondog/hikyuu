@@ -40,6 +40,22 @@
  * For master compatibility, buy_delay/sell_delay are forced to !trade_on_close. It exists to
  * reproduce the results of the Portfolio before the refactoring.
  *
+ *  A suspended instrument comes in two data shapes, and the tradability is decided by the same
+ *  guards as the System entries:
+ *
+ *  - no bar on the suspended day (the daily source drops the day): the leaf cannot run, so the mode
+ * A sampling values it at the last quoted close and folds its queued requests from the request
+ *    lists; the parent legs wait for the next tradable open;
+ *  - a padded bar on the suspended day (open == high == low == close == the previous close, zero
+ *    volume): the leaf runs, but the entry guards refuse the trade and queue a delayed request; the
+ *    parent applies the same guards to its own legs, so it never fills at the padded price either.
+ *
+ *  Minute data carries no padded suspension day at all (only the zero-volume minutes), so
+ *  transAmount/transCount == 0 is the only suspension test there, and can_trade_when_high_eq_low
+ *  decides whether a one-price bar is tradable (on daily data the same parameter separates a
+ *  one-price board from a padded suspension bar). The mode B pass-through legs are not re-judged:
+ *  the sub-system already gated them with its own parameters.
+ *
  *  Serialization restores the shadow-account registry and the scheduling counters, so a loaded
  *  system can continue with run(reset=false); the mode C running pools are rebuilt on the next
  *  rebalancing day.
@@ -630,9 +646,25 @@ private:
      * liquidation suggestion of the unselected sub-system); return 0 when there is no data */
     price_t _getClosePrice(const Datetime& date, const Stock& stock);
 
+    /** Get the last close at or before the date. Used to value an instrument without a bar on the
+     *  sampling day (a suspended day with no data), so it samples at the same price a padded
+     *  suspension bar (close == the previous close) carries. Return 0 for a delisted instrument
+     *  (owned by the delisting path) or when no earlier bar exists */
+    price_t _getLastClosePrice(const Datetime& date, const Stock& stock);
+
     /** Get the open price of the specified instrument on the specified date; return 0 when there
      * is no data */
     price_t _getOpenPrice(const Datetime& date, const Stock& stock);
+
+    /** Whether the parent may trade the bar, following the System entry guards: a one-price bar (a
+     *  one-price board or a padded suspension bar) is tradable only with
+     *  can_trade_when_high_eq_low, and a bar without any trade (a padded suspension bar, or a
+     *  zero-volume minute) is never tradable */
+    bool _isTradableBar(const KRecord& today) const;
+
+    /** Whether the parent may trade the instrument on the date: false when there is no bar or the
+     *  bar itself is not tradable @see _isTradableBar */
+    bool _isTradableAt(const Datetime& date, const Stock& stock);
 
     /** Get the KData of the instrument within the run query (with the per-run cache) */
     KData _getStockKData(const Stock& stock);
@@ -646,13 +678,17 @@ private:
     void _clearDelistedInSubTree(const SystemPtr& sys, const Stock& stock, const Datetime& date,
                                  price_t price);
 
+    /** Drop the queued batch kept for the next open (the batch and its bookkeeping, the calibration
+     *  legs are left untouched) */
+    void _clearOpenPendingBatch();
+
     /** Queue the close-stage suggestions for the execution at the next open (trade_on_close=false).
      *  It is keyed by the driving day: a repeat drive of the same day replaces the queued batch
      *  (idempotent), except while a retry batch is pending (kept as is); a batch left over from an
      *  earlier day (a session that only drives close) is dropped with a single warning, unless it
-     *  is a retry -- the retry legs mirror fills that already happened, so they are merged into the
-     *  new batch (the prices are re-set at the next open). `is_adjust` records whether the close
-     *  that produced the batch was a rebalancing close (the turnover attribution). */
+     *  is a retry -- the mode B retry legs mirror fills that already happened, so they are merged
+     * into the new batch (the prices are re-set at the next open). `is_adjust` records whether the
+     * close that produced the batch was a rebalancing close (the turnover attribution). */
     void _queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions,
                            bool is_adjust);
 

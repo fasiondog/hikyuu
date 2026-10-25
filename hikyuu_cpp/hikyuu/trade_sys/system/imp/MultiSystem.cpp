@@ -929,6 +929,14 @@ void MultiSystem::_discardOpenPending(const string& reason) {
     m_open_pending_adjust = false;
 }
 
+void MultiSystem::_clearOpenPendingBatch() {
+    m_open_pending_suggestions.clear();
+    m_open_pending_date = Datetime();
+    m_open_pending_assets = 0.0;
+    m_open_pending_retry = false;
+    m_open_pending_adjust = false;
+}
+
 void MultiSystem::_pushCheckoutOnce(const SystemPtr& sys) {
     auto& v = m_pending_calibration;
     v.erase(std::remove_if(v.begin(), v.end(),
@@ -996,7 +1004,9 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
         // book (the parent side can only sell what the parent account actually holds)
         TMPtr own_tm = (a.sys && a.sys->getTM()) ? a.sys->getTM() : m_tm;
         price_t price = _getOpenPrice(date, a.stock);
-        if (price <= 0.0) {
+        // The parent derives the calibration legs from its own account: a bar it cannot trade is
+        // deferred like a missing quote
+        if (price <= 0.0 || !_isTradableAt(date, a.stock)) {
             // No quote: the leg is left to the next session -- unless the holding is already gone
             // (e.g. the instrument was delisted and force-cleared while the leg waited): such a
             // dead leg would retry forever and block every future injection
@@ -1863,9 +1873,9 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
     }
     // A batch left over from an earlier day was never consumed at an open (a session that only
     // drives the close): drop it, keeping only the latest batch. Warn once instead of on every
-    // append, so the log is not flooded. A retry batch is exempt: its legs mirror sub-system fills
-    // that already happened, so they are merged into the new batch instead (the prices are re-set
-    // at the next open).
+    // append, so the log is not flooded. A mode B retry batch is exempt: its legs mirror sub-system
+    // fills that already happened, so they are merged into the new batch instead (the prices are
+    // re-set at the next open).
     if (!m_open_pending_suggestions.empty() && !m_open_pending_retry) {
         if (!m_open_pending_warned) {
             m_open_pending_warned = true;
@@ -1879,9 +1889,16 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
     m_open_pending_date = date;
     if (!m_open_pending_suggestions.empty() && m_open_pending_retry) {
         m_open_pending_adjust = m_open_pending_adjust || is_adjust;
-        TradeSuggestionList merged = m_open_pending_suggestions;
-        merged.insert(merged.end(), suggestions.begin(), suggestions.end());
-        m_open_pending_suggestions = merged;
+        if (m_mode == "A") {
+            // The mode A target is re-derived from the leaf intents on every rebalancing day and
+            // the conversion nets the filled holdings only: a kept retry leg plus the re-derived
+            // one would order the same delta twice, so the newest batch supersedes the queued legs
+            m_open_pending_suggestions = suggestions;
+        } else {
+            TradeSuggestionList merged = m_open_pending_suggestions;
+            merged.insert(merged.end(), suggestions.begin(), suggestions.end());
+            m_open_pending_suggestions = merged;
+        }
     } else {
         m_open_pending_suggestions = suggestions;
         m_open_pending_adjust = is_adjust;
@@ -1998,6 +2015,10 @@ TradeSuggestionList MultiSystem::_netSuggestions(const Datetime& date,
 void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                                       KQuery::KType ktype, TradeRecordList& out_trades) {
     TradeSuggestionList netted = _netSuggestions(date, suggestions);
+    // A mode A leg is the parent's own target delta: a bar the parent cannot trade is skipped like
+    // a missing quote (the intent is re-sampled at the next rebalancing close). The mode B legs
+    // mirror the sub-system fills, which the sub-system itself gated already
+    const bool check_tradable = (m_mode == "A");
     // The cash-generating group runs first (sell a long, open a short) so that the freed cash backs
     // the cash-consuming group (cover a short, buy a long) that runs afterwards
     for (const auto& s : netted) {
@@ -2030,8 +2051,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             }
         }
         // No quote (e.g. suspended): a 0-price sell would wipe the holding, skip it
-        if (s.plan_price <= 0.0) {
-            HKU_WARN("Skip the SELL suggestion, {} has no quote on {}!", s.stock.market_code(),
+        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock))) {
+            HKU_WARN("Skip the SELL suggestion, {} cannot be traded on {}!", s.stock.market_code(),
                      date);
             continue;
         }
@@ -2120,8 +2141,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.stock.isNull() || !s.short_side || s.type != SuggestionType::BUY) {
             continue;
         }
-        if (s.plan_price <= 0.0) {
-            HKU_WARN("Skip the BUY suggestion, {} has no quote on {}!", s.stock.market_code(),
+        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock))) {
+            HKU_WARN("Skip the BUY suggestion, {} cannot be traded on {}!", s.stock.market_code(),
                      date);
             continue;
         }
@@ -2153,8 +2174,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.number <= 0.0) {
             continue;
         }
-        if (s.plan_price <= 0.0) {
-            HKU_WARN("Skip the BUY suggestion, {} has no quote on {}!", s.stock.market_code(),
+        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock))) {
+            HKU_WARN("Skip the BUY suggestion, {} cannot be traded on {}!", s.stock.market_code(),
                      date);
             continue;
         }
@@ -2271,13 +2292,17 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     if (!m_trade_on_close && !m_open_pending_suggestions.empty()) {
         TradeSuggestionList executable;
         TradeSuggestionList retry;
+        // A mode A leg is the parent's own target delta: a bar the parent cannot trade defers the
+        // leg as well (the retried legs are superseded by the newest batch at the next rebalancing
+        // close). The mode B legs mirror the sub-system fills, already gated by the sub-system
+        const bool check_tradable = (m_mode == "A");
         for (auto& s : m_open_pending_suggestions) {
             price_t op = _getOpenPrice(datetime, s.stock);
-            if (op > 0.0) {
+            if (op > 0.0 && (!check_tradable || _isTradableAt(datetime, s.stock))) {
                 s.plan_price = op;
                 executable.push_back(s);
             } else {
-                retry.push_back(s);  // No quote (suspension): leave it to the next open
+                retry.push_back(s);  // No quote or not tradable: leave it to the next open
             }
         }
         KQuery::KType kt = m_kdata.getQuery().kType();
@@ -3046,12 +3071,16 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
     }
 
     getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery(), getMode());
-    if (!suggestions.empty()) {
-        if (m_trade_on_close) {
+    if (m_trade_on_close) {
+        if (!suggestions.empty()) {
             _executeSuggestions(datetime, suggestions, ktype, executed);
-        } else {
-            _queueOpenPending(datetime, suggestions, is_adjust);
         }
+    } else if (!suggestions.empty()) {
+        _queueOpenPending(datetime, suggestions, is_adjust);
+    } else if (m_open_pending_retry) {
+        // The mode A target is re-derived on every rebalancing day: an empty batch supersedes the
+        // queued retry legs, whose intents are already covered by the parent holdings
+        _clearOpenPendingBatch();
     }
 
     m_last_suggestions = suggestions;
@@ -3120,6 +3149,12 @@ void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Dateti
         }
         price_t p = _getClosePrice(date, stk);
         if (p <= 0.0) {
+            // No bar on the sampling day (a suspended day with no data): value at the last quoted
+            // close so the pending intents stay visible (the same convention as the mode A leaf
+            // sampling)
+            p = _getLastClosePrice(date, stk);
+        }
+        if (p <= 0.0) {
             continue;
         }
         auto fold = [&](const std::vector<TradeRequest>& reqs, double sign) {
@@ -3147,6 +3182,12 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
     }
     auto price_of = [&](const Stock& s, price_t fallback) {
         price_t p = _getClosePrice(datetime, s);
+        if (p <= 0.0) {
+            // No bar on the sampling day (a suspended day with no data): fall back to the last
+            // quoted close, the same price a padded suspension bar (close == the previous close)
+            // carries, so both suspension shapes sample identically
+            p = _getLastClosePrice(datetime, s);
+        }
         return p > 0.0 ? p : fallback;
     };
     std::map<Stock, double> ratio;  // instrument -> signed net exposure ratio
@@ -3172,16 +3213,30 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
     if (!stk.isNull()) {
         price_t p = price_of(stk, 0.0);
         if (p > 0.0) {
-            for (const auto& req : sub.delayOnNextOpen) {
-                if (!req.valid || req.number <= 0.0) {
-                    continue;
+            // The snapshot carries the requests only when the leaf ran this close (a suspended
+            // leaf early-returns with pos == Null and an empty snapshot): fold them straight from
+            // the request lists then, the same run-independent convention as the nested folding
+            auto fold_requests = [&](const std::vector<TradeRequest>& reqs) {
+                for (const auto& req : reqs) {
+                    if (!req.valid || req.number <= 0.0) {
+                        continue;
+                    }
+                    double v = req.number * p * stk.unit() / base;
+                    if (req.business == BUSINESS_BUY || req.business == BUSINESS_BUY_SHORT) {
+                        ratio[stk] += v;
+                    } else if (req.business == BUSINESS_SELL ||
+                               req.business == BUSINESS_SELL_SHORT) {
+                        ratio[stk] -= v;
+                    }
                 }
-                double v = req.number * p * stk.unit() / base;
-                if (req.business == BUSINESS_BUY || req.business == BUSINESS_BUY_SHORT) {
-                    ratio[stk] += v;
-                } else if (req.business == BUSINESS_SELL || req.business == BUSINESS_SELL_SHORT) {
-                    ratio[stk] -= v;
-                }
+            };
+            if (!sub.delayOnNextOpen.empty()) {
+                fold_requests(sub.delayOnNextOpen);
+            } else {
+                fold_requests(sys->getBuyTradeRequestList());
+                fold_requests(sys->getSellTradeRequestList());
+                fold_requests(sys->getSellShortTradeRequestList());
+                fold_requests(sys->getBuyShortTradeRequestList());
             }
         }
     }
@@ -3408,8 +3463,8 @@ void MultiSystem::_forceSellSubTree(const SystemPtr& sys, const Datetime& date, 
             continue;
         }
         price_t price = on_open ? _getOpenPrice(date, stk) : _getClosePrice(date, stk);
-        if (price <= 0.0) {
-            continue;  // No quote (suspended): the liquidation is left to the next session
+        if (price <= 0.0 || !_isTradableAt(date, stk)) {
+            continue;  // No quote or not tradable: the liquidation is left to the next session
         }
         TradeRecord tr =
           m_tm->sell(date, stk, price, num, 0.0, 0.0, price, PART_PORTFOLIO, "MultiSystem");
@@ -3610,6 +3665,43 @@ price_t MultiSystem::_getClosePrice(const Datetime& date, const Stock& stock) {
     KData kdata = _getStockKData(stock);
     size_t pos = kdata.getPos(date);
     return pos == Null<size_t>() ? 0.0 : kdata.getKRecord(pos).closePrice;
+}
+
+price_t MultiSystem::_getLastClosePrice(const Datetime& date, const Stock& stock) {
+    HKU_IF_RETURN(stock.isNull(), 0.0);
+    // A delisted instrument is owned by the delisting path, never re-valued here
+    HKU_IF_RETURN(!stock.valid() && date > stock.lastDatetime(), 0.0);
+    // The last bar at or before the date, looked up in the same cached KData as the other price
+    // probes (the run query's kType/recover coordinate, no future data)
+    KData kdata = _getStockKData(stock);
+    size_t lo = 0;
+    size_t hi = kdata.size();
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (kdata.getKRecord(mid).datetime <= date) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    return lo == 0 ? 0.0 : kdata.getKRecord(lo - 1).closePrice;
+}
+
+bool MultiSystem::_isTradableBar(const KRecord& today) const {
+    // A one-price bar is either a one-price board or a padded suspension bar: the leaf entry gates
+    // it by can_trade_when_high_eq_low
+    if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
+        return false;
+    }
+    // A bar without any trade carries no fill (a padded suspension bar, or a zero-volume minute)
+    return today.transAmount != 0.0 && today.transCount != 0.0;
+}
+
+bool MultiSystem::_isTradableAt(const Datetime& date, const Stock& stock) {
+    HKU_IF_RETURN(stock.isNull(), false);
+    KData kdata = _getStockKData(stock);
+    size_t pos = kdata.getPos(date);
+    return pos != Null<size_t>() && _isTradableBar(kdata.getKRecord(pos));
 }
 
 price_t MultiSystem::_getOpenPrice(const Datetime& date, const Stock& stock) {

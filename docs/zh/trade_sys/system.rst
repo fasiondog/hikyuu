@@ -10,7 +10,7 @@
 
 :class:`MultiSystem` 支持三种运行模式（``set_mode`` / 只读属性 ``mode``；模式由聚合系统自身持有，亦可经预置 PF 工厂设定）：
 
-- **模式 A「信号汇总」（Signal Aggregation，默认）**：每个子系统持有一个信号「影子账户」（初始信号资金 ``set_sub_init_cash``，逐 bar 恒运行、不逐日重置；``run(reset=True)`` 仍会随整体复位），作为独立信号源；父在调仓日读取**被选中**子系统的**当前意图态**（净敞口持仓 + 未兑现买卖信号），经 AF L2 按「权重 × 净敞口比重 × 父净值」**合成每标的带符号净目标**并对父账户按差额（trade-the-delta）统一下单，多空净额相互抵消；未选中子系统贡献零信号（其标的从目标中消失而被平仓）。影子账本不触碰真实资金。采样时会把**嵌套子树叶子已排队未成交的延迟请求**计入净敞口比（嵌套 C 的待成交意图对采样可见）。
+- **模式 A「信号汇总」（Signal Aggregation，默认）**：每个子系统持有一个信号「影子账户」（初始信号资金 ``set_sub_init_cash``，逐 bar 恒运行、不逐日重置；``run(reset=True)`` 仍会随整体复位），作为独立信号源；父在调仓日读取**被选中**子系统的**当前意图态**（净敞口持仓 + 未兑现买卖信号），经 AF L2 按「权重 × 净敞口比重 × 父净值」**合成每标的带符号净目标**并对父账户按差额（trade-the-delta）统一下单，多空净额相互抵消；未选中子系统贡献零信号（其标的从目标中消失而被平仓）。影子账本不触碰真实资金。采样时会把叶子已排队未成交的延迟请求计入净敞口比（叶子当日未运行的快照为空时直读其请求列表，停牌叶子的悬留意图因此不丢；嵌套 C 的待成交意图对采样可见）。停牌无 bar 叶子按最后可得收盘价估值（与有 bar 但 ``high==low==close``、成交量为 0 的填充停牌形态同一口径）。父层下单前按自身 ``can_trade_when_high_eq_low`` 与零成交（``transAmount/transCount==0``）判定可成交性（与 :class:`System` 入口一致）：不可成交的腿视同无报价延后到下一个可成交开盘；停牌期内若再次调仓，最新一批采样取代已排队的重试腿，不会叠加下单。
 - **模式 B「资金配置」（Fund Allocation，配额划拨，FOF/MOM 风格）**：调仓日先由 AF L1 为每个选中子系统分配额度（目标总资产），并在驱动子系统**之前**将其账户校准到该额度（零配额清算 → 未选中清算/选中回收 → 减持超配 → 注资低配），子系统以精确额度自主交易；父**连续镜像**其真实指令（L2 透传）。配额现金是虚拟预算：``checkin/checkout`` 只记子账户账本、不从父账户划拨，同一调仓日的注资按父剩余现金累计封顶，因此镜像成交有资金支撑、两本账（持仓/成交）保持匹配。composite 子层的减持按叶子市值等比例执行（停牌叶子按最后可得收盘价估值），整手取整残差与停牌不可卖部分按剩余市值补卖（残余不足一手）。前一轮已排队的校准腿计为已卖出：其价值从残差基准扣除；若已覆盖整个缺口，则按缺口目标整手修剪（同标的多腿按队序贪心保留前腿），整手残差由既有补卖机制补足至缺口（残余不足一手）。
 - **模式 B 的 SE 约定**：**未设置 SE 时视同全部子系统被选中**（与模式 A/C 一致），照常分配额度；SE 存在但调仓日选中为空则是「全不选」，由 ``sell_at_not_selected`` 决定是否清仓。
 - **模式 C「共享账户兼容」（Shared Account Compatibility）**：不建影子账户，子系统直接在父真实账户（``shared_tm``）上按自身 MM 交易、持续运行、按信号当日退出；父仅准入（SE）+ 记录 + 可选风控，不做 L2 换算。用于向后兼容重构前的 ``Portfolio``。
@@ -73,7 +73,13 @@
 - **参数别名**：``adjust_cycle``（int，默认 1）、``trade_on_close``（bool，默认 True）、``sell_at_not_selected``（bool，默认 False）、``keep_watch_force_sell``（bool，默认 False）同时以参数形式暴露，``set_param`` 与对应 setter 等价（完全非法值在设置时抛异常，如 ``adjust_cycle < 0``、非法 ``adjust_mode`` / ``axis_mode``；``adjust_cycle == 0`` 归一为 1（负值在设置时抛异常）、``adjust_mode`` 大小写归一、周期日缓存清理与越界告警均在 ``readyForRun`` 时处理）。
 - **交易对象选择（SE）**（``set_se``）：可选设置，调仓日仅采样选中子系统；模式 B/C 中未选中者可强制清仓/回收额度（``set_sell_at_not_selected``），模式 A 中影子账户恒运行，未选中的标的从父目标中消失而被平仓（与 ``sell_at_not_selected`` 无关）。
 - **换手率**（``get_adjust_turnover``）：记录各调仓日的成交金额与调仓前总资产之比。
-- **退市/停牌**：父在开盘阶段统一强制卖出已退市标的持仓（模式 C 的共享账户也由父层执行，子层不重复卖出）；停牌日子系统自动跳过。收盘清算/减持遇停牌的腿回落为次日开盘的延后腿（任意 `trade_on_close` 模式），持仓保持不变直至有报价。
+- **退市**：父在开盘阶段统一强制卖出已退市标的持仓（模式 C 的共享账户也由父层执行，子层不重复卖出）。
+- **停牌（两种数据形态）**：日线数据的停牌有两种形态，口径都是「不可成交即延后」：
+
+    * **无数据**：停牌日整根 bar 缺失，叶子无法运行；模式 A 采样按最后可得收盘价估值并直读其请求列表，停牌期的悬留意图不丢；
+    * **填充 bar**：停牌日有 bar 且 ``open=high=low=close=前收``、成交量为 0，叶子可以运行，但入场守卫拒绝成交并挂延迟请求（``transAmount/transCount==0`` 恒拒绝；``high==low`` 由 ``can_trade_when_high_eq_low`` 决定）。
+
+  父层自算的腿（模式 A 目标腿、收盘校准腿、强制清算腿）套用与 :class:`System` 入口相同的判定，不可成交即视同无报价延后到下一个可成交开盘（任意 ``trade_on_close`` 模式），持仓保持不变直至可成交。分钟级数据没有「停牌日」概念（不存在填充 bar），只有零成交分钟，判定只剩零成交一条；此时 ``can_trade_when_high_eq_low`` 是一字板是否可成交的唯一开关，也是日线数据区分一字板与填充停牌 bar 的开关。模式 B 的透传镜像腿不做二次判定（叶子已按其自身参数判定过）。
 
 - **归档与克隆**（`save`/`load`、`clone`）：影子/配额账户注册表按子层槽位随系统一并保存并在载入后重建，调度计数（close-day 计数、最后驱动日）、固定时间轴、外部调仓日表与未成交的校准腿也会恢复，载入后可用 ``run(reset=False)`` 续跑；模式 C 的运行池在下一个调仓日重建。`goalPrice` 等可能为 NaN 的价格字段以字符串写入归档（文本/XML 归档无法回读 NaN）。
 
@@ -87,7 +93,7 @@ MultiSystem 公共参数：
     * **sell_at_not_selected=False** *(bool)* : 模式 B/C 下是否对未选中（或 L1 配额为 0）的子系统强制清仓并回收其账户
     * **keep_watch_force_sell=False** *(bool)* : 模式 C 下 ``sell_at_not_selected=False`` 时，是否继续每日驱动已出池但仍持仓的子系统（仅盯盘、不强平，凭其自身止损/止盈/卖出信号平仓，归零后自动出池）。调仓日收盘、非调仓日收盘与开盘阶段均会驱动（开盘仅承接其延迟单）；强制清仓仍只由 ``sell_at_not_selected`` 控制。其余模式无效果
 
-    运行期开关（adjust_cycle / adjust_mode / delay_to_trading_day / trade_on_close / sell_at_not_selected / keep_watch_force_sell）在 readyForRun 时快照生效（批量 run 每次运行刷新；直接调用 runMoment* 需先 readyForRun）。:class:`System` 的单证券交易参数（buy_delay / sell_delay / delay_use_current_price / max_delay_count / tp_* / ignore_sell_sg 等）属于各子系统，聚合父层不使用；父层自身的 trace、shared_*、support_borrow_* 仍然生效。模式 C 例外——父层按 trade_on_close 向子系统下发 buy_delay / sell_delay。
+    运行期开关（adjust_cycle / adjust_mode / delay_to_trading_day / trade_on_close / sell_at_not_selected / keep_watch_force_sell）在 readyForRun 时快照生效（批量 run 每次运行刷新；直接调用 runMoment* 需先 readyForRun）。:class:`System` 的单证券交易参数（buy_delay / sell_delay / delay_use_current_price / max_delay_count / tp_* / ignore_sell_sg 等）属于各子系统，聚合父层不使用；父层自身的 trace、can_trade_when_high_eq_low、shared_*、support_borrow_* 仍然生效。模式 C 例外——父层按 trade_on_close 向子系统下发 buy_delay / sell_delay。
 
 System 公共参数：
 
@@ -98,7 +104,7 @@ System 公共参数：
     * **tp_monotonic=True** *(bool)* : 止赢单调递增
     * **tp_delay_n=3** *(int)* : 止盈延迟开始的天数，即止盈策略判断从实际交易几天后开始生效
     * **ignore_sell_sg=False** *(bool)* : 忽略卖出信号，只使用止损/止赢等其他方式卖出
-    * **can_trade_when_high_eq_low=False** *(bool)* : 当最高价等于最低价时，是否允许交易（一字涨停不可买入、一字跌停不可卖出）
+    * **can_trade_when_high_eq_low=False** *(bool)* : 当最高价等于最低价时，是否允许交易（一字涨停不可买入、一字跌停不可卖出）。日线数据的填充停牌 bar（``open=high=low=close=前收``、成交量为 0）同样满足 ``high==low``，故也受此参数控制（成交量为 0 的守卫恒生效，不受该参数影响）；分钟级数据无填充 bar，此参数仅影响一字板
 
     * **ev_open_position=False** *(bool)*: 是否使用市场环境判定进行初始建仓
     * **cn_open_position=False** *(bool)*: 是否使用系统有效性条件进行初始建仓

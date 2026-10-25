@@ -5649,8 +5649,9 @@ TEST_CASE("test_MultiSystem_cascade_a_a_unsampled_fold") {
     CHECK_EQ(first_buy, buy_date);
 }
 
-/** @par Check point: in mode A the retried suggestion leg merges with the new rebalancing batch
- * (the suspended stock is excluded from the new batch by its missing quote, no double counting) */
+/** @par Check point: in mode A the retried suggestion leg is superseded by the new rebalancing
+ * batch (the suspended intent is folded into the re-derived batch by its request list, which fills
+ * once at the resumption open -- no double counting) */
 TEST_CASE("test_MultiSystem_mode_a_retry_merge") {
     Stock stk1 = getStock("sh600005");
     Stock stk2 = getStock("sh600000");
@@ -5696,6 +5697,167 @@ TEST_CASE("test_MultiSystem_mode_a_retry_merge") {
     CHECK_EQ(buy1_date, Datetime(200007030000LL));
     CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
     CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
+}
+
+/** @par Check point: a pending delayed buy queued on a non-rebalancing close stays visible to the
+ * mode A sampling on a no-bar suspension close (sh600005 has no bar on 2000-06-30): the leaf cannot
+ * run on that close, so the request lists are folded instead and the mirror leg fills once at the
+ * resumption open instead of lagging a full rebalance */
+TEST_CASE("test_MultiSystem_mode_a_sampling_suspended_pending_buy_intent") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+    // The suspension shape this case pins: no bar on the rebalancing close, resumption on 07-03
+    REQUIRE(stk1.getKData(KQueryByDate(Datetime(20000630), Datetime(20000701))).empty());
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20000703), Datetime(20000704))).empty());
+    price_t resume_open =
+      stk1.getKData(KQueryByDate(Datetime(20000703), Datetime(20000704))).front().openPrice;
+
+    // The leaf queues a delayed buy on 06-29 (a non-rebalancing close); the next rebalancing close
+    // is 06-30 and stk1 is suspended on it
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006290000LL), Datetime(203001010000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", true);
+    leaf1->setTO(stk1.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_a_suspended_buy_intent");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1}));
+    ms->setTradeOnClose(false);
+    ms->setAdjustDates(DatetimeList{Datetime(200006300000LL), Datetime(200007030000LL)});
+    ms->add(leaf1);
+    ms->run(k);
+
+    size_t buys1 = 0;
+    Datetime buy1_date;
+    price_t buy1_price = 0.0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk1) {
+            buys1++;
+            buy1_date = tr.datetime;
+            buy1_price = tr.realPrice;
+        }
+    }
+
+    /** @arg the suspended intent is sampled on the suspended close and the mirror buy fills once at
+     * the resumption open (2000-07-03) */
+    CHECK_EQ(buys1, 1);
+    CHECK_EQ(buy1_date, Datetime(200007030000LL));
+    CHECK_LT(std::fabs(buy1_price - resume_open), 1e-6);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a held suspended instrument stays visible to the mode A sampling on a no-bar
+ * suspension close (valued at its last quoted close): the first mirror buy of a position opened
+ * before the suspension is queued on the suspended close instead of being lost for the cycle */
+TEST_CASE("test_MultiSystem_mode_a_sampling_suspended_held_position") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+    // The suspension shape this case pins: no bar on the rebalancing close, resumption on 07-03
+    REQUIRE(stk1.getKData(KQueryByDate(Datetime(20000630), Datetime(20000701))).empty());
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20000703), Datetime(20000704))).empty());
+
+    // The leaf buys at the 06-20 close (immediate fill, the shadow holds); the first rebalancing
+    // close is 06-30 and stk1 is suspended on it
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006200000LL), Datetime(203001010000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_a_suspended_held");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1}));
+    ms->setTradeOnClose(false);
+    ms->setAdjustDates(DatetimeList{Datetime(200006300000LL), Datetime(200007030000LL)});
+    ms->add(leaf1);
+    ms->run(k);
+
+    size_t buys1 = 0;
+    Datetime buy1_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk1) {
+            buys1++;
+            buy1_date = tr.datetime;
+        }
+    }
+
+    /** @arg the held instrument is sampled on the suspended close at its last quoted close and the
+     * mirror buy fills at the resumption open (2000-07-03) */
+    CHECK_EQ(buys1, 1);
+    CHECK_EQ(buy1_date, Datetime(200007030000LL));
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a suspension outlasting two rebalancing closes must not duplicate the mirror
+ * leg: the mode A target is re-derived from the leaf intents on every rebalancing day, so the
+ * newest batch supersedes the queued retry legs */
+
+TEST_CASE("test_MultiSystem_mode_a_suspended_retry_batch_superseded") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20051001), Datetime(20051201));
+    KData k = stk2.getKData(full);
+    REQUIRE(k.size() > 20);
+    // The suspension shape this case pins: both rebalancing closes are inside it, resumption on
+    // 11-21
+    REQUIRE(stk1.getKData(KQueryByDate(Datetime(20051031), Datetime(20051101))).empty());
+    REQUIRE(stk1.getKData(KQueryByDate(Datetime(20051104), Datetime(20051105))).empty());
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20051121), Datetime(20051122))).empty());
+
+    auto run_ms = [&](const DatetimeList& adjust_dates) {
+        auto sg1 =
+          make_shared<ScriptedBuySellSG>(Datetime(200510180000LL), Datetime(203001010000LL));
+        auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+        leaf1->setStock(stk1);
+        leaf1->setParam<bool>("buy_delay", false);
+        leaf1->setTO(stk1.getKData(full));
+
+        auto ms = std::make_shared<MultiSystem>("ms_a_suspended_superseded");
+        ms->setTM(crtTM(Datetime(200510010000LL), 200000.0));
+        ms->setMode("A");
+        ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1}));
+        ms->setTradeOnClose(false);
+        ms->setAdjustDates(adjust_dates);
+        ms->add(leaf1);
+        ms->run(k);
+        return ms;
+    };
+
+    auto once = run_ms(DatetimeList{Datetime(200510310000LL)});
+    auto twice = run_ms(DatetimeList{Datetime(200510310000LL), Datetime(200511040000LL)});
+
+    size_t buys = 0;
+    for (const auto& tr : twice->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk1) {
+            buys++;
+        }
+    }
+    double once_num = once->getTM()->getPosition(k.back().datetime, stk1).number;
+    double twice_num = twice->getTM()->getPosition(k.back().datetime, stk1).number;
+
+    /** @arg the queued leg waits for the resumption open and fills once */
+    CHECK_GT(once_num, 0.0);
+    CHECK_EQ(buys, 1);
+    /** @arg the second rebalancing close inside the same suspension supersedes the queued retry
+     * leg: the parent position matches the single-rebalancing case instead of doubling it */
+    CHECK_EQ(twice_num, once_num);
 }
 
 /** @par Check point: a deferred injection waits for the deferred sells of the same rebalancing
