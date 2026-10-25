@@ -9,6 +9,7 @@
 #include <cmath>
 #include <fstream>
 #include <limits>
+#include <stdexcept>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
@@ -125,6 +126,45 @@ TEST_CASE("test_Condition_param_change_recomputes_on_set_to") {
     /** @arg a clean cache hits the early return and is not recalculated again */
     p->setTO(kdata);
     CHECK_EQ(pt->calcCount(), 2);
+}
+
+// Throws from _calculate when "fail" is set, to pin the setTO exception safety
+class ThrowingCNTest : public ConditionBase {
+public:
+    ThrowingCNTest() : ConditionBase("TEST_THROW_CN") {
+        setParam<bool>("fail", false);
+    }
+
+    void _calculate() override {
+        if (getParam<bool>("fail")) {
+            throw std::runtime_error("calculate failed");
+        }
+        _addValid(m_kdata[2].datetime, 1.0);
+    }
+
+    ConditionPtr _clone() override {
+        return make_shared<ThrowingCNTest>();
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_Condition_set_to_is_exception_safe") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(-100));
+    REQUIRE(kdata.size() > 4);
+
+    ConditionPtr cn = make_shared<ThrowingCNTest>();
+    cn->setParam<bool>("fail", true);
+    CHECK_THROWS_AS(cn->setTO(kdata), std::exception);
+
+    /** @arg a failed calculation rolls the input back instead of leaving a half-built cache */
+    CHECK_EQ(cn->size(), 0u);
+
+    /** @arg the retry with the same kdata recalculates instead of short-circuiting */
+    cn->setParam<bool>("fail", false);
+    CHECK_NOTHROW(cn->setTO(kdata));
+    CHECK_EQ(cn->size(), kdata.size());
+    CHECK_UNARY(cn->isValid(kdata[2].datetime));
 }
 
 /** @par Test points */

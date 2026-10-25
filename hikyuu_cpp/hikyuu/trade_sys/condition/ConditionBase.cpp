@@ -80,8 +80,15 @@ void ConditionBase::setTO(const KData& kdata) {
             m_values[i] = 0.0;
             m_date_index[ks[i].datetime] = i;
         }
-        _calculate();
-        m_calculated = true;
+        try {
+            _calculate();
+            m_calculated = true;
+        } catch (...) {
+            m_kdata = Null<KData>();
+            m_date_index.clear();
+            m_values.clear();
+            throw;
+        }
     }
 }
 
