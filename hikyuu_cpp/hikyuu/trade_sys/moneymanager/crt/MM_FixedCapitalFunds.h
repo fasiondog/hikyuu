@@ -15,7 +15,7 @@ namespace hku {
 
 /**
  * Fixed capital funds management strategy
- * Formula: buy quantity = current total assets / capital
+ * Formula: buy quantity = current net assets / capital
  * @param capital
  * @return MoneyManagerPtr
  */
