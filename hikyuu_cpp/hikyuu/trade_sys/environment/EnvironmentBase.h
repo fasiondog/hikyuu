@@ -203,7 +203,9 @@ protected:
     mutable std::shared_mutex m_mutex;
 
     bool m_is_python_object{false};
-    bool m_calculated{false};
+    // Atomic: paramChanged must not take the mutex, _calculate/_reset may call setParam while the
+    // mutex is already held on the same thread
+    std::atomic<bool> m_calculated{false};
 
 //============================================
 // Serialization support
@@ -231,9 +233,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // The cache is restored together with its query, so the next setQuery of the same query
-        // still hits the cache and a different one recalculates
-        m_calculated = m_query != Null<KQuery>();
+        // The values are archived with the parameters, so a cache saved after a parameter change is
+        // stale: mark it dirty to force the first setQuery to recalculate
+        m_calculated = false;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

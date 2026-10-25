@@ -140,8 +140,6 @@ SelectorPtr SelectorBase::clone() {
         p->m_sc_filter = m_sc_filter->clone();
     }
 
-    p->m_pf = m_pf;  // A reference to PF only, not cloned
-
     return p;
 }
 

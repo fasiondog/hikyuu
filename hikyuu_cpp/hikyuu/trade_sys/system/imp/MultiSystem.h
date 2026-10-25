@@ -20,9 +20,9 @@
  *    not reset between the bars (run(reset=true) still resets them with the whole system), so
  *    every sub-system keeps submitting its position intent; on the sampling day
  *    the parent reads the selected ones' current net exposure snapshot and synthesizes one
- *    per-instrument signed net target by the L2 conversion (weight x target ratio x the parent
- *    net assets), then orders uniformly on its own account. The shadow bookkeeping never touches
- *    the real funds.
+ *    per-instrument signed net target by the L2 conversion (weight x net exposure ratio x the
+ * parent net assets), then orders uniformly on its own account. The shadow bookkeeping never
+ * touches the real funds.
  *
  *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
  *    calibrated to its quota on the rebalancing day BEFORE it is driven (zero-quota liquidation,
@@ -677,16 +677,19 @@ private:
      * is no data */
     price_t _getOpenPrice(const Datetime& date, const Stock& stock);
 
-    /** Whether the parent may trade the bar, following the System entry guards: a one-price bar (a
-     *  one-price board or a padded suspension bar) is tradable only with
-     *  can_trade_when_high_eq_low, and a bar without any trade (a padded suspension bar, or a
-     *  zero-volume minute) is never tradable */
-    bool _isTradableBar(const KRecord& today) const;
+protected:
+    /** Whether the parent may fill the given side on the bar, following the System entry guards: a
+     *  one-price bar blocks only the locked-out side (the buy on a limit-up lock, the sell on a
+     *  limit-down lock) unless can_trade_when_high_eq_low, and a bar without any trade (a padded
+     *  suspension bar, or a zero-volume minute) never fills. @param preday the previous bar, null
+     *  when the bar is the first one (the lock direction is then unknown) */
+    bool _isTradableBar(const KRecord& today, const KRecord* preday, bool is_buy) const;
 
-    /** Whether the parent may trade the instrument on the date: false when there is no bar or the
-     *  bar itself is not tradable @see _isTradableBar */
-    bool _isTradableAt(const Datetime& date, const Stock& stock);
+    /** Whether the parent may fill the side on the instrument on the date: false when there is no
+     *  bar or the bar itself does not fill @see _isTradableBar */
+    bool _isTradableAt(const Datetime& date, const Stock& stock, bool is_buy);
 
+private:
     /** Whether the sub account tops up its own cash: the switch of the leaf money manager, or of
      * the nested aggregate itself */
     static bool _mmAutoCheckin(const SystemPtr& sys);

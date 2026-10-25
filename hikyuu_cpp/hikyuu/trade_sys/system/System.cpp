@@ -202,8 +202,8 @@ void System::reset() {
         m_sp->reset();
 
     // m_stock / m_kdata / m_src_kdata must not be reset; they are needed by the subsequent
-    // Portfolio; in a sense the sys instance and the stock are bound one to one, and once a sys
-    // instance is bound to a stock it should not be reset unless it is changed actively
+    // aggregate system; in a sense the sys instance and the stock are bound one to one, and once a
+    // sys instance is bound to a stock it should not be reset unless it is changed actively
     //  m_stock
 
     m_calculated = false;
@@ -635,20 +635,25 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     m_pre_cn_valid = current_cn_valid;
 
     // The entry intent is void once the environment or the condition turns invalid: a queued
-    // delayed buy would re-enter right after the forced exit (the queued covers are kept, they
-    // cut the risk instead of adding it)
-    auto drop_pending_buys = [&]() {
+    // delayed buy or sell-short would re-enter right after the forced exit (the queued sells and
+    // covers are kept, they cut the risk instead of adding it)
+    auto drop_pending_entries = [&]() {
         if (!m_buyRequestList.empty()) {
             HKU_INFO_IF(trace, "[{}] drop {} pending buy request(s)", name(),
                         m_buyRequestList.size());
             m_buyRequestList.clear();
+        }
+        if (!m_sellShortRequestList.empty()) {
+            HKU_INFO_IF(trace, "[{}] drop {} pending sell-short request(s)", name(),
+                        m_sellShortRequestList.size());
+            m_sellShortRequestList.clear();
         }
     };
 
     // If the current environment is invalid
     if (!current_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] current EV is invalid", name()));
-        drop_pending_buys();
+        drop_pending_entries();
         TradeRecord tr;
         // If a long position is held, liquidate it; sell_delay decides the fill timing (this close
         // or the next open)
@@ -684,7 +689,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     // If the system is currently invalid
     if (!current_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] current CN is invalid", name()));
-        drop_pending_buys();
+        drop_pending_entries();
         TradeRecord tr;
         // If a long position is held, liquidate it (the fill timing follows sell_delay)
         if (m_tm->have(m_stock)) {

@@ -34,7 +34,7 @@ EnvironmentBase::EnvironmentBase(const EnvironmentBase& base)
   m_date_index(base.m_date_index),
   m_values(base.m_values),
   m_is_python_object(base.m_is_python_object),
-  m_calculated(base.m_calculated) {}
+  m_calculated(base.m_calculated.load(std::memory_order_relaxed)) {}
 
 EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 
@@ -43,8 +43,7 @@ EnvironmentBase::~EnvironmentBase() {}
 void EnvironmentBase::baseCheckParam(const string& name) const {}
 
 void EnvironmentBase::paramChanged() {
-    std::unique_lock<std::shared_mutex> lock(m_mutex);
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void EnvironmentBase::reset() {
@@ -68,7 +67,7 @@ EnvironmentPtr EnvironmentBase::clone() {
     p->m_query = m_query;
     p->m_date_index = m_date_index;
     p->m_values = m_values;
-    p->m_calculated = m_calculated;
+    p->m_calculated.store(m_calculated.load(std::memory_order_relaxed), std::memory_order_relaxed);
     return p;
 }
 

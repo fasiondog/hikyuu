@@ -2099,24 +2099,27 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
             }
 
             if (weight_iter->suogu() > 0.0) {
-                double suogu_number = position.number * weight_iter->suogu();
+                const double old_number = position.number;
+                double suogu_number = old_number * weight_iter->suogu();
                 double change_number = 0.0;
-                if (suogu_number < position.number) {
+                if (suogu_number < old_number) {
                     // The share contraction adopts the round-up
-                    double old_number = position.number;
                     position.number = roundUp(suogu_number, 0);
                     change_number = position.number - old_number;
-                } else if (suogu_number > position.number) {
+                } else if (suogu_number > old_number) {
                     // The share expansion adopts the truncation
-                    double old_number = position.number;
                     position.number = roundDown(suogu_number, 0);
                     change_number = position.number - old_number;
                 }
 
                 if (change_number != 0.0) {
-                    // totalNumber tracks the same scaled quantity as the gift branch, so the
-                    // average cost of buyMoney / totalNumber follows the contracted price scale
-                    position.totalNumber += change_number;
+                    // Scale the accumulated quantity by the same ratio: sell() leaves totalNumber
+                    // untouched, so adding the change alone would distort the averaged cost
+                    // buyMoney / totalNumber once part of the holding was sold
+                    if (old_number > 0.0) {
+                        position.totalNumber =
+                          roundUp(position.totalNumber * (position.number / old_number), 0);
+                    }
                     TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SUOGU, 0.0, 0.0,
                                        0.0, change_number, CostRecord(), 0.0, m_cash, PART_INVALID);
                     new_trade_buffer.push_back(record);
@@ -2228,21 +2231,25 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
             }
 
             if (weight_iter->suogu() > 0.0) {
-                double suogu_number = position.number * weight_iter->suogu();
+                const double old_number = position.number;
+                double suogu_number = old_number * weight_iter->suogu();
                 double change_number = 0.0;
-                if (suogu_number < position.number) {
-                    double old_number = position.number;
+                if (suogu_number < old_number) {
                     position.number = roundUp(suogu_number, 0);
                     change_number = position.number - old_number;
-                } else if (suogu_number > position.number) {
-                    double old_number = position.number;
+                } else if (suogu_number > old_number) {
                     position.number = roundDown(suogu_number, 0);
                     change_number = position.number - old_number;
                 }
 
                 if (change_number != 0.0) {
-                    // Keep the short average cost (sellMoney / totalNumber) on the scaled price too
-                    position.totalNumber += change_number;
+                    // Keep the short average cost (sellMoney / totalNumber) on the scaled price
+                    // too, scaling by the same ratio for the same partial-cover reason as the long
+                    // side
+                    if (old_number > 0.0) {
+                        position.totalNumber =
+                          roundUp(position.totalNumber * (position.number / old_number), 0);
+                    }
                     TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SHORT_ADJUST, 0.0,
                                        0.0, 0.0, change_number, CostRecord(), 0.0, m_cash,
                                        PART_INVALID);

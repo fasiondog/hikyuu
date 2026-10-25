@@ -1004,9 +1004,11 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
         // book (the parent side can only sell what the parent account actually holds)
         TMPtr own_tm = (a.sys && a.sys->getTM()) ? a.sys->getTM() : m_tm;
         price_t price = _getOpenPrice(date, a.stock);
+        const bool leg_is_buy =
+          (a.kind == CalibrationKind::SUB_COVER || a.kind == CalibrationKind::PARENT_COVER);
         // The parent derives the calibration legs from its own account: a bar it cannot trade is
         // deferred like a missing quote
-        if (price <= 0.0 || !_isTradableAt(date, a.stock)) {
+        if (price <= 0.0 || !_isTradableAt(date, a.stock, leg_is_buy)) {
             // No quote: the leg is left to the next session -- unless the holding is already gone
             // (e.g. the instrument was delisted and force-cleared while the leg waited): such a
             // dead leg would retry forever and block every future injection
@@ -2056,7 +2058,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             }
         }
         // No quote (e.g. suspended): a 0-price sell would wipe the holding, skip it
-        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock))) {
+        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock, false))) {
             HKU_WARN("Skip the SELL suggestion, {} cannot be traded on {}!", s.stock.market_code(),
                      date);
             continue;
@@ -2146,7 +2148,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.stock.isNull() || !s.short_side || s.type != SuggestionType::BUY) {
             continue;
         }
-        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock))) {
+        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock, true))) {
             HKU_WARN("Skip the BUY suggestion, {} cannot be traded on {}!", s.stock.market_code(),
                      date);
             continue;
@@ -2179,7 +2181,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.number <= 0.0) {
             continue;
         }
-        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock))) {
+        if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock, true))) {
             HKU_WARN("Skip the BUY suggestion, {} cannot be traded on {}!", s.stock.market_code(),
                      date);
             continue;
@@ -2303,7 +2305,8 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         const bool check_tradable = (m_mode == "A");
         for (auto& s : m_open_pending_suggestions) {
             price_t op = _getOpenPrice(datetime, s.stock);
-            if (op > 0.0 && (!check_tradable || _isTradableAt(datetime, s.stock))) {
+            const bool pending_is_buy = (s.type == SuggestionType::BUY);
+            if (op > 0.0 && (!check_tradable || _isTradableAt(datetime, s.stock, pending_is_buy))) {
                 s.plan_price = op;
                 executable.push_back(s);
             } else {
@@ -3174,12 +3177,12 @@ void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Dateti
                 }
                 // No converted batch: fall through to the raw leaf requests
             } else {
-                _foldSubtreePendingRequests(child, date, base, ratio);
+                _foldSubtreePendingRequests(child, date, base, ratio, quota);
                 continue;
             }
         }
         if (child->isComposite()) {
-            _foldSubtreePendingRequests(child, date, base, ratio);
+            _foldSubtreePendingRequests(child, date, base, ratio, quota);
             continue;
         }
         Stock stk = child->getStock();
@@ -3543,7 +3546,7 @@ void MultiSystem::_forceSellSubTree(const SystemPtr& sys, const Datetime& date, 
             continue;
         }
         price_t price = on_open ? _getOpenPrice(date, stk) : _getClosePrice(date, stk);
-        if (price <= 0.0 || !_isTradableAt(date, stk)) {
+        if (price <= 0.0 || !_isTradableAt(date, stk, false)) {
             continue;  // No quote or not tradable: the liquidation is left to the next session
         }
         TradeRecord tr =
@@ -3767,21 +3770,26 @@ price_t MultiSystem::_getLastClosePrice(const Datetime& date, const Stock& stock
     return lo == 0 ? 0.0 : kdata.getKRecord(lo - 1).closePrice;
 }
 
-bool MultiSystem::_isTradableBar(const KRecord& today) const {
-    // A one-price bar is either a one-price board or a padded suspension bar: the leaf entry gates
-    // it by can_trade_when_high_eq_low
+bool MultiSystem::_isTradableBar(const KRecord& today, const KRecord* preday, bool is_buy) const {
+    // A one-price bar is either a one-price board or a padded suspension bar; the board locks out
+    // only one side, so the fill follows the System entry guards
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
-        return false;
+        HKU_IF_RETURN(!preday, false);
+        const bool locked =
+          is_buy ? today.closePrice > preday->closePrice : today.closePrice < preday->closePrice;
+        HKU_IF_RETURN(locked, false);
     }
     // A bar without any trade carries no fill (a padded suspension bar, or a zero-volume minute)
     return today.transAmount != 0.0 && today.transCount != 0.0;
 }
 
-bool MultiSystem::_isTradableAt(const Datetime& date, const Stock& stock) {
+bool MultiSystem::_isTradableAt(const Datetime& date, const Stock& stock, bool is_buy) {
     HKU_IF_RETURN(stock.isNull(), false);
     KData kdata = _getStockKData(stock);
     size_t pos = kdata.getPos(date);
-    return pos != Null<size_t>() && _isTradableBar(kdata.getKRecord(pos));
+    HKU_IF_RETURN(pos == Null<size_t>(), false);
+    const KRecord* preday = pos == 0 ? nullptr : &kdata.getKRecord(pos - 1);
+    return _isTradableBar(kdata.getKRecord(pos), preday, is_buy);
 }
 
 price_t MultiSystem::_getOpenPrice(const Datetime& date, const Stock& stock) {

@@ -18,8 +18,6 @@
 
 namespace hku {
 
-class HKU_API Portfolio;
-
 /**
  * Trading object selection module
  * @ingroup Selector
@@ -46,15 +44,6 @@ public:
 
     /** Set the algorithm name */
     void name(const string& name);
-
-    using PFPtr = shared_ptr<Portfolio>;
-    PFPtr getPF() const {
-        return m_pf.lock();
-    }
-
-    void setPF(const PFPtr& pf) {
-        m_pf = pf;
-    }
 
     /**
      * Add a candidate stock and its trading strategy prototype
@@ -217,8 +206,6 @@ protected:
     SystemList m_pro_sys_list;   // Prototype system list
     SystemList m_real_sys_list;  // The systems actually run in the PF portfolio, set when PF
                                  // executes, in the same order as the prototype list
-
-    std::weak_ptr<Portfolio> m_pf;  // Stored but not serialized, the reference to PF
 
 //============================================
 // Serialization support

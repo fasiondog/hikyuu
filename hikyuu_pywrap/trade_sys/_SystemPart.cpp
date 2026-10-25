@@ -23,8 +23,13 @@ void export_SystemPart(py::module& m) {
       .value("MONEYMANAGER", PART_MONEYMANAGER, "The money management strategy")
       .value("PROFITGOAL", PART_PROFITGOAL, "The profit goal strategy")
       .value("SLIPPAGE", PART_SLIPPAGE, "The slippage algorithm")
-      .value("ALLOCATEFUNDS", PART_ALLOCATEFUNDS, "The asset allocation algorithm")
-      .value("SYS", PART_SYSTEM, "The aggregate sub-system (added by the recursive combination refactoring)")
+      .value("ALLOCATEFUNDS", PART_ALLOCATEFUNDS,
+             "[Deprecated] The asset allocation algorithm (kept for the compatibility with the old "
+             "serialized data)")
+      .value("PORTFOLIO", PART_PORTFOLIO,
+             "[Deprecated] Portfolio (kept for the compatibility with the old serialized data)")
+      .value("SYS", PART_SYSTEM,
+             "The aggregate sub-system (added by the recursive combination refactoring)")
       .value("INVALID", PART_INVALID, "An invalid system part")
 
       // Support the abbreviations
@@ -36,5 +41,9 @@ void export_SystemPart(py::module& m) {
       .value("MM", PART_MONEYMANAGER, "The money management strategy")
       .value("PG", PART_PROFITGOAL, "The profit goal strategy")
       .value("SP", PART_SLIPPAGE, "The slippage algorithm")
-      .value("AF", PART_ALLOCATEFUNDS, "The asset allocation algorithm");
+      .value("AF", PART_ALLOCATEFUNDS,
+             "[Deprecated] The asset allocation algorithm (kept for the compatibility with the old "
+             "serialized data)")
+      .value("PF", PART_PORTFOLIO,
+             "[Deprecated] Portfolio (kept for the compatibility with the old serialized data)");
 }
