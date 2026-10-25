@@ -91,8 +91,14 @@ void export_Factor(py::module& m) {
 
       .def("is_null", &Factor::isNull, "Whether it is an empty factor")
 
-      .def("save_to_db", &Factor::save_to_db, py::arg("update_before") = true,
-           R"(save_to_db(self[, update_before=True])
+      .def(
+        "save_to_db",
+        [](Factor& self, bool update_before) {
+            ScopeGilRelease gil(!self.formula().hasPythonPart());
+            self.save_to_db(update_before);
+        },
+        py::arg("update_before") = true,
+        R"(save_to_db(self[, update_before=True])
     
     Save the factor metadata to the database; if the factor already exists, update it, otherwise insert a new record
     
@@ -102,14 +108,21 @@ void export_Factor(py::module& m) {
 
       .def(
         "save_special_values_to_db",
-        py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
+        [](Factor& self, const Stock& stock, const Indicator& values, bool replace) {
+            ScopeGilRelease gil(true);
+            self.save_special_values_to_db(stock, values, replace);
+        },
         py::arg("stock"), py::arg("values"), py::arg("replace") = false)
 
-      .def("save_special_values_to_db",
-           py::overload_cast<const Stock&, const DatetimeList&, const PriceList&, bool>(
-             &Factor::save_special_values_to_db),
-           py::arg("stock"), py::arg("dates"), py::arg("values"), py::arg("replace") = false,
-           R"(save_special_values_to_db(self, stock, values[, replace=False])
+      .def(
+        "save_special_values_to_db",
+        [](Factor& self, const Stock& stock, const DatetimeList& dates, const PriceList& values,
+           bool replace) {
+            ScopeGilRelease gil(true);
+            self.save_special_values_to_db(stock, dates, values, replace);
+        },
+        py::arg("stock"), py::arg("dates"), py::arg("values"), py::arg("replace") = false,
+        R"(save_special_values_to_db(self, stock, values[, replace=False])
 save_special_values_to_db(self, stock, dates, values[, replace=False])
 
     Save the special factor values to the database, supporting two input formats:

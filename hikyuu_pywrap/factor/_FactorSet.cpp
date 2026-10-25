@@ -141,8 +141,13 @@ void export_FactorSet(py::module& m) {
     :return: the list of the calculation results arranged by the stock order
     :rtype: list)")
 
-      .def("save_to_db", &FactorSet::save_to_db,
-           R"(save_to_db(self)
+      .def(
+        "save_to_db",
+        [](FactorSet& self) {
+            ScopeGilRelease gil(!self.hasPythonPart());
+            self.save_to_db();
+        },
+        R"(save_to_db(self)
     
     Save the factor set to the database
     
@@ -155,8 +160,13 @@ void export_FactorSet(py::module& m) {
     
     :note: with name + ktype as the unique identifier)")
 
-      .def("load_from_db", &FactorSet::load_from_db,
-           R"(load_from_db(self)
+      .def(
+        "load_from_db",
+        [](FactorSet& self) {
+            ScopeGilRelease gil(true);
+            self.load_from_db();
+        },
+        R"(load_from_db(self)
     
     Load the factor set from the database
     
