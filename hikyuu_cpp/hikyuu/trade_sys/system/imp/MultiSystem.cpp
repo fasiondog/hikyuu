@@ -3048,11 +3048,20 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
                 zero_targets.push_back(short_pos);
             }
         }
+        // One net zero target per instrument covers a hedged book as well (a long plus a short of
+        // the same instrument): the conversion closes both sides when the target is flat
         auto add_zero_target = [&](const PositionRecord& pos) {
             if (pos.stock.isNull() || covered.count(pos.stock) > 0) {
                 return;
             }
             price_t p = _getClosePrice(datetime, pos.stock);
+            if (p <= 0.0) {
+                // No bar on the sampling day (a suspended day with no data): value the clear leg at
+                // the last quoted close so a full exit still queues on the suspended close (the
+                // tradability gates defer it to the next tradable open, or the leg is re-derived at
+                // the next quoted rebalancing close)
+                p = _getLastClosePrice(datetime, pos.stock);
+            }
             if (p <= 0.0) {
                 return;
             }
@@ -3090,6 +3099,31 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
 
 void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date,
                                               double base, std::map<Stock, double>& ratio) {
+    FoldQuota quota;
+    _foldSubtreePendingRequests(sys, date, base, ratio, quota);
+}
+
+double MultiSystem::_takeFoldQuota(FoldQuota& quota, const TMPtr& tm, const Datetime& date,
+                                   const Stock& stock, bool long_side, double want) {
+    HKU_IF_RETURN(!tm || want <= 0.0, 0.0);
+    auto key = std::make_pair(tm.get(), stock);
+    auto iter = quota.find(key);
+    if (iter == quota.end()) {
+        iter = quota
+                 .emplace(key, std::make_pair(tm->getPosition(date, stock).number,
+                                              tm->getShortPosition(stock).number))
+                 .first;
+    }
+    double& remain = long_side ? iter->second.first : iter->second.second;
+    double num = std::min(want, remain);
+    HKU_IF_RETURN(num <= 0.0, 0.0);
+    remain -= num;
+    return num;
+}
+
+void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date,
+                                              double base, std::map<Stock, double>& ratio,
+                                              FoldQuota& quota) {
     HKU_IF_RETURN(!sys || base <= 0.0, void());
     // A nested mode A has already folded the same leaf intents into its sampling / queued batch
     // on the day it sampled: folding them again would double count the intent
@@ -3157,7 +3191,28 @@ void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Dateti
         if (p <= 0.0) {
             continue;
         }
-        auto fold = [&](const std::vector<TradeRequest>& reqs, double sign) {
+        // A full-close request carries a MAX_DOUBLE number: fold it at most up to the remaining
+        // holding of the owning account, so a full exit nets to zero instead of folding a phantom
+        // short exposure. The quota is shared by every queued request of the same account and side
+        // (a locked one-price board or a zero-volume day queues one per close), and by the leaves
+        // sharing that account
+        const TMPtr child_tm = child->getTM();
+        if (!child_tm) {
+            continue;  // No account to judge the intent against: skip the leaf
+        }
+        auto fold_close = [&](const std::vector<TradeRequest>& reqs, double sign, bool long_side) {
+            for (const auto& r : reqs) {
+                if (!r.valid || r.number <= 0.0) {
+                    continue;
+                }
+                double num = _takeFoldQuota(quota, child_tm, date, stk, long_side, r.number);
+                if (num <= 0.0) {
+                    continue;
+                }
+                ratio[stk] += sign * num * p * stk.unit() / base;
+            }
+        };
+        auto fold_open = [&](const std::vector<TradeRequest>& reqs, double sign) {
             for (const auto& r : reqs) {
                 if (!r.valid || r.number <= 0.0) {
                     continue;
@@ -3165,10 +3220,10 @@ void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Dateti
                 ratio[stk] += sign * r.number * p * stk.unit() / base;
             }
         };
-        fold(child->getBuyTradeRequestList(), 1.0);
-        fold(child->getSellTradeRequestList(), -1.0);
-        fold(child->getBuyShortTradeRequestList(), 1.0);
-        fold(child->getSellShortTradeRequestList(), -1.0);
+        fold_open(child->getBuyTradeRequestList(), 1.0);
+        fold_close(child->getSellTradeRequestList(), -1.0, true);
+        fold_close(child->getBuyShortTradeRequestList(), 1.0, false);
+        fold_open(child->getSellShortTradeRequestList(), -1.0);
     }
 }
 
@@ -3213,45 +3268,65 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
     if (!stk.isNull()) {
         price_t p = price_of(stk, 0.0);
         if (p > 0.0) {
+            // A full-close request carries a MAX_DOUBLE number: fold it at most up to the remaining
+            // holding of the sub account, so "sell exactly what is held" nets to zero (the
+            // uncovered zero target drives it flat) instead of folding a phantom short exposure.
+            // The quota is shared by every queued request of the same side
+            FoldQuota quota;
+            auto fold_request = [&](const TradeRequest& req) {
+                if (!req.valid || req.number <= 0.0) {
+                    return;
+                }
+                const double sign =
+                  (req.business == BUSINESS_BUY || req.business == BUSINESS_BUY_SHORT) ? 1.0 : -1.0;
+                if (req.business == BUSINESS_SELL || req.business == BUSINESS_BUY_SHORT) {
+                    const bool long_side = (req.business == BUSINESS_SELL);
+                    double num =
+                      _takeFoldQuota(quota, sub_tm, datetime, stk, long_side, req.number);
+                    if (num <= 0.0) {
+                        return;
+                    }
+                    ratio[stk] += sign * num * p * stk.unit() / base;
+                    return;
+                }
+                ratio[stk] += sign * req.number * p * stk.unit() / base;
+            };
             // The snapshot carries the requests only when the leaf ran this close (a suspended
             // leaf early-returns with pos == Null and an empty snapshot): fold them straight from
             // the request lists then, the same run-independent convention as the nested folding
-            auto fold_requests = [&](const std::vector<TradeRequest>& reqs) {
-                for (const auto& req : reqs) {
-                    if (!req.valid || req.number <= 0.0) {
-                        continue;
-                    }
-                    double v = req.number * p * stk.unit() / base;
-                    if (req.business == BUSINESS_BUY || req.business == BUSINESS_BUY_SHORT) {
-                        ratio[stk] += v;
-                    } else if (req.business == BUSINESS_SELL ||
-                               req.business == BUSINESS_SELL_SHORT) {
-                        ratio[stk] -= v;
-                    }
-                }
-            };
             if (!sub.delayOnNextOpen.empty()) {
-                fold_requests(sub.delayOnNextOpen);
+                for (const auto& req : sub.delayOnNextOpen) {
+                    fold_request(req);
+                }
             } else {
-                fold_requests(sys->getBuyTradeRequestList());
-                fold_requests(sys->getSellTradeRequestList());
-                fold_requests(sys->getSellShortTradeRequestList());
-                fold_requests(sys->getBuyShortTradeRequestList());
+                for (const auto& req : sys->getBuyTradeRequestList()) {
+                    fold_request(req);
+                }
+                for (const auto& req : sys->getSellTradeRequestList()) {
+                    fold_request(req);
+                }
+                for (const auto& req : sys->getSellShortTradeRequestList()) {
+                    fold_request(req);
+                }
+                for (const auto& req : sys->getBuyShortTradeRequestList()) {
+                    fold_request(req);
+                }
             }
         }
     }
     // Fold a nested aggregate child's queued (converted but unexecuted) orders into the intent
+    FoldQuota clear_quota;
     for (const auto& sug : sub.pendingOnNextOpen) {
         if (sug.stock.isNull() || sug.plan_price <= 0.0 || sug.number <= 0.0) {
             continue;
         }
-        // A CLEAR order number is capped at the current holding of its side (the queued orders
-        // are already converted, but stay defensive against a MAX_DOUBLE full-close number)
+        // A CLEAR order is capped at the remaining holding of its side (the queued orders are
+        // already converted, but stay defensive against a MAX_DOUBLE full-close number); the quota
+        // is shared by every queued CLEAR leg of the same instrument
         double num = sug.number;
         if (sug.type == SuggestionType::CLEAR) {
-            double held = sug.short_side ? sub_tm->getShortPosition(sug.stock).number
-                                         : sub_tm->getPosition(datetime, sug.stock).number;
-            num = std::min(num, held);
+            num =
+              _takeFoldQuota(clear_quota, sub_tm, datetime, sug.stock, !sug.short_side, sug.number);
         }
         if (num <= 0.0) {
             continue;

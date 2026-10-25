@@ -559,12 +559,31 @@ private:
     void _executePendingCalibration(const Datetime& date, KQuery::KType ktype,
                                     TradeRecordList& out);
 
+    /** The remaining holding that the queued full-close requests of an account may still consume,
+     *  per instrument and side (long / short). A full-close request carries a MAX_DOUBLE number, so
+     *  the fold is capped by the actual holding; the cap is keyed by the owning account so that
+     *  several queued requests of the same side (a locked one-price board, a zero-volume day) or
+     *  several leaves sharing one account cannot multiply it */
+    using FoldQuota =
+      std::map<std::pair<const TradeManagerBase*, Stock>, std::pair<double, double>>;
+
+    /** Consume the fold quota of a queued full-close request: return how much of the request still
+     *  fits the remaining holding of the account (long / short side), consuming that amount; 0 when
+     *  the account is unknown or the quota is exhausted */
+    static double _takeFoldQuota(FoldQuota& quota, const TMPtr& tm, const Datetime& date,
+                                 const Stock& stock, bool long_side, double want);
+
     /** Fold the delayed requests of a composite child's leaf sub-systems into the net exposure
      * ratio (a nested C/leaf queues its own requests, the composite MomentResult does not carry
      * them). A nested aggregate's converted queued batch is folded instead of its leaves; a mode A
      * child already sampled on that day is skipped (no 2x) */
     void _foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date, double base,
                                      std::map<Stock, double>& ratio);
+
+    /** The recursive pass of _foldSubtreePendingRequests, carrying the fold quota shared by the
+     *  whole sub-tree */
+    void _foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date, double base,
+                                     std::map<Stock, double>& ratio, FoldQuota& quota);
 
     /** Mode A (Signal Aggregation): the whole close stage of the signal synthesis -- drive every
      *  sub-system (the shadows run continuously) and, on the sampling day, read the selected ones'

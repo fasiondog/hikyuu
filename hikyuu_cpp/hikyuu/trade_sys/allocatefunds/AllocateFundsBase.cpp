@@ -472,6 +472,15 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             o.plan_cash = number * p * unit;
             return o;
         };
+        if (target_shares == 0.0 && cur_long > 0.0 && cur_short > 0.0) {
+            // A hedged book (long and short the same instrument) nets to zero, so the net delta is
+            // blind to it: a flat target must close BOTH sides explicitly, otherwise the two legs
+            // linger for ever (the parent target is a net exposure and never holds both sides on
+            // purpose)
+            orders.push_back(make(SuggestionType::SELL, cur_long, false));
+            orders.push_back(make(SuggestionType::BUY, cur_short, true));
+            continue;
+        }
         if (min_trade > 0.0 && std::fabs(delta) < min_trade) {
             // Below one lot: no trade — except a clearance (a flat target), otherwise a residual
             // position below one lot would stay untradable forever (the skip would always fire)

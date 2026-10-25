@@ -5860,6 +5860,139 @@ TEST_CASE("test_MultiSystem_mode_a_suspended_retry_batch_superseded") {
     CHECK_EQ(twice_num, once_num);
 }
 
+/** @par Check point: a full exit queued before a no-bar suspension close still queues its clear leg
+ * on the suspended close and fills it at the resumption open, in sync with the leaf fill. The
+ * full-close request carries a MAX_DOUBLE number: capped at the actual holding it nets to zero, so
+ * the orphan zero target (valued at the last quoted close) drives the holding flat -- the fold must
+ * never turn "exit the long" into a phantom short exposure (the parent runs with borrow support to
+ * pin that) */
+TEST_CASE("test_MultiSystem_mode_a_suspended_full_exit_clear_queued") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+    // The suspension shape this case pins: no bar on the rebalancing close, resumption on 07-03
+    REQUIRE(stk1.getKData(KQueryByDate(Datetime(20000630), Datetime(20000701))).empty());
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20000703), Datetime(20000704))).empty());
+    // The signal / rebalancing days used below must carry a bar, otherwise the case degenerates
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20000620), Datetime(20000621))).empty());
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20000629), Datetime(20000630))).empty());
+    REQUIRE(!stk2.getKData(KQueryByDate(Datetime(20000621), Datetime(20000622))).empty());
+
+    // The leaf buys at the 06-20 close (the shadow holds; the parent mirrors it at the 06-21
+    // rebalancing close) and queues a full sell on 06-29 (a non-rebalancing close); 06-30 is the
+    // next rebalancing close and stk1 is suspended on it
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006200000LL), Datetime(200006290000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setParam<bool>("sell_delay", true);
+    leaf1->setTO(stk1.getKData(full));
+
+    // The parent supports borrowing stocks (the aggregate syncs its own System-layer borrow
+    // switches onto its TM at readyForRun), so an uncapped fold would plan a phantom short instead
+    // of driving the holding flat
+    auto ms = std::make_shared<MultiSystem>("ms_a_suspended_full_exit");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1}));
+    ms->setTradeOnClose(false);
+    ms->setAdjustDates(
+      DatetimeList{Datetime(200006210000LL), Datetime(200006300000LL), Datetime(200007030000LL)});
+    ms->setParam<bool>("support_borrow_stock", true);
+    ms->add(leaf1);
+    ms->run(k);
+
+    REQUIRE(!ms->getTM()->getTradeList().empty());
+    size_t sells1 = 0;
+    size_t short_legs = 0;
+    Datetime sell1_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk1) {
+            sells1++;
+            sell1_date = tr.datetime;
+        }
+        if (tr.business == BUSINESS_SELL_SHORT || tr.business == BUSINESS_BUY_SHORT) {
+            short_legs++;
+        }
+    }
+
+    /** @arg the clear leg is queued on the suspended close and fills once at the resumption open
+     * (2000-07-03), not at the open after the next rebalancing close */
+    CHECK_EQ(sells1, 1);
+    CHECK_EQ(sell1_date, Datetime(200007030000LL));
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+    /** @arg the full exit never opens a short book (no phantom short from the uncapped fold): the
+     * end state is flat and no short leg (sellShort / cover) is ever traded */
+    CHECK_EQ(ms->getTM()->getShortPosition(stk1).number, 0.0);
+    CHECK_EQ(short_legs, 0);
+    /** @arg the leaf fill and the mirror clear stay in sync */
+    CHECK_EQ(leaf1->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: the subtree fold of a composite child caps a queued full-close request at the
+ * child account's remaining holding too: the mode A parent of a mode C child must not turn the
+ * leaf's "exit the long" into a phantom short (the fold goes through _foldSubtreePendingRequests
+ * instead of the leaf sampling) */
+TEST_CASE("test_MultiSystem_nested_subtree_full_exit_fold_capped") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+    // The suspension shape this case pins: no bar on the rebalancing close, resumption on 07-03
+    REQUIRE(stk1.getKData(KQueryByDate(Datetime(20000630), Datetime(20000701))).empty());
+    REQUIRE(!stk1.getKData(KQueryByDate(Datetime(20000703), Datetime(20000704))).empty());
+
+    // The leaf of the mode C child buys at the 06-20 close and queues a full sell on 06-29; the
+    // child runs with trade_on_close=false, so the leaf sells with a delay and the 06-30 open has
+    // no quote for stk1
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006200000LL), Datetime(200006290000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setTO(stk1.getKData(full));
+
+    auto child = std::make_shared<MultiSystem>("ms_c_child_full_exit");
+    child->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    child->setMode("C");
+    child->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1}));
+    child->setTradeOnClose(false);
+    child->add(leaf1);
+
+    // The parent supports borrowing stocks, so an uncapped fold would plan a phantom short
+    auto ms = std::make_shared<MultiSystem>("ms_a_over_c_full_exit");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{child}));
+    ms->setTradeOnClose(false);
+    ms->setAdjustDates(
+      DatetimeList{Datetime(200006210000LL), Datetime(200006300000LL), Datetime(200007030000LL)});
+    ms->setParam<bool>("support_borrow_stock", true);
+    ms->add(child);
+    ms->run(k);
+
+    REQUIRE(!ms->getTM()->getTradeList().empty());
+    size_t short_legs = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL_SHORT || tr.business == BUSINESS_BUY_SHORT) {
+            short_legs++;
+        }
+    }
+
+    /** @arg the subtree fold caps the full-close request at the child account holding: the parent
+     * never opens a short book and ends flat like the leaf */
+    CHECK_EQ(short_legs, 0);
+    CHECK_EQ(ms->getTM()->getShortPosition(stk1).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+}
+
 /** @par Check point: a deferred injection waits for the deferred sells of the same rebalancing
  * when the sells are retried for a suspension (the freed cash is part of the injection funding) */
 TEST_CASE("test_MultiSystem_mode_b_deferred_inject_waits_for_retry") {

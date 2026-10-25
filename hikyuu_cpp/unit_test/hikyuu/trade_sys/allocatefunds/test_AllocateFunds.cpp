@@ -413,6 +413,38 @@ TEST_CASE("test_AllocateFunds_fixed_amount_lot_filter_order") {
 }
 
 /** @par Test points */
+TEST_CASE("test_AllocateFunds_hedged_book_flat_target_clears_both_sides") {
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    auto tm = crtTM(date, 1000000.0);
+    tm->setParam<bool>("support_borrow_stock", true);
+    // Seed a hedged book: the parent holds one long and one short of the same instrument
+    REQUIRE(!tm->buy(date, stk, 10.0, 100, 0.0, 0.0, 10.0, PART_SYSTEM, "seed").isNull());
+    REQUIRE(!tm->sellShort(date, stk, 10.0, 100, 0.0, 0.0, 10.0, PART_SYSTEM, "seed").isNull());
+    REQUIRE_EQ(tm->getPosition(date, stk).number, doctest::Approx(100.0));
+    REQUIRE_EQ(tm->getShortPosition(stk).number, doctest::Approx(100.0));
+
+    auto af = AF_EqualWeight();
+    TradeSuggestion s;
+    s.stock = stk;
+    s.plan_price = 10.0;
+    s.target_position_ratio = 0.0;  // the orphan zero target synthesized by the parent
+    TradeSuggestionList suggestions{s};
+    af->_toTargets(date, tm, suggestions, {}, KQuery(), "A");
+
+    /** @arg a flat target closes BOTH sides of a hedged book: the net delta (0 - 0) cannot see it,
+     * so the long sell and the short cover must be emitted explicitly */
+    REQUIRE_EQ(suggestions.size(), 2);
+    CHECK_UNARY(suggestions[0].type == SuggestionType::SELL);
+    CHECK_UNARY(!suggestions[0].short_side);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(100.0));
+    CHECK_UNARY(suggestions[1].type == SuggestionType::BUY);
+    CHECK_UNARY(suggestions[1].short_side);
+    CHECK_EQ(suggestions[1].number, doctest::Approx(100.0));
+}
+
+/** @par Test points */
 TEST_CASE("test_AllocateFunds_L3_shrink_only") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
