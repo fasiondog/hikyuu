@@ -161,11 +161,17 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
     // With auto_checkin System deposits the cash at the actual trade, so the number is not
     // constrained by the current cash here
     if (!getParam<bool>("auto_checkin")) {
-        CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-        price_t need_cash = n * price * stock.unit() + cost.total;
+        // Mirror the affordability check of TradeManager::buy: the amount and the cost are both
+        // rounded to the account precision, otherwise a size a fraction of a cent above the cash
+        // passes here and gets the whole order rejected there
+        const int precision = m_tm->precision();
+        auto needCash = [&](double num) {
+            CostRecord cost = m_tm->getBuyCost(datetime, stock, price, num);
+            return roundEx(roundEx(num * price * stock.unit(), precision) + cost.total, precision);
+        };
         price_t current_cash = m_tm->cash(datetime, m_query.kType());
-        if (need_cash > current_cash) {
-            // need_cash(k) is monotonically increasing in k, so binary search the largest
+        if (needCash(n) > current_cash) {
+            // needCash(k) is monotonically increasing in k, so binary search the largest
             // affordable multiple of min_trade — O(log(n/min_trade)) cost evaluations instead of
             // decrementing lot by lot
             double low = min_trade, high = n;
@@ -174,16 +180,14 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                 if (mid <= low || mid >= high) {
                     break;
                 }
-                cost = m_tm->getBuyCost(datetime, stock, price, mid);
-                if (mid * price * stock.unit() + cost.total <= current_cash) {
+                if (needCash(mid) <= current_cash) {
                     low = mid;
                 } else {
                     high = mid;
                 }
             }
             n = low;
-            cost = m_tm->getBuyCost(datetime, stock, price, n);
-            if (n * price * stock.unit() + cost.total > current_cash) {
+            if (needCash(n) > current_cash) {
                 n = 0.0;
             }
         }

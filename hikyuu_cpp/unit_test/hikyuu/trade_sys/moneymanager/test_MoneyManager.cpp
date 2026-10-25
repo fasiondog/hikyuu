@@ -395,6 +395,61 @@ TEST_CASE("test_MoneyManager_getBuyNumber_dirty_max_trade") {
     CHECK_EQ(short_mm->getSellShortNumber(dt, makeStock(500.0), 10.0, 1.0, PART_SIGNAL), 200.0);
 }
 
+// A cost function with a fractional total: with the account precision of 2 the raw amount plus
+// this cost can land just above a cash balance that the unrounded comparison calls affordable
+class HalfCentCostTest final : public TradeCostBase {
+public:
+    HalfCentCostTest() : TradeCostBase("HalfCentCostTest") {}
+
+    CostRecord getBuyCost(const Datetime &, const Stock &, price_t, double) const override {
+        CostRecord ret;
+        ret.commission = 0.005;
+        ret.total = 0.005;
+        return ret;
+    }
+
+    CostRecord getSellCost(const Datetime &, const Stock &, price_t, double) const override {
+        return CostRecord();
+    }
+
+protected:
+    TradeCostPtr _clone() override {
+        return std::make_shared<HalfCentCostTest>();
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_affordability_precision") {
+    // The affordable check rounds like TradeManager::buy: the amount and its cost are rounded to
+    // the account precision before the comparison
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+    REQUIRE_EQ(stock.minTradeNumber(), 1.0);
+    REQUIRE_EQ(stock.unit(), 1.0);
+    const Datetime dt(200001010000);
+
+    // 100.995 + 0.005 is 101.000 raw, but the precision-2 rounding turns the requirement into
+    // 101.01, one cent above the 101.0 cash
+    const price_t price = 100.995;
+    TradeManagerPtr tm = crtTM(dt, 101.0, std::make_shared<HalfCentCostTest>(), "TEST_TM");
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(1.0));
+    mm->setTM(tm);
+
+    /** @arg the trade manager rejects that size: the requirement rounds up to 101.01 */
+    CHECK_UNARY(tm->buy(dt, stock, price, 1.0, 0.0, 0.0, price, PART_SIGNAL).isNull());
+
+    /** @arg the money manager agrees after the same rounding: nothing is affordable */
+    CHECK_EQ(mm->getBuyNumber(dt, stock, price, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg a requirement that stays within the cash after the rounding is still affordable
+     * (100.99 + 0.005 rounds to exactly 101.00) */
+    TradeManagerPtr tm2 = crtTM(dt, 101.0, std::make_shared<HalfCentCostTest>(), "TEST_TM2");
+    MoneyManagerPtr mm2(new ConfigurableBuyNumberMMTest(1.0));
+    mm2->setTM(tm2);
+    CHECK_EQ(mm2->getBuyNumber(dt, stock, 100.99, 1.0, PART_SIGNAL), 1.0);
+}
+
 /** @par Test points */
 TEST_CASE("test_MoneyManager_getBuyNumber_auto_checkin_no_side_effect") {
     // The auto_checkin top-up is done by System at the actual trade: the query stays side-effect
