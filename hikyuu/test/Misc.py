@@ -169,6 +169,26 @@ class MiscTest(unittest.TestCase):
         ms.run(self.kdata, True, True)
         self.assertGreater(len(ms.tm.get_trade_list()), 1)
 
+    def test_multi_system_nested_python_subclass(self):
+        # A Python MultiSystem subclass works as a nested child of another aggregate: it keeps its
+        # dynamic type on the parent drive and its leaf still trades through the two levels
+        class MyMS(MultiSystem):
+            def __init__(self, name="PyMS"):
+                super().__init__(name)
+
+        inner_leaf = _make_sys(self.stock, self.kdata)
+        inner = MyMS("py_inner")
+        inner.tm = crtTM()
+        inner.add(inner_leaf)
+
+        outer = MultiSystem("outer")
+        outer.tm = crtTM()
+        outer.add(inner)
+        outer.run(self.kdata, True, True)
+
+        self.assertIs(type(outer.get_system_list()[0]), MyMS)
+        self.assertGreater(len(outer.tm.get_trade_list()), 0)
+
     def test_get_funds_list_result(self):
         tm_list = [crtTM() for _ in range(4)]
         result = get_funds_list(tm_list, self.ref_dates)

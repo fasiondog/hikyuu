@@ -922,6 +922,62 @@ TEST_CASE("test_System_invalid_ev_drops_pending_buy") {
     CHECK_EQ(std::get<2>(invalidated), 0.0);
 }
 
+/** @par Check point: the entry intent is void on the short side as well - a queued sell-short is
+ *  dropped when the environment turns invalid, so the next open cannot open a fresh short */
+TEST_CASE("test_System_invalid_ev_drops_pending_sell_short") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(201112060000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 10);
+
+    size_t suspended = Null<size_t>();
+    for (size_t i = 2; i + 2 < kdata.size(); i++) {
+        if (kdata[i].transAmount == 0.0 || kdata[i].transCount == 0.0) {
+            suspended = i;
+            break;
+        }
+    }
+    REQUIRE_UNARY(suspended != Null<size_t>());
+
+    auto run_case = [&](const EnvironmentPtr& ev) {
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0, TC_Zero());
+        tm->setParam<bool>("support_borrow_stock", true);
+
+        auto sg = std::make_shared<SingleSignalSG>(kdata[suspended - 1].datetime, false);
+        sg->setParam<bool>("support_borrow_stock", true);
+
+        auto sys = SYS_Simple();
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", true);
+        sys->setParam<bool>("support_borrow_stock", true);
+        sys->setTM(tm);
+        sys->setSG(sg);
+        sys->setMM(MM_Nothing());
+        sys->setEV(ev);
+        sys->setTO(kdata);
+        sys->readyForRun();
+
+        sys->runMoment(kdata[suspended - 1].datetime);  // the sell-short request is queued
+        sys->runMoment(kdata[suspended].datetime);      // nothing fills here
+        MomentResult r = sys->runMoment(kdata[suspended + 1].datetime);
+        return std::make_pair(r, tm->getShortPosition(stk).number);
+    };
+
+    /** @arg the control: with a valid environment the queued sell-short fills on the next open */
+    const DatetimeList all_valid{kdata[suspended - 1].datetime, kdata[suspended].datetime,
+                                 kdata[suspended + 1].datetime};
+    auto control = run_case(make_shared<RangeEV>(all_valid));
+    CHECK_UNARY(control.first.tradesOnOpen.size() == 1);
+    CHECK_GT(control.second, 0.0);
+
+    /** @arg the environment turns invalid on the suspended close: the queued short is dropped */
+    const DatetimeList ev_valid{kdata[suspended - 1].datetime};
+    auto invalidated = run_case(make_shared<RangeEV>(ev_valid));
+    CHECK_UNARY(invalidated.first.tradesOnOpen.empty());
+    CHECK_EQ(invalidated.second, 0.0);
+}
+
 /** @par Check point: the profit goal price is queried once per bar even on the bar where it
  *  triggers - the exit check and the trade record share the same value */
 TEST_CASE("test_System_profit_goal_called_once_per_bar") {

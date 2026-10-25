@@ -2185,6 +2185,81 @@ TEST_CASE("test_MultiSystem_mode_c_delisted") {
     delist_stk.lastDatetime(original_last);
 }
 
+/** @par Check point: a delisting inside a nested aggregate reaches the inner pools (the recursive
+ *  removal) and flattens the shadow books of the nested layer too */
+TEST_CASE("test_MultiSystem_nested_delisted") {
+    Stock alive_stk = getStock("sh600000");
+    Stock delist_stk = getStock("sz000005");  // data ends 2011-04-29: it "delists" mid-window
+    REQUIRE(!alive_stk.isNull());
+    REQUIRE(!delist_stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20111207));
+    KData kd_alive = alive_stk.getKData(query);
+    KData kd_delist = delist_stk.getKData(query);
+    REQUIRE(kd_alive.size() > 100);
+    REQUIRE(kd_delist.size() > 100);
+    const Datetime delist_day = kd_delist.getKRecord(kd_delist.size() - 1).datetime;
+
+    // The test db marks every stock valid through the market LastDate, so sz000005's lastDatetime
+    // does not reflect its shorter data end; override it (restored on exit) to simulate delisting
+    const Datetime original_last = delist_stk.lastDatetime();
+    REQUIRE(original_last > delist_day);
+    delist_stk.lastDatetime(delist_day);
+
+    auto leaf_delist = create_alway_buy_sys();
+    leaf_delist->setTO(kd_delist);
+    auto leaf_alive = create_alway_buy_sys();
+    leaf_alive->setTO(kd_alive);
+
+    auto inner = std::make_shared<MultiSystem>("inner_delist");
+    inner->setTM(crtTM(Datetime(199001010000LL), 300000.0));
+    inner->setMode("A");
+    inner->setSE(SE_Fixed());
+    inner->add(leaf_delist);
+
+    auto tm = crtTM(Datetime(199001010000LL), 1000000.0);
+    auto outer = std::make_shared<MultiSystem>("outer_delist");
+    outer->setTM(tm);
+    outer->setMode("A");
+    outer->setSE(SE_Fixed());
+    outer->setAdjustCycle(1);
+    outer->setTradeOnClose(true);
+    outer->add(inner);
+    outer->add(leaf_alive);
+    outer->run(query);
+
+    /** @arg the delisted holding on the parent account is force liquidated */
+    bool parent_sell = false;
+    for (auto& t : tm->getTradeList()) {
+        if (t.business == BUSINESS_SELL && t.stock == delist_stk && t.datetime > delist_day) {
+            parent_sell = true;
+            break;
+        }
+    }
+    CHECK_UNARY(parent_sell);
+    CHECK_UNARY(!tm->have(delist_stk));
+
+    /** @arg the leaf trading the delisted instrument left the pools of the nested layer */
+    CHECK_EQ(inner->getRunningSet().count(leaf_delist.get()), 0u);
+    bool in_force_sell = false;
+    for (auto& held : inner->getForceSellList()) {
+        if (held.get() == leaf_delist.get()) {
+            in_force_sell = true;
+        }
+    }
+    CHECK_UNARY(!in_force_sell);
+
+    /** @arg the shadow book of the nested layer was flattened as well */
+    auto shadow_tm = leaf_delist->getTM();
+    REQUIRE(shadow_tm);
+    CHECK_NE(shadow_tm.get(), tm.get());
+    CHECK_UNARY(!shadow_tm->have(delist_stk));
+
+    /** @arg the nested layer keeps holding the other instrument */
+    CHECK_UNARY(tm->have(alive_stk));
+
+    delist_stk.lastDatetime(original_last);
+}
+
 /** @par Check point: the live replay shape (run day by day with reset=false, readyForRun on every
  * call) keeps the close-day counter, so with adjust_cycle=2 the SE is consulted only every second
  * driven day; reset restarts the cycle. (readyForRun used to zero the counter on every call, which
@@ -5995,6 +6070,73 @@ TEST_CASE("test_MultiSystem_nested_subtree_full_exit_fold_capped") {
 
 /** @par Check point: a deferred injection waits for the deferred sells of the same rebalancing
  * when the sells are retried for a suspension (the freed cash is part of the injection funding) */
+/** @par Check point: the fold quota is shared across the whole sub-tree, so two leaves of the same
+ * shared account (one of them inside a nested aggregate) never fold more than the holding */
+TEST_CASE("test_MultiSystem_nested_subtree_full_exit_fold_shared_quota") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto make_leaf = [&]() {
+        auto sg =
+          make_shared<ScriptedBuySellSG>(Datetime(200006200000LL), Datetime(200006290000LL));
+        auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+        leaf->setStock(stk1);
+        leaf->setTO(stk1.getKData(full));
+        return leaf;
+    };
+
+    auto leaf1 = make_leaf();
+    auto leaf2 = make_leaf();
+
+    // The nested aggregate shares the account of its parent, so both leaves hold the same
+    // instrument on one book and each queues a full-close request on the same day
+    auto grand = std::make_shared<MultiSystem>("ms_c_grand_quota");
+    grand->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    grand->setMode("C");
+    grand->setSE(std::make_shared<SelectAllSE>(SystemList{leaf2}));
+    grand->setTradeOnClose(false);
+    grand->add(leaf2);
+
+    auto child = std::make_shared<MultiSystem>("ms_c_child_quota");
+    child->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    child->setMode("C");
+    child->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, grand}));
+    child->setTradeOnClose(false);
+    child->add(leaf1);
+    child->add(grand);
+
+    auto ms = std::make_shared<MultiSystem>("ms_a_over_nested_full_exit");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("A");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{child}));
+    ms->setTradeOnClose(false);
+    ms->setAdjustDates(
+      DatetimeList{Datetime(200006210000LL), Datetime(200006300000LL), Datetime(200007030000LL)});
+    ms->setParam<bool>("support_borrow_stock", true);
+    ms->add(child);
+    ms->run(k);
+
+    REQUIRE(!ms->getTM()->getTradeList().empty());
+    size_t short_legs = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL_SHORT || tr.business == BUSINESS_BUY_SHORT) {
+            short_legs++;
+        }
+    }
+
+    /** @arg a doubled fold would plan a phantom short: the shared quota keeps the parent flat
+     *  without ever opening a short book */
+    CHECK_EQ(short_legs, 0);
+    CHECK_EQ(ms->getTM()->getShortPosition(stk1).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+}
+
 TEST_CASE("test_MultiSystem_mode_b_deferred_inject_waits_for_retry") {
     Stock stk1 = getStock("sh600005");
     Stock stk2 = getStock("sz000001");
@@ -7252,6 +7394,297 @@ TEST_CASE("test_MultiSystem_composite_reduction_suspended_close") {
     // The lot rounding alone cannot explain the gap: without the suspended leaf in the value base
     // the ratio clamps to 1.0 and the quoted leaf is sold in full
     CHECK_LT(sold_quote_at_close, quote1 - 1000.0);
+}
+
+/** @par Check point: the delegation chain works at the deepest nesting the library supports: a
+ *  four-level mode B chain hands the budget down to the leaf and mirrors it back to the parent */
+TEST_CASE("test_MultiSystem_cascade_b_b_b_b") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+
+    auto l1 = std::make_shared<MultiSystem>("bbbb_l1");
+    l1->setMode("B");
+    l1->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    l1->add(leaf);
+
+    auto l2 = std::make_shared<MultiSystem>("bbbb_l2");
+    l2->setMode("B");
+    l2->setSE(std::make_shared<SelectAllSE>(SystemList{l1}));
+    l2->add(l1);
+
+    auto l3 = std::make_shared<MultiSystem>("bbbb_l3");
+    l3->setMode("B");
+    l3->setSE(std::make_shared<SelectAllSE>(SystemList{l2}));
+    l3->add(l2);
+
+    auto outer = std::make_shared<MultiSystem>("bbbb_outer");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("B");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{l3}));
+    outer->add(l3);
+    outer->run(k);
+
+    double leaf_pos = leaf->getTM()->getPosition(k.back().datetime, stk).number;
+    double parent_pos = outer->getTM()->getPosition(k.back().datetime, stk).number;
+    double leaf_nav = leaf->getTM()->getFunds(k.back().datetime, KQuery::DAY).net_assets();
+
+    /** @arg the budget reaches the fourth layer: the leaf trades and the parent mirrors it */
+    CHECK_GT(leaf_pos, 0.0);
+    CHECK_GT(leaf_nav, 0.0);
+    CHECK_EQ(parent_pos, doctest::Approx(leaf_pos));
+
+    /** @arg no reserve is configured on the way down, so the leaf keeps the whole budget minus the
+     *  cost of the trades */
+    CHECK_LE(leaf_nav, 100000.0);
+}
+
+/** @par Check point: the folding recurses through several nested layers: an A->B->A->A->leaf chain
+ *  surfaces the leaf intent up to the top mode A parent */
+TEST_CASE("test_MultiSystem_cascade_a_b_a_a_leaf") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+
+    auto a1 = std::make_shared<MultiSystem>("abaa_a1");
+    a1->setMode("A");
+    a1->setSubInitCash(10000.0);
+    a1->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    a1->add(leaf);
+
+    auto a2 = std::make_shared<MultiSystem>("abaa_a2");
+    a2->setMode("A");
+    a2->setSubInitCash(10000.0);
+    a2->setSE(std::make_shared<SelectAllSE>(SystemList{a1}));
+    a2->add(a1);
+
+    auto b1 = std::make_shared<MultiSystem>("abaa_b1");
+    b1->setMode("B");
+    b1->setSE(std::make_shared<SelectAllSE>(SystemList{a2}));
+    b1->add(a2);
+
+    auto outer = std::make_shared<MultiSystem>("abaa_outer");
+    outer->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{b1}));
+    outer->add(b1);
+    outer->run(k);
+
+    double leaf_pos = leaf->getTM()->getPosition(k.back().datetime, stk).number;
+    double parent_pos = outer->getTM()->getPosition(k.back().datetime, stk).number;
+
+    /** @arg the leaf intent is folded up through the nested layers to the top parent */
+    CHECK_GT(leaf_pos, 0.0);
+    CHECK_GT(parent_pos, 0.0);
+
+    /** @arg the parent is liquidated only through the top-level target, not by the nested layers
+     *  trading on their own accounts */
+    bool inner_sold = false;
+    for (const auto& tr : b1->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
+            inner_sold = true;
+        }
+    }
+    CHECK_UNARY(!inner_sold);
+}
+
+/** @par Check point: a walk-forward system is not composite, so the aggregate drives it as a leaf
+ *  (it is not expanded into its internal sub-systems) and it trades on the shared account */
+TEST_CASE("test_MultiSystem_walk_forward_subsystem") {
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    KData k = stk.getKData(KQueryByIndex(-125));
+    REQUIRE(k.size() > 100);
+
+    auto se_wf = SE_MaxFundsOptimal();
+    auto wf = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, se_wf);
+    REQUIRE_UNARY(!wf->isComposite());
+    // Prepare the walk-forward windows on its own instrument before handing it to the aggregate
+    wf->run(stk, KQueryByIndex(-125));
+    REQUIRE_GT(wf->getTM()->getTradeList().size(), 1u);
+
+    auto ms = std::make_shared<MultiSystem>("ms_wf_leaf");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setMode("C");
+    ms->setSE(SE_Fixed());
+    ms->add(wf);
+    ms->run(k);
+
+    /** @arg the walk-forward system is kept as a single sub-system, not expanded */
+    REQUIRE_EQ(ms->getSystemList().size(), 1u);
+    CHECK_EQ(ms->getSystemList()[0].get(), wf.get());
+
+    /** @arg it runs on the shared account of the parent */
+    CHECK_EQ(wf->getTM().get(), ms->getTM().get());
+    CHECK_GT(ms->getTM()->getTradeList().size(), 1u);
+}
+
+// Clones itself with a single prototype only, to exercise the prototype-count guard in the
+// aggregate clone (the original holds two)
+class ShortProtoCloneSE : public SelectorBase {
+public:
+    ShortProtoCloneSE() : SelectorBase("ShortProtoCloneSE") {}
+
+    SelectorPtr _clone() override {
+        auto p = std::make_shared<ShortProtoCloneSE>();
+        if (!m_pro_sys_list.empty()) {
+            p->m_pro_sys_list.emplace_back(m_pro_sys_list.front()->clone());
+        }
+        return p;
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        for (auto& sys : getRealSystemList()) {
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+};
+
+/** @par Check point: cloning an aggregate whose child is itself an aggregate keeps the nested layer
+ *  and rebuilds the whole tree on new instances; the clone reproduces the trades of the original */
+TEST_CASE("test_MultiSystem_clone_nested_composite") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto make_tree = [&](const string& tag) {
+        auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        leaf->setStock(stk);
+        leaf->setParam<bool>("buy_delay", false);
+        auto inner = std::make_shared<MultiSystem>("inner_" + tag);
+        inner->setMode("A");
+        inner->setSubInitCash(10000.0);
+        inner->setSE(SE_Fixed());
+        inner->add(leaf);
+        auto outer = std::make_shared<MultiSystem>("outer_" + tag);
+        outer->setTM(crtTM(k[0].datetime, 100000.0));
+        outer->setMode("A");
+        outer->setSE(SE_Fixed());
+        outer->add(inner);
+        return outer;
+    };
+
+    auto orig = make_tree("cf");
+    orig->run(k);
+    const size_t orig_buys = orig->getTM()->getTradeList().size();
+    REQUIRE_GT(orig_buys, 1u);
+
+    auto cloned = std::dynamic_pointer_cast<MultiSystem>(orig->clone());
+    REQUIRE(cloned);
+
+    /** @arg the nested layer stays an aggregate and every node is a new instance */
+    REQUIRE_EQ(cloned->getSystemList().size(), 1u);
+    auto cloned_inner = cloned->getSystemList()[0];
+    CHECK_UNARY(cloned_inner->isComposite());
+    CHECK_NE(cloned_inner.get(), orig->getSystemList()[0].get());
+    auto* cloned_grand = std::dynamic_pointer_cast<MultiSystem>(cloned_inner).get();
+    REQUIRE(cloned_grand);
+    REQUIRE_EQ(cloned_grand->getSystemList().size(), 1u);
+    auto orig_inner = std::dynamic_pointer_cast<MultiSystem>(orig->getSystemList()[0]);
+    REQUIRE(orig_inner);
+    CHECK_NE(cloned_grand->getSystemList()[0].get(), orig_inner->getSystemList()[0].get());
+
+    /** @arg the clone runs on its own tree and reproduces the original trades */
+    cloned->setTM(crtTM(k[0].datetime, 100000.0));
+    cloned->run(k);
+    CHECK_EQ(cloned->getTM()->getTradeList().size(), orig_buys);
+    CHECK_EQ(cloned->getTM()->getPosition(k.back().datetime, stk).number,
+             doctest::Approx(orig->getTM()->getPosition(k.back().datetime, stk).number));
+}
+
+/** @par Check point: when the cloned SE carries fewer prototypes than the original, the aggregate
+ *  clone falls back to cloning the children itself instead of adopting a partial binding */
+TEST_CASE("test_MultiSystem_clone_se_proto_count_mismatch") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KData k1 = stk1.getKData(KQuery(Datetime(19991110), Datetime(20000225)));
+    REQUIRE(k1.size() > 10);
+
+    auto sys1 = create_alway_buy_sys();
+    sys1->setTO(k1);
+    auto sys2 = create_alway_buy_sys();
+    sys2->setTO(stk2.getKData(KQuery(Datetime(19991110), Datetime(20000225))));
+
+    auto se = std::make_shared<ShortProtoCloneSE>();
+    se->addSystemList(SystemList{sys1, sys2});
+    REQUIRE_EQ(se->getProtoSystemList().size(), 2u);
+
+    auto ms = std::make_shared<MultiSystem>("ms_proto_mismatch");
+    ms->setTM(crtTM(k1[0].datetime, 100000.0));
+    ms->setMode("A");
+    ms->setSE(se);
+    ms->add(sys1);
+    ms->add(sys2);
+
+    auto cloned = std::dynamic_pointer_cast<MultiSystem>(ms->clone());
+    REQUIRE(cloned);
+
+    /** @arg both children were cloned instead of adopting the partial prototype list */
+    REQUIRE_EQ(cloned->getSystemList().size(), 2u);
+    for (size_t i = 0; i < 2; i++) {
+        CHECK_NE(cloned->getSystemList()[i].get(), ms->getSystemList()[i].get());
+    }
+    CHECK_EQ(cloned->getSE()->getProtoSystemList().size(), 1u);
+}
+
+// Exposes the protected tradability probe so the one-price-board direction can be checked directly
+class TradableProbeMS : public MultiSystem {
+public:
+    TradableProbeMS() : MultiSystem("probe_tradable") {}
+
+    bool probeTradable(const KRecord& today, const KRecord* preday, bool is_buy) const {
+        return _isTradableBar(today, preday, is_buy);
+    }
+};
+
+/** @par Check point: the parent tradability follows the side, as the System entry guards do: a
+ *  one-price board locks out only the side it locks, a no-trade bar never fills */
+TEST_CASE("test_MultiSystem_is_tradable_bar_by_side") {
+    TradableProbeMS ms;
+    const KRecord preday(Datetime(200001010000LL), 10.0, 10.0, 10.0, 10.0, 1000.0, 100.0);
+    const KRecord board_up(Datetime(200001020000LL), 11.0, 11.0, 11.0, 11.0, 1000.0, 100.0);
+    const KRecord board_down(Datetime(200001020000LL), 9.0, 9.0, 9.0, 9.0, 1000.0, 100.0);
+    const KRecord normal(Datetime(200001020000LL), 10.0, 10.5, 9.5, 10.2, 1000.0, 100.0);
+    const KRecord no_trade(Datetime(200001020000LL), 10.0, 10.0, 10.0, 10.0, 0.0, 0.0);
+
+    /** @arg a one-price up-limit board blocks the buy only */
+    CHECK_UNARY(!ms.probeTradable(board_up, &preday, true));
+    CHECK_UNARY(ms.probeTradable(board_up, &preday, false));
+
+    /** @arg a one-price down-limit board blocks the sell only */
+    CHECK_UNARY(ms.probeTradable(board_down, &preday, true));
+    CHECK_UNARY(!ms.probeTradable(board_down, &preday, false));
+
+    /** @arg a normal bar fills on both sides */
+    CHECK_UNARY(ms.probeTradable(normal, &preday, true));
+    CHECK_UNARY(ms.probeTradable(normal, &preday, false));
+
+    /** @arg a bar without any trade never fills */
+    CHECK_UNARY(!ms.probeTradable(no_trade, &preday, true));
+    CHECK_UNARY(!ms.probeTradable(no_trade, &preday, false));
+
+    /** @arg a one-price bar without a previous bar is left to the next session */
+    CHECK_UNARY(!ms.probeTradable(board_up, nullptr, false));
 }
 
 /** @} */ /** @} */
