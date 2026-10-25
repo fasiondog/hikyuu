@@ -217,6 +217,76 @@ TEST_CASE("test_EV_Bool_reject_non_finite") {
     CHECK_FALSE(nan->isValid(kdata.front().datetime));
 }
 
+// Counts the _calculate invocations, to pin the invalidation on a parameter change
+class CountingEVTest : public EnvironmentBase {
+public:
+    CountingEVTest() : EnvironmentBase("TEST_COUNT_EV") {
+        setParam<int>("n", 10);
+    }
+
+    void _calculate() override {
+        m_calc_count++;
+    }
+
+    EnvironmentPtr _clone() override {
+        return make_shared<CountingEVTest>();
+    }
+
+    int calcCount() const {
+        return m_calc_count;
+    }
+
+private:
+    int m_calc_count{0};
+};
+
+/** @par Test points */
+TEST_CASE("test_Environment_param_change_recomputes_on_set_query") {
+    const KQuery closed = KQueryByIndex(-100, -50);
+    auto ev = make_shared<CountingEVTest>();
+    ev->setQuery(closed);
+    REQUIRE_EQ(ev->calcCount(), 1);
+
+    /** @arg a parameter change does not recalculate by itself, it only invalidates the cache */
+    ev->setParam<int>("n", 20);
+    CHECK_EQ(ev->calcCount(), 1);
+
+    /** @arg the next setQuery of the same closed query recalculates the invalidated cache */
+    ev->setQuery(closed);
+    CHECK_EQ(ev->calcCount(), 2);
+
+    /** @arg a clean closed query hits the early return and is not recalculated again */
+    ev->setQuery(closed);
+    CHECK_EQ(ev->calcCount(), 2);
+
+    /** @arg a right-open query is treated as the same input, so it hits the cache as well */
+    const KQuery right_open = KQueryByDate(Datetime(200001010000LL), Null<Datetime>(), KQuery::DAY);
+    REQUIRE_UNARY(right_open.isRightOpening());
+    ev->setQuery(right_open);
+    CHECK_EQ(ev->calcCount(), 3);
+    ev->setQuery(right_open);
+    CHECK_EQ(ev->calcCount(), 3);
+}
+
+/** @par Test points */
+TEST_CASE("test_EV_Bool_does_not_rebind_source_indicator") {
+    StockManager &sm = StockManager::instance();
+    KQuery query(-100);
+    KData kdata = sm.getStock("sh000001").getKData(query);
+    REQUIRE(!kdata.empty());
+
+    auto ind = PRICELIST(kdata.size(), 1.0);
+    const KData before = ind.getContext();
+
+    /** @arg the environment still marks the index dates valid */
+    EVPtr ev = EV_Bool(ind);
+    ev->setQuery(query);
+    CHECK(ev->isValid(kdata.back().datetime));
+
+    /** @arg the caller's indicator is not hijacked to the market index kdata */
+    CHECK_UNARY(ind.getContext() == before);
+}
+
 /** @par Test points */
 TEST_CASE("test_EV_TwoLine_reject_size_mismatch") {
     StockManager& sm = StockManager::instance();

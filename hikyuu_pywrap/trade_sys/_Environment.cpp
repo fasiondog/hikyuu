@@ -85,7 +85,11 @@ The custom market environment strategy interfaces:
                     R"(Set or get the query condition
 
     For a Python subclass the _calculate callback acquires the GIL while the mutex is held, so
-    setting the query must not run concurrently with the other calls on the same object.)")
+    The calculation is re-run only when the query differs from the current one: a right-open query
+    (no end time or end index given) is not recalculated when new data arrives, so call ``reset`` or
+    pass a query with an explicit end to refresh. For a Python subclass the calculation takes the
+    GIL while holding the mutex, so setting the query must not run concurrently with the other
+    calls on the same object.)")
 
       .def("get_param", &EnvironmentBase::getParam<boost::any>, R"(get_param(self, name)
 

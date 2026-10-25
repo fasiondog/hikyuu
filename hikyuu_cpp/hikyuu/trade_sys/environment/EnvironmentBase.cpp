@@ -33,20 +33,26 @@ EnvironmentBase::EnvironmentBase(const EnvironmentBase& base)
   m_query(base.m_query),
   m_date_index(base.m_date_index),
   m_values(base.m_values),
-  m_is_python_object(base.m_is_python_object) {}
+  m_is_python_object(base.m_is_python_object),
+  m_calculated(base.m_calculated) {}
 
 EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 
 EnvironmentBase::~EnvironmentBase() {}
 
 void EnvironmentBase::baseCheckParam(const string& name) const {}
-void EnvironmentBase::paramChanged() {}
+
+void EnvironmentBase::paramChanged() {
+    std::unique_lock<std::shared_mutex> lock(m_mutex);
+    m_calculated = false;
+}
 
 void EnvironmentBase::reset() {
     std::unique_lock<std::shared_mutex> lock(m_mutex);
     m_query = Null<KQuery>();
     m_date_index.clear();
     m_values.clear();
+    m_calculated = false;
     _reset();
 }
 
@@ -62,25 +68,27 @@ EnvironmentPtr EnvironmentBase::clone() {
     p->m_query = m_query;
     p->m_date_index = m_date_index;
     p->m_values = m_values;
+    p->m_calculated = m_calculated;
     return p;
 }
 
 void EnvironmentBase::setQuery(const KQuery& query) {
     std::unique_lock<std::shared_mutex> lock(m_mutex);
-    if (m_query != query) {
+    HKU_IF_RETURN(m_calculated && query == m_query, void());
+    m_query = Null<KQuery>();
+    m_date_index.clear();
+    m_values.clear();
+    _reset();
+    m_query = query;
+    m_calculated = false;
+    try {
+        _calculate();
+        m_calculated = true;
+    } catch (...) {
         m_query = Null<KQuery>();
         m_date_index.clear();
         m_values.clear();
-        _reset();
-        m_query = query;
-        try {
-            _calculate();
-        } catch (...) {
-            m_query = Null<KQuery>();
-            m_date_index.clear();
-            m_values.clear();
-            throw;
-        }
+        throw;
     }
 }
 

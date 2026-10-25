@@ -18,7 +18,8 @@ BoolEnvironment::BoolEnvironment() : EnvironmentBase("EV_Bool") {
     setParam<string>("market", "SH");
 }
 
-BoolEnvironment::BoolEnvironment(const Indicator& ind) : EnvironmentBase("EV_Bool"), m_ind(ind) {
+BoolEnvironment::BoolEnvironment(const Indicator& ind)
+: EnvironmentBase("EV_Bool"), m_ind(ind.clone()) {
     setParam<string>("market", "SH");
 }
 
@@ -33,7 +34,7 @@ void BoolEnvironment::_checkParam(const string& name) const {
 }
 
 EnvironmentPtr BoolEnvironment::_clone() {
-    return make_shared<BoolEnvironment>(m_ind.clone());
+    return make_shared<BoolEnvironment>(m_ind);
 }
 
 void BoolEnvironment::_calculate() {

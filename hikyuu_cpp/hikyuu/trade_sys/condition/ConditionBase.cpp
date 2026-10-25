@@ -32,7 +32,10 @@ ConditionBase::ConditionBase(const string& name) : m_name(name) {}
 ConditionBase::~ConditionBase() {}
 
 void ConditionBase::baseCheckParam(const string& name) const {}
-void ConditionBase::paramChanged() {}
+
+void ConditionBase::paramChanged() {
+    m_calculated = false;
+}
 
 void ConditionBase::reset() {
     m_kdata = Null<KData>();
@@ -40,6 +43,7 @@ void ConditionBase::reset() {
     m_sg.reset();
     m_date_index.clear();
     m_values.clear();
+    m_calculated = false;
     _reset();
 }
 
@@ -54,6 +58,7 @@ ConditionPtr ConditionBase::clone() {
     p->m_kdata = m_kdata;
     p->m_date_index = m_date_index;
     p->m_values = m_values;
+    p->m_calculated = m_calculated;
 
     // tm and sg are set by the system at runtime, they are not cloned
     // p->m_tm = m_tm->clone();
@@ -62,10 +67,11 @@ ConditionPtr ConditionBase::clone() {
 }
 
 void ConditionBase::setTO(const KData& kdata) {
-    HKU_IF_RETURN(kdata == m_kdata, void());
+    HKU_IF_RETURN(m_calculated && kdata == m_kdata, void());
     m_kdata = kdata;
     m_date_index.clear();
     m_values.clear();
+    m_calculated = false;
     if (!kdata.empty()) {
         size_t total = kdata.size();
         m_values.resize(total);
@@ -75,6 +81,7 @@ void ConditionBase::setTO(const KData& kdata) {
             m_date_index[ks[i].datetime] = i;
         }
         _calculate();
+        m_calculated = true;
     }
 }
 

@@ -141,6 +141,7 @@ protected:
     map<Datetime, size_t> m_date_index;
     vector<price_t> m_values;
     bool m_is_python_object{false};
+    bool m_calculated{false};
 
 //============================================
 // Serialization support

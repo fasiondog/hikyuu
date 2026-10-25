@@ -57,6 +57,8 @@ public:
     /**
      * Set the query condition; the calculation is re-run only when the query differs from the
      * current one
+     * @note A right-open query (no end time or end index given) is not recalculated when new data
+     *       arrives: call reset() or pass a query with an explicit end to refresh
      * @note For a Python subclass the _calculate callback acquires the GIL while the mutex is
      *       held, so setQuery must not be invoked concurrently with the other calls on the same
      *       object
@@ -201,6 +203,7 @@ protected:
     mutable std::shared_mutex m_mutex;
 
     bool m_is_python_object{false};
+    bool m_calculated{false};
 
 //============================================
 // Serialization support
@@ -228,6 +231,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        // The cache is restored together with its query, so the next setQuery of the same query
+        // still hits the cache and a different one recalculates
+        m_calculated = m_query != Null<KQuery>();
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

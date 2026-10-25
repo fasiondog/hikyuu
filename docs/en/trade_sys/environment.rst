@@ -131,7 +131,10 @@ Usage constraints:
   ``System``);
 * For a Python subclass, setting ``query`` and ``reset`` call back into Python while the lock is
   held (needing the GIL), so they must not run concurrently with the other calls on the same
-  object (see the base class description below).
+  object (see the base class description below);
+* A right-open query (no end time or end index given) is not recalculated when new data arrives:
+  setting the same query again hits the cache, so call ``reset()`` or pass a query with an explicit
+  end to refresh.
 
 
 Custom Market Environment Strategy

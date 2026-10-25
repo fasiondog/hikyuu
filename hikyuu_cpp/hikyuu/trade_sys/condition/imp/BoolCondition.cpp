@@ -16,12 +16,12 @@ namespace hku {
 
 BoolCondition::BoolCondition() : ConditionBase("CN_Bool") {}
 
-BoolCondition::BoolCondition(const Indicator& ind) : ConditionBase("CN_Bool"), m_ind(ind) {}
+BoolCondition::BoolCondition(const Indicator& ind) : ConditionBase("CN_Bool"), m_ind(ind.clone()) {}
 
 BoolCondition::~BoolCondition() {}
 
 ConditionPtr BoolCondition::_clone() {
-    return make_shared<BoolCondition>(m_ind.clone());
+    return make_shared<BoolCondition>(m_ind);
 }
 
 void BoolCondition::_calculate() {

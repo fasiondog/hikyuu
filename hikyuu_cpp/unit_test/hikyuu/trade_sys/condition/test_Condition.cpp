@@ -17,6 +17,8 @@
 #include <hikyuu/trade_sys/condition/crt/CN_Manual.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/indicator/crt/CVAL.h>
+#include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/MA.h>
 
 using namespace hku;
 
@@ -99,6 +101,50 @@ public:
 private:
     CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
 };
+
+/** @par Test points */
+TEST_CASE("test_Condition_param_change_recomputes_on_set_to") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(-100));
+    REQUIRE(kdata.size() > 4);
+
+    ConditionPtr p(new ConditionTest);
+    p->setTO(kdata);
+    ConditionTest *pt = (ConditionTest *)p.get();
+    REQUIRE_EQ(pt->calcCount(), 1);
+
+    /** @arg a parameter change does not recalculate by itself, it only invalidates the cache */
+    p->setParam<int>("n", 20);
+    CHECK_EQ(pt->calcCount(), 1);
+
+    /** @arg the next setTO of the same kdata recalculates the invalidated cache */
+    p->setTO(kdata);
+    CHECK_EQ(pt->calcCount(), 2);
+    CHECK_UNARY(p->isValid(kdata[2].datetime));
+
+    /** @arg a clean cache hits the early return and is not recalculated again */
+    p->setTO(kdata);
+    CHECK_EQ(pt->calcCount(), 2);
+}
+
+/** @par Test points */
+TEST_CASE("test_CN_Bool_does_not_rebind_source_indicator") {
+    StockManager &sm = StockManager::instance();
+    KQuery query(-100);
+    KData kdata = sm.getStock("sh000001").getKData(query);
+    REQUIRE(!kdata.empty());
+
+    auto ind = MA(CLOSE(), 5);
+    const KData before = ind.getContext();
+
+    /** @arg the condition still evaluates the indicator over the given kdata */
+    ConditionPtr cn = CN_Bool(ind);
+    cn->setTO(kdata);
+    CHECK_UNARY(cn->isValid(kdata.back().datetime));
+
+    /** @arg the caller's indicator keeps its own context instead of being rebound to the kdata */
+    CHECK_UNARY(ind.getContext() == before);
+}
 
 /**
  * @defgroup test_Condition test_Condition
