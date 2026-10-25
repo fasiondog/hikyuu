@@ -66,7 +66,9 @@ double normInvCdf(double p) {
 double sampleTruncNormal(double mean, double stddev, double min_v, double max_v,
                          std::mt19937& gen) {
     if (stddev <= 0.0) {
-        return (min_v + max_v) / 2.0;
+        // A zero stddev pins the draw to the mean, like SP_Normal; the truncated normal never
+        // leaves its interval, so keep the pin inside the bounds
+        return std::clamp(mean, min_v, max_v);
     }
     double a = (min_v - mean) / stddev;
     double b = (max_v - mean) / stddev;

@@ -138,4 +138,19 @@ TEST_CASE("test_TruncNormalSlippage_short_side") {
     CHECK_THROWS_AS(sp3->setParam("short_max_value", -0.5), std::exception);
 }
 
+/** @par Test points */
+TEST_CASE("test_TruncNormal_zero_stddev_pins_mean") {
+    /** @arg a zero stddev pins the draw to the mean, like SP_Normal (not the interval midpoint) */
+    auto sp = SP_TruncNormal(0.01, 0.0, -0.1, 0.1);
+    for (int i = 0; i < 5; ++i) {
+        CHECK_LT(std::fabs(sp->getRealBuyPrice(Datetime(202201010930), 10.0) - 10.01), 1e-9);
+        CHECK_LT(std::fabs(sp->getRealSellPrice(Datetime(202201010930), 10.0) - 9.99), 1e-9);
+    }
+
+    /** @arg a mean outside the interval is pinned to the nearest bound */
+    auto sp2 = SP_TruncNormal(0.5, 0.0, -0.1, 0.1);
+    CHECK_LT(std::fabs(sp2->getRealBuyPrice(Datetime(202201010930), 10.0) - 10.1), 1e-9);
+    CHECK_LT(std::fabs(sp2->getRealSellPrice(Datetime(202201010930), 10.0) - 9.9), 1e-9);
+}
+
 /** @} */
