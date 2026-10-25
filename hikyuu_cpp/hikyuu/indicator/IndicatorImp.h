@@ -10,6 +10,7 @@
 #define INDICATORIMP_H_
 
 #include <atomic>
+#include <cctype>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -32,7 +33,38 @@ class HKU_API IndParam;
 
 namespace detail {
 class CompiledFactorPlan;
+
+/** Parses one value text of the legacy string based archive; the special values were written in
+ *  compiler dependent texts (eg. "nan", "-nan(ind)", "1.#QNAN") and would otherwise throw a bad
+ *  lexical cast. A free inline template so that every DLL keeps its own copy */
+template <typename ValueType>
+inline ValueType parseLegacyValueText(const std::string& vstr) {
+    std::string s;
+    s.reserve(vstr.size());
+    for (char c : vstr) {
+        if (c == ' ' || c == '\t' || c == '(' || c == ')') {
+            continue;
+        }
+        s.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+    }
+    if (s.empty()) {
+        return Null<ValueType>();
+    }
+    if (s.find("nan") != std::string::npos) {
+        return Null<ValueType>();
+    }
+    if (s.find("inf") != std::string::npos) {
+        return (s[0] == '-') ? -std::numeric_limits<ValueType>::infinity()
+                             : std::numeric_limits<ValueType>::infinity();
+    }
+    try {
+        return boost::lexical_cast<ValueType>(vstr);
+    } catch (const std::exception&) {
+        // Unrecognizable legacy special value text, treated as invalid
+        return Null<ValueType>();
+    }
 }
+}  // namespace detail
 
 /**
  * Indicator implementation class; when defining a new indicator, this class should be inherited
@@ -551,6 +583,8 @@ private:
 
         uint64_t tag = 0;
         ar& boost::serialization::make_nvp("count", tag);
+        // The tag value discriminates the format (the archive version may be stale across DLLs):
+        // BIT_PATTERN_TAG for the bit pattern arrays, otherwise the legacy per-value texts
         if (tag != BIT_PATTERN_TAG) {
             // The legacy format stored every value as a string of 6 decimal places, reading it
             // back loses precision; kept only to open old archives. Its first field is the value
@@ -584,15 +618,7 @@ private:
         for (size_t j = 0; j < count; j++) {
             std::string vstr;
             ar >> boost::serialization::make_nvp<string>("item", vstr);
-            if (vstr == "nan") {
-                values[j] = Null<value_t>();
-            } else if (vstr == "+inf") {
-                values[j] = std::numeric_limits<value_t>::infinity();
-            } else if (vstr == "-inf") {
-                values[j] = 0.0 - std::numeric_limits<value_t>::infinity();
-            } else {
-                values[j] = boost::lexical_cast<value_t>(vstr);
-            }
+            values[j] = detail::parseLegacyValueText<value_t>(vstr);
         }
     }
 
@@ -771,6 +797,11 @@ inline std::ostream& operator<<(std::ostream& os, const IndicatorImp::buffer_t& 
 }
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = the legacy per-value texts, 1 = the BIT_PATTERN_TAG bit pattern arrays
+BOOST_CLASS_VERSION(::hku::IndicatorImp, 1)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>
