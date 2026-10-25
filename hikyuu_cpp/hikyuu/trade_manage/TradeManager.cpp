@@ -2114,6 +2114,9 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
                 }
 
                 if (change_number != 0.0) {
+                    // totalNumber tracks the same scaled quantity as the gift branch, so the
+                    // average cost of buyMoney / totalNumber follows the contracted price scale
+                    position.totalNumber += change_number;
                     TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SUOGU, 0.0, 0.0,
                                        0.0, change_number, CostRecord(), 0.0, m_cash, PART_INVALID);
                     new_trade_buffer.push_back(record);
@@ -2238,6 +2241,8 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
                 }
 
                 if (change_number != 0.0) {
+                    // Keep the short average cost (sellMoney / totalNumber) on the scaled price too
+                    position.totalNumber += change_number;
                     TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SHORT_ADJUST, 0.0,
                                        0.0, 0.0, change_number, CostRecord(), 0.0, m_cash,
                                        PART_INVALID);
