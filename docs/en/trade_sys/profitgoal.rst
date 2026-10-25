@@ -9,7 +9,7 @@ Built-in Profit Goal Strategies
 
 .. py:function:: PG_FixedPercent([p = 0.2])
 
-    Fixed-percentage profit goal: the goal price is the average cost multiplied by (1 + p) for a long or (1 - p) for a short, rounded to the price precision; the current price is used as the cost when there is no position yet.
+    Fixed-percentage profit goal: the goal price is the average cost multiplied by (1 + p) for a long or (1 - p) for a short, rounded to the price precision; the current price is used as the cost when there is no position yet. The average cost is the gross fill price excluding the transaction fees, so the net return after the goal fills is slightly below p.
 
     :param float p: the percentage
     :return: the profit goal strategy instance

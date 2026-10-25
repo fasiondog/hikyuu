@@ -174,7 +174,7 @@ The custom profit goal strategy interfaces:
 
     m.def("PG_FixedPercent", PG_FixedPercent, py::arg("p") = 0.2, R"(PG_FixedPercent([p = 0.2])
 
-    The fixed percentage profit goal; the target price is the average cost (with the current price when there is no position yet) multiplied by (1 + p) for a long or (1 - p) for a short, rounded to the price precision
+    The fixed percentage profit goal; the target price is the average cost (with the current price when there is no position yet) multiplied by (1 + p) for a long or (1 - p) for a short, rounded to the price precision. The average cost is the gross fill price excluding the transaction fees, so the net return after the goal fills is slightly below p
     
     :param float p: the percentage
     :return: the profit goal strategy instance)");
