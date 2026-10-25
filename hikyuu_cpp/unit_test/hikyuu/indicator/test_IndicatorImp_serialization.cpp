@@ -11,6 +11,7 @@
 #include <cstring>
 #include <fstream>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/utilities/os.h>
 #include <hikyuu/indicator/crt/EXP.h>
 #include <hikyuu/indicator/crt/LOG.h>
 #include <hikyuu/indicator/crt/MA.h>
@@ -97,6 +98,33 @@ PriceList specialValues(bool includeSubnormal = true) {
 }
 
 }  // namespace
+
+/** @par Test points */
+TEST_CASE("test_indicator_serialization_legacy_format") {
+    // A legacy archive saved by the previous format version must stay readable
+    std::ifstream is(fmt::format("{}/test_data/legacy_ma.plk", getCurrentDir()),
+                     std::ios::binary);
+    REQUIRE_UNARY(is.good());
+
+    Indicator back;
+    {
+        boost::archive::text_iarchive ia(is);
+        ia >> BOOST_SERIALIZATION_NVP(back);
+    }
+
+    /** @arg name, size and discard are restored correctly */
+    REQUIRE_EQ(back.name(), "MA");
+    REQUIRE_EQ(back.getResultNumber(), 1);
+    REQUIRE_EQ(back.size(), 20);
+    REQUIRE_EQ(back.discard(), 2);
+
+    /** @arg the NaN prefix and the finite values are restored within the legacy text precision */
+    CHECK_UNARY(std::isnan(back.get(0)));
+    CHECK_UNARY(std::isnan(back.get(1)));
+    CHECK_EQ(back.get(2), doctest::Approx(10.5).epsilon(0.000001));
+    CHECK_EQ(back.get(10), doctest::Approx(14.5).epsilon(0.000001));
+    CHECK_EQ(back.get(19), doctest::Approx(19.0).epsilon(0.000001));
+}
 
 /** @par Test points */
 TEST_CASE("test_indicator_serialization_value_precision") {
