@@ -43,7 +43,7 @@
 - **Open Position Account Return %**：账户当前总收益率（名称沿用历史，含已实现与未实现盈亏，不是仅未平仓头寸的收益），``100 * (net_assets / total_base - 1)``（``total_base`` 为累计投入本金与累计投入资产之和）。
 - **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / total_base``。
 - 上述两项在 ``total_base == 0``（无投入本金）时记为 ``0``；若本金已全部取出但账户仍有盈利现金，该值不代表真实收益，应以 **Account Time-Weighted Return %** 为准。
-- **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``。
+- **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``；统计区间不足 2 天或无投入本金时记 ``0``（与 ``Account CAGR %`` 不同，后者在同样情形下为空值）。
 - **Account CAGR %**：账户年复合收益率，``100 * ((net_assets / total_base) ^ (1 / years) - 1)``；
   当 ``net_assets <= 0``（爆仓/深度亏损）、``total_base <= 0``（无投入）或统计区间不足 2 天时为空值（NaN）。
 - **Account Time-Weighted Return %**（扩展）：时间加权收益率，剔除出入金影响。按日收益
@@ -58,7 +58,7 @@
 - **Total Closed Trades**：已平仓交易（持仓记录）总数。
 - **Total Cost of Closed Trades**：已平仓交易总成本。
 - **Total Net Profit of Closed Trades**：已平仓净利润总额，``Σ (卖出金额 - 成本 - 买入金额)``。
-- **Total Profit of Winning Trades** / **Total Loss of Losing Trades**：盈利交易盈利总额 / 亏损交易亏损总额（利润 > 0 记盈利，否则记亏损，零利润计入亏损）。
+- **Total Profit of Winning Trades** / **Total Loss of Losing Trades**：盈利交易盈利总额 / 亏损交易亏损总额（利润 > 0 记盈利，否则记亏损，零利润计入亏损，胜率因此偏保守）。
 - **Number of Winning Trades** / **Number of Losing Trades**：盈利 / 亏损交易笔数。
 - **Win Rate %**：胜率，``100 * 盈利笔数 / 已平仓笔数``。
 - **Avg Profit per Winning Trade** / **Avg Loss per Losing Trade**：平均每笔盈利 / 平均每笔亏损。
@@ -74,7 +74,7 @@
 R 乘数项
 --------
 
-单笔 R 乘数 ``r = 利润 / 风险``，风险 ``totalRisk = (买入价 - 止损价) * 数量 * 每手乘数``；风险为 0 时记 0。
+单笔 R 乘数 ``r = 利润 / 风险``，风险 ``totalRisk = (买入价 - 止损价) * 数量 * 每手乘数``；风险为 0 时记 0 且仍计入分母；风险为负（如滑点使成交价不高于止损价）时按实际符号计入。
 
 - **R-Multiple Expectancy**：R 乘数期望值，``Σ r / 已平仓笔数``。
 - **Avg R-Multiple of Winning Trades** / **Avg R-Multiple of Losing Trades**：盈利 / 亏损交易平均 R 乘数。

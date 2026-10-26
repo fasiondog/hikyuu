@@ -58,7 +58,9 @@ Returns and annualization
 - Both items are recorded as ``0`` when ``total_base == 0`` (nothing invested); if the principal has been fully
   checked out while the account still holds cash profit, the value does not represent the real return and
   **Account Time-Weighted Return %** should be used instead.
-- **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``.
+- **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``;
+  recorded as ``0`` when the period is shorter than two days or nothing is invested (unlike
+  ``Account CAGR %``, which is Null in the same cases).
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
   Null (NaN) when ``net_assets <= 0`` (wiped out / deep loss), when ``total_base <= 0`` (nothing invested) or
   when the period is shorter than two days.
@@ -77,7 +79,8 @@ Trade statistics
 - **Total Cost of Closed Trades**: the total cost of closed trades.
 - **Total Net Profit of Closed Trades**: the total net profit of closed trades, ``sum(sell money - cost - buy money)``.
 - **Total Profit of Winning Trades** / **Total Loss of Losing Trades**: the total profit of winning trades /
-  the total loss of losing trades (profit > 0 counts as a win, otherwise a loss; a zero-profit trade counts as a loss).
+  the total loss of losing trades (profit > 0 counts as a win, otherwise a loss; a zero-profit trade counts as a
+  loss, which keeps the win rate conservative).
 - **Number of Winning Trades** / **Number of Losing Trades**: the number of winning / losing trades.
 - **Win Rate %**: ``100 * number of winning trades / number of closed trades``.
 - **Avg Profit per Winning Trade** / **Avg Loss per Losing Trade**: the average profit / loss per trade.
@@ -95,7 +98,9 @@ R-multiple items
 ----------------
 
 The per-trade R multiple is ``r = profit / risk``, where the risk is
-``totalRisk = (buy price - stop-loss price) * number * unit``; when the risk is 0, r is recorded as 0.
+``totalRisk = (buy price - stop-loss price) * number * unit``; when the risk is 0, r is recorded as 0 and the
+trade still counts in the denominator; a negative risk (e.g. slippage leaves the fill price at or below the
+stop-loss price) is used with its actual sign.
 
 - **R-Multiple Expectancy**: ``sum(r) / number of closed trades``.
 - **Avg R-Multiple of Winning Trades** / **Avg R-Multiple of Losing Trades**: the average R multiple of
