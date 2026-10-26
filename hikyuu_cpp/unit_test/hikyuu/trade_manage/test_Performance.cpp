@@ -543,4 +543,29 @@ TEST_CASE("test_Performance_reuse_no_stale_state") {
     CHECK_UNARY(std::isnan(p.get("Avg Win / Avg Loss Ratio")));
 }
 
+/** @par Test points */
+TEST_CASE("test_Performance_r_multiple_negative_risk") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+
+    // A stop loss above the entry price leaves a negative risk (-200 here): it is a real case caused by
+    // slippage, so the R multiple keeps its actual sign instead of being dropped
+    tm->buy(Datetime(199911170000LL), stock, 10.0, 100, 12.0);
+    tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911180000LL));
+
+    /** @arg The negative risk is counted, giving r = 100 / -200 = -0.5 */
+    CHECK_EQ(p.get("Total Closed Trades"), 1);
+    CHECK_EQ(p.get("Number of Winning Trades"), 1);
+    CHECK_EQ(p.get("R-Multiple Expectancy"), -0.5);
+    CHECK_EQ(p.get("Avg R-Multiple of Winning Trades"), -0.5);
+    CHECK_EQ(p.get("Max Consecutive Win R-Multiple"), -0.5);
+
+    /** @arg The single-trade extreme starts from 0, so a negative value does not replace it */
+    CHECK_EQ(p.get("Max Single Win R-Multiple"), 0.0);
+}
+
 /** @} */
