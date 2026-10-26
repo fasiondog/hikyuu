@@ -59,11 +59,18 @@ def _measure_progress(work):
 
 def _calibrated_work(build_call, probe):
     """Repeat the probe call until the measured window is long enough, so the
-    progress assertion stays stable on fast machines."""
+    progress assertion stays stable across machines of different speed.
+
+    The window targets ~0.5s of work; fast operations (e.g. a single
+    runMoment step) need many repetitions to fill it, while slow operations are
+    capped by a maximum total window so the suite does not hang."""
     start = time.perf_counter()
     probe()
     elapsed = time.perf_counter() - start
-    rounds = max(1, min(50, int(0.5 / max(elapsed, 0.001))))
+    target_window = 0.5
+    max_window = 5.0
+    rounds = max(1, int(target_window / max(elapsed, 1e-9)))
+    rounds = min(rounds, max(1, int(max_window / max(elapsed, 1e-9))))
 
     def work():
         for _ in range(rounds):
