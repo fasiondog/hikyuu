@@ -286,6 +286,7 @@ void StockManager::_negotiateShmServer() {
     // interruption check and the forwarding registration are done inside the plugin; the client
     // never starts the service itself)
     auto wait_timeout = m_hikyuuParam.tryGet<int64_t>("shm_server_wait_timeout", 600);
+    HKU_INFO(htr("connecting to shm server..."));
     HKU_WARN_IF_RETURN(!plugin->connect(m_datadir, wait_timeout < 0 ? 0 : (uint64_t)wait_timeout),
                        void(), "Failed connect to hikyuu shm server, fallback to standalone mode!");
 
