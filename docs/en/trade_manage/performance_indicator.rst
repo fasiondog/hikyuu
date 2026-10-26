@@ -15,6 +15,9 @@ Common time basis
   market (hikyuu targets multi-asset, multi-strategy mixed portfolios).
 - The annualization factor is **sqrt(365)** (natural days).
 - The period length for annualized returns is in natural days: ``years = number_of_natural_days / 365``.
+- **Report display**: ``report()`` prints ``N/A`` for the undefined (non-finite) items.
+- **Reset semantics**: ``reset()`` clears every value (including the undefined ones); a Null value only ever
+  comes from the current ``statistics()`` run and never survives into the next one.
 - Return metrics are based on **net assets**
   ``net_assets = cash + long market value - short market value - borrowed cash`` (borrowed funds are
   not counted in the numerator); the denominator is the accumulated net investment
@@ -54,7 +57,8 @@ Returns and annualization
 - **Closed Trade Account Return %**: ``100 * net profit of closed trades / total_base``.
 - **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``.
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
-  when ``net_assets <= 0`` (wiped out / deep loss) it returns NaN (Null) instead of entering the report.
+  Null (NaN) when ``net_assets <= 0`` (wiped out / deep loss), when ``total_base <= 0`` (nothing invested) or
+  when the period is shorter than two days.
 - **Account Time-Weighted Return %** (extended): the time-weighted return, excluding cash flows. From the
   daily return ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1`` (``flow_t`` is the net inflow of the
   day) build the index ``E = product(1 + r_t)``, then annualize as ``100 * (E ^ (1 / years) - 1)``.
@@ -74,8 +78,8 @@ Trade statistics
 - **Number of Winning Trades** / **Number of Losing Trades**: the number of winning / losing trades.
 - **Win Rate %**: ``100 * number of winning trades / number of closed trades``.
 - **Avg Profit per Winning Trade** / **Avg Loss per Losing Trade**: the average profit / loss per trade.
-- **Avg Win / Avg Loss Ratio**: ``avg profit / abs(avg loss)``.
-- **Profit Factor**: ``total profit / abs(total loss)``.
+- **Avg Win / Avg Loss Ratio**: ``avg profit / abs(avg loss)``; Null (NaN) when there is no losing trade.
+- **Profit Factor**: ``total profit / abs(total loss)``; Null (NaN) when there is no losing trade.
 - **Profit Expectancy**: the profit expectancy (amount basis),
   ``win rate * avg profit + (1 - win rate) * avg loss``.
 - **Largest Single Win** / **Largest Single Loss**: the largest single profit / loss.

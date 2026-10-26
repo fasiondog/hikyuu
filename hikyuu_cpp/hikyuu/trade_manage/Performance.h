@@ -36,7 +36,7 @@ public:
      *        backward compatibility, but they are deprecated */
     bool exist(const string& key) const;
 
-    /** Reset, clearing the calculated results */
+    /** Reset, clearing the calculated results, including the undefined (Null) ones */
     void reset();
 
     /** Get the statistics value by the item name; it takes effect only after statistics or report

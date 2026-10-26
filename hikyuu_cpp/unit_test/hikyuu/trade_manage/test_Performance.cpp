@@ -384,7 +384,8 @@ TEST_CASE("test_Performance_annualized_short_range") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
 
-    /** @arg A one day history is not extrapolated over a year: every annualized item stays 0 */
+    /** @arg A one day history is not extrapolated over a year: the annualized items stay undefined,
+     * and the compound growth rate is undefined whatever the return is */
     TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
     tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
     tm->sell(Datetime(199911170000LL), stock, 11.0, MAX_DOUBLE);
@@ -395,7 +396,7 @@ TEST_CASE("test_Performance_annualized_short_range") {
     CHECK_EQ(p.get("Trade Opportunities per Year"), 0.0);
     CHECK_EQ(p.get("Annual Expected R-Multiple"), 0.0);
     CHECK_EQ(p.get("Account Avg Annual Return %"), 0.0);
-    CHECK_EQ(p.get("Account CAGR %"), 0.0);
+    CHECK_UNARY(std::isnan(p.get("Account CAGR %")));
 
     /** @arg Two days means years = 2/365: one closed trade is 365/2 opportunities per year, the
      * risk is 10 * 100 = 1000 so the single R multiple is 0.1, and the return is annualized over
@@ -462,6 +463,84 @@ TEST_CASE("test_Performance_time_axis_whole_days") {
     /** @arg The flat time statistics use the same axis: two days in range, one of them held */
     CHECK_EQ(p.get("Total Time Flat"), 1.0);
     CHECK_EQ(p.get("Time Flat / Total Time %"), doctest::Approx(50.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_undefined_ratios") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg Without a losing side the profit factor and the win/loss ratio are undefined, not 0 */
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911180000LL));
+    CHECK_EQ(p.get("Number of Winning Trades"), 1);
+    CHECK_EQ(p.get("Total Loss of Losing Trades"), 0.0);
+    CHECK_EQ(p.get("Avg Loss per Losing Trade"), 0.0);
+    CHECK_UNARY(std::isnan(p.get("Profit Factor")));
+    CHECK_UNARY(std::isnan(p.get("Avg Win / Avg Loss Ratio")));
+
+    /** @arg report prints N/A for the undefined items */
+    CHECK_UNARY(p.report().find("N/A") != string::npos);
+
+    /** @arg Without any closed trade both ratios are undefined as well */
+    TradeManagerPtr idle = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    Performance q;
+    q.statistics(idle, Datetime(199901010000LL));
+    CHECK_EQ(q.get("Total Closed Trades"), 0.0);
+    CHECK_UNARY(std::isnan(q.get("Profit Factor")));
+    CHECK_UNARY(std::isnan(q.get("Avg Win / Avg Loss Ratio")));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_reset_clears_all") {
+    Performance p;
+    p.setValue("Profit Factor", Null<double>());
+    p.setValue("Account Initial Capital", 5.0);
+
+    /** @arg reset clears both the defined and the undefined items */
+    p.reset();
+    PriceList values = p.values();
+    for (size_t i = 0; i < values.size(); ++i) {
+        CHECK_EQ(values[i], 0.0);
+    }
+    CHECK_EQ(p.get("Profit Factor"), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_reuse_no_stale_state") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    Performance p;
+
+    /** @arg An all winning account leaves the ratios undefined */
+    TradeManagerPtr win_tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    win_tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    win_tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+    p.statistics(win_tm, Datetime(199911180000LL));
+    CHECK_UNARY(std::isnan(p.get("Profit Factor")));
+
+    /** @arg Reusing the instance for an account with losses recomputes the ratios */
+    TradeManagerPtr mix_tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    mix_tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    mix_tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+    mix_tm->buy(Datetime(199911180000LL), stock, 10.0, 100);
+    mix_tm->sell(Datetime(199911190000LL), stock, 9.0, MAX_DOUBLE);
+    p.statistics(mix_tm, Datetime(199911190000LL));
+    CHECK_EQ(p.get("Profit Factor"), 1.0);
+    CHECK_EQ(p.get("Avg Win / Avg Loss Ratio"), 1.0);
+
+    /** @arg Switching to an idle account clears the previous values instead of keeping them */
+    TradeManagerPtr idle = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    p.statistics(idle, Datetime(199901010000LL));
+    CHECK_EQ(p.get("Total Closed Trades"), 0.0);
+    CHECK_EQ(p.get("Total Profit of Winning Trades"), 0.0);
+    CHECK_EQ(p.get("Win Rate %"), 0.0);
+    CHECK_UNARY(std::isnan(p.get("Profit Factor")));
+    CHECK_UNARY(std::isnan(p.get("Avg Win / Avg Loss Ratio")));
 }
 
 /** @} */

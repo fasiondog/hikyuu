@@ -13,6 +13,8 @@
   不依赖任何单一市场的交易日历（hikyuu 面向多资产、多策略混合场景）。
 - 年化因子统一为 **sqrt(365)**（自然日）。
 - 年化收益的时长为自然日：``years = 自然日数 / 365``。
+- **报告显示**：``report()`` 对空值（非有限值）统计项显示为 ``N/A``。
+- **重置语义**：``reset()`` 清零全部统计值（包括空值项），空值只由本轮 ``statistics()`` 产生，不会跨次残留。
 - 收益相关指标以**净资产** ``net_assets = 现金 + 多头市值 - 空头市值 - 借入现金`` 为口径（不把借入资金计入分子），
   分母为累计净投入 ``total_base = 累计入金 - 累计出金 + 累计入券 - 累计出券``。
 
@@ -42,7 +44,7 @@
 - **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / total_base``。
 - **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``。
 - **Account CAGR %**：账户年复合收益率，``100 * ((net_assets / total_base) ^ (1 / years) - 1)``；
-  当 ``net_assets <= 0``（爆仓/深度亏损）时返回 NaN（空值），不进入报告。
+  当 ``net_assets <= 0``（爆仓/深度亏损）、``total_base <= 0``（无投入）或统计区间不足 2 天时为空值（NaN）。
 - **Account Time-Weighted Return %**（扩展）：时间加权收益率，剔除出入金影响。按日收益
   ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``（``flow_t`` 为当日净入金）累积得到净值指数
   ``E = ∏(1 + r_t)``，年化 ``100 * (E ^ (1 / years) - 1)``。
@@ -59,8 +61,8 @@
 - **Number of Winning Trades** / **Number of Losing Trades**：盈利 / 亏损交易笔数。
 - **Win Rate %**：胜率，``100 * 盈利笔数 / 已平仓笔数``。
 - **Avg Profit per Winning Trade** / **Avg Loss per Losing Trade**：平均每笔盈利 / 平均每笔亏损。
-- **Avg Win / Avg Loss Ratio**：盈亏比，``平均盈利 / |平均亏损|``。
-- **Profit Factor**：盈利因子，``盈利总额 / |亏损总额|``。
+- **Avg Win / Avg Loss Ratio**：盈亏比，``平均盈利 / |平均亏损|``；无亏损交易时为空值（NaN）。
+- **Profit Factor**：盈利因子，``盈利总额 / |亏损总额|``；无亏损交易时为空值（NaN）。
 - **Profit Expectancy**：盈利期望值（金额口径），``胜率 * 平均盈利 + (1 - 胜率) * 平均亏损``。
 - **Largest Single Win** / **Largest Single Loss**：最大单笔盈利 / 最大单笔亏损。
 - **Largest Single Win %** / **Largest Single Loss %**：最大单笔盈利百分比 / 最大单笔亏损百分比，
