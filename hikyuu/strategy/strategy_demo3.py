@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 #
 # Warning: Hikyuu is a quantitative research tool and does not include a programmatic trading interface itself. This part is only an example of the strategy scheduling runtime,

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 #
 # Create on: 2024-03-11
 #    Author: fasiondog

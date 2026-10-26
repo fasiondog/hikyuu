@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,

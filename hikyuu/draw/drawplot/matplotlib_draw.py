@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 # cp936
 """
 Draw the related charts in the interactive mode, such as the K-line chart and the American K-line chart
