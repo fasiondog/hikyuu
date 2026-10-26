@@ -49,10 +49,10 @@ AllocateFundsBase::Weights MultiFactorAllocateFunds::_allocate(const Datetime& d
         // SE is not configured / a non-rebalancing day / all the scores are zero: fall back to the
         // equal weight, to avoid the zero weight causing the failure to allocate (notified once
         // per instance: it is a normal state on the non-rebalancing days)
-        if (!m_warned_zero_score) {
-            m_warned_zero_score = true;
-            HKU_WARN("AF_MultiFactor: all SE score is zero/absent, fallback to equal weight! [{}]",
-                     name());
+        if (!m_zero_score_notified) {
+            m_zero_score_notified = true;
+            HKU_DEBUG("AF_MultiFactor: all SE score is zero/absent, fallback to equal weight [{}]",
+                      name());
         }
         if (!contexts.empty()) {
             weights.assign(contexts.size(), 1.0 / contexts.size());

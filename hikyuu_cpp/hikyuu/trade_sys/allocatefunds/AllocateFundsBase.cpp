@@ -165,9 +165,9 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
     // The pricing policy: a fixed quota per sub-system when fixed_amount>0 (AF_FixedAmount),
     // otherwise weight x the parent net assets (the parent valuation is needed only there).
     double fixed_amount = getParam<double>("fixed_amount");
-    if (fixed_amount > 0.0 && !m_warned_fixed_amount) {
-        m_warned_fixed_amount = true;
-        HKU_WARN("{}: fixed_amount > 0 takes precedence over the weights in the pricing!", m_name);
+    if (fixed_amount > 0.0 && !m_fixed_amount_notified) {
+        m_fixed_amount_notified = true;
+        HKU_DEBUG("{}: fixed_amount > 0 takes precedence over the weights in the pricing", m_name);
     }
     double eq = 1.0 / contexts.size();
     double net_assets = (mode == "B" && tm) ? tm->getFunds(date, query.kType()).net_assets() : 0.0;
@@ -212,16 +212,16 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
                 double n = std::floor(cap / fixed_amount + 1e-9);
                 if (n < static_cast<double>(quota_count)) {
                     fixed_fit = static_cast<size_t>(n);
-                    HKU_WARN(
+                    HKU_DEBUG(
                       "{}: max_total_position({}) x net assets({:.2f}) funds only {} of the {} "
-                      "sub-systems at fixed_amount({}), the rest get a zero quota!",
+                      "sub-systems at fixed_amount({}), the rest get a zero quota",
                       m_name, max_total, net_assets, fixed_fit, quota_count, fixed_amount);
                 }
             } else if (std::isfinite(sum_w) && sum_w * net_assets > cap * (1.0 + 1e-9)) {
                 double scale = cap / (sum_w * net_assets);
-                HKU_WARN(
+                HKU_DEBUG(
                   "{}: the aggregated quota({:.2f}) exceeds max_total_position({}) x net "
-                  "assets({:.2f}), scaled by {:.4f}!",
+                  "assets({:.2f}), scaled by {:.4f}",
                   m_name, sum_w * net_assets, max_total, net_assets, scale);
                 for (auto& kv : result) {
                     kv.second *= scale;
@@ -398,9 +398,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             target_value[stk] = target;
         }
         if (funded < eligible) {
-            HKU_WARN(
+            HKU_DEBUG(
               "{}::_toTargets: max_total_position({}) x net assets({:.2f}) funds only {} of the "
-              "{} fixed_amount targets, the rest are driven flat!",
+              "{} fixed_amount targets, the rest are driven flat",
               m_name, max_total, parent_net, funded, eligible);
         }
     }
@@ -434,9 +434,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // truncated above, so their gross never exceeds the cap
     if (max_total > 0.0 && parent_net > 0.0 && gross > parent_net * max_total) {
         double scale = parent_net * max_total / gross;
-        HKU_WARN(
+        HKU_DEBUG(
           "{}::_toTargets: the aggregated gross target({:.2f}) exceeds max_total_position({}) x "
-          "net assets({:.2f}), scaled by {:.4f}!",
+          "net assets({:.2f}), scaled by {:.4f}",
           m_name, gross, max_total, parent_net, scale);
         for (auto& kv : target_value) {
             kv.second *= scale;
@@ -451,8 +451,8 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         price_t p = price[stock];
         double unit = stock.unit();
         if (p <= 0.0 || unit <= 0.0) {
-            HKU_WARN("{}::_toTargets: skip {}, no quote or no contract unit!", m_name,
-                     stock.market_code());
+            HKU_DEBUG("{}::_toTargets: skip {}, no quote or no contract unit", m_name,
+                      stock.market_code());
             continue;
         }
         double target_shares = kv.second / (p * unit);
@@ -526,8 +526,8 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
           (o.type == SuggestionType::BUY) || (o.type == SuggestionType::SELL && o.short_side);
         double min_trade = o.stock.minTradeNumber();
         if (needs_lot && min_trade > 0.0 && o.number < min_trade) {
-            HKU_WARN("Skip the opening leg of {} ({:.0f}), it is below one lot!",
-                     o.stock.market_code(), o.number);
+            HKU_DEBUG("Skip the opening leg of {} ({:.0f}), it is below one lot",
+                      o.stock.market_code(), o.number);
             continue;
         }
         filtered.push_back(o);

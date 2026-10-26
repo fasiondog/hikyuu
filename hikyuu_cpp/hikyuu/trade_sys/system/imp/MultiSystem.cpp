@@ -363,8 +363,8 @@ void MultiSystem::_reset() {
     m_kdata_cache_mark = Datetime();
     // The one-shot notices must become visible again after a reset: the risks they report
     // (truncated injection, dropped pending batch, skipped net-short calibration) still apply
-    m_open_pending_warned = false;
-    m_inject_truncated_warned = false;
+    m_open_pending_notified = false;
+    m_inject_truncated_notified = false;
     m_short_reduce_warned = false;
     m_short_inject_warned = false;
     m_no_se_cycle_warned = false;
@@ -379,8 +379,8 @@ void MultiSystem::_reset() {
     m_last_sampled_date = Datetime();
     m_external_quota = 0.0;
     m_external_quota_set = false;
-    m_external_delegate_warned = false;
-    m_external_quota_capped_warned = false;
+    m_external_delegate_notified = false;
+    m_external_quota_capped_notified = false;
     m_multi_parent_warned = false;
     m_not_ready_warned = false;
     m_pending_calibration_retry = false;
@@ -425,8 +425,8 @@ void MultiSystem::_forceResetAll() {
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
     // The one-shot notices must become visible again after a full reset
-    m_open_pending_warned = false;
-    m_inject_truncated_warned = false;
+    m_open_pending_notified = false;
+    m_inject_truncated_notified = false;
     m_short_reduce_warned = false;
     m_short_inject_warned = false;
     m_no_se_cycle_warned = false;
@@ -441,8 +441,8 @@ void MultiSystem::_forceResetAll() {
     m_last_sampled_date = Datetime();
     m_external_quota = 0.0;
     m_external_quota_set = false;
-    m_external_delegate_warned = false;
-    m_external_quota_capped_warned = false;
+    m_external_delegate_notified = false;
+    m_external_quota_capped_notified = false;
     m_multi_parent_warned = false;
     m_not_ready_warned = false;
     m_pending_calibration_retry = false;
@@ -722,11 +722,11 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
             inner->m_external_quota_set = true;
         } else {
             if (!delegatable && inner && inner->getMode() == "B" && quota > 0.0 &&
-                !m_external_delegate_warned) {
-                m_external_delegate_warned = true;
-                HKU_WARN(
+                !m_external_delegate_notified) {
+                m_external_delegate_notified = true;
+                HKU_DEBUG(
                   "The nested mode B {} has no AF to consume the delegated quota, fall back to "
-                  "the direct pro rata reduction!",
+                  "the direct pro rata reduction",
                   inner->name());
             }
             if (quota > 0.0 && reduce_base > quota) {
@@ -857,11 +857,11 @@ price_t MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& d
     if (diff > parent_cash_limit) {
         // The gap is truncated by the remaining parent cash: without a notice the under-funded
         // sub-system would silently stay below its quota (once per instance, to avoid flooding)
-        if (!m_inject_truncated_warned) {
-            m_inject_truncated_warned = true;
-            HKU_WARN(
+        if (!m_inject_truncated_notified) {
+            m_inject_truncated_notified = true;
+            HKU_DEBUG(
               "{}: the mode B gap injection of the sub {} is truncated by the parent cash "
-              "({:.2f} available < {:.2f} needed)!",
+              "({:.2f} available < {:.2f} needed)",
               name(), sys->name(), parent_cash_limit, diff);
         }
         diff = parent_cash_limit;
@@ -915,8 +915,8 @@ void MultiSystem::_clearSubSystemAccounts(const SystemPtr& sys, const Datetime& 
 
 void MultiSystem::_discardOpenPending(const string& reason) {
     if (!m_open_pending_suggestions.empty()) {
-        HKU_WARN("{}: discard {} suggestion(s) queued for the next open ({})", name(),
-                 m_open_pending_suggestions.size(), reason);
+        HKU_DEBUG("{}: discard {} suggestion(s) queued for the next open ({})", name(),
+                  m_open_pending_suggestions.size(), reason);
         m_open_pending_suggestions.clear();
         m_open_pending_date = Datetime();
         m_open_pending_assets = 0.0;
@@ -1884,11 +1884,11 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
     // fills that already happened, so they are merged into the new batch instead (the prices are
     // re-set at the next open).
     if (!m_open_pending_suggestions.empty() && !m_open_pending_retry) {
-        if (!m_open_pending_warned) {
-            m_open_pending_warned = true;
-            HKU_WARN(
+        if (!m_open_pending_notified) {
+            m_open_pending_notified = true;
+            HKU_DEBUG(
               "{}: un-executed open pending suggestions ({} from {}) were never consumed, "
-              "dropped and replaced by the latest batch!",
+              "dropped and replaced by the latest batch",
               name(), m_open_pending_suggestions.size(), m_open_pending_date);
         }
         m_open_pending_suggestions.clear();
@@ -2059,8 +2059,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         }
         // No quote (e.g. suspended): a 0-price sell would wipe the holding, skip it
         if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock, false))) {
-            HKU_WARN("Skip the SELL suggestion, {} cannot be traded on {}!", s.stock.market_code(),
-                     date);
+            HKU_DEBUG("Skip the SELL suggestion, {} cannot be traded on {}", s.stock.market_code(),
+                      date);
             continue;
         }
         TradeRecord tr = s.short_side ? m_tm->sellShort(date, s.stock, s.plan_price, num, 0.0, 0.0,
@@ -2135,9 +2135,9 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         double available = cash - need_cover_cash;
         if (available < need_buy_cash) {
             cash_scale = available > 0.0 ? available / need_buy_cash : 0.0;
-            HKU_WARN(
+            HKU_DEBUG(
               "The BUY suggestions need {:.2f} cash but only {:.2f} left after the covers, scale "
-              "down by {:.2f}!",
+              "down by {:.2f}",
               need_buy_cash, available, cash_scale);
         }
     }
@@ -2149,8 +2149,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             continue;
         }
         if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock, true))) {
-            HKU_WARN("Skip the BUY suggestion, {} cannot be traded on {}!", s.stock.market_code(),
-                     date);
+            HKU_DEBUG("Skip the BUY suggestion, {} cannot be traded on {}", s.stock.market_code(),
+                      date);
             continue;
         }
         double short_num = m_tm->getShortPosition(s.stock).number;
@@ -2182,8 +2182,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             continue;
         }
         if (s.plan_price <= 0.0 || (check_tradable && !_isTradableAt(date, s.stock, true))) {
-            HKU_WARN("Skip the BUY suggestion, {} cannot be traded on {}!", s.stock.market_code(),
-                     date);
+            HKU_DEBUG("Skip the BUY suggestion, {} cannot be traded on {}", s.stock.market_code(),
+                      date);
             continue;
         }
         double min_trade = s.stock.minTradeNumber();
@@ -2204,9 +2204,9 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             double cap_qty =
               (unit_price > 0.0) ? std::floor(power / unit_price / min_trade) * min_trade : 0.0;
             if (cap_qty < qty) {
-                HKU_WARN(
+                HKU_DEBUG(
                   "The BUY leg of {} is reduced from {:.0f} to {:.0f} by the financing buying "
-                  "power!",
+                  "power",
                   s.stock.market_code(), qty, cap_qty);
                 qty = cap_qty;
             }
@@ -2480,8 +2480,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     if (!m_trade_on_close && !m_pending_calibration_retry && !m_pending_calibration.empty() &&
         !m_pending_calibration_date.isNull() &&
         m_pending_calibration_date.startOfDay() != datetime.startOfDay()) {
-        HKU_WARN("{}: un-executed deferred calibration legs from {} dropped on {}!", name(),
-                 m_pending_calibration_date, datetime);
+        HKU_DEBUG("{}: un-executed deferred calibration legs from {} dropped on {}", name(),
+                  m_pending_calibration_date, datetime);
         m_pending_calibration.clear();
         m_pending_calibration_date = Datetime();
         m_pending_calibration_assets = 0.0;
@@ -2626,11 +2626,11 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 if (fixed_amount <= 0.0 && max_total > 0.0 && max_total < 1.0) {
                     price_t cap = max_total * m_tm->getFunds(datetime, ktype).net_assets();
                     if (budget > cap) {
-                        if (!m_external_quota_capped_warned) {
-                            m_external_quota_capped_warned = true;
-                            HKU_WARN(
+                        if (!m_external_quota_capped_notified) {
+                            m_external_quota_capped_notified = true;
+                            HKU_DEBUG(
                               "The delegated quota {:.2f} exceeds the inner reserve cap "
-                              "{:.2f} (max_total_position), capped!",
+                              "{:.2f} (max_total_position), capped",
                               budget, cap);
                         }
                         budget = cap;
@@ -3412,7 +3412,7 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
 
     // trace: output the rebalancing suggestions and trades
     if (getParam<bool>("trace")) {
-        HKU_INFO("[{}] {} adjust suggestions={} executed={}", getPath(), name(), suggestions.size(),
+        HKU_INFO_IF(!suggestions.empty(), "[{}] {} | {} adjust suggestions={} executed={}", getPath(), datetime.ymd(), name(), suggestions.size(),
                  executed.size());
         for (auto& s : suggestions) {
             const char* typ = s.type == SuggestionType::BUY

@@ -242,8 +242,8 @@ protected:
     bool m_is_python_object{false};
 
     // The one-shot notices are per instance, not per process: a shared flag would hide the
-    // diagnostics of every other portfolio / backtest once the first instance warned
-    mutable bool m_warned_fixed_amount{false};
+    // diagnostics of every other portfolio / backtest once the first instance printed them
+    mutable bool m_fixed_amount_notified{false};
     mutable bool m_warned_short_unsupported{false};
 
 //============================================

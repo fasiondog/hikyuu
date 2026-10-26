@@ -781,23 +781,23 @@ private:
     price_t m_external_quota{0.0};  // The quota assigned by the outer mode B layer (the
                                     // inner layer scales its leaf quotas to this total)
     bool m_external_quota_set{false};
-    bool m_external_delegate_warned{false};  // The once-per-instance flag of the nested B fallback
-                                             // warning when the inner cannot consume the budget
+    bool m_external_delegate_notified{false};  // The once-per-instance notice of the nested B
+                                               // fallback when the inner cannot consume the budget
     bool m_multi_parent_warned{false};       // A child driven by another aggregate is warned once
     bool m_not_ready_warned{false};          // Driving without readyForRun is warned once
-    bool m_external_quota_capped_warned{false};  // The once-per-instance flag of the delegated
-                                                 // quota capped by the inner reserve
+    bool m_external_quota_capped_notified{false};  // The once-per-instance notice of the delegated
+                                                   // quota capped by the inner reserve
     bool m_pending_calibration_retry{false};     // The pending calibration is a retry of a previous
                                                  // suspension, exempt from the cross-day drop
     Datetime m_open_turnover_date;               // The rebalancing close whose mode C open fills
                                     // carry the turnover (trade_on_close=false); the modes
                                     // A/B attribute through m_open_pending_adjust
     double m_open_turnover_assets{0.0};     // The assets before that close stage
-    bool m_open_pending_warned{false};      // The once-per-instance flag of the cross-day pending
-                                            // backlog warning (runtime state, not serialized)
-    bool m_inject_truncated_warned{false};  // The once-per-instance flag of the parent-cash
-                                            // truncation warning of the mode B gap injection
-                                            // (runtime state, not serialized)
+    bool m_open_pending_notified{false};    // The once-per-instance notice of the cross-day pending
+                                            // backlog (runtime state, not serialized)
+    bool m_inject_truncated_notified{false};  // The once-per-instance notice of the parent-cash
+                                              // truncation of the mode B gap injection (runtime
+                                              // state, not serialized)
     std::set<System*> m_shadow_sys;         // The sub-systems whose shadow account has been created
                                             // (runtime, not serialized)
     // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides

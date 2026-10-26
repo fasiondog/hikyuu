@@ -43,7 +43,7 @@ public:
                               const string& mode) override;
 
 private:
-    mutable bool m_warned_zero_score{false};
+    mutable bool m_zero_score_notified{false};
 };
 
 }  // namespace hku
