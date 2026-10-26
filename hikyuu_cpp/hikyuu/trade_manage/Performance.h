@@ -28,7 +28,7 @@ public:
     Performance(Performance&& other) noexcept
     : m_result(std::move(other.m_result)), m_keys(std::move(other.m_keys)) {}
 
-    Performance& operator=(const Performance& other) noexcept;
+    Performance& operator=(const Performance& other);
     Performance& operator=(Performance&& other) noexcept;
 
     /** Whether it is a valid statistics item

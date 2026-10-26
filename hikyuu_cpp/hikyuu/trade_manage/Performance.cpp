@@ -204,7 +204,7 @@ bool Performance::exist(const string& key) const {
     return !new_key.empty() && m_result.count(new_key) != 0;
 }
 
-Performance& Performance::operator=(const Performance& other) noexcept {
+Performance& Performance::operator=(const Performance& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = other.m_result;
     m_keys = other.m_keys;
