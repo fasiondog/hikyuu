@@ -1693,7 +1693,8 @@ TEST_CASE("test_MultiSystem_performance_optimal_se") {
     auto dates = StockManager::instance().getTradingCalendar(query);
     REQUIRE_GT(dates.size(), 20);
 
-    for (const string& mode : {"A", "B", "C"}) {
+    vector<string> mode_list{"A", "B", "C"};
+    for (const string& mode : mode_list) {
         auto se = SE_PerformanceOptimal();
         se->setParam<int>("train_len", 10);
         se->setParam<int>("test_len", 5);
