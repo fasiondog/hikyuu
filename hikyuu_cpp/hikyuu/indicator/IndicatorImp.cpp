@@ -1016,14 +1016,24 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         return false;
     }
 
+    // The shift below assumes that the old context fits inside the new one, i.e. every old value
+    // has a place in the new buffer. A buffer bound to a fabricated context (a cached result
+    // holding more records than the real K-line data, e.g. duplicated rows) breaks that
+    // assumption; shifting and the null fill would then run past the end of the buffer, so the
+    // full recalculation is used instead.
     size_t total = m_context.size();
-    size_t copy_len = m_old_context.size() - copy_start_pos;
+    size_t old_total = m_old_context.size();
+    if (copy_start_pos > old_total || old_total - copy_start_pos > total) {
+        return false;
+    }
+
+    size_t copy_len = old_total - copy_start_pos;
     if (copy_len < m_discard) {
         return false;
     }
 
     size_t start_pos = m_context.getPos(m_old_context.back().datetime);
-    if (start_pos == Null<size_t>()) {
+    if (start_pos == Null<size_t>() || start_pos > total) {
         return false;
     }
 
