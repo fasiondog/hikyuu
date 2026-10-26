@@ -30,13 +30,13 @@ reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
 ; Shared memory (SHM) data service: the server must be started explicitly by calling start_shm_server() in some process (a standalone VIP plugin, valid authorization required)
-; The following switch is disabled by default; when no server is running, the process automatically loads all data in standalone mode; uncomment and set it to True to connect as a client to an existing service
-;use_shm_server = True
+; The following switch is disabled by default (False); when no server is running, the process automatically loads all data in standalone mode; set it to True to connect as a client to an existing service
+use_shm_server = False
 ; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
 ; IPC runtime directory of the shm data service (socket / lock / segment record files)
 ; Change it to an absolute path shared between the host and docker containers mounted at the same location if needed
-shm_ipc_dir = {home}/.hikyuu/ipc
+shm_ipc_dir = {shm_ipc_dir}
 
 [block]
 type = sqlite3
@@ -112,13 +112,13 @@ reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
 ; Shared memory (SHM) data service: the server must be started explicitly by calling start_shm_server() in some process (a standalone VIP plugin, valid authorization required)
-; The following switch is disabled by default; when no server is running, the process automatically loads all data in standalone mode; uncomment and set it to True to connect as a client to an existing service
-;use_shm_server = True
+; The following switch is disabled by default (False); when no server is running, the process automatically loads all data in standalone mode; set it to True to connect as a client to an existing service
+use_shm_server = False
 ; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
 ; IPC runtime directory of the shm data service (socket / lock / segment record files)
 ; Change it to an absolute path shared between the host and docker containers mounted at the same location if needed
-shm_ipc_dir = {home}/.hikyuu/ipc
+shm_ipc_dir = {shm_ipc_dir}
 
 [block]
 type = mysql
@@ -181,13 +181,13 @@ reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
 ; Shared memory (SHM) data service: the server must be started explicitly by calling start_shm_server() in some process (a standalone VIP plugin, valid authorization required)
-; The following switch is disabled by default; when no server is running, the process automatically loads all data in standalone mode; uncomment and set it to True to connect as a client to an existing service
-;use_shm_server = True
+; The following switch is disabled by default (False); when no server is running, the process automatically loads all data in standalone mode; set it to True to connect as a client to an existing service
+use_shm_server = False
 ; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
 ; IPC runtime directory of the shm data service (socket / lock / segment record files)
 ; Change it to an absolute path shared between the host and docker containers mounted at the same location if needed
-shm_ipc_dir = {home}/.hikyuu/ipc
+shm_ipc_dir = {shm_ipc_dir}
 
 [block]
 type = clickhouse
@@ -354,7 +354,7 @@ def generate_default_config():
     data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
     hdf5_config = hdf5_template.format(
         dir=data_dir,
-        home=user_dir,
+        shm_ipc_dir=f"{user_dir}/.hikyuu/ipc",
         reload_time="00:00",
         quotation_server='ipc:///tmp/hikyuu_real.ipc',
         lazy_preload=False,

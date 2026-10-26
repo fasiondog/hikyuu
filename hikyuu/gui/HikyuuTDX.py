@@ -100,6 +100,39 @@ class EmittingStream(QObject):
         pass
 
 
+# 界面无对应控件的 [hikyuu] 键一律沿用旧 hikyuu.ini，有控件的键以当前界面为准
+_GUI_HIKYUU_KEYS = ('tmpdir', 'datadir', 'lazy_preload')
+
+
+def _restore_manual_hikyuu_keys(template, old_hikyuu):
+    """回填旧 hikyuu.ini 中手工调整的键：模板已有行（含注释行）原地替换，模板未包含的键追附到 [hikyuu] 段尾"""
+    values = {k: v.replace('{', '{{').replace('}', '}}')
+              for k, v in old_hikyuu.items() if k not in _GUI_HIKYUU_KEYS}
+    lines = template.splitlines()
+    start = next((i for i, line in enumerate(lines) if line.strip() == '[hikyuu]'), -1)
+    if start < 0:
+        return template
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith('[')), len(lines))
+    known = set()
+    for i in range(start + 1, end):
+        stripped = lines[i].lstrip(';').strip()
+        if '=' not in stripped:
+            continue
+        key = stripped.split('=', 1)[0].strip()
+        if not key or ' ' in key:
+            continue
+        known.add(key)
+        if key in values:
+            lines[i] = '%s = %s' % (key, values[key])
+    extra = ['%s = %s' % (k, v) for k, v in values.items() if k not in known]
+    if extra:
+        insert_at = end
+        while insert_at > start + 1 and not lines[insert_at - 1].strip():
+            insert_at -= 1
+        lines[insert_at:insert_at] = extra
+    return '\n'.join(lines)
+
+
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, capture_output=False):
         super(MyMainWindow, self).__init__(parent)
@@ -270,9 +303,13 @@ li.checked::marker { content: "\2612"; }
         old_config = ConfigParser()
         if os.path.exists(filename):
             old_config.read(filename, encoding='utf-8')
-        old_reload_time = "00:00"
+        # 界面无对应控件的 [hikyuu] 键一律沿用旧 hikyuu.ini
+        old_hikyuu = {}
         if old_config.has_section('hikyuu'):
-            old_reload_time = old_config.get('hikyuu', 'reload_time', fallback="00:00")
+            old_hikyuu = dict(old_config.items('hikyuu', raw=True))
+        old_reload_time = old_hikyuu.get('reload_time', "00:00")
+        old_quotation_server = old_hikyuu.get('quotation_server', 'ipc:///tmp/hikyuu_real.ipc')
+        old_shm_ipc_dir = old_hikyuu.get('shm_ipc_dir', os.path.expanduser('~') + '/.hikyuu/ipc')
 
         if current_config.getboolean('hdf5', 'enable', fallback=True):
             data_dir = current_config['hdf5']['dir']
@@ -281,15 +318,15 @@ li.checked::marker { content: "\2612"; }
                     os.mkdir(data_dir + '/tmp')
                 except:
                     pass
+            template = _restore_manual_hikyuu_keys(hku_config_template.hdf5_template, old_hikyuu)
             # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(
-                    hku_config_template.hdf5_template.format(
+                    template.format(
                         dir=data_dir, reload_time=old_reload_time,
-                        home=os.path.expanduser('~'),
+                        shm_ipc_dir=old_shm_ipc_dir,
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
-                        quotation_server=current_config.get(
-                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
+                        quotation_server=old_quotation_server,
                         day=current_config.getboolean('preload', 'day', fallback=True),
                         week=current_config.getboolean('preload', 'week', fallback=False),
                         month=current_config.getboolean('preload', 'month', fallback=False),
@@ -328,15 +365,15 @@ li.checked::marker { content: "\2612"; }
                     os.mkdir(data_dir + '/tmp')
                 except:
                     pass
+            template = _restore_manual_hikyuu_keys(hku_config_template.mysql_template, old_hikyuu)
             with open(filename, 'w', encoding="utf-8") as f:
                 f.write(
-                    hku_config_template.mysql_template.format(
+                    template.format(
                         dir=data_dir,
                         reload_time=old_reload_time,
-                        home=os.path.expanduser('~'),
+                        shm_ipc_dir=old_shm_ipc_dir,
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
-                        quotation_server=current_config.get(
-                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
+                        quotation_server=old_quotation_server,
                         host=current_config['mysql']['host'],
                         port=current_config['mysql']['port'],
                         usr=current_config['mysql']['usr'],
@@ -378,15 +415,15 @@ li.checked::marker { content: "\2612"; }
                     os.mkdir(data_dir + '/tmp')
                 except:
                     pass
+            template = _restore_manual_hikyuu_keys(hku_config_template.clickhouse_template, old_hikyuu)
             with open(filename, 'w', encoding="utf-8") as f:
                 f.write(
-                    hku_config_template.clickhouse_template.format(
+                    template.format(
                         dir=data_dir,
                         reload_time=old_reload_time,
-                        home=os.path.expanduser('~'),
+                        shm_ipc_dir=old_shm_ipc_dir,
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
-                        quotation_server=current_config.get(
-                            'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
+                        quotation_server=old_quotation_server,
                         host=current_config['clickhouse']['host'],
                         port=current_config['clickhouse']['port'],
                         usr=current_config['clickhouse']['usr'],
