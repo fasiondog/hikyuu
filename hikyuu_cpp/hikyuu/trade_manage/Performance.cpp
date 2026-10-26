@@ -204,7 +204,7 @@ bool Performance::exist(const string& key) const {
     return !new_key.empty() && m_result.count(new_key) != 0;
 }
 
-Performance& Performance::operator=(const Performance& other) noexcept {
+Performance& Performance::operator=(const Performance& other) {
     HKU_IF_RETURN(this == &other, *this);
     m_result = other.m_result;
     m_keys = other.m_keys;
@@ -219,11 +219,8 @@ Performance& Performance::operator=(Performance&& other) noexcept {
 }
 
 void Performance::reset() {
-    map_type::iterator iter = m_result.begin();
-    for (; iter != m_result.end(); ++iter) {
-        if (!std::isnan(iter->second)) {
-            iter->second = 0.0;
-        }
+    for (auto& item : m_result) {
+        item.second = 0.0;
     }
 }
 
@@ -296,9 +293,15 @@ string Performance::report() const {
     for (const auto& key : m_keys) {
         const string chinese = lookupChineseName(key);
         if (zh_lang && !chinese.empty()) {
-            buf << chinese << ": " << m_result.at(key) << std::endl;
+            buf << chinese << ": ";
         } else {
-            buf << htr(key.c_str()) << ": " << m_result.at(key) << std::endl;
+            buf << htr(key.c_str()) << ": ";
+        }
+        const double value = m_result.at(key);
+        if (std::isfinite(value)) {
+            buf << value << std::endl;
+        } else {
+            buf << "N/A" << std::endl;
         }
     }
     return buf.str();
@@ -507,12 +510,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
           roundEx(loss.max_continues_r / m_result["Max Consecutive Losses"], precision);
     }
 
-    if (m_result["Total Invested Principal"] != 0.0) {
-        m_result["Open Position Account Return %"] =
-          100. * (net_assets / m_result["Total Invested Principal"] - 1.);
-        m_result["Closed Trade Account Return %"] = 100. *
-                                                    m_result["Total Net Profit of Closed Trades"] /
-                                                    m_result["Total Invested Principal"];
+    if (total_money > 0.0) {
+        m_result["Open Position Account Return %"] = 100. * (net_assets / total_money - 1.);
+        m_result["Closed Trade Account Return %"] =
+          100. * m_result["Total Net Profit of Closed Trades"] / total_money;
     }
 
     if (m_result["Number of Winning Trades"] != 0.0) {
@@ -539,6 +540,8 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
           roundEx(m_result["Avg Profit per Winning Trade"] /
                     std::fabs(m_result["Avg Loss per Losing Trade"]),
                   precision);
+    } else {
+        m_result["Avg Win / Avg Loss Ratio"] = Null<double>();
     }
 
     if (m_result["Total Closed Trades"] != 0.0) {
@@ -551,6 +554,8 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     if (m_result["Total Loss of Losing Trades"] != 0.0) {
         m_result["Profit Factor"] = m_result["Total Profit of Winning Trades"] /
                                     std::fabs(m_result["Total Loss of Losing Trades"]);
+    } else {
+        m_result["Profit Factor"] = Null<double>();
     }
 
     m_result["Profit Expectancy"] =
@@ -559,30 +564,31 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
 
     int64_t duration = 0;
     if (tm->firstDatetime() != Null<Datetime>()) {
-        if (datetime == Null<Datetime>()) {
-            duration = (Datetime::now() - tm->firstDatetime()).days() + 1;
-        } else {
-            duration = (datetime - tm->firstDatetime()).days() + 1;
-        }
+        // Count whole calendar days, the same axis as the flat time statistics below
+        const Datetime end_day = datetime == Null<Datetime>() ? Datetime::now() : datetime;
+        duration = (Datetime(end_day.date()) - Datetime(tm->firstDatetime().date())).days() + 1;
     }
 
+    // All the annualized items share one gate: extrapolating a single day over a year is
+    // meaningless
     double years = duration / 365.0;
+
+    // The geometric annualization is undefined without a positive net asset value and a usable
+    // period; each statistics run writes the item, so no Null can survive from the previous run
+    m_result["Account CAGR %"] = Null<double>();
 
     if (duration > 1) {
         m_result["Trade Opportunities per Year"] = m_result["Total Closed Trades"] / years;
         m_result["Annual Expected R-Multiple"] = roundEx(
           m_result["R-Multiple Expectancy"] * m_result["Trade Opportunities per Year"], precision);
-    }
 
-    if (total_money > 0.0 && years != 0.0) {
-        m_result["Account Avg Annual Return %"] = 100 * (((net_assets / total_money) - 1) / years);
-        // The geometric annualization is defined only for a positive net asset value; a wiped
-        // out / negative account reports Null instead of polluting the report with NaN
-        if (net_assets > 0.0) {
-            m_result["Account CAGR %"] =
-              100 * (std::pow(net_assets / total_money, 1.0 / years) - 1.0);
-        } else {
-            m_result["Account CAGR %"] = Null<double>();
+        if (total_money > 0.0) {
+            m_result["Account Avg Annual Return %"] =
+              100 * (((net_assets / total_money) - 1) / years);
+            if (net_assets > 0.0) {
+                m_result["Account CAGR %"] =
+                  100 * (std::pow(net_assets / total_money, 1.0 / years) - 1.0);
+            }
         }
     }
 

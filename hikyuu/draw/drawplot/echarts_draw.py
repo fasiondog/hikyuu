@@ -1,4 +1,5 @@
 from functools import wraps
+import math
 
 from pyecharts import options as opts
 from pyecharts.charts import Kline, Scatter, Line, Bar, Grid, Page
@@ -6,7 +7,7 @@ from pyecharts.charts.base import Base as ChartBase
 from pyecharts.commons.utils import JsCode
 
 from hikyuu.core import KData, System
-from .common import get_draw_title
+from .common import get_draw_title, format_metric
 from hikyuu import *
 from hikyuu import htr
 
@@ -535,25 +536,58 @@ def sys_performance(sys, ref_stk=None):
     ref_k = ref_stk.get_kdata(query)
 
     funds_list = sys.tm.get_funds_list(ref_dates)
-    funds = [f.total_assets for f in funds_list]
-    funds = VALUE(funds)
-    funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else constant.null_price for f in funds_list]
+    funds = VALUE([f.net_assets for f in funds_list])
+    funds_return = [f.net_assets / f.total_base if f.total_base != 0.0 else constant.null_price
+                    for f in funds_list]
     funds_return = VALUE(funds_return, align_dates=ref_dates)
     funds_return.name = htr("System Cumulative Return")
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
     per = Performance()
-    text = per.report(sys.tm, sh000001_k[-1].datetime)
+    per.statistics(sys.tm, sh000001_k[-1].datetime)
+    text = per.report()
 
     # calculate the max drawdown
     max_pullback = MDD(funds)[-1]
 
-    # calculate the Sharpe ratio
-    bond = ZHBOND10(ref_dates)
-    sigma = STDEV(ROCP(funds), 0)  # n=0: the sample standard deviation of the whole period (expand-all)
-    sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
-    sharp = (per['Account Avg Annual Return %'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
+    # Sharpe ratio: the arithmetic annualized return over the sample standard deviation, both on
+    # the natural-day series with the external cash flows removed (same basis as the plugin)
+    flow_by_day = {}
+    for tr in sys.tm.get_trade_list():
+        day = Datetime(tr.datetime.date())
+        if tr.business == BUSINESS.CHECKIN:
+            flow_by_day[day] = flow_by_day.get(day, 0.0) + tr.real_price
+        elif tr.business == BUSINESS.CHECKOUT:
+            flow_by_day[day] = flow_by_day.get(day, 0.0) - tr.real_price
+
+    nat_days = []
+    day = Datetime(ref_dates[0].date())
+    end_day = Datetime(ref_dates[-1].date())
+    while day <= end_day:
+        nat_days.append(day)
+        day = day + Days(1)
+    nat_values = [f.net_assets for f in sys.tm.get_funds_list(DatetimeList(nat_days))]
+
+    rets = []
+    for i in range(1, len(nat_days)):
+        prev = nat_values[i - 1]
+        if prev <= 0.0:
+            continue
+        flow = flow_by_day.get(nat_days[i], 0.0)
+        r = (nat_values[i] - flow - prev) / prev
+        if math.isfinite(r):
+            rets.append(r)
+
+    sharp = 0.0
+    if len(rets) >= 2:
+        mean_ret = sum(rets) / len(rets)
+        var = sum((r - mean_ret) ** 2 for r in rets) / (len(rets) - 1)
+        sigma = math.sqrt(var) * math.sqrt(365) * 100.0
+        bond = ZHBOND10(ref_dates)
+        rf_vals = [bond[i] for i in range(len(bond)) if math.isfinite(bond[i])]
+        if rf_vals and sigma != 0.0:
+            sharp = (mean_ret * 365 * 100.0 - sum(rf_vals) / len(rf_vals)) / sigma
 
     invest_total = per['Total Invested Principal'] + per['Total Invested Assets']
     cur_fund = per['Current Total Assets']
@@ -561,8 +595,9 @@ def sys_performance(sys, ref_stk=None):
         invest_total, cur_fund, cur_fund - invest_total)
     t2 = htr('Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%').format(
         funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback)
-    t3 = htr('Win Rate: {:<.2f}%    Avg Win/Avg Loss: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
-        per['Win Rate %'], per['Avg Win / Avg Loss Ratio'], sharp)
+    t3 = htr('Win Rate: {}    Avg Win/Avg Loss: 1 : {}    Sharpe Ratio: {}').format(
+        format_metric(per['Win Rate %'], '%'), format_metric(per['Avg Win / Avg Loss Ratio']),
+        format_metric(sharp))
 
     line = iplot(ref_return, ref_k)
     line = iplot(funds_return, ref_k, line)

@@ -379,4 +379,193 @@ TEST_CASE("test_Performance_report") {
     CHECK_UNARY(!buf.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_Performance_annualized_short_range") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg A one day history is not extrapolated over a year: the annualized items stay undefined,
+     * and the compound growth rate is undefined whatever the return is */
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    tm->sell(Datetime(199911170000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911170000LL));
+    CHECK_EQ(p.get("Total Closed Trades"), 1);
+    CHECK_EQ(p.get("Trade Opportunities per Year"), 0.0);
+    CHECK_EQ(p.get("Annual Expected R-Multiple"), 0.0);
+    CHECK_EQ(p.get("Account Avg Annual Return %"), 0.0);
+    CHECK_UNARY(std::isnan(p.get("Account CAGR %")));
+
+    /** @arg Two days means years = 2/365: one closed trade is 365/2 opportunities per year, the
+     * risk is 10 * 100 = 1000 so the single R multiple is 0.1, and the return is annualized over
+     * the same period */
+    TradeManagerPtr tm2 = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    tm2->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    tm2->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance q;
+    q.statistics(tm2, Datetime(199911180000LL));
+    CHECK_EQ(q.get("R-Multiple Expectancy"), doctest::Approx(0.1));
+    CHECK_EQ(q.get("Trade Opportunities per Year"), doctest::Approx(365.0 / 2));
+    CHECK_EQ(q.get("Annual Expected R-Multiple"), doctest::Approx(18.25));
+    CHECK_EQ(q.get("Account Avg Annual Return %"), doctest::Approx(1.825).epsilon(0.001));
+    CHECK_EQ(q.get("Account CAGR %"), doctest::Approx(1.8417).epsilon(0.001));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_return_base_with_asset") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600004");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+
+    // The checked in stock makes base_asset non zero, so the invested base is larger than the cash
+    // principal alone
+    REQUIRE_UNARY(tm->checkinStock(Datetime(199911170000LL), stock, 10.0, 100));
+    TradeRecord sell_tr = tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+    REQUIRE_UNARY(!sell_tr.isNull());
+
+    Datetime eval_dt(199911180000LL);
+    Performance p;
+    p.statistics(tm, eval_dt);
+
+    FundsRecord funds = tm->getFunds(eval_dt, KQuery::DAY);
+    double total_base = funds.base_cash + funds.base_asset;
+
+    /** @arg The invested base covers the checked in assets as well */
+    CHECK_UNARY(total_base > funds.base_cash);
+
+    /** @arg Both return items are measured against the same total invested base */
+    CHECK_EQ(p.get("Open Position Account Return %"),
+             doctest::Approx(100.0 * (funds.net_assets() / total_base - 1.0)));
+    CHECK_EQ(p.get("Closed Trade Account Return %"),
+             doctest::Approx(100.0 * p.get("Total Net Profit of Closed Trades") / total_base));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_time_axis_whole_days") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+
+    // The trade times are intraday: 15:00 to the next day 09:00, a gap of 18 hours that counts as
+    // one day when only the hour difference is truncated
+    tm->buy(Datetime(199911171500LL), stock, 10.0, 100);
+    tm->sell(Datetime(199911180900LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911180900LL));
+
+    /** @arg The annualized items count whole calendar days, so the period is two days */
+    CHECK_EQ(p.get("Trade Opportunities per Year"), doctest::Approx(365.0 / 2));
+
+    /** @arg The flat time statistics use the same axis: two days in range, one of them held */
+    CHECK_EQ(p.get("Total Time Flat"), 1.0);
+    CHECK_EQ(p.get("Time Flat / Total Time %"), doctest::Approx(50.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_undefined_ratios") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg Without a losing side the profit factor and the win/loss ratio are undefined, not 0 */
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911180000LL));
+    CHECK_EQ(p.get("Number of Winning Trades"), 1);
+    CHECK_EQ(p.get("Total Loss of Losing Trades"), 0.0);
+    CHECK_EQ(p.get("Avg Loss per Losing Trade"), 0.0);
+    CHECK_UNARY(std::isnan(p.get("Profit Factor")));
+    CHECK_UNARY(std::isnan(p.get("Avg Win / Avg Loss Ratio")));
+
+    /** @arg report prints N/A for the undefined items */
+    CHECK_UNARY(p.report().find("N/A") != string::npos);
+
+    /** @arg Without any closed trade both ratios are undefined as well */
+    TradeManagerPtr idle = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    Performance q;
+    q.statistics(idle, Datetime(199901010000LL));
+    CHECK_EQ(q.get("Total Closed Trades"), 0.0);
+    CHECK_UNARY(std::isnan(q.get("Profit Factor")));
+    CHECK_UNARY(std::isnan(q.get("Avg Win / Avg Loss Ratio")));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_reset_clears_all") {
+    Performance p;
+    p.setValue("Profit Factor", Null<double>());
+    p.setValue("Account Initial Capital", 5.0);
+
+    /** @arg reset clears both the defined and the undefined items */
+    p.reset();
+    PriceList values = p.values();
+    for (size_t i = 0; i < values.size(); ++i) {
+        CHECK_EQ(values[i], 0.0);
+    }
+    CHECK_EQ(p.get("Profit Factor"), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_reuse_no_stale_state") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    Performance p;
+
+    /** @arg An all winning account leaves the ratios undefined */
+    TradeManagerPtr win_tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    win_tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    win_tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+    p.statistics(win_tm, Datetime(199911180000LL));
+    CHECK_UNARY(std::isnan(p.get("Profit Factor")));
+
+    /** @arg Reusing the instance for an account with losses recomputes the ratios */
+    TradeManagerPtr mix_tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    mix_tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    mix_tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+    mix_tm->buy(Datetime(199911180000LL), stock, 10.0, 100);
+    mix_tm->sell(Datetime(199911190000LL), stock, 9.0, MAX_DOUBLE);
+    p.statistics(mix_tm, Datetime(199911190000LL));
+    CHECK_EQ(p.get("Profit Factor"), 1.0);
+    CHECK_EQ(p.get("Avg Win / Avg Loss Ratio"), 1.0);
+
+    /** @arg Switching to an idle account clears the previous values instead of keeping them */
+    TradeManagerPtr idle = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    p.statistics(idle, Datetime(199901010000LL));
+    CHECK_EQ(p.get("Total Closed Trades"), 0.0);
+    CHECK_EQ(p.get("Total Profit of Winning Trades"), 0.0);
+    CHECK_EQ(p.get("Win Rate %"), 0.0);
+    CHECK_UNARY(std::isnan(p.get("Profit Factor")));
+    CHECK_UNARY(std::isnan(p.get("Avg Win / Avg Loss Ratio")));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_r_multiple_negative_risk") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+
+    // A stop loss above the entry price leaves a negative risk (-200 here): it is a real case caused by
+    // slippage, so the R multiple keeps its actual sign instead of being dropped
+    tm->buy(Datetime(199911170000LL), stock, 10.0, 100, 12.0);
+    tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911180000LL));
+
+    /** @arg The negative risk is counted, giving r = 100 / -200 = -0.5 */
+    CHECK_EQ(p.get("Total Closed Trades"), 1);
+    CHECK_EQ(p.get("Number of Winning Trades"), 1);
+    CHECK_EQ(p.get("R-Multiple Expectancy"), -0.5);
+    CHECK_EQ(p.get("Avg R-Multiple of Winning Trades"), -0.5);
+    CHECK_EQ(p.get("Max Consecutive Win R-Multiple"), -0.5);
+
+    /** @arg The single-trade extreme starts from 0, so a negative value does not replace it */
+    CHECK_EQ(p.get("Max Single Win R-Multiple"), 0.0);
+}
+
 /** @} */

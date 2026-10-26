@@ -1722,6 +1722,7 @@ TEST_CASE("test_MultiSystem_performance_optimal_se") {
             selected_count++;
             CHECK_UNARY(sw[0].sys == sys_list[0] || sw[0].sys == sys_list[1]);
         }
+
         CHECK_GT(selected_count, 0);
 
         /** @arg mode C shares the parent account, no training trade may land on it */

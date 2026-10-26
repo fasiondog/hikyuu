@@ -13,6 +13,8 @@
   不依赖任何单一市场的交易日历（hikyuu 面向多资产、多策略混合场景）。
 - 年化因子统一为 **sqrt(365)**（自然日）。
 - 年化收益的时长为自然日：``years = 自然日数 / 365``。
+- **报告显示**：``report()`` 对空值（非有限值）统计项显示为 ``N/A``。
+- **重置语义**：``reset()`` 清零全部统计值（包括空值项），空值只由本轮 ``statistics()`` 产生，不会跨次残留。
 - 收益相关指标以**净资产** ``net_assets = 现金 + 多头市值 - 空头市值 - 借入现金`` 为口径（不把借入资金计入分子），
   分母为累计净投入 ``total_base = 累计入金 - 累计出金 + 累计入券 - 累计出券``。
 
@@ -30,7 +32,7 @@
 - **Total Invested Assets**：累计投入资产（券口径）。
 - **Total Borrowed Cash**：累计借入现金。
 - **Total Borrowed Assets**：累计借入资产。
-- **Total Dividends**：累计红利（所有 BONUS 记录的现金之和）。
+- **Total Dividends**：累计红利，**仅现金红利**（所有 BONUS 记录的现金之和）；送股（GIFT）、缩股（SUOGU）等不折算为金额，不计入本项。
 - **Cash Balance**：现金余额。
 - **Open Position Net Value**：未平仓头寸市值（多头市值）。
 - **Current Total Assets**：当前总资产（毛口径，含借入资产；仅用于展示，不用于收益计算）。
@@ -38,14 +40,18 @@
 收益与年化项
 ------------
 
-- **Open Position Account Return %**：未平仓账户收益率，``100 * (net_assets / 累计投入本金 - 1)``。
-- **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / 累计投入本金``。
-- **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``。
+- **Open Position Account Return %**：账户当前总收益率（名称沿用历史，含已实现与未实现盈亏，不是仅未平仓头寸的收益），``100 * (net_assets / total_base - 1)``（``total_base`` 为累计投入本金与累计投入资产之和）。
+- **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / total_base``。
+- 上述两项在 ``total_base == 0``（无投入本金）时记为 ``0``；若本金已全部取出但账户仍有盈利现金，该值不代表真实收益，应以 **Account Time-Weighted Return %** 为准。
+- **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``；统计区间不足 2 天或无投入本金时记 ``0``（与 ``Account CAGR %`` 不同，后者在同样情形下为空值）。
 - **Account CAGR %**：账户年复合收益率，``100 * ((net_assets / total_base) ^ (1 / years) - 1)``；
-  当 ``net_assets <= 0``（爆仓/深度亏损）时返回 NaN（空值），不进入报告。
+  当 ``net_assets <= 0``（爆仓/深度亏损）、``total_base <= 0``（无投入）或统计区间不足 2 天时为空值（NaN）。
+- 上述两项的分子为**期末净资产**、分母为**累计净投入**，是「累计投入回报率」的简单/复利年化，**不是时间加权收益率**：
+  持续入金场景下偏保守（数值偏小），若期间取出本金则可能偏大。含出入金时请以 **Account Time-Weighted Return %**（TWR）为准。
 - **Account Time-Weighted Return %**（扩展）：时间加权收益率，剔除出入金影响。按日收益
   ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``（``flow_t`` 为当日净入金）累积得到净值指数
-  ``E = ∏(1 + r_t)``，年化 ``100 * (E ^ (1 / years) - 1)``。
+  ``E = ∏(1 + r_t)``，年化 ``100 * (E ^ (1 / years) - 1)``。年化时长按**有效天数**计
+  （自然日扣除净值为 ``<= 0`` 或收益非有限的日期，跳过天数会告警）；净值归零不终止统计，后续入金重启的收益继续累计。
 - **Account Money-Weighted Return %**（扩展）：资金加权收益率，即外部现金流的年化内部收益率 XIRR，
   求解 ``Σ CF_i / (1 + x) ^ ((t_i - t0) / 365) = 0``；现金流含初始投入、每笔入金（负）、出金（正）与期末净资产（正）。
 
@@ -55,12 +61,12 @@
 - **Total Closed Trades**：已平仓交易（持仓记录）总数。
 - **Total Cost of Closed Trades**：已平仓交易总成本。
 - **Total Net Profit of Closed Trades**：已平仓净利润总额，``Σ (卖出金额 - 成本 - 买入金额)``。
-- **Total Profit of Winning Trades** / **Total Loss of Losing Trades**：盈利交易盈利总额 / 亏损交易亏损总额（利润 > 0 记盈利，否则记亏损，零利润计入亏损）。
+- **Total Profit of Winning Trades** / **Total Loss of Losing Trades**：盈利交易盈利总额 / 亏损交易亏损总额（利润 > 0 记盈利，否则记亏损，零利润计入亏损，胜率因此偏保守）。
 - **Number of Winning Trades** / **Number of Losing Trades**：盈利 / 亏损交易笔数。
 - **Win Rate %**：胜率，``100 * 盈利笔数 / 已平仓笔数``。
 - **Avg Profit per Winning Trade** / **Avg Loss per Losing Trade**：平均每笔盈利 / 平均每笔亏损。
-- **Avg Win / Avg Loss Ratio**：盈亏比，``平均盈利 / |平均亏损|``。
-- **Profit Factor**：盈利因子，``盈利总额 / |亏损总额|``。
+- **Avg Win / Avg Loss Ratio**：盈亏比，``平均盈利 / |平均亏损|``；无亏损交易时为空值（NaN）。
+- **Profit Factor**：盈利因子，``盈利总额 / |亏损总额|``；无亏损交易时为空值（NaN）。
 - **Profit Expectancy**：盈利期望值（金额口径），``胜率 * 平均盈利 + (1 - 胜率) * 平均亏损``。
 - **Largest Single Win** / **Largest Single Loss**：最大单笔盈利 / 最大单笔亏损。
 - **Largest Single Win %** / **Largest Single Loss %**：最大单笔盈利百分比 / 最大单笔亏损百分比，
@@ -71,7 +77,7 @@
 R 乘数项
 --------
 
-单笔 R 乘数 ``r = 利润 / 风险``，风险 ``totalRisk = (买入价 - 止损价) * 数量 * 每手乘数``；风险为 0 时记 0。
+单笔 R 乘数 ``r = 利润 / 风险``，风险 ``totalRisk = (买入价 - 止损价) * 数量 * 每手乘数``；风险为 0 时记 0 且仍计入分母；风险为负（如滑点使成交价不高于止损价）时按实际符号计入。
 
 - **R-Multiple Expectancy**：R 乘数期望值，``Σ r / 已平仓笔数``。
 - **Avg R-Multiple of Winning Trades** / **Avg R-Multiple of Losing Trades**：盈利 / 亏损交易平均 R 乘数。
@@ -101,14 +107,16 @@ R 乘数项
 风险调整项（扩展）
 ------------------
 
-以下指标基于自然日、剔除出入金现金流后的日收益序列（``r_t = (net_assets_t - flow_t)/net_assets_{t-1} - 1``），
-年化收益分子统一使用时间加权收益 TWR：
+以下指标基于自然日、剔除出入金现金流后的日收益序列（``r_t = (net_assets_t - flow_t)/net_assets_{t-1} - 1``）；
+波动率与下行波动均取**样本标准差**（``n-1``）：
 
 - **Annual Volatility %**：年化波动率，``std(r_t) * sqrt(365) * 100``（样本标准差）。
 - **Max Drawdown %**：最大回撤，在时间加权净值指数 ``E`` 上的最大峰谷跌幅，``100 * max((peak - E) / peak)``。
-- **Sharpe Ratio**：夏普比率，``(TWR年化 * 100 - rf) / (年化波动率)``，``rf`` 为 10 年期国债收益率（%）。
-- **Sortino Ratio**：索提诺比率，``(TWR年化 * 100 - rf) / (下行年化波动)``，
-  下行年化波动 = ``sqrt(mean(min(r_t, 0)^2)) * sqrt(365) * 100``。
-- **Calmar Ratio**：卡玛比率，``TWR年化 / 最大回撤``（两者同为小数）。
+- **Sharpe Ratio**：夏普比率，``(100 * mean(r_t) * 365 - rf) / 年化波动率``（分子为算术年化收益，与分母的
+  ``sqrt(365)`` 同源）；``rf`` 为区间内 10 年期国债收益率均值（%），数据缺失时为空值。
+- **Sortino Ratio**：索提诺比率，``(100 * mean(r_t) * 365 - rf) / 下行年化波动``，
+  下行年化波动 = ``sqrt(Σ_{r<0} r^2 / (n-1)) * sqrt(365) * 100``。
+- **Calmar Ratio**：卡玛比率，``TWR年化 / 最大回撤``（两者同为小数；分子保留几何口径）。
 - **Avg Per-Trade Return %** / **Std Per-Trade Return %**：单笔交易收益率（``100 * 利润 / (买入金额 + 成本)``）的
-  均值与样本标准差；无成本记录（如分红送转）无法计算单笔收益率，予以剔除。
+  均值与样本标准差；无成本记录（如分红送转）无法计算单笔收益率，予以剔除。注意核心库的盈亏统计**不剔除**
+  这类记录，因此两处的“笔数”口径不同。

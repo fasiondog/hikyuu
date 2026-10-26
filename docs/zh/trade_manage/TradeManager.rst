@@ -600,7 +600,7 @@
 
     .. py:method:: get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo]
           
-        获取账户历史持仓扩展详情（已平仓记录）
+        获取账户历史持仓扩展详情（已平仓记录）；无 k 线数据的记录无法计算，其扩展字段返回默认值（全 0），表示数据缺失
     
         :param Query.KType ktype: k 线类型
         :param int trade_mode: 交易模式，影响部分统计项：0-收盘时交易，1-下一开盘时交易
@@ -608,14 +608,14 @@
 
     .. py:method:: get_profit_percent_monthly(self[, datetime=Datetime.now()]) -> list[tuple[Datetime, double]]
 
-        获取账户指定截止时刻的账户收益百分比（月度）
+        获取账户指定截止时刻的账户收益百分比（月度），已剔除出入金现金流（入券/出券不计入）
 
         :param Datetime datetime: 指定截止时刻
         :return: 账户收益百分比（月度），元素为 (日期，收益率) 的元组列表
 
     .. py:method:: get_profit_percent_yearly(self[, datetime=Datetime.now()]) -> list[tuple[Datetime, double]]
 
-        获取账户指定截止时刻的账户收益百分比（年度）
+        获取账户指定截止时刻的账户收益百分比（年度），已剔除出入金现金流（入券/出券不计入）
 
         :param Datetime datetime: 指定截止时刻
         :return: 账户收益百分比（年度），元素为 (日期，收益率) 的元组列表

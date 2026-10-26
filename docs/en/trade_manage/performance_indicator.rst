@@ -15,6 +15,9 @@ Common time basis
   market (hikyuu targets multi-asset, multi-strategy mixed portfolios).
 - The annualization factor is **sqrt(365)** (natural days).
 - The period length for annualized returns is in natural days: ``years = number_of_natural_days / 365``.
+- **Report display**: ``report()`` prints ``N/A`` for the undefined (non-finite) items.
+- **Reset semantics**: ``reset()`` clears every value (including the undefined ones); a Null value only ever
+  comes from the current ``statistics()`` run and never survives into the next one.
 - Return metrics are based on **net assets**
   ``net_assets = cash + long market value - short market value - borrowed cash`` (borrowed funds are
   not counted in the numerator); the denominator is the accumulated net investment
@@ -36,7 +39,9 @@ Account funds and assets
 - **Total Invested Assets**: accumulated invested assets (securities).
 - **Total Borrowed Cash**: accumulated borrowed cash.
 - **Total Borrowed Assets**: accumulated borrowed assets.
-- **Total Dividends**: accumulated dividends (sum of the cash of all BONUS records).
+- **Total Dividends**: the accumulated dividends, **cash dividends only** (the sum of the cash of all BONUS
+  records); stock dividends (GIFT), share consolidations (SUOGU) and similar events are not converted to
+  an amount and are not included.
 - **Cash Balance**: the current cash balance.
 - **Open Position Net Value**: the market value of the open long positions.
 - **Current Total Assets**: the current total assets (gross basis, including borrowed assets; for
@@ -45,14 +50,30 @@ Account funds and assets
 Returns and annualization
 -------------------------
 
-- **Open Position Account Return %**: ``100 * (net_assets / accumulated invested principal - 1)``.
-- **Closed Trade Account Return %**: ``100 * net profit of closed trades / accumulated invested principal``.
-- **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``.
+- **Open Position Account Return %**: the current total return of the account — the name is historical, it covers
+  both realized and unrealized profit and is not the return of the open positions alone:
+  ``100 * (net_assets / total_base - 1)``, where ``total_base`` is the accumulated invested principal plus the
+  accumulated invested assets.
+- **Closed Trade Account Return %**: ``100 * net profit of closed trades / total_base``.
+- Both items are recorded as ``0`` when ``total_base == 0`` (nothing invested); if the principal has been fully
+  checked out while the account still holds cash profit, the value does not represent the real return and
+  **Account Time-Weighted Return %** should be used instead.
+- **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``;
+  recorded as ``0`` when the period is shorter than two days or nothing is invested (unlike
+  ``Account CAGR %``, which is Null in the same cases).
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
-  when ``net_assets <= 0`` (wiped out / deep loss) it returns NaN (Null) instead of entering the report.
+  Null (NaN) when ``net_assets <= 0`` (wiped out / deep loss), when ``total_base <= 0`` (nothing invested) or
+  when the period is shorter than two days.
+- Both items above use the closing net assets over the accumulated net investment, so they annualize the
+  "return on the accumulated investment" (simple / compound) and are **not a time-weighted return**: they read
+  low when capital keeps flowing in and can read high when the principal is withdrawn. When there are cash
+  flows, use **Account Time-Weighted Return %** (TWR) instead.
 - **Account Time-Weighted Return %** (extended): the time-weighted return, excluding cash flows. From the
   daily return ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1`` (``flow_t`` is the net inflow of the
-  day) build the index ``E = product(1 + r_t)``, then annualize as ``100 * (E ^ (1 / years) - 1)``.
+  day) build the index ``E = product(1 + r_t)``, then annualize as ``100 * (E ^ (1 / years) - 1)``. The period
+  uses the **usable days** (natural days minus the ones whose net assets are ``<= 0`` or whose return is not
+  finite; the skipped days are logged); a wiped out account does not stop the statistics and the returns
+  after a later checkin keep accumulating.
 - **Account Money-Weighted Return %** (extended): the money-weighted return, i.e. the annualized internal
   rate of return (XIRR) of the external cash flows, solving
   ``sum(CF_i / (1 + x) ^ ((t_i - t0) / 365)) = 0``; the cash flows include the initial investment, each
@@ -65,12 +86,13 @@ Trade statistics
 - **Total Cost of Closed Trades**: the total cost of closed trades.
 - **Total Net Profit of Closed Trades**: the total net profit of closed trades, ``sum(sell money - cost - buy money)``.
 - **Total Profit of Winning Trades** / **Total Loss of Losing Trades**: the total profit of winning trades /
-  the total loss of losing trades (profit > 0 counts as a win, otherwise a loss; a zero-profit trade counts as a loss).
+  the total loss of losing trades (profit > 0 counts as a win, otherwise a loss; a zero-profit trade counts as a
+  loss, which keeps the win rate conservative).
 - **Number of Winning Trades** / **Number of Losing Trades**: the number of winning / losing trades.
 - **Win Rate %**: ``100 * number of winning trades / number of closed trades``.
 - **Avg Profit per Winning Trade** / **Avg Loss per Losing Trade**: the average profit / loss per trade.
-- **Avg Win / Avg Loss Ratio**: ``avg profit / abs(avg loss)``.
-- **Profit Factor**: ``total profit / abs(total loss)``.
+- **Avg Win / Avg Loss Ratio**: ``avg profit / abs(avg loss)``; Null (NaN) when there is no losing trade.
+- **Profit Factor**: ``total profit / abs(total loss)``; Null (NaN) when there is no losing trade.
 - **Profit Expectancy**: the profit expectancy (amount basis),
   ``win rate * avg profit + (1 - win rate) * avg loss``.
 - **Largest Single Win** / **Largest Single Loss**: the largest single profit / loss.
@@ -83,7 +105,9 @@ R-multiple items
 ----------------
 
 The per-trade R multiple is ``r = profit / risk``, where the risk is
-``totalRisk = (buy price - stop-loss price) * number * unit``; when the risk is 0, r is recorded as 0.
+``totalRisk = (buy price - stop-loss price) * number * unit``; when the risk is 0, r is recorded as 0 and the
+trade still counts in the denominator; a negative risk (e.g. slippage leaves the fill price at or below the
+stop-loss price) is used with its actual sign.
 
 - **R-Multiple Expectancy**: ``sum(r) / number of closed trades``.
 - **Avg R-Multiple of Winning Trades** / **Avg R-Multiple of Losing Trades**: the average R multiple of
@@ -120,17 +144,19 @@ Risk-adjusted items (extended)
 ------------------------------
 
 The following metrics are based on the natural-day daily returns with external cash flows removed
-(``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``); the numerator of the annualized return is the
-time-weighted return (TWR):
+(``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``); both the volatility and the downside deviation
+use the **sample standard deviation** (``n-1``):
 
 - **Annual Volatility %**: ``std(r_t) * sqrt(365) * 100`` (sample standard deviation).
 - **Max Drawdown %**: the maximum peak-to-trough drawdown on the time-weighted index ``E``,
   ``100 * max((peak - E) / peak)``.
-- **Sharpe Ratio**: ``(TWR annual * 100 - rf) / annual volatility``, where ``rf`` is the 10Y government
-  bond yield (percent).
-- **Sortino Ratio**: ``(TWR annual * 100 - rf) / annualized downside deviation``, where the annualized
-  downside deviation is ``sqrt(mean(min(r_t, 0)^2)) * sqrt(365) * 100``.
-- **Calmar Ratio**: ``TWR annual / max drawdown`` (both as fractions).
+- **Sharpe Ratio**: ``(100 * mean(r_t) * 365 - rf) / annual volatility``; the numerator is the arithmetic
+  annualized return so that it shares the ``sqrt(365)`` period constant with the denominator; ``rf`` is the
+  mean 10Y government bond yield (percent) over the period, Null when the data is unavailable.
+- **Sortino Ratio**: ``(100 * mean(r_t) * 365 - rf) / annualized downside deviation``, where the annualized
+  downside deviation is ``sqrt(sum(r_t^2 for r_t < 0) / (n - 1)) * sqrt(365) * 100``.
+- **Calmar Ratio**: ``TWR annual / max drawdown`` (both as fractions; the numerator stays geometric).
 - **Avg Per-Trade Return %** / **Std Per-Trade Return %**: the mean and sample standard deviation of the
   per-trade return ``100 * profit / (buy amount + cost)``; records without a cost (e.g. dividend / bonus)
-  cannot yield a per-trade return and are skipped.
+  cannot yield a per-trade return and are skipped. Note the core profit statistics do **not** skip them, so
+  the trade counts of the two differ.
