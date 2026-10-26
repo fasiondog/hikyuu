@@ -17,6 +17,27 @@ void export_Performance(py::module& m) {
       .def(py::init<>())
       .def("exist", &Performance::exist)
 
+      .def(py::pickle(
+        [](const Performance& p) { return py::make_tuple(p.names(), p.values()); },
+        [](py::tuple t) {
+            if (t.size() != 2) {
+                throw std::runtime_error("Invalid state for Performance!");
+            }
+            Performance result;
+            const StringList names = t[0].cast<StringList>();
+            const PriceList values = t[1].cast<PriceList>();
+            if (names.size() != values.size()) {
+                throw std::runtime_error("Invalid state for Performance: names/values mismatch!");
+            }
+            for (size_t i = 0, len = names.size(); i < len; i++) {
+                if (!result.exist(names[i])) {
+                    result.addKey(names[i]);
+                }
+                result.setValue(names[i], values[i]);
+            }
+            return result;
+        }))
+
       .def("reset", &Performance::reset, R"(reset(self)
 
         Reset, clearing the calculated results)")
