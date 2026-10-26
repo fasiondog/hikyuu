@@ -6,7 +6,7 @@
   <title>Hikyuu - 量化交易研究框架</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="keywords" id="metaKeywords" content="hikyuu,quant,backtester,trade,量化交易,系统交易" />
-  <meta name="description" id="metaDescription" content="Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架" />
+  <meta name="description" id="metaDescription" content="基于 C++/Python 的开源量化研究框架：金融与交易正确性优先，策略与组合同构、可任意深度嵌套、部件自由替换的高性能量化引擎" />
   <script>
     // 在渲染前确定语言（避免闪烁）：URL ?lang= > localStorage > 浏览器语言 > 时区推断
     (function () {
@@ -385,8 +385,14 @@
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 2rem;
+    }
+
+    @media (min-width: 1180px) {
+      .stats-container {
+        grid-template-columns: repeat(4, 1fr);
+      }
     }
 
     .stat-item {
@@ -395,8 +401,10 @@
     }
 
     .stat-number {
-      font-size: 3rem;
+      /* 统一字号：长文本（6s / 166ms）也需在单行内放得下 */
+      font-size: 2.25rem;
       font-weight: 800;
+      white-space: nowrap;
       background: linear-gradient(135deg, #a5b4fc 0%, #67e8f9 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -407,6 +415,13 @@
     .stat-label {
       color: #cbd5e1;
       font-size: 1rem;
+    }
+
+    /* 极窄屏收窄内边距，保证最长文本（6s / 166ms）不溢出，同时保持四个数字字号一致 */
+    @media (max-width: 480px) {
+      .stat-item {
+        padding: 1.5rem 1rem;
+      }
     }
 
     /* Features Section - 深蓝黑（深段） */
@@ -1063,21 +1078,21 @@
     <div class="hero-glow"></div>
     <div class="hero-content">
       <div class="hero-text">
-        <span class="hero-badge"><i class="fas fa-star"></i> <span data-i18n="hero.badge">开源超高速量化交易框架</span></span>
+        <span class="hero-badge"><i class="fas fa-star"></i> <span data-i18n="hero.badge">开源量化研究框架 · 金融与交易正确性优先</span></span>
         <h1 class="hero-title"><img src="images/hikyuu_48x48.png" class="hero-title-icon"
-            alt="Hikyuu" />Hikyuu<br>Ultra-Fast Quant Framework</h1>
+            alt="Hikyuu" />Hikyuu<br><span data-i18n="hero.subtitle">高性能量化研究引擎</span></h1>
         <p class="hero-description">
           <span data-i18n="hero.description">基于 C++/Python
-            开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展。金融语义整体自洽，支持多策略、多资产组合的混合回测，贯穿交易模型研发、极速计算与实盘交易全流程。</span>
+            的开源量化研究框架：金融与交易正确性优先，策略与组合同构、可任意深度嵌套、部件自由替换的高性能量化引擎。内核是交易理论与金融语义的完整与正确——不让一个「能跑通」却不成立的策略，被当成结论。</span>
         </p>
         <div class="hero-buttons">
           <a href="https://hikyuu.readthedocs.io" class="btn btn-primary"
             data-href-en="https://hikyuu-en.readthedocs.io/en/latest/">
             <i class="fas fa-book"></i> <span data-i18n="hero.btn.docs">安装与帮助</span>
           </a>
-          <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True"
+          <a href="https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True"
             class="btn btn-secondary" data-lang-only="zh"
-            data-href-en="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True">
+            data-href-en="https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True">
             <i class="fas fa-play-circle"></i> <span data-i18n="hero.btn.examples">入门与示例</span>
           </a>
           <a href="https://gitee.com/fasiondog/hikyuu_hub" class="btn btn-secondary"
@@ -1093,12 +1108,16 @@
   <section class="stats">
     <div class="stats-container">
       <div class="stat-item">
-        <div class="stat-number">166ms</div>
-        <div class="stat-label"><span data-i18n="stat.performance">预热后 1913 万 K 线求和耗时（AMD 7950x）</span></div>
+        <div class="stat-number">6s / 166ms</div>
+        <div class="stat-label"><span data-i18n="stat.perf">1913 万日 K 线加载 + 20 日均线求和：首次 / 预热后（AMD 7950x）</span></div>
       </div>
       <div class="stat-item">
-        <div class="stat-number">10+</div>
-        <div class="stat-label"><span data-i18n="stat.parts">核心策略组件 · 自由组合构建资产库</span></div>
+        <div class="stat-number"><span data-i18n="stat.layers.count">3 层</span></div>
+        <div class="stat-label"><span data-i18n="stat.layers">内建金融语义（交易理论 / 交易规则 / 计算）</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span data-i18n="stat.modes.count">3 种</span></div>
+        <div class="stat-label"><span data-i18n="stat.modes">组合运行模式（A 信号聚合 / B 资金分配 / C 共享账户）</span></div>
       </div>
       <div class="stat-item">
         <div class="stat-number"><span data-i18n="stat.storage.count">4 种</span></div>
@@ -1117,36 +1136,47 @@
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon purple">
-          <i class="fas fa-puzzle-piece"></i>
+          <i class="fas fa-landmark"></i>
         </div>
-        <h3 class="feature-title"><span data-i18n="features.compose.title">组合灵活，分类构建策略资产库</span></h3>
+        <h3 class="feature-title"><span data-i18n="features.kernel.title">金融正确性优先：交易理论与金融语义完整且正确</span></h3>
         <p class="feature-description">
           <span
-            data-i18n="features.compose.desc">对系统化交易方法进行轻量化抽象，涵盖市场环境判断、系统有效条件、信号指示器、止损/止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配等核心组件。基于这些组件自由搭建专属策略库，灵活组合、高效回测，大幅提升研究效率。</span>
+            data-i18n="features.kernel.desc">一笔交易在金融上该怎样成立——何时成交、成本由哪几项构成、除权时持仓与现金如何变化、绩效用什么口径、空值与非有限值怎么传播——在框架里都是完整且显式的：环节不缺、规则被真正执行、可被逐项校验。立意只有一句：不让一个「能跑通」却不成立的策略，被当成结论。</span>
         </p>
       </div>
       <div class="feature-card">
         <div class="feature-icon blue">
+          <i class="fas fa-sitemap"></i>
+        </div>
+        <h3 class="feature-title"><span data-i18n="features.portfolio.title">组合即策略：一个引擎覆盖系统化交易 / 资产配置 / 多因子</span></h3>
+        <p class="feature-description">
+          <span data-i18n="features.portfolio.desc">组合与策略是同一件事：组合节点同样持有完整的交易语义，可任意深度嵌套；同一引擎支持三种运行模式（A 信号聚合 / B 资金分配 / C
+            共享账户），覆盖多策略观点叠加、FOF/MOM 再平衡与多策略共享资金池。团队 / 个人的策略池可以整体回测，也可以拆开算账。</span>
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon amber">
+          <i class="fas fa-map"></i>
+        </div>
+        <h3 class="feature-title"><span data-i18n="features.map.title">一张理论地图，而非黑盒</span></h3>
+        <p class="feature-description">
+          <span data-i18n="features.map.desc">把做策略该考虑的环节逐项列出（环境 → 条件 → 信号 → 仓位 → 退出 → 滑点 → 成本；组合层：选样 → 资金分配 →
+            风控），照图逐项填写，路径本身就是入门路径。它不是自动交易工具：不内置券商对接、不承诺自动下单，OrderBroker
+            只是可插拔接口，对接与否由你决定并承担合规责任。适合想把系统化交易认真学一遍的人。</span>
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon purple">
           <i class="fas fa-bolt"></i>
         </div>
         <h3 class="feature-title"><span data-i18n="features.perf.title">极致性能，轻松构建专属量化应用</span></h3>
         <p class="feature-description">
           <span data-i18n="features.perf.desc">C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x
-            实测：A 股全市场 1913 万日 K 线预热后，计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。</span>
+            实测：1913 万日 K 线首次加载约 6 秒，预热后计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。</span>
         </p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon amber">
-          <i class="fas fa-object-group"></i>
-        </div>
-        <h3 class="feature-title"><span data-i18n="features.syntax.title">系统策略任意组合，金融语义整体自洽</span></h3>
-        <p class="feature-description">
-          <span data-i18n="features.syntax.desc">交易系统由职责单一、语义清晰的 part
-            构成，任意搭配都能保持金融语义的整体自洽；多个系统还可进一步组合为资产组合（Portfolio），对多策略、多资产进行整体混合回测——组合结果与直觉一致、回测行为可预期，策略探索更高效、更可靠。</span>
-        </p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon purple">
+        <div class="feature-icon blue">
           <i class="fas fa-cloud"></i>
         </div>
         <h3 class="feature-title"><span data-i18n="features.cloud.title">自主可控，搭建专属云量化平台</span></h3>
@@ -1156,23 +1186,14 @@
         </p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon blue">
-          <i class="fas fa-database"></i>
-        </div>
-        <h3 class="feature-title"><span data-i18n="features.storage.title">模块化可扩展数据存储</span></h3>
-        <p class="feature-description">
-          <span data-i18n="features.storage.desc">支持 HDF5、MySQL、ClickHouse、SQLite 四种存储方式。默认 HDF5 文件体积小、读写快、备份便捷。插件扩展的
-            ClickHouse 存储读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级高频数据。</span>
-        </p>
-      </div>
-      <div class="feature-card">
         <div class="feature-icon amber">
           <i class="fas fa-shield-alt"></i>
         </div>
-        <h3 class="feature-title"><span data-i18n="features.license.title">开源透明，数据安全可控</span></h3>
+        <h3 class="feature-title"><span data-i18n="features.license.title">开源透明，工程可验证</span></h3>
         <p class="feature-description">
-          <span data-i18n="features.license.desc">Apache 2.0 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++
-            核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。</span>
+          <span data-i18n="features.license.desc">Apache 2.0
+            开源协议，代码透明审计无忧。核心代码 1300+ 处显式校验拦住规则与输入边界，1600+ 个 doctest 用例、1.6 万条断言按「一模块一套件、一边界一用例」组织；Windows / Ubuntu / macOS
+            三平台 CI；C++ 核心可独立剥离，核心数据与策略全量本地可控。</span>
         </p>
       </div>
     </div>
@@ -1186,11 +1207,12 @@
             data-i18n="code.badge">快速上手</span></span>
         <h2 class="section-title"><span data-i18n="code.title">简洁的API设计</span></h2>
         <p class="section-description">
-          <span data-i18n="code.description">几行代码即可创建一个完整的量化策略回测系统。Hikyuu提供直观的API，让策略开发更高效。</span>
+          <span data-i18n="code.description">pip install hikyuu
+            即可安装，用 HikyuuTDX 图形界面一键导入 A 股历史行情，几行代码跑通第一个回测。</span>
         </p>
-        <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True"
+        <a href="https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True"
           class="btn btn-primary" style="margin-top: 2rem;"
-          data-href-en="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True">
+          data-href-en="https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True">
           <i class="fas fa-external-link-alt"></i> <span data-i18n="code.more">查看更多示例</span>
         </a>
       </div>
@@ -1200,19 +1222,57 @@
           <div class="code-dot yellow"></div>
           <div class="code-dot green"></div>
         </div>
-        <pre><code><span class="comment" data-i18n="code.comment.tm"># 创建模拟交易账户进行回测，初始资金30万</span>
+        <pre><code><span class="keyword">from</span> hikyuu.interactive <span class="keyword">import</span> *
+
+<span class="comment" data-i18n="code.comment.tm"># 创建模拟交易账户进行回测，初始资金 30 万</span>
 my_tm = <span class="function">crtTM</span>(init_cash = <span class="number">300000</span>)
 
-<span class="comment" data-i18n="code.comment.sg1"># 创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线）</span>
+<span class="comment" data-i18n="code.comment.sg1"># 创建信号指示器（以 5 日 EMA 为快线，其 10 日 EMA 为慢线）</span>
 <span class="comment" data-i18n="code.comment.sg2"># 快线向上穿越慢线时买入，反之卖出</span>
 my_sg = <span class="function">SG_Flex</span>(<span class="function">EMA</span>(<span class="function">CLOSE</span>(), n=<span class="number">5</span>), slow_n=<span class="number">10</span>)
 
-<span class="comment" data-i18n="code.comment.mm"># 固定每次买入1000股</span>
+<span class="comment" data-i18n="code.comment.mm"># 固定每次买入 1000 股</span>
 my_mm = <span class="function">MM_FixedCount</span>(<span class="number">1000</span>)
 
 <span class="comment" data-i18n="code.comment.run"># 创建交易系统并运行</span>
 sys = <span class="function">SYS_Simple</span>(tm = my_tm, sg = my_sg, mm = my_mm)
 sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>], <span class="function">Query</span>(<span class="number">-150</span>))</code></pre>
+      </div>
+    </div>
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div class="code-block" style="margin-top: 3rem;">
+        <div class="code-header">
+          <div class="code-dot red"></div>
+          <div class="code-dot yellow"></div>
+          <div class="code-dot green"></div>
+        </div>
+        <p style="font-weight: 700; margin-bottom: 1rem; color: var(--white);"><span data-i18n="code.p.title">组合即策略：组合可作为节点，任意深度嵌套</span></p>
+        <pre><code><span class="keyword">from</span> hikyuu.interactive <span class="keyword">import</span> *
+
+<span class="comment" data-i18n="code.p.c1"># 1. 每个子系统都是一套完整的系统化交易：各自的 SG / MM / ST 与账本</span>
+<span class="keyword">def</span> <span class="function">make_leaf</span>(code, sg):
+    sys = <span class="function">SYS_Simple</span>(tm=<span class="function">crtTM</span>(init_cash=<span class="number">100000</span>), sg=sg,
+                     mm=<span class="function">MM_FixedPercent</span>(<span class="number">0.5</span>), st=<span class="function">ST_FixedPercent</span>(<span class="number">0.05</span>))
+    sys.to = sm[code].<span class="function">get_kdata</span>(<span class="function">Query</span>(<span class="number">-500</span>))    <span class="comment" data-i18n="code.p.c2"># 绑定自身 K 线</span>
+    <span class="keyword">return</span> sys
+
+trend = <span class="function">make_leaf</span>(<span class="string">"sh600000"</span>, <span class="function">SG_Cross</span>(<span class="function">EMA</span>(<span class="function">CLOSE</span>(), n=<span class="number">5</span>), <span class="function">MA</span>(<span class="function">CLOSE</span>(), n=<span class="number">60</span>)))
+grid = <span class="function">make_leaf</span>(<span class="string">"sh600004"</span>, <span class="function">SG_Cross</span>(<span class="function">EMA</span>(<span class="function">CLOSE</span>(), n=<span class="number">3</span>), <span class="function">MA</span>(<span class="function">CLOSE</span>(), n=<span class="number">10</span>)))
+
+<span class="comment" data-i18n="code.p.c3"># 2. 组合工厂只做投资组合该做的事：谁参与（SE）+ 分多少钱（AF）</span>
+group = <span class="function">PF_SignalAggregate</span>(tm=<span class="function">crtTM</span>(<span class="function">Datetime</span>(<span class="number">202001010000</span>), <span class="number">300000</span>), adjust_cycle=<span class="number">5</span>)
+group.<span class="function">add</span>(trend)
+group.<span class="function">add</span>(grid)
+
+<span class="comment" data-i18n="code.p.c4"># 3. 这个组合还能作为节点参与更大的组合（多资产多策略的逐层聚合）</span>
+top = <span class="function">PF_Simple</span>(tm=<span class="function">crtTM</span>(<span class="function">Datetime</span>(<span class="number">202001010000</span>), <span class="number">1000000</span>),
+                af=<span class="function">AF_FixedWeightList</span>([<span class="number">0.6</span>, <span class="number">0.4</span>]), adjust_cycle=<span class="number">5</span>)
+top.<span class="function">add</span>(group)
+top.<span class="function">add</span>(<span class="function">make_leaf</span>(<span class="string">"sh600005"</span>, <span class="function">SG_Cross</span>(<span class="function">EMA</span>(<span class="function">CLOSE</span>(), n=<span class="number">10</span>), <span class="function">MA</span>(<span class="function">CLOSE</span>(), n=<span class="number">30</span>))))
+
+<span class="comment" data-i18n="code.p.c5"># 4. 一次运行，整个组合在同一账户内统一结算</span>
+top.<span class="function">run</span>(<span class="function">Query</span>(<span class="number">-500</span>))
+<span class="keyword">print</span>(top.tm.<span class="function">get_funds</span>().total_assets)</code></pre>
       </div>
     </div>
   </section>
@@ -1222,7 +1282,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
     <div class="section-header">
       <span class="section-badge"><span data-i18n="arch.badge">系统架构</span></span>
       <h2 class="section-title"><span data-i18n="arch.title">交易系统化架构</span></h2>
-      <p class="section-description"><span data-i18n="arch.description">遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合，整体金融语义严格自洽</span>
+      <p class="section-description"><span data-i18n="arch.description">每一行都是一个可替换的卡口，换掉任何一个，结算、成本与校验仍由框架承担，整体金融语义严格自洽</span>
       </p>
     </div>
     <div class="arch-diagram">
@@ -1238,15 +1298,15 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
             <div class="arch-module-code">PF</div>
             <div class="arch-module-info">
               <span class="arch-module-name" data-i18n="arch.pf.name">投资组合</span>
-              <span class="arch-module-desc" data-i18n="arch.pf.desc">多标的策略调度</span>
+              <span class="arch-module-desc" data-i18n="arch.pf.desc">多资产多策略组合：选样、资金分配与统一记账</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener"
             href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/selector.html">
             <div class="arch-module-code">SE</div>
             <div class="arch-module-info">
-              <span class="arch-module-name" data-i18n="arch.se.name">交易对象选择</span>
-              <span class="arch-module-desc" data-i18n="arch.se.desc">选股策略筛选</span>
+              <span class="arch-module-name" data-i18n="arch.se.name">系统对象选择</span>
+              <span class="arch-module-desc" data-i18n="arch.se.desc">系统策略筛选</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener"
@@ -1254,7 +1314,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
             <div class="arch-module-code">AF</div>
             <div class="arch-module-info">
               <span class="arch-module-name" data-i18n="arch.af.name">资金分配</span>
-              <span class="arch-module-desc" data-i18n="arch.af.desc">多标的资金调度</span>
+              <span class="arch-module-desc" data-i18n="arch.af.desc">L1 权重 / L2 换算 / L3 风控</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener"
@@ -1302,8 +1362,16 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
             href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/stoploss.html">
             <div class="arch-module-code">ST</div>
             <div class="arch-module-info">
-              <span class="arch-module-name" data-i18n="arch.st.name">止损 / 止盈</span>
+              <span class="arch-module-name" data-i18n="arch.st.name">止损</span>
               <span class="arch-module-desc" data-i18n="arch.st.desc">风险控制退出</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener"
+            href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/trade_sys.html">
+            <div class="arch-module-code">TP</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name" data-i18n="arch.tp.name">止盈</span>
+              <span class="arch-module-desc" data-i18n="arch.tp.desc">达到目标价位退出</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener"
@@ -1369,7 +1437,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
             <div class="arch-module-code">SM</div>
             <div class="arch-module-info">
               <span class="arch-module-name" data-i18n="arch.sm.name">证券管理</span>
-              <span class="arch-module-desc" data-i18n="arch.sm.desc">StockManager 统一管理</span>
+              <span class="arch-module-desc" data-i18n="arch.sm.desc">证券统一管理</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener"
@@ -1403,15 +1471,15 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
     <div class="source-links">
       <a href="https://github.com/fasiondog/hikyuu" class="source-link">
         <i class="fab fa-github"></i>
-        <span data-i18n="source.github">GitHub</span>
+        <span data-i18n="source.github">GitHub（海外）</span>
       </a>
       <a href="https://gitee.com/fasiondog/hikyuu" class="source-link">
         <i class="fas fa-code-branch"></i>
-        <span data-i18n="source.gitee">码云 Gitee</span>
+        <span data-i18n="source.gitee">码云 Gitee（国内推荐）</span>
       </a>
       <a href="https://gitcode.com/hikyuu/hikyuu" class="source-link">
         <i class="fas fa-code"></i>
-        <span data-i18n="source.gitcode">GitCode（推荐）</span>
+        <span data-i18n="source.gitcode">GitCode（国内推荐）</span>
       </a>
     </div>
   </section>
@@ -1433,7 +1501,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
           <div
             style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             ¥30</div>
-          <p><span data-i18n="donate.coffee.desc">支付宝扫码 · 一次性的小小支持</span></p>
+          <p><span data-i18n="donate.coffee.desc">支付宝 · 一次性支持（赠历史日线及 3 个月捐赠权益）</span></p>
           <span
             style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span
               data-i18n="donate.cta">前往捐赠</span> <i class="fas fa-arrow-right"></i></span>
@@ -1445,7 +1513,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
           <div
             style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             ¥50</div>
-          <p><span data-i18n="donate.halfyear">支付宝扫码 · 半年期订阅权益</span></p>
+          <p><span data-i18n="donate.halfyear">支付宝 · 半年期捐赠权益（赠历史日线）</span></p>
           <span
             style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span
               data-i18n="donate.cta">前往捐赠</span> <i class="fas fa-arrow-right"></i></span>
@@ -1457,7 +1525,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
           <div
             style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             ¥100</div>
-          <p><span data-i18n="donate.fullyear">支付宝扫码 · 全年期订阅权益</span></p>
+          <p><span data-i18n="donate.fullyear">支付宝 · 全年期捐赠权益（赠历史日 / 分 / 时 / 笔数据）</span></p>
           <span
             style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span
               data-i18n="donate.cta">前往捐赠</span> <i class="fas fa-arrow-right"></i></span>
@@ -1469,7 +1537,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
           <div
             style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             ¥300<span data-i18n="donate.peryear">/年</span></div>
-          <p><span data-i18n="donate.zsxq.desc">3 台设备登录 · 续费半价 · 专属微信群及策略部件库</span></p>
+          <p><span data-i18n="donate.zsxq.desc">首年 ¥300 续费半价 · 3 台设备登录 · 专属微信群及策略部件库（赠历史日 / 分 / 时 / 笔数据）</span></p>
           <span
             style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span
               data-i18n="donate.join">前往加入</span> <i class="fas fa-arrow-right"></i></span>
@@ -1478,7 +1546,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
       <p style="max-width: 800px; margin: 2rem auto 0; text-align: center; color: #94a3b8; font-size: 0.875rem;"
         data-lang-only="zh">
         <i class="fas fa-gift"></i> <span data-i18n="donate.note">捐赠计划与附赠详见</span>
-        <a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html" target="_blank" rel="noopener"
+        <a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html" target="_blank" rel="noopener"
           style="color: var(--primary-light); text-decoration: none; font-weight: 600;"
           data-href-en="https://hikyuu-en.readthedocs.io/en/latest/vip/vip-plan.html"><span
             data-i18n="donate.plan">捐赠计划说明</span></a>
@@ -1531,12 +1599,12 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
     <div style="max-width: 800px; margin: 3rem auto 0; text-align: center;">
       <p style="color: #94a3b8;">
         <b style="color: #cbd5e1;"><span data-i18n="contribute.needed">需要的帮助：</span></b><span
-          data-i18n="contribute.list">测试反馈 BUG · 编写文档 · 开发新功能 · 网站优化</span>
+          data-i18n="contribute.list">测试并反馈 Bug · 编写文档 · 开发新功能 · 网站优化</span>
         <br>
         <a href="https://gitee.com/fasiondog/hikyuu/issues"
           style="color: var(--primary-light); text-decoration: none; font-weight: 600;"
           data-href-en="https://github.com/fasiondog/hikyuu/issues">
-          <span data-i18n="contribute.link">建议通过在码云上开 issue 方式来贡献以上内容</span> <i class="fas fa-arrow-right"></i>
+          <span data-i18n="contribute.link">建议通过在 GitHub / Gitee / GitCode 开 issue 的方式贡献以上内容</span> <i class="fas fa-arrow-right"></i>
         </a>
       </p>
     </div>
@@ -1560,6 +1628,8 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
             href="https://gitee.com/fasiondog" style="color: var(--primary-light); text-decoration: none;">fasiondog</a>
           <span data-i18n="footer.author.suffix">维护</span>
         </p>
+        <p style="margin-top: 1rem; font-size: 0.75rem; color: #64748b; max-width: 800px; margin-left: auto; margin-right: auto;"><span
+            data-i18n="footer.disclaimer">免责声明：本项目为开源金融技术研究工具，仅供个人学习、学术研究与数据分析使用，不构成任何投资建议与交易指导，不提供、不内置证券交易服务。用户自主对接交易接口及相应实操行为，由用户自行承担全部风险与法律责任。</span></p>
       </div>
     </div>
   </footer>
@@ -1570,7 +1640,7 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
     var I18N = {
       zh: {
         'meta.title': 'Hikyuu - 量化交易研究框架',
-        'meta.description': 'Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架',
+        'meta.description': '基于 C++/Python 的开源量化研究框架：金融与交易正确性优先，策略与组合同构、可任意深度嵌套、部件自由替换的高性能量化引擎',
         'meta.keywords': 'hikyuu,quant,backtester,trade,量化交易,系统交易',
 
         'nav.features': '核心优势',
@@ -1579,88 +1649,99 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
         'nav.source': '源码地址',
         'nav.community': '社区支持',
 
-        'hero.badge': '开源超高速量化交易框架',
-        'hero.description': '基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展。金融语义整体自洽，支持多策略、多资产组合的混合回测，贯穿交易模型研发、极速计算与实盘交易全流程。',
+        'hero.badge': '开源量化研究框架 · 金融与交易正确性优先',
+        'hero.subtitle': '高性能量化研究引擎',
+        'hero.description': '基于 C++/Python 的开源量化研究框架：金融与交易正确性优先，策略与组合同构、可任意深度嵌套、部件自由替换的高性能量化引擎。内核是交易理论与金融语义的完整与正确——不让一个「能跑通」却不成立的策略，被当成结论。',
         'hero.btn.docs': '安装与帮助',
         'hero.btn.examples': '入门与示例',
         'hero.btn.hub': '策略部件库',
 
-        'stat.performance': '预热后 1913 万 K 线求和耗时（AMD 7950x）',
-        'stat.parts': '核心策略组件 · 自由组合构建资产库',
+        'stat.perf': '1913 万日 K 线加载 + 20 日均线求和：首次 / 预热后（AMD 7950x）',
+        'stat.layers.count': '3 层',
+        'stat.layers': '内建金融语义（交易理论 / 交易规则 / 计算）',
+        'stat.modes.count': '3 种',
+        'stat.modes': '组合运行模式（A 信号聚合 / B 资金分配 / C 共享账户）',
         'stat.storage.count': '4 种',
         'stat.storage': '存储方式（HDF5 / MySQL / ClickHouse / SQLite）',
 
         'features.badge': '核心优势',
         'features.title': '为什么选择 Hikyuu',
         'features.description': '强大的功能特性，助力您的量化交易研究',
-        'features.compose.title': '组合灵活，分类构建策略资产库',
-        'features.compose.desc': '对系统化交易方法进行轻量化抽象，涵盖市场环境判断、系统有效条件、信号指示器、止损/止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配等核心组件。基于这些组件自由搭建专属策略库，灵活组合、高效回测，大幅提升研究效率。',
+        'features.kernel.title': '金融正确性优先：交易理论与金融语义完整且正确',
+        'features.kernel.desc': '一笔交易在金融上该怎样成立——何时成交、成本由哪几项构成、除权时持仓与现金如何变化、绩效用什么口径、空值与非有限值怎么传播——在框架里都是完整且显式的：环节不缺、规则被真正执行、可被逐项校验。立意只有一句：不让一个「能跑通」却不成立的策略，被当成结论。',
+        'features.portfolio.title': '组合即策略：一个引擎覆盖系统化交易 / 资产配置 / 多因子',
+        'features.portfolio.desc': '组合与策略是同一件事：组合节点同样持有完整的交易语义，可任意深度嵌套；同一引擎支持三种运行模式（A 信号聚合 / B 资金分配 / C 共享账户），覆盖多策略观点叠加、FOF/MOM 再平衡与多策略共享资金池。团队 / 个人的策略池可以整体回测，也可以拆开算账。',
+        'features.map.title': '一张理论地图，而非黑盒',
+        'features.map.desc': '把做策略该考虑的环节逐项列出（环境 → 条件 → 信号 → 仓位 → 退出 → 滑点 → 成本；组合层：选样 → 资金分配 → 风控），照图逐项填写，路径本身就是入门路径。它不是自动交易工具：不内置券商对接、不承诺自动下单，OrderBroker 只是可插拔接口，对接与否由你决定并承担合规责任。适合想把系统化交易认真学一遍的人。',
         'features.perf.title': '极致性能，轻松构建专属量化应用',
-        'features.perf.desc': 'C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x 实测：A 股全市场 1913 万日 K 线预热后，计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。',
-        'features.syntax.title': '系统策略任意组合，金融语义整体自洽',
-        'features.syntax.desc': '交易系统由职责单一、语义清晰的 part 构成，任意搭配都能保持金融语义的整体自洽；多个系统还可进一步组合为资产组合（Portfolio），对多策略、多资产进行整体混合回测——组合结果与直觉一致、回测行为可预期，策略探索更高效、更可靠。',
+        'features.perf.desc': 'C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x 实测：1913 万日 K 线首次加载约 6 秒，预热后计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。',
         'features.cloud.title': '自主可控，搭建专属云量化平台',
         'features.cloud.desc': '结合 Python + Jupyter 与云服务器，搭建完全自主可控的云量化平台，手机、平板、电脑随时随地访问。无缝对接 numpy、scipy、pandas、TensorFlow 等 AI 与数据分析工具，按需自定义界面、实现服务化部署。',
-        'features.storage.title': '模块化可扩展数据存储',
-        'features.storage.desc': '支持 HDF5、MySQL、ClickHouse、SQLite 四种存储方式。默认 HDF5 文件体积小、读写快、备份便捷。插件扩展的 ClickHouse 存储读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级高频数据。',
-        'features.license.title': '开源透明，数据安全可控',
-        'features.license.desc': 'Apache 2.0 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。',
+        'features.license.title': '开源透明，工程可验证',
+        'features.license.desc': 'Apache 2.0 开源协议，代码透明审计无忧。核心代码 1300+ 处显式校验拦住规则与输入边界，1600+ 个 doctest 用例、1.6 万条断言按「一模块一套件、一边界一用例」组织；Windows / Ubuntu / macOS 三平台 CI；C++ 核心可独立剥离，核心数据与策略全量本地可控。',
 
         'code.badge': '快速上手',
         'code.title': '简洁的API设计',
-        'code.description': '几行代码即可创建一个完整的量化策略回测系统。Hikyuu提供直观的API，让策略开发更高效。',
+        'code.description': 'Python 3.10+ 环境下 pip install hikyuu 即可安装，用 HikyuuTDX 图形界面一键导入 A 股历史行情，几行代码跑通第一个回测。',
         'code.more': '查看更多示例',
-        'code.comment.tm': '# 创建模拟交易账户进行回测，初始资金30万',
-        'code.comment.sg1': '# 创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线）',
+        'code.comment.tm': '# 创建模拟交易账户进行回测，初始资金 30 万',
+        'code.comment.sg1': '# 创建信号指示器（以 5 日 EMA 为快线，其 10 日 EMA 为慢线）',
         'code.comment.sg2': '# 快线向上穿越慢线时买入，反之卖出',
-        'code.comment.mm': '# 固定每次买入1000股',
+        'code.comment.mm': '# 固定每次买入 1000 股',
         'code.comment.run': '# 创建交易系统并运行',
+        'code.p.title': '组合即策略：组合可作为节点，任意深度嵌套',
+        'code.p.c1': '# 1. 每个子系统都是一套完整的系统化交易：各自的 SG / MM / ST 与账本',
+        'code.p.c2': '# 绑定自身 K 线',
+        'code.p.c3': '# 2. 组合工厂只做投资组合该做的事：谁参与（SE）+ 分多少钱（AF）',
+        'code.p.c4': '# 3. 这个组合还能作为节点参与更大的组合（多资产多策略的逐层聚合）',
+        'code.p.c5': '# 4. 一次运行，整个组合在同一账户内统一结算',
 
         'arch.badge': '系统架构',
         'arch.title': '交易系统化架构',
-        'arch.description': '遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合，整体金融语义严格自洽',
+        'arch.description': '每一行都是一个可替换的卡口，换掉任何一个，结算、成本与校验仍由框架承担，整体金融语义严格自洽',
         'arch.layer.portfolio': '投资组合层',
         'arch.layer.sys': '交易系统',
         'arch.layer.sys.code': 'SYS · 单对象',
         'arch.layer.trade': '交易管理',
         'arch.layer.trade.code': '执行 & 记录',
         'arch.layer.data': '数据层',
-        'arch.pf.name': '投资组合', 'arch.pf.desc': '多标的策略调度',
-        'arch.se.name': '交易对象选择', 'arch.se.desc': '选股策略筛选',
-        'arch.af.name': '资金分配', 'arch.af.desc': '多标的资金调度',
+        'arch.pf.name': '投资组合', 'arch.pf.desc': '多资产多策略组合：选样、资金分配与统一记账',
+        'arch.se.name': '系统对象选择', 'arch.se.desc': '系统策略筛选',
+        'arch.af.name': '资金分配', 'arch.af.desc': 'L1 权重 / L2 换算 / L3 风控',
         'arch.mf.name': '多因子模型', 'arch.mf.desc': '因子评分与排序',
         'arch.ev.name': '市场环境判断', 'arch.ev.desc': '大盘环境有效性',
         'arch.cn.name': '系统有效条件', 'arch.cn.desc': '系统适用条件',
         'arch.sg.name': '信号指示器', 'arch.sg.desc': '产生买卖信号',
-        'arch.st.name': '止损 / 止盈', 'arch.st.desc': '风险控制退出',
+        'arch.st.name': '止损', 'arch.st.desc': '风险控制退出',
+        'arch.tp.name': '止盈', 'arch.tp.desc': '达到目标价位退出',
         'arch.mm.name': '资金管理', 'arch.mm.desc': '买卖数量控制',
         'arch.pg.name': '盈利目标', 'arch.pg.desc': '目标达成退出',
         'arch.sp.name': '移滑价差', 'arch.sp.desc': '回测价格模拟',
         'arch.tm.name': '交易管理', 'arch.tm.desc': '账户资金与持仓记录',
         'arch.ob.name': '订单执行', 'arch.ob.desc': '实盘下单 broker 对接',
-        'arch.sm.name': '证券管理', 'arch.sm.desc': 'StockManager 统一管理',
+        'arch.sm.name': '证券管理', 'arch.sm.desc': '证券统一管理',
         'arch.kd.name': 'K 线数据', 'arch.kd.desc': 'KData 量价序列',
         'arch.q.name': '数据查询', 'arch.q.desc': 'Query 时间范围筛选',
 
         'source.badge': '开源项目',
         'source.title': '浏览源码',
         'source.description': '欢迎 Star、Fork，参与贡献',
-        'source.github': 'GitHub',
-        'source.gitee': '码云 Gitee（推荐）',
-        'source.gitcode': 'GitCode（推荐）',
+        'source.github': 'GitHub（海外）',
+        'source.gitee': '码云 Gitee（国内推荐）',
+        'source.gitcode': 'GitCode（国内推荐）',
 
         'donate.badge': '支持项目',
         'donate.title': '感谢捐赠，让 Hikyuu 走得更远',
         'donate.description': '因作者精力有限，对捐赠用户的问题会优先解答、确保响应',
         'donate.coffee': '请作者喝杯咖啡',
-        'donate.coffee.desc': '支付宝扫码 · 一次性的小小支持',
+        'donate.coffee.desc': '支付宝 · 一次性支持（赠历史日线及 3 个月捐赠权益）',
         'donate.180half': '订阅 180 天',
         'donate.365full': '订阅 365 天',
-        'donate.halfyear': '支付宝扫码 · 半年期订阅权益',
-        'donate.fullyear': '支付宝扫码 · 全年期订阅权益',
+        'donate.halfyear': '支付宝 · 半年期捐赠权益（赠历史日线）',
+        'donate.fullyear': '支付宝 · 全年期捐赠权益（赠历史日 / 分 / 时 / 笔数据）',
         'donate.zsxq': '加入知识星球',
         'donate.peryear': '/年',
-        'donate.zsxq.desc': '3 台设备登录 · 续费半价 · 专属微信群及策略部件库',
+        'donate.zsxq.desc': '首年 ¥300 续费半价 · 3 台设备登录 · 专属微信群及策略部件库（赠历史日 / 分 / 时 / 笔数据）',
         'donate.cta': '前往捐赠',
         'donate.join': '前往加入',
         'donate.note': '捐赠计划与附赠详见',
@@ -1684,15 +1765,16 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
         'community.alt.zsxq': 'Hikyuu量化星球',
 
         'contribute.needed': '需要的帮助：',
-        'contribute.list': '测试反馈 BUG · 编写文档 · 开发新功能 · 网站优化',
-        'contribute.link': '建议通过在码云上开 issue 方式来贡献以上内容',
+        'contribute.list': '测试并反馈 Bug · 编写文档 · 开发新功能 · 网站优化',
+        'contribute.link': '建议通过在 GitHub / Gitee / GitCode 开 issue 的方式贡献以上内容',
 
         'footer.docs': '文档',
         'footer.community': '社区',
         'footer.license.prefix': '基于',
         'footer.license.suffix': '开源协议发布',
         'footer.author.prefix': '由',
-        'footer.author.suffix': '维护'
+        'footer.author.suffix': '维护',
+        'footer.disclaimer': '免责声明：本项目为开源金融技术研究工具，仅供个人学习、学术研究与数据分析使用，不构成任何投资建议与交易指导，不提供、不内置证券交易服务。用户自主新增、对接各类交易接口、开发拓展功能以及对应的实操行为，均由用户自行承担全部风险与法律责任，严禁对接非法交易通道、用于违规交易场景。'
       },
 
       en: {
@@ -1707,29 +1789,33 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
         'nav.community': 'Community',
 
         'hero.badge': 'Open-Source Ultra-Fast Quantitative Trading Framework',
+        'hero.subtitle': 'Ultra-Fast Quant Framework',
         'hero.description': 'Hikyuu Quant Framework is an open-source, extremely fast quantitative trading research framework written in C++/Python. It focuses on strategy analysis, backtesting and the extension to live trading. With self-consistent financial semantics maintained as a whole, it supports mixed backtesting of multi-strategy, multi-asset portfolios and stays coherent across the whole workflow: trading model development, an extremely fast computation engine, and live trading.',
         'hero.btn.docs': 'Install & Help',
         'hero.btn.examples': 'Getting Started',
         'hero.btn.hub': 'Strategy Part Library',
 
-        'stat.performance': 'Summing 19.13 million K-line records after warm-up (AMD 7950x)',
-        'stat.parts': 'Core strategy parts · combine freely to build your strategy library',
+        'stat.perf': 'Loading 19.13M daily bars + summing the 20-day MA: first run / after warm-up (AMD 7950x)',
+        'stat.layers.count': '3',
+        'stat.layers': 'Layers of built-in financial semantics (trading theory / trading rules / calculation)',
+        'stat.modes.count': '3',
+        'stat.modes': 'Portfolio run modes (A signal aggregation / B fund allocation / C shared account)',
         'stat.storage.count': '4',
         'stat.storage': 'Storage backends (HDF5 / MySQL / ClickHouse / SQLite)',
 
         'features.badge': 'Core Advantages',
         'features.title': 'Why Choose Hikyuu',
         'features.description': 'Powerful features empowering your quantitative trading research',
-        'features.compose.title': 'Flexible Composition: Build Your Strategy Library by Category',
-        'features.compose.desc': 'A lightweight abstraction of systematic trading methods, covering the core parts of market environment, system validity condition, signal generator, stop-loss / take-profit, money management, profit goal, slippage, trading object selection and fund allocation. Build your own strategy library from these parts, combine them freely, backtest efficiently and greatly boost research productivity.',
+        'features.kernel.title': 'Correctness First: Complete and Correct Trading Theory & Financial Semantics',
+        'features.kernel.desc': 'How a trade should financially come into existence — when it fills, which items make up its cost, how positions and cash change on ex-rights / ex-dividend dates, which convention performance follows, how nulls and non-finite values propagate — is complete and explicit in the framework: no missing links, rules that are actually executed, and results that can be verified item by item. In one sentence: never let a strategy that "runs" but does not hold up be taken as a conclusion.',
+        'features.portfolio.title': 'Portfolio as Strategy: One Engine Covering Systematic Trading / Asset Allocation / Multi-Factor',
+        'features.portfolio.desc': 'A portfolio and a strategy are the same thing: a portfolio node holds a full set of trading semantics of its own and can be nested to any depth; the same engine supports three run modes (A signal aggregation / B fund allocation / C shared account), covering multi-strategy view overlay, FOF/MOM rebalancing and multi-strategy shared cash pools. A team\'s or an individual\'s strategy pool can be backtested as a whole or accounted for separately.',
+        'features.map.title': 'A Map, Not a Black Box',
+        'features.map.desc': 'It lists item by item what building a strategy should take into account (environment → condition → signal → sizing → exit → slippage → cost; portfolio layer: selection → fund allocation → risk control). Fill it in item by item and the path itself is the way in. It is not an automated trading tool: no built-in broker connectivity and no automatic order placement; OrderBroker is merely a pluggable interface — whether to connect one is your decision and your compliance responsibility. It suits people who want to study systematic trading seriously.',
         'features.perf.title': 'Extreme Performance: Build Your Own Quant Application',
         'features.perf.desc': 'The C++ core library natively supports multithreading and multi-core acceleration; the Python interface integrates TA-Lib and converts seamlessly to and from numpy and pandas. Measured on an AMD 7950x: after warm-up over the 19.13 million daily K-line records of the whole Chinese A-share market, computing and summing the 20-day moving average takes only 166 ms. The core library can be stripped out to build custom tools.',
-        'features.syntax.title': 'Compose Strategies Freely with Self-Consistent Financial Semantics',
-        'features.syntax.desc': 'Trading systems are composed of parts with clear, single-purpose semantics, and any combination stays financially coherent as a whole. Multiple systems can further be composed into a Portfolio for holistic mixed backtesting across multiple strategies and assets — results match intuition and backtest behavior remains predictable, making strategy exploration faster and more reliable.',
         'features.cloud.title': 'Self-Controlled: Build Your Own Cloud Quant Platform',
         'features.cloud.desc': 'Combine Python + Jupyter with a cloud server to build a fully self-controlled quant platform, accessible from phone, tablet or PC anywhere, anytime. It works seamlessly with numpy, scipy, pandas, TensorFlow and other AI and data-analysis tools, so you can customize the UI and deploy it as a service.',
-        'features.storage.title': 'Modular and Extensible Data Storage',
-        'features.storage.desc': 'Four storage backends are supported: HDF5, MySQL, ClickHouse and SQLite. The default HDF5 store is compact, fast to read and write and easy to back up. The plugin-based ClickHouse store is faster than HDF5 and uses far less space than MySQL, making it a better fit for minute-level high-frequency data.',
         'features.license.title': 'Open and Transparent: Your Data Stays in Your Control',
         'features.license.desc': 'Released under the Apache 2.0 license with transparent, auditable code. Your market data and strategies stay fully local and under your control, and the C++ core library can be used standalone to build custom client tools without worrying about third-party platform restrictions.',
 
@@ -1742,6 +1828,12 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
         'code.comment.sg2': '# buy when the fast line crosses above the slow line, sell otherwise)',
         'code.comment.mm': '# buy a fixed 1000 shares each time',
         'code.comment.run': '# create the trading system and run it',
+        'code.p.title': 'Portfolio as Strategy: nest portfolios as nodes to any depth',
+        'code.p.c1': '# 1. Each sub-system is a complete systematic trading system: its own SG / MM / ST and ledger',
+        'code.p.c2': '# bind its own K-line',
+        'code.p.c3': '# 2. The portfolio factory does only what a portfolio should do: who participates (SE) + how much money each gets (AF)',
+        'code.p.c4': '# 3. This portfolio can itself participate as a node of a larger portfolio (layer-by-layer aggregation across instruments and strategies)',
+        'code.p.c5': '# 4. One run: the whole portfolio settles in a single account',
 
         'arch.badge': 'System Architecture',
         'arch.title': 'Systematic Trading Architecture',
@@ -1759,7 +1851,8 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
         'arch.ev.name': 'Market Environment', 'arch.ev.desc': 'Overall market validity',
         'arch.cn.name': 'System Validity Condition', 'arch.cn.desc': 'Conditions the system applies to',
         'arch.sg.name': 'Signal Generator', 'arch.sg.desc': 'Generates buy/sell signals',
-        'arch.st.name': 'Stop-loss / Take-profit', 'arch.st.desc': 'Risk-control exits',
+        'arch.st.name': 'Stop-loss', 'arch.st.desc': 'Risk-control exit',
+        'arch.tp.name': 'Take-profit', 'arch.tp.desc': 'Exits once the target level is reached',
         'arch.mm.name': 'Money Management', 'arch.mm.desc': 'Controls buy/sell quantity',
         'arch.pg.name': 'Profit Goal', 'arch.pg.desc': 'Exits once the goal is reached',
         'arch.sp.name': 'Slippage', 'arch.sp.desc': 'Simulates prices in backtests',
@@ -1819,7 +1912,8 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
         'footer.license.prefix': 'Released under the',
         'footer.license.suffix': '',
         'footer.author.prefix': 'Maintained by',
-        'footer.author.suffix': ''
+        'footer.author.suffix': '',
+        'footer.disclaimer': 'Disclaimer: this project is an open-source financial technology research tool, intended for personal study, academic research and data analysis only. It does not constitute investment advice or trading guidance, and does not provide or embed any securities trading service. Any trading interface you connect and any actual operation you perform are entirely at your own risk and legal responsibility.'
       }
     };
 
