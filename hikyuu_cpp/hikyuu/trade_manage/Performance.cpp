@@ -507,12 +507,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
           roundEx(loss.max_continues_r / m_result["Max Consecutive Losses"], precision);
     }
 
-    if (m_result["Total Invested Principal"] != 0.0) {
-        m_result["Open Position Account Return %"] =
-          100. * (net_assets / m_result["Total Invested Principal"] - 1.);
-        m_result["Closed Trade Account Return %"] = 100. *
-                                                    m_result["Total Net Profit of Closed Trades"] /
-                                                    m_result["Total Invested Principal"];
+    if (total_money > 0.0) {
+        m_result["Open Position Account Return %"] = 100. * (net_assets / total_money - 1.);
+        m_result["Closed Trade Account Return %"] =
+          100. * m_result["Total Net Profit of Closed Trades"] / total_money;
     }
 
     if (m_result["Number of Winning Trades"] != 0.0) {
@@ -559,14 +557,13 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
 
     int64_t duration = 0;
     if (tm->firstDatetime() != Null<Datetime>()) {
-        if (datetime == Null<Datetime>()) {
-            duration = (Datetime::now() - tm->firstDatetime()).days() + 1;
-        } else {
-            duration = (datetime - tm->firstDatetime()).days() + 1;
-        }
+        // Count whole calendar days, the same axis as the flat time statistics below
+        const Datetime end_day = datetime == Null<Datetime>() ? Datetime::now() : datetime;
+        duration = (Datetime(end_day.date()) - Datetime(tm->firstDatetime().date())).days() + 1;
     }
 
-    // All the annualized items share one gate: extrapolating a single day over a year is meaningless
+    // All the annualized items share one gate: extrapolating a single day over a year is
+    // meaningless
     double years = duration / 365.0;
 
     if (duration > 1) {

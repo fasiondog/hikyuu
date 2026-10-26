@@ -413,4 +413,55 @@ TEST_CASE("test_Performance_annualized_short_range") {
     CHECK_EQ(q.get("Account CAGR %"), doctest::Approx(1.8417).epsilon(0.001));
 }
 
+/** @par Test points */
+TEST_CASE("test_Performance_return_base_with_asset") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600004");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+
+    // The checked in stock makes base_asset non zero, so the invested base is larger than the cash
+    // principal alone
+    REQUIRE_UNARY(tm->checkinStock(Datetime(199911170000LL), stock, 10.0, 100));
+    TradeRecord sell_tr = tm->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+    REQUIRE_UNARY(!sell_tr.isNull());
+
+    Datetime eval_dt(199911180000LL);
+    Performance p;
+    p.statistics(tm, eval_dt);
+
+    FundsRecord funds = tm->getFunds(eval_dt, KQuery::DAY);
+    double total_base = funds.base_cash + funds.base_asset;
+
+    /** @arg The invested base covers the checked in assets as well */
+    CHECK_UNARY(total_base > funds.base_cash);
+
+    /** @arg Both return items are measured against the same total invested base */
+    CHECK_EQ(p.get("Open Position Account Return %"),
+             doctest::Approx(100.0 * (funds.net_assets() / total_base - 1.0)));
+    CHECK_EQ(p.get("Closed Trade Account Return %"),
+             doctest::Approx(100.0 * p.get("Total Net Profit of Closed Trades") / total_base));
+}
+
+/** @par Test points */
+TEST_CASE("test_Performance_time_axis_whole_days") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+
+    // The trade times are intraday: 15:00 to the next day 09:00, a gap of 18 hours that counts as
+    // one day when only the hour difference is truncated
+    tm->buy(Datetime(199911171500LL), stock, 10.0, 100);
+    tm->sell(Datetime(199911180900LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911180900LL));
+
+    /** @arg The annualized items count whole calendar days, so the period is two days */
+    CHECK_EQ(p.get("Trade Opportunities per Year"), doctest::Approx(365.0 / 2));
+
+    /** @arg The flat time statistics use the same axis: two days in range, one of them held */
+    CHECK_EQ(p.get("Total Time Flat"), 1.0);
+    CHECK_EQ(p.get("Time Flat / Total Time %"), doctest::Approx(50.0));
+}
+
 /** @} */

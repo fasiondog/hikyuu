@@ -30,7 +30,7 @@
 - **Total Invested Assets**：累计投入资产（券口径）。
 - **Total Borrowed Cash**：累计借入现金。
 - **Total Borrowed Assets**：累计借入资产。
-- **Total Dividends**：累计红利（所有 BONUS 记录的现金之和）。
+- **Total Dividends**：累计红利，**仅现金红利**（所有 BONUS 记录的现金之和）；送股（GIFT）、缩股（SUOGU）等不折算为金额，不计入本项。
 - **Cash Balance**：现金余额。
 - **Open Position Net Value**：未平仓头寸市值（多头市值）。
 - **Current Total Assets**：当前总资产（毛口径，含借入资产；仅用于展示，不用于收益计算）。
@@ -38,8 +38,8 @@
 收益与年化项
 ------------
 
-- **Open Position Account Return %**：未平仓账户收益率，``100 * (net_assets / 累计投入本金 - 1)``。
-- **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / 累计投入本金``。
+- **Open Position Account Return %**：未平仓账户收益率，``100 * (net_assets / total_base - 1)``（``total_base`` 为累计投入本金与累计投入资产之和）。
+- **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / total_base``。
 - **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``。
 - **Account CAGR %**：账户年复合收益率，``100 * ((net_assets / total_base) ^ (1 / years) - 1)``；
   当 ``net_assets <= 0``（爆仓/深度亏损）时返回 NaN（空值），不进入报告。

@@ -36,7 +36,9 @@ Account funds and assets
 - **Total Invested Assets**: accumulated invested assets (securities).
 - **Total Borrowed Cash**: accumulated borrowed cash.
 - **Total Borrowed Assets**: accumulated borrowed assets.
-- **Total Dividends**: accumulated dividends (sum of the cash of all BONUS records).
+- **Total Dividends**: the accumulated dividends, **cash dividends only** (the sum of the cash of all BONUS
+  records); stock dividends (GIFT), share consolidations (SUOGU) and similar events are not converted to
+  an amount and are not included.
 - **Cash Balance**: the current cash balance.
 - **Open Position Net Value**: the market value of the open long positions.
 - **Current Total Assets**: the current total assets (gross basis, including borrowed assets; for
@@ -45,8 +47,9 @@ Account funds and assets
 Returns and annualization
 -------------------------
 
-- **Open Position Account Return %**: ``100 * (net_assets / accumulated invested principal - 1)``.
-- **Closed Trade Account Return %**: ``100 * net profit of closed trades / accumulated invested principal``.
+- **Open Position Account Return %**: ``100 * (net_assets / total_base - 1)``, where ``total_base`` is the accumulated
+  invested principal plus the accumulated invested assets.
+- **Closed Trade Account Return %**: ``100 * net profit of closed trades / total_base``.
 - **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``.
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
   when ``net_assets <= 0`` (wiped out / deep loss) it returns NaN (Null) instead of entering the report.
