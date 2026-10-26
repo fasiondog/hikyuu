@@ -70,7 +70,10 @@ Returns and annualization
   flows, use **Account Time-Weighted Return %** (TWR) instead.
 - **Account Time-Weighted Return %** (extended): the time-weighted return, excluding cash flows. From the
   daily return ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1`` (``flow_t`` is the net inflow of the
-  day) build the index ``E = product(1 + r_t)``, then annualize as ``100 * (E ^ (1 / years) - 1)``.
+  day) build the index ``E = product(1 + r_t)``, then annualize as ``100 * (E ^ (1 / years) - 1)``. The period
+  uses the **usable days** (natural days minus the ones whose net assets are ``<= 0`` or whose return is not
+  finite; the skipped days are logged); a wiped out account does not stop the statistics and the returns
+  after a later checkin keep accumulating.
 - **Account Money-Weighted Return %** (extended): the money-weighted return, i.e. the annualized internal
   rate of return (XIRR) of the external cash flows, solving
   ``sum(CF_i / (1 + x) ^ ((t_i - t0) / 365)) = 0``; the cash flows include the initial investment, each
@@ -141,17 +144,19 @@ Risk-adjusted items (extended)
 ------------------------------
 
 The following metrics are based on the natural-day daily returns with external cash flows removed
-(``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``); the numerator of the annualized return is the
-time-weighted return (TWR):
+(``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``); both the volatility and the downside deviation
+use the **sample standard deviation** (``n-1``):
 
 - **Annual Volatility %**: ``std(r_t) * sqrt(365) * 100`` (sample standard deviation).
 - **Max Drawdown %**: the maximum peak-to-trough drawdown on the time-weighted index ``E``,
   ``100 * max((peak - E) / peak)``.
-- **Sharpe Ratio**: ``(TWR annual * 100 - rf) / annual volatility``, where ``rf`` is the 10Y government
-  bond yield (percent).
-- **Sortino Ratio**: ``(TWR annual * 100 - rf) / annualized downside deviation``, where the annualized
-  downside deviation is ``sqrt(mean(min(r_t, 0)^2)) * sqrt(365) * 100``.
-- **Calmar Ratio**: ``TWR annual / max drawdown`` (both as fractions).
+- **Sharpe Ratio**: ``(100 * mean(r_t) * 365 - rf) / annual volatility``; the numerator is the arithmetic
+  annualized return so that it shares the ``sqrt(365)`` period constant with the denominator; ``rf`` is the
+  mean 10Y government bond yield (percent) over the period, Null when the data is unavailable.
+- **Sortino Ratio**: ``(100 * mean(r_t) * 365 - rf) / annualized downside deviation``, where the annualized
+  downside deviation is ``sqrt(sum(r_t^2 for r_t < 0) / (n - 1)) * sqrt(365) * 100``.
+- **Calmar Ratio**: ``TWR annual / max drawdown`` (both as fractions; the numerator stays geometric).
 - **Avg Per-Trade Return %** / **Std Per-Trade Return %**: the mean and sample standard deviation of the
   per-trade return ``100 * profit / (buy amount + cost)``; records without a cost (e.g. dividend / bonus)
-  cannot yield a per-trade return and are skipped.
+  cannot yield a per-trade return and are skipped. Note the core profit statistics do **not** skip them, so
+  the trade counts of the two differ.

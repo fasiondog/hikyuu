@@ -734,7 +734,9 @@ Common parameters:
         py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
         R"(get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
 
-    Get the historical position extended details of the account (the closed records)
+    Get the historical position extended details of the account (the closed records); entries
+    whose K-line data is empty cannot be computed and are returned with the default (all zero)
+    extended fields, i.e. the data is missing
 
     :param Query.KType ktype: the K-line type
     :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
@@ -749,7 +751,8 @@ Common parameters:
         py::arg("datetime") = py::none(),
         R"(get_profit_percent_monthly(self, datetime=None) -> list[tuple[Datetime, double]]
 
-    Get the account profit percentage (monthly) of the account at the specified deadline
+    Get the account profit percentage (monthly) of the account at the specified deadline,
+    excluding the external cash flows (check in / check out)
 
     :param Datetime datetime: the specified deadline (defaults to the current time)
     :return: the account profit percentage (monthly))")
@@ -762,7 +765,8 @@ Common parameters:
         py::arg("datetime") = py::none(),
         R"(get_profit_percent_yearly(self, datetime=None) -> list[tuple[Datetime, double]]
 
-    Get the account profit percentage (yearly) of the account at the specified deadline
+    Get the account profit percentage (yearly) of the account at the specified deadline,
+    excluding the external cash flows (check in / check out)
 
     :param Datetime datetime: the specified deadline (defaults to the current time)
     :return: the account profit percentage (yearly))")
