@@ -2416,16 +2416,18 @@ void TradeManager::tocsv(const string& path) {
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename1);
 
     // The key itself is used as the column name when no translation is available
-    auto col = [](const char* key) { return lang_htr(key) + ","; };
+    auto col = [](const std::string& name) { return name + ","; };
 
     file.setf(std::ios_base::fixed);
     file.precision(3);
-    file << "#" << col("fill_date") << col("market_code") << col("stock_name") << col("business")
-         << col("planPrice") << col("realPrice") << col("goalPrice") << col("fill_number")
-         << col("commission") << col("stamp_tax") << col("transfer_fee") << col("other_cost")
-         << col("cost_total") << col("stoploss") << col("cash") << col("signal_part") << col("Date")
-         << col("Open") << col("High") << col("Low") << col("Close") << col("Amount")
-         << col("Volume") << col("remark") << std::endl;
+    file << "#" << col(htr("fill_date")) << col(htr("market_code")) << col(htr("stock_name"))
+         << col(htr("business")) << col(htr("planPrice")) << col(htr("realPrice"))
+         << col(htr("goalPrice")) << col(htr("fill_number")) << col(htr("commission"))
+         << col(htr("stamp_tax")) << col(htr("transfer_fee")) << col(htr("other_cost"))
+         << col(htr("cost_total")) << col(htr("stoploss")) << col(htr("cash"))
+         << col(htr("signal_part")) << col(htr("Date")) << col(htr("Open")) << col(htr("High"))
+         << col(htr("Low")) << col(htr("Close")) << col(htr("Amount")) << col(htr("Volume"))
+         << col(htr("remark")) << std::endl;
     TradeRecordList::const_iterator trade_iter = m_trade_list.begin();
     for (; trade_iter != m_trade_list.end(); ++trade_iter) {
         const TradeRecord& record = *trade_iter;
@@ -2465,10 +2467,11 @@ void TradeManager::tocsv(const string& path) {
     // Export the closed position records
     file.open(filename2.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
-    file << "#" << col("entry_date") << col("exit_date") << col("market_code") << col("stock_name")
-         << col("total_number") << col("buy_money") << col("total_cost") << col("sell_money")
-         << col("total_profit") << col("total_risk") << col("profit_loss_ratio") << col("hold_days")
-         << col("buy_count") << col("sell_count") << std::endl;
+    file << "#" << col(htr("entry_date")) << col(htr("exit_date")) << col(htr("market_code"))
+         << col(htr("stock_name")) << col(htr("total_number")) << col(htr("buy_money"))
+         << col(htr("total_cost")) << col(htr("sell_money")) << col(htr("total_profit"))
+         << col(htr("total_risk")) << col(htr("profit_loss_ratio")) << col(htr("hold_days"))
+         << col(htr("buy_count")) << col(htr("sell_count")) << std::endl;
     PositionRecordList::const_iterator history_iter = m_position_history.begin();
     for (; history_iter != m_position_history.end(); ++history_iter) {
         const PositionRecord& record = *history_iter;
@@ -2488,11 +2491,12 @@ void TradeManager::tocsv(const string& path) {
     // Export the open position records
     file.open(filename3.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
-    file << "#" << col("entry_date") << col("exit_date") << col("market_code") << col("stock_name")
-         << col("current_number") << col("total_number") << col("buy_money") << col("total_cost")
-         << col("sell_money") << col("total_risk") << col("buy_count") << col("sell_count")
-         << col("floating_profit") << col("profit_cost_price") << col("floating_profit_ratio")
-         << std::endl;
+    file << "#" << col(htr("entry_date")) << col(htr("exit_date")) << col(htr("market_code"))
+         << col(htr("stock_name")) << col(htr("current_number")) << col(htr("total_number"))
+         << col(htr("buy_money")) << col(htr("total_cost")) << col(htr("sell_money"))
+         << col(htr("total_risk")) << col(htr("buy_count")) << col(htr("sell_count"))
+         << col(htr("floating_profit")) << col(htr("profit_cost_price"))
+         << col(htr("floating_profit_ratio")) << std::endl;
     position_map_type::const_iterator position_iter = m_position.begin();
     for (; position_iter != m_position.end(); ++position_iter) {
         const PositionRecord& record = position_iter->second;
@@ -2533,9 +2537,10 @@ void TradeManager::tocsv(const string& path) {
     // Export the short positions (open + closed)
     file.open(filename5.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename5);
-    file << "#" << col("kind") << col("entry_date") << col("exit_date") << col("market_code")
-         << col("stock_name") << col("number") << col("total_number") << col("buy_money")
-         << col("total_cost") << col("sell_money") << col("total_risk") << std::endl;
+    file << "#" << col(htr("kind")) << col(htr("entry_date")) << col(htr("exit_date"))
+         << col(htr("market_code")) << col(htr("stock_name")) << col(htr("number"))
+         << col(htr("total_number")) << col(htr("buy_money")) << col(htr("total_cost"))
+         << col(htr("sell_money")) << col(htr("total_risk")) << std::endl;
     auto writeShort = [&](const char* kind, const PositionRecord& r) {
         file << kind << sep << r.takeDatetime << sep << r.cleanDatetime << sep
              << r.stock.market_code() << sep << r.stock.name() << sep << r.number << sep
@@ -2551,8 +2556,8 @@ void TradeManager::tocsv(const string& path) {
     // Export the current borrow stock
     file.open(filename6.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename6);
-    file << "#" << col("market_code") << col("stock_name") << col("number") << col("value")
-         << std::endl;
+    file << "#" << col(htr("market_code")) << col(htr("stock_name")) << col(htr("number"))
+         << col(htr("value")) << std::endl;
     for (const auto& kv : m_borrow_stock) {
         const BorrowRecord& r = kv.second;
         file << r.stock.market_code() << sep << r.stock.name() << sep << r.number << sep << r.value

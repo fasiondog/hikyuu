@@ -192,7 +192,7 @@ PYBIND11_MODULE(core, m) {
     The placeholders in the msgid use the python style ``{}``, and the caller formats the returned
     text itself::
 
-        htr("Account({}) cumulative return").format(tm.name)
+        htr("Account({}) Cumulative Return").format(tm.name)
 
     :param str key: the text in English (the msgid)
     :return: the translated text; the original text is returned when no translation exists

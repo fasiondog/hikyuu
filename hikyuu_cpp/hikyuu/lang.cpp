@@ -25,8 +25,10 @@ void loadLocalLanguage(const std::string &path) {
     std::string lang = getSystemLanguage();
     if (lang == "zh_cn") {
         auto &reader = moFileLib::moFileReaderSingleton::GetInstance();
-        reader.ReadFile(fmt::format("{}/zh_CN/hikyuu.mo", path).c_str());
+        // The plugin catalog is read first: a duplicated id replaces the existing entry, so the core
+        // catalog loaded last owns the wording of every key both catalogs define
         reader.ReadFile(fmt::format("{}/zh_CN/hikyuu_plugin.mo", path).c_str());
+        reader.ReadFile(fmt::format("{}/zh_CN/hikyuu.mo", path).c_str());
     }
 }
 
