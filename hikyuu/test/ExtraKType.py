@@ -16,6 +16,8 @@ import subprocess
 import sys
 import unittest
 
+from hikyuu import is_valid_license
+
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CONFIG = "test_data/hikyuu_win.ini" if sys.platform == "win32" else "test_data/hikyuu_linux.ini"
 
@@ -46,6 +48,7 @@ EXTRA_KTYPE_PROBE = (
 
 
 class ExtraKTypeTest(unittest.TestCase):
+    @unittest.skipUnless(is_valid_license(), "the extended K-line plugin requires a valid license")
     def test_register_extra_ktype_python_callback(self):
         # The python callback must be callable from the core (GIL wrapped) and destructible
         # on release without crashing.

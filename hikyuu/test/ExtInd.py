@@ -18,6 +18,7 @@ import numpy as np
 from test_init import *
 
 
+@unittest.skipUnless(is_valid_license(), "the extended indicators require a valid license")
 class ExtIndTest(unittest.TestCase):
     def setUp(self):
         stk = sm['sh000001']
