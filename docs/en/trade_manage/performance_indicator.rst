@@ -55,6 +55,9 @@ Returns and annualization
   ``100 * (net_assets / total_base - 1)``, where ``total_base`` is the accumulated invested principal plus the
   accumulated invested assets.
 - **Closed Trade Account Return %**: ``100 * net profit of closed trades / total_base``.
+- Both items are recorded as ``0`` when ``total_base == 0`` (nothing invested); if the principal has been fully
+  checked out while the account still holds cash profit, the value does not represent the real return and
+  **Account Time-Weighted Return %** should be used instead.
 - **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``.
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
   Null (NaN) when ``net_assets <= 0`` (wiped out / deep loss), when ``total_base <= 0`` (nothing invested) or
