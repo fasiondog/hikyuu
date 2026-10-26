@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  An open-source, ultra-fast, and efficient quantitative trading framework in C++/Python
+  An open-source quantitative backtesting framework in C++/Python — next-bar fills, itemized costs, equity adjustments, leverage off by default
 </p>
 
 <p align="center">
@@ -17,11 +17,25 @@
   <b>English</b> | <a href="readme.zh.md">简体中文</a>
 </p>
 
-Hikyuu Quant Framework builds on mature systematic trading and portfolio management concepts, with a core
-focus on a fast research workflow for strategy (or asset) portfolios. It decomposes quantitative analysis
-into independently replaceable **strategy parts** — market environment, signals, stop-loss / take-profit,
-money management, profit goals, slippage, multi-factor models and fund allocation — which you can freely
-combine into your own strategy library and validate through backtesting.
+**Hikyuu's kernel is the completeness and correctness of trading theory and financial semantics**: how a
+trade should financially come into existence — when it fills, which items make up its cost, how positions
+and cash change on ex-rights / ex-dividend dates, which convention performance follows, how nulls and
+non-finite values propagate — is **complete and explicit** in the framework: no missing links, rules that
+are actually executed, and results that can be verified item by item, rather than left to the user to
+guarantee.
+
+**Its purpose, in one sentence: never let a strategy that "runs" but does not hold up be taken as a
+conclusion.**
+
+Two means serve this kernel: **splitting the structure along theoretical questions** — a strategy must
+answer market environment, condition, signal, position sizing, exit and fill price; a portfolio must
+answer who participates, how much money each gets and by what score — each is a theoretical must-answer
+question, not an engineering module; and **portfolio as strategy** — making the portfolio a first-class
+citizen (`SE` / `AF` / `MF`) is what lets the kernel extend from a single strategy to multi-asset,
+multi-strategy. Every link can then be replaced and evaluated independently, and every trade is recorded
+in a queryable ledger; the value of the framework is not exhaustive coverage, but **getting every slot
+right and keeping the contract intact after replacement** (see "🏛️ Trading theory and financial
+semantics" and "🧬 Portfolio as strategy" below).
 
 > ⚠️ **Disclaimer**: This project is an open-source financial technology research tool. It is intended
 > for personal study, academic research and data analysis only. It does not constitute any investment
@@ -39,15 +53,19 @@ combine into your own strategy library and validate through backtesting.
 <p align="center">
   <table>
     <tr>
-      <td align="center" width="33%">
-        <strong><code>⚡ 166ms</code></strong><br>
-        <sub>Sum over 19.13 million K-line bars after warm-up (AMD 7950x)</sub>
+      <td align="center" width="25%">
+        <strong><code>⚡ 6s / 166ms</code></strong><br>
+        <sub>Loading 19.13M daily bars + summing the 20-day MA: first run / after warm-up (AMD 7950x, <a href="https://mp.weixin.qq.com/s?__biz=MzkwMzY1NzYxMA==&mid=2247483768&idx=1&sn=33e40aa9633857fa7b4c7ded51c95ae7">benchmark details</a>)</sub>
       </td>
-      <td align="center" width="33%">
-        <strong><code>🧩 10+</code></strong><br>
-        <sub>Core strategy parts · freely composable asset library</sub>
+      <td align="center" width="25%">
+        <strong><code>🏛️ 3 layers</code></strong><br>
+        <sub>Built-in financial semantics (trading theory / trading rules / calculation)</sub>
       </td>
-      <td align="center" width="33%">
+      <td align="center" width="25%">
+        <strong><code>🧬 3 modes</code></strong><br>
+        <sub>Portfolio run modes (A signal aggregation / B fund allocation / C shared account)</sub>
+      </td>
+      <td align="center" width="25%">
         <strong><code>💾 4 types</code></strong><br>
         <sub>Storage backends (HDF5 / MySQL / ClickHouse / SQLite)</sub>
       </td>
@@ -68,14 +86,54 @@ combine into your own strategy library and validate through backtesting.
 
 ---
 
+## 🧭 Before you start: what it is, and what it is not
+
+> **It is not an automated trading tool, nor an order execution system**: it does not embed broker
+> connectivity, promise automatic order placement, or do tick-level matching or low-latency execution;
+> `OrderBroker` is merely a pluggable interface — whether to connect one, and to which channel, is your
+> decision and your compliance responsibility. It advances bar by bar and executes the financial semantics
+> of a trade in full according to real rules; the decisions remain yours. Matching microstructure (partial
+> fills, cancellations, order queues) and modern portfolio optimization (mean-variance, risk parity) are
+> no exception: the framework does not pick such algorithms for you, but it keeps the slots ready —
+> matching plugs in via `OrderBroker` and fill models; portfolio optimization takes an `AF` subclass, and
+> the same applies to `SE` / `MF` / `MM` / `ST`. **The point of the framework is not to write all the
+> algorithms, but to keep every slot right: each slot is replaceable, and settlement and validation still
+> hold after replacement.**
+
+**The barrier is kept on purpose**: the framework will not use a pretty curve to make up for the premises
+you never thought of. You have to understand these links yourself — otherwise all you get is the illusion
+of something that runs.
+
+From another angle, it works more like a map: it lists item by item what building a strategy should take
+into account (environment → condition → signal → sizing → exit → slippage → cost; portfolio layer:
+selection → fund allocation → risk control). Fill it in item by item and the path itself is the way in.
+**It suits people who want to study systematic trading seriously** — self-learners and students included —
+not those who want a return curve in two days.
+
+> "If you don't bet, you can't win. If you lose all your chips, you can't bet." — Larry Hite
+
+A few words for beginners and self-learners:
+
+- **Get the flow running first; talk about returns later**: a backtest return is not proof of ability —
+  being able to explain why every trade filled is.
+- **Change one part at a time**: keep the other links fixed as a control, or you cannot tell where a
+  change in results came from.
+- **Get costs and equity adjustments right before tuning parameters**: parameters "optimized" without
+  cost constraints are usually just fitting noise.
+- **Care about "in what environment it fails"**: that is more useful than "how much it made
+  historically"; test with out-of-sample and walk-forward validation (`SYS_WalkForward`) instead of
+  re-tuning on the same window.
+- **Be careful with what is off by default**: leverage and short selling are deliberately disabled by
+  default; understand margin, forced liquidation and borrow costs before turning them on explicitly.
+
+---
+
 ## ⚡ Quick Start (run your first backtest)
 
 ### Requirements
 
-- **Python 3.10+** (3.9 and below are no longer supported for pip installation since 2.8.0)
+- **Python 3.10+** (official packages are built for Python 3.10 – 3.13 only)
 - Windows / Linux / macOS (Linux: Ubuntu 24.04+)
-- Main dependencies are installed automatically: `numpy`, `pandas`, `matplotlib`, `PySide6`,
-  `tables`, etc.
 
 ### Step 1: Install
 
@@ -101,7 +159,9 @@ HikyuuTDX
 importdata
 ```
 
-> ℹ️ **Data coverage**: HikyuuTDX downloads **China A-share** historical data only and needs a one-time initial configuration in the GUI. Overseas markets (US stocks, etc.) are not available yet and will be supported gradually.
+> ℹ️ **Data coverage**: HikyuuTDX downloads **China A-share** historical data only and needs a one-time
+> initial configuration in the GUI. Overseas markets (US stocks, etc.) are not available yet and will be
+> supported gradually.
 
 ### Step 3: Run your first backtest
 
@@ -129,104 +189,254 @@ sys.run(sm['sz000001'], Query(-150))
 
 > 📖 See the [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True)
 > for the complete example.
-
-### ❓ FAQ
-
-| Symptom                                                     | Solution                                                                              |
-| :---------------------------------------------------------- | :------------------------------------------------------------------------------------ |
-| `pip install` on Windows hangs while downloading PyQt / PySide6 | Use the Tsinghua mirror: `pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple` |
-| `HikyuuTDX` GUI cannot import data                          | Use the `importdata` command instead (run the GUI once first to generate the config)   |
-| Errors about a missing hdf5 / dll                           | Run `pip install tables` to reinstall HDF5 support                                    |
-| Build tool for **building from source**                     | This project uses **xmake**, not cmake                                                |
-
-> 💡 For more questions see the [documentation](https://hikyuu.readthedocs.io/en/latest/index.html),
-> or [open an issue on Gitee](https://gitee.com/fasiondog/hikyuu/issues).
+>
+> Once a single system works, the next step is combining several strategies into one portfolio: see
+> "🧬 Portfolio as strategy" below.
 
 ---
 
-## 🚀 Why Hikyuu?
+## 🏛️ Trading theory and financial semantics: complete and correct
 
-> Powerful features for your quantitative trading research
+> Three layers, each owning one thing — miss one and it does not hold: **trading theory** — no missing
+> link; without the portfolio layer, multiple strategies are just parallel backtests. **trading rules** —
+> the rules must be right; without equity adjustments and itemized costs, ex-rights days and cross-year
+> returns are distorted, and without filling-time constraints, a signal filled on its own bar is
+> look-ahead. **calculation** — null semantics must be consistent; left to each indicator, one `inf`
+> pollutes every downstream window aggregation. All three are explicit objects and global conventions in
+> the framework — enforced by the framework and guarded at the entry points, not by a reminder in the
+> docs.
 
-### 💹 Flexible composition: build a categorized strategy asset library
+| Layer | What it answers |
+| :--- | :--- |
+| Trading theory | Which parts make up a strategy; which layers organize a portfolio |
+| Trading rules | How a trade fills, pays fees, adjusts for equity events and is priced in the market |
+| Calculation | How nulls and numbers stay consistent along the whole computation chain |
 
-Hikyuu provides a lightweight abstraction over systematic trading methods, encapsulating the market
-environment, signal generators, stop-loss / take-profit, money management, profit goals, slippage and
-fund allocation as independently replaceable **strategy parts**. You can combine them freely, backtest
-efficiently, and focus on the effect and impact of a single part during research. See
-"Core parts of the systematic trading architecture" below for the complete list.
+**Trading theory**: the split follows theoretical structure, not code responsibilities — a strategy must
+answer market environment (`EV`), condition (`CN`), signal (`SG`), position sizing (`MM`), exit (`ST` /
+`TP` / `PG`) and fill price (`SP`); a portfolio must answer who participates (`SE`), how much money each
+gets (`AF`: L1 weights / L2 conversion / L3 risk control) and by what score (`MF`). Each is a theoretical
+must-answer question; miss one and the strategy is incomplete.
 
-<p align="center">
-  <img src="docs/en/_static/10002-function-arc.png" alt="Functional architecture" width="800">
-</p>
+**Trading rules**: fills are delayed to the next bar's open by default (`buy_delay` / `sell_delay`); a
+one-price board (high == low) or a trading suspension defers the fill, and it is abandoned beyond
+`max_delay_count`; the slippage price is clamped to the day's `[low, high]`. Costs are itemized per
+`CostRecord` (commission / stamp duty / transfer fee) and computed separately for buys and sells;
+`updateWithWeight` adjusts positions and cash on ex-rights / ex-dividend events; margin financing and
+securities lending are off by default; performance is annualized on net assets and calendar days
+(`duration / 365`).
 
-### 🚀 Extreme performance: build your own quant application with ease
+**Calculation**: undefined states (division by zero / zero variance / all-missing / zero benchmark)
+produce `Null` (NaN), not `0.0` or `inf` — `0.0` collides with a legitimate zero and `inf` pollutes
+downstream aggregation; aggregations accumulate only finite values and count only valid entries in the
+denominator (one for a mean, two for dispersion), producing `Null` only when everything is missing;
+serialization stores IEEE bit patterns, so NaN / ±Inf / signed zero round-trip losslessly. Trading inputs
+are constrained the same way: a non-finite or non-positive size, or a non-positive fill price, is
+discarded; a negative rebalance cycle raises immediately. Nulls and finite values are a **global contract
+rather than a per-part choice** — new parts inherit the same convention automatically.
 
-The project consists of three parts: a **high-performance C++ core library**, the **Python interface
-layer (hikyuu)**, and the **interactive exploration tool**.
+These three layers are not documentation promises: 1,300+ explicit guards in the core code catch rule and
+input-boundary violations; 1,600+ doctest cases with 16,000+ assertions are organized "one suite per
+module, one case per boundary", covering empty inputs, `Null<T>()`, non-finite values and out-of-range
+exceptions; `small-test` runs on the three-platform CI without real market data.
 
-- **Measured on an AMD 7950x**: loading the full A-share market (19.13 million daily K-line bars) and
-  computing and summing the 20-day moving average for the first time takes only **6 seconds**; once the
-  data is warm, the same operation takes only **166 milliseconds**
-  ([📊 Performance benchmark details](https://mp.weixin.qq.com/s?__biz=MzkwMzY1NzYxMA==&mid=2247483768&idx=1&sn=33e40aa9633857fa7b4c7ded51c95ae7),
-  article in Chinese).
-- **C++ core library**: ships with a complete strategy framework, native multi-threading and multi-core
-  acceleration, leaving room to scale for very high computing demands. The core library can also be used
-  standalone, helping developers build custom quantitative tools quickly.
-- **Python interface layer (hikyuu)**: a lightweight wrapper around the C++ core with TA-Lib integrated;
-  converts seamlessly to and from numpy and pandas, so it plugs into the mainstream Python data analysis
-  ecosystem.
-- **hikyuu.interactive**: the interactive exploration tool, with built-in visualization of candlesticks,
-  indicators and signals, suitable for rapid strategy validation and backtest analysis.
+> To bypass these rules you can only change parameters explicitly — **the framework takes the side of
+> "holding up as a trade" rather than "being the least trouble to run"**. This is also a common reason
+> why the same strategy shows different returns across frameworks: whatever is left unmodeled depends on
+> the user remembering to make it up.
 
-### 🍳 Concise syntax: explore strategies faster and more freely
+> The trade-off has a cost: the same strategy usually shows lower returns than an idealized backtest —
+> fees deducted, fills waited for, equity events adjusted. Better an ugly backtest number than letting a
+> runnable-but-wrong result pass as a usable strategy.
 
-Both **object-oriented** and **command-line** styles are supported. Especially during strategy exploration,
-the command-line style is minimal and expressive, letting you validate ideas and iterate faster.
+---
 
-### 🔐 Self-controlled: build your own cloud quant platform
+## 🧬 Portfolio as strategy: one engine covering systematic trading / asset allocation / multi-factor
 
-Combining **Python + Jupyter** with a cloud server gives you a fully self-controlled cloud quant platform.
-Once deployed, access it anywhere (phone, tablet or computer) and turn new ideas into practice quickly. It
-also integrates with mature AI and data analysis tools such as **numpy, scipy, pandas and TensorFlow** for
-building intelligent quantitative systems. You can customize the interface or deploy it as a service as
-needed.
+**A portfolio and a strategy are the same thing**: a portfolio node is not "a set of weights" — it holds
+a full set of trading semantics of its own. The sub-systems' `EV` / `CN` / `SG` / `MM` / `ST` / `TP` /
+`PG` / `SP` decide *how to trade*; the ledger (`TM`) records fills and positions trade by trade, computes
+costs item by item (commission / stamp duty / transfer fee) and adjusts for equity events; the execution
+layer handles next-bar fills, retries on failure and trading suspensions — these three layers still hold
+on the portfolio node, merged into a single account only at the outermost level.
 
-### 🎁 Modular and extensible data storage
+The portfolio layer therefore answers only the two questions a portfolio should answer: **who
+participates** (`SE` selection, `MF` multi-factor scoring) and **how much money each gets** (`AF`: L1
+weights / L2 conversion / L3 portfolio risk control).
 
-Four storage backends are currently supported: **HDF5, MySQL, ClickHouse and SQLite**, with HDF5 as the
-default (compact, fast to read and write, and easy to back up). ClickHouse is available through a plugin:
-it reads and writes faster than HDF5 and uses far less space than MySQL, making it a better fit for
-minute-level and higher-frequency data.
+This is not a naming refinement but three directly usable consequences:
 
-### 💻 Concise API design
+- **A node is a complete trading system, not a money-allocation slot** — a single system, a walk-forward
+  system, a custom Python system, or a portfolio itself can all be attached as a node of a parent
+  portfolio, with no adapter layer; there is no depth limit (duplicate additions and circular references
+  are rejected).
+- **Financial semantics sit on every node** — stop-loss, itemized costs, equity adjustments and delayed
+  fills in a sub-system keep working unchanged after joining a portfolio; they are merged into a single
+  account only at the outermost level.
+- **The three layers of `AF` are independently replaceable (mode A)** — swapping the weight source
+  (`AF_EqualWeight` / `AF_FixedWeightList` / `AF_MultiFactor`) does not touch L3 risk control, and
+  changing L3 does not touch the L1 weights; mode B allocates quotas with sub-manager autonomy and skips
+  the L3 clipping. See "🏗️ Core parts of the systematic trading architecture" below for the full list.
 
-A complete strategy backtest system takes only a few lines of code — the intuitive API makes strategy
-development more efficient.
+```python
+from hikyuu.interactive import *
 
-### 🔓 Open source and transparent, with data under your control
+# 1. Each sub-system is a complete systematic trading system: its own SG / MM / ST and ledger
+def make_leaf(code, sg):
+    sys = SYS_Simple(tm=crtTM(init_cash=100000), sg=sg,
+                     mm=MM_FixedPercent(0.5), st=ST_FixedPercent(0.05))
+    sys.to = sm[code].get_kdata(Query(-500))    # bind its own K-line
+    return sys
 
-Released under the **Apache 2.0** license, with fully auditable source code. Core data and strategies stay
-entirely under your local control; the C++ core library can be used standalone, so you can build your own
-client tools without worrying about third-party platform restrictions.
+trend = make_leaf("sh600000", SG_Cross(EMA(CLOSE(), n=5), MA(CLOSE(), n=60)))
+grid = make_leaf("sh600004", SG_Cross(EMA(CLOSE(), n=3), MA(CLOSE(), n=10)))
+
+# 2. The portfolio factory does only what a portfolio should do: who participates (SE) + how much
+#    money each gets (AF)
+group = PF_SignalAggregate(tm=crtTM(Datetime(202001010000), 300000), adjust_cycle=5)
+group.add(trend)
+group.add(grid)
+
+# 3. This portfolio can itself participate as a node of a larger portfolio (layer-by-layer aggregation
+#    across instruments and strategies)
+top = PF_Simple(tm=crtTM(Datetime(202001010000), 1000000),
+                af=AF_FixedWeightList([0.6, 0.4]), adjust_cycle=5)
+top.add(group)
+top.add(make_leaf("sh600005", SG_Cross(EMA(CLOSE(), n=10), MA(CLOSE(), n=30))))
+
+# 4. One run: the whole portfolio settles in a single account
+top.run(Query(-500))
+print(top.tm.get_funds().total_assets)
+```
+
+The same engine supports three portfolio run modes, each with its own factory (an existing portfolio can
+also switch explicitly via `set_mode`):
+
+| Factory | Account topology and money flow | Methodology | Typical scenarios |
+| :--- | :--- | :--- | :--- |
+| `PF_SignalAggregate` (mode A) | Sub-systems run on fixed shadow accounts purely as signal sources; the parent converts their intents into execution orders through the AF's L2 conversion, applies L3 portfolio risk control and orders uniformly | Signal / view aggregation and portfolio construction; multi-factor scores can drive selection or weights | Overlaying multiple strategy views on one instrument pool; factor-weighted selection |
+| `PF_Simple` (mode B) | On rebalance days the AF allocates a quota to each sub-system; sub-systems decide autonomously within their quota and the parent passes their orders through | Asset allocation and rebalancing: weights / risk budgeting / rebalance cycle | FOF / MOM, core-satellite, periodic rebalancing |
+| `PF_WithoutAF` (mode C) | No shadow accounts; sub-systems trade directly on the parent's real account using their own MM | Parallel execution of systematic trading: each system keeps its full decision chain | Reproducing the legacy `Portfolio` backtest semantics; multiple strategies sharing one cash pool |
+
+When personal capital is limited and strategies are many, mode A is more practical: sub-systems act as
+signal sources only and hold no capital; the parent account synthesizes the views into a net position and
+orders uniformly, avoiding the fragmentation of "each strategy gets a slice too small for one lot". Mode
+B fits scenarios where capital can be partitioned and accounted for independently.
+
+The three modes are not mutually exclusive: within one portfolio you can replace `SE` / `AF` / `MF`, and
+a portfolio of one mode can be a node of another (e.g. an outer mode B allocating quotas to an inner mode
+A), layer by layer. Multi-factor is not a separate switch: it plugs into both A and B paths through
+`SE_MultiFactor` (score-based selection) and `AF_MultiFactor` (weights from the SE scores).
+
+Rebalance days are set by `set_adjust_cycle(n)` or `set_adjust_dates([...])`; sub-system cash is
+reclaimed on rebalance days and reallocated by the AF, so the cash released by a sub-system's stop-loss /
+take-profit flows back to the portfolio layer on the next rebalance day (`set_adjust_cycle(1)` settles
+every trading day).
+
+> ⚠️ Two prerequisites: every sub-system keeps its own independent SG / MM (sharing them means they
+> overwrite each other); `run(kdata)` requires each sub-system to have bound its own K-line — otherwise
+> use `run(Query(...))` driven by the trading calendar. The architecture supports multiple markets; the
+> built-in importers currently cover the A-share market, and other assets plug in via custom data drivers
+> or plugins.
+
+**A team's or an individual's strategy pool can be backtested as a whole or accounted for separately**:
+build each strategy as an independent node — regardless of instrument or author, they keep their own
+signals, sizing and stop-loss; the portfolio layer decides who participates and how much money each
+gets, and the parent account produces the overall performance. In modes A / B every sub-system keeps its
+own ledger, so you can look at the whole and at the contribution of one strategy at the same time; the
+hierarchy can be organized as "team → group → member" using the same nesting mechanism as strategies.
+
+### Differences from common practice
+
+> The two common approaches each fit different workflows; the difference is who carries these links: one
+> runs several strategies side by side on one account in an event-driven framework, with no portfolio
+> layer modeled — who participates, how much money each gets and when to rebalance are yours to wrap; the
+> other turns signals / factors into matrices for an optimizer or model, getting a set of weights whose
+> order sizes, stop-loss, take-profit, fill timing and costs live in a separate execution layer that is
+> not one abstraction with the strategy.
+
+| Dimension | Event-driven parallel strategies | Vectorized factor / signal research | Hikyuu |
+| :--- | :--- | :--- | :--- |
+| Hierarchy model | Strategies side by side on one account, no portfolio layer | Signal matrix → portfolio weights → separate executor | Portfolio and strategy are isomorphic, arbitrarily deep nesting |
+| Portfolio-layer duties | Hand-written wrapper for allocation and rebalancing | Weights come out of the optimizer / model | `SE` selection + `AF` (L1 weights / L2 conversion / L3 risk control) + `MF` scoring built in |
+| Trading semantics | Implemented by each strategy | Carried by a separate executor, not one abstraction with the strategy | `EV` / `CN` / `SG` / `MM` / `ST` / `TP` / `PG` / `SP` + itemized costs, equity adjustments, delayed fills and retries |
+| State synchronization | Shared cash pool; sub-systems influence each other only indirectly | No day-by-day state machine | At the open / close stages of the same bar, the parent account keeps one set of books |
+| Compute kernel | Mostly interpreted implementations | Vectorized acceleration | C++ kernel + native multi-threading, with optional local vectorized compilation (the `local` option) |
+| AI takeover granularity | Generate a whole strategy or parameter set | Generate factors / portfolio weights | Can go down to a single part; the rest stays framework-managed |
+
+If you only do factor research in a vectorized environment, the division of the other two lines is not
+necessarily a problem; Hikyuu's choice is to bring the portfolio layer and trading semantics into one
+abstraction, at the cost of one more structural layer to understand.
+
+**The difference is not whether you can compose, but the blast radius of mistakes**: commercial tools
+leave the portfolio layer to your scripts — allocation, cash constraints, rebalancing and reconciliation
+live in the same block of code, and one mistake makes the whole book wrong; Hikyuu splits the portfolio
+layer into selection `SE`, fund allocation `AF` (L1 weights / L2 conversion / L3 risk control) and
+scoring `MF`, with default implementations. When customizing you answer only "how much each gets", while
+settlement, reconciliation, cash limits and fees stay with the framework.
+
+By the standard of "structure split along trading theory, every slot replaceable, contracts intact after
+replacement", we have not seen a second implementation among publicly visible open-source frameworks.
+
+### 🤖 AI applicability: takeover granularity and integration cost
+
+> Consider a concrete task: **let AI optimize only the take-profit, while entries and sizing keep the
+> existing rules**.
+>
+> In most frameworks the cost of this is not training but rewiring: the exit logic sits inside the
+> strategy class, and pulling it out, exposing account state to the outside and making the reward reflect
+> real fills and costs takes a thick wrapper layer. In Hikyuu the take-profit is already an independent
+> object (`TP`): write a `TP` subclass and nothing else moves.
+
+| Three things AI integration must solve | Most frameworks | Hikyuu |
+| :--- | :--- | :--- |
+| Pull out the decision point | Edit the strategy code, or generate the whole strategy | Parts are already objects; swap one |
+| Host account and position state | Maintain it yourself, or expose internals | Hosted by `TM`; read directly via `get_funds(dt)` |
+| Make the reward reflect real friction | Rebuild costs / equity adjustments / fill conventions | NAV already net of costs, equity-adjusted, filled at real timing |
+
+> Both costs shrink at once: the **search space** narrows from "strategies × parameters" to "the output
+> of one part"; the **experiment cost** drops from "build an adapter layer" to "write one part". Add the
+> determinism of bar-driven execution (episodes are replayable) and entry guards (illegal configurations
+> fail early), and you can first confine AI to a narrow experiment on one part, then widen the takeover
+> step by step.
+
+> Current state: `runMoment` / `get_funds(dt)` / `get_performance(dt)` provide the `step` / `state` /
+> `reward` primitives, and the part contract (`clone`, serialization, parameter enumeration) supports
+> search and evolution; walk-forward optimization is built in (`SYS_WalkForward` with
+> `SE_MaxFundsOptimal` / `SE_PerformanceOptimal` / `SE_EvaluateOptimal`). A thin Gym-style wrapper with
+> example-level feature and reward references is planned; the trainer stays outside.
 
 ---
 
 ## 🏗️ Core parts of the systematic trading architecture
 
-> Rigorously architected around systematic trading concepts; every part can be replaced and combined freely
+> The project consists of three parts: a **C++ core library**, a **Python interface layer** and an
+> **interactive exploration tool**; every part can be replaced and combined freely.
+>
+> The data layer supports four storage backends: **HDF5 / MySQL / ClickHouse / SQLite** (HDF5 by default;
+> ClickHouse comes as a plugin — it reads and writes minute-level data faster than HDF5 and uses far less
+> space than MySQL, fitting minute-level and higher-frequency data better).
+
+<p align="center">
+  <img src="docs/en/_static/10002-function-arc.png" alt="Functional architecture" width="800">
+</p>
+
+This table is the **slot list of the domain model**: every row is a replaceable slot (`EV` / `CN` / `SG` /
+`MM` / `ST` / `TP` / `PG` / `SP`; `SE` / `AF` / `MF`) — swap any one and settlement, costs and validation
+remain with the framework.
 
 | Layer                    | Part                         | Description                                        |
 | :----------------------- | :--------------------------- | :------------------------------------------------- |
-| **Portfolio layer**      | `Portfolio / PF`             | Portfolio: strategy scheduling across multiple systems |
-|                          | `Selector / SE`              | Selector: system / strategy screening              |
-|                          | `AllocateFunds / AF`         | Fund allocation: capital allocation across systems |
+| **Portfolio layer**      | `PF_*` (portfolio factories; `Portfolio` is a compatibility alias) | Multi-asset, multi-strategy portfolios: selection, fund allocation and unified accounting |
+|                          | `Selector / SE`              | System / strategy screening                        |
+|                          | `AllocateFunds / AF`         | Fund allocation: portfolio-level L1 weights / L2 conversion / L3 risk control |
 |                          | `MultiFactor / MF`           | Multi-factor model: factor scoring and ranking     |
-| **Trading system SYS**   | `Environment / EV`           | Environment: market regime validity assessment     |
+| **Trading system SYS**   | `Environment / EV`           | Market environment: validity assessment of the broad market regime |
 |                          | `Condition / CN`             | Condition: situations where the system applies     |
-|                          | `Signal / SG`                | Signal: generates buy / sell signals               |
-|                          | `Stoploss / Stopprofit / ST` | Stop-loss / take-profit: risk-control exits        |
+|                          | `Signal / SG`                | Signal generator: produces buy / sell signals      |
 |                          | `MoneyManager / MM`          | Money management: order size control               |
+|                          | `Stoploss / ST`              | Stop-loss: risk-control exit                       |
+|                          | `Takeprofit / TP`            | Take-profit: exit when the target level is reached |
 |                          | `ProfitGoal / PG`            | Profit goal: exit when the target is reached       |
 |                          | `Slippage / SP`              | Slippage: price simulation in backtesting          |
 | **Trade management**     | `TradeManager / TM`          | Trade manager: account cash and position records   |
@@ -280,6 +490,17 @@ Python-side dependencies are listed in [requirements.txt](requirements.txt).
 
 ---
 
+## 🛠️ Engineering and architecture
+
+For those who want to build on or maintain the project long-term, the following is directly verifiable:
+
+- **C++20 + xmake**: CI on Windows / Ubuntu / macOS; third-party dependencies and their licenses are summarized in `THIRD_PARTY_LICENSES.md`
+- **Three test tiers**: `small-test` (CI default, no real market data) / `unit-test` / `real-test` (requires real market data), plus `-m coverage` for an lcov report
+- **The C++ core is independently detachable**: `hikyuu_cpp/hikyuu` is a standalone build target, so custom tools can be built on it without Python
+- **Bilingual documentation**: `docs/zh` and `docs/en` share the same structure, and the core C++ / Python comments and docstrings are in English
+
+---
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=fasiondog%2Fhikyuu&type=date&legend=top-left">
@@ -289,4 +510,3 @@ Python-side dependencies are listed in [requirements.txt](requirements.txt).
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&legend=top-left" />
  </picture>
 </a>
-

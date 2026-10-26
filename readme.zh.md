@@ -257,12 +257,12 @@ print(top.tm.get_funds().total_assets)
 | AI 接入要解决的三件事 | 多数框架 | Hikyuu |
 | :--- | :--- | :--- |
 | 把决策点拆出来 | 改策略代码，或生成整个策略 | 部件本身就是对象，换一个即可 |
-| 托管账户与持仓状态 | 自己维护，或暴露内部状态 | `TM` 托管，`getFunds(dt)` 直接取 |
+| 托管账户与持仓状态 | 自己维护，或暴露内部状态 | `TM` 托管，`get_funds(dt)` 直接取 |
 | 让奖励反映真实摩擦 | 自己重建成本 / 权息 / 成交口径 | 净值已扣成本、已调权息、按真实时机成交 |
 
 > 于是两件事同时变小：**搜索空间**从「策略 × 参数」缩到「一个部件的输出」；**实验成本**从「造一层适配」降到「写一个部件」。再叠加 bar 驱动的确定性（episode 可重放）与入口守卫（非法配置提前失败），可以先把 AI 限制在一个部件上做窄实验，再逐步扩大接管范围。
 
-> 现状：`runMoment` / `getFunds(dt)` / `getPerformance(dt)` 提供 `step` / `state` / `reward` 原语，部件契约（`clone`、序列化、参数枚举）支持搜索与进化；走步优化已内置（`SYS_WalkForward` 配合 `SE_MaxFundsOptimal` / `SE_PerformanceOptimal` / `SE_EvaluateOptimal`）。计划补一层 Gym 风格薄封装与示例级特征、奖励参考；训练器留在外部。
+> 现状：`runMoment` / `get_funds(dt)` / `get_performance(dt)` 提供 `step` / `state` / `reward` 原语，部件契约（`clone`、序列化、参数枚举）支持搜索与进化；走步优化已内置（`SYS_WalkForward` 配合 `SE_MaxFundsOptimal` / `SE_PerformanceOptimal` / `SE_EvaluateOptimal`）。计划补一层 Gym 风格薄封装与示例级特征、奖励参考；训练器留在外部。
 
 ---
 
