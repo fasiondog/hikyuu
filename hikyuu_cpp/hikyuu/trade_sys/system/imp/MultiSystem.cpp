@@ -3117,10 +3117,9 @@ double MultiSystem::_takeFoldQuota(FoldQuota& quota, const TMPtr& tm, const Date
     auto key = std::make_pair(tm.get(), stock);
     auto iter = quota.find(key);
     if (iter == quota.end()) {
-        iter = quota
-                 .emplace(key, std::make_pair(tm->getPosition(date, stock).number,
-                                              tm->getShortPosition(stock).number))
-                 .first;
+        iter = quota.try_emplace(key).first;
+        iter->second.first = tm->getPosition(date, stock).number;
+        iter->second.second = tm->getShortPosition(stock).number;
     }
     double& remain = long_side ? iter->second.first : iter->second.second;
     double num = std::min(want, remain);
