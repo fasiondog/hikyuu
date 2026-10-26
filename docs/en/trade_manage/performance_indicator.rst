@@ -64,6 +64,10 @@ Returns and annualization
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
   Null (NaN) when ``net_assets <= 0`` (wiped out / deep loss), when ``total_base <= 0`` (nothing invested) or
   when the period is shorter than two days.
+- Both items above use the closing net assets over the accumulated net investment, so they annualize the
+  "return on the accumulated investment" (simple / compound) and are **not a time-weighted return**: they read
+  low when capital keeps flowing in and can read high when the principal is withdrawn. When there are cash
+  flows, use **Account Time-Weighted Return %** (TWR) instead.
 - **Account Time-Weighted Return %** (extended): the time-weighted return, excluding cash flows. From the
   daily return ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1`` (``flow_t`` is the net inflow of the
   day) build the index ``E = product(1 + r_t)``, then annualize as ``100 * (E ^ (1 / years) - 1)``.

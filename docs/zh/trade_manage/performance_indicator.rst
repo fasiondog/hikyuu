@@ -46,6 +46,8 @@
 - **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``；统计区间不足 2 天或无投入本金时记 ``0``（与 ``Account CAGR %`` 不同，后者在同样情形下为空值）。
 - **Account CAGR %**：账户年复合收益率，``100 * ((net_assets / total_base) ^ (1 / years) - 1)``；
   当 ``net_assets <= 0``（爆仓/深度亏损）、``total_base <= 0``（无投入）或统计区间不足 2 天时为空值（NaN）。
+- 上述两项的分子为**期末净资产**、分母为**累计净投入**，是「累计投入回报率」的简单/复利年化，**不是时间加权收益率**：
+  持续入金场景下偏保守（数值偏小），若期间取出本金则可能偏大。含出入金时请以 **Account Time-Weighted Return %**（TWR）为准。
 - **Account Time-Weighted Return %**（扩展）：时间加权收益率，剔除出入金影响。按日收益
   ``r_t = (net_assets_t - flow_t) / net_assets_{t-1} - 1``（``flow_t`` 为当日净入金）累积得到净值指数
   ``E = ∏(1 + r_t)``，年化 ``100 * (E ^ (1 / years) - 1)``。
