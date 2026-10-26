@@ -566,23 +566,25 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         }
     }
 
+    // All the annualized items share one gate: extrapolating a single day over a year is meaningless
     double years = duration / 365.0;
 
     if (duration > 1) {
         m_result["Trade Opportunities per Year"] = m_result["Total Closed Trades"] / years;
         m_result["Annual Expected R-Multiple"] = roundEx(
           m_result["R-Multiple Expectancy"] * m_result["Trade Opportunities per Year"], precision);
-    }
 
-    if (total_money > 0.0 && years != 0.0) {
-        m_result["Account Avg Annual Return %"] = 100 * (((net_assets / total_money) - 1) / years);
-        // The geometric annualization is defined only for a positive net asset value; a wiped
-        // out / negative account reports Null instead of polluting the report with NaN
-        if (net_assets > 0.0) {
-            m_result["Account CAGR %"] =
-              100 * (std::pow(net_assets / total_money, 1.0 / years) - 1.0);
-        } else {
-            m_result["Account CAGR %"] = Null<double>();
+        if (total_money > 0.0) {
+            m_result["Account Avg Annual Return %"] =
+              100 * (((net_assets / total_money) - 1) / years);
+            // The geometric annualization is defined only for a positive net asset value; a wiped
+            // out / negative account reports Null instead of polluting the report with NaN
+            if (net_assets > 0.0) {
+                m_result["Account CAGR %"] =
+                  100 * (std::pow(net_assets / total_money, 1.0 / years) - 1.0);
+            } else {
+                m_result["Account CAGR %"] = Null<double>();
+            }
         }
     }
 

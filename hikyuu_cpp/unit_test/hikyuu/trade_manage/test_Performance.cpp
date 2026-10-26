@@ -379,4 +379,38 @@ TEST_CASE("test_Performance_report") {
     CHECK_UNARY(!buf.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_Performance_annualized_short_range") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg A one day history is not extrapolated over a year: every annualized item stays 0 */
+    TradeManagerPtr tm = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    tm->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    tm->sell(Datetime(199911170000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance p;
+    p.statistics(tm, Datetime(199911170000LL));
+    CHECK_EQ(p.get("Total Closed Trades"), 1);
+    CHECK_EQ(p.get("Trade Opportunities per Year"), 0.0);
+    CHECK_EQ(p.get("Annual Expected R-Multiple"), 0.0);
+    CHECK_EQ(p.get("Account Avg Annual Return %"), 0.0);
+    CHECK_EQ(p.get("Account CAGR %"), 0.0);
+
+    /** @arg Two days means years = 2/365: one closed trade is 365/2 opportunities per year, the
+     * risk is 10 * 100 = 1000 so the single R multiple is 0.1, and the return is annualized over
+     * the same period */
+    TradeManagerPtr tm2 = crtTM(Datetime(199901010000LL), 1000000, TC_Zero(), "TEST");
+    tm2->buy(Datetime(199911170000LL), stock, 10.0, 100);
+    tm2->sell(Datetime(199911180000LL), stock, 11.0, MAX_DOUBLE);
+
+    Performance q;
+    q.statistics(tm2, Datetime(199911180000LL));
+    CHECK_EQ(q.get("R-Multiple Expectancy"), doctest::Approx(0.1));
+    CHECK_EQ(q.get("Trade Opportunities per Year"), doctest::Approx(365.0 / 2));
+    CHECK_EQ(q.get("Annual Expected R-Multiple"), doctest::Approx(18.25));
+    CHECK_EQ(q.get("Account Avg Annual Return %"), doctest::Approx(1.825).epsilon(0.001));
+    CHECK_EQ(q.get("Account CAGR %"), doctest::Approx(1.8417).epsilon(0.001));
+}
+
 /** @} */
