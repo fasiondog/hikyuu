@@ -38,7 +38,7 @@
 收益与年化项
 ------------
 
-- **Open Position Account Return %**：未平仓账户收益率，``100 * (net_assets / total_base - 1)``（``total_base`` 为累计投入本金与累计投入资产之和）。
+- **Open Position Account Return %**：账户当前总收益率（名称沿用历史，含已实现与未实现盈亏，不是仅未平仓头寸的收益），``100 * (net_assets / total_base - 1)``（``total_base`` 为累计投入本金与累计投入资产之和）。
 - **Closed Trade Account Return %**：已平仓账户收益率，``100 * 已平仓净利润 / total_base``。
 - **Account Avg Annual Return %**：账户平均年收益率（单利），``100 * ((net_assets / total_base - 1) / years)``。
 - **Account CAGR %**：账户年复合收益率，``100 * ((net_assets / total_base) ^ (1 / years) - 1)``；

@@ -47,8 +47,10 @@ Account funds and assets
 Returns and annualization
 -------------------------
 
-- **Open Position Account Return %**: ``100 * (net_assets / total_base - 1)``, where ``total_base`` is the accumulated
-  invested principal plus the accumulated invested assets.
+- **Open Position Account Return %**: the current total return of the account — the name is historical, it covers
+  both realized and unrealized profit and is not the return of the open positions alone:
+  ``100 * (net_assets / total_base - 1)``, where ``total_base`` is the accumulated invested principal plus the
+  accumulated invested assets.
 - **Closed Trade Account Return %**: ``100 * net profit of closed trades / total_base``.
 - **Account Avg Annual Return %**: the average annual return (simple), ``100 * ((net_assets / total_base - 1) / years)``.
 - **Account CAGR %**: the compound annual growth rate, ``100 * ((net_assets / total_base) ^ (1 / years) - 1)``;
