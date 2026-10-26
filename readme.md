@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  An open-source quantitative backtesting framework in C++/Python — next-bar fills, itemized costs, equity adjustments, leverage off by default
+  An open-source quantitative research framework in C++/Python — a high-performance engine that puts financial and trading correctness first, with portfolios isomorphic to strategies, nestable to any depth, and freely replaceable components
 </p>
 
 <p align="center">
