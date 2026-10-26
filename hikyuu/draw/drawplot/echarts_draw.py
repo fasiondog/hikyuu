@@ -544,7 +544,8 @@ def sys_performance(sys, ref_stk=None):
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
     per = Performance()
-    text = per.report(sys.tm, sh000001_k[-1].datetime)
+    per.statistics(sys.tm, sh000001_k[-1].datetime)
+    text = per.report()
 
     # calculate the max drawdown
     max_pullback = MDD(funds)[-1]
