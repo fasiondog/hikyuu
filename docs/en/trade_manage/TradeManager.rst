@@ -606,7 +606,9 @@ Common parameters:
 
     .. py:method:: get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo]
           
-        Get the historical extended position details of the account (closed records)
+        Get the historical extended position details of the account (closed records); records without
+        K-line data cannot be computed and return the default (all zero) extended fields, i.e. the data
+        is missing
     
         :param Query.KType ktype: the K-line type
         :param int trade_mode: the trading mode, affecting some statistics items: 0-trade at the close, 1-trade at the next open
@@ -614,14 +616,16 @@ Common parameters:
 
     .. py:method:: get_profit_percent_monthly(self[, datetime=Datetime.now()]) -> list[tuple[Datetime, double]]
 
-        Get the account's monthly profit percentage as of the specified deadline
+        Get the account's monthly profit percentage as of the specified deadline, excluding the external
+        cash flows (stock in/out events are not excluded)
 
         :param Datetime datetime: the specified deadline
         :return: the account's monthly profit percentage, a list of (date, return rate) tuples
 
     .. py:method:: get_profit_percent_yearly(self[, datetime=Datetime.now()]) -> list[tuple[Datetime, double]]
 
-        Get the account's yearly profit percentage as of the specified deadline
+        Get the account's yearly profit percentage as of the specified deadline, excluding the external
+        cash flows (stock in/out events are not excluded)
 
         :param Datetime datetime: the specified deadline
         :return: the account's yearly profit percentage, a list of (date, return rate) tuples
