@@ -1073,6 +1073,10 @@ private:
     size_t m_sell_step;
 };
 
+//-----------------------------------------------------------------------------
+// benchmark
+//-----------------------------------------------------------------------------
+#if ENABLE_BENCHMARK_TEST
 /** @par Test points (benchmark: prints the cost only, no time assertion) */
 TEST_CASE("bench_SG_logic_operator") {
     StockManager &sm = StockManager::instance();
@@ -1154,6 +1158,7 @@ TEST_CASE("bench_SG_logic_operator") {
         }
     }
 }
+#endif
 
 /** @par Test points */
 TEST_CASE("test_SG_Manual_direct_drive") {
