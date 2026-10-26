@@ -30,6 +30,12 @@
 # ===============================================================================
 
 from hikyuu import Query, htr
+from math import isfinite
+
+
+def format_metric(value, suffix=""):
+    """Format a metric for display; a non-finite value (NaN / inf) is shown as N/A."""
+    return f"{value:<.2f}{suffix}" if isfinite(value) else "N/A"
 
 
 def get_draw_title(kdata):

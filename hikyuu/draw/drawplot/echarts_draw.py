@@ -7,7 +7,7 @@ from pyecharts.charts.base import Base as ChartBase
 from pyecharts.commons.utils import JsCode
 
 from hikyuu.core import KData, System
-from .common import get_draw_title
+from .common import get_draw_title, format_metric
 from hikyuu import *
 from hikyuu import htr
 
@@ -555,10 +555,11 @@ def sys_performance(sys, ref_stk=None):
     # the natural-day series with the external cash flows removed (same basis as the plugin)
     flow_by_day = {}
     for tr in sys.tm.get_trade_list():
+        day = Datetime(tr.datetime.date())
         if tr.business == BUSINESS.CHECKIN:
-            flow_by_day[tr.datetime] = flow_by_day.get(tr.datetime, 0.0) + tr.real_price
+            flow_by_day[day] = flow_by_day.get(day, 0.0) + tr.real_price
         elif tr.business == BUSINESS.CHECKOUT:
-            flow_by_day[tr.datetime] = flow_by_day.get(tr.datetime, 0.0) - tr.real_price
+            flow_by_day[day] = flow_by_day.get(day, 0.0) - tr.real_price
 
     nat_days = []
     day = Datetime(ref_dates[0].date())
@@ -594,8 +595,9 @@ def sys_performance(sys, ref_stk=None):
         invest_total, cur_fund, cur_fund - invest_total)
     t2 = htr('Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%').format(
         funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback)
-    t3 = htr('Win Rate: {:<.2f}%    Avg Win/Avg Loss: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
-        per['Win Rate %'], per['Avg Win / Avg Loss Ratio'], sharp)
+    t3 = htr('Win Rate: {}    Avg Win/Avg Loss: 1 : {}    Sharpe Ratio: {}').format(
+        format_metric(per['Win Rate %'], '%'), format_metric(per['Avg Win / Avg Loss Ratio']),
+        format_metric(sharp))
 
     line = iplot(ref_return, ref_k)
     line = iplot(funds_return, ref_k, line)

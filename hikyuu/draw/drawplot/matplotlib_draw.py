@@ -21,7 +21,7 @@ from matplotlib.image import imread
 from hikyuu import *
 from hikyuu import constant, isnan, Indicator, KData, IF, ALIGN, htr
 
-from .common import get_draw_title
+from .common import get_draw_title, format_metric
 
 
 ICON_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -909,10 +909,11 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     # the natural-day series with the external cash flows removed (same basis as the plugin)
     flow_by_day = {}
     for tr in tm.get_trade_list():
+        day = Datetime(tr.datetime.date())
         if tr.business == BUSINESS.CHECKIN:
-            flow_by_day[tr.datetime] = flow_by_day.get(tr.datetime, 0.0) + tr.real_price
+            flow_by_day[day] = flow_by_day.get(day, 0.0) + tr.real_price
         elif tr.business == BUSINESS.CHECKOUT:
-            flow_by_day[tr.datetime] = flow_by_day.get(tr.datetime, 0.0) - tr.real_price
+            flow_by_day[day] = flow_by_day.get(day, 0.0) - tr.real_price
 
     nat_days = []
     day = Datetime(ref_dates[0].date())
@@ -950,8 +951,9 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
         'Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%'
         '    Current Drawdown from Peak: {:<.2f}%').format(
             funds_return[-1] * 100 - 100, per["Account Avg Annual Return %"], max_pullback, mdd_current)
-    t3 = htr('Win Rate: {:<.2f}%    Avg Win/Avg Loss: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
-        per['Win Rate %'], per['Avg Win / Avg Loss Ratio'], sharp)
+    t3 = htr('Win Rate: {}    Avg Win/Avg Loss: 1 : {}    Sharpe Ratio: {}').format(
+        format_metric(per['Win Rate %'], '%'), format_metric(per['Avg Win / Avg Loss Ratio']),
+        format_metric(sharp))
 
     import matplotlib.pyplot as plt
     fg = plt.figure(figsize=(15, 10))
