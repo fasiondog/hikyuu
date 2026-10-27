@@ -1,164 +1,131 @@
 # Release Notes
 
-## Unreleased
-
-**⚠️ Breaking change: MM / AF responsibility separation (the Portfolio / AllocateFunds rework)**
-
-The former standalone portfolio engine `Portfolio` (`SimplePortfolio` / `WithoutAFPortfolio`) is now carried by `MultiSystem`;
-the portfolio-level fund allocation is split out of `MoneyManagerBase` and carried by the standalone base class `AllocateFundsBase` (AF):
-
-* The `PF_Simple` / `PF_WithoutAF` factories are kept (the function names, the parameter names, the parameter order
-  and the defaults unchanged), but they **return `MultiSystem`**, with the `af` parameter type changed from
-  `MMPtr` to `AFPtr`; the added `trade_on_close` / `sell_at_not_selected` / `keep_watch_force_sell` are all trailing
-  parameters, so an existing positional call is unaffected;
-* The `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor`
-  factories are kept, but they **return `AllocateFundsBase` instances** (`AFPtr`);
-* `MoneyManagerBase` is **restricted to the single-system / single-security** form: the portfolio-level interfaces
-  are removed (`allocate` / `set_mode` / `_allocate_system_weight` / `_allocate_suggestions` / `_check_risk`
-  and the `mode` attribute);
-* The `Portfolio` class and its methods are **no longer provided** (Python keeps only the import-compatibility
-  alias `Portfolio = MultiSystem`, without the old methods); the Python `crtAF` is **kept**, its callback contract
-  updated from `_allocateWeight(date, se_list)` to `_allocate(date, tm, contexts, query)`, with the optional
-  `_to_targets` / `_check_risk` injection.
-
-Migration points:
-
-* Calls of `PF_*` / `AF_*` with positional arguments need no change (the `PortfolioPtr` → `MultiSystemPtr` and
-  `AFPtr` → `AllocateFundsPtr` compatibility aliases are provided);
-* The `Portfolio` class methods are replaced by the `MultiSystem` equivalents: use `set_axis_mode("calendar")` +
-  `set_date_axis(...)` for the driving time axis; `lastSuggestion()` → `last_suggestion` (the trade records
-  of the last day plus the delayed requests; an aggregate system also offers `to_suggestions()` returning
-  the `TradeSuggestion` list it converted);
-  the query interfaces such as `getRunningDates/getCycleEndDates/getRealSystemList` are no longer provided;
-* Custom fund allocation: build quickly with `crtAF(allocate_func[, to_targets_func, check_risk_func])`, or subclass
-  `AllocateFundsBase` and override `_allocate` (L1) / `_to_targets` (L2) / `_check_risk` (L3);
-* The portfolio allocation modes (A/B/C) are owned by the aggregate `MultiSystem` itself (`set_mode` / the
-  read-only `mode` attribute) and are passed into the AF hooks as the trailing `mode` argument; serialization
-  stays backward compatible (the `m_mode` in the old archives, previously held by the AF, migrates to
-  `MultiSystem` automatically);
-* The parameters without a corresponding semantic in the new system, such as `sys_use_self_tm`, are ignored with a
-  warning; `AF_MultiFactor` provides the `auto_adjust_weight` parameter (default `True`, the scores are normalized
-  to sum 1 before allocating, and a score sum below 1 also allocates fully; with `False` the score itself is the
-  final weight).
-
-**⚠️ AF risk control is active by default**: `max_single_position` defaults to 1.0, i.e. a single instrument position value <= the net assets (`<=0` disables the limit, `>1` takes effect as 1.0); `max_total_position` defaults to 1.0, in mode A the aggregated target market value of all instruments <= the net assets, in mode B the sum of the sub-system quotas <= the net assets; when exceeded the **weight pricing is scaled down proportionally** while the **fixed amounts are truncated to whole quanta** (with a warning reporting how many were funded; `<=0` disables the cap). For over-allocation or leverage, raise it or set it to `<=0`. The base class also carries the `fixed_amount` parameter (when >0 it overrides the weight pricing with a warning; being an **absolute amount** it is never scaled down, only whole quanta are funded and the rest gets a zero quota) and `adjust_running_sys` (default `True`, mode B only; when `False` the running sub-systems keep their holdings and only the new sub-systems get the remaining cash). The executor also supports `auto_checkin` (default `False`: deposits extra principal for the gap computed from the money plus the commission, which inflates the backtest equity curve and may top up on every bar whose targets change) and margin buying power (`support_borrow_cash` set on the `MultiSystem`; the buying power is then derived from the margin rate **per order**, so a multi-leg batch is funded in order and later legs may be shrunk).
-
-See the docs: `trade_portfolio/portfolio` and `trade_portfolio/allocate_funds`.
-
-**⚠️ Behavior change: an invalid `adjust_cycle` no longer degrades silently**
-
-`adjust_cycle` on `MultiSystem` (including the value passed through by the `PF_Simple` / `PF_WithoutAF` /
-`PF_SignalAggregate` factories) is now validated: a negative value throws at set time; `0` is kept and
-warned at `ready_for_run`, where it is treated as `1` (i.e. the 1st calendar day of the period in the
-period modes); in the period modes (week/month/quarter/year) a value that can never reach a driven day
-(week > 5 / month > 31 / quarter > 92 / year > 366) is warned but not clamped, and that mode then never
-triggers a rebalancing. Previously `PF_Simple(tm, se, af, 0, "month")` silently degraded to
-"rebalance on every bar".
-
-**⚠️ Behavior change: mode B treats every sub-system as selected when no SE is set**
-
-Previously a mode B `MultiSystem` without an SE (`se=None`) skipped the quota calibration: the sub-accounts
-started from zero cash and were never funded again, so the whole backtest produced no trade at all (only
-a single warning at factory construction). It is now aligned with the modes A/C -- without an SE every
-sub-system is treated as selected and gets its quota as usual; a nested mode B (FOF/MOM) without an SE
-also accepts the quota delegated by the outer layer. Note the difference: an SE **present** but selecting
-nobody on the rebalancing day means "nothing selected", and `sell_at_not_selected` still decides whether
-those are cleared. See "the SE convention of mode B" in `trade_sys/system` and `trade_portfolio/portfolio`.
-
-**New: the mode C force-sell pool watch switch `keep_watch_force_sell` (default `False`)**
-
-With the mode C default `sell_at_not_selected=False`, a sub-system that the SE stops admitting while it
-still holds is driven one last time and then never again (its stop-loss / profit goal / sell signals all
-stop working and the position stays frozen until it is handled manually). The new `MultiSystem` parameter
-`keep_watch_force_sell` (default `False`) keeps driving those removed holdings: watch-only, nothing is
-force-sold -- their own stop-loss / profit goal / sell signal closes them and they leave the pool once
-flat. It applies to the rebalancing close, the non-rebalancing close and the open (the open only carries
-their delayed legs), while the forced liquidation is still owned by `sell_at_not_selected` alone. `PF_WithoutAF` / `PF_ModeC` take
-`keep_watch_force_sell=False` as a trailing parameter (existing positional calls are unaffected), and
-Python exposes `set_keep_watch_force_sell` as well. The default stays `False`, so existing backtests keep
-their results.
-
-**⚠️ Breaking change: `AF_FixedWeightList` rejects an empty weight list**
-
-`AF_FixedWeightList([])` no longer degrades silently to an `AF_EqualWeight` instance: like an all-zero or non-finite list it throws at both the factory and `set_param("weights", [])` (an empty list cannot price anything). A length that does not match the number of sub-systems still falls back to the equal weight.
-
-**⚠️ Breaking change: profit goal strategy (PG) subclass interface normalization**
-
-`ProfitGoalBase::getGoal` / `getShortGoal` are now non-virtual public interfaces; the subclass hooks are unified
-as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / `_clone` / `_calculate`):
-
-* C++ custom subclasses: the `PROFITGOAL_IMP` macro is updated accordingly; rename the `getGoal` implementation
-  to `_getGoal`; `_getShortGoal` is optional and returns constant.null_price by default (no short goal set);
-* Python custom profit goal strategies: the override hook `get_goal(self, datetime, price)` is renamed to
-  `_get_goal(self, datetime, price)`, with the optional `_get_short_goal`; the public query methods
-  `get_goal` / `get_short_goal` remain;
-* `crtPG(get_goal, ...)` keeps its signature and usage; the internal callback contract is renamed from
-  `get_goal` to `_get_goal`.
-
-**⚠️ Breaking Changes: Slippage interface reworked (the subclass computes only the raw price; the System part validates and clamps it)**
-
-A custom `SlippageBase` subclass (C++/Python) previously overrode `get_real_buy_price` / `get_real_sell_price` to return the final trade price directly. It must now override `_get_real_buy_price` / `_get_real_sell_price` to compute only the **raw** price. The System part - the only caller in the framework, which already holds the original (unadjusted) record of the bar - then validates the result and clamps it into the bar's range:
-
-* an invalid result (non-finite or non-positive) falls back to the plan price: 0 is accepted by the trade manager as the market-order placeholder, so it must never come from the slippage path;
-* the model price is rounded to the market's minimum price tick, so a fill never lands between two ticks (the plan price and the bar bounds are raw market prices and are used as they are);
-* both sides are clamped into the bar's `[low, high]` range.
-
-Migration:
-
-* Python custom slippage (`crtSP` subclasses): rename `get_real_buy_price` / `get_real_sell_price` to `_get_real_buy_price` / `_get_real_sell_price` (raw price only); `get_real_buy_price` / `get_real_sell_price` now return the raw price of the model, and the price used by the trade is the fixed-up one.
-* C++ custom slippage: move the implementation from `getRealBuyPrice` / `getRealSellPrice` into the protected virtuals `_getRealBuyPrice` / `_getRealSellPrice`.
-* If your custom slippage clamped to the day range internally, drop that logic (the System part does it now).
-* `SP_FixedPercent` no longer emits the invalid-plan-price warning (`HKU_WARN`), matching the other five built-in slippage implementations.
-
-**⚠️ Breaking Changes: StoplossBase interface reworked (subclass implements only _getPrice / _getShortPrice)**
-
-A custom `StoplossBase` subclass previously overrode the public virtuals `getPrice` / `getShortPrice`. It must now override the protected virtuals `_getPrice` / `_getShortPrice` to compute only the raw stop-loss price; the public `getPrice` / `getShortPrice` become non-virtual wrappers that delegate to the subclass hooks (same form as `reset` / `_reset`).
-
-* C++ custom stop-loss / take-profit: move the implementation from `getPrice` / `getShortPrice` to `_getPrice` / `_getShortPrice`. Python custom stop-loss / take-profit: rename the override methods from `get_price` / `get_short_price` to `_get_price` / `_get_short_price` (the `crtST` helper is updated accordingly).
-
-**⚠️ Breaking change: the money manager common parameters renamed (unified to the lowercase-underscore style)**
-
-The money management base-class common parameters `auto-checkin` → `auto_checkin` and `max-stock` → `max_stock` are renamed to match the lowercase-underscore naming style of the per-strategy parameters (`max_loss`, `risk`, `capital`, ...):
-
-* Calling `set_param` / `get_param` with the old hyphenated names raises an out-of-range exception; use the new names instead;
-* Only these two common parameters are affected, the per-strategy parameter names are unchanged;
-* Examples: `mm.set_param("auto_checkin", True)`, `mm.get_param("max_stock")`.
-
-**⚠️ Breaking change: same-day signal merging and the single-direction rule**
-
-Multiple signal inputs on the same date are merged into one net value: a positive net keeps only the buy signal, a negative net only the sell signal (the opposite record of that date is removed), and a net of about zero leaves no signal on that date; with `alternate=true`, a same-day record that already points in the same direction is only refreshed with the net value, not treated as a new entry. The new Python bindings `get_value` / `get_buy_value` / `get_sell_value` expose the signal values.
-
-**⚠️ Breaking change: the indicator parameter `out-extreme` renamed to `out_extreme`**
-
-`ZSCORE` / `NORM_Zscore` and the other indicators/normalizers using `out_extreme` follow the lowercase-underscore style, and `set_param` with the old hyphenated name raises an exception.
-
-**⚠️ Archive format changes**: `SignalBase` adds the cycle start/end and cycle-date fields, and the operator signals no longer serialize the base class twice, so old `SG_*` archives (and systems embedding `m_sg`) must be re-saved; hyphenated parameter keys in old archives (`auto-checkin` / `max-stock` / `out-extreme`) are not migrated automatically and fall back to the defaults after deserialization, call `set_param` explicitly to restore them.
-
-**⚠️ Behavior change: the selector default names corrected (spelling)**: the default name of `SE_Signal` (the old typo `SE_Sigal`) and the default name of the multiplication combinator selector (`se1 * se2`), changed from `SE_Multi` to `SE_Mul` (to avoid confusion with the multi-factor selectors `SE_MultiFactor*`). The value-operator selectors: the base-class default name spelling corrected to `SE_OperatorValue` (the old `SE_OpearatorValue`), and the sub / div forward and inverted forms, which shared one name, are now distinguished - the inverted form (the number as the left operand, e.g. `3.0 - se`, `3.0 / se`) is named `SE_SubInvValue` / `SE_DivInvValue`. Only the displayed values of `name()` / `str()` are affected; class identification in serialized archives is based on the class name, not the name field, so old archives still load normally (an instance restored from an old archive keeps its old name).
+## 3.0.0 - October 28, 2026
 
 **🚀 New Features**
 
-* feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)
-* feat(portfolio): new `PF_SignalAggregate` (mode A signal aggregation) and the letter-named aliases `PF_ModeA` / `PF_ModeB` / `PF_ModeC`
-* feat(allocatefunds): the standalone `AllocateFundsBase` base class with the `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` factories (carrying the portfolio-level L1/L2/L3)
-* feat(allocatefunds): restore the Python `crtAF` quick construction (L1 `_allocate`, with the optional L2 `_to_targets` / L3 `_check_risk` injection)
-* feat(MultiSystem): new `axis_mode` / `adjust_cycle` / `adjust_mode` / `delay_to_trading_day` / `trade_on_close` / `sell_at_not_selected` parameters; the run-time switches are snapshotted at `readyForRun` and fully illegal values are rejected at set time, supporting internalizing the adjust mode into an adjust-date table
+* feat(portfolio): the new `MultiSystem` portfolio engine (mode A signal aggregation / B fund allocation / C shared account), the `PF_SignalAggregate` factory and the `PF_ModeA` / `PF_ModeB` / `PF_ModeC` aliases
+* feat(allocatefunds): `AllocateFundsBase` extended into three replaceable layers L1/L2/L3, with the new `AF_FixedAmount` / `AF_MultiFactor` factories
+* feat(allocatefunds): AF risk-control parameters `max_single_position` / `max_total_position` (default 1.0, `<=0` disables; when exceeded the weight pricing is scaled down and the fixed amounts are truncated to whole quanta), `fixed_amount` (an absolute amount taking precedence over the weight pricing) and `adjust_running_sys`; the executor adds `auto_checkin` (funds the gap) and the margin buying power `support_borrow_cash`
+* feat(MultiSystem): new `axis_mode` / `adjust_cycle` / `adjust_mode` / `delay_to_trading_day` / `trade_on_close` / `sell_at_not_selected` parameters (snapshotted at `readyForRun`) and arbitrary-depth nesting (the parent/child mode matrix is in `trade_sys/system`); the runtime state is serializable and the aggregate supports pickle, plus the `run(query)` overload and `MomentResult.pendingOnNextOpen`
+* feat(MultiSystem): the mode C removed-holding watch switch `keep_watch_force_sell` (default `False`): when on, a removed sub-system that still holds keeps being driven (watch-only, no forced close; its own stop-loss / profit goal / sell signal closes it and it leaves the pool once flat); the forced liquidation is still owned by `sell_at_not_selected` alone. `PF_WithoutAF` / `PF_ModeC` take it as a trailing parameter and the default stays unchanged
+* feat(strategy): new `crt_multi_sys_strategy` to mount a `MultiSystem` directly on the strategy runtime; `Strategy` supports shorts: with `support_short` on, the `order` sell part beyond the long holding opens a short by borrow-and-sell (close first, then open), and `buy_short` / `sell_short` place an order directly
+* feat(trade_manage): the margin accounting is completed: an under-margined order is rejected and only the shortfall is borrowed (no more silent deposits inflating the return base); new borrow/return cost hooks `get_borrow_cash_cost` / `get_return_cash_cost` / `get_borrow_stock_cost` / `get_return_stock_cost`; the short and borrowed positions follow bonus / consolidation events and pay the lender's cash dividend (new `BORROW_ADJUST` / `SHORT_ADJUST` / `DIVIDEND_COMPENSATION` record types)
+* feat(trade_manage): `Performance` supports pickle
 * feat(slippage): the four random slippages (`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`) gain an `adverse_only` parameter (default `true` keeps the one-sided unfavorable cost; `false` applies the raw signed sample as zero-mean execution noise)
-* feat(slippage): asymmetric long/short slippage is now supported: `SlippageBase` gains `get_real_buy_short_price` (covering a short) and `get_real_sell_short_price` (opening a short) with their overridable hooks, which delegate to the long-side hooks by default so an existing implementation keeps its behavior; `SP_FixedPercent` / `SP_FixedValue` gain `short_p` / `short_value`, the four random models gain `short_mean` / `short_stddev` / `short_min_value` / `short_max_value` (each taking its long-side counterpart value at construction when left `None`); `crtSP` gains the optional `get_real_buy_short_price` / `get_real_sell_short_price` arguments (note: an archive serialized by an older version carries no `short_*` key, so after deserialization the short side takes the class default instead of the matching long-side value; call `set_param` explicitly to restore it)
-* feat(moneymanager): `MM_Nothing` now supports opening shorts, sized by the account net assets (the net assets ÷ (price × unit)), consistent with the net-assets based strategies (`MM_FixedCapital` / `MM_FixedCapitalFunds` / `MM_FixedPercent`) in using the net assets as the short base, so the borrowed proceeds no longer inflate the short size; a new `if_have_short_will_not_sell_short` parameter (default `False`) controls whether an open short blocks a further short entry (previously the base default forbade short entry; the behavior changes to silently allowing it)
+* feat(slippage): asymmetric long/short slippage: `SlippageBase` gains the cover / open-short side hooks (delegating to the long side by default, so an existing implementation keeps its behavior); `SP_FixedPercent` / `SP_FixedValue` gain `short_p` / `short_value`, and the four random models gain `short_mean` / `short_stddev` / `short_min_value` / `short_max_value` (`None` takes the long-side value); `crtSP` gains the matching optional arguments (an older archive carries no `short_*` key, so set them explicitly)
+* feat(moneymanager): `MM_Nothing` supports opening shorts, sized by the account net assets (net assets / (price × unit)), consistent with the net-assets based strategies (`MM_FixedCapital` / `MM_FixedCapitalFunds` / `MM_FixedPercent`), so the borrowed proceeds no longer inflate the short size; a new `if_have_short_will_not_sell_short` parameter (default `False`) controls whether an existing short blocks a further short entry (previously the base default forbade it; the behavior changes to silently allowing it)
+* feat(signal): new `SG_Manual` manual signal; `SG_Cycle` and custom cycle signals can read the injected rebalancing dates through `set_cycle_dates` / `get_cycle_dates` (modes A/B inject the whole range before the run, mode C declares on the day it is selected); new `get_value` / `get_buy_value` / `get_sell_value` read the signal values
+* feat(environment): new `EV_Manual` market environment with `get_value` / `get_values` bound; `_add_valid` accepts an accumulation value and `ConditionBase` follows
+* feat(multifactor): new `get_scores_np` / `iter_scores` numpy interfaces for large cross-sections (one structured array per section instead of one Python object per record), `get_scores` accepts a `ScoresFilterBase` directly, and `MultiFactorBase` binds the `reset` / `_reset` hooks
+* feat(indicator): `VAR` / `VARP` / `COV` / `CORR` / `BETA` / `SKEW` / `KURT` / `SPEARMAN` and the other window statistics support the `n=0` expanding window; `ROUND` / `ROUNDUP` / `ROUNDDOWN` support a negative `ndigits`; `DATE` / `TIME` / `YEAR` / `MONTH` / `WEEK` / `DAY` / `HOUR` / `MINUTE` accept the date axis of the input indicator when used as a non-leaf; `WEAVE` warns when the result sets exceed the limit
+* feat(KData): `operator==` / Python `==` now also compares the last record when the stock, query and size match, so a revised or appended realtime tail of a right-open query can trigger the downstream cache recomputation (still not a full element-wise comparison)
+* feat(utilities): `initLogger` is exposed to Python and the logger state is thread-safe
+
+**⚡️ Improvements**
+
+* perf(pywrap): release the GIL broadly: whole-series K-data / calendar disk loads, pure C++ multi-factor computation, batch indicator calculation, account queries, factor read/write, analysis and batch helpers; the indicator numpy converters copy contiguous buffers in bulk and the Python sequence to vector path gains a numpy fast path
+* perf(indicator): `EXIST` / `EVERY` / `BARSLASTS` replace the repeated rescans with a recurrence, the `IC` cross-section and `SPEARMAN` reuse scratch buffers, `SAFTYLOSS` is fully parallel, the rolling power sums use ring buffers, the `SMA` incremental pass starts at the framework start position, `TIME` drops the duplicated date-list copy and `BLOCKSETNUM` uses binary search
+* perf(trade_manage): `updateWithWeight` short-circuits on a per-stock check frontier
+* perf(selector): the `SE_Signal` index drops the per-signal weight, the operator selectors intersect in a single pass and reuse the cloned prototypes, `clone` no longer clones the runtime system list, and the multi-factor cross-section is filtered before copying
+* perf(signal): the value operators merge-iterate and the logic operators use a merge join, `SG_Bool` aligns only on a size mismatch, and an unchanged cycle-date injection is skipped
+* perf(factor): the `FactorSet` slow path becomes single-layer parallel over stocks
+* perf(global): the spot records are shared across handler tasks and `getSpotMarketCode` uses string concatenation
+* refactor(utilities): introduce the async DB connect base classes and a richer condition builder
+* refactor(trade_sys): an invalid `MultiSystem.adjust_cycle` throws or warns at set time and mode B without an SE behaves like A/C (every sub-system counts as selected); `AF_FixedWeightList` rejects empty / all-zero / non-finite weights; the selector default names are corrected (`SE_Signal` / multiplication / operator selectors; only the `name()` / `str()` output is affected and archives still load)
+* refactor(trade_sys): the PG / slippage / stop-loss subclass hooks are unified to the `_xxx` style (`_getGoal` / `_getRealBuyPrice` / `_getPrice`, i.e. `_get_goal` / `_get_real_buy_price` / `_get_price` in Python); the built-in components keep their behavior, custom subclasses must rename; a slippage subclass now computes the raw price only and the System validates, rounds and clamps it to the day range; `is_valid` becomes the overridable `_is_valid` hook (EV / CN aligned, default "finite and > 0")
+* refactor(trade_sys): the parameter keys use the lowercase-underscore style (`auto_checkin` / `max_stock` / `out_extreme`); the old hyphenated keys throw at `set_param`; the old keys in an old archive are not migrated and fall back to the defaults after deserialization, so call `set_param` explicitly
 
 **🐞 Bug Fixes**
 
-* fix(KData): Adjustment fixed to a fixed-baseline convention: the forward adjustment is anchored at the last data day and the backward one at the data start, so adjusted values no longer depend on the queried range and `Stock::getKData` matches `kdata.getKData`; fix the double adjustment of the backward-adjusted KData sub-queries, the tail offset of the extended-range splicing, the doubled first-day volume/amount in weekly-and-above aggregation, the missed high update when a phase day makes both a new low and a new high, the out-of-bounds read on daily gaps, the extended ktypes wrongly using the daily adjustment formula, the missed first-bar adjustment of minute windows and the crash of front()/back() on an empty KData; adjustment is now price-only, the volume and the turnover amount keep their raw values (aligned with mainstream data sources such as Wind / JoinQuant; see the adjustment convention note of Query)
+* fix(KData): Adjustment fixed to a fixed-baseline convention: the forward adjustment is anchored at the last data day and the backward one at the data start, so adjusted values no longer depend on the queried range and `Stock::getKData` matches `kdata.getKData`; fix the double adjustment of the backward-adjusted KData sub-queries, the tail offset of the extended-range splicing, the doubled first-day volume/amount in weekly-and-above aggregation, the missed high update when a phase day makes both a new low and a new high, the out-of-bounds read on daily gaps, the extended ktypes wrongly using the daily adjustment formula and the missed first-bar adjustment of minute windows; adjustment is now price-only, the volume and the turnover amount keep their raw values (aligned with mainstream data sources such as Wind / JoinQuant; see the adjustment convention note of Query)
 * fix(indicator): The ADJ_FACTOR series now uses the fixed baseline and matches RECOVER_EQUAL_BACKWARD value-by-value on the same range; the ADJ_VOL convention is changed to VOL / ADJ_FACTOR (price-only adjustment keeps the turnover amount unchanged)
-* fix(stock): Fix the crash when fetching K-records through the preloaded buffer with a lowercase ktype, getMarketValue falling back to the latest price for queries earlier than the first record (future data leakage; now returns 0), the race between buffer release and queries, the unchecked blockDriver, and the reload concurrency race
-* fix(block): Fix the null-pointer dereference when calling getStockList on a null Block; add is now idempotent (adding an already-present security returns true, only a null stock or an unknown code returns false) and the list overloads return an all-of result
+* fix(stock/kdata): Fix the crash when fetching K-records through the preloaded buffer with a lowercase ktype, `getMarketValue` falling back to the latest price for queries earlier than the first record (future data leakage; now returns 0), the race between buffer release and queries (the buffer is now held by a shared_ptr so the views stay valid), the security position of the private buffer being computed more than once, the unchecked `blockDriver`, the reload concurrency race, an empty or out-of-range access returning a null record, `KRecord` using a scaled tolerance for a large amount/count, the writable `data()` removed from the shared-memory view, and the `StockManager` preload exception capture with the load-event callbacks dispatched from a lock-held snapshot
+* fix(block): Fix the null-pointer dereference when calling getStockList on a null Block; add is now idempotent (adding an already-present security returns true, only a null stock or an unknown code returns false) and the list overloads return an all-of result without short-circuiting
 * fix(strategy): Fix the inverted dedup logic of StrategyContext that made the stock code and ktype deduplication ineffective; stock codes are normalized to uppercase before dedup and stored uppercased (stock_list reads back normalized values and dedups correctly against the default must-load codes)
-* fix(trade_sys): PG_FixedPercent now computes the average cost as buyMoney / totalNumber, so a partial sell no longer inflates the goal price and disables the take-profit; the goal price is rounded to the stock price precision (up for a long, down for a short, after sanitizing the float noise) instead of returning an intransactable price; implement the short goal; return no goal instead of dereferencing a null trade manager
-* fix(trade_sys): PG_FixedHoldDays now counts the held trading days of the traded object itself with a day table built at setTO, replacing the per-bar daily driver query (O(n²) over a run, with locks and IO) by two binary searches; it no longer fails silently when the stock has no daily data
-* fix(trade_sys): ProfitGoalBase::clone no longer carries the traded object, so a clone always re-calculates at setTO (a pre-computing custom subclass used to stay silently stale on the clone); the "no short goal" sentinel of _get_short_goal is unified to constant.null_price, matching the long side
-* fix(signal): same-day signal inputs are merged into one net value with a single direction per date: a zero net no longer leaves a stale signal behind (previously `shouldBuy`/`shouldSell` could both hold), and with `alternate=true` a repeated same-day write refreshes the value instead of dropping it
-* fix(KData): `operator==` / Python `==` now also compares the last record when the stock, query and size match, so a revised or appended realtime tail of a right-open query can trigger the downstream cache recomputation (still not a full element-wise comparison)
+* fix(trade_manage): account reconstruction replays every trade record type (stock in/out, borrow/return, consolidation and the ex-rights adjustments); the trade entries reject a non-positive / non-finite number and an invalid price; `get_profit_cum_change_curve` returns Null when the invested base is 0, and an unclosed `total_profit` returns NaN
+* fix(trade_manage): `BrokerTradeManager` prices a market order at the latest close, validates the checkin/checkout cash, keeps the last known state when the asset fetch fails, and revalues the snapshot holdings at the queried date
+* fix(trade_sys): `PG_FixedPercent` computes the average cost as buyMoney / totalNumber (a partial sell no longer inflates the goal price and disables the take-profit), rounds to the stock price precision and implements the short goal; `PG_FixedHoldDays` counts the trading days of the traded object itself with a day table built at `setTO` (the O(n²) locked, IO-heavy query over a run becomes two binary searches); `ProfitGoalBase::clone` no longer carries the traded object, so a clone re-calculates at `setTO`
+* fix(trade_sys): stop-loss / take-profit: `ST_Indicator` clones only its configuration and rebuilds the result at `setTO`, guards an empty or length-mismatched indicator; `ST_Saftyloss` rejects a non-positive / non-finite `p`
+* fix(trade_sys): every trade path sizes the order at the actual fill price (after the slippage); a sell is capped at `maxTradeNumber` before the buy is clamped by the available cash, and a non-finite `maxTradeNumber` is rejected
+* fix(trade_sys): signals: the `SG_Single` sell-side noise threshold is symmetric with the buy side (a down bar no longer triggers a sell every day), `Cross` / `CrossGold` / `Band` / `SG_Single` align to the K-data by date on a length mismatch, a combined signal re-calculates its sub-signals at `setTO` to clear stale signals, and the value-operator clone keeps the operand order
+* fix(trade_sys): selectors: the operator selectors serialize and reload round-trip and rebuild their prototypes without doubling the weights; the `SE_Signal` prototype binding and clone mapping; the multi-factor lookup and zero-division weights; the multi-factor selector validates the recovery type range
+* fix(trade_sys): environment / condition combination operators: `|` (Or) normalizes to 0/1, Multi/Div stay invalid when both sides are invalid, a non-finite value counts as invalid, and `EV_TwoLine` aligns to the K-data before comparing the lengths
+* fix(trade_sys): money management: the MM `auto_checkin` deposits once at the actual buy (the quantity query no longer mutates the account), the quantity query uses the query-datetime cash instead of replaying the weight side effects, plus parameter and non-finite guards
+* fix(indicator): non-finite values count as missing: `BARSLASTCOUNT`, the condition-family validity, the rolling sums and statistics, the `IIR` filters, the zero-variance family and the `INSUM` cross-stock aggregation are no longer permanently contaminated by NaN/Inf; a zero divisor and a zero variance return Null, `ZSCORE` of a constant series returns NaN, and `WINNER` / `TS_RANK` / `MRR` / the `ROC` family return Null on an invalid input
+* fix(indicator): an incremental calculation that no longer fits the new context is rejected and recalculated, completing the discard declarations and the empty / out-of-range guards of `HHV` / `LLV` / `STDP` / `SLOPE` / `CVAL` / `ISLASTBAR` / `SUMBARS`; `HHVBARS` / `LLVBARS` break a tie on the most recent bar, `INTPART` truncates toward zero, the `ATR` first valid index matches `MA(TR)`, `SLOPE` uses relative coordinates, `AMA` fixes the warm-up `ER` lower bound and the rolling window, and `DEVSQ` propagates a window containing a missing value
+* fix(indicator): the result buffers are serialized as bit patterns (legacy text archives still load), the indicator imp copy constructor is deleted to avoid a double free, an accessor of an implementation-less indicator returns Null, a cloned subtree keeps its parent links inside the clone, and the result-set index is bounds-checked; `HSL` / `COST` normalize the share count per ktype, `ZONGGUBEN` aligns its leading nulls, `ISLIMITUP` / `ISLIMITDOWN` judge on the backward-adjusted close across ex-rights dates, the period parameters are capped below INT_MAX and a `FINANCE` field-name error reports its context
+* fix(multifactor): IC/ICIR output NaN when the weight sum is zero, the degenerate cross-sections and the normalize configuration propagate, `GroupSCFilter` uses quantile boundaries, `getICIR` resolves `ic_n` and validates `ir_n`, and `get_all_factors` behaves like `get_factor` when `save_all_factors` is off
+* fix(strategy): an order number beyond the int64 lot conversion range is rejected and `order_value` warns without a current daily bar; a sell that is not an integer multiple of the minimum trade unit escalates to a full clear only when the position itself has an odd lot and the request covers it, otherwise it is truncated and ignored with a warning when the truncation reaches 0; the event loop `stop()` works and a restart no longer registers the timers and the heartbeat twice, single-session markets are supported, and `KeyboardInterrupt` stops gracefully
+* fix(analysis): the combination names are deduplicated, `sort_key` is validated to avoid a silent empty result, out-of-range records are skipped, every combination runs on its own account, and the `analysis.py` wrappers validate their arguments and the `Performance.exist` usage
+* fix(utilities): a task waiting for its own nested tasks no longer overflows the stack, `ResourcePool` timer timeout and coroutine resume races, `PluginLoader` nulls the handle after `dlclose`, HTTP connection reuse / IPv6 hosts / response limit, MySQL data truncation and column-length checks, `Datetime` and SQL integer handling, and `roundEx` for large and negative digits
+* fix(global): the spot agent start/stop is serialized and its init flag atomic, each post-process handler is isolated, defensive JSON and FlatBuffers parsing, `readUUID` no longer posts uninitialized memory, the nng socket is closed on a failed option setup, and the version feedback parsing is hardened
+* fix(factor): the `Factor` structural fields are immutable, `FactorSet` supports a negative index and bounds-checks it, removing a factor keeps the insertion order, and the factor name is validated at the save/query/remove entries
+* fix(pywrap): callback and conversion safety: the Python-part detection, `boost::any` no longer uses `py::eval`, the `python_list_to_vector` / data-driver owners / numpy converters are exception- and lifetime-safe, pickle rejects a str state, and the inspect cache and the callback arity are checked by position
+* fix(pywrap): `get_position_ext_info` returns a single `PositionExtInfo` again, and the overload returning the whole position dictionary is renamed `get_position_ext_info_dict`
+* fix(draw): the cash flows are keyed by date, an undefined metric shows `N/A`, the performance is computed before the report text is rendered, and the Sharpe ratio and the return curve match the performance basis
+* fix(i18n): the CSV header keys are translatable and the core catalog takes precedence, with the gettext catalog refreshed and the wording corrected
+* fix(gui): saving the config preserves the manually tuned `hikyuu.ini` keys
+
+**⚠️ Breaking Changes**
+
+**MM / AF rework (`Portfolio` → `MultiSystem`)**
+
+The former portfolio engine `Portfolio` (`SimplePortfolio` / `WithoutAFPortfolio`) is carried by `MultiSystem`.
+The `PF_Simple` / `PF_WithoutAF` factories are kept (the function names, the parameter order and the defaults
+unchanged), but they **return `MultiSystemPtr`**:
+
+* The `Portfolio` class and its methods are no longer provided (Python keeps only the import-compatibility
+  alias `Portfolio = MultiSystem`): drive the time axis with `set_axis_mode("calendar")` + `set_date_axis(...)`,
+  `lastSuggestion()` becomes `last_suggestion`, and the query interfaces `getAdjustDates` / `getCycleEndDates` /
+  `getRunningDates` / `getRealSystemList` are no longer provided;
+* The `AllocateFundsBase` subclass hook changes from `_allocateWeight(date, se_list)` to
+  `_allocate(date, tm, contexts, query, mode)` (L1), with the optional L2 `_to_targets` / L3 `_check_risk`; the
+  first callback of the Python `crtAF` becomes `allocate_func(self, date, tm, contexts, query, mode)`, plus the
+  optional `to_targets_func` / `check_risk_func`;
+* The allocation modes (A/B/C) are owned by `MultiSystem` (`set_mode` / the read-only `mode`) and are passed to
+  the AF hooks as the trailing `mode` argument; parameters without a meaning in the new system, such as
+  `sys_use_self_tm`, are ignored with a warning.
+
+See the docs: `trade_portfolio/portfolio` and `trade_portfolio/allocate_funds`.
+
+**Same-day signal merging and the single-direction rule**
+
+Multiple signal inputs on the same date are merged into one net value: a positive net keeps only the buy signal
+and a negative net only the sell signal, while a net of about zero leaves no signal; with `alternate=true` a
+same-direction same-day write only refreshes the value. Among the signal operators `+ - * /` keep the value and
+`& |` keep only the direction. The `cycle` parameter now only marks "consumes the rebalancing dates injected by
+`MultiSystem`" and no longer changes the calculation range, and it is mutually exclusive with `alternate=true`
+(setting `cycle` forces `alternate=false` with a warning). The archive adds the cycle start/end and cycle-date
+fields, so old `SG_*` archives (and systems embedding `m_sg`) must be re-saved.
+
+**Behavior change: `TC_FixedA` redefined as the rolling current cost model**
+
+`TC_FixedA` now always matches the current A-share rates: the transfer fee is 0.01 per mille of the turnover on
+all markets in both directions, and the sell stamp duty is 0.5 per mille. The former per-share transfer-fee model
+is renamed `TC_FixedAPre2015`, and `TC_FixedA2015` / `TC_FixedA2017` are frozen as historical conventions (the
+2017 model now also charges the Shenzhen sell-side transfer fee, consistent with the buy side). A backtest using
+`TC_FixedA` changes its trading costs accordingly; pick the model of the matching period explicitly for a
+historical backtest. An old archive holding `TC_FixedA` interprets the per-share transfer fee as a rate, so switch
+to `TC_FixedAPre2015` and re-save it. See `trade_manage/trade_cost`.
+
+**Behavior change: the performance statistics basis is unified**
+
+The return items of `Performance` now use the net assets (cash + long value - short value - borrowed cash) over
+the cumulative net invested base (deposits - withdrawals + stocks in - stocks out); the time-related statistics
+use natural calendar days with an annualization factor of 365; with less than two days of history, no invested
+principal, or non-positive net assets the annualized items follow their definition (an empty value, except
+`Account Avg Annual Return` which records 0); an undefined item is NaN (`report()` shows `N/A`) and `reset()`
+clears every statistics slot. See `trade_manage/performance_indicator`.
+
+**WalkForward window driving reworked**
+
+`SYS_WalkForward` now locates the covering run window per datetime through a single driving entry: the window data
+is built lazily and the candidate is re-anchored only on a window switch, so the first window is no longer skipped
+(existing backtest results change), and moment driving without a prior calculation fails loudly; intraday driving
+is available through `runMomentOnOpen` / `runMomentOnClose`, and a window switch honors
+`clean_hold_when_select_changed`. `WalkForwardTradeManager` is a runtime-only view and no longer serializable,
+so an old `SYS_WalkForward` archive **cannot be loaded and must be regenerated**. See `trade_sys/walkforward`.
 
 ## 2.8.3 - October 1, 2026
 

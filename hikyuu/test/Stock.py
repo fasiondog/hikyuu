@@ -7,6 +7,7 @@
 # History: 1)20120928, Added by fasiondog
 # ===============================================================================
 
+import sys
 import threading
 import time
 import unittest
@@ -70,13 +71,23 @@ class StockTest(unittest.TestCase):
         thread = threading.Thread(target=spin)
         thread.start()
         time.sleep(0.05)
-        before = counter[0]
-        stock.load_kdata_to_buffer(Query.WEEK)
-        progress = counter[0] - before
+
+        old_interval = sys.getswitchinterval()
+        sys.setswitchinterval(1.0)
+        try:
+            before = counter[0]
+            start = time.perf_counter()
+            while time.perf_counter() - start < 0.1:
+                stock.release_kdata_buffer(Query.WEEK)
+                stock.load_kdata_to_buffer(Query.WEEK)
+            progress = counter[0] - before
+        finally:
+            sys.setswitchinterval(old_interval)
+
         stop.set()
         thread.join()
         stock.release_kdata_buffer(Query.WEEK)  # restore the pre-test buffer state
-        self.assertGreater(progress, 50)
+        self.assertGreater(progress, 0, 'the GIL is not released while the kdata buffer loads')
 
     def test_pickle(self):
         if not constant.pickle_support:
