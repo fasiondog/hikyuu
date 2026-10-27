@@ -10,6 +10,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ISLASTBAR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
