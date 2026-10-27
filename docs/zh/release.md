@@ -2,160 +2,109 @@
 
 # 版本发布说明
 
-## Unreleased
-
-**⚠️ 破坏性变更：MM / AF 职责分离（Portfolio / AllocateFunds 体系重构）**
-
-原独立组合引擎 `Portfolio`（`SimplePortfolio` / `WithoutAFPortfolio`）由 `MultiSystem` 承接；
-组合级资金分配从 `MoneyManagerBase` 剥离，改由独立基类 `AllocateFundsBase`（AF）承载：
-
-* `PF_Simple` / `PF_WithoutAF` 工厂保留（函数名、参数名、参数顺序、默认值不变），但**返回 `MultiSystem`**，
-  其中 `af` 参数类型由 `MMPtr` 改为 `AFPtr`；新增的 `trade_on_close` / `sell_at_not_selected` /
-  `keep_watch_force_sell` 均为末尾追加形参，按位置传参的旧调用不受影响；
-* `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor`
-  工厂保留，但**返回 `AllocateFundsBase` 实例**（`AFPtr`）；
-* `MoneyManagerBase` **限定为单系统 / 单证券**形态：移除组合级接口
-  （`allocate` / `set_mode` / `_allocate_system_weight` / `_allocate_suggestions` / `_check_risk`
-  与 `mode` 属性）；
-* `Portfolio` 类及其方法**不再提供**（Python 层仅保留导入兼容别名 `Portfolio = MultiSystem`，不提供旧方法）；
-  Python `crtAF` **保留**，回调契约由 `_allocateWeight(date, se_list)` 更新为
-  `_allocate(date, tm, contexts, query)`，并可选注入 `_to_targets` / `_check_risk`。
-
-迁移要点：
-
-* 位置传参调用 `PF_*` / `AF_*` 无需修改（提供 `PortfolioPtr` → `MultiSystemPtr`、
-  `AFPtr` → `AllocateFundsPtr` 兼容别名）；
-* `Portfolio` 类方法改用 `MultiSystem` 等价接口：驱动时间轴用 `set_axis_mode("calendar")` +
-  `set_date_axis(...)`；`lastSuggestion()` → `last_suggestion`（返回最后一天的交易记录与延迟请求，
-  聚合系统另提供 `to_suggestions()` 返回本层转换后的 `TradeSuggestion` 列表）；
-  `getRunningDates/getCycleEndDates/getRealSystemList` 等查询接口不再提供；
-* 自定义资产分配：`crtAF(allocate_func[, to_targets_func, check_risk_func])` 快速构建，或继承
-  `AllocateFundsBase` 并重载 `_allocate`（L1）/ `_to_targets`（L2）/ `_check_risk`（L3）；
-* 组合级分配模式（A/B/C）由聚合系统 `MultiSystem` 自身持有（`set_mode` / 只读属性 `mode`），
-  并作为末尾的 `mode` 形参传入 AF 各钩子；序列化向后兼容（旧档案中的 `m_mode` 原由 AF 持有，
-  现自动迁移至 `MultiSystem`）；
-* `sys_use_self_tm` 等在新体系无对应语义的参数将被忽略并告警；`AF_MultiFactor` 提供 `auto_adjust_weight`
-  参数（默认 `True`，评分归一化为和为 1 后分配，评分总和小于 1 也满仓分配；`False` 时评分即最终权重）。
-
-**⚠️ AF 风控默认生效**：`max_single_position` 默认 1.0，即单标的持仓市值 ≤ 净资产
-（`<=0` 不限制，`>1` 按 1.0 生效）；`max_total_position` 默认 1.0，模式 A 下所有标的聚合目标市值 ≤ 净资产、
-模式 B 下各子系统配额总和 ≤ 净资产，超出时**权重定价按比例等比缩减**、**固定额度按整数个额度截断**
-（告警并报告获配数；`<=0` 不限制）。若需超配或杠杆场景，请上调或设为 `<=0`。基类另含 `fixed_amount`
-（大于 0 时覆盖权重定价并告警；作为**绝对金额**不受等比缩减，而是只满足整数个额度，其余标的/子系统
-配额置 0）与 `adjust_running_sys`（默认 `True`，仅模式 B 生效；`False` 时已运行子系统保持现状、
-仅新子系统获配剩余现金）参数。执行端另支持 `auto_checkin`（默认 `False`：按“名义额 + 手续费”计算缺口并
-追加本金，回测资金曲线会失真，目标逐日变化时可能逐日补资）与融资购买力（`support_borrow_cash` 设在
-`MultiSystem` 上，开启后按保证金率**逐笔**折算，同一批多笔按顺序分配、靠后的腿可能被缩减）。
-
-详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
-
-**⚠️ 行为变更：`adjust_cycle` 非法值不再静默降级**
-
-`MultiSystem` 的 `adjust_cycle`（含 `PF_Simple` / `PF_WithoutAF` / `PF_SignalAggregate` 三个工厂的透传值）
-现在校验取值：负值在设置阶段直接抛异常；`0` 保留原值，在 `ready_for_run` 时告警并按 `1` 处理（周期模式下
-即“周期内第 1 个日历日”）；周期模式（week/month/quarter/year）下永远无法落在被驱动日的值
-（周 > 5 / 月 > 31 / 季 > 92 / 年 > 366）只告警、不钳制，此时该模式不再触发调仓。
-此前 `PF_Simple(tm, se, af, 0, "month")` 会静默退化为“每根 K 线都调仓”。
-
-**⚠️ 行为变更：模式 B 未设置 SE 时视为全部选中**
-
-`MultiSystem` 模式 B 此前在未设置 SE（`se=None`）时跳过配额校准：子账户从零现金起步且再无注资，
-整个回测一笔交易都不会产生（仅工厂构造期一句告警）。现与模式 A/C 对齐——无 SE 时全部子系统
-视同选中，照常分配额度并交易；嵌套的模式 B（FOF/MOM）无 SE 时也可接受外层下发的额度。
-注意区分：SE **存在**但调仓日选中为空是「全不选」，仍由 `sell_at_not_selected` 决定是否清仓。
-详见 `trade_sys/system` 的「模式 B 的 SE 约定」与 `trade_portfolio/portfolio`。        
-
-**新增：模式 C 出池持仓盯盘开关 `keep_watch_force_sell`（默认 `False`）**
-
-模式 C 默认 `sell_at_not_selected=False` 时，被 SE 剔除但仍持仓的子系统只在出池当日补驱动一次，
-此后不再被驱动（止损/止盈/卖出信号全部失效，持仓冻结到人工干预）。新增 `MultiSystem` 参数
-`keep_watch_force_sell`（默认 `False`）：开启后出池仍持仓者继续被驱动（仅盯盘、不强平，由其自身
-止损/止盈/卖出信号平仓，归零后自动出池），调仓日与非调仓日收盘、开盘阶段均生效（开盘仅承接其延迟单）；强制清仓仍
-只由 `sell_at_not_selected` 控制。`PF_WithoutAF` / `PF_ModeC` 在末尾追加形参
-`keep_watch_force_sell=False`（既有位置传参不受影响），Python 侧另有 `set_keep_watch_force_sell`。
-默认值保持 `False`，既有回测结果不变。        
-
-**⚠️ 破坏性变更：`AF_FixedWeightList` 空权重列表改为抛异常**
-
-`AF_FixedWeightList([])` 不再静默降级为 `AF_EqualWeight` 实例，而是与全零/非有限权重一致，
-在工厂与 `set_param("weights", [])` 两处均直接抛异常（空列表无法定价）。数量不等于子系统数时
-仍按原行为回退等权。
-
-**⚠️ 破坏性变更：盈利目标策略（PG）子类接口规范化**
-
-`ProfitGoalBase::getGoal` / `getShortGoal` 改为非虚公开接口，子类计算接口统一为 `_getGoal` / `_getShortGoal`
-（与 `_reset` / `_clone` / `_calculate` 的 `_xxx` 风格一致）：
-
-* C++ 自定义子类：`PROFITGOAL_IMP` 宏已同步，需将 `getGoal` 实现改名为 `_getGoal`；`getShortGoal` 可选，
-  默认返回 `constant.null_price` 表示未设置空头目标；
-* Python 自定义盈利目标策略：重载接口 `get_goal(self, datetime, price)` 改名为 `_get_goal(self, datetime, price)`，
-  可选空头接口为 `_get_short_goal`；公开查询方法 `get_goal` / `get_short_goal` 保留；
-* `crtPG(get_goal, ...)` 参数与用法不变，内部回调契约由 `get_goal` 更新为 `_get_goal`。
-
-**⚠️ 破坏性变更：Slippage 接口调整（滑点子类只算原始价，由 System 层校验并钳制）**
-
-自定义滑点基类 `SlippageBase` 的派生类（C++ / Python）原先需重载 `get_real_buy_price` / `get_real_sell_price` 直接给出实际成交价；现改为**重载 `_get_real_buy_price` / `_get_real_sell_price` 仅计算原始价**。框架内唯一的调用方 System 在成交处已持有当日**未复权**的原始 K 线记录，由其校验并钳制：
-
-* 返回值非法（非有限数或非正数）时回退计划价 —— 0 是交易管理接受的市价单占位价，绝不能从滑点路径透传；
-* 模型价按市场最小变动单位取整，成交价不会落在两个档位之间（非法值时回退的计划价与钳制到的当日上下界本身就是市场价，原样使用）；
-* 买卖两侧都钳制到当日 `[最低价, 最高价]` 区间。
-
-迁移要点：
-
-* Python 自定义滑点（`crtSP` 子类）需将 `get_real_buy_price` / `get_real_sell_price` 重命名为 `_get_real_buy_price` / `_get_real_sell_price`（仅算原始价，不再自行钳制）；`get_real_buy_price` / `get_real_sell_price` 返回模型原始价，成交所用价格为其校验钳制后的结果；
-* C++ 自定义滑点需将实现从 `getRealBuyPrice` / `getRealSellPrice` 迁移至 protected 虚函数 `_getRealBuyPrice` / `_getRealSellPrice`；
-* 若此前自定义滑点已在内部做区间钳制，移除该逻辑即可（现由 System 层统一处理）；
-* `SP_FixedPercent` 移除对计划价的有效性告警（`HKU_WARN`），与其余 5 个内置滑点实现保持一致。
-
-**⚠️ 破坏性变更：StoplossBase 接口调整（子类仅实现 _getPrice / _getShortPrice）**
-
-自定义止损/止赢基类 `StoplossBase` 的派生类原先需重载公有虚函数 `getPrice` / `getShortPrice`；现改为**重载受保护虚函数 `_getPrice` / `_getShortPrice` 仅计算原始止损价**，公有 `getPrice` / `getShortPrice` 作为非虚包装直接委托给子类钩子（与 `reset` / `_reset` 形式一致）。
-
-* C++ 自定义止损/止赢需将实现从 `getPrice` / `getShortPrice` 迁移至 `_getPrice` / `_getShortPrice`；Python 侧自定义止损/止赢亦需将重写方法从 `get_price` / `get_short_price` 改为 `_get_price` / `_get_short_price`（`crtST` 已同步）。
-
-**⚠️ 破坏性变更：资金管理公共参数重命名（统一为小写下划线风格）**
-
-资金管理基类公共参数 `auto-checkin` → `auto_checkin`、`max-stock` → `max_stock`，与各策略自有参数（`max_loss`、`risk`、`capital` 等）的小写下划线命名风格统一：
-
-* 通过 `set_param` / `get_param` 使用旧连字符参数名将抛出参数不存在异常，需改用新名称；
-* 仅上述两个公共参数受影响，各策略自有参数命名不变；
-* 示例：`mm.set_param("auto_checkin", True)`、`mm.get_param("max_stock")`。
-
-**⚠️ 破坏性变更：信号同日合并与单方向语义**
-
-`SignalBase` 同一日期的多次信号写入按数值合并为净额：净额为正时该日仅保留买入信号，为负时仅保留卖出信号（同日相反方向的记录被移除），净额约为 0 时该日不保留信号；`alternate=true` 下同日已有同向记录时只刷新数值，不视为新开仓。新增 Python 绑定 `get_value` / `get_buy_value` / `get_sell_value`，可读取信号数值幅度。
-
-**⚠️ 破坏性变更：指标参数 `out-extreme` → `out_extreme`**
-
-`ZSCORE` / `NORM_Zscore` 等使用 `out_extreme` 的指标与归一化实现统一改为小写下划线命名，旧名 `set_param` 会抛异常。
-
-**⚠️ 归档格式变化**：`SignalBase` 新增周期起止与周期日字段，算子信号不再重复序列化基类，旧 `SG_*`（以及内嵌 `m_sg` 的系统）归档需重新保存；旧归档中的连字符参数键（`auto-checkin` / `max-stock` / `out-extreme`）不会自动迁移，反序列化后取默认值，需显式 `set_param` 补齐。
-
-**⚠️ 行为变化：选择器默认名称拼写修正**：`SE_Signal` 的默认名（旧拼写错误 `SE_Sigal`）与乘法组合选择器（`se1 * se2`）的默认名由 `SE_Multi` 改为 `SE_Mul`（避免与多因子选择器 `SE_MultiFactor*` 混淆）。数值运算选择器：基类默认名拼写改正为 `SE_OperatorValue`（旧 `SE_OpearatorValue`）；减法/除法的正向与反向此前同名，反向（数为左侧操作数，如 `3.0 - se`、`3.0 / se`）区分为 `SE_SubInvValue` / `SE_DivInvValue`。以上仅影响 `name()` / `str()` 的显示值；序列化归档的类识别基于类名而非名称字段，旧归档仍可正常加载（旧归档恢复出的实例名称仍为旧名）。
+## 3.0.0 - 2026年10月28日
 
 **🚀 新增特性**
 
-* feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 C）
-* feat(portfolio): 新增 `PF_SignalAggregate`（模式 A 信号聚合工厂）与 `PF_ModeA` / `PF_ModeB` / `PF_ModeC` 模式字母别名
-* feat(allocatefunds): 独立 `AllocateFundsBase` 基类与 `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` 工厂（承载组合级 L1/L2/L3）
-* feat(allocatefunds): 恢复 Python `crtAF` 便捷构造（L1 `_allocate`，可选注入 L2 `_to_targets` / L3 `_check_risk`）
-* feat(MultiSystem): 新增 `axis_mode` / `adjust_cycle` / `adjust_mode` / `delay_to_trading_day` / `trade_on_close` / `sell_at_not_selected` 参数，运行期开关在 `readyForRun` 时快照生效，完全非法值在设置时抛异常；支持将调仓模式内化为调仓日表
+* feat(portfolio): 新增 `MultiSystem` 组合引擎（模式 A 信号聚合 / B 资金配置 / C 共享账户）、`PF_SignalAggregate` 工厂与 `PF_ModeA` / `PF_ModeB` / `PF_ModeC` 别名
+* feat(allocatefunds): `AllocateFundsBase` 扩展为 L1/L2/L3 三层可替换算法，新增 `AF_FixedAmount` / `AF_MultiFactor` 工厂
+* feat(allocatefunds): AF 风控参数 `max_single_position` / `max_total_position`（默认 1.0，`<=0` 取消；超出时权重按比例缩减、固定额度按整数个额度截断）、`fixed_amount`（绝对金额，优先于权重定价）与 `adjust_running_sys`；执行端另有 `auto_checkin`（缺口注资）与融资购买力 `support_borrow_cash`
+* feat(MultiSystem): 新增 `axis_mode` / `adjust_cycle` / `adjust_mode` / `delay_to_trading_day` / `trade_on_close` / `sell_at_not_selected` 参数（`readyForRun` 时快照生效），支持任意层级嵌套聚合（父子模式矩阵见 `trade_sys/system`）；运行期状态可序列化、聚合对象支持 pickle，新增 `run(query)` 重载与 `MomentResult.pendingOnNextOpen`
+* feat(MultiSystem): 模式 C 出池持仓盯盘开关 `keep_watch_force_sell`（默认 `False`）：开启后出池仍持仓的子系统继续被驱动（仅盯盘、不强平，由其自身止损/止盈/卖出信号平仓，归零后自动出池）；强制清仓仍只由 `sell_at_not_selected` 控制。`PF_WithoutAF` / `PF_ModeC` 末尾追加该形参，默认值不变
+* feat(strategy): 新增 `crt_multi_sys_strategy`，可将 `MultiSystem` 直接挂到策略运行时；`Strategy` 支持空头：`support_short` 开启后 `order` 卖出超出多头持仓的部分自动“先平后开”融券开空，另提供 `buy_short` / `sell_short` 直接下单
+* feat(trade_manage): 融资融券记账完善：保证金不足时拒绝下单并只借入缺口（不再静默注资污染收益基数），新增借券/归还成本钩子 `get_borrow_cash_cost` / `get_return_cash_cost` / `get_borrow_stock_cost` / `get_return_stock_cost`，空头与借券持仓随送股/缩股调整并补偿出借人现金红利（新增 `BORROW_ADJUST` / `SHORT_ADJUST` / `DIVIDEND_COMPENSATION` 记录类型）
+* feat(trade_manage): `Performance` 支持 pickle
 * feat(slippage): 四个随机移滑价差（`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`）新增 `adverse_only` 参数（默认 `true` 保持单向不利成本；`false` 直接使用带符号采样值，实现零均值执行噪声）
-* feat(slippage): 支持多空不对称滑点：`SlippageBase` 新增 `get_real_buy_short_price`（平空）与 `get_real_sell_short_price`（开空）及其可重载钩子（默认分别委托给多头侧钩子，旧实现行为不变）；`SP_FixedPercent` / `SP_FixedValue` 新增 `short_p` / `short_value`，四个随机模型新增 `short_mean` / `short_stddev` / `short_min_value` / `short_max_value`（留空 `None` 时在构造时取对应多头侧参数值）；`crtSP` 新增 `get_real_buy_short_price` / `get_real_sell_short_price` 可选参数（注意：旧版本序列化的档案不含 `short_*` 键，反序列化后空头侧取类默认值而非对应多头侧值，需显式 `set_param` 补齐）
+* feat(slippage): 支持多空不对称滑点：`SlippageBase` 新增平空/开空侧钩子（默认委托多头侧，旧实现行为不变），`SP_FixedPercent` / `SP_FixedValue` 新增 `short_p` / `short_value`，四个随机模型新增 `short_mean` / `short_stddev` / `short_min_value` / `short_max_value`（`None` 时取多头侧值）；`crtSP` 同步新增可选参数（旧档案不含 `short_*` 键，需显式补设）
 * feat(moneymanager): `MM_Nothing` 支持开空，开空数量按账户净权益计算（净权益 / (价格 × 单位)），与 `MM_FixedCapital` / `MM_FixedCapitalFunds` / `MM_FixedPercent` 等以净权益为空头基数的策略一致，借券货款不再膨胀开空额度；新增 `if_have_short_will_not_sell_short` 参数（默认 `False`）控制已有空头时是否禁止再次开空（此前基类默认禁止开空，行为变更为静默允许）
+* feat(signal): 新增 `SG_Manual` 手工信号；`SG_Cycle` 与自定义周期信号可经 `set_cycle_dates` / `get_cycle_dates` 读取注入的调仓日（模式 A/B 运行前注入整段调仓日，模式 C 在入选日声明）；新增 `get_value` / `get_buy_value` / `get_sell_value` 读取信号数值
+* feat(environment): 新增 `EV_Manual` 市场环境并绑定 `get_value` / `get_values`，`_add_valid` 支持累加值，`ConditionBase` 同步
+* feat(multifactor): 新增 `get_scores_np` / `iter_scores` 大截面 numpy 接口（整个截面只构建一个结构化数组，避免每条记录一个 Python 对象），`get_scores` 可直接接受 `ScoresFilterBase`，`MultiFactorBase` 绑定 `reset` / `_reset` 钩子
+* feat(indicator): `VAR` / `VARP` / `COV` / `CORR` / `BETA` / `SKEW` / `KURT` / `SPEARMAN` 等窗口统计支持 `n=0` 扩展窗口；`ROUND` / `ROUNDUP` / `ROUNDDOWN` 支持负 `ndigits`；`DATE` / `TIME` / `YEAR` / `MONTH` / `WEEK` / `DAY` / `HOUR` / `MINUTE` 支持作为非叶子使用输入指标的日期轴；`WEAVE` 结果集超上限时告警
+* feat(KData): `operator==` / Python `==` 在 stock、query、size 相同的前提下追加比较末根记录，右开区间查询下实时尾部修订或新增可触发下游缓存重算（仍非全量逐元素比较）
+* feat(utilities): `initLogger` 暴露至 Python，日志器状态改为线程安全
+
+**⚡️ 优化改进**
+
+* perf(pywrap): 大面积释放 GIL —— K 线/日历整段磁盘加载、多因子纯 C++ 计算、指标批量计算、账户查询、因子读写、分析与批量辅助接口；指标 numpy 转换改连续缓冲批量拷贝，Python 序列转 vector 增加 numpy 快速路径
+* perf(indicator): `EXIST` / `EVERY` / `BARSLASTS` 的重复重扫改递推，`IC` 截面与 `SPEARMAN` 复用临时缓冲，`SAFTYLOSS` 全量并行，滚动幂和改环形缓冲，`SMA` 增量从框架起点开始，`TIME` 去掉重复日期列表拷贝，`BLOCKSETNUM` 二分定位
+* perf(trade_manage): `updateWithWeight` 按标的检查前沿短路
+* perf(selector): `SE_Signal` 索引去掉逐信号权重，运算符选择器单趟交集并复用克隆原型，`clone` 不再克隆运行时系统列表，多因子截面先过滤后拷贝
+* perf(signal): 值运算合并遍历、逻辑运算归并连接，`SG_Bool` 仅在长度不一致时对齐，周期日注入跳过未变化
+* perf(factor): `FactorSet` 慢路径改为按标的单层并行
+* perf(global): spot 记录跨处理任务共享、`getSpotMarketCode` 改字符串拼接
+* refactor(utilities): 引入异步 DB 连接基类与更丰富的条件构造器
+* refactor(trade_sys): `MultiSystem.adjust_cycle` 非法值设置时抛异常或告警，模式 B 无 SE 时与 A/C 一致（全部子系统视同选中）；`AF_FixedWeightList` 空/全零/非有限权重改为抛异常；`SE_Signal` / 乘法 / 运算选择器的默认名称拼写修正（仅影响 `name()` / `str()` 显示，归档不受影响）
+* refactor(trade_sys): PG / 滑点 / 止损止盈的子类钩子统一为 `_xxx` 风格（`_getGoal` / `_getRealBuyPrice` / `_getPrice`，Python 对应 `_get_goal` / `_get_real_buy_price` / `_get_price`），内置组件行为不变，自定义子类需同步改名；滑点改为子类只算原始价，由 System 统一校验、取整并钳制到当日区间；`is_valid` 统一为可重载钩子 `_is_valid`（EV / CN 同步，默认“有限且 > 0”）
+* refactor(trade_sys): 参数键统一为小写下划线（`auto_checkin` / `max_stock` / `out_extreme`），旧连字符键在 `set_param` 时抛异常；旧归档中的旧键不会迁移，反序列化后取默认值，需显式 `set_param` 补齐
 
 **🐞 缺陷修复**
 
-* fix(KData): 复权修复为固定基准口径：前复权锚定数据最后一日、后复权锚定数据起点，复权结果与查询区间无关，`Stock::getKData` 与 `kdata.getKData` 结果一致；修复后复权 KData 子查询二次复权、扩区拼接尾部偏移、周线及以上聚合首日量额双计、相位同日创新高时最高价漏更新、日线缺口越界读、扩展周期误用日线复权公式、分钟线窗口首根漏调整、空 KData 访问 front()/back() 崩溃等问题；复权调整为只对价格复权，成交量与成交额保持原始值（对齐 Wind / 聚宽等主流数据源口径，详见 Query 复权口径说明）
+* fix(KData): 复权修复为固定基准口径：前复权锚定数据最后一日、后复权锚定数据起点，复权结果与查询区间无关，`Stock::getKData` 与 `kdata.getKData` 结果一致；修复后复权 KData 子查询二次复权、扩区拼接尾部偏移、周线及以上聚合首日量额双计、相位同日创新高时最高价漏更新、日线缺口越界读、扩展周期误用日线复权公式、分钟线窗口首根漏调整等问题；复权调整为只对价格复权，成交量与成交额保持原始值（对齐 Wind / 聚宽等主流数据源口径，详见 Query 复权口径说明）
 * fix(indicator): ADJ_FACTOR 系列复权因子指标改为固定基准计算，与 RECOVER_EQUAL_BACKWARD 同区间逐值一致；ADJ_VOL 口径调整为 VOL / ADJ_FACTOR（配合复权只调价，保持成交额不变）
-* fix(stock): 修复小写 K 线类型经预载缓冲取 K 线崩溃、getMarketValue 对早于首根 K 线的查询回退最新价（未来数据泄漏，改为返回 0）、K 线缓冲释放与查询并发竞态、blockDriver 未判空、reload 并发竞争
+* fix(stock/kdata): 小写 K 线类型经预载缓冲取 K 线崩溃、`getMarketValue` 对早于首根 K 线的查询回退最新价（未来数据泄漏，改为返回 0）、K 线缓冲释放与查询并发竞态（改以 shared_ptr 持有保持视图有效）、私有缓冲的证券位置只计算一次、`blockDriver` 未判空、reload 并发竞争、空或越界访问返回 Null 记录、`KRecord` 对大成交额/数量使用缩放容差、共享内存视图移除可写 `data()`、`StockManager` 预加载异常捕获与加载事件回调按锁内快照派发
 * fix(block): 修复 Null Block 调 getStockList 空指针解引用崩溃；add 改为幂等语义（重复添加已存在的证券返回 true，仅 Null Stock 或无效代码返回 false），列表版 add 返回值改为 all-of（任一失败即为 false 且不短路）
 * fix(strategy): 修复 StrategyContext 股票代码与 K 线类型去重逻辑写反导致去重完全失效的问题；股票代码归一化为大写后去重并存储，stock_list 读回值为大写归一化值（混合大小写重复也能去除，并与默认必载代码正确合流）
-* fix(trade_sys): PG_FixedPercent 止盈目标价改用 buyMoney / totalNumber 计算平均成本，修复部分减仓后目标价被按比例抬高、止盈永不触发；目标价按标的价格精度取整（多头向上、空头向下，取整前先归化浮点噪声），不再返回不可成交价；补充空头目标实现；未设置账户时返回未限定目标而非空指针崩溃
-* fix(trade_sys): PG_FixedHoldDays 持有天数改为按交易对象自身的交易日统计，并在 setTO 时预建日期表，持仓每根 K 线的日线驱动查询（整轮 O(n²)、带锁与 IO）降为两次二分；标的无日线数据时不再静默失效
-* fix(trade_sys): ProfitGoalBase::clone 不再传播交易对象，克隆体经 setTO 重新计算（原先预计算型自定义子类在克隆体上静默失效）；_get_short_goal「未设置目标」的哨兵由 0 统一为 constant.null_price，与多头口径一致
-* fix(signal): 同日信号写入合并为净额并保持「一日一方向」：净额归零时不再残留旧信号（`shouldBuy`/`shouldSell` 可同时为真），`alternate=true` 下同日重复写入刷新数值而非丢弃
-* fix(KData): `operator==` / Python `==` 在 stock、query、size 相同的前提下追加比较末根记录，右开区间查询下实时尾部的修订或新增 K 线可触发下游缓存重算（仍非全量逐元素比较）
+* fix(trade_manage): 账户重建改为回放全部交易记录类型（含出入券、借入/归还、缩股与除权调整）；交易入口拒绝非正/非有限的数量与非法价格；`get_profit_cum_change_curve` 本金基准为 0 时返回 Null，未平仓 `total_profit` 返回 NaN
+* fix(trade_manage): `BrokerTradeManager` 市价单按最新收盘计价、checkin/checkout 校验现金、资产读取失败时保留上次状态，快照持仓按查询日重估
+* fix(trade_sys): PG_FixedPercent 止盈目标价改用 buyMoney / totalNumber 计算平均成本（修复部分减仓后目标价被按比例抬高、止盈永不触发），按标的价格精度取整并补充空头目标；PG_FixedHoldDays 持有天数改按交易对象自身交易日统计、`setTO` 预建日期表（整轮 O(n²)、带锁与 IO 的查询降为两次二分）；ProfitGoalBase::clone 不再传播交易对象，克隆体经 `setTO` 重算
+* fix(trade_sys): 止损/止盈：`ST_Indicator` 克隆只复制配置、结果由 `setTO` 重建，空或长度不符的指标给出守卫；`ST_Saftyloss` 拒绝非正/非有限 `p`
+* fix(trade_sys): System 各交易路径的委托数量改按实际成交价（滑点后）计算，卖单先按 `maxTradeNumber` 截断、买单再按可用现金钳制，非有限的 `maxTradeNumber` 直接拒绝
+* fix(trade_sys): 信号：`SG_Single` 卖出侧噪声阈值与买入对称（修复下跌 bar 每日触发卖出）、`Cross` / `CrossGold` / `Band` / `SG_Single` 在长度不符时按日期对齐 K 线、组合信号在 `setTO` 时重算子信号以清理陈旧信号、值运算克隆保留操作数方向
+* fix(trade_sys): 选择器：运算符选择器序列化可往返且重建原型不再翻倍权重、`SE_Signal` 原型绑定与 clone 映射、多因子查找与零除权重、多因子选择器校验复权类型范围
+* fix(trade_sys): 环境/条件组合运算：`|`（Or）结果归一化为 0/1、两侧均无效时乘除保持无效、非有限值按无效处理、`EV_TwoLine` 先在 K 线上对齐再判断长度
+* fix(trade_sys): 资金管理：MM 的 `auto_checkin` 改为实际成交时一次性注资（数量查询不再改变账户）、数量查询改用查询时刻的现金而非回放权重副作用，并补齐参数与非有限值守卫
+* fix(indicator): 非有限值统一视为缺失：`BARSLASTCOUNT`、条件族有效性、滚动和与统计量、`IIR` 滤波、零方差族、`INSUM` 跨股聚合不再被 NaN/Inf 永久污染；零除与零方差返回 Null，`ZSCORE` 常数序列返回 NaN，`WINNER` / `TS_RANK` / `MRR` / `ROC` 族无效输入返回 Null
+* fix(indicator): 增量计算在上下文变化时拒绝续算并重算，补齐 `HHV` / `LLV` / `STDP` / `SLOPE` / `CVAL` / `ISLASTBAR` / `SUMBARS` 等 discard 声明与空、越界守卫；`HHVBARS` / `LLVBARS` 并列取最近一根、`INTPART` 向零截断、`ATR` 首有效索引对齐 `MA(TR)`、`SLOPE` 改相对坐标、`AMA` 修正预热 `ER` 下界与滚动窗口、`DEVSQ` 窗口含缺失值时传播
+* fix(indicator): 结果缓冲区改按位模式序列化（旧文本档案仍可读），删除指标实现的拷贝构造避免缓冲重复释放、无实现时访问器返回 Null、克隆子树父指针留在克隆内、结果集序号越界守卫；`HSL` / `COST` 按周期归一股数单位、`ZONGGUBEN` 首部空值对齐、`ISLIMITUP` / `ISLIMITDOWN` 改用后复权收盘跨除权日判定、周期参数上限防 int 溢出、`FINANCE` 字段名错误给出上下文
+* fix(multifactor): IC/ICIR 权重和为 0 时输出 NaN、退化截面与归一化配置的传播、`GroupSCFilter` 改用分位边界、`getICIR` 的 `ic_n` 解析与 `ir_n` 校验、`save_all_factors` 关闭时 `get_all_factors` 与 `get_factor` 行为一致
+* fix(strategy): 订单数量超出 int64 手数转换范围时拒绝、无当日 bar 时 `order_value` 告警；卖出非最小交易单位整数倍的委托仅在持仓本身含零股且委托覆盖全部持仓时升级为清仓，否则按整数倍截断、截断为 0 时忽略并告警；事件循环 `stop()` 可停止且重启不重复注册定时器与心跳、支持单时段市场、`KeyboardInterrupt` 优雅退出
+* fix(analysis): 组合名称去重、`sort_key` 校验避免静默空结果、越界记录跳过、每个组合使用独立账户、`analysis.py` 的参数校验与 `Performance.exist` 用法
+* fix(utilities): 修复线程池任务等待自身嵌套任务导致栈溢出、`ResourcePool` 定时器超时与协程恢复竞态、`PluginLoader` `dlclose` 后句柄未置空、HTTP 连接复用/IPv6 主机/响应上限、MySQL 数据截断与列长校验、`Datetime` 与 SQL 整数处理、`roundEx` 大数与负位数
+* fix(global): spot agent 启停串行化与初始化标志原子化、逐处理器异常隔离、JSON 与 FlatBuffers 缺字段防御、`readUUID` 未初始化内存、nng socket 选项失败关闭、版本反馈解析加固
+* fix(factor): `Factor` 结构字段改为不可变、`FactorSet` 支持负索引并校验越界、删除因子保持插入顺序、因子名在保存/查询/删除入口校验
+* fix(pywrap): 回调与转换安全：Python 部分判定、`boost::any` 转换不再使用 `py::eval`、`python_list_to_vector` / 数据驱动持有者 / numpy 转换的异常与生命周期、pickle 拒绝 str state、inspect 缓存与回调参数个数按位置校验
+* fix(pywrap): `get_position_ext_info` 恢复按单一标的返回 `PositionExtInfo`，原返回整个持仓字典的重载更名为 `get_position_ext_info_dict`
+* fix(draw): 现金流按日期归一、未定义指标显示 `N/A`、先计算绩效再渲染报告文本、夏普比率与收益曲线对齐绩效口径
+* fix(i18n): CSV 表头键可翻译且核心目录优先，刷新 gettext 目录并修正文案
+* fix(gui): 保存配置时保留手工调整的 `hikyuu.ini` 项
+
+**⚠️ 破坏性变更**
+
+**MM / AF 体系重构（`Portfolio` → `MultiSystem`）**
+
+原组合引擎 `Portfolio`（`SimplePortfolio` / `WithoutAFPortfolio`）由 `MultiSystem` 承接。`PF_Simple` /
+`PF_WithoutAF` 工厂保留（函数名、形参顺序与默认值不变），但**返回 `MultiSystemPtr`**：
+
+* `Portfolio` 类及其方法不再提供（Python 仅保留导入兼容别名 `Portfolio = MultiSystem`）：驱动时间轴改用
+  `set_axis_mode("calendar")` + `set_date_axis(...)`，`lastSuggestion()` → `last_suggestion`，
+  `getAdjustDates` / `getCycleEndDates` / `getRunningDates` / `getRealSystemList` 等查询接口不再提供；
+* `AllocateFundsBase` 子类钩子由 `_allocateWeight(date, se_list)` 改为 `_allocate(date, tm, contexts, query, mode)`
+  （L1），可选实现 L2 `_to_targets` / L3 `_check_risk`；Python `crtAF` 的首个回调相应变为
+  `allocate_func(self, date, tm, contexts, query, mode)`，并新增可选的 `to_targets_func` / `check_risk_func`；
+* 分配模式（A/B/C）由 `MultiSystem` 持有（`set_mode` / 只读 `mode`），作为末尾 `mode` 形参传入 AF 各钩子；
+  `sys_use_self_tm` 等在新体系无对应语义的参数被忽略并告警。
+
+详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
+
+**信号同日合并与单方向语义**
+
+`SignalBase` 同一日期的多次写入按数值合并为净额：净额为正只保留买入、为负只保留卖出，约为 0 则不保留；
+`alternate=true` 下同日同向写入只刷新数值；加减乘除保留数值、与/或只保留方向。`cycle` 参数改为标记
+“依赖 MultiSystem 注入的调仓日”，不再改变计算范围，且与 `alternate=true` 互斥（强制 `alternate=false` 并告警）。
+归档新增周期起止与周期日字段，旧 `SG_*`（含内嵌 `m_sg` 的系统）归档需重新保存。
+
+**行为变更：`TC_FixedA` 重定义为滚动默认成本模型**
+
+`TC_FixedA` 现始终对应当前 A 股费率：过户费按成交金额万 0.1 全市场双向收取、卖出印花税万 5。原先按成交数量收取过户费的模型更名为 `TC_FixedAPre2015`，`TC_FixedA2015` / `TC_FixedA2017` 冻结为历史口径（其中 2017 模型补收深市卖出过户费，与买入侧一致）。直接使用 `TC_FixedA` 的回测交易成本会随之变化，历史回测请显式选用对应年份的模型；旧归档中的 `TC_FixedA` 会把按股数的过户费参数解释为费率，需改用 `TC_FixedAPre2015` 并重新保存。详见 `trade_manage/trade_cost`。
+
+**行为变更：绩效统计口径统一**
+
+`Performance` 的收益项改为以净资产（现金 + 多头市值 − 空头市值 − 借入现金）为分子、累计净投入（入金 − 出金 + 入券 − 出券）为分母；时间相关统计统一采用自然日、年化因子 365；统计区间不足 2 天、无投入本金或净资产非正时，年化项按定义返回空值（`Account Avg Annual Return` 记 0）；未定义项统一为 NaN（`report()` 显示 `N/A`），`reset()` 清空全部统计槽位。详见 `trade_manage/performance_indicator`。
+
+**WalkForward 窗口驱动重构**
+
+`SYS_WalkForward` 改为按时间定位覆盖窗口的单一驱动入口：窗口数据按需构建，仅在切换窗口时重锚候选系统，首个窗口不再被跳过（既有回测结果会变化），未经计算直接按 moment 驱动将显式报错；新增盘中 `runMomentOnOpen` / `runMomentOnClose` 驱动，窗口切换遵循 `clean_hold_when_select_changed`。`WalkForwardTradeManager` 改为纯运行期视图、不再序列化，**旧版 `SYS_WalkForward` 归档无法加载，需重新生成**。详见 `trade_sys/walkforward`。
 
 ## 2.8.3 - 2026年10月1日
 
