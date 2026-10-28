@@ -51,8 +51,9 @@ CONF_KEYS = [
 
 # Sections whose content is language-specific by design: the donation area carries domestic payment
 # QR codes and channel tables that have no counterpart for overseas readers. Images inside such a
-# section are excluded from the image-set comparison; the title hierarchy is still compared.
-_EXEMPT_SECTION_KEYWORDS = ("donation", "donate", "donor", "sponsor", "捐赠", "赞赏", "打赏")
+# section are excluded from the image-set comparison; the title hierarchy, labels and code-block
+# languages are still compared.
+_EXEMPT_SECTION_KEYWORDS = ("donation", "donate", "donor", "sponsor", "捐款", "捐赠", "赞赏", "打赏")
 
 _TITLE_UNDERLINE = re.compile(r"^[=~`^+\-*#\"'<>,.:;_!]{4,}\s*$")
 
@@ -126,9 +127,9 @@ def _rst_headings(lines):
 def parse_rst_items(path):
     """Extract explicit labels, image refs, code-block languages and literalinclude paths.
 
-    Images inside an exempt section (see _EXEMPT_SECTION_KEYWORDS) are not collected: the
-    donation area legitimately differs between the two languages (e.g. domestic payment QR
-    codes have no counterpart for overseas readers). Title hierarchy stays strictly compared.
+    Only images inside an exempt section (see _EXEMPT_SECTION_KEYWORDS) are skipped: the donation
+    area legitimately differs between the two languages (e.g. domestic payment QR codes have no
+    counterpart for overseas readers). Labels and code-block languages are still compared there.
     """
     labels = set()
     images = set()
@@ -150,10 +151,12 @@ def parse_rst_items(path):
             depth = depth_of[char]
             if skip_depth is not None and depth <= skip_depth:
                 skip_depth = None
-            if skip_depth is None and any(k in title.lower() for k in _EXEMPT_SECTION_KEYWORDS):
+            if (skip_depth is None and depth > 0
+                    and any(k in title.lower() for k in _EXEMPT_SECTION_KEYWORDS)):
+                # depth 0 is the document title itself: exempting it would blanket the whole file.
                 skip_depth = depth
             continue
-        if skip_depth is not None:
+        if skip_depth is not None and re.match(r"^\.\.\s+(?:figure|image)::", line):
             continue
         m = re.match(r"^\.\.\s+_([^:]+):", line)
         if m:

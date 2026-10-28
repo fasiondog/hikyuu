@@ -56,7 +56,7 @@ _TAG_STRIP = re.compile(r"<[^>]+>")
 
 # Headings whose title contains any of these mark a language-specific section
 # whose content is allowed to diverge between the two READMEs (case-insensitive).
-_DONATION_KEYWORDS = ("donation", "donate", "sponsor", "捐赠", "捐款", "赞赏", "打赏")
+_DONATION_KEYWORDS = ("donation", "donate", "donor", "sponsor", "捐款", "捐赠", "赞赏", "打赏")
 
 # The quick-links table points at language-specific resources (localized
 # documentation sites and the en/zh notebook trees), so its links are allowed
