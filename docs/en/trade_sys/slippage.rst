@@ -98,7 +98,7 @@ Built-in Slippage Algorithms
 
 .. note::
 
-    The four random slippages warn consistently on an absurd parameter (a warning only, the calculation is unchanged): a stddev above 1.0 (SP_Normal / SP_LogNormal) or an amplitude above 1.0 (SP_Uniform / SP_TruncNormal, i.e. the larger absolute bound of the range) logs a warning; the long side and the short_ side are judged separately; the parameter itself has no upper bound.
+    The four random slippages warn consistently on an absurd parameter (a warning only, the calculation is unchanged): a stddev above 1.0 (SP_Normal / SP_LogNormal) or an amplitude above 1.0 (SP_Uniform / SP_TruncNormal, i.e. the larger absolute bound of the range) logs a warning; the long side and the ``short_`` side are judged separately; the parameter itself has no upper bound.
 
 
 Custom Slippage Algorithm
