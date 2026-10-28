@@ -9,6 +9,10 @@ structure fingerprint against the same file in the other tree:
     fingerprint = (title hierarchy, explicit labels, image references,
                    code-block languages, literalinclude paths)
 
+The donation section is exempt from the image-set comparison: it carries domestic payment QR
+codes and channel tables that legitimately have no counterpart for overseas readers. Title
+hierarchy, labels and code-block languages are still compared there.
+
 Usage:
     python3 docs/tools/check_docs_parity.py          # structure only (default)
     python3 docs/tools/check_docs_parity.py --full   # additionally hash _static and key conf.py items
@@ -44,6 +48,11 @@ CONF_KEYS = [
     "version",
     "release",
 ]
+
+# Sections whose content is language-specific by design: the donation area carries domestic payment
+# QR codes and channel tables that have no counterpart for overseas readers. Images inside such a
+# section are excluded from the image-set comparison; the title hierarchy is still compared.
+_EXEMPT_SECTION_KEYWORDS = ("donation", "donate", "donor", "sponsor", "捐赠", "赞赏", "打赏")
 
 _TITLE_UNDERLINE = re.compile(r"^[=~`^+\-*#\"'<>,.:;_!]{4,}\s*$")
 
@@ -103,30 +112,64 @@ def parse_title_hierarchy(path):
     return []  # .ipynb title hierarchies are not compared
 
 
+def _rst_headings(lines):
+    """Map line index -> (underline char, title text) for RST section headings."""
+    result = {}
+    for i in range(len(lines) - 1):
+        text = lines[i].rstrip("\n").strip()
+        underline = lines[i + 1].rstrip("\n")
+        if text and _TITLE_UNDERLINE.match(underline) and not _TITLE_UNDERLINE.match(text):
+            result[i] = (underline[0], text)
+    return result
+
+
 def parse_rst_items(path):
-    """Extract explicit labels, image refs, code-block languages and literalinclude paths."""
+    """Extract explicit labels, image refs, code-block languages and literalinclude paths.
+
+    Images inside an exempt section (see _EXEMPT_SECTION_KEYWORDS) are not collected: the
+    donation area legitimately differs between the two languages (e.g. domestic payment QR
+    codes have no counterpart for overseas readers). Title hierarchy stays strictly compared.
+    """
     labels = set()
     images = set()
     code_langs = []
     literal_includes = []
     with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.rstrip("\n")
-            m = re.match(r"^\.\.\s+_([^:]+):", line)
-            if m:
-                labels.add(m.group(1))
-                continue
-            m = re.match(r"^\.\.\s+(?:figure|image)::\s+(.+)$", line)
-            if m:
-                images.add(m.group(1).strip())
-                continue
-            m = re.match(r"^\.\.\s+code-block::\s*(\w+)", line)
-            if m:
-                code_langs.append(m.group(1))
-                continue
-            m = re.match(r"^\.\.\s+literalinclude::\s+(.+)$", line)
-            if m:
-                literal_includes.append(m.group(1).strip())
+        lines = f.readlines()
+    headings = _rst_headings(lines)
+    # RST does not fix underline characters to levels; the order of first use does.
+    depth_of = {}
+    skip_depth = None
+    for i, raw in enumerate(lines):
+        line = raw.rstrip("\n")
+        heading = headings.get(i)
+        if heading:
+            char, title = heading
+            if char not in depth_of:
+                depth_of[char] = len(depth_of)
+            depth = depth_of[char]
+            if skip_depth is not None and depth <= skip_depth:
+                skip_depth = None
+            if skip_depth is None and any(k in title.lower() for k in _EXEMPT_SECTION_KEYWORDS):
+                skip_depth = depth
+            continue
+        if skip_depth is not None:
+            continue
+        m = re.match(r"^\.\.\s+_([^:]+):", line)
+        if m:
+            labels.add(m.group(1))
+            continue
+        m = re.match(r"^\.\.\s+(?:figure|image)::\s+(.+)$", line)
+        if m:
+            images.add(m.group(1).strip())
+            continue
+        m = re.match(r"^\.\.\s+code-block::\s*(\w+)", line)
+        if m:
+            code_langs.append(m.group(1))
+            continue
+        m = re.match(r"^\.\.\s+literalinclude::\s+(.+)$", line)
+        if m:
+            literal_includes.append(m.group(1).strip())
     return labels, images, code_langs, literal_includes
 
 
