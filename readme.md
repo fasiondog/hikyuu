@@ -24,10 +24,16 @@ non-finite values propagate — is **complete and explicit** in the framework: n
 are actually executed, and results that can be verified item by item, rather than left to the user to
 guarantee.
 
-**Its purpose, in one sentence: never let a strategy that "runs" but does not hold up be taken as a
-conclusion.**
+**Its purpose, in two sentences: never let a strategy that "runs" but does not hold up be taken as a
+conclusion; and never let a full-market validation become waiting.**
 
-Two means serve this kernel: **splitting the structure along theoretical questions** — a strategy must
+**Speed is not fewer steps — it is what makes "verify every step" affordable on an ordinary machine**:
+on an Orange Pi 5 Plus (an ARM single-board computer), a full `SYS_Simple` run for each of the 3,547
+securities over ten years (2015–2026) — the EMA5 single-line inflection point from
+`SG_Flex(EMA(C, 5), slow_n=10)` with `MM_FixedCount(100)`, each on its own ledger — takes about 13
+seconds.
+
+Two means serve the first sentence: **splitting the structure along theoretical questions** — a strategy must
 answer market environment, condition, signal, position sizing, exit and fill price; a portfolio must
 answer who participates, how much money each gets and by what score — each is a theoretical must-answer
 question, not an engineering module; and **portfolio as strategy** — making the portfolio a first-class
@@ -35,7 +41,8 @@ citizen (`SE` / `AF` / `MF`) is what lets the kernel extend from a single strate
 multi-strategy. Every link can then be replaced and evaluated independently, and every trade is recorded
 in a queryable ledger; the value of the framework is not exhaustive coverage, but **getting every slot
 right and keeping the contract intact after replacement** (see "🏛️ Trading theory and financial
-semantics" and "🧬 Portfolio as strategy" below).
+semantics" and "🧬 Portfolio as strategy" below); speed comes from the same kernel running directly in
+C++ — **not one step skipped to make it fast**.
 
 > ⚠️ **Disclaimer**: This project is an open-source financial technology research tool. It is intended
 > for personal study, academic research and data analysis only. It does not constitute any investment
