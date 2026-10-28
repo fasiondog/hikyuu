@@ -21,9 +21,9 @@ conclusion; and never let a full-market validation become waiting.**
 
 **Speed is not fewer steps — it is what makes "verify every step" affordable on an ordinary machine**:
 on an Orange Pi 5 Plus (an ARM single-board computer), a full ``SYS_Simple`` run for each of the 3,547
-securities over ten years (2015–2026) — the EMA5 single-line inflection point from
-``SG_Flex(EMA(C, 5), slow_n=10)`` with ``MM_FixedCount(100)``, each on its own ledger — takes about 13
-seconds.
+currently valid non-index securities over the eleven years 2015–2026 — the EMA5 self-cross with its own
+EMA10 from ``SG_Flex(EMA(C, 5), slow_n=10)`` plus ``MM_FixedCount(100)``, each on its own ledger, on
+warm data and walking them in a single serial process — takes about 13 seconds.
 
 Two means serve the first sentence: **splitting the structure along theoretical questions** — a
 strategy must answer market environment, condition, signal, position sizing, exit and fill price; a
@@ -33,8 +33,8 @@ the portfolio a first-class citizen (``SE`` / ``AF`` / ``MF``) is what lets the 
 single strategy to multi-asset, multi-strategy. Every link can then be replaced and evaluated
 independently, and every trade is recorded in a queryable ledger; the value of the framework is not
 exhaustive coverage, but **getting every slot right and keeping the contract intact after
-replacement**; speed comes from the same kernel running directly in C++, with **not one step skipped
-to make it fast**.
+replacement**; speed comes from the same C++ kernel — the same ledger, the same guards, only without
+an interpreter in between.
 
 Project repositories:
 
@@ -514,9 +514,12 @@ verifiable:
   milliseconds once the data is warm; see the
   `benchmark article <https://mp.weixin.qq.com/s?__biz=MzkwMzY1NzYxMA==&mid=2247483768&idx=1&sn=33e40aa9633857fa7b4c7ded51c95ae7>`_
 
+Disclaimer
+--------------------------------
+
 .. warning::
 
-   **Disclaimer**: this project is an open-source financial technology research tool. It is intended
+   This project is an open-source financial technology research tool. It is intended
    for personal study, academic research and data analysis only. It does not constitute any investment
    advice or trading guidance, and it does not provide or embed any securities trading service. Any
    trading interface, extension or actual operation added or developed by the user is entirely at the
