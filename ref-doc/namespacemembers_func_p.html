@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 命名空间成员</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,74 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li class="current"><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="namespaces.html"><span>命名空间列表</span></a></li>
-      <li class="current"><a href="namespacemembers.html"><span>命名空间成员</span></a></li>
-    </ul>
-  </div>
-  <div id="navrow3" class="tabs2">
-    <ul class="tablist">
-      <li><a href="namespacemembers.html"><span>全部</span></a></li>
-      <li class="current"><a href="namespacemembers_func.html"><span>函数</span></a></li>
-      <li><a href="namespacemembers_vars.html"><span>变量</span></a></li>
-      <li><a href="namespacemembers_type.html"><span>类型定义</span></a></li>
-      <li><a href="namespacemembers_enum.html"><span>枚举</span></a></li>
-      <li><a href="namespacemembers_eval.html"><span>枚举值</span></a></li>
-    </ul>
-  </div>
-  <div id="navrow4" class="tabs3">
-    <ul class="tablist">
-      <li><a href="namespacemembers_func.html#index_a"><span>a</span></a></li>
-      <li><a href="namespacemembers_func_c.html#index_c"><span>c</span></a></li>
-      <li><a href="namespacemembers_func_d.html#index_d"><span>d</span></a></li>
-      <li><a href="namespacemembers_func_e.html#index_e"><span>e</span></a></li>
-      <li><a href="namespacemembers_func_g.html#index_g"><span>g</span></a></li>
-      <li><a href="namespacemembers_func_h.html#index_h"><span>h</span></a></li>
-      <li><a href="namespacemembers_func_i.html#index_i"><span>i</span></a></li>
-      <li><a href="namespacemembers_func_k.html#index_k"><span>k</span></a></li>
-      <li><a href="namespacemembers_func_l.html#index_l"><span>l</span></a></li>
-      <li><a href="namespacemembers_func_m.html#index_m"><span>m</span></a></li>
-      <li><a href="namespacemembers_func_o.html#index_o"><span>o</span></a></li>
-      <li class="current"><a href="namespacemembers_func_p.html#index_p"><span>p</span></a></li>
-      <li><a href="namespacemembers_func_r.html#index_r"><span>r</span></a></li>
-      <li><a href="namespacemembers_func_s.html#index_s"><span>s</span></a></li>
-      <li><a href="namespacemembers_func_t.html#index_t"><span>t</span></a></li>
-      <li><a href="namespacemembers_func_u.html#index_u"><span>u</span></a></li>
-      <li><a href="namespacemembers_func_v.html#index_v"><span>v</span></a></li>
-      <li><a href="namespacemembers_func_w.html#index_w"><span>w</span></a></li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('namespacemembers_func_p.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -110,35 +74,60 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="contents">
-&#160;
+<div class="textblock">这里是所有命名空间函数, 及指向每个函数所属命名空间文档的链接: </div>
 
-<h3><a class="anchor" id="index_p"></a>- p -</h3><ul>
-<li>PG_FixedPercent()
-: <a class="el" href="namespacehku.html#af351f833f76c2712275209e3dd7034c8">hku</a>
-</li>
-<li>PG_NoGoal()
-: <a class="el" href="namespacehku.html#aaac89f731e926cdcad81e48c8ed70c77">hku</a>
-</li>
-<li>POS()
-: <a class="el" href="namespacehku.html#af936028581b64180d08983c6bc49fb93">hku</a>
-</li>
-<li>PRICELIST()
-: <a class="el" href="group___indicator.html#gab605844111fd39ada0c7caf96afcd22c">hku</a>
-</li>
+<h3 class="doxsection"><a id="index_p" name="index_p"></a>- p -</h3><ul>
+<li>parallel_for_index()&#160;:&#160;<a class="el" href="namespacehku.html#a83a966d034006bba6ac9be6c18bf3adb">hku</a></li>
+<li>parallel_for_index_single()&#160;:&#160;<a class="el" href="namespacehku.html#a4feb32ae2923e0280bcb95ad7451cb16">hku</a></li>
+<li>parallel_for_index_void()&#160;:&#160;<a class="el" href="namespacehku.html#a5550155082674c2c04cd832c7c179417">hku</a></li>
+<li>parallel_for_index_void_single()&#160;:&#160;<a class="el" href="namespacehku.html#a8ac70cd7bd76492df264a3eef64d9d39">hku</a></li>
+<li>parallel_for_range()&#160;:&#160;<a class="el" href="namespacehku.html#a1df471204050f3cb65e1fe3e54f10f7e">hku</a></li>
+<li>parallel_run_sys()&#160;:&#160;<a class="el" href="namespacehku.html#ae39f7aebcc27181ae562efb38f45c30e">hku</a></li>
+<li>parallelIndexRange()&#160;:&#160;<a class="el" href="namespacehku.html#a7eba6addf3c6174523254247eeb8e851">hku</a></li>
+<li>Parameter::get&lt; boost::any &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#a39ca5b98a12c4a5c9a939b5f9e325d1a">hku</a></li>
+<li>parseLegacyValueText()&#160;:&#160;<a class="el" href="namespacehku_1_1detail.html#a7507dfa81eefcf6bdf7c5cf6c465d9fb">hku::detail</a></li>
+<li>PF_ModeA()&#160;:&#160;<a class="el" href="group___portfolio.html#gadd3bcbc7d6a7679da18193f5973937ba">hku</a></li>
+<li>PF_ModeB()&#160;:&#160;<a class="el" href="group___portfolio.html#ga28f3e70f90b4844e6490318c61649a37">hku</a></li>
+<li>PF_ModeC()&#160;:&#160;<a class="el" href="group___portfolio.html#gae447247e145304d1113724e497c9b314">hku</a></li>
+<li>PF_SignalAggregate()&#160;:&#160;<a class="el" href="group___portfolio.html#gae0bdca7939870e84f48b8b4a7d0f3a4c">hku</a></li>
+<li>PF_Simple()&#160;:&#160;<a class="el" href="group___portfolio.html#ga3f4d9be5f2f143688f763f2844d27f2a">hku</a></li>
+<li>PF_WithoutAF()&#160;:&#160;<a class="el" href="group___portfolio.html#ga8a2bd839d627835d5c54a5f82ef3beea">hku</a></li>
+<li>PG_FixedHoldDays()&#160;:&#160;<a class="el" href="group___profit_goal.html#ga1035758de2864cd69e9b6ee2831e088d">hku</a></li>
+<li>PG_FixedPercent()&#160;:&#160;<a class="el" href="namespacehku.html#af351f833f76c2712275209e3dd7034c8">hku</a></li>
+<li>PG_NoGoal()&#160;:&#160;<a class="el" href="namespacehku.html#aaac89f731e926cdcad81e48c8ed70c77">hku</a></li>
+<li>post()&#160;:&#160;<a class="el" href="namespacehku_1_1net.html#a091939315430c69b784e1cc96cc81711">hku::net</a></li>
+<li>POW()&#160;:&#160;<a class="el" href="group___indicator.html#gaaa80fea1ccce619de9bc7992fd5ec070">hku</a></li>
+<li>priceFromSerialString()&#160;:&#160;<a class="el" href="namespacehku.html#ac44125a0dd7da604e5a80bda06bd445d">hku</a></li>
+<li>PRICELIST()&#160;:&#160;<a class="el" href="group___indicator.html#ga16b7998e447f1a87d81e9bd32613fc78">hku</a></li>
+<li>priceToSerialString()&#160;:&#160;<a class="el" href="namespacehku.html#a00c6c9e02526f7e69c6d132f0cf5a74b">hku</a></li>
+<li>pullFromBufferServerLocal()&#160;:&#160;<a class="el" href="namespacehku.html#a9837cc97927db2d0454f4d469b52b0cf">hku</a></li>
+<li>pythonInInteractive()&#160;:&#160;<a class="el" href="namespacehku.html#a388ac769a54f1f6df04ac059acd582a7">hku</a></li>
+<li>pythonInJupyter()&#160;:&#160;<a class="el" href="namespacehku.html#a05a4de7e6d2c60259d8014f8167ef1cb">hku</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

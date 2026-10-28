@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::Datetime类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_datetime.html','','classhku_1_1_datetime-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,93 +74,190 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
-<a href="classhku_1_1_datetime-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::Datetime类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___data_type.html">DataType 基础数据类型定义</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::Datetime类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___data_type.html">DataType basic data type definitions</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>日期类型  
- <a href="classhku_1_1_datetime.html#details">更多...</a></p>
+<p>Date type  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_datetime_8h_source.html">Datetime.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a860ec98845685546511f10ce65d2e242"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a860ec98845685546511f10ce65d2e242">Datetime</a> ()</td></tr>
-<tr class="memdesc:a860ec98845685546511f10ce65d2e242"><td class="mdescLeft">&#160;</td><td class="mdescRight">默认构造函数，Null&lt;Datetime&gt;  <a href="#a860ec98845685546511f10ce65d2e242">更多...</a><br /></td></tr>
-<tr class="separator:a860ec98845685546511f10ce65d2e242"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad03ca87c8e59e97714e96f8f02f37bee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#ad03ca87c8e59e97714e96f8f02f37bee">Datetime</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;)</td></tr>
-<tr class="separator:ad03ca87c8e59e97714e96f8f02f37bee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf38738cc2315801adcd49e694d4247c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#adf38738cc2315801adcd49e694d4247c">Datetime</a> (int <a class="el" href="classhku_1_1_datetime.html#a95fe099da4885c4e349cdf48a26a73e2">year</a>, int <a class="el" href="classhku_1_1_datetime.html#a43074f7909e6b00c277b7e0a0f6e6220">month</a>, int <a class="el" href="classhku_1_1_datetime.html#a14f7041ce8ea7475bdae3d4294783e50">day</a>, int hh=0, int mm=0, int sec=0)</td></tr>
-<tr class="separator:adf38738cc2315801adcd49e694d4247c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a613aac38aafa80b255c60ce98b7b2d68"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a613aac38aafa80b255c60ce98b7b2d68">Datetime</a> (const bd::date &amp;)</td></tr>
-<tr class="memdesc:a613aac38aafa80b255c60ce98b7b2d68"><td class="mdescLeft">&#160;</td><td class="mdescRight">从boost::gregorian::date构造日期类型  <a href="#a613aac38aafa80b255c60ce98b7b2d68">更多...</a><br /></td></tr>
-<tr class="separator:a613aac38aafa80b255c60ce98b7b2d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e119ab0999267d3724b9a03273c150c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a7e119ab0999267d3724b9a03273c150c">Datetime</a> (const bt::ptime &amp;)</td></tr>
-<tr class="memdesc:a7e119ab0999267d3724b9a03273c150c"><td class="mdescLeft">&#160;</td><td class="mdescRight">从boost::posix_time::ptime构造  <a href="#a7e119ab0999267d3724b9a03273c150c">更多...</a><br /></td></tr>
-<tr class="separator:a7e119ab0999267d3724b9a03273c150c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbe2993496da9d8d15cf44703faf48a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#acbe2993496da9d8d15cf44703faf48a5">Datetime</a> (unsigned long long)</td></tr>
-<tr class="memdesc:acbe2993496da9d8d15cf44703faf48a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过数字方式构造日期类型，数字格式：YYYYMMDDhhmmss，如 200101010000  <a href="#acbe2993496da9d8d15cf44703faf48a5">更多...</a><br /></td></tr>
-<tr class="separator:acbe2993496da9d8d15cf44703faf48a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbde993605695b8337d5cf01b5dfd5e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#abbde993605695b8337d5cf01b5dfd5e9">Datetime</a> (const std::string &amp;)</td></tr>
-<tr class="memdesc:abbde993605695b8337d5cf01b5dfd5e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过字符串方式构造日期类型，如："2001-01-01 18:00:00.12345"  <a href="#abbde993605695b8337d5cf01b5dfd5e9">更多...</a><br /></td></tr>
-<tr class="separator:abbde993605695b8337d5cf01b5dfd5e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95fe099da4885c4e349cdf48a26a73e2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a95fe099da4885c4e349cdf48a26a73e2">year</a> () const </td></tr>
-<tr class="separator:a95fe099da4885c4e349cdf48a26a73e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43074f7909e6b00c277b7e0a0f6e6220"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a43074f7909e6b00c277b7e0a0f6e6220">month</a> () const </td></tr>
-<tr class="separator:a43074f7909e6b00c277b7e0a0f6e6220"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14f7041ce8ea7475bdae3d4294783e50"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a14f7041ce8ea7475bdae3d4294783e50">day</a> () const </td></tr>
-<tr class="separator:a14f7041ce8ea7475bdae3d4294783e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84780e0f23beb6cbec4116a60a805925"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a84780e0f23beb6cbec4116a60a805925">hour</a> () const </td></tr>
-<tr class="separator:a84780e0f23beb6cbec4116a60a805925"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12846abc6c6fcb9ea1884d437cb65911"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a12846abc6c6fcb9ea1884d437cb65911">minute</a> () const </td></tr>
-<tr class="separator:a12846abc6c6fcb9ea1884d437cb65911"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a941c84fbbdcf35091541b06568dd8031"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a941c84fbbdcf35091541b06568dd8031">second</a> () const </td></tr>
-<tr class="separator:a941c84fbbdcf35091541b06568dd8031"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeaa91f76b2994cb6a89520d581816341"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#aeaa91f76b2994cb6a89520d581816341">number</a> () const </td></tr>
-<tr class="memdesc:aeaa91f76b2994cb6a89520d581816341"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回如YYYYMMDDhhmmss格式的数字，方便比较操作， Null&lt;Datetime&gt;()对应的 number 为 <a class="el" href="classhku_1_1_null_3_01unsigned_01long_01long_01_4.html" title="提供unsigned long long（无符号64位整型）的Null值 ">Null&lt;unsigned long long&gt;</a>  <a href="#aeaa91f76b2994cb6a89520d581816341">更多...</a><br /></td></tr>
-<tr class="separator:aeaa91f76b2994cb6a89520d581816341"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0da04172de09c50bf5f081aaefae5ca9"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a0da04172de09c50bf5f081aaefae5ca9">toString</a> () const </td></tr>
-<tr class="separator:a0da04172de09c50bf5f081aaefae5ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbdc7a3291297361c93a76d61ee072f1"><td class="memItemLeft" align="right" valign="top">bt::ptime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#acbdc7a3291297361c93a76d61ee072f1">ptime</a> () const </td></tr>
-<tr class="memdesc:acbdc7a3291297361c93a76d61ee072f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回 boost::posix_time::ptime  <a href="#acbdc7a3291297361c93a76d61ee072f1">更多...</a><br /></td></tr>
-<tr class="separator:acbdc7a3291297361c93a76d61ee072f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7138f0d3c15d315c2409a7ae16b4e839"><td class="memItemLeft" align="right" valign="top">bd::date&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a7138f0d3c15d315c2409a7ae16b4e839">date</a> () const </td></tr>
-<tr class="memdesc:a7138f0d3c15d315c2409a7ae16b4e839"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回 boost::gregorian::date  <a href="#a7138f0d3c15d315c2409a7ae16b4e839">更多...</a><br /></td></tr>
-<tr class="separator:a7138f0d3c15d315c2409a7ae16b4e839"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a860ec98845685546511f10ce65d2e242" id="r_a860ec98845685546511f10ce65d2e242"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a860ec98845685546511f10ce65d2e242">Datetime</a> ()</td></tr>
+<tr class="memdesc:a860ec98845685546511f10ce65d2e242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null&lt;Datetime&gt;</a>  <br /></td></tr>
+<tr class="memitem:ad03ca87c8e59e97714e96f8f02f37bee" id="r_ad03ca87c8e59e97714e96f8f02f37bee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad03ca87c8e59e97714e96f8f02f37bee">Datetime</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;)</td></tr>
+<tr class="memitem:a4f9b6ca9080f56216fa7ab1fa9b26d04" id="r_a4f9b6ca9080f56216fa7ab1fa9b26d04"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f9b6ca9080f56216fa7ab1fa9b26d04">Datetime</a> (long <a class="el" href="#a9e4a9f377df71bbf69992eb9efd6784e">year</a>, long <a class="el" href="#ac37ce81598d4bca9cdf2ad834fadec0c">month</a>, long <a class="el" href="#a3c7fdd66d9c1b2a30ae9446c2d35828b">day</a>, long hh=0, long mm=0, long sec=0, long millisec=0, long microsec=0)</td></tr>
+<tr class="memdesc:a4f9b6ca9080f56216fa7ab1fa9b26d04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:a613aac38aafa80b255c60ce98b7b2d68" id="r_a613aac38aafa80b255c60ce98b7b2d68"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a613aac38aafa80b255c60ce98b7b2d68">Datetime</a> (const bd::date &amp;)</td></tr>
+<tr class="memdesc:a613aac38aafa80b255c60ce98b7b2d68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the date type from boost::gregorian::date  <br /></td></tr>
+<tr class="memitem:a7e119ab0999267d3724b9a03273c150c" id="r_a7e119ab0999267d3724b9a03273c150c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e119ab0999267d3724b9a03273c150c">Datetime</a> (const bt::ptime &amp;)</td></tr>
+<tr class="memdesc:a7e119ab0999267d3724b9a03273c150c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from boost::posix_time::ptime  <br /></td></tr>
+<tr class="memitem:acbe2993496da9d8d15cf44703faf48a5" id="r_acbe2993496da9d8d15cf44703faf48a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acbe2993496da9d8d15cf44703faf48a5">Datetime</a> (unsigned long long)</td></tr>
+<tr class="memdesc:acbe2993496da9d8d15cf44703faf48a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the date type with a number  <br /></td></tr>
+<tr class="memitem:abbde993605695b8337d5cf01b5dfd5e9" id="r_abbde993605695b8337d5cf01b5dfd5e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbde993605695b8337d5cf01b5dfd5e9">Datetime</a> (const std::string &amp;)</td></tr>
+<tr class="memdesc:abbde993605695b8337d5cf01b5dfd5e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the date type with a string  <br /></td></tr>
+<tr class="memitem:aa5b5d255f9fcec5262ce927672a92130" id="r_aa5b5d255f9fcec5262ce927672a92130"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5b5d255f9fcec5262ce927672a92130">operator=</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;)</td></tr>
+<tr class="memitem:a9e4a9f377df71bbf69992eb9efd6784e" id="r_a9e4a9f377df71bbf69992eb9efd6784e"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e4a9f377df71bbf69992eb9efd6784e">year</a> () const</td></tr>
+<tr class="memdesc:a9e4a9f377df71bbf69992eb9efd6784e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Year; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:ac37ce81598d4bca9cdf2ad834fadec0c" id="r_ac37ce81598d4bca9cdf2ad834fadec0c"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac37ce81598d4bca9cdf2ad834fadec0c">month</a> () const</td></tr>
+<tr class="memdesc:ac37ce81598d4bca9cdf2ad834fadec0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Month [1, 12]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:a3c7fdd66d9c1b2a30ae9446c2d35828b" id="r_a3c7fdd66d9c1b2a30ae9446c2d35828b"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c7fdd66d9c1b2a30ae9446c2d35828b">day</a> () const</td></tr>
+<tr class="memdesc:a3c7fdd66d9c1b2a30ae9446c2d35828b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Day [1, 31]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:a5873e0a514e211aeb31cdbd52d5c403d" id="r_a5873e0a514e211aeb31cdbd52d5c403d"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5873e0a514e211aeb31cdbd52d5c403d">hour</a> () const</td></tr>
+<tr class="memdesc:a5873e0a514e211aeb31cdbd52d5c403d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hour [0, 23]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:a4b4e8b3abd0e71269d4267fb78a273b2" id="r_a4b4e8b3abd0e71269d4267fb78a273b2"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b4e8b3abd0e71269d4267fb78a273b2">minute</a> () const</td></tr>
+<tr class="memdesc:a4b4e8b3abd0e71269d4267fb78a273b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minute [0, 59]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:a5e1773128c40a9954ab68a4e19ad5f22" id="r_a5e1773128c40a9954ab68a4e19ad5f22"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e1773128c40a9954ab68a4e19ad5f22">second</a> () const</td></tr>
+<tr class="memdesc:a5e1773128c40a9954ab68a4e19ad5f22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Second [0, 59]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:aba4bc84c03010e985b7674ae938a2ca8" id="r_aba4bc84c03010e985b7674ae938a2ca8"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba4bc84c03010e985b7674ae938a2ca8">millisecond</a> () const</td></tr>
+<tr class="memdesc:aba4bc84c03010e985b7674ae938a2ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Millisecond [0, 999]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:aac5cb9094b8e84f85b90d69c5ce6acc9" id="r_aac5cb9094b8e84f85b90d69c5ce6acc9"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac5cb9094b8e84f85b90d69c5ce6acc9">microsecond</a> () const</td></tr>
+<tr class="memdesc:aac5cb9094b8e84f85b90d69c5ce6acc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Microsecond [0, 999]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>  <br /></td></tr>
+<tr class="memitem:a640604a1d089417e13ba1b349290f87e" id="r_a640604a1d089417e13ba1b349290f87e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a640604a1d089417e13ba1b349290f87e">isNull</a> () const</td></tr>
+<tr class="memdesc:a640604a1d089417e13ba1b349290f87e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null&lt;Datetime&gt;</a>  <br /></td></tr>
+<tr class="memitem:a0cf335ae4735276f83562d58e9834a9b" id="r_a0cf335ae4735276f83562d58e9834a9b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0cf335ae4735276f83562d58e9834a9b">operator+</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> d) const</td></tr>
+<tr class="memdesc:a0cf335ae4735276f83562d58e9834a9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Date operation, add the given duration  <br /></td></tr>
+<tr class="memitem:a2a52f8330c115f4965925ef3e5a3d5e0" id="r_a2a52f8330c115f4965925ef3e5a3d5e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2a52f8330c115f4965925ef3e5a3d5e0">operator-</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> d) const</td></tr>
+<tr class="memdesc:a2a52f8330c115f4965925ef3e5a3d5e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Date operation, subtract the given duration  <br /></td></tr>
+<tr class="memitem:ac09b98ac18a9352b8c0672d14d9fd0c3" id="r_ac09b98ac18a9352b8c0672d14d9fd0c3"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:ac09b98ac18a9352b8c0672d14d9fd0c3 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac09b98ac18a9352b8c0672d14d9fd0c3">operator+</a> (std::chrono::duration&lt; Rep, Period &gt; duration) const</td></tr>
+<tr class="memdesc:ac09b98ac18a9352b8c0672d14d9fd0c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Date operation, add a chrono duration  <br /></td></tr>
+<tr class="memitem:a6df6d7321bf2e371f3bef6a50aae5f0e" id="r_a6df6d7321bf2e371f3bef6a50aae5f0e"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:a6df6d7321bf2e371f3bef6a50aae5f0e template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6df6d7321bf2e371f3bef6a50aae5f0e">operator-</a> (std::chrono::duration&lt; Rep, Period &gt; duration) const</td></tr>
+<tr class="memdesc:a6df6d7321bf2e371f3bef6a50aae5f0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Date operation, subtract a chrono duration  <br /></td></tr>
+<tr class="memitem:abebfd4c593ec71dfd216c30be6c9c322" id="r_abebfd4c593ec71dfd216c30be6c9c322"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abebfd4c593ec71dfd216c30be6c9c322">number</a> () const noexcept</td></tr>
+<tr class="memdesc:abebfd4c593ec71dfd216c30be6c9c322"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a number in the YYYYMMDDhhmm format, convenient for the comparison operations The number corresponding to Null&lt;Datetime&gt;() is <a class="el" href="classhku_1_1_null_3_01unsigned_01long_01long_01_4.html" title="It provides the Null value of unsigned long long (the unsigned 64-bit integer)">Null&lt;unsigned long long&gt;</a>  <br /></td></tr>
+<tr class="memitem:add648aba83eeb7d7ac132004a9c64429" id="r_add648aba83eeb7d7ac132004a9c64429"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add648aba83eeb7d7ac132004a9c64429">ym</a> () const noexcept</td></tr>
+<tr class="memdesc:add648aba83eeb7d7ac132004a9c64429"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a number in the YYYYMMDD format  <br /></td></tr>
+<tr class="memitem:ae2d25eff528ec6b6781a776a7591fc86" id="r_ae2d25eff528ec6b6781a776a7591fc86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2d25eff528ec6b6781a776a7591fc86">ymd</a> () const noexcept</td></tr>
+<tr class="memdesc:ae2d25eff528ec6b6781a776a7591fc86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a number in the YYYYMMDD format  <br /></td></tr>
+<tr class="memitem:adc918350219f93ecd5c4adc6d06d4f5a" id="r_adc918350219f93ecd5c4adc6d06d4f5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc918350219f93ecd5c4adc6d06d4f5a">ymdh</a> () const noexcept</td></tr>
+<tr class="memdesc:adc918350219f93ecd5c4adc6d06d4f5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a number in the YYYYMMDDHH format  <br /></td></tr>
+<tr class="memitem:aa769ee20621c6de4015a1a08bf83ba5a" id="r_aa769ee20621c6de4015a1a08bf83ba5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa769ee20621c6de4015a1a08bf83ba5a">ymdhm</a> () const noexcept</td></tr>
+<tr class="memdesc:aa769ee20621c6de4015a1a08bf83ba5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a number in the YYYYMMDDhhmm format  <br /></td></tr>
+<tr class="memitem:a1bda670438b048b60ca6df5c0aa037fe" id="r_a1bda670438b048b60ca6df5c0aa037fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1bda670438b048b60ca6df5c0aa037fe">ymdhms</a> () const noexcept</td></tr>
+<tr class="memdesc:a1bda670438b048b60ca6df5c0aa037fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a number in the YYYYMMDDhhmmss format  <br /></td></tr>
+<tr class="memitem:a0b688a2c9c9d6c22c4790f8056239870" id="r_a0b688a2c9c9d6c22c4790f8056239870"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b688a2c9c9d6c22c4790f8056239870">hex</a> () const noexcept</td></tr>
+<tr class="memdesc:a0b688a2c9c9d6c22c4790f8056239870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to a number in the oracle datetime way; the last 7 bytes represent the century, the year in the century, the month, the day, the hour, the minute and the second respectively  <br /></td></tr>
+<tr class="memitem:aa46496aa7b150e57018405a55d3ae4d5" id="r_aa46496aa7b150e57018405a55d3ae4d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa46496aa7b150e57018405a55d3ae4d5">ticks</a> () const noexcept</td></tr>
+<tr class="memdesc:aa46496aa7b150e57018405a55d3ae4d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of the microseconds elapsed since the minimum date  <br /></td></tr>
+<tr class="memitem:a212bb61d2114684f9a62727de23ac76c" id="r_a212bb61d2114684f9a62727de23ac76c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a212bb61d2114684f9a62727de23ac76c">timestamp</a> () const noexcept</td></tr>
+<tr class="memdesc:a212bb61d2114684f9a62727de23ac76c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00.  <br /></td></tr>
+<tr class="memitem:a86ab326b06699a2c74aa48e599aa2334" id="r_a86ab326b06699a2c74aa48e599aa2334"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86ab326b06699a2c74aa48e599aa2334">timestampUTC</a> () const noexcept</td></tr>
+<tr class="memdesc:a86ab326b06699a2c74aa48e599aa2334"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00, with the local UTC offset deducted.  <br /></td></tr>
+<tr class="memitem:a57a3ca27af692556d18634febc59fe0d" id="r_a57a3ca27af692556d18634febc59fe0d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57a3ca27af692556d18634febc59fe0d">str</a> () const</td></tr>
+<tr class="memdesc:a57a3ca27af692556d18634febc59fe0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to a string for the reading and printing, the format is:  <br /></td></tr>
+<tr class="memitem:a55869c9ae4bd99659b241fa2604b488b" id="r_a55869c9ae4bd99659b241fa2604b488b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55869c9ae4bd99659b241fa2604b488b">repr</a> () const</td></tr>
+<tr class="memdesc:a55869c9ae4bd99659b241fa2604b488b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to a string, the format is: Datetime(year, month, day, hour, minute, second, millisecond, microsecond)  <br /></td></tr>
+<tr class="memitem:a870093ed7fadbabd5157b6a0e8e0cfb2" id="r_a870093ed7fadbabd5157b6a0e8e0cfb2"><td class="memItemLeft" align="right" valign="top">bt::ptime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a870093ed7fadbabd5157b6a0e8e0cfb2">ptime</a> () const</td></tr>
+<tr class="memdesc:a870093ed7fadbabd5157b6a0e8e0cfb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return boost::posix_time::ptime  <br /></td></tr>
+<tr class="memitem:a93f7a48d426e3de3bfde7303c969d39e" id="r_a93f7a48d426e3de3bfde7303c969d39e"><td class="memItemLeft" align="right" valign="top">bd::date&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93f7a48d426e3de3bfde7303c969d39e">date</a> () const</td></tr>
+<tr class="memdesc:a93f7a48d426e3de3bfde7303c969d39e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return boost::gregorian::date  <br /></td></tr>
+<tr class="memitem:a7fc99dea7ed7540a927d1e8d1c892bc0" id="r_a7fc99dea7ed7540a927d1e8d1c892bc0"><td class="memItemLeft" align="right" valign="top">std::time_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fc99dea7ed7540a927d1e8d1c892bc0">to_time_t</a> () const</td></tr>
+<tr class="memdesc:a7fc99dea7ed7540a927d1e8d1c892bc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return std::time_t  <br /></td></tr>
+<tr class="memitem:a0370f39b9df87745c22616285396a8e3" id="r_a0370f39b9df87745c22616285396a8e3"><td class="memTemplParams" colspan="2">template&lt;typename Duration = std::chrono::microseconds&gt; </td></tr>
+<tr class="memitem:a0370f39b9df87745c22616285396a8e3 template"><td class="memItemLeft" align="right" valign="top">std::chrono::local_time&lt; Duration &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0370f39b9df87745c22616285396a8e3">to_local_time</a> () const</td></tr>
+<tr class="memdesc:a0370f39b9df87745c22616285396a8e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to std::chrono::local_time  <br /></td></tr>
+<tr class="memitem:aed83b74f7ba67a1b22de52a1fcc80129" id="r_aed83b74f7ba67a1b22de52a1fcc80129"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed83b74f7ba67a1b22de52a1fcc80129">dayOfWeek</a> () const</td></tr>
+<tr class="memdesc:aed83b74f7ba67a1b22de52a1fcc80129"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the day of the week, Sunday is 0 and Monday is 1  <br /></td></tr>
+<tr class="memitem:ae76c0eaaa7003d4f4daaa3dd662f7b58" id="r_ae76c0eaaa7003d4f4daaa3dd662f7b58"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae76c0eaaa7003d4f4daaa3dd662f7b58">dayOfYear</a> () const</td></tr>
+<tr class="memdesc:ae76c0eaaa7003d4f4daaa3dd662f7b58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the day of the year, January 1 is the first day of the year  <br /></td></tr>
+<tr class="memitem:a43aa60a6190ebd5e585d3f0c03b17858" id="r_a43aa60a6190ebd5e585d3f0c03b17858"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43aa60a6190ebd5e585d3f0c03b17858">startOfDay</a> () const</td></tr>
+<tr class="memdesc:a43aa60a6190ebd5e585d3f0c03b17858"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the day, i.e.  <br /></td></tr>
+<tr class="memitem:aba175ef682f4c47432e847c30c7972c9" id="r_aba175ef682f4c47432e847c30c7972c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba175ef682f4c47432e847c30c7972c9">endOfDay</a> () const</td></tr>
+<tr class="memdesc:aba175ef682f4c47432e847c30c7972c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The end date of the day, i.e.  <br /></td></tr>
+<tr class="memitem:a733a7111d82cd3e8e20fed2e1989b891" id="r_a733a7111d82cd3e8e20fed2e1989b891"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a733a7111d82cd3e8e20fed2e1989b891">dateOfWeek</a> (int <a class="el" href="#a3c7fdd66d9c1b2a30ae9446c2d35828b">day</a>) const</td></tr>
+<tr class="memdesc:a733a7111d82cd3e8e20fed2e1989b891"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the date of the given day of this week; Sunday is day 0 and Saturday is day 6  <br /></td></tr>
+<tr class="memitem:a8c8a4b2d8feef60a31272ea0fed30725" id="r_a8c8a4b2d8feef60a31272ea0fed30725"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c8a4b2d8feef60a31272ea0fed30725">startOfWeek</a> () const</td></tr>
+<tr class="memdesc:a8c8a4b2d8feef60a31272ea0fed30725"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start date of the week (Monday)  <br /></td></tr>
+<tr class="memitem:a065157ae7971486d1f89dc6ada60ce26" id="r_a065157ae7971486d1f89dc6ada60ce26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a065157ae7971486d1f89dc6ada60ce26">endOfWeek</a> () const</td></tr>
+<tr class="memdesc:a065157ae7971486d1f89dc6ada60ce26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end date of the week (Sunday)  <br /></td></tr>
+<tr class="memitem:a698d90bcbf732c9d875f15634547e80f" id="r_a698d90bcbf732c9d875f15634547e80f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a698d90bcbf732c9d875f15634547e80f">startOfMonth</a> () const</td></tr>
+<tr class="memdesc:a698d90bcbf732c9d875f15634547e80f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start date of the month  <br /></td></tr>
+<tr class="memitem:a3a898e7fb6b8ea2479de44abac18e1a3" id="r_a3a898e7fb6b8ea2479de44abac18e1a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a898e7fb6b8ea2479de44abac18e1a3">endOfMonth</a> () const</td></tr>
+<tr class="memdesc:a3a898e7fb6b8ea2479de44abac18e1a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end date of the month, such as December 31  <br /></td></tr>
+<tr class="memitem:a88f6636a9f69c05e3c3f2e6b480d4abd" id="r_a88f6636a9f69c05e3c3f2e6b480d4abd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88f6636a9f69c05e3c3f2e6b480d4abd">startOfQuarter</a> () const</td></tr>
+<tr class="memdesc:a88f6636a9f69c05e3c3f2e6b480d4abd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start date of the quarter  <br /></td></tr>
+<tr class="memitem:a256433e20f84f8e0577098306f672280" id="r_a256433e20f84f8e0577098306f672280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a256433e20f84f8e0577098306f672280">endOfQuarter</a> () const</td></tr>
+<tr class="memdesc:a256433e20f84f8e0577098306f672280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end date of the quarter  <br /></td></tr>
+<tr class="memitem:a44d758f7a024e6d82f597558c4aa2f38" id="r_a44d758f7a024e6d82f597558c4aa2f38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44d758f7a024e6d82f597558c4aa2f38">startOfHalfyear</a> () const</td></tr>
+<tr class="memdesc:a44d758f7a024e6d82f597558c4aa2f38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start date of the half year  <br /></td></tr>
+<tr class="memitem:af6d679f6ae5c7bd9de36621c03b2faf9" id="r_af6d679f6ae5c7bd9de36621c03b2faf9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6d679f6ae5c7bd9de36621c03b2faf9">endOfHalfyear</a> () const</td></tr>
+<tr class="memdesc:af6d679f6ae5c7bd9de36621c03b2faf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end date of the half year  <br /></td></tr>
+<tr class="memitem:a040c42a0c721d305acf72d9e51d50a21" id="r_a040c42a0c721d305acf72d9e51d50a21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a040c42a0c721d305acf72d9e51d50a21">startOfYear</a> () const</td></tr>
+<tr class="memdesc:a040c42a0c721d305acf72d9e51d50a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start date of the year  <br /></td></tr>
+<tr class="memitem:a90043e1c0141fcc25fe8261f9ea1a4fb" id="r_a90043e1c0141fcc25fe8261f9ea1a4fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90043e1c0141fcc25fe8261f9ea1a4fb">endOfYear</a> () const</td></tr>
+<tr class="memdesc:a90043e1c0141fcc25fe8261f9ea1a4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end date of the year  <br /></td></tr>
+<tr class="memitem:a21dd3f71cf2cad0df6880d3be8675fa1" id="r_a21dd3f71cf2cad0df6880d3be8675fa1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a21dd3f71cf2cad0df6880d3be8675fa1">nextDay</a> () const</td></tr>
+<tr class="memdesc:a21dd3f71cf2cad0df6880d3be8675fa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The next natural day  <br /></td></tr>
+<tr class="memitem:a0680b8813326c8be6d75f39bfabc861d" id="r_a0680b8813326c8be6d75f39bfabc861d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0680b8813326c8be6d75f39bfabc861d">nextWeek</a> () const</td></tr>
+<tr class="memdesc:a0680b8813326c8be6d75f39bfabc861d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the next week (Monday)  <br /></td></tr>
+<tr class="memitem:ab3e8b194e0b644089a2436f7e11ed3e5" id="r_ab3e8b194e0b644089a2436f7e11ed3e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3e8b194e0b644089a2436f7e11ed3e5">nextMonth</a> () const</td></tr>
+<tr class="memdesc:ab3e8b194e0b644089a2436f7e11ed3e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the next month  <br /></td></tr>
+<tr class="memitem:a1c55442e4ab749bcf277b38538e11c2c" id="r_a1c55442e4ab749bcf277b38538e11c2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1c55442e4ab749bcf277b38538e11c2c">nextQuarter</a> () const</td></tr>
+<tr class="memdesc:a1c55442e4ab749bcf277b38538e11c2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the next quarter  <br /></td></tr>
+<tr class="memitem:af2acbf81ee2029b553f4a34c3b9644c3" id="r_af2acbf81ee2029b553f4a34c3b9644c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2acbf81ee2029b553f4a34c3b9644c3">nextHalfyear</a> () const</td></tr>
+<tr class="memdesc:af2acbf81ee2029b553f4a34c3b9644c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the next half year  <br /></td></tr>
+<tr class="memitem:a15b8f6b42ac64f6ad3861fc6a180ae1f" id="r_a15b8f6b42ac64f6ad3861fc6a180ae1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15b8f6b42ac64f6ad3861fc6a180ae1f">nextYear</a> () const</td></tr>
+<tr class="memdesc:a15b8f6b42ac64f6ad3861fc6a180ae1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the next year  <br /></td></tr>
+<tr class="memitem:af844900b8b1249c4a445ea018ea03592" id="r_af844900b8b1249c4a445ea018ea03592"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af844900b8b1249c4a445ea018ea03592">preDay</a> () const</td></tr>
+<tr class="memdesc:af844900b8b1249c4a445ea018ea03592"><td class="mdescLeft">&#160;</td><td class="mdescRight">The previous natural day  <br /></td></tr>
+<tr class="memitem:af81bfeb206325e155d04c2b2864e66dd" id="r_af81bfeb206325e155d04c2b2864e66dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af81bfeb206325e155d04c2b2864e66dd">preWeek</a> () const</td></tr>
+<tr class="memdesc:af81bfeb206325e155d04c2b2864e66dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Monday date of the previous week  <br /></td></tr>
+<tr class="memitem:ac21b7391888370e1ed1391a0af151422" id="r_ac21b7391888370e1ed1391a0af151422"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac21b7391888370e1ed1391a0af151422">preMonth</a> () const</td></tr>
+<tr class="memdesc:ac21b7391888370e1ed1391a0af151422"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the previous month  <br /></td></tr>
+<tr class="memitem:aa8663302923434e1b6dae5fd7365b54a" id="r_aa8663302923434e1b6dae5fd7365b54a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8663302923434e1b6dae5fd7365b54a">preQuarter</a> () const</td></tr>
+<tr class="memdesc:aa8663302923434e1b6dae5fd7365b54a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the previous quarter  <br /></td></tr>
+<tr class="memitem:a31c10404b8af8d4a09e93dbfb0f533d2" id="r_a31c10404b8af8d4a09e93dbfb0f533d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31c10404b8af8d4a09e93dbfb0f533d2">preHalfyear</a> () const</td></tr>
+<tr class="memdesc:a31c10404b8af8d4a09e93dbfb0f533d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the previous half year  <br /></td></tr>
+<tr class="memitem:ab58c42cb45e940e707fe305c5115aad5" id="r_ab58c42cb45e940e707fe305c5115aad5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab58c42cb45e940e707fe305c5115aad5">preYear</a> () const</td></tr>
+<tr class="memdesc:ab58c42cb45e940e707fe305c5115aad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The start date of the previous year  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 静态 Public 成员函数</h2></td></tr>
-<tr class="memitem:a0f88d3517ddaef614cef7d455826cfb7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a0f88d3517ddaef614cef7d455826cfb7">min</a> ()</td></tr>
-<tr class="memdesc:a0f88d3517ddaef614cef7d455826cfb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回所能表示的最小日期：1400-Jan-01 00:00:00  <a href="#a0f88d3517ddaef614cef7d455826cfb7">更多...</a><br /></td></tr>
-<tr class="separator:a0f88d3517ddaef614cef7d455826cfb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dc83e34e56842596105a78934c8a5be"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#a1dc83e34e56842596105a78934c8a5be">max</a> ()</td></tr>
-<tr class="memdesc:a1dc83e34e56842596105a78934c8a5be"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回所能表示的最大日期：9999-Dec-31 00:00:00  <a href="#a1dc83e34e56842596105a78934c8a5be">更多...</a><br /></td></tr>
-<tr class="separator:a1dc83e34e56842596105a78934c8a5be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1524d543b6836d229fe177989c35162"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html#af1524d543b6836d229fe177989c35162">now</a> ()</td></tr>
-<tr class="memdesc:af1524d543b6836d229fe177989c35162"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回本地计算机当前时刻  <a href="#af1524d543b6836d229fe177989c35162">更多...</a><br /></td></tr>
-<tr class="separator:af1524d543b6836d229fe177989c35162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bcda9336692499ddbe71bdb66c7acad" id="r_a7bcda9336692499ddbe71bdb66c7acad"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7bcda9336692499ddbe71bdb66c7acad">min</a> ()</td></tr>
+<tr class="memdesc:a7bcda9336692499ddbe71bdb66c7acad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the minimum expressible date: 1400-Jan-01 00:00:00  <br /></td></tr>
+<tr class="memitem:a2016c6d99dd992305361023a4e7db32e" id="r_a2016c6d99dd992305361023a4e7db32e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2016c6d99dd992305361023a4e7db32e">max</a> ()</td></tr>
+<tr class="memdesc:a2016c6d99dd992305361023a4e7db32e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the maximum expressible date: 9999-Dec-31 00:00:00  <br /></td></tr>
+<tr class="memitem:a3a8b7bc02a8f268dd75b05010117df3f" id="r_a3a8b7bc02a8f268dd75b05010117df3f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a8b7bc02a8f268dd75b05010117df3f">now</a> ()</td></tr>
+<tr class="memdesc:a3a8b7bc02a8f268dd75b05010117df3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current moment of the local machine  <br /></td></tr>
+<tr class="memitem:af8b73f4abe7857bec2d947653eb92dd6" id="r_af8b73f4abe7857bec2d947653eb92dd6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8b73f4abe7857bec2d947653eb92dd6">today</a> ()</td></tr>
+<tr class="memdesc:af8b73f4abe7857bec2d947653eb92dd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return today's date of the local machine  <br /></td></tr>
+<tr class="memitem:af488182c1b109b76823d99d8950e33b8" id="r_af488182c1b109b76823d99d8950e33b8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af488182c1b109b76823d99d8950e33b8">fromHex</a> (<a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> time)</td></tr>
+<tr class="memdesc:af488182c1b109b76823d99d8950e33b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compatible with oracle datetime format: except the most significant byte, every byte represents the century, the year in the century, the month, the day, the hour, the minute and the second in turn  <br /></td></tr>
+<tr class="memitem:af36ca17e3dd57eb88680d886cf18896b" id="r_af36ca17e3dd57eb88680d886cf18896b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af36ca17e3dd57eb88680d886cf18896b">fromTimestamp</a> (<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a212bb61d2114684f9a62727de23ac76c">timestamp</a>)</td></tr>
+<tr class="memdesc:af36ca17e3dd57eb88680d886cf18896b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from a timestamp (microseconds)  <br /></td></tr>
+<tr class="memitem:aac4977b30d8648521b35fc0705cc27d1" id="r_aac4977b30d8648521b35fc0705cc27d1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac4977b30d8648521b35fc0705cc27d1">fromTimestampUTC</a> (<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a212bb61d2114684f9a62727de23ac76c">timestamp</a>)</td></tr>
+<tr class="memdesc:aac4977b30d8648521b35fc0705cc27d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from a timestamp (microseconds) and add the local UTC time offset  <br /></td></tr>
+<tr class="memitem:ae250207a19516551a46d1757baae8750" id="r_ae250207a19516551a46d1757baae8750"><td class="memTemplParams" colspan="2">template&lt;typename Duration&gt; </td></tr>
+<tr class="memitem:ae250207a19516551a46d1757baae8750 template"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae250207a19516551a46d1757baae8750">fromLocalTime</a> (std::chrono::local_time&lt; Duration &gt; local_time)</td></tr>
+<tr class="memdesc:ae250207a19516551a46d1757baae8750"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from std::chrono::local_time  <br /></td></tr>
+<tr class="memitem:ae09a551d32f26c3f7b857b0262690572" id="r_ae09a551d32f26c3f7b857b0262690572"><td class="memTemplParams" colspan="2">template&lt;typename Clock, typename Duration&gt; </td></tr>
+<tr class="memitem:ae09a551d32f26c3f7b857b0262690572 template"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae09a551d32f26c3f7b857b0262690572">fromTimePointUTC</a> (std::chrono::time_point&lt; Clock, Duration &gt; time_point)</td></tr>
+<tr class="memdesc:ae09a551d32f26c3f7b857b0262690572"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from std::chrono::time_point and add the local UTC time offset  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>日期类型 </p>
-<p>构造失败将抛出异常 std::out_of_range </p>
-</div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a860ec98845685546511f10ce65d2e242"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Date type </p>
+<p>An exception std::out_of_range is thrown when the construction fails </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a860ec98845685546511f10ce65d2e242" name="a860ec98845685546511f10ce65d2e242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a860ec98845685546511f10ce65d2e242">&#9670;&#160;</a></span>Datetime() <span class="overload">[1/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -175,22 +267,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>默认构造函数，Null&lt;Datetime&gt; </p>
+<p>Default constructor, <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null&lt;Datetime&gt;</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="ad03ca87c8e59e97714e96f8f02f37bee"></a>
+<a id="ad03ca87c8e59e97714e96f8f02f37bee" name="ad03ca87c8e59e97714e96f8f02f37bee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad03ca87c8e59e97714e96f8f02f37bee">&#9670;&#160;</a></span>Datetime() <span class="overload">[2/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -200,79 +294,88 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>d</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>d</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="adf38738cc2315801adcd49e694d4247c"></a>
+<a id="a4f9b6ca9080f56216fa7ab1fa9b26d04" name="a4f9b6ca9080f56216fa7ab1fa9b26d04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f9b6ca9080f56216fa7ab1fa9b26d04">&#9670;&#160;</a></span>Datetime() <span class="overload">[3/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>year</em>, </td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>year</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>month</em>, </td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>month</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>day</em>, </td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>day</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>hh</em> = <code>0</code>, </td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>hh</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>mm</em> = <code>0</code>, </td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>mm</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>sec</em> = <code>0</code>&#160;</td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>sec</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
         </tr>
         <tr>
+          <td class="paramkey"></td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>millisec</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>microsec</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Constructor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>year </td></tr>
+    <tr><td class="paramname">month</td><td>month </td></tr>
+    <tr><td class="paramname">day</td><td>day </td></tr>
+    <tr><td class="paramname">hh</td><td>hour </td></tr>
+    <tr><td class="paramname">mm</td><td>minute </td></tr>
+    <tr><td class="paramname">sec</td><td>second </td></tr>
+    <tr><td class="paramname">millisec</td><td>millisecond </td></tr>
+    <tr><td class="paramname">microsec</td><td>microsecond </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="a613aac38aafa80b255c60ce98b7b2d68"></a>
+<a id="a613aac38aafa80b255c60ce98b7b2d68" name="a613aac38aafa80b255c60ce98b7b2d68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a613aac38aafa80b255c60ce98b7b2d68">&#9670;&#160;</a></span>Datetime() <span class="overload">[4/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -282,23 +385,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramtype">const bd::date &amp;&#160;</td>
-          <td class="paramname"><em>d</em></td><td>)</td>
+          <td class="paramtype">const bd::date &amp;</td>          <td class="paramname"><span class="paramname"><em>d</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>从boost::gregorian::date构造日期类型 </p>
+<p>Construct the date type from boost::gregorian::date </p>
 
 </div>
 </div>
-<a class="anchor" id="a7e119ab0999267d3724b9a03273c150c"></a>
+<a id="a7e119ab0999267d3724b9a03273c150c" name="a7e119ab0999267d3724b9a03273c150c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e119ab0999267d3724b9a03273c150c">&#9670;&#160;</a></span>Datetime() <span class="overload">[5/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -308,23 +412,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramtype">const bt::ptime &amp;&#160;</td>
-          <td class="paramname"><em>d</em></td><td>)</td>
+          <td class="paramtype">const bt::ptime &amp;</td>          <td class="paramname"><span class="paramname"><em>d</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>从boost::posix_time::ptime构造 </p>
+<p>Construct from boost::posix_time::ptime </p>
 
 </div>
 </div>
-<a class="anchor" id="acbe2993496da9d8d15cf44703faf48a5"></a>
+<a id="acbe2993496da9d8d15cf44703faf48a5" name="acbe2993496da9d8d15cf44703faf48a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbe2993496da9d8d15cf44703faf48a5">&#9670;&#160;</a></span>Datetime() <span class="overload">[6/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -334,23 +439,28 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramtype">unsigned long long&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">unsigned long long</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>通过数字方式构造日期类型，数字格式：YYYYMMDDhhmmss，如 200101010000 </p>
+<p>Construct the date type with a number </p>
+<p>The following number formats are supported </p><pre>
+    1. YYYYMMDDhhmm, e.g. 200101010000
+    2. YYYYMMDD, e.g. 20010101
+    3. YYYYMMDDhhmmss, e.g. 20010101000000
+</pre> 
+</div>
+</div>
+<a id="abbde993605695b8337d5cf01b5dfd5e9" name="abbde993605695b8337d5cf01b5dfd5e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbde993605695b8337d5cf01b5dfd5e9">&#9670;&#160;</a></span>Datetime() <span class="overload">[7/7]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="abbde993605695b8337d5cf01b5dfd5e9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -360,24 +470,31 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::Datetime::Datetime </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>ts</em></td><td>)</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>通过字符串方式构造日期类型，如："2001-01-01 18:00:00.12345" </p>
+<p>Construct the date type with a string </p>
+<p>The following string formats are supported for the construction: </p><pre>
+    1. "2001-01-01" or "2001/1/1"
+    2、"20010101"
+    3、"2001-01-01 18:00:00.12345"
+    4、"20010101T181159"
+    5、"20240822 11:30:06.230"
+</pre> 
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a93f7a48d426e3de3bfde7303c969d39e" name="a93f7a48d426e3de3bfde7303c969d39e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93f7a48d426e3de3bfde7303c969d39e">&#9670;&#160;</a></span>date()</h2>
 
-</div>
-</div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a7138f0d3c15d315c2409a7ae16b4e839"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -387,22 +504,68 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bd::date hku::Datetime::date </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>返回 boost::gregorian::date </p>
+<p>Return boost::gregorian::date </p>
 
 </div>
 </div>
-<a class="anchor" id="a14f7041ce8ea7475bdae3d4294783e50"></a>
+<a id="a733a7111d82cd3e8e20fed2e1989b891" name="a733a7111d82cd3e8e20fed2e1989b891"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a733a7111d82cd3e8e20fed2e1989b891">&#9670;&#160;</a></span>dateOfWeek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::dateOfWeek </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>day</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the date of the given day of this week; Sunday is day 0 and Saturday is day 6 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">day</td><td>the day of this week; <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> is returned if it is not between 0 and 6 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3c7fdd66d9c1b2a30ae9446c2d35828b" name="a3c7fdd66d9c1b2a30ae9446c2d35828b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c7fdd66d9c1b2a30ae9446c2d35828b">&#9670;&#160;</a></span>day()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long hku::Datetime::day </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Day [1, 31]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
+
+</div>
+</div>
+<a id="aed83b74f7ba67a1b22de52a1fcc80129" name="aed83b74f7ba67a1b22de52a1fcc80129"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed83b74f7ba67a1b22de52a1fcc80129">&#9670;&#160;</a></span>dayOfWeek()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -410,22 +573,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int hku::Datetime::day </td>
+          <td class="memname">int hku::Datetime::dayOfWeek </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Return the day of the week, Sunday is 0 and Monday is 1 </p>
+
 </div>
 </div>
-<a class="anchor" id="a84780e0f23beb6cbec4116a60a805925"></a>
+<a id="ae76c0eaaa7003d4f4daaa3dd662f7b58" name="ae76c0eaaa7003d4f4daaa3dd662f7b58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae76c0eaaa7003d4f4daaa3dd662f7b58">&#9670;&#160;</a></span>dayOfYear()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -433,22 +600,387 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int hku::Datetime::hour </td>
+          <td class="memname">int hku::Datetime::dayOfYear </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Return the day of the year, January 1 is the first day of the year </p>
+
 </div>
 </div>
-<a class="anchor" id="a1dc83e34e56842596105a78934c8a5be"></a>
+<a id="aba175ef682f4c47432e847c30c7972c9" name="aba175ef682f4c47432e847c30c7972c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba175ef682f4c47432e847c30c7972c9">&#9670;&#160;</a></span>endOfDay()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::endOfDay </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The end date of the day, i.e. </p>
+<p>23:59:59 </p>
+
+</div>
+</div>
+<a id="af6d679f6ae5c7bd9de36621c03b2faf9" name="af6d679f6ae5c7bd9de36621c03b2faf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6d679f6ae5c7bd9de36621c03b2faf9">&#9670;&#160;</a></span>endOfHalfyear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::endOfHalfyear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the end date of the half year </p>
+
+</div>
+</div>
+<a id="a3a898e7fb6b8ea2479de44abac18e1a3" name="a3a898e7fb6b8ea2479de44abac18e1a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a898e7fb6b8ea2479de44abac18e1a3">&#9670;&#160;</a></span>endOfMonth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::endOfMonth </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the end date of the month, such as December 31 </p>
+
+</div>
+</div>
+<a id="a256433e20f84f8e0577098306f672280" name="a256433e20f84f8e0577098306f672280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a256433e20f84f8e0577098306f672280">&#9670;&#160;</a></span>endOfQuarter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::endOfQuarter </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the end date of the quarter </p>
+
+</div>
+</div>
+<a id="a065157ae7971486d1f89dc6ada60ce26" name="a065157ae7971486d1f89dc6ada60ce26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a065157ae7971486d1f89dc6ada60ce26">&#9670;&#160;</a></span>endOfWeek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::endOfWeek </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the end date of the week (Sunday) </p>
+
+</div>
+</div>
+<a id="a90043e1c0141fcc25fe8261f9ea1a4fb" name="a90043e1c0141fcc25fe8261f9ea1a4fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90043e1c0141fcc25fe8261f9ea1a4fb">&#9670;&#160;</a></span>endOfYear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::endOfYear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the end date of the year </p>
+
+</div>
+</div>
+<a id="af488182c1b109b76823d99d8950e33b8" name="af488182c1b109b76823d99d8950e33b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af488182c1b109b76823d99d8950e33b8">&#9670;&#160;</a></span>fromHex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::fromHex </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a></td>          <td class="paramname"><span class="paramname"><em>time</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compatible with oracle datetime format: except the most significant byte, every byte represents the century, the year in the century, the month, the day, the hour, the minute and the second in turn </p>
+
+</div>
+</div>
+<a id="ae250207a19516551a46d1757baae8750" name="ae250207a19516551a46d1757baae8750"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae250207a19516551a46d1757baae8750">&#9670;&#160;</a></span>fromLocalTime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Duration&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::fromLocalTime </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::local_time&lt; Duration &gt;</td>          <td class="paramname"><span class="paramname"><em>local_time</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from std::chrono::local_time </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Duration</td><td>the chrono duration type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">local_time</td><td>chrono local_time </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> </dd></dl>
+
+</div>
+</div>
+<a id="ae09a551d32f26c3f7b857b0262690572" name="ae09a551d32f26c3f7b857b0262690572"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae09a551d32f26c3f7b857b0262690572">&#9670;&#160;</a></span>fromTimePointUTC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Clock, typename Duration&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::fromTimePointUTC </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::time_point&lt; Clock, Duration &gt;</td>          <td class="paramname"><span class="paramname"><em>time_point</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from std::chrono::time_point and add the local UTC time offset </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Clock</td><td>the clock type </td></tr>
+    <tr><td class="paramname">Duration</td><td>the chrono duration type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_point</td><td>chrono time_point (usually representing a UTC time) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> </dd></dl>
+
+</div>
+</div>
+<a id="af36ca17e3dd57eb88680d886cf18896b" name="af36ca17e3dd57eb88680d886cf18896b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af36ca17e3dd57eb88680d886cf18896b">&#9670;&#160;</a></span>fromTimestamp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::fromTimestamp </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>timestamp</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from a timestamp (microseconds) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timestamp</td><td>the timestamp in microseconds (starting from 00:00:00 on January 1, 1970) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> </dd></dl>
+
+</div>
+</div>
+<a id="aac4977b30d8648521b35fc0705cc27d1" name="aac4977b30d8648521b35fc0705cc27d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac4977b30d8648521b35fc0705cc27d1">&#9670;&#160;</a></span>fromTimestampUTC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::fromTimestampUTC </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>timestamp</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> object from a timestamp (microseconds) and add the local UTC time offset </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timestamp</td><td>the timestamp in microseconds (starting from 00:00:00 on January 1, 1970) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> </dd></dl>
+
+</div>
+</div>
+<a id="a0b688a2c9c9d6c22c4790f8056239870" name="a0b688a2c9c9d6c22c4790f8056239870"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b688a2c9c9d6c22c4790f8056239870">&#9670;&#160;</a></span>hex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::hex </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert to a number in the oracle datetime way; the last 7 bytes represent the century, the year in the century, the month, the day, the hour, the minute and the second respectively </p>
+<dl class="section note"><dt>注解</dt><dd>The precision is up to the second </dd></dl>
+
+</div>
+</div>
+<a id="a5873e0a514e211aeb31cdbd52d5c403d" name="a5873e0a514e211aeb31cdbd52d5c403d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5873e0a514e211aeb31cdbd52d5c403d">&#9670;&#160;</a></span>hour()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long hku::Datetime::hour </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Hour [0, 23]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
+
+</div>
+</div>
+<a id="a640604a1d089417e13ba1b349290f87e" name="a640604a1d089417e13ba1b349290f87e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a640604a1d089417e13ba1b349290f87e">&#9670;&#160;</a></span>isNull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Datetime::isNull </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null&lt;Datetime&gt;</a> </p>
+
+</div>
+</div>
+<a id="a2016c6d99dd992305361023a4e7db32e" name="a2016c6d99dd992305361023a4e7db32e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2016c6d99dd992305361023a4e7db32e">&#9670;&#160;</a></span>max()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -458,22 +990,62 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::max </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>返回所能表示的最大日期：9999-Dec-31 00:00:00 </p>
+<p>Return the maximum expressible date: 9999-Dec-31 00:00:00 </p>
 
 </div>
 </div>
-<a class="anchor" id="a0f88d3517ddaef614cef7d455826cfb7"></a>
+<a id="aac5cb9094b8e84f85b90d69c5ce6acc9" name="aac5cb9094b8e84f85b90d69c5ce6acc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac5cb9094b8e84f85b90d69c5ce6acc9">&#9670;&#160;</a></span>microsecond()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long hku::Datetime::microsecond </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Microsecond [0, 999]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
+
+</div>
+</div>
+<a id="aba4bc84c03010e985b7674ae938a2ca8" name="aba4bc84c03010e985b7674ae938a2ca8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba4bc84c03010e985b7674ae938a2ca8">&#9670;&#160;</a></span>millisecond()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long hku::Datetime::millisecond </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Millisecond [0, 999]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
+
+</div>
+</div>
+<a id="a7bcda9336692499ddbe71bdb66c7acad" name="a7bcda9336692499ddbe71bdb66c7acad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bcda9336692499ddbe71bdb66c7acad">&#9670;&#160;</a></span>min()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -483,68 +1055,176 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::min </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>返回所能表示的最小日期：1400-Jan-01 00:00:00 </p>
+<p>Return the minimum expressible date: 1400-Jan-01 00:00:00 </p>
 
 </div>
 </div>
-<a class="anchor" id="a12846abc6c6fcb9ea1884d437cb65911"></a>
+<a id="a4b4e8b3abd0e71269d4267fb78a273b2" name="a4b4e8b3abd0e71269d4267fb78a273b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b4e8b3abd0e71269d4267fb78a273b2">&#9670;&#160;</a></span>minute()</h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int hku::Datetime::minute </td>
+          <td class="memname">long hku::Datetime::minute </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Minute [0, 59]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="a43074f7909e6b00c277b7e0a0f6e6220"></a>
+<a id="ac37ce81598d4bca9cdf2ad834fadec0c" name="ac37ce81598d4bca9cdf2ad834fadec0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac37ce81598d4bca9cdf2ad834fadec0c">&#9670;&#160;</a></span>month()</h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int hku::Datetime::month </td>
+          <td class="memname">long hku::Datetime::month </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Month [1, 12]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="af1524d543b6836d229fe177989c35162"></a>
+<a id="a21dd3f71cf2cad0df6880d3be8675fa1" name="a21dd3f71cf2cad0df6880d3be8675fa1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21dd3f71cf2cad0df6880d3be8675fa1">&#9670;&#160;</a></span>nextDay()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::nextDay </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The next natural day </p>
+
+</div>
+</div>
+<a id="af2acbf81ee2029b553f4a34c3b9644c3" name="af2acbf81ee2029b553f4a34c3b9644c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2acbf81ee2029b553f4a34c3b9644c3">&#9670;&#160;</a></span>nextHalfyear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::nextHalfyear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the next half year </p>
+
+</div>
+</div>
+<a id="ab3e8b194e0b644089a2436f7e11ed3e5" name="ab3e8b194e0b644089a2436f7e11ed3e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3e8b194e0b644089a2436f7e11ed3e5">&#9670;&#160;</a></span>nextMonth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::nextMonth </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the next month </p>
+
+</div>
+</div>
+<a id="a1c55442e4ab749bcf277b38538e11c2c" name="a1c55442e4ab749bcf277b38538e11c2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c55442e4ab749bcf277b38538e11c2c">&#9670;&#160;</a></span>nextQuarter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::nextQuarter </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the next quarter </p>
+
+</div>
+</div>
+<a id="a0680b8813326c8be6d75f39bfabc861d" name="a0680b8813326c8be6d75f39bfabc861d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0680b8813326c8be6d75f39bfabc861d">&#9670;&#160;</a></span>nextWeek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::nextWeek </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the next week (Monday) </p>
+
+</div>
+</div>
+<a id="a15b8f6b42ac64f6ad3861fc6a180ae1f" name="a15b8f6b42ac64f6ad3861fc6a180ae1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15b8f6b42ac64f6ad3861fc6a180ae1f">&#9670;&#160;</a></span>nextYear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::nextYear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the next year </p>
+
+</div>
+</div>
+<a id="a3a8b7bc02a8f268dd75b05010117df3f" name="a3a8b7bc02a8f268dd75b05010117df3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a8b7bc02a8f268dd75b05010117df3f">&#9670;&#160;</a></span>now()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -554,39 +1234,323 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::now </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>返回本地计算机当前时刻 </p>
+<p>Return the current moment of the local machine </p>
 
 </div>
 </div>
-<a class="anchor" id="aeaa91f76b2994cb6a89520d581816341"></a>
+<a id="abebfd4c593ec71dfd216c30be6c9c322" name="abebfd4c593ec71dfd216c30be6c9c322"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abebfd4c593ec71dfd216c30be6c9c322">&#9670;&#160;</a></span>number()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::number </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return a number in the YYYYMMDDhhmm format, convenient for the comparison operations The number corresponding to Null&lt;Datetime&gt;() is <a class="el" href="classhku_1_1_null_3_01unsigned_01long_01long_01_4.html" title="It provides the Null value of unsigned long long (the unsigned 64-bit integer)">Null&lt;unsigned long long&gt;</a> </p>
+<dl class="section note"><dt>注解</dt><dd>The precision is up to the minute </dd></dl>
+
+</div>
+</div>
+<a id="ac09b98ac18a9352b8c0672d14d9fd0c3" name="ac09b98ac18a9352b8c0672d14d9fd0c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac09b98ac18a9352b8c0672d14d9fd0c3">&#9670;&#160;</a></span>operator+() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::operator+ </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Date operation, add a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> </dd></dl>
+
+</div>
+</div>
+<a id="a0cf335ae4735276f83562d58e9834a9b" name="a0cf335ae4735276f83562d58e9834a9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cf335ae4735276f83562d58e9834a9b">&#9670;&#160;</a></span>operator+() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>d</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Date operation, add the given duration </p>
+
+</div>
+</div>
+<a id="a6df6d7321bf2e371f3bef6a50aae5f0e" name="a6df6d7321bf2e371f3bef6a50aae5f0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6df6d7321bf2e371f3bef6a50aae5f0e">&#9670;&#160;</a></span>operator-() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::operator- </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Date operation, subtract a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> </dd></dl>
+
+</div>
+</div>
+<a id="a2a52f8330c115f4965925ef3e5a3d5e0" name="a2a52f8330c115f4965925ef3e5a3d5e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a52f8330c115f4965925ef3e5a3d5e0">&#9670;&#160;</a></span>operator-() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::operator- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>d</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Date operation, subtract the given duration </p>
+
+</div>
+</div>
+<a id="aa5b5d255f9fcec5262ce927672a92130" name="aa5b5d255f9fcec5262ce927672a92130"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5b5d255f9fcec5262ce927672a92130">&#9670;&#160;</a></span>operator=()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned long long hku::Datetime::number </td>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp; hku::Datetime::operator= </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af844900b8b1249c4a445ea018ea03592" name="af844900b8b1249c4a445ea018ea03592"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af844900b8b1249c4a445ea018ea03592">&#9670;&#160;</a></span>preDay()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::preDay </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>返回如YYYYMMDDhhmmss格式的数字，方便比较操作， Null&lt;Datetime&gt;()对应的 number 为 <a class="el" href="classhku_1_1_null_3_01unsigned_01long_01long_01_4.html" title="提供unsigned long long（无符号64位整型）的Null值 ">Null&lt;unsigned long long&gt;</a> </p>
+<p>The previous natural day </p>
 
 </div>
 </div>
-<a class="anchor" id="acbdc7a3291297361c93a76d61ee072f1"></a>
+<a id="a31c10404b8af8d4a09e93dbfb0f533d2" name="a31c10404b8af8d4a09e93dbfb0f533d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31c10404b8af8d4a09e93dbfb0f533d2">&#9670;&#160;</a></span>preHalfyear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::preHalfyear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the previous half year </p>
+
+</div>
+</div>
+<a id="ac21b7391888370e1ed1391a0af151422" name="ac21b7391888370e1ed1391a0af151422"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac21b7391888370e1ed1391a0af151422">&#9670;&#160;</a></span>preMonth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::preMonth </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the previous month </p>
+
+</div>
+</div>
+<a id="aa8663302923434e1b6dae5fd7365b54a" name="aa8663302923434e1b6dae5fd7365b54a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8663302923434e1b6dae5fd7365b54a">&#9670;&#160;</a></span>preQuarter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::preQuarter </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the previous quarter </p>
+
+</div>
+</div>
+<a id="af81bfeb206325e155d04c2b2864e66dd" name="af81bfeb206325e155d04c2b2864e66dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af81bfeb206325e155d04c2b2864e66dd">&#9670;&#160;</a></span>preWeek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::preWeek </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The Monday date of the previous week </p>
+
+</div>
+</div>
+<a id="ab58c42cb45e940e707fe305c5115aad5" name="ab58c42cb45e940e707fe305c5115aad5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab58c42cb45e940e707fe305c5115aad5">&#9670;&#160;</a></span>preYear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::preYear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The start date of the previous year </p>
+
+</div>
+</div>
+<a id="a870093ed7fadbabd5157b6a0e8e0cfb2" name="a870093ed7fadbabd5157b6a0e8e0cfb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a870093ed7fadbabd5157b6a0e8e0cfb2">&#9670;&#160;</a></span>ptime()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -596,22 +1560,62 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bt::ptime hku::Datetime::ptime </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>返回 boost::posix_time::ptime </p>
+<p>Return boost::posix_time::ptime </p>
 
 </div>
 </div>
-<a class="anchor" id="a941c84fbbdcf35091541b06568dd8031"></a>
+<a id="a55869c9ae4bd99659b241fa2604b488b" name="a55869c9ae4bd99659b241fa2604b488b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55869c9ae4bd99659b241fa2604b488b">&#9670;&#160;</a></span>repr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::Datetime::repr </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert to a string, the format is: Datetime(year, month, day, hour, minute, second, millisecond, microsecond) </p>
+
+</div>
+</div>
+<a id="a5e1773128c40a9954ab68a4e19ad5f22" name="a5e1773128c40a9954ab68a4e19ad5f22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e1773128c40a9954ab68a4e19ad5f22">&#9670;&#160;</a></span>second()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long hku::Datetime::second </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Second [0, 59]; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
+
+</div>
+</div>
+<a id="a43aa60a6190ebd5e585d3f0c03b17858" name="a43aa60a6190ebd5e585d3f0c03b17858"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43aa60a6190ebd5e585d3f0c03b17858">&#9670;&#160;</a></span>startOfDay()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -619,37 +1623,144 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int hku::Datetime::second </td>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::startOfDay </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>The start date of the day, i.e. </p>
+<p>0 o'clock </p>
+
 </div>
 </div>
-<a class="anchor" id="a0da04172de09c50bf5f081aaefae5ca9"></a>
+<a id="a44d758f7a024e6d82f597558c4aa2f38" name="a44d758f7a024e6d82f597558c4aa2f38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44d758f7a024e6d82f597558c4aa2f38">&#9670;&#160;</a></span>startOfHalfyear()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::string hku::Datetime::toString </td>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::startOfHalfyear </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Return the start date of the half year </p>
+
 </div>
 </div>
-<a class="anchor" id="a95fe099da4885c4e349cdf48a26a73e2"></a>
+<a id="a698d90bcbf732c9d875f15634547e80f" name="a698d90bcbf732c9d875f15634547e80f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a698d90bcbf732c9d875f15634547e80f">&#9670;&#160;</a></span>startOfMonth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::startOfMonth </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the start date of the month </p>
+
+</div>
+</div>
+<a id="a88f6636a9f69c05e3c3f2e6b480d4abd" name="a88f6636a9f69c05e3c3f2e6b480d4abd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88f6636a9f69c05e3c3f2e6b480d4abd">&#9670;&#160;</a></span>startOfQuarter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::startOfQuarter </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the start date of the quarter </p>
+
+</div>
+</div>
+<a id="a8c8a4b2d8feef60a31272ea0fed30725" name="a8c8a4b2d8feef60a31272ea0fed30725"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c8a4b2d8feef60a31272ea0fed30725">&#9670;&#160;</a></span>startOfWeek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::startOfWeek </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the start date of the week (Monday) </p>
+
+</div>
+</div>
+<a id="a040c42a0c721d305acf72d9e51d50a21" name="a040c42a0c721d305acf72d9e51d50a21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a040c42a0c721d305acf72d9e51d50a21">&#9670;&#160;</a></span>startOfYear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::startOfYear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the start date of the year </p>
+
+</div>
+</div>
+<a id="a57a3ca27af692556d18634febc59fe0d" name="a57a3ca27af692556d18634febc59fe0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57a3ca27af692556d18634febc59fe0d">&#9670;&#160;</a></span>str()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::Datetime::str </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert to a string for the reading and printing, the format is: </p>
+<pre>
+When the milliseconds and microseconds are zero: 2019-01-02 01:01:00
+When they are not zero: 2019-01-02 01:01:00:000001
+</pre> 
+</div>
+</div>
+<a id="aa46496aa7b150e57018405a55d3ae4d5" name="aa46496aa7b150e57018405a55d3ae4d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa46496aa7b150e57018405a55d3ae4d5">&#9670;&#160;</a></span>ticks()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -657,32 +1768,345 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int hku::Datetime::year </td>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::ticks </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The number of the microseconds elapsed since the minimum date </p>
+
+</div>
+</div>
+<a id="a212bb61d2114684f9a62727de23ac76c" name="a212bb61d2114684f9a62727de23ac76c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a212bb61d2114684f9a62727de23ac76c">&#9670;&#160;</a></span>timestamp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::Datetime::timestamp </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00. </p>
+<p>A date before 1970 yields a negative value instead of wrapping around; the <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> maps to INT64_MIN (the numpy/pandas datetime64 NaT sentinel) </p>
+
+</div>
+</div>
+<a id="a86ab326b06699a2c74aa48e599aa2334" name="a86ab326b06699a2c74aa48e599aa2334"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86ab326b06699a2c74aa48e599aa2334">&#9670;&#160;</a></span>timestampUTC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::Datetime::timestampUTC </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00, with the local UTC offset deducted. </p>
+<p>A date before 1970 yields a negative value instead of wrapping around; the <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> maps to INT64_MIN (the numpy/pandas datetime64 NaT sentinel) </p>
+
+</div>
+</div>
+<a id="a0370f39b9df87745c22616285396a8e3" name="a0370f39b9df87745c22616285396a8e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0370f39b9df87745c22616285396a8e3">&#9670;&#160;</a></span>to_local_time()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Duration&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::chrono::local_time&lt; Duration &gt; hku::Datetime::to_local_time </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert to std::chrono::local_time </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Duration</td><td>the target chrono duration type, microseconds by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>chrono local_time </dd></dl>
+
+</div>
+</div>
+<a id="a7fc99dea7ed7540a927d1e8d1c892bc0" name="a7fc99dea7ed7540a927d1e8d1c892bc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fc99dea7ed7540a927d1e8d1c892bc0">&#9670;&#160;</a></span>to_time_t()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::time_t hku::Datetime::to_time_t </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return std::time_t </p>
+
+</div>
+</div>
+<a id="af8b73f4abe7857bec2d947653eb92dd6" name="af8b73f4abe7857bec2d947653eb92dd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8b73f4abe7857bec2d947653eb92dd6">&#9670;&#160;</a></span>today()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Datetime::today </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return today's date of the local machine </p>
+
+</div>
+</div>
+<a id="a9e4a9f377df71bbf69992eb9efd6784e" name="a9e4a9f377df71bbf69992eb9efd6784e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e4a9f377df71bbf69992eb9efd6784e">&#9670;&#160;</a></span>year()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long hku::Datetime::year </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Year; an exception is thrown if it is <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> </p>
+
+</div>
+</div>
+<a id="add648aba83eeb7d7ac132004a9c64429" name="add648aba83eeb7d7ac132004a9c64429"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add648aba83eeb7d7ac132004a9c64429">&#9670;&#160;</a></span>ym()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::ym </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return a number in the YYYYMMDD format </p>
+
+</div>
+</div>
+<a id="ae2d25eff528ec6b6781a776a7591fc86" name="ae2d25eff528ec6b6781a776a7591fc86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2d25eff528ec6b6781a776a7591fc86">&#9670;&#160;</a></span>ymd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::ymd </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return a number in the YYYYMMDD format </p>
+
+</div>
+</div>
+<a id="adc918350219f93ecd5c4adc6d06d4f5a" name="adc918350219f93ecd5c4adc6d06d4f5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc918350219f93ecd5c4adc6d06d4f5a">&#9670;&#160;</a></span>ymdh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::ymdh </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return a number in the YYYYMMDDHH format </p>
+
+</div>
+</div>
+<a id="aa769ee20621c6de4015a1a08bf83ba5a" name="aa769ee20621c6de4015a1a08bf83ba5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa769ee20621c6de4015a1a08bf83ba5a">&#9670;&#160;</a></span>ymdhm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::ymdhm </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return a number in the YYYYMMDDhhmm format </p>
+
+</div>
+</div>
+<a id="a1bda670438b048b60ca6df5c0aa037fe" name="a1bda670438b048b60ca6df5c0aa037fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1bda670438b048b60ca6df5c0aa037fe">&#9670;&#160;</a></span>ymdhms()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Datetime::ymdhms </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return a number in the YYYYMMDDhhmmss format </p>
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
-<li>hikyuu/datetime/<a class="el" href="_datetime_8h_source.html">Datetime.h</a></li>
-<li>hikyuu/datetime/<a class="el" href="_datetime_8cpp.html">Datetime.cpp</a></li>
+<li>hikyuu/utilities/datetime/<a class="el" href="_datetime_8h_source.html">Datetime.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_datetime.html">Datetime</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

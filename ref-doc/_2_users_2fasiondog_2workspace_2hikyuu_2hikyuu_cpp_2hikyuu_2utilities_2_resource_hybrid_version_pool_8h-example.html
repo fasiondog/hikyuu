@@ -1,0 +1,387 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: /Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceHybridVersionPool.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_hybrid_version_pool_8h-example.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceHybridVersionPool.h</div></div>
+</div><!--header-->
+<div class="contents">
+<p>Set a single parameter (it triggers the version increment)</p>
+<p>Set a single parameter (it triggers the version increment)</p><dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ValueType</td><td>the parameter value type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>parameter name </td></tr>
+    <tr><td class="paramname">value</td><td>parameter value</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>This method will:<ol type="1">
+<li>Update the global parameters</li>
+<li>Increase the global version number</li>
+<li>Update the parameters of the global shared pool</li>
+<li>The parameters of the TLS Pool are lazily updated at the next get()</li>
+</ol>
+</dd></dl>
+<div class="fragment"><div class="line">pool.setParam&lt;std::string&gt;(<span class="stringliteral">&quot;host&quot;</span>, <span class="stringliteral">&quot;new_host&quot;</span>);</div>
+<div class="line">pool.setParam&lt;<span class="keywordtype">int</span>&gt;(<span class="stringliteral">&quot;port&quot;</span>, 3307);</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">/*</span></div>
+<div class="line"><span class="comment"> * ResourceHybridVersionPool.h</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> *  Copyright (c) 2025, hikyuu.org</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> *  Created on: 2025-05-13</span></div>
+<div class="line"><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><span class="comment"> */</span></div>
+<div class="line"><span class="preprocessor">#pragma once</span></div>
+<div class="line"><span class="preprocessor">#ifndef HKU_UTILS_RESOURCE_HYBRID_VERSION_POOL_H</span></div>
+<div class="line"><span class="preprocessor">#define HKU_UTILS_RESOURCE_HYBRID_VERSION_POOL_H</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;shared_mutex&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;ResourceTlsVersionPool.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;ResourcePool.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ResourceType, <span class="keywordtype">size_t</span> MAX_TLS_POOL_SIZE_LIMIT = 2&gt;</div>
+<div class="line"><span class="keyword">class </span>ResourceHybridVersionPool {</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    <span class="keyword">using </span><a id="a0" name="a0"></a><a class="code hl_typedef" href="classhku_1_1_resource_hybrid_version_pool.html#a9f732345f6bf09e9880391fc57d2b055">TlsPoolType</a> = ResourceTlsVersionPool&lt;ResourceType, MAX_TLS_POOL_SIZE_LIMIT&gt;;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">using </span><a id="a1" name="a1"></a><a class="code hl_typedef" href="classhku_1_1_resource_hybrid_version_pool.html#adeb05630df61b307e837f4e1114583bc">GlobalPoolType</a> = ResourceVersionPool&lt;ResourceType&gt;;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> <a id="a2" name="a2"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a>(<span class="keyword">const</span> <a id="a3" name="a3"></a><a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param,</div>
+<div class="line">                                       <span class="keywordtype">size_t</span> max_tls_pool_size = MAX_TLS_POOL_SIZE_LIMIT,</div>
+<div class="line">                                       <span class="keywordtype">size_t</span> max_global_pool_size = 64)</div>
+<div class="line">    : m_param(param),</div>
+<div class="line">      m_max_global_pool_size(max_global_pool_size),</div>
+<div class="line">      m_max_tls_pool_size(max_tls_pool_size),</div>
+<div class="line">      m_version(0) {</div>
+<div class="line">        <span class="comment">// Check and truncate the TLS pool size</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_max_tls_pool_size &gt; MAX_TLS_POOL_SIZE_LIMIT) {</div>
+<div class="line">            HKU_WARN(<span class="stringliteral">&quot;max_tls_pool_size({}) exceeds physical limit ({}), truncated to {}&quot;</span>,</div>
+<div class="line">                     m_max_tls_pool_size, MAX_TLS_POOL_SIZE_LIMIT, MAX_TLS_POOL_SIZE_LIMIT);</div>
+<div class="line">            m_max_tls_pool_size = MAX_TLS_POOL_SIZE_LIMIT;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Initialize the default parameters of the TLS Pool</span></div>
+<div class="line">        <a id="a4" name="a4"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#afafed4e1d71f8ef3e961b66496f1cc7e">TlsPoolType::init</a>(param);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Set the actually used size of the TLS Pool</span></div>
+<div class="line">        <a id="a5" name="a5"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">TlsPoolType::getInstance</a>().<a id="a6" name="a6"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#aa4626dbdcee011748df020d88534cfb4">maxCount</a>(m_max_tls_pool_size);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Create the global shared pool (with the size given at runtime, supporting the</span></div>
+<div class="line">        <span class="comment">// multi-thread concurrency)</span></div>
+<div class="line">        m_global_pool = std::make_unique&lt;GlobalPoolType&gt;(m_param, m_max_global_pool_size);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <a id="a7" name="a7"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a16c867f5b07362336f8743b726f1e813">~ResourceHybridVersionPool</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a> &amp;<a id="a8" name="a8"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#aa4de16eaa1f58838bcb8059a05219107">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a>(<a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a> &amp;&amp;) <span class="keyword">noexcept</span> = <span class="keywordflow">default</span>;</div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a> &amp;<a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#aa4de16eaa1f58838bcb8059a05219107">operator=</a>(<a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">ResourceHybridVersionPool</a> &amp;&amp;) <span class="keyword">noexcept</span> = <span class="keywordflow">default</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ValueType&gt;</div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a9" name="a9"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a94832b5f086fc4fa5300a8bd2274ba10">setParam</a>(<span class="keyword">const</span> std::string &amp;name, <span class="keyword">const</span> ValueType &amp;value) {</div>
+<div class="line">        <span class="comment">// Update the global parameters and the version number</span></div>
+<div class="line">        {</div>
+<div class="line">            std::lock_guard&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">            m_param.<a id="a10" name="a10"></a><a class="code hl_function" href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">set</a>&lt;ValueType&gt;(name, value);</div>
+<div class="line">        }</div>
+<div class="line">        m_version.fetch_add(1, std::memory_order_release);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Update the parameters of the global shared pool</span></div>
+<div class="line">        m_global_pool-&gt;template <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a94832b5f086fc4fa5300a8bd2274ba10">setParam&lt;ValueType&gt;</a>(name, value);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Note: the parameters of the TLS Pool are lazily updated at the next get()</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a11" name="a11"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a00c2881df025e18bb208cb4c2b89a794">setParameter</a>(<span class="keyword">const</span> <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param) {</div>
+<div class="line">        {</div>
+<div class="line">            std::lock_guard&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">            m_param = param;</div>
+<div class="line">        }</div>
+<div class="line">        m_version.fetch_add(1, std::memory_order_release);</div>
+<div class="line">        m_global_pool-&gt;setParameter(param);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a00c2881df025e18bb208cb4c2b89a794">setParameter</a>(<a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;&amp;param) {</div>
+<div class="line">        {</div>
+<div class="line">            std::lock_guard&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">            m_param = std::move(param);</div>
+<div class="line">        }</div>
+<div class="line">        m_version.fetch_add(1, std::memory_order_release);</div>
+<div class="line">        m_global_pool-&gt;setParameter(m_param);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> <a id="a12" name="a12"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a41c6c981e944e3576a96d745f1c53afe">haveParam</a>(<span class="keyword">const</span> std::string &amp;name) {</div>
+<div class="line">        std::shared_lock&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">        <span class="keywordflow">return</span> m_param.<a id="a13" name="a13"></a><a class="code hl_function" href="classhku_1_1_parameter.html#a1cca33b034a332fc7ed9a5cedfaf281a">have</a>(name);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ValueType&gt;</div>
+<div class="line">    ValueType <a id="a14" name="a14"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a8ca1ddc8234db6dcbaee055024cdacb3">getParam</a>(<span class="keyword">const</span> std::string &amp;name) {</div>
+<div class="line">        std::shared_lock&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">        <span class="keywordflow">return</span> m_param.<a id="a15" name="a15"></a><a class="code hl_function" href="classhku_1_1_parameter.html#a5a178504381754095e48ff4279e83520">get</a>&lt;ValueType&gt;(name);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">int</span> <a id="a16" name="a16"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a8405c8022a2762bf3ba002396a2ec6ae">getVersion</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_version.load(std::memory_order_acquire);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a17" name="a17"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#adb62ad9ec7d2201ceca8b74350e094e4">incVersion</a>() {</div>
+<div class="line">        m_version.fetch_add(1, std::memory_order_release);</div>
+<div class="line">        m_global_pool-&gt;incVersion(1);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::shared_ptr&lt;ResourceType&gt; <a id="a18" name="a18"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#aad08d4a12026113dba6707d529ee543f">get</a>() {</div>
+<div class="line">        <span class="comment">// If the TLS Pool is disabled, acquire it from the global pool directly</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_max_tls_pool_size == 0) {</div>
+<div class="line">            <span class="keywordflow">return</span> m_global_pool-&gt;get();</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 1. Check whether the TLS Pool version needs to be synchronized</span></div>
+<div class="line">        <span class="keyword">auto</span> &amp;tls_pool = <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">TlsPoolType::getInstance</a>();</div>
+<div class="line">        <span class="keywordtype">int</span> current_version = m_version.load(std::memory_order_acquire);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (tls_pool.getVersion() != current_version) {</div>
+<div class="line">            <span class="comment">// The version does not match, synchronize the parameters and the version</span></div>
+<div class="line">            <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> current_param;</div>
+<div class="line">            {</div>
+<div class="line">                std::shared_lock&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">                current_param = m_param;</div>
+<div class="line">            }</div>
+<div class="line">            tls_pool.syncVersion(current_version, current_param);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 2. Acquire it from the TLS Pool preferentially (the fast path)</span></div>
+<div class="line">        <span class="keyword">auto</span> tls_result = tls_pool.get();</div>
+<div class="line">        <span class="keywordflow">if</span> (tls_result) {</div>
+<div class="line">            <span class="keywordflow">return</span> tls_result.value();  <span class="comment">// The TLS Pool succeeded, extract the shared_ptr</span></div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 3. The TLS Pool failed, try to acquire it from the global shared pool</span></div>
+<div class="line">        <span class="keywordflow">return</span> m_global_pool-&gt;get();  <span class="comment">// It may return nullptr or throw CreateResourceException</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::shared_ptr&lt;ResourceType&gt; <a id="a19" name="a19"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a2151ac11869492e0531390da3e710063">getWaitFor</a>(<a id="a20" name="a20"></a><a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> ms_timeout) {</div>
+<div class="line">        <span class="comment">// If the TLS Pool is disabled (max_tls_pool_size == 0), wait and acquire it from the global</span></div>
+<div class="line">        <span class="comment">// pool directly</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_max_tls_pool_size == 0) {</div>
+<div class="line">            <span class="keywordflow">return</span> m_global_pool-&gt;getWaitFor(ms_timeout);  <span class="comment">// It may throw an exception</span></div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 1. Check whether the TLS Pool version needs to be synchronized</span></div>
+<div class="line">        <span class="keyword">auto</span> &amp;tls_pool = <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">TlsPoolType::getInstance</a>();</div>
+<div class="line">        <span class="keywordtype">int</span> current_version = m_version.load(std::memory_order_acquire);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (tls_pool.getVersion() != current_version) {</div>
+<div class="line">            <span class="comment">// The version does not match, synchronize the parameters and the version</span></div>
+<div class="line">            <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> current_param;</div>
+<div class="line">            {</div>
+<div class="line">                std::shared_lock&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">                current_param = m_param;</div>
+<div class="line">            }</div>
+<div class="line">            tls_pool.syncVersion(current_version, current_param);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 2. Acquire it from the TLS Pool preferentially (the fast path)</span></div>
+<div class="line">        <span class="keyword">auto</span> tls_result = tls_pool.get();</div>
+<div class="line">        <span class="keywordflow">if</span> (tls_result) {</div>
+<div class="line">            <span class="keywordflow">return</span> tls_result.value();  <span class="comment">// The TLS Pool succeeded, extract the shared_ptr</span></div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 3. The TLS Pool failed, try to wait and acquire it from the global shared pool (with a</span></div>
+<div class="line">        <span class="comment">// timeout)</span></div>
+<div class="line">        <span class="keywordflow">return</span> m_global_pool-&gt;getWaitFor(ms_timeout);  <span class="comment">// It may throw GetResourceTimeoutException</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::shared_ptr&lt;ResourceType&gt; <a id="a21" name="a21"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#aa366b5bcf97ba735e1cfcc01e8767157">getAndWait</a>() {</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a2151ac11869492e0531390da3e710063">getWaitFor</a>(0);  <span class="comment">// getWaitFor(0) is called to implement the indefinite waiting</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::shared_ptr&lt;ResourceType&gt; <a id="a22" name="a22"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a4dfe8ae43d8d7ba236ec0dc81eea99f3">getFromTlsPool</a>() {</div>
+<div class="line">        <span class="comment">// Synchronize the version first</span></div>
+<div class="line">        <span class="keyword">auto</span> &amp;tls_pool = <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">TlsPoolType::getInstance</a>();</div>
+<div class="line">        <span class="keywordtype">int</span> current_version = m_version.load(std::memory_order_acquire);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (tls_pool.getVersion() != current_version) {</div>
+<div class="line">            <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> current_param;</div>
+<div class="line">            {</div>
+<div class="line">                std::shared_lock&lt;std::shared_mutex&gt; lock(m_param_mutex);</div>
+<div class="line">                current_param = m_param;</div>
+<div class="line">            }</div>
+<div class="line">            tls_pool.syncVersion(current_version, current_param);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="keyword">auto</span> result = tls_pool.get();</div>
+<div class="line">        <span class="keywordflow">return</span> result ? result.value() : <span class="keyword">nullptr</span>;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::shared_ptr&lt;ResourceType&gt; <a id="a23" name="a23"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a35c11f607659a5e9e986241c41813364">getFromGlobalPool</a>() {</div>
+<div class="line">        <span class="keywordflow">return</span> m_global_pool-&gt;get();  <span class="comment">// It may return nullptr or throw CreateResourceException</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_typedef" href="classhku_1_1_resource_hybrid_version_pool.html#a9f732345f6bf09e9880391fc57d2b055">TlsPoolType</a> &amp;<a id="a24" name="a24"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a2af648e91553e42535f5ac7d1d74dab5">tlsPool</a>() {</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">TlsPoolType::getInstance</a>();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_typedef" href="classhku_1_1_resource_hybrid_version_pool.html#adeb05630df61b307e837f4e1114583bc">GlobalPoolType</a> &amp;<a id="a25" name="a25"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#a42f47fa52b5809aa73cddfca7af421d8">globalPool</a>() {</div>
+<div class="line">        <span class="keywordflow">return</span> *m_global_pool;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a26" name="a26"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#abd8cc50a5bab224c094be14a48f9b6c5">maxTlsPoolSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_max_tls_pool_size;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a27" name="a27"></a><a class="code hl_function" href="classhku_1_1_resource_hybrid_version_pool.html#ace35286905434f64148fdf0af4e2005f">maxGlobalPoolSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_max_global_pool_size;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> m_param;                  <span class="comment">// Global parameters (protected by the lock)</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_max_global_pool_size{64};  <span class="comment">// The maximum number of the resources of the</span></div>
+<div class="line">                                        <span class="comment">// global shared pool</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_max_tls_pool_size{MAX_TLS_POOL_SIZE_LIMIT};  <span class="comment">// The maximum number of the resources</span></div>
+<div class="line">                                                          <span class="comment">// actually used by the TLS Pool</span></div>
+<div class="line">    std::unique_ptr&lt;GlobalPoolType&gt; m_global_pool;        <span class="comment">// The global shared pool instance</span></div>
+<div class="line">    std::atomic&lt;int&gt; m_version{0};                        <span class="comment">// Global version number</span></div>
+<div class="line">    <span class="keyword">mutable</span> std::shared_mutex m_param_mutex;  <span class="comment">// The mutex protecting the parameter access</span></div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace hku</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#endif </span><span class="comment">/* HKU_UTILS_RESOURCE_HYBRID_VERSION_POOL_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a1cca33b034a332fc7ed9a5cedfaf281a"><div class="ttname"><a href="classhku_1_1_parameter.html#a1cca33b034a332fc7ed9a5cedfaf281a">hku::Parameter::have</a></div><div class="ttdeci">bool have(const string &amp;name) const noexcept</div><div class="ttdoc">Whether a parameter with the given name exists</div><div class="ttdef"><b>定义</b> Parameter.h:224</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a5a06d1c39381362db1bac88f55d9472e"><div class="ttname"><a href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">hku::Parameter::set</a></div><div class="ttdeci">void set(const string &amp;name, const ValueType &amp;value)</div><div class="ttdoc">Set the given parameter value</div><div class="ttdef"><b>定义</b> Parameter.h:489</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a5a178504381754095e48ff4279e83520"><div class="ttname"><a href="classhku_1_1_parameter.html#a5a178504381754095e48ff4279e83520">hku::Parameter::get</a></div><div class="ttdeci">ValueType get(const string &amp;name) const</div><div class="ttdoc">Get the given parameter value; an exception is thrown when the parameter does not exist or the type d...</div><div class="ttdef"><b>定义</b> Parameter.h:466</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a00c2881df025e18bb208cb4c2b89a794"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a00c2881df025e18bb208cb4c2b89a794">hku::ResourceHybridVersionPool::setParameter</a></div><div class="ttdeci">void setParameter(const Parameter &amp;param)</div><div class="ttdoc">Replace the parameters as a whole (it triggers the version increment)</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:188</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a16c867f5b07362336f8743b726f1e813"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a16c867f5b07362336f8743b726f1e813">hku::ResourceHybridVersionPool::~ResourceHybridVersionPool</a></div><div class="ttdeci">~ResourceHybridVersionPool()=default</div><div class="ttdoc">Destructor</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a2151ac11869492e0531390da3e710063"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a2151ac11869492e0531390da3e710063">hku::ResourceHybridVersionPool::getWaitFor</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getWaitFor(uint64_t ms_timeout)</div><div class="ttdoc">Get an available resource within the given timeout</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:320</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a2af648e91553e42535f5ac7d1d74dab5"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a2af648e91553e42535f5ac7d1d74dab5">hku::ResourceHybridVersionPool::tlsPool</a></div><div class="ttdeci">TlsPoolType &amp; tlsPool()</div><div class="ttdoc">Get the TLS Pool reference</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:416</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a35c11f607659a5e9e986241c41813364"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a35c11f607659a5e9e986241c41813364">hku::ResourceHybridVersionPool::getFromGlobalPool</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getFromGlobalPool()</div><div class="ttdoc">Acquire the resource from the global shared pool only (synchronously)</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:411</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a41c6c981e944e3576a96d745f1c53afe"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a41c6c981e944e3576a96d745f1c53afe">hku::ResourceHybridVersionPool::haveParam</a></div><div class="ttdeci">bool haveParam(const std::string &amp;name)</div><div class="ttdoc">Check whether the parameter exists</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:217</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a42f47fa52b5809aa73cddfca7af421d8"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a42f47fa52b5809aa73cddfca7af421d8">hku::ResourceHybridVersionPool::globalPool</a></div><div class="ttdeci">GlobalPoolType &amp; globalPool()</div><div class="ttdoc">Get the global shared pool reference</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:421</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a4d717d5eb1f69be6413912da4b78ef42"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42">hku::ResourceHybridVersionPool::ResourceHybridVersionPool</a></div><div class="ttdeci">ResourceHybridVersionPool(const Parameter &amp;param, size_t max_tls_pool_size=MAX_TLS_POOL_SIZE_LIMIT, size_t max_global_pool_size=64)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:105</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a4dfe8ae43d8d7ba236ec0dc81eea99f3"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a4dfe8ae43d8d7ba236ec0dc81eea99f3">hku::ResourceHybridVersionPool::getFromTlsPool</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getFromTlsPool()</div><div class="ttdoc">Acquire the resource from the TLS Pool only (synchronously)</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:386</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a8405c8022a2762bf3ba002396a2ec6ae"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a8405c8022a2762bf3ba002396a2ec6ae">hku::ResourceHybridVersionPool::getVersion</a></div><div class="ttdeci">int getVersion() const</div><div class="ttdoc">Get the current global version number</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:241</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a8ca1ddc8234db6dcbaee055024cdacb3"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a8ca1ddc8234db6dcbaee055024cdacb3">hku::ResourceHybridVersionPool::getParam</a></div><div class="ttdeci">ValueType getParam(const std::string &amp;name)</div><div class="ttdoc">Get the parameter value</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:231</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a94832b5f086fc4fa5300a8bd2274ba10"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a94832b5f086fc4fa5300a8bd2274ba10">hku::ResourceHybridVersionPool::setParam</a></div><div class="ttdeci">void setParam(const std::string &amp;name, const ValueType &amp;value)</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:163</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_a9f732345f6bf09e9880391fc57d2b055"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#a9f732345f6bf09e9880391fc57d2b055">hku::ResourceHybridVersionPool::TlsPoolType</a></div><div class="ttdeci">ResourceTlsVersionPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; TlsPoolType</div><div class="ttdoc">TLS Pool type alias</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:81</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_aa366b5bcf97ba735e1cfcc01e8767157"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#aa366b5bcf97ba735e1cfcc01e8767157">hku::ResourceHybridVersionPool::getAndWait</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getAndWait()</div><div class="ttdoc">Get an available resource; if the maximum number of the resources allowed is exceeded,...</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:377</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_aa4de16eaa1f58838bcb8059a05219107"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#aa4de16eaa1f58838bcb8059a05219107">hku::ResourceHybridVersionPool::operator=</a></div><div class="ttdeci">ResourceHybridVersionPool &amp; operator=(const ResourceHybridVersionPool &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_aad08d4a12026113dba6707d529ee543f"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#aad08d4a12026113dba6707d529ee543f">hku::ResourceHybridVersionPool::get</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; get()</div><div class="ttdoc">Get an available resource; a null pointer is returned when the maximum number of the resources allowe...</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:272</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_abd8cc50a5bab224c094be14a48f9b6c5"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#abd8cc50a5bab224c094be14a48f9b6c5">hku::ResourceHybridVersionPool::maxTlsPoolSize</a></div><div class="ttdeci">size_t maxTlsPoolSize() const</div><div class="ttdoc">Get the maximum number of the resources actually used by the TLS pool</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:426</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_ace35286905434f64148fdf0af4e2005f"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#ace35286905434f64148fdf0af4e2005f">hku::ResourceHybridVersionPool::maxGlobalPoolSize</a></div><div class="ttdeci">size_t maxGlobalPoolSize() const</div><div class="ttdoc">Get the maximum number of the resources of the global shared pool</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:431</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_adb62ad9ec7d2201ceca8b74350e094e4"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#adb62ad9ec7d2201ceca8b74350e094e4">hku::ResourceHybridVersionPool::incVersion</a></div><div class="ttdeci">void incVersion()</div><div class="ttdoc">Manually increase the version number</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:250</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_version_pool_html_adeb05630df61b307e837f4e1114583bc"><div class="ttname"><a href="classhku_1_1_resource_hybrid_version_pool.html#adeb05630df61b307e837f4e1114583bc">hku::ResourceHybridVersionPool::GlobalPoolType</a></div><div class="ttdeci">ResourceVersionPool&lt; ResourceType &gt; GlobalPoolType</div><div class="ttdoc">Global shared pool type alias (std::mutex is used to support the multi-thread concurrent access)</div><div class="ttdef"><b>定义</b> ResourceHybridVersionPool.h:85</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_aa4626dbdcee011748df020d88534cfb4"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#aa4626dbdcee011748df020d88534cfb4">hku::ResourceTlsVersionPool::maxCount</a></div><div class="ttdeci">size_t maxCount() const</div><div class="ttdoc">Get the maximum number of the resources allowed (the logical upper limit)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:366</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_adb0598a712d14cb651f44e7ff9511c90"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">hku::ResourceTlsVersionPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::getInstance</a></div><div class="ttdeci">static ResourceTlsVersionPool &amp; getInstance()</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:168</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_afafed4e1d71f8ef3e961b66496f1cc7e"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#afafed4e1d71f8ef3e961b66496f1cc7e">hku::ResourceTlsVersionPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::init</a></div><div class="ttdeci">static void init(const Parameter &amp;param)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:145</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_ac354a2ce9a6e6b3de1e91127fa79f686"><div class="ttname"><a href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">hku::Parameter</a></div><div class="ttdeci">class HKU_API Parameter</div><div class="ttdef"><b>定义</b> Stock.h:30</div></div>
+</div><!-- fragment --> </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

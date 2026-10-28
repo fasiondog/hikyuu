@@ -1,0 +1,201 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/system/TradeSuggestion.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_trade_suggestion_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">TradeSuggestion.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * TradeSuggestion.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Recursive combination refactoring: the suggestion instruction with the complete semantic expression (without normalization)</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#ifndef TRADESUGGESTION_H_</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define TRADESUGGESTION_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../../DataType.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;SystemPart.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;../../Stock.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> = nlohmann::json;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_system.html">System</a>;  <span class="comment">// Forward declaration, to avoid a circular include with System.h</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622eac45b496ec0828772c8088e4118f09b33">   25</a></span><span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622e">SuggestionType</a> { <a class="code hl_enumvalue" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea0c6d9dfb485b43c6fba87439f9f73ac4">HOLD</a> = 0, <a class="code hl_enumvalue" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622eac45b496ec0828772c8088e4118f09b33">BUY</a>, <a class="code hl_enumvalue" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea860926e6fc3f191e18ee7a98259164b8">SELL</a>, <a class="code hl_enumvalue" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea813461e0c58e7ad59a2fd83ca2237fec">CLEAR</a> };</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span></div>
+<div class="foldopen" id="foldopen00031" data-start="{" data-end="};">
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html">   31</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_struct" href="structhku_1_1_trade_suggestion.html">TradeSuggestion</a> {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a5c5c1d9fc9577d17f6bef5db8cdd4c25">   32</a></span>    <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a5c5c1d9fc9577d17f6bef5db8cdd4c25">stock</a>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#add8b409f68e0f914ccc1eab6dc06dc0c">   33</a></span>    std::shared_ptr&lt;System&gt; <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#add8b409f68e0f914ccc1eab6dc06dc0c">sys</a>;  <span class="comment">// The source sub-system (nestable, a direct sub-system in the aggregate form)</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a6ff794d67ab236418d59a4bf51b7b152">   34</a></span>    <a class="code hl_enumeration" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622e">SuggestionType</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a6ff794d67ab236418d59a4bf51b7b152">type</a>{<a class="code hl_enumvalue" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea0c6d9dfb485b43c6fba87439f9f73ac4">SuggestionType::HOLD</a>};</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a353db09327379a4f61f88173c9f4b675">   36</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a353db09327379a4f61f88173c9f4b675">number</a>{0.0};       <span class="comment">// The raw quantity (not scaled); MAX_DOUBLE means full close</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a2fe16c211273a8d1be984ff8d1f9d9f4">   37</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a2fe16c211273a8d1be984ff8d1f9d9f4">plan_price</a>{0.0};</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a561a2c7b53f236e2eae1ea9af37a7a99">   38</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a561a2c7b53f236e2eae1ea9af37a7a99">plan_cash</a>{0.0};   <span class="comment">// = number * plan_price</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="comment">// false: the long side (BUY opens, SELL reduces, CLEAR closes all); true: the short side</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="comment">// (SELL opens a short, BUY covers, CLEAR closes the whole short). The number stays positive</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="comment">// and the type carries the direction.</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a761f7e61dc15109e0125a158690b222d">   43</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a761f7e61dc15109e0125a158690b222d">short_side</a>{<span class="keyword">false</span>};</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#acf6792f8f99bf2f8bdc33698fbe4e431">   45</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#acf6792f8f99bf2f8bdc33698fbe4e431">cash_ratio</a>{0.0};            <span class="comment">// plan_cash / the cash balance before this stage&#39;s trade (magnitude)</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a350c842fc7c93d1f128b10bfb622c8ad">   46</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a350c842fc7c93d1f128b10bfb622c8ad">assets_ratio</a>{0.0};          <span class="comment">// The increment ratio: plan_cash / the net assets before this</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                                       <span class="comment">// stage&#39;s trade; the sign encodes direction (&gt; 0 buy/cover,</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                                       <span class="comment">// &lt; 0 sell/open-short)</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a25e841bba21bae047008e333cb01300e">   49</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a25e841bba21bae047008e333cb01300e">target_position_ratio</a>{0.0}; <span class="comment">// The signed net target level: the target net position market</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                                       <span class="comment">// value after the trade / the net assets; defined for all types</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                                       <span class="comment">// (0 means flat), the sign encodes long/short</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a5276d423bb305d84b46338b9efd09ca6">   53</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a5276d423bb305d84b46338b9efd09ca6">stoploss</a>{0.0};</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#af9d8bd319d5162fad8984f0791958d56">   54</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#af9d8bd319d5162fad8984f0791958d56">goalPrice</a>{0.0};</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a1f68305a6d6021960b5f7123ad8a2fee">   55</a></span>    <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a1f68305a6d6021960b5f7123ad8a2fee">from</a>{<a class="code hl_enumvalue" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a5727afe4e851c81b4538ae8f93bc8e4b">PART_SIGNAL</a>};  <span class="comment">// PART_SYSTEM when it comes from a sub-system</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#ac1da4d1558beb83bd23ab43c8ce38c15">   56</a></span>    <span class="keywordtype">int</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#ac1da4d1558beb83bd23ab43c8ce38c15">urgency</a>{0};                <span class="comment">// 0 - executed at the current close; 1 - executed immediately at the next open</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#a0cc64d60b97a1b978687851abd8bc0e4">   57</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#a0cc64d60b97a1b978687851abd8bc0e4">score</a>{0.0};             <span class="comment">// The signal strength, used for the SE / MM sorting</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#ab786b82e1ce96d49151a638467ef08e0">   58</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#ab786b82e1ce96d49151a638467ef08e0">remark</a>;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="structhku_1_1_trade_suggestion.html#aedf4f9a5a00c2cda8f5dfe4864a270a2">   59</a></span>    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> <a class="code hl_variable" href="structhku_1_1_trade_suggestion.html#aedf4f9a5a00c2cda8f5dfe4864a270a2">ext</a>;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>};</div>
+</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">   62</a></span><span class="keyword">typedef</span> vector&lt;TradeSuggestion&gt; <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a>;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#endif </span><span class="comment">/* TRADESUGGESTION_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html"><div class="ttname"><a href="classhku_1_1_system.html">hku::System</a></div><div class="ttdoc">Base class of the trading system</div><div class="ttdef"><b>定义</b> System.h:38</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="agroup___system_html_ga578a43d6f138141648ea4c76bad2d706"><div class="ttname"><a href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">hku::SystemPart</a></div><div class="ttdeci">SystemPart</div><div class="ttdoc">Enumeration definition of the system associated parts (the respective strategies),...</div><div class="ttdef"><b>定义</b> SystemPart.h:21</div></div>
+<div class="ttc" id="agroup___system_html_gga578a43d6f138141648ea4c76bad2d706a5727afe4e851c81b4538ae8f93bc8e4b"><div class="ttname"><a href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a5727afe4e851c81b4538ae8f93bc8e4b">hku::PART_SIGNAL</a></div><div class="ttdeci">@ PART_SIGNAL</div><div class="ttdoc">Signal generator</div><div class="ttdef"><b>定义</b> SystemPart.h:24</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a614669a9afe4fd6dff3b575ad2f8622e"><div class="ttname"><a href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622e">hku::SuggestionType</a></div><div class="ttdeci">SuggestionType</div><div class="ttdoc">The suggestion type</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:25</div></div>
+<div class="ttc" id="anamespacehku_html_a614669a9afe4fd6dff3b575ad2f8622ea0c6d9dfb485b43c6fba87439f9f73ac4"><div class="ttname"><a href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea0c6d9dfb485b43c6fba87439f9f73ac4">hku::SuggestionType::HOLD</a></div><div class="ttdeci">@ HOLD</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:25</div></div>
+<div class="ttc" id="anamespacehku_html_a614669a9afe4fd6dff3b575ad2f8622ea813461e0c58e7ad59a2fd83ca2237fec"><div class="ttname"><a href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea813461e0c58e7ad59a2fd83ca2237fec">hku::SuggestionType::CLEAR</a></div><div class="ttdeci">@ CLEAR</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:25</div></div>
+<div class="ttc" id="anamespacehku_html_a614669a9afe4fd6dff3b575ad2f8622ea860926e6fc3f191e18ee7a98259164b8"><div class="ttname"><a href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea860926e6fc3f191e18ee7a98259164b8">hku::SuggestionType::SELL</a></div><div class="ttdeci">@ SELL</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:25</div></div>
+<div class="ttc" id="anamespacehku_html_a614669a9afe4fd6dff3b575ad2f8622eac45b496ec0828772c8088e4118f09b33"><div class="ttname"><a href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622eac45b496ec0828772c8088e4118f09b33">hku::SuggestionType::BUY</a></div><div class="ttdeci">@ BUY</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:25</div></div>
+<div class="ttc" id="anamespacehku_html_ac89c5611bbd8872a208fe9c18a369899"><div class="ttname"><a href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">hku::TradeSuggestionList</a></div><div class="ttdeci">vector&lt; TradeSuggestion &gt; TradeSuggestionList</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:62</div></div>
+<div class="ttc" id="anamespacehku_html_ae9a514f1ae8310455075ca506de17757"><div class="ttname"><a href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">hku::json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>定义</b> MomentResult.h:25</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html">hku::TradeSuggestion</a></div><div class="ttdoc">The suggestion instruction with the complete semantic expression (without normalization)</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:31</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a0cc64d60b97a1b978687851abd8bc0e4"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a0cc64d60b97a1b978687851abd8bc0e4">hku::TradeSuggestion::score</a></div><div class="ttdeci">double score</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:57</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a1f68305a6d6021960b5f7123ad8a2fee"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a1f68305a6d6021960b5f7123ad8a2fee">hku::TradeSuggestion::from</a></div><div class="ttdeci">SystemPart from</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:55</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a25e841bba21bae047008e333cb01300e"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a25e841bba21bae047008e333cb01300e">hku::TradeSuggestion::target_position_ratio</a></div><div class="ttdeci">double target_position_ratio</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:49</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a2fe16c211273a8d1be984ff8d1f9d9f4"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a2fe16c211273a8d1be984ff8d1f9d9f4">hku::TradeSuggestion::plan_price</a></div><div class="ttdeci">price_t plan_price</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:37</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a350c842fc7c93d1f128b10bfb622c8ad"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a350c842fc7c93d1f128b10bfb622c8ad">hku::TradeSuggestion::assets_ratio</a></div><div class="ttdeci">double assets_ratio</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:46</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a353db09327379a4f61f88173c9f4b675"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a353db09327379a4f61f88173c9f4b675">hku::TradeSuggestion::number</a></div><div class="ttdeci">double number</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:36</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a5276d423bb305d84b46338b9efd09ca6"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a5276d423bb305d84b46338b9efd09ca6">hku::TradeSuggestion::stoploss</a></div><div class="ttdeci">price_t stoploss</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:53</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a561a2c7b53f236e2eae1ea9af37a7a99"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a561a2c7b53f236e2eae1ea9af37a7a99">hku::TradeSuggestion::plan_cash</a></div><div class="ttdeci">price_t plan_cash</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:38</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a5c5c1d9fc9577d17f6bef5db8cdd4c25"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a5c5c1d9fc9577d17f6bef5db8cdd4c25">hku::TradeSuggestion::stock</a></div><div class="ttdeci">Stock stock</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:32</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a6ff794d67ab236418d59a4bf51b7b152"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a6ff794d67ab236418d59a4bf51b7b152">hku::TradeSuggestion::type</a></div><div class="ttdeci">SuggestionType type</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:34</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_a761f7e61dc15109e0125a158690b222d"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#a761f7e61dc15109e0125a158690b222d">hku::TradeSuggestion::short_side</a></div><div class="ttdeci">bool short_side</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:43</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_ab786b82e1ce96d49151a638467ef08e0"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#ab786b82e1ce96d49151a638467ef08e0">hku::TradeSuggestion::remark</a></div><div class="ttdeci">string remark</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:58</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_ac1da4d1558beb83bd23ab43c8ce38c15"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#ac1da4d1558beb83bd23ab43c8ce38c15">hku::TradeSuggestion::urgency</a></div><div class="ttdeci">int urgency</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:56</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_acf6792f8f99bf2f8bdc33698fbe4e431"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#acf6792f8f99bf2f8bdc33698fbe4e431">hku::TradeSuggestion::cash_ratio</a></div><div class="ttdeci">double cash_ratio</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:45</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_add8b409f68e0f914ccc1eab6dc06dc0c"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#add8b409f68e0f914ccc1eab6dc06dc0c">hku::TradeSuggestion::sys</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; sys</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:33</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_aedf4f9a5a00c2cda8f5dfe4864a270a2"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#aedf4f9a5a00c2cda8f5dfe4864a270a2">hku::TradeSuggestion::ext</a></div><div class="ttdeci">json ext</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:59</div></div>
+<div class="ttc" id="astructhku_1_1_trade_suggestion_html_af9d8bd319d5162fad8984f0791958d56"><div class="ttname"><a href="structhku_1_1_trade_suggestion.html#af9d8bd319d5162fad8984f0791958d56">hku::TradeSuggestion::goalPrice</a></div><div class="ttdeci">price_t goalPrice</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:54</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_be1571b252e421c31ea0682d2947607c.html">system</a></li><li class="navelem"><b>TradeSuggestion.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/sqlite/AsyncSQLiteStatement.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_async_s_q_lite_statement_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">AsyncSQLiteStatement.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AsyncSQLiteStatement.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2019, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2026-05-09</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef HIKYUU_DB_CONNECT_SQLITE_ASYNCSQLITESTATEMENT_H</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define HIKYUU_DB_CONNECT_SQLITE_ASYNCSQLITESTATEMENT_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../AsyncSQLStatementBase.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// Forward declaration, to avoid the circular dependency</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span></div>
+<div class="foldopen" id="foldopen00026" data-start="{" data-end="};">
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html">   26</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">AsyncSQLiteStatement</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_statement_base.html#a8b22b7fa76e2d51cea827c81f567919d">AsyncSQLStatementBase</a> {</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">   28</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">AsyncSQLiteStatement</a>(<a class="code hl_class" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> *connect, <span class="keyword">const</span> std::string &amp;sql);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#aa4f5d933c8eae1860956d8020c8610e7">   29</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#aa4f5d933c8eae1860956d8020c8610e7">~AsyncSQLiteStatement</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#ad9afe15eab62bc8b88876e2c4d3315dd">   31</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#ad9afe15eab62bc8b88876e2c4d3315dd">AsyncSQLiteStatement</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">AsyncSQLiteStatement</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a3460f62c21bd362cc08463c92b14631d">   32</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">AsyncSQLiteStatement</a> &amp;<a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a3460f62c21bd362cc08463c92b14631d">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">AsyncSQLiteStatement</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#aa1b3931f90ce1121e050b6e6c65566e3">   34</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#aa1b3931f90ce1121e050b6e6c65566e3">sub_exec</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a43a4fed7f7b009ecaba6ea7e184f924c">   35</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;bool&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a43a4fed7f7b009ecaba6ea7e184f924c">sub_moveNext</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#ad0d167647b9f1e830a5fee8f03b89a73">   36</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#ad0d167647b9f1e830a5fee8f03b89a73">sub_getLastRowid</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a4714079b1485166110be9373e19763f7">   38</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a4714079b1485166110be9373e19763f7">sub_bindNull</a>(<span class="keywordtype">int</span> idx) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#ae88477e28ca98a0e8b1de6291891129a">   39</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#ae88477e28ca98a0e8b1de6291891129a">sub_bindInt</a>(<span class="keywordtype">int</span> idx, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> value) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#ab26d624d7dbcf779ff7e6814a59ba9dc">   40</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#ab26d624d7dbcf779ff7e6814a59ba9dc">sub_bindDouble</a>(<span class="keywordtype">int</span> idx, <span class="keywordtype">double</span> item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a2d06c6418b9ecc2b5c9fca5216f2f780">   41</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a2d06c6418b9ecc2b5c9fca5216f2f780">sub_bindDatetime</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a01c02bfee0c8bfde5030bc1f0ef09076">   42</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a01c02bfee0c8bfde5030bc1f0ef09076">sub_bindText</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#ae711fa480038c3a80728c34fe23532d0">   43</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#ae711fa480038c3a80728c34fe23532d0">sub_bindText</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> <span class="keywordtype">char</span> *item, <span class="keywordtype">size_t</span> len) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a06b2aa58e64ac7a80a9710da0f767706">   44</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a06b2aa58e64ac7a80a9710da0f767706">sub_bindBlob</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#af6e7807342bc4001ccf515ef177f45b5">   45</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#af6e7807342bc4001ccf515ef177f45b5">sub_bindBlob</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> std::vector&lt;char&gt; &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a7153abda4facc7dd1a6c0099a8119a3d">   47</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a7153abda4facc7dd1a6c0099a8119a3d">sub_getNumColumns</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a7c376697569f53b87e1303b277993a99">   48</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a7c376697569f53b87e1303b277993a99">sub_getColumnAsInt64</a>(<span class="keywordtype">int</span> idx, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a09ed57896ddef98ada522bdff9a2e400">   49</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a09ed57896ddef98ada522bdff9a2e400">sub_getColumnAsDouble</a>(<span class="keywordtype">int</span> idx, <span class="keywordtype">double</span> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a0889999325a4057be1328d0b7feb7f37">   50</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a0889999325a4057be1328d0b7feb7f37">sub_getColumnAsDatetime</a>(<span class="keywordtype">int</span> idx, <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a5339e4645ff6183844718746eb317f91">   51</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a5339e4645ff6183844718746eb317f91">sub_getColumnAsText</a>(<span class="keywordtype">int</span> idx, std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a6332004300cc2ca9a2bc33d311318a5b">   52</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a6332004300cc2ca9a2bc33d311318a5b">sub_getColumnAsBlob</a>(<span class="keywordtype">int</span> idx, std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_lite_statement.html#a1b376d584bc86580a68dc078b7a133b3">   53</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_s_q_lite_statement.html#a1b376d584bc86580a68dc078b7a133b3">sub_getColumnAsBlob</a>(<span class="keywordtype">int</span> idx, std::vector&lt;char&gt; &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keywordtype">void</span> _reset();</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">struct </span>Impl;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    std::unique_ptr&lt;Impl&gt; m_impl;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>};</div>
+</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#endif </span><span class="comment">/* HIKYUU_DB_CONNECT_SQLITE_ASYNCSQLITESTATEMENT_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_statement_base_html_a8b22b7fa76e2d51cea827c81f567919d"><div class="ttname"><a href="classhku_1_1_async_s_q_l_statement_base.html#a8b22b7fa76e2d51cea827c81f567919d">hku::AsyncSQLStatementBase::AsyncSQLStatementBase</a></div><div class="ttdeci">AsyncSQLStatementBase(AsyncDBConnectBase *driver, const std::string &amp;sql_statement)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> AsyncSQLStatementBase.h:231</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_connect_html"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_connect.html">hku::AsyncSQLiteConnect</a></div><div class="ttdoc">Asynchronous SQLite connection</div><div class="ttdef"><b>定义</b> AsyncSQLiteConnect.h:30</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a01c02bfee0c8bfde5030bc1f0ef09076"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a01c02bfee0c8bfde5030bc1f0ef09076">hku::AsyncSQLiteStatement::sub_bindText</a></div><div class="ttdeci">virtual void sub_bindText(int idx, const std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a06b2aa58e64ac7a80a9710da0f767706"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a06b2aa58e64ac7a80a9710da0f767706">hku::AsyncSQLiteStatement::sub_bindBlob</a></div><div class="ttdeci">virtual void sub_bindBlob(int idx, const std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a0889999325a4057be1328d0b7feb7f37"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a0889999325a4057be1328d0b7feb7f37">hku::AsyncSQLiteStatement::sub_getColumnAsDatetime</a></div><div class="ttdeci">virtual void sub_getColumnAsDatetime(int idx, Datetime &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a09ed57896ddef98ada522bdff9a2e400"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a09ed57896ddef98ada522bdff9a2e400">hku::AsyncSQLiteStatement::sub_getColumnAsDouble</a></div><div class="ttdeci">virtual void sub_getColumnAsDouble(int idx, double &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a1b376d584bc86580a68dc078b7a133b3"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a1b376d584bc86580a68dc078b7a133b3">hku::AsyncSQLiteStatement::sub_getColumnAsBlob</a></div><div class="ttdeci">virtual void sub_getColumnAsBlob(int idx, std::vector&lt; char &gt; &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a2d06c6418b9ecc2b5c9fca5216f2f780"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a2d06c6418b9ecc2b5c9fca5216f2f780">hku::AsyncSQLiteStatement::sub_bindDatetime</a></div><div class="ttdeci">virtual void sub_bindDatetime(int idx, const Datetime &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a3460f62c21bd362cc08463c92b14631d"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a3460f62c21bd362cc08463c92b14631d">hku::AsyncSQLiteStatement::operator=</a></div><div class="ttdeci">AsyncSQLiteStatement &amp; operator=(const AsyncSQLiteStatement &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a43a4fed7f7b009ecaba6ea7e184f924c"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a43a4fed7f7b009ecaba6ea7e184f924c">hku::AsyncSQLiteStatement::sub_moveNext</a></div><div class="ttdeci">virtual net::awaitable&lt; bool &gt; sub_moveNext() override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a4714079b1485166110be9373e19763f7"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a4714079b1485166110be9373e19763f7">hku::AsyncSQLiteStatement::sub_bindNull</a></div><div class="ttdeci">virtual void sub_bindNull(int idx) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a47360a6467b7d0d5be71c15dc8581b8b"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a47360a6467b7d0d5be71c15dc8581b8b">hku::AsyncSQLiteStatement::AsyncSQLiteStatement</a></div><div class="ttdeci">AsyncSQLiteStatement(AsyncSQLiteConnect *connect, const std::string &amp;sql)</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a5339e4645ff6183844718746eb317f91"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a5339e4645ff6183844718746eb317f91">hku::AsyncSQLiteStatement::sub_getColumnAsText</a></div><div class="ttdeci">virtual void sub_getColumnAsText(int idx, std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a6332004300cc2ca9a2bc33d311318a5b"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a6332004300cc2ca9a2bc33d311318a5b">hku::AsyncSQLiteStatement::sub_getColumnAsBlob</a></div><div class="ttdeci">virtual void sub_getColumnAsBlob(int idx, std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a7153abda4facc7dd1a6c0099a8119a3d"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a7153abda4facc7dd1a6c0099a8119a3d">hku::AsyncSQLiteStatement::sub_getNumColumns</a></div><div class="ttdeci">virtual int sub_getNumColumns() const override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_a7c376697569f53b87e1303b277993a99"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#a7c376697569f53b87e1303b277993a99">hku::AsyncSQLiteStatement::sub_getColumnAsInt64</a></div><div class="ttdeci">virtual void sub_getColumnAsInt64(int idx, int64_t &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_aa1b3931f90ce1121e050b6e6c65566e3"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#aa1b3931f90ce1121e050b6e6c65566e3">hku::AsyncSQLiteStatement::sub_exec</a></div><div class="ttdeci">virtual net::awaitable&lt; void &gt; sub_exec() override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_aa4f5d933c8eae1860956d8020c8610e7"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#aa4f5d933c8eae1860956d8020c8610e7">hku::AsyncSQLiteStatement::~AsyncSQLiteStatement</a></div><div class="ttdeci">virtual ~AsyncSQLiteStatement() override</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_ab26d624d7dbcf779ff7e6814a59ba9dc"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#ab26d624d7dbcf779ff7e6814a59ba9dc">hku::AsyncSQLiteStatement::sub_bindDouble</a></div><div class="ttdeci">virtual void sub_bindDouble(int idx, double item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_ad0d167647b9f1e830a5fee8f03b89a73"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#ad0d167647b9f1e830a5fee8f03b89a73">hku::AsyncSQLiteStatement::sub_getLastRowid</a></div><div class="ttdeci">virtual uint64_t sub_getLastRowid() override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_ad9afe15eab62bc8b88876e2c4d3315dd"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#ad9afe15eab62bc8b88876e2c4d3315dd">hku::AsyncSQLiteStatement::AsyncSQLiteStatement</a></div><div class="ttdeci">AsyncSQLiteStatement(const AsyncSQLiteStatement &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_ae711fa480038c3a80728c34fe23532d0"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#ae711fa480038c3a80728c34fe23532d0">hku::AsyncSQLiteStatement::sub_bindText</a></div><div class="ttdeci">virtual void sub_bindText(int idx, const char *item, size_t len) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_ae88477e28ca98a0e8b1de6291891129a"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#ae88477e28ca98a0e8b1de6291891129a">hku::AsyncSQLiteStatement::sub_bindInt</a></div><div class="ttdeci">virtual void sub_bindInt(int idx, int64_t value) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_lite_statement_html_af6e7807342bc4001ccf515ef177f45b5"><div class="ttname"><a href="classhku_1_1_async_s_q_lite_statement.html#af6e7807342bc4001ccf515ef177f45b5">hku::AsyncSQLiteStatement::sub_bindBlob</a></div><div class="ttdeci">virtual void sub_bindBlob(int idx, const std::vector&lt; char &gt; &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="agroup___data_type_html_ga2b6c0eff2e4f65f353dc655a1baf7f04"><div class="ttname"><a href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">hku::int64_t</a></div><div class="ttdeci">long long int64_t</div><div class="ttdef"><b>定义</b> DataType.h:99</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><a href="dir_22517f5458a7819cb7338454b9c24008.html">sqlite</a></li><li class="navelem"><b>AsyncSQLiteStatement.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

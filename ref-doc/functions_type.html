@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 类成员 - 类型定义</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,55 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li class="current"><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
-  </div>
-  <div id="navrow3" class="tabs2">
-    <ul class="tablist">
-      <li><a href="functions.html"><span>全部</span></a></li>
-      <li><a href="functions_func.html"><span>函数</span></a></li>
-      <li><a href="functions_vars.html"><span>变量</span></a></li>
-      <li class="current"><a href="functions_type.html"><span>类型定义</span></a></li>
-      <li><a href="functions_enum.html"><span>枚举</span></a></li>
-      <li><a href="functions_eval.html"><span>枚举值</span></a></li>
-      <li><a href="functions_rela.html"><span>相关函数</span></a></li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('functions_type.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -91,100 +74,178 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="contents">
-&#160;<ul>
-<li>AllocateMoneyPtr
-: <a class="el" href="classhku_1_1_allocate_money_base.html#a0ba56b2f0b0e491da7549d487c390c39">hku::AllocateMoneyBase</a>
-</li>
-<li>ConditionPtr
-: <a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">hku::ConditionBase</a>
-</li>
-<li>const_iterator
-: <a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">hku::Block</a>
-, <a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">hku::StockManager</a>
-</li>
-<li>difference_type
-: <a class="el" href="classhku_1_1_stock_map_iterator.html#a8746d158d80d814c9365b42a4871828b">hku::StockMapIterator</a>
-</li>
-<li>EnvironmentPtr
-: <a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">hku::EnvironmentBase</a>
-</li>
-<li>IndicatorImpPtr
-: <a class="el" href="classhku_1_1_indicator_imp.html#a78e62fd07d0c2aac26b6d7cf718d06cf">hku::IndicatorImp</a>
-</li>
-<li>iterator_category
-: <a class="el" href="classhku_1_1_stock_map_iterator.html#a9f896fa00e4b8459be613f8746221a17">hku::StockMapIterator</a>
-</li>
-<li>map_type
-: <a class="el" href="classhku_1_1_performance.html#a105e47b285936ede290293600023f77f">hku::Performance</a>
-</li>
-<li>MarketInfoMap
-: <a class="el" href="classhku_1_1_base_info_driver.html#ade9abc81f0a29002311633d810d087f8">hku::BaseInfoDriver</a>
-</li>
-<li>MoneyManagerPtr
-: <a class="el" href="classhku_1_1_money_manager_base.html#adfbe0726a617ac65fbd1229cbddba80d">hku::MoneyManagerBase</a>
-</li>
-<li>OperandNodePtr
-: <a class="el" href="classhku_1_1_operand_node.html#ab71ba357d054ff8ec54194c88b22dbb3">hku::OperandNode</a>
-</li>
-<li>Part
-: <a class="el" href="classhku_1_1_system.html#adb3b73210759b54aee348f649eef55c9">hku::System</a>
-</li>
-<li>pointer
-: <a class="el" href="classhku_1_1_stock_map_iterator.html#aa74392ec45477fc63fe948a774d2165a">hku::StockMapIterator</a>
-</li>
-<li>PortfolioPtr
-: <a class="el" href="classhku_1_1_portfolio.html#a1232fc26145ed71a9ad921bff3c71e89">hku::Portfolio</a>
-</li>
-<li>ProfitGoalPtr
-: <a class="el" href="classhku_1_1_profit_goal_base.html#a9e3ac026ec08ab33aa251495ddfc33b5">hku::ProfitGoalBase</a>
-</li>
-<li>reference
-: <a class="el" href="classhku_1_1_stock_map_iterator.html#a96bff265da39f0e195c79dd7c69de7ca">hku::StockMapIterator</a>
-</li>
-<li>SelectorPtr
-: <a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase</a>
-</li>
-<li>SignalPtr
-: <a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">hku::SignalBase</a>
-</li>
-<li>SlippagePtr
-: <a class="el" href="classhku_1_1_slippage_base.html#a1cd0b87be5905c8c82cb967d37330470">hku::SlippageBase</a>
-</li>
-<li>stock_map_t
-: <a class="el" href="classhku_1_1_stock_map_iterator.html#ae2524a8e7ca4a97adb8f7e0efb95971d">hku::StockMapIterator</a>
-</li>
-<li>StockTypeInfoMap
-: <a class="el" href="classhku_1_1_base_info_driver.html#a625a4b538b460d2a796da414247441a6">hku::BaseInfoDriver</a>
-</li>
-<li>StoplossPtr
-: <a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">hku::StoplossBase</a>
-</li>
-<li>StringList
-: <a class="el" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">hku::IniParser</a>
-</li>
-<li>StringListPtr
-: <a class="el" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">hku::IniParser</a>
-</li>
-<li>TradeCostPtr
-: <a class="el" href="classhku_1_1_trade_cost_base.html#ab8a2cdb8789bd96416e6a1ba262c914c">hku::TradeCostBase</a>
-</li>
-<li>value_type
-: <a class="el" href="classhku_1_1_stock_map_iterator.html#a5144cb0f7ed8ef6eff3bc14654c8d46a">hku::StockMapIterator</a>
-</li>
+<div class="textblock">这里是所有类型定义, 及指向其所属类的链接: </div>
+
+<h3 class="doxsection"><a id="index_a" name="index_a"></a>- a -</h3><ul>
+<li>agg_func_t&#160;:&#160;<a class="el" href="classhku_1_1_extend_indicators_plugin_interface.html#a99db7861148593574f6a5fe2a09e7267">hku::ExtendIndicatorsPluginInterface</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_b" name="index_b"></a>- b -</h3><ul>
+<li>buffer_t&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp.html#a81a6d03c8ef39bd8c17ca4b12c3cfab3">hku::IndicatorImp</a></li>
+<li>Builder&#160;:&#160;<a class="el" href="structhikyuu_1_1flat_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s.html#a7f25ac7b1c5ab29d0071fe70d0482c40">hikyuu::flat::FLATBUFFERS_FINAL_CLASS</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_c" name="index_c"></a>- c -</h3><ul>
+<li>CacheMap&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#a69ab022ca1e862f5e63e1d0c9c58514b">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+<li>CacheValue&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#af4b06ec2d8a6c413e50f65a451c3c447">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+<li>ConditionPtr&#160;:&#160;<a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">hku::ConditionBase</a></li>
+<li>const_iterator&#160;:&#160;<a class="el" href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">hku::AsyncSQLResultSet&lt; TableT, page_size &gt;</a>, <a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">hku::Block</a>, <a class="el" href="classhku_1_1_condition_base.html#a3034fb90fd041ee9a2cdb5045cef3f5e">hku::ConditionBase</a>, <a class="el" href="classhku_1_1_filter_node.html#a5e027798a7dbf8d306c0592e22d5f123">hku::FilterNode</a>, <a class="el" href="classhku_1_1_indicator_imp_buffer.html#ab2875f4e094e835ef0f5487f67bf25c3">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_performance.html#aad5177410ebdd9ecdf7f9a5a810e1192">hku::Performance</a>, <a class="el" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">hku::SQLResultSet&lt; TableT, page_size &gt;</a>, <a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">hku::StockManager</a></li>
+<li>const_pointer&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp_buffer.html#a180411bd562abcc52536408ec1a18635">hku::IndicatorImpBuffer</a></li>
+<li>const_reference&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp_buffer.html#a7fa911d9f8d706499d1e4f1b1d4cfd3a">hku::IndicatorImpBuffer</a></li>
+<li>const_reverse_iterator&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp_buffer.html#a61c7c334bcdf29648fe5ef2d3ddff85b">hku::IndicatorImpBuffer</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_d" name="index_d"></a>- d -</h3><ul>
+<li>difference_type&#160;:&#160;<a class="el" href="classhku_1_1_factor_set_1_1const__iterator.html#ab338c7b53fb44b1af6fd269a43f74347">hku::FactorSet::const_iterator</a>, <a class="el" href="classhku_1_1_indicator_imp_buffer.html#a2bb2851cf08ab66d20e65f8e480e88e9">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html#a7b7958a12c2d84cd6e0cc5422ef708a8">hku::KData::const_iterator</a>, <a class="el" href="classhku_1_1_stock_map_iterator.html#a8746d158d80d814c9365b42a4871828b">hku::StockMapIterator</a></li>
+<li>DriverConnectPtr&#160;:&#160;<a class="el" href="classhku_1_1_driver_connect_pool.html#aab1bdc81e9a92f960bf323a6515980ad">hku::DriverConnectPool&lt; DriverConnectT &gt;</a></li>
+<li>DriverPtr&#160;:&#160;<a class="el" href="classhku_1_1_driver_connect_pool.html#adef63028e3286b6c9fb51abe1db66273">hku::DriverConnectPool&lt; DriverConnectT &gt;</a></li>
+<li>DriverType&#160;:&#160;<a class="el" href="classhku_1_1_k_data_driver_connect.html#a90f4a9d3cb6a78f9b1e25a895873b232">hku::KDataDriverConnect</a></li>
+<li>DriverTypePtr&#160;:&#160;<a class="el" href="classhku_1_1_k_data_driver_connect.html#a6f56e6ba377c15dc46e857260bf1a9d1">hku::KDataDriverConnect</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_e" name="index_e"></a>- e -</h3><ul>
+<li>EnvironmentPtr&#160;:&#160;<a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">hku::EnvironmentBase</a></li>
+<li>executor_type&#160;:&#160;<a class="el" href="classhku_1_1_asio_http_client.html#ad9cec4956a963ed76e9946c96cee74c8">hku::AsioHttpClient</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_f" name="index_f"></a>- f -</h3><ul>
+<li>filter_func&#160;:&#160;<a class="el" href="classhku_1_1_bind_filter_node.html#a06e5189f968c099a3bee0f60a790cd6a">hku::BindFilterNode</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_g" name="index_g"></a>- g -</h3><ul>
+<li>GlobalPoolType&#160;:&#160;<a class="el" href="classhku_1_1_resource_hybrid_pool.html#a182102bbf319cf6e0e02a0f4aacc70f8">hku::ResourceHybridPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</a>, <a class="el" href="classhku_1_1_resource_hybrid_version_pool.html#adeb05630df61b307e837f4e1114583bc">hku::ResourceHybridVersionPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</a></li>
+<li>group_func_t&#160;:&#160;<a class="el" href="classhku_1_1_extend_indicators_plugin_interface.html#a91058950da5b4ac2f50a52321bc51c1b">hku::ExtendIndicatorsPluginInterface</a></li>
+<li>Guard&#160;:&#160;<a class="el" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">lru11::Cache&lt; Key, Value, Lock, Map &gt;</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_i" name="index_i"></a>- i -</h3><ul>
+<li>ind_param_map_t&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp.html#a74d0abbf8d1185755b71342dd0fe6e94">hku::IndicatorImp</a></li>
+<li>IndicatorImpPtr&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp.html#a78e62fd07d0c2aac26b6d7cf718d06cf">hku::IndicatorImp</a></li>
+<li>iterator&#160;:&#160;<a class="el" href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">hku::AsyncSQLResultSet&lt; TableT, page_size &gt;</a>, <a class="el" href="classhku_1_1_factor_set.html#a45fee633a9b6596ffff059f8d9b67773">hku::FactorSet</a>, <a class="el" href="classhku_1_1_filter_node.html#a933ee1784a29fb30f262909311b07602">hku::FilterNode</a>, <a class="el" href="classhku_1_1_indicator.html#a402164ce6af0a2443d014aa44cb92ebb">hku::Indicator</a>, <a class="el" href="classhku_1_1_indicator_imp_buffer.html#ade0f860a563f0296a38adf215ddd3e8b">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_k_data.html#af756ac6ec0fd5e7a5eb025a40224bf9a">hku::KData</a>, <a class="el" href="classhku_1_1_parameter.html#af1960200ba8a1c3d7225aa0742b15250">hku::Parameter</a>, <a class="el" href="classhku_1_1_performance.html#a1d49b3abc32c4871c32166de8738fbec">hku::Performance</a>, <a class="el" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">hku::SQLResultSet&lt; TableT, page_size &gt;</a></li>
+<li>iterator_category&#160;:&#160;<a class="el" href="classhku_1_1_factor_set_1_1const__iterator.html#a86624c549a597a571d0c577a1f506116">hku::FactorSet::const_iterator</a>, <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html#a8c5e57c286d12460a25490fe46bfe5f1">hku::KData::const_iterator</a>, <a class="el" href="classhku_1_1_stock_map_iterator.html#afb776d9415f47c5bf0117cc2e6e7decd">hku::StockMapIterator</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_k" name="index_k"></a>- k -</h3><ul>
+<li>KDataDriverPtr&#160;:&#160;<a class="el" href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">hku::KDataDriver</a></li>
+<li>KDataImpPtr&#160;:&#160;<a class="el" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">hku::KDataImp</a></li>
+<li>key_type&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#a6d6c28dc2363b8ac3c163770fac45503">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+<li>KType&#160;:&#160;<a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_l" name="index_l"></a>- l -</h3><ul>
+<li>list_type&#160;:&#160;<a class="el" href="classlru11_1_1_cache.html#a6ccfadba850efde2a167aa946486bde5">lru11::Cache&lt; Key, Value, Lock, Map &gt;</a></li>
+<li>lock_type&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#acc2b876d2ad307b4d2056c5af46ed5cd">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a>, <a class="el" href="classlru11_1_1_cache.html#a41ad4f5198e342e02f3ef3b39777f373">lru11::Cache&lt; Key, Value, Lock, Map &gt;</a></li>
+<li>LruList&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#a87f871ba06c64547c0ed8e72701d3894">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_m" name="index_m"></a>- m -</h3><ul>
+<li>map_type&#160;:&#160;<a class="el" href="classhku_1_1_performance.html#a5e644223642f6c35f6b7a1c1a119f27a">hku::Performance</a>, <a class="el" href="classlru11_1_1_cache.html#a6ec408686f93b8da0375c17c817622d8">lru11::Cache&lt; Key, Value, Lock, Map &gt;</a></li>
+<li>MarketInfoMap&#160;:&#160;<a class="el" href="classhku_1_1_base_info_driver.html#ade9abc81f0a29002311633d810d087f8">hku::BaseInfoDriver</a></li>
+<li>MergedEmitFunc&#160;:&#160;<a class="el" href="classhku_1_1_operator_signal.html#a5f5719e166ec6d0e5ec92a8db84e0f6c">hku::OperatorSignal</a>, <a class="el" href="classhku_1_1_operator_value_signal.html#ac7f2a88756cecbe43243aa874397d003">hku::OperatorValueSignal</a></li>
+<li>moContextLookupList&#160;:&#160;<a class="el" href="classmo_file_reader.html#abb1ab174607bf8e1db986d71caaad72e">moFileReader</a></li>
+<li>moLookupList&#160;:&#160;<a class="el" href="classmo_file_reader.html#ab5382f6394b7f6ed812f6bd6973707cc">moFileReader</a></li>
+<li>MoneyManagerPtr&#160;:&#160;<a class="el" href="classhku_1_1_money_manager_base.html#adfbe0726a617ac65fbd1229cbddba80d">hku::MoneyManagerBase</a></li>
+<li>moTranslationPairList&#160;:&#160;<a class="el" href="structmo_file_info.html#a223670512540362f1d0a9ef133002d6e">moFileInfo</a></li>
+<li>MultiFactorPtr&#160;:&#160;<a class="el" href="classhku_1_1_multi_factor_base.html#ae14bf8d50ad746b01a1bd41cdf076135">hku::MultiFactorBase</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_n" name="index_n"></a>- n -</h3><ul>
+<li>node_type&#160;:&#160;<a class="el" href="classlru11_1_1_cache.html#a127e5d893104aeb8c930bd336543f2e1">lru11::Cache&lt; Key, Value, Lock, Map &gt;</a></li>
+<li>NormPtr&#160;:&#160;<a class="el" href="classhku_1_1_normalize_base.html#a5bbaa5ca9f3c6856dea7525cb04fe560">hku::NormalizeBase</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_p" name="index_p"></a>- p -</h3><ul>
+<li>param_map_t&#160;:&#160;<a class="el" href="classhku_1_1_parameter.html#a66ea6a5a8bf9d1a140af32c9b52ad0e0">hku::Parameter</a></li>
+<li>Part&#160;:&#160;<a class="el" href="classhku_1_1_system.html#adb3b73210759b54aee348f649eef55c9">hku::System</a></li>
+<li>pointer&#160;:&#160;<a class="el" href="classhku_1_1_factor_set_1_1const__iterator.html#affc6030886cbeffaf4bf9e58ea5d1b2c">hku::FactorSet::const_iterator</a>, <a class="el" href="classhku_1_1_indicator_imp_buffer.html#a85c4ec3204ede8c25ac6688df1bb44ec">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html#a7ba97686d492e409b7b5d3492e29f342">hku::KData::const_iterator</a>, <a class="el" href="classhku_1_1_stock_map_iterator.html#a28cb7943dca89c78b4bdd233a588fe05">hku::StockMapIterator</a></li>
+<li>process_func&#160;:&#160;<a class="el" href="classhku_1_1_bind_filter_node.html#a055706fc476eb6f98fe9571a55f6036e">hku::BindFilterNode</a></li>
+<li>ProfitGoalPtr&#160;:&#160;<a class="el" href="classhku_1_1_profit_goal_base.html#a9e3ac026ec08ab33aa251495ddfc33b5">hku::ProfitGoalBase</a></li>
+<li>ptr_t&#160;:&#160;<a class="el" href="classhku_1_1_filter_node.html#a005e9c55521dbfe2f37ceccdc9e4a05b">hku::FilterNode</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_r" name="index_r"></a>- r -</h3><ul>
+<li>reference&#160;:&#160;<a class="el" href="classhku_1_1_factor_set_1_1const__iterator.html#a69b943801da13c7c47d69171b914905c">hku::FactorSet::const_iterator</a>, <a class="el" href="classhku_1_1_indicator_imp_buffer.html#a877946356dd55c49e004012e0e832d0c">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html#a3d2a570acd78d6edef2b4616a373471c">hku::KData::const_iterator</a>, <a class="el" href="classhku_1_1_stock_map_iterator.html#a96bff265da39f0e195c79dd7c69de7ca">hku::StockMapIterator</a></li>
+<li>ResourcePtr&#160;:&#160;<a class="el" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">hku::ResourceAsioPool&lt; ResourceType, MutexType &gt;</a>, <a class="el" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">hku::ResourceAsioVersionPool&lt; ResourceType, MutexType &gt;</a>, <a class="el" href="classhku_1_1_resource_pool.html#ad490980c748bfd3e792b3a9fc4e889d3">hku::ResourcePool&lt; ResourceType &gt;</a>, <a class="el" href="classhku_1_1_resource_tls_pool.html#aef194d2071ec01c8af42d6953f9943ba">hku::ResourceTlsPool&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;</a>, <a class="el" href="classhku_1_1_resource_tls_version_pool.html#a13cd85da7db19a00087419e4b81cf0eb">hku::ResourceTlsVersionPool&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;</a>, <a class="el" href="classhku_1_1_resource_version_pool.html#a8977678733517487cfa6c003e1711794">hku::ResourceVersionPool&lt; ResourceType &gt;</a></li>
+<li>ResultSet&#160;:&#160;<a class="el" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a7092d38d34d80b5c591e1ada1c46bc5e">hku::AsyncSQLResultSetIterator&lt; TableT, page_size &gt;</a>, <a class="el" href="classhku_1_1_s_q_l_result_set_iterator.html#a28da7c93df192587db4cc792d233b105">hku::SQLResultSetIterator&lt; TableT, page_size &gt;</a></li>
+<li>reverse_iterator&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp_buffer.html#ae3b2168aa9b4008d285d8af2d39a31f2">hku::IndicatorImpBuffer</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_s" name="index_s"></a>- s -</h3><ul>
+<li>ScoresFilterPtr&#160;:&#160;<a class="el" href="classhku_1_1_scores_filter_base.html#a6e547c8669cde948bf6e38662a2e76c4">hku::ScoresFilterBase</a></li>
+<li>SelectorPtr&#160;:&#160;<a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase</a></li>
+<li>SharedGuard&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#acf395d8ef56efa0043074487a9ee4f43">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+<li>SignalPtr&#160;:&#160;<a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">hku::SignalBase</a></li>
+<li>size_type&#160;:&#160;<a class="el" href="classhku_1_1_indicator_imp_buffer.html#a131f1da7e090e43051ea75e9da36e055">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_lru_cache.html#aff7f6eee6e1fd5c7a9faa2a28fce85b2">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+<li>SlippagePtr&#160;:&#160;<a class="el" href="classhku_1_1_slippage_base.html#a1cd0b87be5905c8c82cb967d37330470">hku::SlippageBase</a></li>
+<li>stock_map_t&#160;:&#160;<a class="el" href="classhku_1_1_stock_map_iterator.html#ae2524a8e7ca4a97adb8f7e0efb95971d">hku::StockMapIterator</a></li>
+<li>StockTypeInfoMap&#160;:&#160;<a class="el" href="classhku_1_1_base_info_driver.html#ac71beb361eaccc99830f74483bfef340">hku::BaseInfoDriver</a></li>
+<li>StoplossPtr&#160;:&#160;<a class="el" href="classhku_1_1_stoploss_base.html#ad50d98f2cb30dc6e5ac603ca61d14888">hku::StoplossBase</a></li>
+<li>StringList&#160;:&#160;<a class="el" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">hku::IniParser</a></li>
+<li>StringListPtr&#160;:&#160;<a class="el" href="classhku_1_1_ini_parser.html#a4fd52b140382fe905f8f4c19593c2974">hku::IniParser</a></li>
+<li>SystemPtr&#160;:&#160;<a class="el" href="classhku_1_1_system.html#a5d929a7607fc7caac365ec6074393120">hku::System</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_t" name="index_t"></a>- t -</h3><ul>
+<li>Table&#160;:&#160;<a class="el" href="structhikyuu_1_1flat_1_1_spot_builder.html#a0af07e6bee205934d6a1d31bb9c651f5">hikyuu::flat::SpotBuilder</a>, <a class="el" href="structhikyuu_1_1flat_1_1_spot_list_builder.html#a964843c1c2a5f713de1aebd5a3e00c22">hikyuu::flat::SpotListBuilder</a></li>
+<li>task_handle&#160;:&#160;<a class="el" href="classhku_1_1_global_steal_thread_pool.html#a90c2182b44b68e086881e9f8e0b13bda">hku::GlobalStealThreadPool</a>, <a class="el" href="classhku_1_1_m_q_steal_thread_pool.html#a80304f10077fe3673e53cccdd43397b9">hku::MQStealThreadPool</a>, <a class="el" href="classhku_1_1_m_q_thread_pool.html#a513121e8b80ed70f1e6e6f7b5ce12795">hku::MQThreadPool</a>, <a class="el" href="classhku_1_1_steal_thread_pool.html#a75171f5cf3cd305b8f5992cff96ae809">hku::StealThreadPool</a>, <a class="el" href="classhku_1_1_thread_pool.html#a6030d1236d87caa352a0b00447ab87c4">hku::ThreadPool</a></li>
+<li>TlsPoolType&#160;:&#160;<a class="el" href="classhku_1_1_resource_hybrid_pool.html#a41a1c0f36ba5b85911d2e72bcb7493b1">hku::ResourceHybridPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</a>, <a class="el" href="classhku_1_1_resource_hybrid_version_pool.html#a9f732345f6bf09e9880391fc57d2b055">hku::ResourceHybridVersionPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</a></li>
+<li>TradeCostPtr&#160;:&#160;<a class="el" href="classhku_1_1_trade_cost_base.html#ab8a2cdb8789bd96416e6a1ba262c914c">hku::TradeCostBase</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_u" name="index_u"></a>- u -</h3><ul>
+<li>UniqueGuard&#160;:&#160;<a class="el" href="classhku_1_1_lru_cache.html#ae241e326a28fd407a3fecab40d94d30d">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_v" name="index_v"></a>- v -</h3><ul>
+<li>value_t&#160;:&#160;<a class="el" href="classhku_1_1_indicator.html#ac8f468be2ac0597910e8171292ddcee2">hku::Indicator</a>, <a class="el" href="classhku_1_1_indicator_imp.html#abfe6452bf4e40263d5416512e391ac5c">hku::IndicatorImp</a>, <a class="el" href="classhku_1_1_multi_factor_base.html#a6b0369d09742862d4cd06abfc38619d7">hku::MultiFactorBase</a>, <a class="el" href="structhku_1_1_score_record.html#ae826b2a2b47f6135b4ff6299e810734f">hku::ScoreRecord</a></li>
+<li>value_type&#160;:&#160;<a class="el" href="classhku_1_1_factor_set_1_1const__iterator.html#ac5c26c585847db7bf78b08799c517da5">hku::FactorSet::const_iterator</a>, <a class="el" href="classhku_1_1_indicator_imp_buffer.html#a705bae14852e89a7e891c099f5d7a35f">hku::IndicatorImpBuffer</a>, <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html#aa0aeb81687f2b7d0c276bf54577bc187">hku::KData::const_iterator</a>, <a class="el" href="classhku_1_1_lru_cache.html#a87667a306a0ff8dd7df0312564bd87c4">hku::LruCache&lt; KeyType, ValueType, Lock &gt;</a>, <a class="el" href="classhku_1_1_stock_map_iterator.html#a5144cb0f7ed8ef6eff3bc14654c8d46a">hku::StockMapIterator</a></li>
+</ul>
+
+
+<h3 class="doxsection"><a id="index_w" name="index_w"></a>- w -</h3><ul>
+<li>Weights&#160;:&#160;<a class="el" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">hku::AllocateFundsBase</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,0 +1,576 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::SpendTimer类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_spend_timer.html','','classhku_1_1_spend_timer-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::SpendTimer类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___spend_timer.html">Spend timer time consumption statistics</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Timer for the statistics of the program execution time consumption, it assists in calculating the code execution time  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_spend_timer_8h_source.html">SpendTimer.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ae1f5df1af4529d8ce71def545726d615" id="r_ae1f5df1af4529d8ce71def545726d615"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1f5df1af4529d8ce71def545726d615">SpendTimer</a> ()</td></tr>
+<tr class="memdesc:ae1f5df1af4529d8ce71def545726d615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it records the current system time  <br /></td></tr>
+<tr class="memitem:a186407430e5db0c497ea61fdf717b57f" id="r_a186407430e5db0c497ea61fdf717b57f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a186407430e5db0c497ea61fdf717b57f">SpendTimer</a> (const char *id, const char *filename, int lineno)</td></tr>
+<tr class="memdesc:a186407430e5db0c497ea61fdf717b57f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it records the current system time  <br /></td></tr>
+<tr class="memitem:a8699125c246ffaf204113d4e80036869" id="r_a8699125c246ffaf204113d4e80036869"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8699125c246ffaf204113d4e80036869">SpendTimer</a> (const char *id, const char *msg, const char *filename, int lineno)</td></tr>
+<tr class="memdesc:a8699125c246ffaf204113d4e80036869"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it records the current system time  <br /></td></tr>
+<tr class="memitem:ab98627f78fd3c47da4b5ad6f6cdb3995" id="r_ab98627f78fd3c47da4b5ad6f6cdb3995"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab98627f78fd3c47da4b5ad6f6cdb3995">~SpendTimer</a> ()</td></tr>
+<tr class="memdesc:ab98627f78fd3c47da4b5ad6f6cdb3995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, it calculates the time consumed from the construction to the destruction and prints the output  <br /></td></tr>
+<tr class="memitem:a7bde4132e2b8c0d40acc80ea083d05a6" id="r_a7bde4132e2b8c0d40acc80ea083d05a6"><td class="memItemLeft" align="right" valign="top">std::chrono::duration&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7bde4132e2b8c0d40acc80ea083d05a6">duration</a> () const</td></tr>
+<tr class="memdesc:a7bde4132e2b8c0d40acc80ea083d05a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the time consumed from the start to the current moment, in seconds  <br /></td></tr>
+<tr class="memitem:ad69e92991c82ba3e1a78f701b2f20ddd" id="r_ad69e92991c82ba3e1a78f701b2f20ddd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad69e92991c82ba3e1a78f701b2f20ddd">show</a> () const</td></tr>
+<tr class="memdesc:ad69e92991c82ba3e1a78f701b2f20ddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the time consumed from the start of the timer until now, and return the current consumed seconds  <br /></td></tr>
+<tr class="memitem:a1034add0dbca7afc008774c230b52ca1" id="r_a1034add0dbca7afc008774c230b52ca1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1034add0dbca7afc008774c230b52ca1">value</a> () const</td></tr>
+<tr class="memdesc:a1034add0dbca7afc008774c230b52ca1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of the seconds consumed from the start to the current  <br /></td></tr>
+<tr class="memitem:ae50862ff1f69ec9828d263041f88e02f" id="r_ae50862ff1f69ec9828d263041f88e02f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae50862ff1f69ec9828d263041f88e02f">keep</a> (const std::string &amp;description)</td></tr>
+<tr class="memdesc:ae50862ff1f69ec9828d263041f88e02f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stopwatch timing; every keep records the interval between the current time and the last keep  <br /></td></tr>
+<tr class="memitem:a260c74b4694b4f1c6e0ac4e3bde33245" id="r_a260c74b4694b4f1c6e0ac4e3bde33245"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::chrono::duration&lt; double &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a260c74b4694b4f1c6e0ac4e3bde33245">getKeepDurations</a> () const</td></tr>
+<tr class="memdesc:a260c74b4694b4f1c6e0ac4e3bde33245"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the stopwatch timing list  <br /></td></tr>
+<tr class="memitem:a18a45e51b48a849e9c9206d78775ecff" id="r_a18a45e51b48a849e9c9206d78775ecff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18a45e51b48a849e9c9206d78775ecff">setCycle</a> (int cycle)</td></tr>
+<tr class="memdesc:a18a45e51b48a849e9c9206d78775ecff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the number of the loops in the benchmark test  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a981ddee0237af6a32eaa5d636e6bc315" id="r_a981ddee0237af6a32eaa5d636e6bc315"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a981ddee0237af6a32eaa5d636e6bc315">isClosed</a> ()</td></tr>
+<tr class="memdesc:a981ddee0237af6a32eaa5d636e6bc315"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current switch state of the time consumption printing  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:a207f0375ccef7debb933c052b7adddc7" id="r_a207f0375ccef7debb933c052b7adddc7"><td class="memItemLeft" align="right" valign="top">void HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a207f0375ccef7debb933c052b7adddc7">close_spend_time</a> ()</td></tr>
+<tr class="memdesc:a207f0375ccef7debb933c052b7adddc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Globally turn off the time consumption printing output  <br /></td></tr>
+<tr class="memitem:a96ef2cfe2c468aec46a40c72d5ecaa9d" id="r_a96ef2cfe2c468aec46a40c72d5ecaa9d"><td class="memItemLeft" align="right" valign="top">void HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96ef2cfe2c468aec46a40c72d5ecaa9d">open_spend_time</a> ()</td></tr>
+<tr class="memdesc:a96ef2cfe2c468aec46a40c72d5ecaa9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Globally turn on the time consumption printing output  <br /></td></tr>
+<tr class="memitem:a2b19094833b83b025310a1205bf365cb" id="r_a2b19094833b83b025310a1205bf365cb"><td class="memItemLeft" align="right" valign="top">bool HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b19094833b83b025310a1205bf365cb">get_spend_time_status</a> ()</td></tr>
+<tr class="memdesc:a2b19094833b83b025310a1205bf365cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the global state of the time consumption printing output: true - on, false - off  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Timer for the statistics of the program execution time consumption, it assists in calculating the code execution time </p>
+<dl class="section note"><dt>注解</dt><dd>It is not recommended to use it directly, the related utility macros should be used </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___spend_timer.html#ga02124aae88a097c7f8f1f7f5b9e1bb0e">SPEND_TIME</a>, <a class="el" href="group___spend_timer.html#ga9e74e7593b1d73aff07441c0252e7e9e">SPEND_TIME_MSG</a>, SPEND_TIMG_CONTROL </dd></dl>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ae1f5df1af4529d8ce71def545726d615" name="ae1f5df1af4529d8ce71def545726d615"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1f5df1af4529d8ce71def545726d615">&#9670;&#160;</a></span>SpendTimer() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::SpendTimer::SpendTimer </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor, it records the current system time </p>
+
+</div>
+</div>
+<a id="a186407430e5db0c497ea61fdf717b57f" name="a186407430e5db0c497ea61fdf717b57f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a186407430e5db0c497ea61fdf717b57f">&#9670;&#160;</a></span>SpendTimer() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::SpendTimer::SpendTimer </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>filename</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>lineno</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor, it records the current system time </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>timer id </td></tr>
+    <tr><td class="paramname">filename</td><td>the current file name, corresponding to <b>FILE</b> </td></tr>
+    <tr><td class="paramname">lineno</td><td>the current line number, corresponding to <b>LINE</b> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8699125c246ffaf204113d4e80036869" name="a8699125c246ffaf204113d4e80036869"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8699125c246ffaf204113d4e80036869">&#9670;&#160;</a></span>SpendTimer() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::SpendTimer::SpendTimer </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>msg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>filename</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>lineno</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor, it records the current system time </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>timer id </td></tr>
+    <tr><td class="paramname">msg</td><td>the additional output message </td></tr>
+    <tr><td class="paramname">filename</td><td>the current file name, corresponding to <b>FILE</b> </td></tr>
+    <tr><td class="paramname">lineno</td><td>the current line number, corresponding to <b>LINE</b> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab98627f78fd3c47da4b5ad6f6cdb3995" name="ab98627f78fd3c47da4b5ad6f6cdb3995"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab98627f78fd3c47da4b5ad6f6cdb3995">&#9670;&#160;</a></span>~SpendTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::SpendTimer::~SpendTimer </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor, it calculates the time consumed from the construction to the destruction and prints the output </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a7bde4132e2b8c0d40acc80ea083d05a6" name="a7bde4132e2b8c0d40acc80ea083d05a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bde4132e2b8c0d40acc80ea083d05a6">&#9670;&#160;</a></span>duration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::chrono::duration&lt; double &gt; hku::SpendTimer::duration </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the time consumed from the start to the current moment, in seconds </p>
+<dl class="section return"><dt>返回</dt><dd>std::chrono::duration&lt;double&gt; </dd></dl>
+
+</div>
+</div>
+<a id="a260c74b4694b4f1c6e0ac4e3bde33245" name="a260c74b4694b4f1c6e0ac4e3bde33245"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a260c74b4694b4f1c6e0ac4e3bde33245">&#9670;&#160;</a></span>getKeepDurations()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; std::chrono::duration&lt; double &gt; &gt; &amp; hku::SpendTimer::getKeepDurations </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the stopwatch timing list </p>
+<dl class="section return"><dt>返回</dt><dd>const std::vector&lt;std::chrono::duration&lt;double&gt;&gt;&amp; </dd></dl>
+
+</div>
+</div>
+<a id="a981ddee0237af6a32eaa5d636e6bc315" name="a981ddee0237af6a32eaa5d636e6bc315"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a981ddee0237af6a32eaa5d636e6bc315">&#9670;&#160;</a></span>isClosed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SpendTimer::isClosed </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current switch state of the time consumption printing </p>
+
+</div>
+</div>
+<a id="ae50862ff1f69ec9828d263041f88e02f" name="ae50862ff1f69ec9828d263041f88e02f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae50862ff1f69ec9828d263041f88e02f">&#9670;&#160;</a></span>keep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SpendTimer::keep </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>description</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stopwatch timing; every keep records the interval between the current time and the last keep </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">description</td><td>description </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>The first keep is the interval between the current time and the start </dd></dl>
+
+</div>
+</div>
+<a id="a18a45e51b48a849e9c9206d78775ecff" name="a18a45e51b48a849e9c9206d78775ecff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18a45e51b48a849e9c9206d78775ecff">&#9670;&#160;</a></span>setCycle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SpendTimer::setCycle </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>cycle</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Tell the number of the loops in the benchmark test </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cycle</td><td>the number of the loops, used for the time consumption statistics printing only </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad69e92991c82ba3e1a78f701b2f20ddd" name="ad69e92991c82ba3e1a78f701b2f20ddd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad69e92991c82ba3e1a78f701b2f20ddd">&#9670;&#160;</a></span>show()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SpendTimer::show </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the time consumed from the start of the timer until now, and return the current consumed seconds </p>
+
+</div>
+</div>
+<a id="a1034add0dbca7afc008774c230b52ca1" name="a1034add0dbca7afc008774c230b52ca1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1034add0dbca7afc008774c230b52ca1">&#9670;&#160;</a></span>value()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::SpendTimer::value </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the number of the seconds consumed from the start to the current </p>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="a207f0375ccef7debb933c052b7adddc7" name="a207f0375ccef7debb933c052b7adddc7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a207f0375ccef7debb933c052b7adddc7">&#9670;&#160;</a></span>close_spend_time</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HKU_UTILS_API close_spend_time </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Globally turn off the time consumption printing output </p>
+
+</div>
+</div>
+<a id="a2b19094833b83b025310a1205bf365cb" name="a2b19094833b83b025310a1205bf365cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b19094833b83b025310a1205bf365cb">&#9670;&#160;</a></span>get_spend_time_status</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool HKU_UTILS_API get_spend_time_status </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the global state of the time consumption printing output: true - on, false - off </p>
+
+</div>
+</div>
+<a id="a96ef2cfe2c468aec46a40c72d5ecaa9d" name="a96ef2cfe2c468aec46a40c72d5ecaa9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96ef2cfe2c468aec46a40c72d5ecaa9d">&#9670;&#160;</a></span>open_spend_time</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HKU_UTILS_API open_spend_time </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Globally turn on the time consumption printing output </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_spend_timer_8h_source.html">SpendTimer.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_spend_timer.html">SpendTimer</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

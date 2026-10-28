@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['kdatadriverimpptr',['KDataDriverImpPtr',['../namespacehku.html#ad3c5d31e88224ffc26773733e5f33e75',1,'hku']]],
-  ['kdatadriverptr',['KDataDriverPtr',['../namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b',1,'hku']]],
-  ['kdataimpptr',['KDataImpPtr',['../namespacehku.html#a03f95e2a1f93a1349d1a706b3e6fbe6d',1,'hku']]],
-  ['krecordlist',['KRecordList',['../group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0',1,'hku']]]
+  ['h5fileptr_0',['H5FilePtr',['../namespacehku.html#a96337b5826c9de20f8bf243ba1145ead',1,'hku']]],
+  ['httpchunkcallback_1',['HttpChunkCallback',['../namespacehku.html#add33de391a0cdfa0f88190014659e92c',1,'hku']]],
+  ['httpheaders_2',['HttpHeaders',['../namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1',1,'hku']]],
+  ['httpparams_3',['HttpParams',['../namespacehku.html#a384406f8f86e023533afe3d8502ecb79',1,'hku']]]
 ];

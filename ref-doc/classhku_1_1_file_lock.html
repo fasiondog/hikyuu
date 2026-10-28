@@ -1,0 +1,465 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::FileLock类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_file_lock.html','','classhku_1_1_file_lock-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::FileLock类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Cross-process file lock  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_file_lock_8h_source.html">FileLock.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a64b995158abd81648e5d539bcb8e02cd" id="r_a64b995158abd81648e5d539bcb8e02cd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64b995158abd81648e5d539bcb8e02cd">FileLock</a> (std::string <a class="el" href="#aa915450dabf91b1797f4e5695f45b3e6">filename</a>)</td></tr>
+<tr class="memdesc:a64b995158abd81648e5d539bcb8e02cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it only records the lock file name and registers the in-process mutex, without locking  <br /></td></tr>
+<tr class="memitem:a0ca2681c8f4b2e46ffd6ce90337ba13a" id="r_a0ca2681c8f4b2e46ffd6ce90337ba13a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ca2681c8f4b2e46ffd6ce90337ba13a">~FileLock</a> ()</td></tr>
+<tr class="memdesc:a0ca2681c8f4b2e46ffd6ce90337ba13a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, it releases the lock automatically if it is still held  <br /></td></tr>
+<tr class="memitem:a523b6c85d1546e3aaf432853f687b313" id="r_a523b6c85d1546e3aaf432853f687b313"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a523b6c85d1546e3aaf432853f687b313">FileLock</a> (const <a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;)=delete</td></tr>
+<tr class="memitem:ad438fca2715422bd663e58ff6acaf548" id="r_ad438fca2715422bd663e58ff6acaf548"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad438fca2715422bd663e58ff6acaf548">operator=</a> (const <a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;)=delete</td></tr>
+<tr class="memitem:ab5eaa761e48c928039b4db2fafddb12a" id="r_ab5eaa761e48c928039b4db2fafddb12a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5eaa761e48c928039b4db2fafddb12a">FileLock</a> (<a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memitem:ae8e90d28b1d321190cd194a75282c23b" id="r_ae8e90d28b1d321190cd194a75282c23b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8e90d28b1d321190cd194a75282c23b">operator=</a> (<a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memitem:a84f28d78680aae98ce05745f49e4c145" id="r_a84f28d78680aae98ce05745f49e4c145"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84f28d78680aae98ce05745f49e4c145">tryLock</a> () noexcept</td></tr>
+<tr class="memdesc:a84f28d78680aae98ce05745f49e4c145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to lock (non-blocking)  <br /></td></tr>
+<tr class="memitem:a37941c685b293ca897ae8fc2ffc1a88b" id="r_a37941c685b293ca897ae8fc2ffc1a88b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37941c685b293ca897ae8fc2ffc1a88b">waitLock</a> (int maxAttempts=10, int waitTimeMs=100) noexcept</td></tr>
+<tr class="memdesc:a37941c685b293ca897ae8fc2ffc1a88b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for the lock; it tries at most maxAttempts times with an interval of waitTimeMs milliseconds every time  <br /></td></tr>
+<tr class="memitem:adcfc2071a9e9ef3652fdec45deba7b6b" id="r_adcfc2071a9e9ef3652fdec45deba7b6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcfc2071a9e9ef3652fdec45deba7b6b">unlock</a> () noexcept</td></tr>
+<tr class="memdesc:adcfc2071a9e9ef3652fdec45deba7b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlock (it is a no-op when the lock is not held)  <br /></td></tr>
+<tr class="memitem:aa4e9036bcf255d224026c23482e1eff9" id="r_aa4e9036bcf255d224026c23482e1eff9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4e9036bcf255d224026c23482e1eff9">isLocked</a> () const noexcept</td></tr>
+<tr class="memdesc:aa4e9036bcf255d224026c23482e1eff9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the lock is currently held  <br /></td></tr>
+<tr class="memitem:aa915450dabf91b1797f4e5695f45b3e6" id="r_aa915450dabf91b1797f4e5695f45b3e6"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa915450dabf91b1797f4e5695f45b3e6">filename</a> () const noexcept</td></tr>
+<tr class="memdesc:aa915450dabf91b1797f4e5695f45b3e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the lock file name  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Cross-process file lock </p>
+<p>Underlying implementation: POSIX uses the fcntl(F_SETLK) record lock and Windows uses LockFileEx; both are cross-process mutual exclusion locks maintained by the kernel and are released automatically by the kernel when the process exits (including an abnormal crash), so the permanent deadlock caused by the residual lock file in the early "O_CREAT|O_EXCL" implementation does not happen.</p>
+<dl class="section note"><dt>注解</dt><dd><ul>
+<li>The POSIX record lock is an advisory lock and is held per "process": locking repeatedly within the same process does not fail, and closing any fd of this file releases all the locks of this process on this file. Therefore this class additionally maintains an in-process mutex to guarantee that the locking of the same path within the same process is serialized, and to avoid mistakenly releasing the other held locks. The in-process mutual exclusion relies on "a single copy of the implementation image": if multiple copies of this implementation exist in the same process at the same time (such as the plugin and the main program statically linking it separately), the in-process mutual exclusion becomes invalid and the cross-process lock also becomes invalid because of the fcntl semantics of the same process.</li>
+<li>The lock file (filename) is created automatically when it does not exist and is never deleted. Do not perform unlink/rename on the lock file, otherwise the inode the lock depends on is no longer unique and the cross-process mutual exclusion is broken.</li>
+<li>The lock file must not be a symlink. The POSIX implementation opens the lock file with O_NOFOLLOW and refuses to lock when the path is a symlink, so the lock always synchronizes on the file named by the path itself. As a residual caveat: an attacker who can write to the directory of the lock file can still replace or recreate it; keep the lock file in a directory writable only by trusted users.</li>
+<li>All the processes participating in the mutual exclusion must use exactly the same filename (this class normalizes the path for the registry key, but it is still recommended to use the absolute path uniformly).</li>
+<li>This class can be used as a local function object or a controlled lifetime object only; it must not be used as a static/global object: the in-process mutex registry is destroyed when the process exits, and a static <a class="el" href="classhku_1_1_file_lock.html" title="Cross-process file lock">FileLock</a> may be destructed after the registry has been destructed.</li>
+<li>After the object has been moved (<a class="el" href="#aa915450dabf91b1797f4e5695f45b3e6" title="Get the lock file name">filename()</a> is empty) it can only be destructed or assigned again, <a class="el" href="#a84f28d78680aae98ce05745f49e4c145" title="Try to lock (non-blocking)">tryLock()</a> must not be called further.</li>
+</ul>
+</dd></dl>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classhku_1_1_file_lock.html">hku::FileLock</a> lock(fmt::format(<span class="stringliteral">&quot;{}.lock&quot;</span>, <a class="code hl_function" href="#aa915450dabf91b1797f4e5695f45b3e6">filename</a>));</div>
+<div class="line"><span class="keywordflow">if</span> (lock.tryLock()) {</div>
+<div class="line">    <span class="comment">// ... the protected operations</span></div>
+<div class="line">}   <span class="comment">// It is unlocked automatically when lock is destructed</span></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html"><div class="ttname"><a href="classhku_1_1_file_lock.html">hku::FileLock</a></div><div class="ttdoc">Cross-process file lock</div><div class="ttdef"><b>定义</b> FileLock.h:69</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_aa915450dabf91b1797f4e5695f45b3e6"><div class="ttname"><a href="#aa915450dabf91b1797f4e5695f45b3e6">hku::FileLock::filename</a></div><div class="ttdeci">const std::string &amp; filename() const noexcept</div><div class="ttdoc">Get the lock file name</div><div class="ttdef"><b>定义</b> FileLock.h:114</div></div>
+</div><!-- fragment --> </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a64b995158abd81648e5d539bcb8e02cd" name="a64b995158abd81648e5d539bcb8e02cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64b995158abd81648e5d539bcb8e02cd">&#9670;&#160;</a></span>FileLock() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::FileLock::FileLock </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>filename</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor, it only records the lock file name and registers the in-process mutex, without locking </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the lock file name (it is recommended to use a bypass file independent of the data files) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0ca2681c8f4b2e46ffd6ce90337ba13a" name="a0ca2681c8f4b2e46ffd6ce90337ba13a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ca2681c8f4b2e46ffd6ce90337ba13a">&#9670;&#160;</a></span>~FileLock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::FileLock::~FileLock </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destructor, it releases the lock automatically if it is still held </p>
+
+</div>
+</div>
+<a id="a523b6c85d1546e3aaf432853f687b313" name="a523b6c85d1546e3aaf432853f687b313"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a523b6c85d1546e3aaf432853f687b313">&#9670;&#160;</a></span>FileLock() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::FileLock::FileLock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab5eaa761e48c928039b4db2fafddb12a" name="ab5eaa761e48c928039b4db2fafddb12a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5eaa761e48c928039b4db2fafddb12a">&#9670;&#160;</a></span>FileLock() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::FileLock::FileLock </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="aa915450dabf91b1797f4e5695f45b3e6" name="aa915450dabf91b1797f4e5695f45b3e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa915450dabf91b1797f4e5695f45b3e6">&#9670;&#160;</a></span>filename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string &amp; hku::FileLock::filename </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the lock file name </p>
+
+</div>
+</div>
+<a id="aa4e9036bcf255d224026c23482e1eff9" name="aa4e9036bcf255d224026c23482e1eff9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4e9036bcf255d224026c23482e1eff9">&#9670;&#160;</a></span>isLocked()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::FileLock::isLocked </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the lock is currently held </p>
+
+</div>
+</div>
+<a id="ad438fca2715422bd663e58ff6acaf548" name="ad438fca2715422bd663e58ff6acaf548"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad438fca2715422bd663e58ff6acaf548">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp; hku::FileLock::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae8e90d28b1d321190cd194a75282c23b" name="ae8e90d28b1d321190cd194a75282c23b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8e90d28b1d321190cd194a75282c23b">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp; hku::FileLock::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_file_lock.html">FileLock</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a84f28d78680aae98ce05745f49e4c145" name="a84f28d78680aae98ce05745f49e4c145"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84f28d78680aae98ce05745f49e4c145">&#9670;&#160;</a></span>tryLock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::FileLock::tryLock </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to lock (non-blocking) </p>
+<dl class="section return"><dt>返回</dt><dd>true the lock is acquired successfully, false it is already held by another process or another thread of this process </dd></dl>
+
+</div>
+</div>
+<a id="adcfc2071a9e9ef3652fdec45deba7b6b" name="adcfc2071a9e9ef3652fdec45deba7b6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcfc2071a9e9ef3652fdec45deba7b6b">&#9670;&#160;</a></span>unlock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::FileLock::unlock </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Unlock (it is a no-op when the lock is not held) </p>
+
+</div>
+</div>
+<a id="a37941c685b293ca897ae8fc2ffc1a88b" name="a37941c685b293ca897ae8fc2ffc1a88b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37941c685b293ca897ae8fc2ffc1a88b">&#9670;&#160;</a></span>waitLock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::FileLock::waitLock </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>maxAttempts</em></span><span class="paramdefsep"> = </span><span class="paramdefval">10</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>waitTimeMs</em></span><span class="paramdefsep"> = </span><span class="paramdefval">100</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait for the lock; it tries at most maxAttempts times with an interval of waitTimeMs milliseconds every time </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">maxAttempts</td><td>the maximum number of the attempts </td></tr>
+    <tr><td class="paramname">waitTimeMs</td><td>the interval in milliseconds between the attempts </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true the lock is acquired successfully, false the lock is still not acquired after the number of the attempts is exceeded </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>It does not keep waiting after the last attempt </dd></dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_file_lock_8h_source.html">FileLock.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_file_lock.html">FileLock</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

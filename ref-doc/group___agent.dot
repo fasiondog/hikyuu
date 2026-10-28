@@ -1,0 +1,11 @@
+digraph "Agent external data receiving and sending agent"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir=LR;
+  Node1 [id="Node000001",label="Agent external data\l receiving and sending agent",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node2 [id="Node000002",label="Hikyuu core engine\l library",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___hikyuu.html",tooltip="The core library, it contains the stock data management, the indicator implementation,..."];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+}

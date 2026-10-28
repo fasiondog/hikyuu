@@ -1,0 +1,169 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/moneymanager/imp/FixedCountTpsMM.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_fixed_count_tps_m_m_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">FixedCountTpsMM.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-02-20</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef TRADE_SYS_MONEYMANAGER_IMP_FIXEDCOUNTTPSMM_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define TRADE_SYS_MONEYMANAGER_IMP_FIXEDCOUNTTPSMM_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../MoneyManagerBase.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="foldopen" id="foldopen00016" data-start="{" data-end="};">
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html">   16</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#aa045458d7cc18d90103d52964bb0dbc8">FixedCountTpsMM</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_money_manager_base.html#a7f492ef7dae91c16123d892ddac60aa6">MoneyManagerBase</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#aa045458d7cc18d90103d52964bb0dbc8">   18</a></span>    <a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#aa045458d7cc18d90103d52964bb0dbc8">FixedCountTpsMM</a>();</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#af852dae0bc489044f45097843ebfd770">   19</a></span>    <a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#af852dae0bc489044f45097843ebfd770">FixedCountTpsMM</a>(<span class="keyword">const</span> vector&lt;double&gt;&amp; buy_counts, <span class="keyword">const</span> vector&lt;double&gt;&amp; sell_counts);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#adf91dc4bb21febf4f1ace9fdc63a2341">   20</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#adf91dc4bb21febf4f1ace9fdc63a2341">~FixedCountTpsMM</a>();</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#a55e1c4f2308c970e689e2652c4335a12">   22</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_money_manager_base.html#adfbe0726a617ac65fbd1229cbddba80d">MoneyManagerPtr</a> <a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#a55e1c4f2308c970e689e2652c4335a12">_clone</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#a7d12a54497e9b95e4bf7bdbcb5bf6f82">   23</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#a7d12a54497e9b95e4bf7bdbcb5bf6f82">_getBuyNumber</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                                 <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> risk, <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#a4fd6fa44574d0e225bf3182430a08e6a">   25</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_fixed_count_tps_m_m.html#a4fd6fa44574d0e225bf3182430a08e6a">_getSellNumber</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                                  <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> risk, <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    vector&lt;double&gt; m_buy_counts;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    vector&lt;double&gt; m_sell_counts;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_count_tps_m_m.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   34</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_friend" href="classhku_1_1_fixed_count_tps_m_m.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(<a class="code hl_function" href="classhku_1_1_money_manager_base.html#a7f492ef7dae91c16123d892ddac60aa6">MoneyManagerBase</a>);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_buy_counts);</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_sell_counts);</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    }</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>};</div>
+</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#endif </span><span class="comment">/* TRADE_SYS_MONEYMANAGER_IMP_FIXEDCAPITAL_FUNDS_MM_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_a4fd6fa44574d0e225bf3182430a08e6a"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#a4fd6fa44574d0e225bf3182430a08e6a">hku::FixedCountTpsMM::_getSellNumber</a></div><div class="ttdeci">virtual double _getSellNumber(const Datetime &amp;datetime, const Stock &amp;stock, price_t price, price_t risk, SystemPart from) override</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_a55e1c4f2308c970e689e2652c4335a12"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#a55e1c4f2308c970e689e2652c4335a12">hku::FixedCountTpsMM::_clone</a></div><div class="ttdeci">virtual MoneyManagerPtr _clone() override</div><div class="ttdoc">Interface for the subclass to clone its private variables</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_a7d12a54497e9b95e4bf7bdbcb5bf6f82"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#a7d12a54497e9b95e4bf7bdbcb5bf6f82">hku::FixedCountTpsMM::_getBuyNumber</a></div><div class="ttdeci">virtual double _getBuyNumber(const Datetime &amp;datetime, const Stock &amp;stock, price_t price, price_t risk, SystemPart from) override</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_aa045458d7cc18d90103d52964bb0dbc8"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#aa045458d7cc18d90103d52964bb0dbc8">hku::FixedCountTpsMM::FixedCountTpsMM</a></div><div class="ttdeci">FixedCountTpsMM()</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_ac98d07dd8f7b70e16ccb9a01abf56b9c"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">hku::FixedCountTpsMM::access</a></div><div class="ttdeci">friend class boost::serialization::access</div><div class="ttdef"><b>定义</b> FixedCountTpsMM.h:34</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_adf91dc4bb21febf4f1ace9fdc63a2341"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#adf91dc4bb21febf4f1ace9fdc63a2341">hku::FixedCountTpsMM::~FixedCountTpsMM</a></div><div class="ttdeci">virtual ~FixedCountTpsMM()</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_count_tps_m_m_html_af852dae0bc489044f45097843ebfd770"><div class="ttname"><a href="classhku_1_1_fixed_count_tps_m_m.html#af852dae0bc489044f45097843ebfd770">hku::FixedCountTpsMM::FixedCountTpsMM</a></div><div class="ttdeci">FixedCountTpsMM(const vector&lt; double &gt; &amp;buy_counts, const vector&lt; double &gt; &amp;sell_counts)</div></div>
+<div class="ttc" id="aclasshku_1_1_money_manager_base_html_a7f492ef7dae91c16123d892ddac60aa6"><div class="ttname"><a href="classhku_1_1_money_manager_base.html#a7f492ef7dae91c16123d892ddac60aa6">hku::MoneyManagerBase::MoneyManagerBase</a></div><div class="ttdeci">MoneyManagerBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_money_manager_base_html_adfbe0726a617ac65fbd1229cbddba80d"><div class="ttname"><a href="classhku_1_1_money_manager_base.html#adfbe0726a617ac65fbd1229cbddba80d">hku::MoneyManagerBase::MoneyManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; MoneyManagerBase &gt; MoneyManagerPtr</div><div class="ttdef"><b>定义</b> MoneyManagerBase.h:74</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="agroup___system_html_ga578a43d6f138141648ea4c76bad2d706"><div class="ttname"><a href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">hku::SystemPart</a></div><div class="ttdeci">SystemPart</div><div class="ttdoc">Enumeration definition of the system associated parts (the respective strategies),...</div><div class="ttdef"><b>定义</b> SystemPart.h:21</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_15bc3ef00d53ef552fe2a855f2f51407.html">moneymanager</a></li><li class="navelem"><a href="dir_91137c95a23c3ce4ad8cc236088f98e7.html">imp</a></li><li class="navelem"><b>FixedCountTpsMM.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

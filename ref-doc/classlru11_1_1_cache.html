@@ -1,0 +1,732 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: lru11::Cache&lt; Key, Value, Lock, Map &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classlru11_1_1_cache.html','','classlru11_1_1_cache-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">lru11::Cache&lt; Key, Value, Lock, Map &gt; 模板类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="_l_r_u_cache11_8h_source.html">LRUCache11.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a127e5d893104aeb8c930bd336543f2e1" id="r_a127e5d893104aeb8c930bd336543f2e1"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="structlru11_1_1_key_value_pair.html">KeyValuePair</a>&lt; Key, Value &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a127e5d893104aeb8c930bd336543f2e1">node_type</a></td></tr>
+<tr class="memitem:a6ccfadba850efde2a167aa946486bde5" id="r_a6ccfadba850efde2a167aa946486bde5"><td class="memItemLeft" align="right" valign="top">typedef std::list&lt; <a class="el" href="structlru11_1_1_key_value_pair.html">KeyValuePair</a>&lt; Key, Value &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ccfadba850efde2a167aa946486bde5">list_type</a></td></tr>
+<tr class="memitem:a6ec408686f93b8da0375c17c817622d8" id="r_a6ec408686f93b8da0375c17c817622d8"><td class="memItemLeft" align="right" valign="top">typedef Map&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ec408686f93b8da0375c17c817622d8">map_type</a></td></tr>
+<tr class="memitem:a41ad4f5198e342e02f3ef3b39777f373" id="r_a41ad4f5198e342e02f3ef3b39777f373"><td class="memItemLeft" align="right" valign="top">typedef Lock&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a41ad4f5198e342e02f3ef3b39777f373">lock_type</a></td></tr>
+<tr class="memitem:a6cd796ff1cf429e2a7c8ea5ed53c9ea6" id="r_a6cd796ff1cf429e2a7c8ea5ed53c9ea6"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> = std::lock_guard&lt;<a class="el" href="#a41ad4f5198e342e02f3ef3b39777f373">lock_type</a>&gt;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a69a0e81e98534fc16bc2338dfc8013a5" id="r_a69a0e81e98534fc16bc2338dfc8013a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69a0e81e98534fc16bc2338dfc8013a5">Cache</a> (size_t maxSize=64, size_t elasticity=10)</td></tr>
+<tr class="memdesc:a69a0e81e98534fc16bc2338dfc8013a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">the maxSize is the soft limit of keys and (maxSize + elasticity) is the hard limit the cache is allowed to grow till (maxSize + elasticity) and is pruned back to maxSize keys set maxSize = 0 for an unbounded cache (but in that case, you're better off using a std::unordered_map directly anyway!  <br /></td></tr>
+<tr class="memitem:a0ec32ccdfe845b0e824496adf577e34d" id="r_a0ec32ccdfe845b0e824496adf577e34d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ec32ccdfe845b0e824496adf577e34d">~Cache</a> ()=default</td></tr>
+<tr class="memitem:aef21643a4db6a9c0f873fbfa9849018f" id="r_aef21643a4db6a9c0f873fbfa9849018f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef21643a4db6a9c0f873fbfa9849018f">size</a> () const</td></tr>
+<tr class="memitem:aafd70e5e7c3a7714c2ad2b3ed5d27e58" id="r_aafd70e5e7c3a7714c2ad2b3ed5d27e58"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aafd70e5e7c3a7714c2ad2b3ed5d27e58">empty</a> () const</td></tr>
+<tr class="memitem:ac8b55077c5abbd9945394702750a8afb" id="r_ac8b55077c5abbd9945394702750a8afb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8b55077c5abbd9945394702750a8afb">clear</a> ()</td></tr>
+<tr class="memitem:a72801db36bfd7defc56939a93920ce1f" id="r_a72801db36bfd7defc56939a93920ce1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a72801db36bfd7defc56939a93920ce1f">insert</a> (const Key &amp;k, const Value &amp;v)</td></tr>
+<tr class="memitem:a2d4c1907b8a7607970d0baea3d383e00" id="r_a2d4c1907b8a7607970d0baea3d383e00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d4c1907b8a7607970d0baea3d383e00">insert</a> (const Key &amp;k, Value &amp;&amp;v)</td></tr>
+<tr class="memitem:af1000e528ffbc3d3af364a17733ed6af" id="r_af1000e528ffbc3d3af364a17733ed6af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1000e528ffbc3d3af364a17733ed6af">tryGet</a> (const Key &amp;kIn, Value &amp;vOut)</td></tr>
+<tr class="memitem:abe63c6e275d872efeb64d65152f3386d" id="r_abe63c6e275d872efeb64d65152f3386d"><td class="memItemLeft" align="right" valign="top">Value &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe63c6e275d872efeb64d65152f3386d">get</a> (const Key &amp;k)</td></tr>
+<tr class="memdesc:abe63c6e275d872efeb64d65152f3386d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The const reference returned here is only guaranteed to be valid till the next insert/delete It is changed to a non-const reference so that it can be modified.  <br /></td></tr>
+<tr class="memitem:a63ed35fc34418e15c040b57de68931fc" id="r_a63ed35fc34418e15c040b57de68931fc"><td class="memItemLeft" align="right" valign="top">Value&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63ed35fc34418e15c040b57de68931fc">getCopy</a> (const Key &amp;k)</td></tr>
+<tr class="memdesc:a63ed35fc34418e15c040b57de68931fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a copy of the stored object (if found)  <br /></td></tr>
+<tr class="memitem:a84d6cf31575e6f0cd86d6875c584748c" id="r_a84d6cf31575e6f0cd86d6875c584748c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84d6cf31575e6f0cd86d6875c584748c">remove</a> (const Key &amp;k)</td></tr>
+<tr class="memitem:acb54d4e0df59c867d97b125baccfa678" id="r_acb54d4e0df59c867d97b125baccfa678"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb54d4e0df59c867d97b125baccfa678">contains</a> (const Key &amp;k) const</td></tr>
+<tr class="memitem:a03095fcc4df1756aaf8765201946abfb" id="r_a03095fcc4df1756aaf8765201946abfb"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03095fcc4df1756aaf8765201946abfb">getMaxSize</a> () const</td></tr>
+<tr class="memitem:a07aaa205f52778da78261d27447a1f39" id="r_a07aaa205f52778da78261d27447a1f39"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07aaa205f52778da78261d27447a1f39">getElasticity</a> () const</td></tr>
+<tr class="memitem:a15465e3f7cbe2194cb31a17fe5972225" id="r_a15465e3f7cbe2194cb31a17fe5972225"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15465e3f7cbe2194cb31a17fe5972225">getMaxAllowedSize</a> () const</td></tr>
+<tr class="memitem:a23019466ee76516f05a82b17e9b71897" id="r_a23019466ee76516f05a82b17e9b71897"><td class="memTemplParams" colspan="2">template&lt;typename F&gt; </td></tr>
+<tr class="memitem:a23019466ee76516f05a82b17e9b71897 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23019466ee76516f05a82b17e9b71897">cwalk</a> (F &amp;f) const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:af9441a972228fe2eb097454c15688c70" id="r_af9441a972228fe2eb097454c15688c70"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af9441a972228fe2eb097454c15688c70">prune</a> ()</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt;<br />
+class lru11::Cache&lt; Key, Value, Lock, Map &gt;</div><pre class="fragment">The LRU Cache class templated by
+    Key - key type
+    Value - value type
+    MapType - an associative container like std::unordered_map
+    LockType - a lock type derived from the Lock class (default:
+</pre><p> <a class="el" href="classlru11_1_1_null_lock.html">NullLock</a> = no synchronization) </p><pre class="fragment">The default NullLock based template is not thread-safe, however passing
+</pre><p> Lock=std::mutex will make it thread-safe </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a6cd796ff1cf429e2a7c8ea5ed53c9ea6" name="a6cd796ff1cf429e2a7c8ea5ed53c9ea6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">&#9670;&#160;</a></span>Guard</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::Guard = std::lock_guard&lt;<a class="el" href="#a41ad4f5198e342e02f3ef3b39777f373">lock_type</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6ccfadba850efde2a167aa946486bde5" name="a6ccfadba850efde2a167aa946486bde5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ccfadba850efde2a167aa946486bde5">&#9670;&#160;</a></span>list_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::list&lt;<a class="el" href="structlru11_1_1_key_value_pair.html">KeyValuePair</a>&lt;Key, Value&gt; &gt; <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::list_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a41ad4f5198e342e02f3ef3b39777f373" name="a41ad4f5198e342e02f3ef3b39777f373"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41ad4f5198e342e02f3ef3b39777f373">&#9670;&#160;</a></span>lock_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Lock <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::lock_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6ec408686f93b8da0375c17c817622d8" name="a6ec408686f93b8da0375c17c817622d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ec408686f93b8da0375c17c817622d8">&#9670;&#160;</a></span>map_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Map <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::map_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a127e5d893104aeb8c930bd336543f2e1" name="a127e5d893104aeb8c930bd336543f2e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a127e5d893104aeb8c930bd336543f2e1">&#9670;&#160;</a></span>node_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="structlru11_1_1_key_value_pair.html">KeyValuePair</a>&lt;Key, Value&gt; <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::node_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a69a0e81e98534fc16bc2338dfc8013a5" name="a69a0e81e98534fc16bc2338dfc8013a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69a0e81e98534fc16bc2338dfc8013a5">&#9670;&#160;</a></span>Cache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::Cache </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>maxSize</em></span><span class="paramdefsep"> = </span><span class="paramdefval">64</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>elasticity</em></span><span class="paramdefsep"> = </span><span class="paramdefval">10</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the maxSize is the soft limit of keys and (maxSize + elasticity) is the hard limit the cache is allowed to grow till (maxSize + elasticity) and is pruned back to maxSize keys set maxSize = 0 for an unbounded cache (but in that case, you're better off using a std::unordered_map directly anyway! </p>
+<p>:) </p>
+
+</div>
+</div>
+<a id="a0ec32ccdfe845b0e824496adf577e34d" name="a0ec32ccdfe845b0e824496adf577e34d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ec32ccdfe845b0e824496adf577e34d">&#9670;&#160;</a></span>~Cache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::~<a class="el" href="classlru11_1_1_cache.html">Cache</a> </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ac8b55077c5abbd9945394702750a8afb" name="ac8b55077c5abbd9945394702750a8afb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8b55077c5abbd9945394702750a8afb">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb54d4e0df59c867d97b125baccfa678" name="acb54d4e0df59c867d97b125baccfa678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb54d4e0df59c867d97b125baccfa678">&#9670;&#160;</a></span>contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::contains </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a23019466ee76516f05a82b17e9b71897" name="a23019466ee76516f05a82b17e9b71897"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23019466ee76516f05a82b17e9b71897">&#9670;&#160;</a></span>cwalk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename F&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::cwalk </td>
+          <td>(</td>
+          <td class="paramtype">F &amp;</td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aafd70e5e7c3a7714c2ad2b3ed5d27e58" name="aafd70e5e7c3a7714c2ad2b3ed5d27e58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafd70e5e7c3a7714c2ad2b3ed5d27e58">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abe63c6e275d872efeb64d65152f3386d" name="abe63c6e275d872efeb64d65152f3386d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe63c6e275d872efeb64d65152f3386d">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Value &amp; <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::get </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The const reference returned here is only guaranteed to be valid till the next insert/delete It is changed to a non-const reference so that it can be modified. </p>
+<p>But note that this is a dangerous operation! </p>
+
+</div>
+</div>
+<a id="a63ed35fc34418e15c040b57de68931fc" name="a63ed35fc34418e15c040b57de68931fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63ed35fc34418e15c040b57de68931fc">&#9670;&#160;</a></span>getCopy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Value <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::getCopy </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>returns a copy of the stored object (if found) </p>
+
+</div>
+</div>
+<a id="a07aaa205f52778da78261d27447a1f39" name="a07aaa205f52778da78261d27447a1f39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07aaa205f52778da78261d27447a1f39">&#9670;&#160;</a></span>getElasticity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::getElasticity </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a15465e3f7cbe2194cb31a17fe5972225" name="a15465e3f7cbe2194cb31a17fe5972225"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15465e3f7cbe2194cb31a17fe5972225">&#9670;&#160;</a></span>getMaxAllowedSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::getMaxAllowedSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a03095fcc4df1756aaf8765201946abfb" name="a03095fcc4df1756aaf8765201946abfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03095fcc4df1756aaf8765201946abfb">&#9670;&#160;</a></span>getMaxSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::getMaxSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a72801db36bfd7defc56939a93920ce1f" name="a72801db36bfd7defc56939a93920ce1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72801db36bfd7defc56939a93920ce1f">&#9670;&#160;</a></span>insert() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::insert </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Value &amp;</td>          <td class="paramname"><span class="paramname"><em>v</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2d4c1907b8a7607970d0baea3d383e00" name="a2d4c1907b8a7607970d0baea3d383e00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d4c1907b8a7607970d0baea3d383e00">&#9670;&#160;</a></span>insert() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::insert </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>v</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af9441a972228fe2eb097454c15688c70" name="af9441a972228fe2eb097454c15688c70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9441a972228fe2eb097454c15688c70">&#9670;&#160;</a></span>prune()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::prune </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a84d6cf31575e6f0cd86d6875c584748c" name="a84d6cf31575e6f0cd86d6875c584748c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84d6cf31575e6f0cd86d6875c584748c">&#9670;&#160;</a></span>remove()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::remove </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aef21643a4db6a9c0f873fbfa9849018f" name="aef21643a4db6a9c0f873fbfa9849018f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef21643a4db6a9c0f873fbfa9849018f">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af1000e528ffbc3d3af364a17733ed6af" name="af1000e528ffbc3d3af364a17733ed6af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1000e528ffbc3d3af364a17733ed6af">&#9670;&#160;</a></span>tryGet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key, class Value, class Lock = NullLock, class Map = std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classlru11_1_1_cache.html">lru11::Cache</a>&lt; Key, Value, Lock, Map &gt;::tryGet </td>
+          <td>(</td>
+          <td class="paramtype">const Key &amp;</td>          <td class="paramname"><span class="paramname"><em>kIn</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value &amp;</td>          <td class="paramname"><span class="paramname"><em>vOut</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_l_r_u_cache11_8h_source.html">LRUCache11.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacelru11.html">lru11</a></li><li class="navelem"><a href="classlru11_1_1_cache.html">Cache</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

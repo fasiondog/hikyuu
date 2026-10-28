@@ -1,0 +1,1773 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::TimeDelta类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_time_delta.html','','classhku_1_1_time_delta-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::TimeDelta类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___data_type.html">DataType basic data type definitions</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Duration, used for the time calculation  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_time_delta_8h_source.html">TimeDelta.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ae640491fce702951dc0e67d76a591d47" id="r_ae640491fce702951dc0e67d76a591d47"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> (<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a>=0, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a731dd68a298dde33ed5f823fbb62fb52">hours</a>=0, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a>=0, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a6533f8873544fbaee127ebe1f7d10104">seconds</a>=0, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a>=0, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a>=0)</td></tr>
+<tr class="memdesc:ae640491fce702951dc0e67d76a591d47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:acef913e32b1c3de904e72501cd3d7d27" id="r_acef913e32b1c3de904e72501cd3d7d27"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acef913e32b1c3de904e72501cd3d7d27">TimeDelta</a> (bt::time_duration td)</td></tr>
+<tr class="memdesc:acef913e32b1c3de904e72501cd3d7d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from boost::posix_time::time_duration  <br /></td></tr>
+<tr class="memitem:a03b18591c752bfb561a1c87f0f6b6d47" id="r_a03b18591c752bfb561a1c87f0f6b6d47"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:a03b18591c752bfb561a1c87f0f6b6d47 template"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03b18591c752bfb561a1c87f0f6b6d47">TimeDelta</a> (std::chrono::duration&lt; Rep, Period &gt; dur)</td></tr>
+<tr class="memdesc:a03b18591c752bfb561a1c87f0f6b6d47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from std::chrono::duration  <br /></td></tr>
+<tr class="memitem:a067807164bdadd686ffb8614bf93a79c" id="r_a067807164bdadd686ffb8614bf93a79c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a067807164bdadd686ffb8614bf93a79c">TimeDelta</a> (const std::string &amp;delta)</td></tr>
+<tr class="memdesc:a067807164bdadd686ffb8614bf93a79c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from a string, the format: -1 days, hh:mm:ss.000000)  <br /></td></tr>
+<tr class="memitem:a1dbd73c1d5440b7600201a0c37b91787" id="r_a1dbd73c1d5440b7600201a0c37b91787"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1dbd73c1d5440b7600201a0c37b91787">TimeDelta</a> (const <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> &amp;)=default</td></tr>
+<tr class="memdesc:a1dbd73c1d5440b7600201a0c37b91787"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment constructor  <br /></td></tr>
+<tr class="memitem:a5f29fd0a90bb426d834d1f251b660cf6" id="r_a5f29fd0a90bb426d834d1f251b660cf6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f29fd0a90bb426d834d1f251b660cf6">operator=</a> (const <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> &amp;other)</td></tr>
+<tr class="memdesc:a5f29fd0a90bb426d834d1f251b660cf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment function  <br /></td></tr>
+<tr class="memitem:ad51fe836c4e013ab4a838c1c2e8ccfae" id="r_ad51fe836c4e013ab4a838c1c2e8ccfae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a> () const</td></tr>
+<tr class="memdesc:ad51fe836c4e013ab4a838c1c2e8ccfae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the normalized number of the days  <br /></td></tr>
+<tr class="memitem:a731dd68a298dde33ed5f823fbb62fb52" id="r_a731dd68a298dde33ed5f823fbb62fb52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a731dd68a298dde33ed5f823fbb62fb52">hours</a> () const</td></tr>
+<tr class="memdesc:a731dd68a298dde33ed5f823fbb62fb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the normalized hours [0, 23]  <br /></td></tr>
+<tr class="memitem:a65f6b09fab81bbd255e2c7b3eb3f6faa" id="r_a65f6b09fab81bbd255e2c7b3eb3f6faa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a> () const</td></tr>
+<tr class="memdesc:a65f6b09fab81bbd255e2c7b3eb3f6faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the normalized minutes [0, 59]  <br /></td></tr>
+<tr class="memitem:a6533f8873544fbaee127ebe1f7d10104" id="r_a6533f8873544fbaee127ebe1f7d10104"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6533f8873544fbaee127ebe1f7d10104">seconds</a> () const</td></tr>
+<tr class="memdesc:a6533f8873544fbaee127ebe1f7d10104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the normalized seconds [0, 59]  <br /></td></tr>
+<tr class="memitem:a4e8dea880ff28b7ea6395b5f7d9f85c6" id="r_a4e8dea880ff28b7ea6395b5f7d9f85c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a> () const</td></tr>
+<tr class="memdesc:a4e8dea880ff28b7ea6395b5f7d9f85c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the normalized milliseconds [0, 999]  <br /></td></tr>
+<tr class="memitem:a97945aed5a10dba6b6cd3bb4cc398fd6" id="r_a97945aed5a10dba6b6cd3bb4cc398fd6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a> () const</td></tr>
+<tr class="memdesc:a97945aed5a10dba6b6cd3bb4cc398fd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the normalized microseconds [0, 999]  <br /></td></tr>
+<tr class="memitem:a450612f14c6711dd7596bf5d95efa040" id="r_a450612f14c6711dd7596bf5d95efa040"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a450612f14c6711dd7596bf5d95efa040">ticks</a> () const</td></tr>
+<tr class="memdesc:a450612f14c6711dd7596bf5d95efa040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of the ticks, i.e.  <br /></td></tr>
+<tr class="memitem:a9f634cabf4a9c75d910e378bd94fb2a8" id="r_a9f634cabf4a9c75d910e378bd94fb2a8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f634cabf4a9c75d910e378bd94fb2a8">total_days</a> () const</td></tr>
+<tr class="memdesc:a9f634cabf4a9c75d910e378bd94fb2a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the total days with a fraction  <br /></td></tr>
+<tr class="memitem:a087e8b3fe4476c4e4c74acd9225f852e" id="r_a087e8b3fe4476c4e4c74acd9225f852e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a087e8b3fe4476c4e4c74acd9225f852e">total_hours</a> () const</td></tr>
+<tr class="memdesc:a087e8b3fe4476c4e4c74acd9225f852e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the total hours with a fraction  <br /></td></tr>
+<tr class="memitem:af2846ead4f0c906d0aa94c43caf46305" id="r_af2846ead4f0c906d0aa94c43caf46305"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2846ead4f0c906d0aa94c43caf46305">total_minutes</a> () const</td></tr>
+<tr class="memdesc:af2846ead4f0c906d0aa94c43caf46305"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the total minutes with a fraction  <br /></td></tr>
+<tr class="memitem:aa5a97d0887dfebade7485247893a8754" id="r_aa5a97d0887dfebade7485247893a8754"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5a97d0887dfebade7485247893a8754">total_seconds</a> () const</td></tr>
+<tr class="memdesc:aa5a97d0887dfebade7485247893a8754"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the total seconds with a fraction  <br /></td></tr>
+<tr class="memitem:a738be5861930ec7b62c7ace178296aad" id="r_a738be5861930ec7b62c7ace178296aad"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a738be5861930ec7b62c7ace178296aad">total_milliseconds</a> () const</td></tr>
+<tr class="memdesc:a738be5861930ec7b62c7ace178296aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the total milliseconds with a fraction  <br /></td></tr>
+<tr class="memitem:a49a641ab809047c64aaa0977f61a9448" id="r_a49a641ab809047c64aaa0977f61a9448"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a49a641ab809047c64aaa0977f61a9448">isNegative</a> () const</td></tr>
+<tr class="memdesc:a49a641ab809047c64aaa0977f61a9448"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is a negative duration  <br /></td></tr>
+<tr class="memitem:ac869dbaa6f71ae3f7a1a75b753a323cd" id="r_ac869dbaa6f71ae3f7a1a75b753a323cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac869dbaa6f71ae3f7a1a75b753a323cd">abs</a> () const</td></tr>
+<tr class="memdesc:ac869dbaa6f71ae3f7a1a75b753a323cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the absolute value  <br /></td></tr>
+<tr class="memitem:a78c8022d9b7ad97e1a5180333edc2bac" id="r_a78c8022d9b7ad97e1a5180333edc2bac"><td class="memItemLeft" align="right" valign="top">bt::time_duration&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78c8022d9b7ad97e1a5180333edc2bac">time_duration</a> () const</td></tr>
+<tr class="memdesc:a78c8022d9b7ad97e1a5180333edc2bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to boost::posix_time::time_duration  <br /></td></tr>
+<tr class="memitem:abe21cf3b9bdf500bb36c446a9938d7da" id="r_abe21cf3b9bdf500bb36c446a9938d7da"><td class="memTemplParams" colspan="2">template&lt;typename Duration = std::chrono::microseconds&gt; </td></tr>
+<tr class="memitem:abe21cf3b9bdf500bb36c446a9938d7da template"><td class="memItemLeft" align="right" valign="top">Duration&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a> () const</td></tr>
+<tr class="memdesc:abe21cf3b9bdf500bb36c446a9938d7da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to std::chrono::duration  <br /></td></tr>
+<tr class="memitem:aaf308e6a7dbe956b33ae0da808f552ce" id="r_aaf308e6a7dbe956b33ae0da808f552ce"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf308e6a7dbe956b33ae0da808f552ce">str</a> () const</td></tr>
+<tr class="memdesc:aaf308e6a7dbe956b33ae0da808f552ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to a string, the format: -1 days hh:mm:ss.000000)  <br /></td></tr>
+<tr class="memitem:a525cafee4e1bd8a7e2b515a5748e1f10" id="r_a525cafee4e1bd8a7e2b515a5748e1f10"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a525cafee4e1bd8a7e2b515a5748e1f10">repr</a> () const</td></tr>
+<tr class="memdesc:a525cafee4e1bd8a7e2b515a5748e1f10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to a string, the format: TimeDelta(days,hours,mins,secs,millisecs,microsecs)  <br /></td></tr>
+<tr class="memitem:a6331ceb4e90b1cf71d9c1349ebd13cff" id="r_a6331ceb4e90b1cf71d9c1349ebd13cff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6331ceb4e90b1cf71d9c1349ebd13cff">operator+</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memdesc:a6331ceb4e90b1cf71d9c1349ebd13cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add two durations  <br /></td></tr>
+<tr class="memitem:ae53e556271ab0be83d8f68feb2917eeb" id="r_ae53e556271ab0be83d8f68feb2917eeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae53e556271ab0be83d8f68feb2917eeb">operator-</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memdesc:ae53e556271ab0be83d8f68feb2917eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subtract two durations  <br /></td></tr>
+<tr class="memitem:a0edeff81a3b551b0dd9bd78caa1ead1a" id="r_a0edeff81a3b551b0dd9bd78caa1ead1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0edeff81a3b551b0dd9bd78caa1ead1a">operator+</a> () const</td></tr>
+<tr class="memdesc:a0edeff81a3b551b0dd9bd78caa1ead1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The + operator, it returns the same value  <br /></td></tr>
+<tr class="memitem:af8800c3fcf8e60ad17a0d111726b181e" id="r_af8800c3fcf8e60ad17a0d111726b181e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8800c3fcf8e60ad17a0d111726b181e">operator-</a> () const</td></tr>
+<tr class="memdesc:af8800c3fcf8e60ad17a0d111726b181e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The - operator, it gives the negative value, equivalent to TimeDelta(0) minus itself  <br /></td></tr>
+<tr class="memitem:a4fc5025a2e8c67717ecdedcff46e1ea9" id="r_a4fc5025a2e8c67717ecdedcff46e1ea9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4fc5025a2e8c67717ecdedcff46e1ea9">operator*</a> (double p) const</td></tr>
+<tr class="memdesc:a4fc5025a2e8c67717ecdedcff46e1ea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the duration by a coefficient, the result is rounded  <br /></td></tr>
+<tr class="memitem:ae0c87a20e64b26f3a32a00c929e18e6b" id="r_ae0c87a20e64b26f3a32a00c929e18e6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0c87a20e64b26f3a32a00c929e18e6b">operator/</a> (double p) const</td></tr>
+<tr class="memdesc:ae0c87a20e64b26f3a32a00c929e18e6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divide the duration by a coefficient, the result is rounded.  <br /></td></tr>
+<tr class="memitem:a753cf969ffdc284a7dc946675c7355ff" id="r_a753cf969ffdc284a7dc946675c7355ff"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a753cf969ffdc284a7dc946675c7355ff">operator/</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memdesc:a753cf969ffdc284a7dc946675c7355ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divide two durations to get their ratio.  <br /></td></tr>
+<tr class="memitem:a116903242ffa233d124677e3440c8e92" id="r_a116903242ffa233d124677e3440c8e92"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a116903242ffa233d124677e3440c8e92">floorDiv</a> (double p) const</td></tr>
+<tr class="memdesc:a116903242ffa233d124677e3440c8e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Floor division, the decimal part is truncated directly  <br /></td></tr>
+<tr class="memitem:ad1353e664af7448ee5cb69c4ea265618" id="r_ad1353e664af7448ee5cb69c4ea265618"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1353e664af7448ee5cb69c4ea265618">operator%</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memdesc:ad1353e664af7448ee5cb69c4ea265618"><td class="mdescLeft">&#160;</td><td class="mdescRight">The remainder of the division of two durations.  <br /></td></tr>
+<tr class="memitem:a78f6da39c746dcad4acc81e717163fc3" id="r_a78f6da39c746dcad4acc81e717163fc3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78f6da39c746dcad4acc81e717163fc3">operator==</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memitem:a7e1b1ad942ac451f188e36494e1f054e" id="r_a7e1b1ad942ac451f188e36494e1f054e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e1b1ad942ac451f188e36494e1f054e">operator!=</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memitem:a17ab194dae63558ec3154b0b9d17c30f" id="r_a17ab194dae63558ec3154b0b9d17c30f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a17ab194dae63558ec3154b0b9d17c30f">operator&gt;</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memitem:a4091d90668775127cb2a9cb31217cf9d" id="r_a4091d90668775127cb2a9cb31217cf9d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4091d90668775127cb2a9cb31217cf9d">operator&lt;</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memitem:ae052025c35852d78a8e9803e31e3aca1" id="r_ae052025c35852d78a8e9803e31e3aca1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae052025c35852d78a8e9803e31e3aca1">operator&gt;=</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memitem:a838ba36be5e68fc056c49178abff10b8" id="r_a838ba36be5e68fc056c49178abff10b8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a838ba36be5e68fc056c49178abff10b8">operator&lt;=</a> (<a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> td) const</td></tr>
+<tr class="memitem:aeae6a291358a1423b4a1a09ae05c7bbf" id="r_aeae6a291358a1423b4a1a09ae05c7bbf"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:aeae6a291358a1423b4a1a09ae05c7bbf template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeae6a291358a1423b4a1a09ae05c7bbf">operator+</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:aeae6a291358a1423b4a1a09ae05c7bbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a chrono duration to the duration  <br /></td></tr>
+<tr class="memitem:adedbfa23572d5c0924c003cdc33d11b2" id="r_adedbfa23572d5c0924c003cdc33d11b2"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:adedbfa23572d5c0924c003cdc33d11b2 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adedbfa23572d5c0924c003cdc33d11b2">operator-</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:adedbfa23572d5c0924c003cdc33d11b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subtract a chrono duration from the duration  <br /></td></tr>
+<tr class="memitem:af0da5ff83cd50536fc6681f383f72c0e" id="r_af0da5ff83cd50536fc6681f383f72c0e"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:af0da5ff83cd50536fc6681f383f72c0e template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0da5ff83cd50536fc6681f383f72c0e">operator==</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:af0da5ff83cd50536fc6681f383f72c0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare whether it is equal to a chrono duration  <br /></td></tr>
+<tr class="memitem:ae0e2566a201d83af50dda68398d547d1" id="r_ae0e2566a201d83af50dda68398d547d1"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:ae0e2566a201d83af50dda68398d547d1 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0e2566a201d83af50dda68398d547d1">operator!=</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:ae0e2566a201d83af50dda68398d547d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare whether it is not equal to a chrono duration  <br /></td></tr>
+<tr class="memitem:abffbd6811edd561a97362b683448c180" id="r_abffbd6811edd561a97362b683448c180"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:abffbd6811edd561a97362b683448c180 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abffbd6811edd561a97362b683448c180">operator&gt;</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:abffbd6811edd561a97362b683448c180"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare whether it is greater than a chrono duration  <br /></td></tr>
+<tr class="memitem:ae8b1d72a6d0ccbb21395a27e5712160f" id="r_ae8b1d72a6d0ccbb21395a27e5712160f"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:ae8b1d72a6d0ccbb21395a27e5712160f template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8b1d72a6d0ccbb21395a27e5712160f">operator&lt;</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:ae8b1d72a6d0ccbb21395a27e5712160f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare whether it is less than a chrono duration  <br /></td></tr>
+<tr class="memitem:a9062a2e96e68015d552431733bff67f1" id="r_a9062a2e96e68015d552431733bff67f1"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:a9062a2e96e68015d552431733bff67f1 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9062a2e96e68015d552431733bff67f1">operator&gt;=</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:a9062a2e96e68015d552431733bff67f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare whether it is greater than or equal to a chrono duration  <br /></td></tr>
+<tr class="memitem:aad9ea9a614621c89a997d4591d0e5fef" id="r_aad9ea9a614621c89a997d4591d0e5fef"><td class="memTemplParams" colspan="2">template&lt;typename Rep, typename Period&gt; </td></tr>
+<tr class="memitem:aad9ea9a614621c89a997d4591d0e5fef template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad9ea9a614621c89a997d4591d0e5fef">operator&lt;=</a> (std::chrono::duration&lt; Rep, Period &gt; <a class="el" href="#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>) const</td></tr>
+<tr class="memdesc:aad9ea9a614621c89a997d4591d0e5fef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare whether it is less than or equal to a chrono duration  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a56c61b6b81667e29dd86465bc566ace8" id="r_a56c61b6b81667e29dd86465bc566ace8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56c61b6b81667e29dd86465bc566ace8">min</a> ()</td></tr>
+<tr class="memdesc:a56c61b6b81667e29dd86465bc566ace8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the minimum expressible value <a class="el" href="classhku_1_1_time_delta.html" title="Duration, used for the time calculation">TimeDelta</a>(-99999999)  <br /></td></tr>
+<tr class="memitem:ae6b1c46de963a1370d2da0f5fe0598be" id="r_ae6b1c46de963a1370d2da0f5fe0598be"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6b1c46de963a1370d2da0f5fe0598be">max</a> ()</td></tr>
+<tr class="memdesc:ae6b1c46de963a1370d2da0f5fe0598be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum expressible value TimeDelta(99999999, 23, 59, 59, 999, 999)  <br /></td></tr>
+<tr class="memitem:ac6ce8778755752d8fd5348ad0565e541" id="r_ac6ce8778755752d8fd5348ad0565e541"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac6ce8778755752d8fd5348ad0565e541">maxTicks</a> ()</td></tr>
+<tr class="memdesc:ac6ce8778755752d8fd5348ad0565e541"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of the ticks supported  <br /></td></tr>
+<tr class="memitem:af0c8e0193ab618b3cf9bc4d78b0b84d1" id="r_af0c8e0193ab618b3cf9bc4d78b0b84d1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0c8e0193ab618b3cf9bc4d78b0b84d1">minTicks</a> ()</td></tr>
+<tr class="memdesc:af0c8e0193ab618b3cf9bc4d78b0b84d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum number of the ticks supported  <br /></td></tr>
+<tr class="memitem:a6e3adb876b7a25dc9eac1076a5599b28" id="r_a6e3adb876b7a25dc9eac1076a5599b28"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6e3adb876b7a25dc9eac1076a5599b28">resolution</a> ()</td></tr>
+<tr class="memdesc:a6e3adb876b7a25dc9eac1076a5599b28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the expression precision 1 microsecond, TimeDelta(0, 0, 0, 0, 0, 1)  <br /></td></tr>
+<tr class="memitem:a9d8901b88a1e74717baf240f37d79b08" id="r_a9d8901b88a1e74717baf240f37d79b08"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d8901b88a1e74717baf240f37d79b08">fromTicks</a> (<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a450612f14c6711dd7596bf5d95efa040">ticks</a>)</td></tr>
+<tr class="memdesc:a9d8901b88a1e74717baf240f37d79b08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create from the ticks  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Duration, used for the time calculation </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ae640491fce702951dc0e67d76a591d47" name="ae640491fce702951dc0e67d76a591d47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae640491fce702951dc0e67d76a591d47">&#9670;&#160;</a></span>TimeDelta() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TimeDelta::TimeDelta </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>days</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>hours</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>minutes</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>seconds</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>milliseconds</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>microseconds</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor </p>
+<dl class="section note"><dt>注解</dt><dd><pre>
+1. Total duration range: TimeDetla(-99999999) - TimeDelta(99999999, 23, 59, 59, 999, 999).
+2. It differs from boost::posix_time::time_duration: as long as one parameter of
+time_duration is negative it is regarded as a negative duration, while <a class="el" href="classhku_1_1_time_delta.html" title="Duration, used for the time calculation">TimeDelta</a> is the sum
+of the ticks represented by every parameter.
+3. When it is a negative duration only <a class="el" href="#ad51fe836c4e013ab4a838c1c2e8ccfae" title="Get the normalized number of the days">days()</a> is negative, all the other parts (<a class="el" href="#a731dd68a298dde33ed5f823fbb62fb52" title="Get the normalized hours [0, 23]">hours()</a> ...)
+   are positive. This is consistent with the behavior of python datetime.timedelta.
+</pre> </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">days</td><td>days [-99999999, 99999999] </td></tr>
+    <tr><td class="paramname">hours</td><td>hours [-100000, 100000] </td></tr>
+    <tr><td class="paramname">minutes</td><td>minutes [-100000, 100000] </td></tr>
+    <tr><td class="paramname">seconds</td><td>seconds [-8639900, 8639900]) </td></tr>
+    <tr><td class="paramname">milliseconds</td><td>milliseconds [-86399000000, 86399000000]) </td></tr>
+    <tr><td class="paramname">microseconds</td><td>microseconds [-86399000000, 86399000000]) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="acef913e32b1c3de904e72501cd3d7d27" name="acef913e32b1c3de904e72501cd3d7d27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acef913e32b1c3de904e72501cd3d7d27">&#9670;&#160;</a></span>TimeDelta() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TimeDelta::TimeDelta </td>
+          <td>(</td>
+          <td class="paramtype">bt::time_duration</td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct from boost::posix_time::time_duration </p>
+
+</div>
+</div>
+<a id="a03b18591c752bfb561a1c87f0f6b6d47" name="a03b18591c752bfb561a1c87f0f6b6d47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03b18591c752bfb561a1c87f0f6b6d47">&#9670;&#160;</a></span>TimeDelta() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TimeDelta::TimeDelta </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>dur</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct from std::chrono::duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dur</td><td>the chrono duration object </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a067807164bdadd686ffb8614bf93a79c" name="a067807164bdadd686ffb8614bf93a79c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a067807164bdadd686ffb8614bf93a79c">&#9670;&#160;</a></span>TimeDelta() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TimeDelta::TimeDelta </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>delta</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct from a string, the format: -1 days, hh:mm:ss.000000) </p>
+
+</div>
+</div>
+<a id="a1dbd73c1d5440b7600201a0c37b91787" name="a1dbd73c1d5440b7600201a0c37b91787"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dbd73c1d5440b7600201a0c37b91787">&#9670;&#160;</a></span>TimeDelta() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TimeDelta::TimeDelta </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assignment constructor </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ac869dbaa6f71ae3f7a1a75b753a323cd" name="ac869dbaa6f71ae3f7a1a75b753a323cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac869dbaa6f71ae3f7a1a75b753a323cd">&#9670;&#160;</a></span>abs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::abs </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the absolute value </p>
+
+</div>
+</div>
+<a id="ad51fe836c4e013ab4a838c1c2e8ccfae" name="ad51fe836c4e013ab4a838c1c2e8ccfae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad51fe836c4e013ab4a838c1c2e8ccfae">&#9670;&#160;</a></span>days()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::days </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the normalized number of the days </p>
+
+</div>
+</div>
+<a id="abe21cf3b9bdf500bb36c446a9938d7da" name="abe21cf3b9bdf500bb36c446a9938d7da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe21cf3b9bdf500bb36c446a9938d7da">&#9670;&#160;</a></span>duration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Duration = std::chrono::microseconds&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Duration hku::TimeDelta::duration </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert to std::chrono::duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Duration</td><td>the target chrono duration type, microseconds by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the converted chrono duration </dd></dl>
+
+</div>
+</div>
+<a id="a116903242ffa233d124677e3440c8e92" name="a116903242ffa233d124677e3440c8e92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a116903242ffa233d124677e3440c8e92">&#9670;&#160;</a></span>floorDiv()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::floorDiv </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Floor division, the decimal part is truncated directly </p>
+
+</div>
+</div>
+<a id="a9d8901b88a1e74717baf240f37d79b08" name="a9d8901b88a1e74717baf240f37d79b08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d8901b88a1e74717baf240f37d79b08">&#9670;&#160;</a></span>fromTicks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::fromTicks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>ticks</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create from the ticks </p>
+
+</div>
+</div>
+<a id="a731dd68a298dde33ed5f823fbb62fb52" name="a731dd68a298dde33ed5f823fbb62fb52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a731dd68a298dde33ed5f823fbb62fb52">&#9670;&#160;</a></span>hours()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::hours </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the normalized hours [0, 23] </p>
+
+</div>
+</div>
+<a id="a49a641ab809047c64aaa0977f61a9448" name="a49a641ab809047c64aaa0977f61a9448"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49a641ab809047c64aaa0977f61a9448">&#9670;&#160;</a></span>isNegative()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::isNegative </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether it is a negative duration </p>
+
+</div>
+</div>
+<a id="ae6b1c46de963a1370d2da0f5fe0598be" name="ae6b1c46de963a1370d2da0f5fe0598be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6b1c46de963a1370d2da0f5fe0598be">&#9670;&#160;</a></span>max()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::max </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the maximum expressible value TimeDelta(99999999, 23, 59, 59, 999, 999) </p>
+
+</div>
+</div>
+<a id="ac6ce8778755752d8fd5348ad0565e541" name="ac6ce8778755752d8fd5348ad0565e541"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6ce8778755752d8fd5348ad0565e541">&#9670;&#160;</a></span>maxTicks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::maxTicks </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The maximum number of the ticks supported </p>
+
+</div>
+</div>
+<a id="a97945aed5a10dba6b6cd3bb4cc398fd6" name="a97945aed5a10dba6b6cd3bb4cc398fd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97945aed5a10dba6b6cd3bb4cc398fd6">&#9670;&#160;</a></span>microseconds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::microseconds </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the normalized microseconds [0, 999] </p>
+
+</div>
+</div>
+<a id="a4e8dea880ff28b7ea6395b5f7d9f85c6" name="a4e8dea880ff28b7ea6395b5f7d9f85c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e8dea880ff28b7ea6395b5f7d9f85c6">&#9670;&#160;</a></span>milliseconds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::milliseconds </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the normalized milliseconds [0, 999] </p>
+
+</div>
+</div>
+<a id="a56c61b6b81667e29dd86465bc566ace8" name="a56c61b6b81667e29dd86465bc566ace8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56c61b6b81667e29dd86465bc566ace8">&#9670;&#160;</a></span>min()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::min </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the minimum expressible value <a class="el" href="classhku_1_1_time_delta.html" title="Duration, used for the time calculation">TimeDelta</a>(-99999999) </p>
+
+</div>
+</div>
+<a id="af0c8e0193ab618b3cf9bc4d78b0b84d1" name="af0c8e0193ab618b3cf9bc4d78b0b84d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0c8e0193ab618b3cf9bc4d78b0b84d1">&#9670;&#160;</a></span>minTicks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::minTicks </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The minimum number of the ticks supported </p>
+
+</div>
+</div>
+<a id="a65f6b09fab81bbd255e2c7b3eb3f6faa" name="a65f6b09fab81bbd255e2c7b3eb3f6faa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65f6b09fab81bbd255e2c7b3eb3f6faa">&#9670;&#160;</a></span>minutes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::minutes </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the normalized minutes [0, 59] </p>
+
+</div>
+</div>
+<a id="ae0e2566a201d83af50dda68398d547d1" name="ae0e2566a201d83af50dda68398d547d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0e2566a201d83af50dda68398d547d1">&#9670;&#160;</a></span>operator!=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compare whether it is not equal to a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool </dd></dl>
+
+</div>
+</div>
+<a id="a7e1b1ad942ac451f188e36494e1f054e" name="a7e1b1ad942ac451f188e36494e1f054e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e1b1ad942ac451f188e36494e1f054e">&#9670;&#160;</a></span>operator!=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad1353e664af7448ee5cb69c4ea265618" name="ad1353e664af7448ee5cb69c4ea265618"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1353e664af7448ee5cb69c4ea265618">&#9670;&#160;</a></span>operator%()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator% </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The remainder of the division of two durations. </p>
+<p><a class="el" href="classhku_1_1exception.html">hku::exception</a> is thrown when it is divided by a zero duration. </p>
+
+</div>
+</div>
+<a id="a4fc5025a2e8c67717ecdedcff46e1ea9" name="a4fc5025a2e8c67717ecdedcff46e1ea9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fc5025a2e8c67717ecdedcff46e1ea9">&#9670;&#160;</a></span>operator*()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator* </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Multiply the duration by a coefficient, the result is rounded </p>
+
+</div>
+</div>
+<a id="a0edeff81a3b551b0dd9bd78caa1ead1a" name="a0edeff81a3b551b0dd9bd78caa1ead1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0edeff81a3b551b0dd9bd78caa1ead1a">&#9670;&#160;</a></span>operator+() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator+ </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The + operator, it returns the same value </p>
+
+</div>
+</div>
+<a id="aeae6a291358a1423b4a1a09ae05c7bbf" name="aeae6a291358a1423b4a1a09ae05c7bbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeae6a291358a1423b4a1a09ae05c7bbf">&#9670;&#160;</a></span>operator+() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator+ </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a chrono duration to the duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_time_delta.html" title="Duration, used for the time calculation">TimeDelta</a> </dd></dl>
+
+</div>
+</div>
+<a id="a6331ceb4e90b1cf71d9c1349ebd13cff" name="a6331ceb4e90b1cf71d9c1349ebd13cff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6331ceb4e90b1cf71d9c1349ebd13cff">&#9670;&#160;</a></span>operator+() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add two durations </p>
+
+</div>
+</div>
+<a id="af8800c3fcf8e60ad17a0d111726b181e" name="af8800c3fcf8e60ad17a0d111726b181e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8800c3fcf8e60ad17a0d111726b181e">&#9670;&#160;</a></span>operator-() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator- </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The - operator, it gives the negative value, equivalent to TimeDelta(0) minus itself </p>
+
+</div>
+</div>
+<a id="adedbfa23572d5c0924c003cdc33d11b2" name="adedbfa23572d5c0924c003cdc33d11b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adedbfa23572d5c0924c003cdc33d11b2">&#9670;&#160;</a></span>operator-() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator- </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subtract a chrono duration from the duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_time_delta.html" title="Duration, used for the time calculation">TimeDelta</a> </dd></dl>
+
+</div>
+</div>
+<a id="ae53e556271ab0be83d8f68feb2917eeb" name="ae53e556271ab0be83d8f68feb2917eeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae53e556271ab0be83d8f68feb2917eeb">&#9670;&#160;</a></span>operator-() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subtract two durations </p>
+
+</div>
+</div>
+<a id="ae0c87a20e64b26f3a32a00c929e18e6b" name="ae0c87a20e64b26f3a32a00c929e18e6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0c87a20e64b26f3a32a00c929e18e6b">&#9670;&#160;</a></span>operator/() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::operator/ </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Divide the duration by a coefficient, the result is rounded. </p>
+<p><a class="el" href="classhku_1_1exception.html">hku::exception</a> is thrown if it is divided by zero. Use floorDiv if the rounding is not desired </p>
+
+</div>
+</div>
+<a id="a753cf969ffdc284a7dc946675c7355ff" name="a753cf969ffdc284a7dc946675c7355ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a753cf969ffdc284a7dc946675c7355ff">&#9670;&#160;</a></span>operator/() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::TimeDelta::operator/ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Divide two durations to get their ratio. </p>
+<p><a class="el" href="classhku_1_1exception.html">hku::exception</a> is thrown when it is divided by a zero duration. </p>
+
+</div>
+</div>
+<a id="ae8b1d72a6d0ccbb21395a27e5712160f" name="ae8b1d72a6d0ccbb21395a27e5712160f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8b1d72a6d0ccbb21395a27e5712160f">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compare whether it is less than a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool </dd></dl>
+
+</div>
+</div>
+<a id="a4091d90668775127cb2a9cb31217cf9d" name="a4091d90668775127cb2a9cb31217cf9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4091d90668775127cb2a9cb31217cf9d">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aad9ea9a614621c89a997d4591d0e5fef" name="aad9ea9a614621c89a997d4591d0e5fef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad9ea9a614621c89a997d4591d0e5fef">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compare whether it is less than or equal to a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool </dd></dl>
+
+</div>
+</div>
+<a id="a838ba36be5e68fc056c49178abff10b8" name="a838ba36be5e68fc056c49178abff10b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a838ba36be5e68fc056c49178abff10b8">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5f29fd0a90bb426d834d1f251b660cf6" name="a5f29fd0a90bb426d834d1f251b660cf6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f29fd0a90bb426d834d1f251b660cf6">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> &amp; hku::TimeDelta::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy assignment function </p>
+
+</div>
+</div>
+<a id="af0da5ff83cd50536fc6681f383f72c0e" name="af0da5ff83cd50536fc6681f383f72c0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0da5ff83cd50536fc6681f383f72c0e">&#9670;&#160;</a></span>operator==() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator== </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compare whether it is equal to a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool </dd></dl>
+
+</div>
+</div>
+<a id="a78f6da39c746dcad4acc81e717163fc3" name="a78f6da39c746dcad4acc81e717163fc3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78f6da39c746dcad4acc81e717163fc3">&#9670;&#160;</a></span>operator==() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abffbd6811edd561a97362b683448c180" name="abffbd6811edd561a97362b683448c180"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abffbd6811edd561a97362b683448c180">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compare whether it is greater than a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool </dd></dl>
+
+</div>
+</div>
+<a id="a17ab194dae63558ec3154b0b9d17c30f" name="a17ab194dae63558ec3154b0b9d17c30f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17ab194dae63558ec3154b0b9d17c30f">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9062a2e96e68015d552431733bff67f1" name="a9062a2e96e68015d552431733bff67f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9062a2e96e68015d552431733bff67f1">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Rep, typename Period&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;</td>          <td class="paramname"><span class="paramname"><em>duration</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compare whether it is greater than or equal to a chrono duration </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Rep</td><td>the representation type </td></tr>
+    <tr><td class="paramname">Period</td><td>the period type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">duration</td><td>chrono duration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool </dd></dl>
+
+</div>
+</div>
+<a id="ae052025c35852d78a8e9803e31e3aca1" name="ae052025c35852d78a8e9803e31e3aca1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae052025c35852d78a8e9803e31e3aca1">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::TimeDelta::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>td</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a525cafee4e1bd8a7e2b515a5748e1f10" name="a525cafee4e1bd8a7e2b515a5748e1f10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a525cafee4e1bd8a7e2b515a5748e1f10">&#9670;&#160;</a></span>repr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::TimeDelta::repr </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert to a string, the format: TimeDelta(days,hours,mins,secs,millisecs,microsecs) </p>
+
+</div>
+</div>
+<a id="a6e3adb876b7a25dc9eac1076a5599b28" name="a6e3adb876b7a25dc9eac1076a5599b28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e3adb876b7a25dc9eac1076a5599b28">&#9670;&#160;</a></span>resolution()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::TimeDelta::resolution </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the expression precision 1 microsecond, TimeDelta(0, 0, 0, 0, 0, 1) </p>
+
+</div>
+</div>
+<a id="a6533f8873544fbaee127ebe1f7d10104" name="a6533f8873544fbaee127ebe1f7d10104"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6533f8873544fbaee127ebe1f7d10104">&#9670;&#160;</a></span>seconds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::seconds </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the normalized seconds [0, 59] </p>
+
+</div>
+</div>
+<a id="aaf308e6a7dbe956b33ae0da808f552ce" name="aaf308e6a7dbe956b33ae0da808f552ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf308e6a7dbe956b33ae0da808f552ce">&#9670;&#160;</a></span>str()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::TimeDelta::str </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert to a string, the format: -1 days hh:mm:ss.000000) </p>
+
+</div>
+</div>
+<a id="a450612f14c6711dd7596bf5d95efa040" name="a450612f14c6711dd7596bf5d95efa040"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a450612f14c6711dd7596bf5d95efa040">&#9670;&#160;</a></span>ticks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::TimeDelta::ticks </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the number of the ticks, i.e. </p>
+<p>the total microseconds after the conversion </p>
+
+</div>
+</div>
+<a id="a78c8022d9b7ad97e1a5180333edc2bac" name="a78c8022d9b7ad97e1a5180333edc2bac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78c8022d9b7ad97e1a5180333edc2bac">&#9670;&#160;</a></span>time_duration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bt::time_duration hku::TimeDelta::time_duration </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert to boost::posix_time::time_duration </p>
+
+</div>
+</div>
+<a id="a9f634cabf4a9c75d910e378bd94fb2a8" name="a9f634cabf4a9c75d910e378bd94fb2a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f634cabf4a9c75d910e378bd94fb2a8">&#9670;&#160;</a></span>total_days()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::TimeDelta::total_days </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the total days with a fraction </p>
+
+</div>
+</div>
+<a id="a087e8b3fe4476c4e4c74acd9225f852e" name="a087e8b3fe4476c4e4c74acd9225f852e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a087e8b3fe4476c4e4c74acd9225f852e">&#9670;&#160;</a></span>total_hours()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::TimeDelta::total_hours </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the total hours with a fraction </p>
+
+</div>
+</div>
+<a id="a738be5861930ec7b62c7ace178296aad" name="a738be5861930ec7b62c7ace178296aad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a738be5861930ec7b62c7ace178296aad">&#9670;&#160;</a></span>total_milliseconds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::TimeDelta::total_milliseconds </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the total milliseconds with a fraction </p>
+
+</div>
+</div>
+<a id="af2846ead4f0c906d0aa94c43caf46305" name="af2846ead4f0c906d0aa94c43caf46305"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2846ead4f0c906d0aa94c43caf46305">&#9670;&#160;</a></span>total_minutes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::TimeDelta::total_minutes </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the total minutes with a fraction </p>
+
+</div>
+</div>
+<a id="aa5a97d0887dfebade7485247893a8754" name="aa5a97d0887dfebade7485247893a8754"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5a97d0887dfebade7485247893a8754">&#9670;&#160;</a></span>total_seconds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::TimeDelta::total_seconds </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the total seconds with a fraction </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/datetime/<a class="el" href="_time_delta_8h_source.html">TimeDelta.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_time_delta.html">TimeDelta</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

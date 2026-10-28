@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hikyuu/StockTypeInfo.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_stock_type_info_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,45 +74,187 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">StockTypeInfo.h</div>  </div>
+  <div class="headertitle"><div class="title">StockTypeInfo.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_stock_type_info_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * StockTypeInfo.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2011-12-12</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef STOCKTYPEINFO_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define STOCKTYPEINFO_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_data_type_8h.html">DataType.h</a>&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#aeca3f77e36b4815adc4655f7de633c5e">   15</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_BLOCK 0  </span></div><div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#ad2d392eff1369bda2eadafbdd23e9bc6">   16</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_A     1  </span></div><div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#acfa7218c06c847f3d010962a636ea7f5">   17</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_INDEX 2  </span></div><div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#a91819a922162c54c3d96f60a8c5d0d28">   18</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_B     3  </span></div><div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#a29df8984f72de5c810a4ea629abd6fed">   19</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_FUND  4  </span></div><div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#a24a5038a77b2896677248340d9be63f7">   20</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_ETF   5  </span></div><div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#a8d286e47773ce5ae0f95ce1035696636">   21</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_ND    6  </span></div><div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#a977abc4763dd435316bc150c0601d438">   22</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_BOND  7  </span></div><div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#adc84d83375aadf80dc8adf9c8c5b9f05">   23</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_GEM   8  </span></div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor"></span></div><div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="_stock_type_info_8h.html#a8c0ec1961dfac352781358ee4a5f9656">   25</a></span>&#160;<span class="preprocessor">#define STOCKTYPE_TMP 999  </span></div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor"></span></div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div><div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html">   31</a></span>&#160;<span class="keyword">class </span><a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a> {</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>();</div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>(<a class="code" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a>, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp;, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>,</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                  <span class="keywordtype">int</span>, <span class="keywordtype">size_t</span>, <span class="keywordtype">size_t</span>);</div><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div><div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">   39</a></span>&#160;    <a class="code" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a> <a class="code" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">type</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_type; }</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div><div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#afbdd533a4b5be89ff0af76c1a92f4b20">   42</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code" href="classhku_1_1_stock_type_info.html#afbdd533a4b5be89ff0af76c1a92f4b20">description</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_description; }</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div><div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a9c61eae8fd9716368316b9edfd3cacdd">   45</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_stock_type_info.html#a9c61eae8fd9716368316b9edfd3cacdd">tick</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_tick; }</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div><div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#ada08bf46cda8112ca01047c40556c52f">   48</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_stock_type_info.html#ada08bf46cda8112ca01047c40556c52f">tickValue</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_tickValue; }</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div><div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#afe8011c2e57cf252a5304dd200aa08fe">   51</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_stock_type_info.html#afe8011c2e57cf252a5304dd200aa08fe">unit</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_unit;}</div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div><div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#ab33c14108ae2ca82ffefb7ea8a9bd877">   54</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classhku_1_1_stock_type_info.html#ab33c14108ae2ca82ffefb7ea8a9bd877">precision</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_precision; }</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div><div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#ab12d2f514f342af5b6bae6a45311ee0b">   57</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classhku_1_1_stock_type_info.html#ab12d2f514f342af5b6bae6a45311ee0b">minTradeNumber</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_minTradeNumber; }</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div><div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a6c8b6da0f01f55d31e22b3a9b7e0d764">   60</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classhku_1_1_stock_type_info.html#a6c8b6da0f01f55d31e22b3a9b7e0d764">maxTradeNumber</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_maxTradeNumber; }</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">string</span> toString() <span class="keyword">const</span>;</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a> m_type;          <span class="comment">//证券类型</span></div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">string</span> m_description;       <span class="comment">//描述信息</span></div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_tick;             <span class="comment">//最小跳动量</span></div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_tickValue;        <span class="comment">//每一个tick价格</span></div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_unit;             <span class="comment">//每最小变动量价格，即单位价格 = tickValue/tick</span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">int</span> m_precision;            <span class="comment">//价格精度</span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">size_t</span> m_minTradeNumber;    <span class="comment">//每笔最小交易量</span></div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">size_t</span> m_maxTradeNumber;    <span class="comment">//每笔最大交易量</span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;};</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp; <a class="code" href="namespacehku.html#afbc657216bc5d9e85c6c73f634449b7f">operator&lt;&lt;</a>(std::ostream &amp;, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;);</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">//</span></div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">// 关系比较函数</span></div><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">//</span></div><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment"></span><span class="keywordtype">bool</span> <a class="code" href="namespacehku.html#a03a5b2668c94f28ba6c31edf3fd1a0c9">operator==</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;);</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="namespacehku.html#a7831bcce3326ba7612e3995af932c43a">operator!=</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;);</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div><div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="namespacehku.html#a533e596bb0e2fcf36c1f92a7c927db0e">   94</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="namespacehku.html#a03a5b2668c94f28ba6c31edf3fd1a0c9">operator==</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m1, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m2) {</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordflow">return</span> m1.<a class="code" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">type</a>() == m2.<a class="code" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">type</a>();</div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div><div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="namespacehku.html#aa5c6418f413637411a2830d91fac3c2c">   99</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="namespacehku.html#a7831bcce3326ba7612e3995af932c43a">operator!=</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m1, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m2) {</div><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">return</span> m1.<a class="code" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">type</a>() != m2.<a class="code" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">type</a>();</div><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div><div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div><div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;} <span class="comment">/* namespace hikyuu */</span></div><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* STOCKTYPEINFO_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="group___data_type_html_gaa7e9bc4ead4537f39a91612a5b6ae563"><div class="ttname"><a href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku::hku_uint32</a></div><div class="ttdeci">unsigned hku_uint32</div><div class="ttdef"><b>Definition:</b> DataType.h:54</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html"><div class="ttname"><a href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a></div><div class="ttdoc">证券类型信息 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:31</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_ab33c14108ae2ca82ffefb7ea8a9bd877"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ab33c14108ae2ca82ffefb7ea8a9bd877">hku::StockTypeInfo::precision</a></div><div class="ttdeci">int precision() const </div><div class="ttdoc">获取价格精度 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:54</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_a6c8b6da0f01f55d31e22b3a9b7e0d764"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a6c8b6da0f01f55d31e22b3a9b7e0d764">hku::StockTypeInfo::maxTradeNumber</a></div><div class="ttdeci">size_t maxTradeNumber() const </div><div class="ttdoc">获取每笔最大交易数量 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:60</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_ab12d2f514f342af5b6bae6a45311ee0b"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ab12d2f514f342af5b6bae6a45311ee0b">hku::StockTypeInfo::minTradeNumber</a></div><div class="ttdeci">size_t minTradeNumber() const </div><div class="ttdoc">获取每笔最小交易数量 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:57</div></div>
-<div class="ttc" id="namespacehku_html_a7831bcce3326ba7612e3995af932c43a"><div class="ttname"><a href="namespacehku.html#a7831bcce3326ba7612e3995af932c43a">hku::operator!=</a></div><div class="ttdeci">bool operator!=(const Datetime &amp;, const Datetime &amp;)</div><div class="ttdef"><b>Definition:</b> Datetime.h:122</div></div>
-<div class="ttc" id="_data_type_8h_html_af59fd09cf4bfe9c265f61882e5f07d7a"><div class="ttname"><a href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a></div><div class="ttdeci">#define HKU_API</div><div class="ttdef"><b>Definition:</b> DataType.h:12</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_a9c61eae8fd9716368316b9edfd3cacdd"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a9c61eae8fd9716368316b9edfd3cacdd">hku::StockTypeInfo::tick</a></div><div class="ttdeci">price_t tick() const </div><div class="ttdoc">获取最小跳动量 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:45</div></div>
-<div class="ttc" id="namespacehku_html_afbc657216bc5d9e85c6c73f634449b7f"><div class="ttname"><a href="namespacehku.html#afbc657216bc5d9e85c6c73f634449b7f">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;blk)</div><div class="ttdef"><b>Definition:</b> Block.cpp:13</div></div>
-<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
-<div class="ttc" id="namespacehku_html_a03a5b2668c94f28ba6c31edf3fd1a0c9"><div class="ttname"><a href="namespacehku.html#a03a5b2668c94f28ba6c31edf3fd1a0c9">hku::operator==</a></div><div class="ttdeci">bool operator==(const Datetime &amp;, const Datetime &amp;)</div><div class="ttdef"><b>Definition:</b> Datetime.h:118</div></div>
-<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_afbdd533a4b5be89ff0af76c1a92f4b20"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#afbdd533a4b5be89ff0af76c1a92f4b20">hku::StockTypeInfo::description</a></div><div class="ttdeci">const string &amp; description() const </div><div class="ttdoc">获取证券类型描述信息 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:42</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_ada08bf46cda8112ca01047c40556c52f"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ada08bf46cda8112ca01047c40556c52f">hku::StockTypeInfo::tickValue</a></div><div class="ttdeci">price_t tickValue() const </div><div class="ttdoc">每tick价格 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:48</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_ae2f59372ee923682512de57487214387"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">hku::StockTypeInfo::type</a></div><div class="ttdeci">hku_uint32 type() const </div><div class="ttdoc">获取证券类型 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:39</div></div>
-<div class="ttc" id="classhku_1_1_stock_type_info_html_afe8011c2e57cf252a5304dd200aa08fe"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#afe8011c2e57cf252a5304dd200aa08fe">hku::StockTypeInfo::unit</a></div><div class="ttdeci">price_t unit() const </div><div class="ttdoc">每单位价格 = tickValue / tick </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:51</div></div>
-<div class="ttc" id="_data_type_8h_html"><div class="ttname"><a href="_data_type_8h.html">DataType.h</a></div></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * StockTypeInfo.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2011-12-12</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef STOCKTYPEINFO_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define STOCKTYPEINFO_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;DataType.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#define STOCKTYPE_BLOCK 0    </span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#define STOCKTYPE_A 1        </span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#define STOCKTYPE_INDEX 2    </span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#define STOCKTYPE_B 3        </span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#define STOCKTYPE_FUND 4     </span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#define STOCKTYPE_ETF 5      </span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#define STOCKTYPE_ND 6       </span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#define STOCKTYPE_BOND 7     </span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#define STOCKTYPE_GEM 8      </span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define STOCKTYPE_START 9    </span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#define STOCKTYPE_CRYPTO 10  </span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#define STOCKTYPE_A_BJ 11    </span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#define STOCKTYPE_TMP 999  </span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span></div>
+<div class="foldopen" id="foldopen00035" data-start="{" data-end="};">
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html">   35</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a> {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">   40</a></span>    <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>();</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#ac14ca7616831beda1fa4b8ae5c9ce989">   41</a></span>    <a class="code hl_function" href="classhku_1_1_stock_type_info.html#ac14ca7616831beda1fa4b8ae5c9ce989">StockTypeInfo</a>(<a class="code hl_typedef" href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">uint32_t</a>, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp;, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>, <span class="keywordtype">int</span>, <span class="keywordtype">double</span>, <span class="keywordtype">double</span>);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a5e694239d4f4744ed7ffc7fbf69017ec">   43</a></span>    <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a5e694239d4f4744ed7ffc7fbf69017ec">StockTypeInfo</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a3a94f37d161a056977ddc38416c97204">   44</a></span>    <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>&amp; <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a3a94f37d161a056977ddc38416c97204">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#ae3c9e2b8f91d122b575ecb383276b7b8">   46</a></span>    <a class="code hl_function" href="classhku_1_1_stock_type_info.html#ae3c9e2b8f91d122b575ecb383276b7b8">StockTypeInfo</a>(<a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>&amp;&amp;) noexcept;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#adc4a872802b815a8b5e26f31da3e0706">   47</a></span>    <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>&amp; operator=(<a class="code hl_function" href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">StockTypeInfo</a>&amp;&amp;) noexcept;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span></div>
+<div class="foldopen" id="foldopen00050" data-start="{" data-end="}">
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">   50</a></span>    <a class="code hl_typedef" href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">uint32_t</a> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">type</a>() const noexcept {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keywordflow">return</span> m_type;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    }</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span></div>
+<div class="foldopen" id="foldopen00055" data-start="{" data-end="}">
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a8d6a324664c5f423837fb837c0880f55">   55</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a8d6a324664c5f423837fb837c0880f55">description</a>() const noexcept {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordflow">return</span> m_description;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    }</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span></div>
+<div class="foldopen" id="foldopen00060" data-start="{" data-end="}">
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#aa69c5f313d1fde505a9f8c62148a34c5">   60</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#aa69c5f313d1fde505a9f8c62148a34c5">tick</a>() const noexcept {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keywordflow">return</span> m_tick;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    }</div>
+</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span></div>
+<div class="foldopen" id="foldopen00065" data-start="{" data-end="}">
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a6473ee2ac7cc41a62154cdef8b131bed">   65</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a6473ee2ac7cc41a62154cdef8b131bed">tickValue</a>() const noexcept {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        <span class="keywordflow">return</span> m_tickValue;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    }</div>
+</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span></div>
+<div class="foldopen" id="foldopen00070" data-start="{" data-end="}">
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a90e0afe3a27a5a532f120553db258571">   70</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a90e0afe3a27a5a532f120553db258571">unit</a>() const noexcept {</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <span class="keywordflow">return</span> m_unit;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    }</div>
+</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span></div>
+<div class="foldopen" id="foldopen00075" data-start="{" data-end="}">
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#add357d274e029096bb9b46fb54bf4014">   75</a></span>    <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#add357d274e029096bb9b46fb54bf4014">precision</a>() const noexcept {</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordflow">return</span> m_precision;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    }</div>
+</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span></div>
+<div class="foldopen" id="foldopen00080" data-start="{" data-end="}">
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a800bc24d3b1c2165f51ee1c1fded995d">   80</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a800bc24d3b1c2165f51ee1c1fded995d">minTradeNumber</a>() const noexcept {</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">return</span> m_minTradeNumber;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="}">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a27d2ef48c98f78196e0485bdf1e4a0b3">   85</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a27d2ef48c98f78196e0485bdf1e4a0b3">maxTradeNumber</a>() const noexcept {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="keywordflow">return</span> m_maxTradeNumber;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    }</div>
+</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="classhku_1_1_stock_type_info.html#a00ee51b12efdba061bba8ebb9a38a447">   90</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_stock_type_info.html#a00ee51b12efdba061bba8ebb9a38a447">toString</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <a class="code hl_typedef" href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">uint32_t</a> m_type;          <span class="comment">// Security type</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keywordtype">string</span> m_description;     <span class="comment">// Description</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_tick;           <span class="comment">// Minimum tick size</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_tickValue;      <span class="comment">// Price of every tick</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_unit;           <span class="comment">// Price per unit = tickValue / tick (defaults to 1.0 if tick == 0)</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordtype">int</span> m_precision;          <span class="comment">// Price precision</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keywordtype">double</span> m_minTradeNumber;  <span class="comment">// Minimum trade quantity per order</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordtype">double</span> m_maxTradeNumber;  <span class="comment">// Maximum trade quantity per order</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>};</div>
+</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="group___stock_manage.html#gaf0d68acd86bf52f1e2bd1481472a1b98">  108</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment">//</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment">// Relational comparison functions</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment">//</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">operator==</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5bd8194c0579cf9e5367715d927211ae">operator!=</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp;);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span></div>
+<div class="foldopen" id="foldopen00119" data-start="{" data-end="}">
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="namespacehku.html#a533e596bb0e2fcf36c1f92a7c927db0e">  119</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">operator==</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m1, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m2) {</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordflow">return</span> m1.<a class="code hl_function" href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">type</a>() == m2.<a class="code hl_function" href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">type</a>();</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>}</div>
+</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span></div>
+<div class="foldopen" id="foldopen00124" data-start="{" data-end="}">
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="namespacehku.html#aa5c6418f413637411a2830d91fac3c2c">  124</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5bd8194c0579cf9e5367715d927211ae">operator!=</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m1, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&amp; m2) {</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    <span class="keywordflow">return</span> m1.<a class="code hl_function" href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">type</a>() != m2.<a class="code hl_function" href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">type</a>();</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>}</div>
+</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="preprocessor">#if FMT_VERSION &gt;= 90000</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::StockTypeInfo&gt; : ostream_formatter {};</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="preprocessor">#endif </span><span class="comment">/* STOCKTYPEINFO_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html"><div class="ttname"><a href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a></div><div class="ttdoc">Security type information</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:35</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a00ee51b12efdba061bba8ebb9a38a447"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a00ee51b12efdba061bba8ebb9a38a447">hku::StockTypeInfo::toString</a></div><div class="ttdeci">string toString() const</div><div class="ttdoc">Used by str of python only</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a27d2ef48c98f78196e0485bdf1e4a0b3"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a27d2ef48c98f78196e0485bdf1e4a0b3">hku::StockTypeInfo::maxTradeNumber</a></div><div class="ttdeci">double maxTradeNumber() const noexcept</div><div class="ttdoc">Get the maximum trade quantity per order</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:85</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a3a94f37d161a056977ddc38416c97204"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a3a94f37d161a056977ddc38416c97204">hku::StockTypeInfo::operator=</a></div><div class="ttdeci">StockTypeInfo &amp; operator=(const StockTypeInfo &amp;)=default</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a5e694239d4f4744ed7ffc7fbf69017ec"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a5e694239d4f4744ed7ffc7fbf69017ec">hku::StockTypeInfo::StockTypeInfo</a></div><div class="ttdeci">StockTypeInfo(const StockTypeInfo &amp;)=default</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a6473ee2ac7cc41a62154cdef8b131bed"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a6473ee2ac7cc41a62154cdef8b131bed">hku::StockTypeInfo::tickValue</a></div><div class="ttdeci">price_t tickValue() const noexcept</div><div class="ttdoc">Price per tick</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:65</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a800bc24d3b1c2165f51ee1c1fded995d"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a800bc24d3b1c2165f51ee1c1fded995d">hku::StockTypeInfo::minTradeNumber</a></div><div class="ttdeci">double minTradeNumber() const noexcept</div><div class="ttdoc">Get the minimum trade quantity per order</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:80</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a873debf1b0ff46e1df0010a1e86d185f"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a873debf1b0ff46e1df0010a1e86d185f">hku::StockTypeInfo::StockTypeInfo</a></div><div class="ttdeci">StockTypeInfo()</div><div class="ttdoc">Default constructor, returns Null&lt;StockTypeInfo&gt;().</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a8d6a324664c5f423837fb837c0880f55"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a8d6a324664c5f423837fb837c0880f55">hku::StockTypeInfo::description</a></div><div class="ttdeci">const string &amp; description() const noexcept</div><div class="ttdoc">Get the description of the security type</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:55</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_a90e0afe3a27a5a532f120553db258571"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a90e0afe3a27a5a532f120553db258571">hku::StockTypeInfo::unit</a></div><div class="ttdeci">price_t unit() const noexcept</div><div class="ttdoc">Price per unit, i.e.</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:70</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_aa69c5f313d1fde505a9f8c62148a34c5"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#aa69c5f313d1fde505a9f8c62148a34c5">hku::StockTypeInfo::tick</a></div><div class="ttdeci">price_t tick() const noexcept</div><div class="ttdoc">Get the minimum tick size</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:60</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_ac14ca7616831beda1fa4b8ae5c9ce989"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ac14ca7616831beda1fa4b8ae5c9ce989">hku::StockTypeInfo::StockTypeInfo</a></div><div class="ttdeci">StockTypeInfo(uint32_t, const string &amp;, price_t, price_t, int, double, double)</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_add357d274e029096bb9b46fb54bf4014"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#add357d274e029096bb9b46fb54bf4014">hku::StockTypeInfo::precision</a></div><div class="ttdeci">int precision() const noexcept</div><div class="ttdoc">Get the price precision</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:75</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_ae3c9e2b8f91d122b575ecb383276b7b8"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ae3c9e2b8f91d122b575ecb383276b7b8">hku::StockTypeInfo::StockTypeInfo</a></div><div class="ttdeci">StockTypeInfo(StockTypeInfo &amp;&amp;) noexcept</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_type_info_html_affed693f30100ed920615f12e83012fa"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#affed693f30100ed920615f12e83012fa">hku::StockTypeInfo::type</a></div><div class="ttdeci">uint32_t type() const noexcept</div><div class="ttdoc">Get the security type</div><div class="ttdef"><b>定义</b> StockTypeInfo.h:50</div></div>
+<div class="ttc" id="agroup___data_type_html_gacefea155cc989d0eea72c2c053981f06"><div class="ttname"><a href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">hku::uint32_t</a></div><div class="ttdeci">unsigned uint32_t</div><div class="ttdef"><b>定义</b> DataType.h:111</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a5bd8194c0579cf9e5367715d927211ae"><div class="ttname"><a href="namespacehku.html#a5bd8194c0579cf9e5367715d927211ae">hku::operator!=</a></div><div class="ttdeci">HKU_API Indicator operator!=(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a5c8f988e50bc4ff1a742bbc29de54119"><div class="ttname"><a href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">hku::operator==</a></div><div class="ttdeci">HKU_API Indicator operator==(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><b>StockTypeInfo.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

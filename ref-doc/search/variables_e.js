@@ -1,10 +1,24 @@
 var searchData=
 [
-  ['sellmoney',['sellMoney',['../classhku_1_1_position_record.html#a01265fa6e18cd7b019b8cc4a63881c02',1,'hku::PositionRecord']]],
-  ['short_5fmarket_5fvalue',['short_market_value',['../classhku_1_1_funds_record.html#af3615a88ba2e256712c2659a188c539f',1,'hku::FundsRecord']]],
-  ['stamptax',['stamptax',['../classhku_1_1_cost_record.html#a2b71696b95bdd4a62f8f961081a31bd7',1,'hku::CostRecord']]],
-  ['start',['start',['../structhku_1_1_h5_index_record.html#a834c0b21b46d18bced9b44416608d21d',1,'hku::H5IndexRecord']]],
-  ['stock',['stock',['../classhku_1_1_borrow_record.html#a5135f11fd0bbaaff842818ab9f0adff5',1,'hku::BorrowRecord::stock()'],['../classhku_1_1_position_record.html#a2d58c15b73c7dcde4f95f84804937c67',1,'hku::PositionRecord::stock()'],['../classhku_1_1_trade_record.html#af1a821e73fd35d459436f7c183c75907',1,'hku::TradeRecord::stock()']]],
-  ['stockmanager',['StockManager',['../namespacehku.html#a9eae0a131b910844c89c8498433ec3fd',1,'hku']]],
-  ['stoploss',['stoploss',['../classhku_1_1_position_record.html#a007be3fad5897e2a53e221d38840a860',1,'hku::PositionRecord::stoploss()'],['../classhku_1_1_trade_record.html#a4864b2553fd6064b153ab203ae334e9a',1,'hku::TradeRecord::stoploss()'],['../classhku_1_1_trade_request.html#a586ab9bb718b2d8cdd02471c331ef00f',1,'hku::TradeRequest::stoploss()']]]
+  ['parameter_0',['Parameter',['../namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686',1,'hku']]],
+  ['pendingonnextopen_1',['pendingOnNextOpen',['../structhku_1_1_moment_result.html#ae8ff6cc58ce13f79c3ad4fe66b97b029',1,'hku::MomentResult']]],
+  ['performance_2',['Performance',['../namespacehku.html#a4d6be6163c9dd226e997e9298a96b839',1,'hku']]],
+  ['periodic_5farmed_3',['periodic_armed',['../structhku_1_1_strategy_1_1_run_daily_at.html#ac221cb82d86dcf06b832bed6d203785e',1,'hku::Strategy::RunDailyAt']]],
+  ['pin_4',['pin',['../structhku_1_1_k_record_view.html#ace99304a2d627fb2fa2b49d57b806de8',1,'hku::KRecordView']]],
+  ['pkdata_5',['pKData',['../structhku_1_1_stock_1_1_data.html#a58fa7eb0813fca743ec2769a26a27bba',1,'hku::Stock::Data']]],
+  ['plan_5fcash_6',['plan_cash',['../structhku_1_1_trade_suggestion.html#a561a2c7b53f236e2eae1ea9af37a7a99',1,'hku::TradeSuggestion']]],
+  ['plan_5fprice_7',['plan_price',['../structhku_1_1_trade_suggestion.html#a2fe16c211273a8d1be984ff8d1f9d9f4',1,'hku::TradeSuggestion']]],
+  ['planprice_8',['planPrice',['../classhku_1_1_trade_record.html#a2607f74085252ff08cb64262c9cad40c',1,'hku::TradeRecord']]],
+  ['pmutex_9',['pMutex',['../structhku_1_1_stock_1_1_data.html#a2d4e1f7c1ccf9a1bb3ce99eedbd0b0a7',1,'hku::Stock::Data']]],
+  ['pool_10',['pool',['../structhku_1_1_resource_tls_pool_1_1_resource_deleter.html#aebcef1360a03808089593a032de743af',1,'hku::ResourceTlsPool::ResourceDeleter::pool'],['../structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a149b682a0a8ef47aefa906c16dc75456',1,'hku::ResourceTlsVersionPool::ResourceDeleter::pool'],['../structhku_1_1_global_steal_thread_pool_1_1_executor_wrapper.html#aad7d5e124927d8edda17d40ed28ce816',1,'hku::GlobalStealThreadPool::ExecutorWrapper::pool'],['../structhku_1_1_m_q_steal_thread_pool_1_1_executor_wrapper.html#abd23fa907b899da69f8bbf64781f3b18',1,'hku::MQStealThreadPool::ExecutorWrapper::pool'],['../structhku_1_1_m_q_thread_pool_1_1_executor_wrapper.html#a7bf7f3793cd7bef4015117f80c057d25',1,'hku::MQThreadPool::ExecutorWrapper::pool'],['../structhku_1_1_steal_thread_pool_1_1_executor_wrapper.html#a010918bfc0a12d6a7e906100a973c5f5',1,'hku::StealThreadPool::ExecutorWrapper::pool'],['../structhku_1_1_thread_pool_1_1_executor_wrapper.html#ac640d04e1adfa26c22e49f6492bba656',1,'hku::ThreadPool::ExecutorWrapper::pool']]],
+  ['position_11',['position',['../structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763',1,'hku::PositionExtInfo']]],
+  ['positions_12',['positions',['../structhku_1_1_moment_result.html#ad89a46baf3cd22cc2683d06385b16219',1,'hku::MomentResult']]],
+  ['precision_13',['precision',['../structhku_1_1_stock_info.html#a60396d5b2ea4812e02b67014eb8435cb',1,'hku::StockInfo']]],
+  ['price_14',['price',['../structhku_1_1_h5_time_line_record.html#aee81b61df2bfe7982a86a505a938ea4b',1,'hku::H5TimeLineRecord::price'],['../structhku_1_1_h5_trans_record.html#a414b24b77340837671ba4c123d32db44',1,'hku::H5TransRecord::price'],['../classhku_1_1_time_line_record.html#aec64b3dcfa6b2a102c2dec10fbf38f18',1,'hku::TimeLineRecord::price'],['../structhku_1_1_borrow_record_1_1_data.html#a9f9b86f0391473b3994783936bb800aa',1,'hku::BorrowRecord::Data::price'],['../classhku_1_1_trans_record.html#ab5f19092197f7ef0306c2f6026dd5bf9',1,'hku::TransRecord::price']]],
+  ['price_5fk_15',['price_k',['../structhku_1_1_equal_recover_factor.html#a260db6375491df495975ca68927dbb79',1,'hku::EqualRecoverFactor']]],
+  ['price_5flist_16',['price_list',['../structhku_1_1_param_item_record.html#a40c5bb2770715ac591b20c1971408b7a',1,'hku::ParamItemRecord']]],
+  ['priceforsell_17',['priceForSell',['../structhku_1_1_stock_weight_table_view.html#a3be2d1f933e4acad18d501295e7278c5',1,'hku::StockWeightTableView']]],
+  ['profit_5fcurve_18',['profit_curve',['../structhku_1_1_sub_system_context.html#a305c6118c23a0b4e212364148cd9cc71',1,'hku::SubSystemContext']]],
+  ['psize_19',['PSIZE',['../classhku_1_1_async_s_q_l_result_set.html#afb50c15b3aa27f6ca15332ceba594fd3',1,'hku::AsyncSQLResultSet::PSIZE'],['../classhku_1_1_s_q_l_result_set.html#a4677109d16be518c1dd6058f51150128',1,'hku::SQLResultSet::PSIZE']]],
+  ['pullfrombufferserver_20',['pullFromBufferServer',['../structhku_1_1ipc_1_1_shm_client_forwarders.html#a5450d6d2acf2c05919d4886dc87e67d0',1,'hku::ipc::ShmClientForwarders']]]
 ];

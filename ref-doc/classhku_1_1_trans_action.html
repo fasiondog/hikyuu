@@ -1,0 +1,282 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::TransAction类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_trans_action.html','','classhku_1_1_trans_action-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::TransAction类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___d_b_connect.html">DB Connect database connection</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Manual transaction handling; it allows the nested starting of the transaction and requires a manual start and commit; on the automatic exit it does not commit automatically but rolls back!  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_auto_trans_action_8h_source.html">AutoTransAction.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a7f4762d1507475319968f893c301e889" id="r_a7f4762d1507475319968f893c301e889"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f4762d1507475319968f893c301e889">TransAction</a> (const <a class="el" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a> &amp;driver)</td></tr>
+<tr class="memdesc:a7f4762d1507475319968f893c301e889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:a973b81bec38ea18b4efc6eba43130b86" id="r_a973b81bec38ea18b4efc6eba43130b86"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a973b81bec38ea18b4efc6eba43130b86">~TransAction</a> ()</td></tr>
+<tr class="memdesc:a973b81bec38ea18b4efc6eba43130b86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor  <br /></td></tr>
+<tr class="memitem:a8766ef82d191bd16e0a1e90edfb02995" id="r_a8766ef82d191bd16e0a1e90edfb02995"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8766ef82d191bd16e0a1e90edfb02995">connect</a> () const</td></tr>
+<tr class="memdesc:a8766ef82d191bd16e0a1e90edfb02995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the database connection  <br /></td></tr>
+<tr class="memitem:ab9e7f1cb7e33c8e8c4c56496b60f6e5d" id="r_ab9e7f1cb7e33c8e8c4c56496b60f6e5d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9e7f1cb7e33c8e8c4c56496b60f6e5d">begin</a> ()</td></tr>
+<tr class="memdesc:ab9e7f1cb7e33c8e8c4c56496b60f6e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start the transaction  <br /></td></tr>
+<tr class="memitem:a7a7d84bce9462c3ff413303c460f5874" id="r_a7a7d84bce9462c3ff413303c460f5874"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a7d84bce9462c3ff413303c460f5874">end</a> ()</td></tr>
+<tr class="memdesc:a7a7d84bce9462c3ff413303c460f5874"><td class="mdescLeft">&#160;</td><td class="mdescRight">End and commit the transaction  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Manual transaction handling; it allows the nested starting of the transaction and requires a manual start and commit; on the automatic exit it does not commit automatically but rolls back! </p>
+<p>There must be one effective manual transaction start; multiple nested starts are regarded as one transaction handling. After a manual commit, the transaction must be started manually again if there is new transaction handling. </p><dl class="section note"><dt>注解</dt><dd>When nested, it may happen that the inner transaction has been committed but the outer transaction handling fails and is rolled back (only the part of the corresponding transaction handling is rolled back) </dd></dl>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a7f4762d1507475319968f893c301e889" name="a7f4762d1507475319968f893c301e889"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f4762d1507475319968f893c301e889">&#9670;&#160;</a></span>TransAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TransAction::TransAction </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>driver</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">driver</td><td>the database connection pointer </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a973b81bec38ea18b4efc6eba43130b86" name="a973b81bec38ea18b4efc6eba43130b86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a973b81bec38ea18b4efc6eba43130b86">&#9670;&#160;</a></span>~TransAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::TransAction::~TransAction </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ab9e7f1cb7e33c8e8c4c56496b60f6e5d" name="ab9e7f1cb7e33c8e8c4c56496b60f6e5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e7f1cb7e33c8e8c4c56496b60f6e5d">&#9670;&#160;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::TransAction::begin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start the transaction </p>
+
+</div>
+</div>
+<a id="a8766ef82d191bd16e0a1e90edfb02995" name="a8766ef82d191bd16e0a1e90edfb02995"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8766ef82d191bd16e0a1e90edfb02995">&#9670;&#160;</a></span>connect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a> &amp; hku::TransAction::connect </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the database connection </p>
+
+</div>
+</div>
+<a id="a7a7d84bce9462c3ff413303c460f5874" name="a7a7d84bce9462c3ff413303c460f5874"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a7d84bce9462c3ff413303c460f5874">&#9670;&#160;</a></span>end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::TransAction::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>End and commit the transaction </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/db_connect/<a class="el" href="_auto_trans_action_8h_source.html">AutoTransAction.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_trans_action.html">TransAction</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

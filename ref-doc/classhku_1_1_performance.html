@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::Performance类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_performance.html','','classhku_1_1_performance-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,72 +74,120 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_performance.html">Performance</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="classhku_1_1_performance-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::Performance类 参考</div>  </div>
+  <div class="headertitle"><div class="title">hku::Performance类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_manager.html">TradeManager trade management</a> &raquo; <a class="el" href="group___performance.html">Performance performance statistics</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
+<p>Simple performance statistics  
+ <a href="#details">更多...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_performance_8h_source.html">Performance.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a105e47b285936ede290293600023f77f"><td class="memItemLeft" align="right" valign="top">typedef map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a105e47b285936ede290293600023f77f">map_type</a></td></tr>
-<tr class="separator:a105e47b285936ede290293600023f77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e644223642f6c35f6b7a1c1a119f27a" id="r_a5e644223642f6c35f6b7a1c1a119f27a"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; string, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e644223642f6c35f6b7a1c1a119f27a">map_type</a></td></tr>
+<tr class="memitem:a1d49b3abc32c4871c32166de8738fbec" id="r_a1d49b3abc32c4871c32166de8738fbec"><td class="memItemLeft" align="right" valign="top">typedef map_type::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d49b3abc32c4871c32166de8738fbec">iterator</a></td></tr>
+<tr class="memitem:aad5177410ebdd9ecdf7f9a5a810e1192" id="r_aad5177410ebdd9ecdf7f9a5a810e1192"><td class="memItemLeft" align="right" valign="top">typedef map_type::const_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad5177410ebdd9ecdf7f9a5a810e1192">const_iterator</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:ad1ddab0e33fa96c64c6fda13299d5410"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#ad1ddab0e33fa96c64c6fda13299d5410">Performance</a> ()</td></tr>
-<tr class="separator:ad1ddab0e33fa96c64c6fda13299d5410"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f2ac0bb842e0fb9f8f9840bb135b6f0"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a9f2ac0bb842e0fb9f8f9840bb135b6f0">~Performance</a> ()</td></tr>
-<tr class="separator:a9f2ac0bb842e0fb9f8f9840bb135b6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f23a50febeba6b349277be2847e5b45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a9f23a50febeba6b349277be2847e5b45">reset</a> ()</td></tr>
-<tr class="separator:a9f23a50febeba6b349277be2847e5b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a713e9157d94cc4b5d4392809541f2e36"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a713e9157d94cc4b5d4392809541f2e36">get</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name) const </td></tr>
-<tr class="separator:a713e9157d94cc4b5d4392809541f2e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44ea571c755d1808c1b4876d9b5067cb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a44ea571c755d1808c1b4876d9b5067cb">operator[]</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name) const </td></tr>
-<tr class="separator:a44ea571c755d1808c1b4876d9b5067cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b7a7bc424bd01c08331fa4d19e2db26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a3b7a7bc424bd01c08331fa4d19e2db26">report</a> (const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;tm, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_datetime.html#af1524d543b6836d229fe177989c35162">Datetime::now</a>())</td></tr>
-<tr class="separator:a3b7a7bc424bd01c08331fa4d19e2db26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a93f2402bdc4d8f23ac3d024c032c5d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_performance.html#a6a93f2402bdc4d8f23ac3d024c032c5d">statistics</a> (const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;tm, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
-<tr class="separator:a6a93f2402bdc4d8f23ac3d024c032c5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1ddab0e33fa96c64c6fda13299d5410" id="r_ad1ddab0e33fa96c64c6fda13299d5410"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1ddab0e33fa96c64c6fda13299d5410">Performance</a> ()</td></tr>
+<tr class="memitem:a1449655a0cc2d6d545c446f076370750" id="r_a1449655a0cc2d6d545c446f076370750"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1449655a0cc2d6d545c446f076370750">~Performance</a> ()</td></tr>
+<tr class="memitem:a649d6c140a750aaea093964dfc405733" id="r_a649d6c140a750aaea093964dfc405733"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a649d6c140a750aaea093964dfc405733">Performance</a> (const <a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;other)=default</td></tr>
+<tr class="memitem:ae3952033b3c35c9dc2c2b91063da9315" id="r_ae3952033b3c35c9dc2c2b91063da9315"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3952033b3c35c9dc2c2b91063da9315">Performance</a> (<a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memitem:a64723fefb62cb996d11001d48554b75b" id="r_a64723fefb62cb996d11001d48554b75b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64723fefb62cb996d11001d48554b75b">operator=</a> (const <a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;other)</td></tr>
+<tr class="memitem:aba89523eb6ad65a25c608e7b7411d9ff" id="r_aba89523eb6ad65a25c608e7b7411d9ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba89523eb6ad65a25c608e7b7411d9ff">operator=</a> (<a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memitem:aeef952b451d570c1f5183c95cf11fa57" id="r_aeef952b451d570c1f5183c95cf11fa57"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeef952b451d570c1f5183c95cf11fa57">exist</a> (const string &amp;key) const</td></tr>
+<tr class="memdesc:aeef952b451d570c1f5183c95cf11fa57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is a valid statistics item  <br /></td></tr>
+<tr class="memitem:a9f23a50febeba6b349277be2847e5b45" id="r_a9f23a50febeba6b349277be2847e5b45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f23a50febeba6b349277be2847e5b45">reset</a> ()</td></tr>
+<tr class="memdesc:a9f23a50febeba6b349277be2847e5b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset, clearing the calculated results, including the undefined (<a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>) ones  <br /></td></tr>
+<tr class="memitem:a35b20fea747314907c37d1a9cde8faa9" id="r_a35b20fea747314907c37d1a9cde8faa9"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a35b20fea747314907c37d1a9cde8faa9">get</a> (const string &amp;name) const</td></tr>
+<tr class="memdesc:a35b20fea747314907c37d1a9cde8faa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the statistics value by the item name; it takes effect only after statistics or report has been run  <br /></td></tr>
+<tr class="memitem:ad6832214e4811e710faa2ced06d637ba" id="r_ad6832214e4811e710faa2ced06d637ba"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad6832214e4811e710faa2ced06d637ba">operator[]</a> (const string &amp;name) const</td></tr>
+<tr class="memdesc:ad6832214e4811e710faa2ced06d637ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">The same as get  <br /></td></tr>
+<tr class="memitem:a5cc995659b5db70b17506a57df4bc1ae" id="r_a5cc995659b5db70b17506a57df4bc1ae"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5cc995659b5db70b17506a57df4bc1ae">report</a> () const</td></tr>
+<tr class="memdesc:a5cc995659b5db70b17506a57df4bc1ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple text statistics report, used for the direct printing output.  <br /></td></tr>
+<tr class="memitem:ac3e2355473bc8b2c108bac74d13f0dff" id="r_ac3e2355473bc8b2c108bac74d13f0dff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3e2355473bc8b2c108bac74d13f0dff">statistics</a> (const <a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> &amp;tm, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>())</td></tr>
+<tr class="memdesc:ac3e2355473bc8b2c108bac74d13f0dff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count the system performance up to a certain moment according to the trade records; datetime must be greater than or equal to lastDatetime so that it can be used to calculate the current market value  <br /></td></tr>
+<tr class="memitem:a3ca7d3674ea88e3f7f40e1c1ebdff393" id="r_a3ca7d3674ea88e3f7f40e1c1ebdff393"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">StringList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ca7d3674ea88e3f7f40e1c1ebdff393">names</a> () const</td></tr>
+<tr class="memdesc:a3ca7d3674ea88e3f7f40e1c1ebdff393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the names of all the statistics items, in the same order as values  <br /></td></tr>
+<tr class="memitem:abd1c1bfe2efc0653b8447278698f8f29" id="r_abd1c1bfe2efc0653b8447278698f8f29"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd1c1bfe2efc0653b8447278698f8f29">values</a> () const</td></tr>
+<tr class="memdesc:abd1c1bfe2efc0653b8447278698f8f29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the values of all the statistics items, in the same order as names  <br /></td></tr>
+<tr class="memitem:aa6dcf04a3ffbc9861fba6a18ab521faa" id="r_aa6dcf04a3ffbc9861fba6a18ab521faa"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#a5e644223642f6c35f6b7a1c1a119f27a">map_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa6dcf04a3ffbc9861fba6a18ab521faa">getAll</a> () const</td></tr>
+<tr class="memitem:a170751cfb1d6e854d09e687e23d1aaab" id="r_a170751cfb1d6e854d09e687e23d1aaab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a170751cfb1d6e854d09e687e23d1aaab">addKey</a> (const string &amp;key, const string &amp;chinese=string())</td></tr>
+<tr class="memdesc:a170751cfb1d6e854d09e687e23d1aaab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new statistics item  <br /></td></tr>
+<tr class="memitem:a7ea1fec5601a0797a958458765694785" id="r_a7ea1fec5601a0797a958458765694785"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ea1fec5601a0797a958458765694785">setValue</a> (const string &amp;key, double value)</td></tr>
+<tr class="memdesc:a7ea1fec5601a0797a958458765694785"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value of the given statistics item  <br /></td></tr>
 </table>
-<h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="a105e47b285936ede290293600023f77f"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Simple performance statistics </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="aad5177410ebdd9ecdf7f9a5a810e1192" name="aad5177410ebdd9ecdf7f9a5a810e1192"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad5177410ebdd9ecdf7f9a5a810e1192">&#9670;&#160;</a></span>const_iterator</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef map&lt;<a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, double&gt; <a class="el" href="classhku_1_1_performance.html#a105e47b285936ede290293600023f77f">hku::Performance::map_type</a></td>
+          <td class="memname">typedef map_type::const_iterator <a class="el" href="#aad5177410ebdd9ecdf7f9a5a810e1192">hku::Performance::const_iterator</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="ad1ddab0e33fa96c64c6fda13299d5410"></a>
+<a id="a1d49b3abc32c4871c32166de8738fbec" name="a1d49b3abc32c4871c32166de8738fbec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d49b3abc32c4871c32166de8738fbec">&#9670;&#160;</a></span>iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef map_type::iterator <a class="el" href="#a1d49b3abc32c4871c32166de8738fbec">hku::Performance::iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5e644223642f6c35f6b7a1c1a119f27a" name="a5e644223642f6c35f6b7a1c1a119f27a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e644223642f6c35f6b7a1c1a119f27a">&#9670;&#160;</a></span>map_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::map&lt;string, double&gt; <a class="el" href="#a5e644223642f6c35f6b7a1c1a119f27a">hku::Performance::map_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ad1ddab0e33fa96c64c6fda13299d5410" name="ad1ddab0e33fa96c64c6fda13299d5410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1ddab0e33fa96c64c6fda13299d5410">&#9670;&#160;</a></span>Performance() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::Performance::Performance </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -152,7 +195,9 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9f2ac0bb842e0fb9f8f9840bb135b6f0"></a>
+<a id="a1449655a0cc2d6d545c446f076370750" name="a1449655a0cc2d6d545c446f076370750"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1449655a0cc2d6d545c446f076370750">&#9670;&#160;</a></span>~Performance()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -160,39 +205,241 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::Performance::~Performance </td>
+          <td class="memname">virtual hku::Performance::~Performance </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a713e9157d94cc4b5d4392809541f2e36"></a>
+<a id="a649d6c140a750aaea093964dfc405733" name="a649d6c140a750aaea093964dfc405733"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a649d6c140a750aaea093964dfc405733">&#9670;&#160;</a></span>Performance() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Performance::Performance </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3952033b3c35c9dc2c2b91063da9315" name="ae3952033b3c35c9dc2c2b91063da9315"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3952033b3c35c9dc2c2b91063da9315">&#9670;&#160;</a></span>Performance() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Performance::Performance </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a170751cfb1d6e854d09e687e23d1aaab" name="a170751cfb1d6e854d09e687e23d1aaab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a170751cfb1d6e854d09e687e23d1aaab">&#9670;&#160;</a></span>addKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Performance::addKey </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>chinese</em></span><span class="paramdefsep"> = </span><span class="paramdefval">string()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add a new statistics item </p>
+<dl class="section note"><dt>注解</dt><dd>Since the i18n refactoring, only the English key is supported; a non-English key, such as a legacy Chinese one, is rejected with an error log </dd>
+<dd>
+A duplicated or empty key is rejected, so that one key owns exactly one result slot </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">chinese</td><td>the optional corresponding Chinese name of the key, which is registered into the unified key name mapping: it is displayed by report in the Chinese environment, and the Chinese key is also accepted by get/exist like the built-in legacy keys </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aeef952b451d570c1f5183c95cf11fa57" name="aeef952b451d570c1f5183c95cf11fa57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeef952b451d570c1f5183c95cf11fa57">&#9670;&#160;</a></span>exist()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Performance::exist </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether it is a valid statistics item </p>
+<dl class="section note"><dt>注解</dt><dd>The legacy Chinese keys (used before the i18n refactoring) are still accepted for backward compatibility, but they are deprecated </dd></dl>
+
+</div>
+</div>
+<a id="a35b20fea747314907c37d1a9cde8faa9" name="a35b20fea747314907c37d1a9cde8faa9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35b20fea747314907c37d1a9cde8faa9">&#9670;&#160;</a></span>get()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">double hku::Performance::get </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the statistics value by the item name; it takes effect only after statistics or report has been run </p>
+<dl class="section note"><dt>注解</dt><dd>The legacy Chinese keys (used before the i18n refactoring) are still accepted for backward compatibility, but they are deprecated </dd></dl>
+
+</div>
+</div>
+<a id="aa6dcf04a3ffbc9861fba6a18ab521faa" name="aa6dcf04a3ffbc9861fba6a18ab521faa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6dcf04a3ffbc9861fba6a18ab521faa">&#9670;&#160;</a></span>getAll()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="#a5e644223642f6c35f6b7a1c1a119f27a">map_type</a> &amp; hku::Performance::getAll </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3ca7d3674ea88e3f7f40e1c1ebdff393" name="a3ca7d3674ea88e3f7f40e1c1ebdff393"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ca7d3674ea88e3f7f40e1c1ebdff393">&#9670;&#160;</a></span>names()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">StringList</a> &amp; hku::Performance::names </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the names of all the statistics items, in the same order as values </p>
+
+</div>
+</div>
+<a id="a64723fefb62cb996d11001d48554b75b" name="a64723fefb62cb996d11001d48554b75b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64723fefb62cb996d11001d48554b75b">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_performance.html">Performance</a> &amp; hku::Performance::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a44ea571c755d1808c1b4876d9b5067cb"></a>
+<a id="aba89523eb6ad65a25c608e7b7411d9ff" name="aba89523eb6ad65a25c608e7b7411d9ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba89523eb6ad65a25c608e7b7411d9ff">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_performance.html">Performance</a> &amp; hku::Performance::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_performance.html">Performance</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad6832214e4811e710faa2ced06d637ba" name="ad6832214e4811e710faa2ced06d637ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6832214e4811e710faa2ced06d637ba">&#9670;&#160;</a></span>operator[]()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -202,98 +449,158 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">double hku::Performance::operator[] </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>The same as get </p>
+
 </div>
 </div>
-<a class="anchor" id="a3b7a7bc424bd01c08331fa4d19e2db26"></a>
+<a id="a5cc995659b5db70b17506a57df4bc1ae" name="a5cc995659b5db70b17506a57df4bc1ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cc995659b5db70b17506a57df4bc1ae">&#9670;&#160;</a></span>report()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::Performance::report </td>
+          <td class="memname">string hku::Performance::report </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
-          <td class="paramname"><em>tm</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em> = <code><a class="el" href="classhku_1_1_datetime.html#af1524d543b6836d229fe177989c35162">Datetime::now</a>()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>A simple text statistics report, used for the direct printing output. </p>
+<dl class="section note"><dt>注解</dt><dd>It takes effect only after statistics has been run, or when <a class="el" href="classhku_1_1_performance.html" title="Simple performance statistics">Performance</a> itself is the result got from TM </dd></dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
 </div>
 </div>
-<a class="anchor" id="a9f23a50febeba6b349277be2847e5b45"></a>
+<a id="a9f23a50febeba6b349277be2847e5b45" name="a9f23a50febeba6b349277be2847e5b45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f23a50febeba6b349277be2847e5b45">&#9670;&#160;</a></span>reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::Performance::reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Reset, clearing the calculated results, including the undefined (<a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>) ones </p>
+
 </div>
 </div>
-<a class="anchor" id="a6a93f2402bdc4d8f23ac3d024c032c5d"></a>
+<a id="a7ea1fec5601a0797a958458765694785" name="a7ea1fec5601a0797a958458765694785"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ea1fec5601a0797a958458765694785">&#9670;&#160;</a></span>setValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Performance::setValue </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the value of the given statistics item </p>
+<dl class="section note"><dt>注解</dt><dd>Since the i18n refactoring, only the English key is supported; a non-English key, such as a legacy Chinese one, is rejected with an error log </dd>
+<dd>
+Only a registered key is accepted; setting a not exist key is rejected </dd></dl>
+
+</div>
+</div>
+<a id="ac3e2355473bc8b2c108bac74d13f0dff" name="ac3e2355473bc8b2c108bac74d13f0dff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3e2355473bc8b2c108bac74d13f0dff">&#9670;&#160;</a></span>statistics()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::Performance::statistics </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
-          <td class="paramname"><em>tm</em>, </td>
+          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>tm</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>()</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Count the system performance up to a certain moment according to the trade records; datetime must be greater than or equal to lastDatetime so that it can be used to calculate the current market value </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tm</td><td>the given trade management instance </td></tr>
+    <tr><td class="paramname">datetime</td><td>the statistics end moment </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abd1c1bfe2efc0653b8447278698f8f29" name="abd1c1bfe2efc0653b8447278698f8f29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd1c1bfe2efc0653b8447278698f8f29">&#9670;&#160;</a></span>values()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> hku::Performance::values </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the values of all the statistics items, in the same order as names </p>
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/trade_manage/<a class="el" href="_performance_8h_source.html">Performance.h</a></li>
-<li>hikyuu/trade_manage/<a class="el" href="_performance_8cpp.html">Performance.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_performance.html">Performance</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

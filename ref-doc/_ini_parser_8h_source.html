@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: hikyuu_utils/iniparser/IniParser.h 源文件</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/ini_parser/IniParser.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_ini_parser_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,34 +74,135 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_699ca82e967419bb3b9d6415a2e15ac3.html">hikyuu_utils</a></li><li class="navelem"><a class="el" href="dir_37647721fe80f39e7681957eac7aeeed.html">iniparser</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">IniParser.h</div>  </div>
+  <div class="headertitle"><div class="title">IniParser.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_ini_parser_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * IniFile.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2010-5-19</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef INIPARSER_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define INIPARSER_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;stdexcept&gt;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;list&gt;</span></div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;boost/utility.hpp&gt;</span></div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span></div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#if defined(BOOST_MSVC)</span></div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#pragma warning(disable: 4251)</span></div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#pragma warning(disable: 4275)</span></div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#pragma warning(disable: 4290)</span></div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#ifndef HKU_API</span></div><div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">   25</a></span>&#160;<span class="preprocessor">#define HKU_API</span></div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div><div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html">   55</a></span>&#160;<span class="keyword">class </span><a class="code" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_ini_parser.html">IniParser</a> : boost::noncopyable {</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">   57</a></span>&#160;    <span class="keyword">typedef</span> std::list&lt;std::string&gt; <a class="code" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">StringList</a>;</div><div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">   58</a></span>&#160;    <span class="keyword">typedef</span> boost::shared_ptr&lt;std::list&lt;std::string&gt; &gt; <a class="code" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">StringListPtr</a>;</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classhku_1_1_ini_parser.html">IniParser</a>();</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classhku_1_1_ini_parser.html">IniParser</a>();</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">void</span> read(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; filename) <span class="keywordflow">throw</span> (std::invalid_argument,</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            std::logic_error);</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">void</span> clear();</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordtype">bool</span> hasSection(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section) <span class="keyword">const</span>;</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">bool</span> hasOption(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section, <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; option) <span class="keyword">const</span>;</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    StringListPtr getSectionList() <span class="keyword">const</span>;</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    StringListPtr getOptionList(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section) <span class="keyword">const</span>;</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a> <span class="keyword">get</span>(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section, <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; option,</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; default_str = <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>()) <span class="keyword">const</span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            <span class="keywordflow">throw</span> (std::invalid_argument);</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="comment">//以下默认值类型使用string的原因是因为int/float/double/bool类型没有空对象</span></div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">int</span> getInt(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section, <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; option,</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; default_str = <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>()) <span class="keyword">const</span>;</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordtype">float</span> getFloat(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section, <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; option,</div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; default_str = <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>()) <span class="keyword">const</span>;</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">double</span> getDouble(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section, <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; option,</div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; default_str = <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>()) <span class="keyword">const</span>;</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">bool</span> getBool(<span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; section, <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; option,</div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>&amp; default_str = <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">std::string</a>()) <span class="keyword">const</span>;</div><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div><div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">typedef</span> std::map&lt;std::string, std::string&gt; item_map_type;</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keyword">typedef</span> std::map&lt;std::string, item_map_type&gt; section_map_type;</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    section_map_type m_sections;</div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;};</div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;} <span class="comment">/* namespace */</span></div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* INIFILE_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_ini_parser_html_a990f71339ca1d7cb5c60a62c5044020f"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">hku::IniParser::StringList</a></div><div class="ttdeci">std::list&lt; std::string &gt; StringList</div><div class="ttdef"><b>Definition:</b> IniParser.h:57</div></div>
-<div class="ttc" id="group___data_type_html_ga409c63378ffa8adc12552ee86a7d49de"><div class="ttname"><a href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">hku::string</a></div><div class="ttdeci">std::string string</div><div class="ttdef"><b>Definition:</b> DataType.h:59</div></div>
-<div class="ttc" id="classhku_1_1_ini_parser_html"><div class="ttname"><a href="classhku_1_1_ini_parser.html">hku::IniParser</a></div><div class="ttdoc">支持简单的ini格式文件的读取  </div><div class="ttdef"><b>Definition:</b> IniParser.h:55</div></div>
-<div class="ttc" id="classhku_1_1_ini_parser_html_afebc7005a3db23f48ff8a46a45253dc9"><div class="ttname"><a href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">hku::IniParser::StringListPtr</a></div><div class="ttdeci">boost::shared_ptr&lt; std::list&lt; std::string &gt; &gt; StringListPtr</div><div class="ttdef"><b>Definition:</b> IniParser.h:58</div></div>
-<div class="ttc" id="_ini_parser_8h_html_af59fd09cf4bfe9c265f61882e5f07d7a"><div class="ttname"><a href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a></div><div class="ttdeci">#define HKU_API</div><div class="ttdef"><b>Definition:</b> IniParser.h:25</div></div>
-<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * IniFile.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2010-5-19</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef INIPARSER_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define INIPARSER_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/utilities/config.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#if !HKU_ENABLE_INI_PARSER</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#error &quot;Don&#39;t enable ini_parser, please config with --ini_parser=y&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;list&gt;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#if defined(_MSC_VER)</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#pragma warning(disable : 4251)</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#pragma warning(disable : 4275)</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#pragma warning(disable : 4290)</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#ifndef HKU_UTILS_API</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#define HKU_UTILS_API</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="foldopen" id="foldopen00062" data-start="{" data-end="};">
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html">   62</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">IniParser</a> {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">   64</a></span>    <span class="keyword">typedef</span> std::list&lt;std::string&gt; <a class="code hl_typedef" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">StringList</a>;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a4fd52b140382fe905f8f4c19593c2974">   65</a></span>    <span class="keyword">typedef</span> std::shared_ptr&lt;std::list&lt;std::string&gt; &gt; <a class="code hl_typedef" href="classhku_1_1_ini_parser.html#a4fd52b140382fe905f8f4c19593c2974">StringListPtr</a>;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">   67</a></span>    <a class="code hl_function" href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">IniParser</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">IniParser</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a222adcf049c87ca78119fe310998853d">   68</a></span>    <a class="code hl_function" href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">IniParser</a>&amp; <a class="code hl_function" href="classhku_1_1_ini_parser.html#a222adcf049c87ca78119fe310998853d">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">IniParser</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#acd6dabeb2b2b27a55f3e4a6a8c37b97a">   70</a></span>    <a class="code hl_function" href="classhku_1_1_ini_parser.html#acd6dabeb2b2b27a55f3e4a6a8c37b97a">IniParser</a>();</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a8dc3a7a66e7e7785615cb55a81d90e9e">   71</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a8dc3a7a66e7e7785615cb55a81d90e9e">~IniParser</a>();</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a440091ff037a936db01737c540fa9b78">   73</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a440091ff037a936db01737c540fa9b78">read</a>(<span class="keyword">const</span> std::string&amp; filename);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a5018c56a290c75a0b89b3e1473844e34">   74</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a5018c56a290c75a0b89b3e1473844e34">clear</a>();</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a8c24534d6c5f3868e8643d8685a452da">   76</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a8c24534d6c5f3868e8643d8685a452da">hasSection</a>(<span class="keyword">const</span> std::string&amp; section) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a143dfb9ea643050510e01ac5bfcd606f">   77</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a143dfb9ea643050510e01ac5bfcd606f">hasOption</a>(<span class="keyword">const</span> std::string&amp; section, <span class="keyword">const</span> std::string&amp; option) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a878af12c044b2e002be0156e55b9c430">   79</a></span>    <a class="code hl_typedef" href="classhku_1_1_ini_parser.html#a4fd52b140382fe905f8f4c19593c2974">StringListPtr</a> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a878af12c044b2e002be0156e55b9c430">getSectionList</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a9215f3e5305b43642a842ced3f00c75b">   80</a></span>    <a class="code hl_typedef" href="classhku_1_1_ini_parser.html#a4fd52b140382fe905f8f4c19593c2974">StringListPtr</a> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a9215f3e5305b43642a842ced3f00c75b">getOptionList</a>(<span class="keyword">const</span> std::string&amp; section) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a98588f7d871990deaf481c8fa314b26c">   82</a></span>    std::string <a class="code hl_function" href="classhku_1_1_ini_parser.html#a98588f7d871990deaf481c8fa314b26c">get</a>(<span class="keyword">const</span> std::string&amp; section, <span class="keyword">const</span> std::string&amp; option,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                    <span class="keyword">const</span> std::string&amp; default_str = std::string()) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="comment">// The reason why the following default value type uses string is that the int/float/double/bool</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="comment">// types have no empty object</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a542c448456c291149af1a421eaf0eb0c">   87</a></span>    <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a542c448456c291149af1a421eaf0eb0c">getInt</a>(<span class="keyword">const</span> std::string&amp; section, <span class="keyword">const</span> std::string&amp; option,</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>               <span class="keyword">const</span> std::string&amp; default_str = std::string()) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a0306cc5b88d022c1219f7df0b814117e">   90</a></span>    <span class="keywordtype">float</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a0306cc5b88d022c1219f7df0b814117e">getFloat</a>(<span class="keyword">const</span> std::string&amp; section, <span class="keyword">const</span> std::string&amp; option,</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                   <span class="keyword">const</span> std::string&amp; default_str = std::string()) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a306ef0c73553c9455c4ca40379dd1616">   93</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a306ef0c73553c9455c4ca40379dd1616">getDouble</a>(<span class="keyword">const</span> std::string&amp; section, <span class="keyword">const</span> std::string&amp; option,</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>                     <span class="keyword">const</span> std::string&amp; default_str = std::string()) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classhku_1_1_ini_parser.html#a6a292f1ee566b11361aed3a77123ac57">   96</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_ini_parser.html#a6a292f1ee566b11361aed3a77123ac57">getBool</a>(<span class="keyword">const</span> std::string&amp; section, <span class="keyword">const</span> std::string&amp; option,</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>                 <span class="keyword">const</span> std::string&amp; default_str = std::string()) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keyword">typedef</span> std::map&lt;std::string, std::string&gt; item_map_type;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keyword">typedef</span> std::map&lt;std::string, item_map_type&gt; section_map_type;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    section_map_type m_sections;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>};</div>
+</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="preprocessor">#endif </span><span class="comment">/* INIFILE_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a0306cc5b88d022c1219f7df0b814117e"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a0306cc5b88d022c1219f7df0b814117e">hku::IniParser::getFloat</a></div><div class="ttdeci">float getFloat(const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a143dfb9ea643050510e01ac5bfcd606f"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a143dfb9ea643050510e01ac5bfcd606f">hku::IniParser::hasOption</a></div><div class="ttdeci">bool hasOption(const std::string &amp;section, const std::string &amp;option) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a222adcf049c87ca78119fe310998853d"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a222adcf049c87ca78119fe310998853d">hku::IniParser::operator=</a></div><div class="ttdeci">IniParser &amp; operator=(const IniParser &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a306ef0c73553c9455c4ca40379dd1616"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a306ef0c73553c9455c4ca40379dd1616">hku::IniParser::getDouble</a></div><div class="ttdeci">double getDouble(const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a440091ff037a936db01737c540fa9b78"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a440091ff037a936db01737c540fa9b78">hku::IniParser::read</a></div><div class="ttdeci">void read(const std::string &amp;filename)</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a4fd52b140382fe905f8f4c19593c2974"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a4fd52b140382fe905f8f4c19593c2974">hku::IniParser::StringListPtr</a></div><div class="ttdeci">std::shared_ptr&lt; std::list&lt; std::string &gt; &gt; StringListPtr</div><div class="ttdef"><b>定义</b> IniParser.h:65</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a5018c56a290c75a0b89b3e1473844e34"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a5018c56a290c75a0b89b3e1473844e34">hku::IniParser::clear</a></div><div class="ttdeci">void clear()</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a542c448456c291149af1a421eaf0eb0c"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a542c448456c291149af1a421eaf0eb0c">hku::IniParser::getInt</a></div><div class="ttdeci">int getInt(const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a5587557c81bb5381fe081a25f52c34f1"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a5587557c81bb5381fe081a25f52c34f1">hku::IniParser::IniParser</a></div><div class="ttdeci">IniParser(const IniParser &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a6a292f1ee566b11361aed3a77123ac57"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a6a292f1ee566b11361aed3a77123ac57">hku::IniParser::getBool</a></div><div class="ttdeci">bool getBool(const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a878af12c044b2e002be0156e55b9c430"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a878af12c044b2e002be0156e55b9c430">hku::IniParser::getSectionList</a></div><div class="ttdeci">StringListPtr getSectionList() const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a8c24534d6c5f3868e8643d8685a452da"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a8c24534d6c5f3868e8643d8685a452da">hku::IniParser::hasSection</a></div><div class="ttdeci">bool hasSection(const std::string &amp;section) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a8dc3a7a66e7e7785615cb55a81d90e9e"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a8dc3a7a66e7e7785615cb55a81d90e9e">hku::IniParser::~IniParser</a></div><div class="ttdeci">virtual ~IniParser()</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a9215f3e5305b43642a842ced3f00c75b"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a9215f3e5305b43642a842ced3f00c75b">hku::IniParser::getOptionList</a></div><div class="ttdeci">StringListPtr getOptionList(const std::string &amp;section) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a98588f7d871990deaf481c8fa314b26c"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a98588f7d871990deaf481c8fa314b26c">hku::IniParser::get</a></div><div class="ttdeci">std::string get(const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_a990f71339ca1d7cb5c60a62c5044020f"><div class="ttname"><a href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">hku::IniParser::StringList</a></div><div class="ttdeci">std::list&lt; std::string &gt; StringList</div><div class="ttdef"><b>定义</b> IniParser.h:64</div></div>
+<div class="ttc" id="aclasshku_1_1_ini_parser_html_acd6dabeb2b2b27a55f3e4a6a8c37b97a"><div class="ttname"><a href="classhku_1_1_ini_parser.html#acd6dabeb2b2b27a55f3e4a6a8c37b97a">hku::IniParser::IniParser</a></div><div class="ttdeci">IniParser()</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6754b2c7cee350f5db9946b7fe82a0d3.html">ini_parser</a></li><li class="navelem"><b>IniParser.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

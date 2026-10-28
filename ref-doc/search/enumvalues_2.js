@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['date',['DATE',['../classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8a92de22d5f02fa3d0abe3693eddcc370d',1,'hku::KQuery']]],
-  ['day',['DAY',['../classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a58c2095b55dc7968c423954663358cec',1,'hku::KQuery']]],
-  ['div',['DIV',['../classhku_1_1_operand_node.html#a0b7ba3f582d0bdfb6876349262b774dfa4a4eb9c3b93172692d39fa0d0725d2bc',1,'hku::OperandNode']]]
+  ['clear_0',['CLEAR',['../namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622ea813461e0c58e7ad59a2fd83ca2237fec',1,'hku']]]
 ];

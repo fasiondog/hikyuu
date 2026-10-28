@@ -1,0 +1,367 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::NodeServer类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_node_server.html','','classhku_1_1_node_server-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::NodeServer类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="_node_server_8h_source.html">NodeServer.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a557a631e2cc8636f7077ea5aad6ef005" id="r_a557a631e2cc8636f7077ea5aad6ef005"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a557a631e2cc8636f7077ea5aad6ef005">NodeServer</a> ()=default</td></tr>
+<tr class="memitem:aa85889e246cae0487c033938e71f37c6" id="r_aa85889e246cae0487c033938e71f37c6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa85889e246cae0487c033938e71f37c6">NodeServer</a> (const std::string &amp;addr)</td></tr>
+<tr class="memitem:affdc293d1d4c8612f6b5125131c7af2d" id="r_affdc293d1d4c8612f6b5125131c7af2d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affdc293d1d4c8612f6b5125131c7af2d">~NodeServer</a> ()</td></tr>
+<tr class="memitem:afb30b2ee19e778ab6499737e6ef69abd" id="r_afb30b2ee19e778ab6499737e6ef69abd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb30b2ee19e778ab6499737e6ef69abd">setAddr</a> (const std::string &amp;addr)</td></tr>
+<tr class="memitem:a34cb0d985c0e09d08c3db15ce3b9b9a8" id="r_a34cb0d985c0e09d08c3db15ce3b9b9a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34cb0d985c0e09d08c3db15ce3b9b9a8">regHandle</a> (const std::string &amp;cmd, const std::function&lt; <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a>(<a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;&amp;req)&gt; &amp;handle)</td></tr>
+<tr class="memitem:add11c1f01258c379bf959b600bc25804" id="r_add11c1f01258c379bf959b600bc25804"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add11c1f01258c379bf959b600bc25804">regHandle</a> (const std::string &amp;cmd, std::function&lt; <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a>(<a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;&amp;req)&gt; &amp;&amp;handle)</td></tr>
+<tr class="memitem:a409dc5135d1c5885a4a7d08ae3fe0b0e" id="r_a409dc5135d1c5885a4a7d08ae3fe0b0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a409dc5135d1c5885a4a7d08ae3fe0b0e">start</a> (size_t max_parrel=128)</td></tr>
+<tr class="memitem:a862fccd8a7d357c4043350c4544ecebe" id="r_a862fccd8a7d357c4043350c4544ecebe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a862fccd8a7d357c4043350c4544ecebe">loop</a> ()</td></tr>
+<tr class="memitem:a69c941186b782a1bf2148ef8cb5ea4e2" id="r_a69c941186b782a1bf2148ef8cb5ea4e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69c941186b782a1bf2148ef8cb5ea4e2">stop</a> ()</td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a557a631e2cc8636f7077ea5aad6ef005" name="a557a631e2cc8636f7077ea5aad6ef005"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a557a631e2cc8636f7077ea5aad6ef005">&#9670;&#160;</a></span>NodeServer() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::NodeServer::NodeServer </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa85889e246cae0487c033938e71f37c6" name="aa85889e246cae0487c033938e71f37c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa85889e246cae0487c033938e71f37c6">&#9670;&#160;</a></span>NodeServer() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::NodeServer::NodeServer </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>addr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="affdc293d1d4c8612f6b5125131c7af2d" name="affdc293d1d4c8612f6b5125131c7af2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affdc293d1d4c8612f6b5125131c7af2d">&#9670;&#160;</a></span>~NodeServer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::NodeServer::~NodeServer </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a862fccd8a7d357c4043350c4544ecebe" name="a862fccd8a7d357c4043350c4544ecebe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a862fccd8a7d357c4043350c4544ecebe">&#9670;&#160;</a></span>loop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::NodeServer::loop </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a34cb0d985c0e09d08c3db15ce3b9b9a8" name="a34cb0d985c0e09d08c3db15ce3b9b9a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34cb0d985c0e09d08c3db15ce3b9b9a8">&#9670;&#160;</a></span>regHandle() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::NodeServer::regHandle </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::function&lt; <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a>(<a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;&amp;req)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>handle</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="add11c1f01258c379bf959b600bc25804" name="add11c1f01258c379bf959b600bc25804"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add11c1f01258c379bf959b600bc25804">&#9670;&#160;</a></span>regHandle() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::NodeServer::regHandle </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>cmd</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a>(<a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;&amp;req)&gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>handle</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb30b2ee19e778ab6499737e6ef69abd" name="afb30b2ee19e778ab6499737e6ef69abd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb30b2ee19e778ab6499737e6ef69abd">&#9670;&#160;</a></span>setAddr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::NodeServer::setAddr </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>addr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a409dc5135d1c5885a4a7d08ae3fe0b0e" name="a409dc5135d1c5885a4a7d08ae3fe0b0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a409dc5135d1c5885a4a7d08ae3fe0b0e">&#9670;&#160;</a></span>start()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::NodeServer::start </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>max_parrel</em></span><span class="paramdefsep"> = </span><span class="paramdefval">128</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a69c941186b782a1bf2148ef8cb5ea4e2" name="a69c941186b782a1bf2148ef8cb5ea4e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69c941186b782a1bf2148ef8cb5ea4e2">&#9670;&#160;</a></span>stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::NodeServer::stop </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/node/<a class="el" href="_node_server_8h_source.html">NodeServer.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_node_server.html">NodeServer</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

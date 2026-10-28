@@ -1,0 +1,142 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/plugin/backtest.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('backtest_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">backtest.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-04-12</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;hikyuu/strategy/Strategy.h&quot;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="group___strategy.html#ga63667172361c46f854f7f52f08a0cfdc">   29</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="group___strategy.html#ga63667172361c46f854f7f52f08a0cfdc">backtest</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_strategy_context.html">StrategyContext</a>&amp; context, <span class="keyword">const</span> std::function&lt;<span class="keywordtype">void</span>(<a class="code hl_class" href="classhku_1_1_strategy.html">Strategy</a>*)&gt;&amp; on_bar,</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                      <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; start_date,</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                      <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; end_date = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;Datetime&gt;</a>(),</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>                      <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; ref_market = <span class="stringliteral">&quot;SH&quot;</span>,</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                      <span class="keywordtype">int</span> mode = 0, <span class="keywordtype">bool</span> support_short = <span class="keyword">false</span>, <a class="code hl_typedef" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> slip = <a class="code hl_typedef" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>());</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment">// It is used after sm.init only</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="namespacehku.html#ad576cb9c7171556f789ef7a2d30a8bb6">   36</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="group___strategy.html#ga63667172361c46f854f7f52f08a0cfdc">backtest</a>(<span class="keyword">const</span> std::function&lt;<span class="keywordtype">void</span>(<a class="code hl_class" href="classhku_1_1_strategy.html">Strategy</a>*)&gt;&amp; on_bar, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                      <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; start_date, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; end_date = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;Datetime&gt;</a>(),</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                      <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; ref_market = <span class="stringliteral">&quot;SH&quot;</span>,</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                      <span class="keywordtype">int</span> mode = 0, <span class="keywordtype">bool</span> support_short = <span class="keyword">false</span>, <a class="code hl_typedef" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> slip = <a class="code hl_typedef" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>());</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a305b6d1aff976a8b9d2460e6964308fe"><div class="ttname"><a href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">hku::KQuery::DAY</a></div><div class="ttdeci">static const string DAY</div><div class="ttdef"><b>定义</b> KQuery.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_null_html"><div class="ttname"><a href="classhku_1_1_null.html">hku::Null</a></div><div class="ttdoc">It provides the Null value of the given type</div><div class="ttdef"><b>定义</b> Null.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html"><div class="ttname"><a href="classhku_1_1_strategy_context.html">hku::StrategyContext</a></div><div class="ttdoc">Strategy context, it defines the security / K-line level information contained when the strategy is e...</div><div class="ttdef"><b>定义</b> StrategyContext.h:21</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_html"><div class="ttname"><a href="classhku_1_1_strategy.html">hku::Strategy</a></div><div class="ttdoc">Strategy runtime</div><div class="ttdef"><b>定义</b> Strategy.h:44</div></div>
+<div class="ttc" id="agroup___slippage_html_ga049e6ab56e4c995847c08232913198e1"><div class="ttname"><a href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">hku::SlippagePtr</a></div><div class="ttdeci">shared_ptr&lt; SlippageBase &gt; SlippagePtr</div><div class="ttdoc">Client programs should all use this pointer type to operate the slippage algorithm</div><div class="ttdef"><b>定义</b> SlippageBase.h:225</div></div>
+<div class="ttc" id="agroup___strategy_html_ga63667172361c46f854f7f52f08a0cfdc"><div class="ttname"><a href="group___strategy.html#ga63667172361c46f854f7f52f08a0cfdc">hku::backtest</a></div><div class="ttdeci">void HKU_API backtest(const StrategyContext &amp;context, const std::function&lt; void(Strategy *)&gt; &amp;on_bar, const TradeManagerPtr &amp;tm, const Datetime &amp;start_date, const Datetime &amp;end_date=Null&lt; Datetime &gt;(), const KQuery::KType &amp;ktype=KQuery::DAY, const string &amp;ref_market=&quot;SH&quot;, int mode=0, bool support_short=false, SlippagePtr slip=SlippagePtr())</div><div class="ttdoc">Strategy backtest (event driven way)</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga9d7ab0c25be37c167f61358a5fa526f0"><div class="ttname"><a href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TradeManagerPtr</div><div class="ttdoc">Client programs should use this type for the actual operations</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:904</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_991d4c37e893a0798e9e63870536be30.html">plugin</a></li><li class="navelem"><b>backtest.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

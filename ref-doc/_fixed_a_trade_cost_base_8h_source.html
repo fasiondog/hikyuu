@@ -1,0 +1,183 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_manage/imp/FixedATradeCostBase.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_fixed_a_trade_cost_base_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">FixedATradeCostBase.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * FixedATradeCostBase.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2026-10-9</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef TRADE_MANAGE_IMP_FIXEDATRADECOSTBASE_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define TRADE_MANAGE_IMP_FIXEDATRADECOSTBASE_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../TradeCostBase.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span></div>
+<div class="foldopen" id="foldopen00030" data-start="{" data-end="};">
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html">   30</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#a94077e99895dcbbc5f39df99e42f3f01">FixedATradeCostBase</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_trade_cost_base.html#a30024100b138cfe9a27222e02301f902">TradeCostBase</a> {</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#a94077e99895dcbbc5f39df99e42f3f01">   32</a></span>    <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#a94077e99895dcbbc5f39df99e42f3f01">FixedATradeCostBase</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_trade_cost_base.html#aebef499b679a5c5bfe03c93fd2e19698">name</a>);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#a2212ff7353c0ed2403016c4a66c5d846">   33</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#a2212ff7353c0ed2403016c4a66c5d846">~FixedATradeCostBase</a>();</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#a7adab5a4b423b91bff972aeb00288690">   43</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_cost_record.html">CostRecord</a> <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#a7adab5a4b423b91bff972aeb00288690">getBuyCost</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                                  <span class="keywordtype">double</span> num) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#aab78f28af8cbec93d10daf45bf8a1a8d">   54</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_cost_record.html">CostRecord</a> <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#aab78f28af8cbec93d10daf45bf8a1a8d">getSellCost</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>                                   <span class="keywordtype">double</span> num) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#a53092c66c93945effac94dc0c53f36a7">   57</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#a53092c66c93945effac94dc0c53f36a7">_checkParam</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_trade_cost_base.html#aebef499b679a5c5bfe03c93fd2e19698">name</a>) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#a80ee408a6de76cc273f77abbe65170f3">   68</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_fixed_a_trade_cost_base.html#a80ee408a6de76cc273f77abbe65170f3">_calcTransferFee</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> value, <span class="keywordtype">double</span> num) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="classhku_1_1_fixed_a_trade_cost_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   72</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(<a class="code hl_function" href="classhku_1_1_trade_cost_base.html#a30024100b138cfe9a27222e02301f902">TradeCostBase</a>);</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>};</div>
+</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>BOOST_SERIALIZATION_ASSUME_ABSTRACT(FixedATradeCostBase)</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="foldopen" id="foldopen00087" data-start="" data-end="">
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="group___trade_cost.html#ga31d936815e8f38b353a39bf2d0535622">   87</a></span><span class="preprocessor">#define TRADE_COST_FIXEDA_SERIALIZATION                               \</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">private:                                                              \</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">    friend class boost::serialization::access;                        \</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">    template &lt;class Archive&gt;                                          \</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">    void serialize(Archive&amp; ar, const unsigned int version) {         \</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(FixedATradeCostBase); \</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">    }</span></div>
+</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">#define TRADE_COST_FIXEDA_SERIALIZATION</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="preprocessor">#endif </span><span class="comment">/* TRADE_MANAGE_IMP_FIXEDATRADECOSTBASE_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_cost_record_html"><div class="ttname"><a href="classhku_1_1_cost_record.html">hku::CostRecord</a></div><div class="ttdoc">Cost record</div><div class="ttdef"><b>定义</b> CostRecord.h:25</div></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_a_trade_cost_base_html_a2212ff7353c0ed2403016c4a66c5d846"><div class="ttname"><a href="classhku_1_1_fixed_a_trade_cost_base.html#a2212ff7353c0ed2403016c4a66c5d846">hku::FixedATradeCostBase::~FixedATradeCostBase</a></div><div class="ttdeci">virtual ~FixedATradeCostBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_a_trade_cost_base_html_a53092c66c93945effac94dc0c53f36a7"><div class="ttname"><a href="classhku_1_1_fixed_a_trade_cost_base.html#a53092c66c93945effac94dc0c53f36a7">hku::FixedATradeCostBase::_checkParam</a></div><div class="ttdeci">virtual void _checkParam(const string &amp;name) const override</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_a_trade_cost_base_html_a7adab5a4b423b91bff972aeb00288690"><div class="ttname"><a href="classhku_1_1_fixed_a_trade_cost_base.html#a7adab5a4b423b91bff972aeb00288690">hku::FixedATradeCostBase::getBuyCost</a></div><div class="ttdeci">virtual CostRecord getBuyCost(const Datetime &amp;datetime, const Stock &amp;stock, price_t price, double num) const override</div><div class="ttdoc">Calculate the buy cost</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_a_trade_cost_base_html_a80ee408a6de76cc273f77abbe65170f3"><div class="ttname"><a href="classhku_1_1_fixed_a_trade_cost_base.html#a80ee408a6de76cc273f77abbe65170f3">hku::FixedATradeCostBase::_calcTransferFee</a></div><div class="ttdeci">virtual price_t _calcTransferFee(const Stock &amp;stock, price_t value, double num) const =0</div><div class="ttdoc">Transfer-fee policy that differs among the eras: either per share or per turnover value,...</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_a_trade_cost_base_html_a94077e99895dcbbc5f39df99e42f3f01"><div class="ttname"><a href="classhku_1_1_fixed_a_trade_cost_base.html#a94077e99895dcbbc5f39df99e42f3f01">hku::FixedATradeCostBase::FixedATradeCostBase</a></div><div class="ttdeci">FixedATradeCostBase(const string &amp;name)</div></div>
+<div class="ttc" id="aclasshku_1_1_fixed_a_trade_cost_base_html_aab78f28af8cbec93d10daf45bf8a1a8d"><div class="ttname"><a href="classhku_1_1_fixed_a_trade_cost_base.html#aab78f28af8cbec93d10daf45bf8a1a8d">hku::FixedATradeCostBase::getSellCost</a></div><div class="ttdeci">virtual CostRecord getSellCost(const Datetime &amp;datetime, const Stock &amp;stock, price_t price, double num) const override</div><div class="ttdoc">Calculate the sell cost</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="aclasshku_1_1_trade_cost_base_html_a30024100b138cfe9a27222e02301f902"><div class="ttname"><a href="classhku_1_1_trade_cost_base.html#a30024100b138cfe9a27222e02301f902">hku::TradeCostBase::TradeCostBase</a></div><div class="ttdeci">TradeCostBase(const string &amp;name)</div></div>
+<div class="ttc" id="aclasshku_1_1_trade_cost_base_html_aebef499b679a5c5bfe03c93fd2e19698"><div class="ttname"><a href="classhku_1_1_trade_cost_base.html#aebef499b679a5c5bfe03c93fd2e19698">hku::TradeCostBase::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the name</div><div class="ttdef"><b>定义</b> TradeCostBase.h:34</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></li><li class="navelem"><a href="dir_6e98491e327e2a1629b5b53cc2b0a3ca.html">imp</a></li><li class="navelem"><b>FixedATradeCostBase.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

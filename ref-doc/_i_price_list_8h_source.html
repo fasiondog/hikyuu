@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hikyuu/indicator/imp/IPriceList.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_i_price_list_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,38 +74,79 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html">indicator</a></li><li class="navelem"><a class="el" href="dir_33c68ad0fcacd12a721ddcadbbc0c6ce.html">imp</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">IPriceList.h</div>  </div>
+  <div class="headertitle"><div class="title">IPriceList.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_i_price_list_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * IPriceList.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-2-12</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef IPRICELIST_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define IPRICELIST_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../Indicator.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">//找到数组最后一个Null&lt;price_t&gt;，并将之前的数据全部置为Null</span></div><div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html">   16</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_i_price_list.html">IPriceList</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_indicator_imp.html">IndicatorImp</a> {</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="_indicator_imp_8h.html#a55e9acb9541b95a4b4de59b0d5c3d81b">INDICATOR_IMP</a>(<a class="code" href="classhku_1_1_i_price_list.html">IPriceList</a>)</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="_indicator_imp_8h.html#a27051fc080b7d118326832244215d1cd">INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">IPriceList</a>();</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">IPriceList</a>(<span class="keyword">const</span> <a class="code" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&amp;, <span class="keywordtype">int</span> <a class="code" href="classhku_1_1_indicator_imp.html#a803983d7a0b3a2aa7884e46c6c74edb3">discard</a>);</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">IPriceList</a>(<a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> *, <span class="keywordtype">size_t</span>);</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_i_price_list.html#a4b4d40e2f08869b3e9cc818afb12f736">~IPriceList</a>();</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;};</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* IPRICELIST_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="_indicator_imp_8h_html_a27051fc080b7d118326832244215d1cd"><div class="ttname"><a href="_indicator_imp_8h.html#a27051fc080b7d118326832244215d1cd">INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="ttdeci">#define INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="ttdef"><b>Definition:</b> IndicatorImp.h:168</div></div>
-<div class="ttc" id="classhku_1_1_indicator_imp_html"><div class="ttname"><a href="classhku_1_1_indicator_imp.html">hku::IndicatorImp</a></div><div class="ttdoc">指标实现类，定义新指标时，应从此类继承 </div><div class="ttdef"><b>Definition:</b> IndicatorImp.h:33</div></div>
-<div class="ttc" id="classhku_1_1_i_price_list_html"><div class="ttname"><a href="classhku_1_1_i_price_list.html">hku::IPriceList</a></div><div class="ttdef"><b>Definition:</b> IPriceList.h:16</div></div>
-<div class="ttc" id="group___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>Definition:</b> DataType.h:72</div></div>
-<div class="ttc" id="classhku_1_1_i_price_list_html_a65cf389e3a480fa499973eddf0cd0f8c"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">hku::IPriceList::IPriceList</a></div><div class="ttdeci">IPriceList()</div><div class="ttdef"><b>Definition:</b> IPriceList.cpp:12</div></div>
-<div class="ttc" id="classhku_1_1_i_price_list_html_a4b4d40e2f08869b3e9cc818afb12f736"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a4b4d40e2f08869b3e9cc818afb12f736">hku::IPriceList::~IPriceList</a></div><div class="ttdeci">virtual ~IPriceList()</div><div class="ttdef"><b>Definition:</b> IPriceList.cpp:64</div></div>
-<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
-<div class="ttc" id="_indicator_imp_8h_html_a55e9acb9541b95a4b4de59b0d5c3d81b"><div class="ttname"><a href="_indicator_imp_8h.html#a55e9acb9541b95a4b4de59b0d5c3d81b">INDICATOR_IMP</a></div><div class="ttdeci">#define INDICATOR_IMP(classname)</div><div class="ttdef"><b>Definition:</b> IndicatorImp.h:178</div></div>
-<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
-<div class="ttc" id="classhku_1_1_indicator_imp_html_a803983d7a0b3a2aa7884e46c6c74edb3"><div class="ttname"><a href="classhku_1_1_indicator_imp.html#a803983d7a0b3a2aa7884e46c6c74edb3">hku::IndicatorImp::discard</a></div><div class="ttdeci">size_t discard() const </div><div class="ttdef"><b>Definition:</b> IndicatorImp.h:48</div></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * IPriceList.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2013-2-12</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef INDICATOR_IMP_IPRICELIST_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define INDICATOR_IMP_IPRICELIST_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../Indicator.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// Find the last Null&lt;price_t&gt; in the array and set all the preceding data to Null</span></div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html">   17</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">IPriceList</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_indicator_imp.html#a2491b09ab8d65f22d937bebdc5222980">IndicatorImp</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    INDICATOR_IMP(<a class="code hl_function" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">IPriceList</a>)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">   22</a></span>    <a class="code hl_function" href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">IPriceList</a>();</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html#a4875f660fd802292a7334f5eca45ad26">   23</a></span>    <a class="code hl_function" href="classhku_1_1_i_price_list.html#a4875f660fd802292a7334f5eca45ad26">IPriceList</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&amp;, <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_indicator_imp.html#a8509bb18078abf4a1c7148ae58e1128b">discard</a>);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html#a901f5568b7b8fb2c2dd1af15d30d2d42">   24</a></span>    <a class="code hl_function" href="classhku_1_1_i_price_list.html#a901f5568b7b8fb2c2dd1af15d30d2d42">IPriceList</a>(<a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&amp;&amp;, <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_indicator_imp.html#a8509bb18078abf4a1c7148ae58e1128b">discard</a>);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html#a865ab6d5acda0fbc95a929fcbe3107d3">   25</a></span>    <a class="code hl_function" href="classhku_1_1_i_price_list.html#a865ab6d5acda0fbc95a929fcbe3107d3">IPriceList</a>(<span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_indicator_imp.html#ad10e5e49b0378f823ae1faa9ec40ab45">size</a>, <span class="keywordtype">double</span> value, <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_indicator_imp.html#a8509bb18078abf4a1c7148ae58e1128b">discard</a>);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html#aaf6dcb08e896de109ed61b91769d3e9e">   26</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_i_price_list.html#aaf6dcb08e896de109ed61b91769d3e9e">~IPriceList</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_i_price_list.html#a836e76485bf0816ee39d4cc8093595c3">   27</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_i_price_list.html#a836e76485bf0816ee39d4cc8093595c3">_checkParam</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_indicator_imp.html#a1d6fa2aa71eab3f70c6adaafeda1dc21">name</a>) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>};</div>
+</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#endif </span><span class="comment">/* INDICATOR_IMP_IPRICELIST_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_i_price_list_html_a4875f660fd802292a7334f5eca45ad26"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a4875f660fd802292a7334f5eca45ad26">hku::IPriceList::IPriceList</a></div><div class="ttdeci">IPriceList(const PriceList &amp;, int discard)</div></div>
+<div class="ttc" id="aclasshku_1_1_i_price_list_html_a65cf389e3a480fa499973eddf0cd0f8c"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a65cf389e3a480fa499973eddf0cd0f8c">hku::IPriceList::IPriceList</a></div><div class="ttdeci">IPriceList()</div></div>
+<div class="ttc" id="aclasshku_1_1_i_price_list_html_a836e76485bf0816ee39d4cc8093595c3"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a836e76485bf0816ee39d4cc8093595c3">hku::IPriceList::_checkParam</a></div><div class="ttdeci">virtual void _checkParam(const string &amp;name) const override</div></div>
+<div class="ttc" id="aclasshku_1_1_i_price_list_html_a865ab6d5acda0fbc95a929fcbe3107d3"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a865ab6d5acda0fbc95a929fcbe3107d3">hku::IPriceList::IPriceList</a></div><div class="ttdeci">IPriceList(size_t size, double value, int discard)</div></div>
+<div class="ttc" id="aclasshku_1_1_i_price_list_html_a901f5568b7b8fb2c2dd1af15d30d2d42"><div class="ttname"><a href="classhku_1_1_i_price_list.html#a901f5568b7b8fb2c2dd1af15d30d2d42">hku::IPriceList::IPriceList</a></div><div class="ttdeci">IPriceList(PriceList &amp;&amp;, int discard)</div></div>
+<div class="ttc" id="aclasshku_1_1_i_price_list_html_aaf6dcb08e896de109ed61b91769d3e9e"><div class="ttname"><a href="classhku_1_1_i_price_list.html#aaf6dcb08e896de109ed61b91769d3e9e">hku::IPriceList::~IPriceList</a></div><div class="ttdeci">virtual ~IPriceList() override</div></div>
+<div class="ttc" id="aclasshku_1_1_indicator_imp_html_a1d6fa2aa71eab3f70c6adaafeda1dc21"><div class="ttname"><a href="classhku_1_1_indicator_imp.html#a1d6fa2aa71eab3f70c6adaafeda1dc21">hku::IndicatorImp::name</a></div><div class="ttdeci">const string &amp; name() const noexcept</div><div class="ttdef"><b>定义</b> IndicatorImp.h:686</div></div>
+<div class="ttc" id="aclasshku_1_1_indicator_imp_html_a2491b09ab8d65f22d937bebdc5222980"><div class="ttname"><a href="classhku_1_1_indicator_imp.html#a2491b09ab8d65f22d937bebdc5222980">hku::IndicatorImp::IndicatorImp</a></div><div class="ttdeci">IndicatorImp()</div><div class="ttdoc">Default constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_indicator_imp_html_a8509bb18078abf4a1c7148ae58e1128b"><div class="ttname"><a href="classhku_1_1_indicator_imp.html#a8509bb18078abf4a1c7148ae58e1128b">hku::IndicatorImp::discard</a></div><div class="ttdeci">size_t discard() const noexcept</div><div class="ttdef"><b>定义</b> IndicatorImp.h:678</div></div>
+<div class="ttc" id="aclasshku_1_1_indicator_imp_html_ad10e5e49b0378f823ae1faa9ec40ab45"><div class="ttname"><a href="classhku_1_1_indicator_imp.html#ad10e5e49b0378f823ae1faa9ec40ab45">hku::IndicatorImp::size</a></div><div class="ttdeci">size_t size() const noexcept</div><div class="ttdef"><b>定义</b> IndicatorImp.h:682</div></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_5d61c8df36118f58eb2ea847be75f1ac.html">indicator</a></li><li class="navelem"><a href="dir_33c68ad0fcacd12a721ddcadbbc0c6ce.html">imp</a></li><li class="navelem"><b>IPriceList.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,0 +1,11 @@
+digraph "OrderBroker order broker"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir=LR;
+  Node1 [id="Node000001",label="OrderBroker order broker",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="The order broker, it implements the actual order operations and the programmatic orders"];
+  Node2 [id="Node000002",label="TradeManager trade\l management",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___trade_manager.html",tooltip="Trade management, responsible for recording every trade record and the current positions"];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+}

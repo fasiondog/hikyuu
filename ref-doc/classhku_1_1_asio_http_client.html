@@ -1,0 +1,2710 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::AsioHttpClient类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_asio_http_client.html','','classhku_1_1_asio_http_client-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::AsioHttpClient类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>High performance HTTP client based on Boost.Beast/Asio  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_asio_http_client_8h_source.html">AsioHttpClient.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:ad9cec4956a963ed76e9946c96cee74c8" id="r_ad9cec4956a963ed76e9946c96cee74c8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9cec4956a963ed76e9946c96cee74c8">executor_type</a> = boost::asio::any_io_executor</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ae15ab83977e23af987107e4271a702e8" id="r_ae15ab83977e23af987107e4271a702e8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae15ab83977e23af987107e4271a702e8">AsioHttpClient</a> (<a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> thread_count=1, size_t max_concurrency=0)</td></tr>
+<tr class="memdesc:ae15ab83977e23af987107e4271a702e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (the internal io_context mode)  <br /></td></tr>
+<tr class="memitem:aa72aa2c03215ea004efcf7ac747234cf" id="r_aa72aa2c03215ea004efcf7ac747234cf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa72aa2c03215ea004efcf7ac747234cf">AsioHttpClient</a> (const std::string &amp;<a class="el" href="#ab87b23815aeb5207c8ed12e181c95188">url</a>, <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> timeout=<a class="el" href="#ab4654e477c6ebca7ac0ad2be1a3c0256">DEFAULT_TIMEOUT_MS</a>, <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> thread_count=1, size_t max_concurrency=0)</td></tr>
+<tr class="memdesc:aa72aa2c03215ea004efcf7ac747234cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (the internal io_context mode with a URL)  <br /></td></tr>
+<tr class="memitem:a339bd5a8352c067a0879b082a149d611" id="r_a339bd5a8352c067a0879b082a149d611"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a339bd5a8352c067a0879b082a149d611">AsioHttpClient</a> (<a class="el" href="namespacehku_1_1net.html#a3155297dc9319abf630d0ec15db79ce3">net::io_context</a> &amp;ctx, const std::string &amp;<a class="el" href="#ab87b23815aeb5207c8ed12e181c95188">url</a>, <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> timeout=<a class="el" href="#ab4654e477c6ebca7ac0ad2be1a3c0256">DEFAULT_TIMEOUT_MS</a>, size_t max_concurrency=0)</td></tr>
+<tr class="memdesc:a339bd5a8352c067a0879b082a149d611"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (the external io_context mode)  <br /></td></tr>
+<tr class="memitem:a2ec6513c5bb02a4cdcf949b53cb6624b" id="r_a2ec6513c5bb02a4cdcf949b53cb6624b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2ec6513c5bb02a4cdcf949b53cb6624b">~AsioHttpClient</a> ()</td></tr>
+<tr class="memdesc:a2ec6513c5bb02a4cdcf949b53cb6624b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor  <br /></td></tr>
+<tr class="memitem:aeb0ffbbdfdcbf0c2de0ec41b30d3c56f" id="r_aeb0ffbbdfdcbf0c2de0ec41b30d3c56f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeb0ffbbdfdcbf0c2de0ec41b30d3c56f">AsioHttpClient</a> (const <a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;)=delete</td></tr>
+<tr class="memitem:a51fd830e82707ea1cc1db33eac97779c" id="r_a51fd830e82707ea1cc1db33eac97779c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51fd830e82707ea1cc1db33eac97779c">operator=</a> (const <a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;)=delete</td></tr>
+<tr class="memitem:ab2d9f6a6843ba8399406b581be620ede" id="r_ab2d9f6a6843ba8399406b581be620ede"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2d9f6a6843ba8399406b581be620ede">AsioHttpClient</a> (<a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;&amp;)=delete</td></tr>
+<tr class="memitem:aad28a057ad7bad88e068355eb78f1ff5" id="r_aad28a057ad7bad88e068355eb78f1ff5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad28a057ad7bad88e068355eb78f1ff5">operator=</a> (<a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;&amp;)=delete</td></tr>
+<tr class="memitem:ad9cfdf1419eb3a291d15e0a907ae6c1c" id="r_ad9cfdf1419eb3a291d15e0a907ae6c1c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9cfdf1419eb3a291d15e0a907ae6c1c">valid</a> () const noexcept</td></tr>
+<tr class="memdesc:ad9cfdf1419eb3a291d15e0a907ae6c1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether the client is valid  <br /></td></tr>
+<tr class="memitem:ab87b23815aeb5207c8ed12e181c95188" id="r_ab87b23815aeb5207c8ed12e181c95188"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab87b23815aeb5207c8ed12e181c95188">url</a> () const noexcept</td></tr>
+<tr class="memdesc:ab87b23815aeb5207c8ed12e181c95188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the currently set URL  <br /></td></tr>
+<tr class="memitem:ade9a414877f1c2f03cc4cbbf3b7db12c" id="r_ade9a414877f1c2f03cc4cbbf3b7db12c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade9a414877f1c2f03cc4cbbf3b7db12c">setUrl</a> (const std::string &amp;<a class="el" href="#ab87b23815aeb5207c8ed12e181c95188">url</a>)</td></tr>
+<tr class="memdesc:ade9a414877f1c2f03cc4cbbf3b7db12c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the target URL  <br /></td></tr>
+<tr class="memitem:af08582b2deca94d3c45f35ed6f8c55e1" id="r_af08582b2deca94d3c45f35ed6f8c55e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af08582b2deca94d3c45f35ed6f8c55e1">setTimeout</a> (<a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> ms)</td></tr>
+<tr class="memdesc:af08582b2deca94d3c45f35ed6f8c55e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the timeout  <br /></td></tr>
+<tr class="memitem:aba0fc6fcd839cf4bf76a18e0f4ccb58f" id="r_aba0fc6fcd839cf4bf76a18e0f4ccb58f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba0fc6fcd839cf4bf76a18e0f4ccb58f">getTimeout</a> () const noexcept</td></tr>
+<tr class="memdesc:aba0fc6fcd839cf4bf76a18e0f4ccb58f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current timeout  <br /></td></tr>
+<tr class="memitem:ad91a71dad53fde45acc6dbd3a2107f65" id="r_ad91a71dad53fde45acc6dbd3a2107f65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad91a71dad53fde45acc6dbd3a2107f65">setMaxResponseSize</a> (size_t bytes)</td></tr>
+<tr class="memdesc:ad91a71dad53fde45acc6dbd3a2107f65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the upper limit of the response body size (bytes)  <br /></td></tr>
+<tr class="memitem:ac1d7ff79219f1c8e2c61adcde625f07e" id="r_ac1d7ff79219f1c8e2c61adcde625f07e"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1d7ff79219f1c8e2c61adcde625f07e">getMaxResponseSize</a> () const noexcept</td></tr>
+<tr class="memdesc:ac1d7ff79219f1c8e2c61adcde625f07e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current upper limit of the response body size  <br /></td></tr>
+<tr class="memitem:a2c41c0a94265edd362cb7575eb607644" id="r_a2c41c0a94265edd362cb7575eb607644"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c41c0a94265edd362cb7575eb607644">setMaxHeaderSize</a> (size_t bytes)</td></tr>
+<tr class="memdesc:a2c41c0a94265edd362cb7575eb607644"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the upper limit of the response header size (bytes)  <br /></td></tr>
+<tr class="memitem:a552027d77f6fea352afda442412f522f" id="r_a552027d77f6fea352afda442412f522f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a552027d77f6fea352afda442412f522f">getMaxHeaderSize</a> () const noexcept</td></tr>
+<tr class="memdesc:a552027d77f6fea352afda442412f522f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current upper limit of the response header size  <br /></td></tr>
+<tr class="memitem:ae9c70854f173adbc94110ac0f83d4bab" id="r_ae9c70854f173adbc94110ac0f83d4bab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ad9cec4956a963ed76e9946c96cee74c8">executor_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9c70854f173adbc94110ac0f83d4bab">get_executor</a> () const noexcept</td></tr>
+<tr class="memitem:aa719678a90324ea7ac85e296c0c8c051" id="r_aa719678a90324ea7ac85e296c0c8c051"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa719678a90324ea7ac85e296c0c8c051">setDefaultHeaders</a> (std::map&lt; std::string, std::string &gt; &amp;&amp;headers)</td></tr>
+<tr class="memdesc:aa719678a90324ea7ac85e296c0c8c051"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the default request headers (the move semantics)  <br /></td></tr>
+<tr class="memitem:a69a75decf22d7df25f6dcfc7bfa9775a" id="r_a69a75decf22d7df25f6dcfc7bfa9775a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69a75decf22d7df25f6dcfc7bfa9775a">setCaFile</a> (const std::string &amp;filename)</td></tr>
+<tr class="memdesc:a69a75decf22d7df25f6dcfc7bfa9775a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the custom CA certificate file path  <br /></td></tr>
+<tr class="memitem:a8caaee926d720f5d7eeba7166bf40312" id="r_a8caaee926d720f5d7eeba7166bf40312"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8caaee926d720f5d7eeba7166bf40312">setDefaultHeaders</a> (const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers)</td></tr>
+<tr class="memdesc:a8caaee926d720f5d7eeba7166bf40312"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the default request headers (the copy semantics)  <br /></td></tr>
+<tr class="memitem:a68ebd887bca3fc26b462374090d77cba" id="r_a68ebd887bca3fc26b462374090d77cba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68ebd887bca3fc26b462374090d77cba">async_request</a> (const std::string &amp;method, const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type)</td></tr>
+<tr class="memdesc:a68ebd887bca3fc26b462374090d77cba"><td class="mdescLeft">&#160;</td><td class="mdescRight">General asynchronous HTTP request  <br /></td></tr>
+<tr class="memitem:a53013aab8ed94611c3242b5d700e952e" id="r_a53013aab8ed94611c3242b5d700e952e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a53013aab8ed94611c3242b5d700e952e">async_get</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers={})</td></tr>
+<tr class="memdesc:a53013aab8ed94611c3242b5d700e952e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous GET request (without parameters)  <br /></td></tr>
+<tr class="memitem:acc76d315b145e9446e2de61b5e7688ad" id="r_acc76d315b145e9446e2de61b5e7688ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc76d315b145e9446e2de61b5e7688ad">async_get</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers)</td></tr>
+<tr class="memdesc:acc76d315b145e9446e2de61b5e7688ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous GET request (with the query parameters)  <br /></td></tr>
+<tr class="memitem:aa979ab6f8bd919b075dea17ca2f139c6" id="r_aa979ab6f8bd919b075dea17ca2f139c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa979ab6f8bd919b075dea17ca2f139c6">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t len, const std::string &amp;content_type)</td></tr>
+<tr class="memdesc:aa979ab6f8bd919b075dea17ca2f139c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (with the parameters and the request body)  <br /></td></tr>
+<tr class="memitem:a633db444c1af2b6712b6622500e95205" id="r_a633db444c1af2b6712b6622500e95205"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a633db444c1af2b6712b6622500e95205">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t len, const std::string &amp;content_type)</td></tr>
+<tr class="memdesc:a633db444c1af2b6712b6622500e95205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (the request body only)  <br /></td></tr>
+<tr class="memitem:a77242b3469d5a199b2a70e09ef656840" id="r_a77242b3469d5a199b2a70e09ef656840"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77242b3469d5a199b2a70e09ef656840">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const std::string &amp;content, const std::string &amp;content_type=&quot;text/plain&quot;)</td></tr>
+<tr class="memdesc:a77242b3469d5a199b2a70e09ef656840"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (the string content)  <br /></td></tr>
+<tr class="memitem:af525bcd02ac231406e4bdec73d68d5ba" id="r_af525bcd02ac231406e4bdec73d68d5ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af525bcd02ac231406e4bdec73d68d5ba">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const std::string &amp;content, const std::string &amp;content_type=&quot;text/plain&quot;)</td></tr>
+<tr class="memdesc:af525bcd02ac231406e4bdec73d68d5ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (the string content, without parameters)  <br /></td></tr>
+<tr class="memitem:ab24b527cb7702ae25f261a9d1c51a7b1" id="r_ab24b527cb7702ae25f261a9d1c51a7b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab24b527cb7702ae25f261a9d1c51a7b1">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;body)</td></tr>
+<tr class="memdesc:ab24b527cb7702ae25f261a9d1c51a7b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (the JSON data, with the parameters)  <br /></td></tr>
+<tr class="memitem:a607874bba1b8b04e7dc901ee2071b059" id="r_a607874bba1b8b04e7dc901ee2071b059"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a607874bba1b8b04e7dc901ee2071b059">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;body)</td></tr>
+<tr class="memdesc:a607874bba1b8b04e7dc901ee2071b059"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (the JSON data, with the request headers)  <br /></td></tr>
+<tr class="memitem:a1a6135b89c452f4f1f51d8616e5d39ac" id="r_a1a6135b89c452f4f1f51d8616e5d39ac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a6135b89c452f4f1f51d8616e5d39ac">async_post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;body)</td></tr>
+<tr class="memdesc:a1a6135b89c452f4f1f51d8616e5d39ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous POST request (the JSON data, the simplified version)  <br /></td></tr>
+<tr class="memitem:af58cf17f576f4ecce4be7b7a105b67e7" id="r_af58cf17f576f4ecce4be7b7a105b67e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af58cf17f576f4ecce4be7b7a105b67e7">async_requestStream</a> (const std::string &amp;method, const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:af58cf17f576f4ecce4be7b7a105b67e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming asynchronous HTTP request (it supports the large file download)  <br /></td></tr>
+<tr class="memitem:a2b3cd63e539fe445a5b78be4db6ea059" id="r_a2b3cd63e539fe445a5b78be4db6ea059"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b3cd63e539fe445a5b78be4db6ea059">async_getStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:a2b3cd63e539fe445a5b78be4db6ea059"><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming asynchronous GET request (with the parameters)  <br /></td></tr>
+<tr class="memitem:a702766c749b277d459e5e33bdea8624d" id="r_a702766c749b277d459e5e33bdea8624d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a702766c749b277d459e5e33bdea8624d">async_getStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:a702766c749b277d459e5e33bdea8624d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming asynchronous GET request (without parameters)  <br /></td></tr>
+<tr class="memitem:ac54933c939249c70caf3a8f1c9efb629" id="r_ac54933c939249c70caf3a8f1c9efb629"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac54933c939249c70caf3a8f1c9efb629">async_postStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:ac54933c939249c70caf3a8f1c9efb629"><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming asynchronous POST request (with the parameters and the request body)  <br /></td></tr>
+<tr class="memitem:ae1e7e763d3491cd6681e0776f3ec3b22" id="r_ae1e7e763d3491cd6681e0776f3ec3b22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1e7e763d3491cd6681e0776f3ec3b22">async_postStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:ae1e7e763d3491cd6681e0776f3ec3b22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Streaming asynchronous POST request (the request body only)  <br /></td></tr>
+<tr class="memitem:aebcfffaa74dcb974632115f2141a47da" id="r_aebcfffaa74dcb974632115f2141a47da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebcfffaa74dcb974632115f2141a47da">request</a> (const std::string &amp;method, const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type)</td></tr>
+<tr class="memdesc:aebcfffaa74dcb974632115f2141a47da"><td class="mdescLeft">&#160;</td><td class="mdescRight">General synchronous HTTP request  <br /></td></tr>
+<tr class="memitem:a65902b1b4d276a7f71bdba2be734f499" id="r_a65902b1b4d276a7f71bdba2be734f499"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65902b1b4d276a7f71bdba2be734f499">get</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers={})</td></tr>
+<tr class="memdesc:a65902b1b4d276a7f71bdba2be734f499"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous GET request (without parameters)  <br /></td></tr>
+<tr class="memitem:abbf12183091fffecc863566cf5c6a11f" id="r_abbf12183091fffecc863566cf5c6a11f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbf12183091fffecc863566cf5c6a11f">get</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers)</td></tr>
+<tr class="memdesc:abbf12183091fffecc863566cf5c6a11f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous GET request (with the query parameters)  <br /></td></tr>
+<tr class="memitem:a0052f17515f13cb5e6fff4655a14629d" id="r_a0052f17515f13cb5e6fff4655a14629d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0052f17515f13cb5e6fff4655a14629d">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t len, const std::string &amp;content_type)</td></tr>
+<tr class="memdesc:a0052f17515f13cb5e6fff4655a14629d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (with the parameters and the request body)  <br /></td></tr>
+<tr class="memitem:a6c2e6f281afcad38f7e982e840fc0a91" id="r_a6c2e6f281afcad38f7e982e840fc0a91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c2e6f281afcad38f7e982e840fc0a91">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t len, const std::string &amp;content_type)</td></tr>
+<tr class="memdesc:a6c2e6f281afcad38f7e982e840fc0a91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (the request body only)  <br /></td></tr>
+<tr class="memitem:ac7cb76e85314d7d36ff3e98622b98108" id="r_ac7cb76e85314d7d36ff3e98622b98108"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7cb76e85314d7d36ff3e98622b98108">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const std::string &amp;content, const std::string &amp;content_type=&quot;text/plain&quot;)</td></tr>
+<tr class="memdesc:ac7cb76e85314d7d36ff3e98622b98108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (the string content, with the parameters)  <br /></td></tr>
+<tr class="memitem:a135f2a6d1d14ff759343c4a574db988f" id="r_a135f2a6d1d14ff759343c4a574db988f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a135f2a6d1d14ff759343c4a574db988f">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const std::string &amp;content, const std::string &amp;content_type=&quot;text/plain&quot;)</td></tr>
+<tr class="memdesc:a135f2a6d1d14ff759343c4a574db988f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (the string content, without parameters)  <br /></td></tr>
+<tr class="memitem:a278d85634d82a5f5e7a44ac126c5da19" id="r_a278d85634d82a5f5e7a44ac126c5da19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a278d85634d82a5f5e7a44ac126c5da19">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;body)</td></tr>
+<tr class="memdesc:a278d85634d82a5f5e7a44ac126c5da19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (the JSON data, with the parameters)  <br /></td></tr>
+<tr class="memitem:a3588147a25b3b0f984fb84b843962b0c" id="r_a3588147a25b3b0f984fb84b843962b0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3588147a25b3b0f984fb84b843962b0c">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;body)</td></tr>
+<tr class="memdesc:a3588147a25b3b0f984fb84b843962b0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (the JSON data, with the request headers)  <br /></td></tr>
+<tr class="memitem:af22c32f0022f65d665e0bb55994a5017" id="r_af22c32f0022f65d665e0bb55994a5017"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af22c32f0022f65d665e0bb55994a5017">post</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;body)</td></tr>
+<tr class="memdesc:af22c32f0022f65d665e0bb55994a5017"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous POST request (the JSON data, the simplified version)  <br /></td></tr>
+<tr class="memitem:ab9b41feee13f20e22fe5d305bc3b686c" id="r_ab9b41feee13f20e22fe5d305bc3b686c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9b41feee13f20e22fe5d305bc3b686c">requestStream</a> (const std::string &amp;method, const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:ab9b41feee13f20e22fe5d305bc3b686c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous streaming HTTP request (it supports the large file download)  <br /></td></tr>
+<tr class="memitem:a26009a35182ebab1ea1333cdbd4ee117" id="r_a26009a35182ebab1ea1333cdbd4ee117"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26009a35182ebab1ea1333cdbd4ee117">getStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:a26009a35182ebab1ea1333cdbd4ee117"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous streaming GET request (with the parameters)  <br /></td></tr>
+<tr class="memitem:aeba7174cf7cd5dfefd0eee13d0b108c1" id="r_aeba7174cf7cd5dfefd0eee13d0b108c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeba7174cf7cd5dfefd0eee13d0b108c1">getStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:aeba7174cf7cd5dfefd0eee13d0b108c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous streaming GET request (without parameters)  <br /></td></tr>
+<tr class="memitem:a51decce03f83f7996086de9fe0080f68" id="r_a51decce03f83f7996086de9fe0080f68"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51decce03f83f7996086de9fe0080f68">postStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;params, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:a51decce03f83f7996086de9fe0080f68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous streaming POST request (with the parameters and the request body)  <br /></td></tr>
+<tr class="memitem:aaf38768fd3bae8dc267535ba72b494ba" id="r_aaf38768fd3bae8dc267535ba72b494ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf38768fd3bae8dc267535ba72b494ba">postStream</a> (const std::string &amp;path, const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;headers, const char *body, size_t body_len, const std::string &amp;content_type, const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;chunk_callback)</td></tr>
+<tr class="memdesc:aaf38768fd3bae8dc267535ba72b494ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronous streaming POST request (the request body only)  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+静态 Public 属性</h2></td></tr>
+<tr class="memitem:ab4654e477c6ebca7ac0ad2be1a3c0256" id="r_ab4654e477c6ebca7ac0ad2be1a3c0256"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4654e477c6ebca7ac0ad2be1a3c0256">DEFAULT_TIMEOUT_MS</a> = 30000</td></tr>
+<tr class="memdesc:ab4654e477c6ebca7ac0ad2be1a3c0256"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default timeout (ms)  <br /></td></tr>
+<tr class="memitem:af95142bb4e5187005b53c92427629357" id="r_af95142bb4e5187005b53c92427629357"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af95142bb4e5187005b53c92427629357">MAX_TIMEOUT_MS</a> = 60000</td></tr>
+<tr class="memdesc:af95142bb4e5187005b53c92427629357"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum timeout (ms), it is used when a value &lt;= 0 is passed  <br /></td></tr>
+<tr class="memitem:a1a0518cd3e6e76787d4cf92c551f9296" id="r_a1a0518cd3e6e76787d4cf92c551f9296"><td class="memItemLeft" align="right" valign="top">static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a0518cd3e6e76787d4cf92c551f9296">DEFAULT_MAX_RESPONSE_SIZE</a> = 8 * 1024 * 1024</td></tr>
+<tr class="memdesc:a1a0518cd3e6e76787d4cf92c551f9296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default upper limit of the response body, it bounds the memory of one response (the same value as the beast default, so the behavior does not change unless it is raised)  <br /></td></tr>
+<tr class="memitem:a5a8522b54f07192c6968b1635190b879" id="r_a5a8522b54f07192c6968b1635190b879"><td class="memItemLeft" align="right" valign="top">static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5a8522b54f07192c6968b1635190b879">DEFAULT_MAX_HEADER_SIZE</a> = 8 * 1024</td></tr>
+<tr class="memdesc:a5a8522b54f07192c6968b1635190b879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default upper limit of the response header (the same value as the beast default)  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>High performance HTTP client based on Boost.Beast/Asio </p>
+<p>It supports the HTTP/1.1 and HTTPS protocols and provides the synchronous and asynchronous request modes. It uses the connection pool technology to improve the performance and supports the streaming response for the large file download.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
+Basic features</h2>
+<ul>
+<li>Underlying network library: Boost.Beast (HTTP/1.1) + Boost.Asio (the asynchronous I/O)</li>
+<li>Coroutine support: the C++20 coroutines, the return type is boost::asio::awaitable&lt;T&gt;</li>
+<li>Connection pool: it manages the HTTP persistent connections automatically and supports the version detection</li>
+<li>SSL/TLS: the optional HTTPS support (OpenSSL is required)</li>
+<li>Timeout control: the timeout of every stage of the DNS resolution, the connection, the sending and the receiving</li>
+<li>Streaming: Content-Length and Transfer-Encoding: chunked are supported</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
+Running modes</h2>
+<ul>
+<li><b>The internal io_context mode</b>: the default constructor and the constructor with a URL create an independent io_context and start the background threads to run the event loop, the user does not need to manage it manually</li>
+<li><b>The external io_context mode</b>: it is injected through the constructor with an external io_context parameter, the lifetime is fully controlled from outside and multiple clients can share the same io_context</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
+Asynchronous operation modes</h2>
+<ul>
+<li><b>The wait-for-completion mode</b> (async_*): it is suitable for the scenarios needing a return value, an exception handling or a guaranteed order</li>
+<li><b>The fire-and-forget mode</b>: it is suitable for the scenarios not caring about the result, such as the background logging and the monitoring reporting (to be implemented)</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
+Resource management</h2>
+<ul>
+<li>std::unique_ptr&lt;net::io_context&gt; is used to manage the internal io_context</li>
+<li>An executor_work_guard is created to prevent the io_context from exiting when there is no task</li>
+<li>At the destruction the work_guard is released first, then it waits for the worker threads to be finished, and finally the io_context is stopped</li>
+<li>The move operations are disabled to ensure the resource safety</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
+Build configuration</h2>
+<div class="fragment"><div class="line"># Enable the HTTP client</div>
+<div class="line">xmake f --http_client=y</div>
+<div class="line"> </div>
+<div class="line"># Enable the HTTPS support (OpenSSL is required)</div>
+<div class="line">xmake f --http_client_ssl=y</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+Usage example</h2>
+<div class="fragment"><div class="line"><span class="comment">// A simple GET request (synchronous)</span></div>
+<div class="line"><a class="code hl_function" href="#ae15ab83977e23af987107e4271a702e8">AsioHttpClient</a> client(<span class="stringliteral">&quot;https://api.example.com&quot;</span>);</div>
+<div class="line"><span class="keyword">auto</span> response = client.get(<span class="stringliteral">&quot;/users&quot;</span>);</div>
+<div class="line">std::cout &lt;&lt; response.body() &lt;&lt; std::endl;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// An asynchronous GET request (the C++20 coroutine)</span></div>
+<div class="line"><span class="keyword">co_await</span> client.async_get(<span class="stringliteral">&quot;/users&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// A streaming download of a large file</span></div>
+<div class="line">std::ofstream file(<span class="stringliteral">&quot;download.bin&quot;</span>, std::ios::binary);</div>
+<div class="line"><span class="keyword">co_await</span> client.async_getStream(<span class="stringliteral">&quot;/largefile&quot;</span>,</div>
+<div class="line">    [&amp;file](<span class="keyword">const</span> <span class="keywordtype">char</span>* data, <span class="keywordtype">size_t</span> size) {</div>
+<div class="line">        file.write(data, size);</div>
+<div class="line">    });</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// A custom CA certificate (HTTPS)</span></div>
+<div class="line">client.setCaFile(<span class="stringliteral">&quot;/path/to/ca.pem&quot;</span>);</div>
+<div class="ttc" id="aclasshku_1_1_asio_http_client_html_ae15ab83977e23af987107e4271a702e8"><div class="ttname"><a href="#ae15ab83977e23af987107e4271a702e8">hku::AsioHttpClient::AsioHttpClient</a></div><div class="ttdeci">AsioHttpClient(int32_t thread_count=1, size_t max_concurrency=0)</div><div class="ttdoc">Constructor (the internal io_context mode)</div></div>
+</div><!-- fragment --><dl class="section note"><dt>注解</dt><dd>This class cannot be moved or copied, because it manages the lifetimes of the background threads and the io_context </dd>
+<dd>
+When an external io_context is used, its lifetime must be longer than the client </dd>
+<dd>
+Lifetime contract: do not destroy the client while an asynchronous request is still in flight. The coroutines of the async_* methods run on behalf of this object, so an unfinished one both outlives its owner and keeps a connection borrowed from the internal pool, which makes the destructor wait for a return that can never happen. The synchronous methods are safe by construction, since they only return after the whole exchange has finished and the connection has been given back </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete response class </dd>
+<dd>
+<a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response class </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="ad9cec4956a963ed76e9946c96cee74c8" name="ad9cec4956a963ed76e9946c96cee74c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9cec4956a963ed76e9946c96cee74c8">&#9670;&#160;</a></span>executor_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#ad9cec4956a963ed76e9946c96cee74c8">hku::AsioHttpClient::executor_type</a> = boost::asio::any_io_executor</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ae15ab83977e23af987107e4271a702e8" name="ae15ab83977e23af987107e4271a702e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae15ab83977e23af987107e4271a702e8">&#9670;&#160;</a></span>AsioHttpClient() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsioHttpClient::AsioHttpClient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a></td>          <td class="paramname"><span class="paramname"><em>thread_count</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>max_concurrency</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor (the internal io_context mode) </p>
+<p>It creates the internal io_context and starts the background threads to run the event loop.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thread_count</td><td>the number of the worker threads, 1 by default </td></tr>
+    <tr><td class="paramname">max_concurrency</td><td>the maximum number of the concurrent connections of the connection pool, 0 means unlimited </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa72aa2c03215ea004efcf7ac747234cf" name="aa72aa2c03215ea004efcf7ac747234cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa72aa2c03215ea004efcf7ac747234cf">&#9670;&#160;</a></span>AsioHttpClient() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsioHttpClient::AsioHttpClient </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>url</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a></td>          <td class="paramname"><span class="paramname"><em>timeout</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#ab4654e477c6ebca7ac0ad2be1a3c0256">DEFAULT_TIMEOUT_MS</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a></td>          <td class="paramname"><span class="paramname"><em>thread_count</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>max_concurrency</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor (the internal io_context mode with a URL) </p>
+<p>It creates the internal io_context, starts the background threads and sets the target URL.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">url</td><td>the target URL (e.g. "https://api.example.com:8080/v1") </td></tr>
+    <tr><td class="paramname">timeout</td><td>the timeout (ms); MAX_TIMEOUT_MS is used when it is &lt;= 0 </td></tr>
+    <tr><td class="paramname">thread_count</td><td>the number of the worker threads, 1 by default </td></tr>
+    <tr><td class="paramname">max_concurrency</td><td>the maximum number of the concurrent connections of the connection pool, 0 means unlimited </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a339bd5a8352c067a0879b082a149d611" name="a339bd5a8352c067a0879b082a149d611"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a339bd5a8352c067a0879b082a149d611">&#9670;&#160;</a></span>AsioHttpClient() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsioHttpClient::AsioHttpClient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacehku_1_1net.html#a3155297dc9319abf630d0ec15db79ce3">net::io_context</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ctx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>url</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a></td>          <td class="paramname"><span class="paramname"><em>timeout</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#ab4654e477c6ebca7ac0ad2be1a3c0256">DEFAULT_TIMEOUT_MS</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>max_concurrency</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor (the external io_context mode) </p>
+<p>It uses the io_context provided from outside and does not own it. It is suitable for the scenario where multiple clients share the same event loop.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ctx</td><td>the external io_context reference, its lifetime is managed by the caller </td></tr>
+    <tr><td class="paramname">url</td><td>the target URL (e.g. "https://api.example.com:8080/v1") </td></tr>
+    <tr><td class="paramname">timeout</td><td>the timeout (ms); MAX_TIMEOUT_MS is used when it is &lt;= 0 </td></tr>
+    <tr><td class="paramname">max_concurrency</td><td>the maximum number of the concurrent connections of the connection pool, 0 means unlimited</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>The external io_context must be run and maintained by the caller </dd></dl>
+
+</div>
+</div>
+<a id="a2ec6513c5bb02a4cdcf949b53cb6624b" name="a2ec6513c5bb02a4cdcf949b53cb6624b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ec6513c5bb02a4cdcf949b53cb6624b">&#9670;&#160;</a></span>~AsioHttpClient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::AsioHttpClient::~AsioHttpClient </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor </p>
+<p>The resources are released safely in the following order:</p><ol type="1">
+<li>Release the executor_work_guard, allowing the io_context to exit naturally</li>
+<li>Wait for all the worker threads to be finished</li>
+<li>Explicitly stop the io_context</li>
+</ol>
+<dl class="section note"><dt>注解</dt><dd>It ensures that all the asynchronous operations are finished safely, without a forced interruption </dd></dl>
+
+</div>
+</div>
+<a id="aeb0ffbbdfdcbf0c2de0ec41b30d3c56f" name="aeb0ffbbdfdcbf0c2de0ec41b30d3c56f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb0ffbbdfdcbf0c2de0ec41b30d3c56f">&#9670;&#160;</a></span>AsioHttpClient() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsioHttpClient::AsioHttpClient </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab2d9f6a6843ba8399406b581be620ede" name="ab2d9f6a6843ba8399406b581be620ede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2d9f6a6843ba8399406b581be620ede">&#9670;&#160;</a></span>AsioHttpClient() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsioHttpClient::AsioHttpClient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a53013aab8ed94611c3242b5d700e952e" name="a53013aab8ed94611c3242b5d700e952e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53013aab8ed94611c3242b5d700e952e">&#9670;&#160;</a></span>async_get() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_get </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous GET request (without parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="acc76d315b145e9446e2de61b5e7688ad" name="acc76d315b145e9446e2de61b5e7688ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc76d315b145e9446e2de61b5e7688ad">&#9670;&#160;</a></span>async_get() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_get </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous GET request (with the query parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a702766c749b277d459e5e33bdea8624d" name="a702766c749b277d459e5e33bdea8624d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a702766c749b277d459e5e33bdea8624d">&#9670;&#160;</a></span>async_getStream() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt; hku::AsioHttpClient::async_getStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Streaming asynchronous GET request (without parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="a2b3cd63e539fe445a5b78be4db6ea059" name="a2b3cd63e539fe445a5b78be4db6ea059"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b3cd63e539fe445a5b78be4db6ea059">&#9670;&#160;</a></span>async_getStream() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt; hku::AsioHttpClient::async_getStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Streaming asynchronous GET request (with the parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="a633db444c1af2b6712b6622500e95205" name="a633db444c1af2b6712b6622500e95205"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a633db444c1af2b6712b6622500e95205">&#9670;&#160;</a></span>async_post() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (the request body only) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a607874bba1b8b04e7dc901ee2071b059" name="a607874bba1b8b04e7dc901ee2071b059"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a607874bba1b8b04e7dc901ee2071b059">&#9670;&#160;</a></span>async_post() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (the JSON data, with the request headers) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the JSON object </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="af525bcd02ac231406e4bdec73d68d5ba" name="af525bcd02ac231406e4bdec73d68d5ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af525bcd02ac231406e4bdec73d68d5ba">&#9670;&#160;</a></span>async_post() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;text/plain&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (the string content, without parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">content</td><td>the request body string </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type, "text/plain" by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="aa979ab6f8bd919b075dea17ca2f139c6" name="aa979ab6f8bd919b075dea17ca2f139c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa979ab6f8bd919b075dea17ca2f139c6">&#9670;&#160;</a></span>async_post() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (with the parameters and the request body) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="ab24b527cb7702ae25f261a9d1c51a7b1" name="ab24b527cb7702ae25f261a9d1c51a7b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab24b527cb7702ae25f261a9d1c51a7b1">&#9670;&#160;</a></span>async_post() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (the JSON data, with the parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the JSON object </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>Content-Type is set to "application/json" automatically </dd></dl>
+
+</div>
+</div>
+<a id="a77242b3469d5a199b2a70e09ef656840" name="a77242b3469d5a199b2a70e09ef656840"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77242b3469d5a199b2a70e09ef656840">&#9670;&#160;</a></span>async_post() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;text/plain&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (the string content) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">content</td><td>the request body string </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type, "text/plain" by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a1a6135b89c452f4f1f51d8616e5d39ac" name="a1a6135b89c452f4f1f51d8616e5d39ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a6135b89c452f4f1f51d8616e5d39ac">&#9670;&#160;</a></span>async_post() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Asynchronous POST request (the JSON data, the simplified version) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">body</td><td>the JSON object </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="ae1e7e763d3491cd6681e0776f3ec3b22" name="ae1e7e763d3491cd6681e0776f3ec3b22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1e7e763d3491cd6681e0776f3ec3b22">&#9670;&#160;</a></span>async_postStream() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt; hku::AsioHttpClient::async_postStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Streaming asynchronous POST request (the request body only) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="ac54933c939249c70caf3a8f1c9efb629" name="ac54933c939249c70caf3a8f1c9efb629"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac54933c939249c70caf3a8f1c9efb629">&#9670;&#160;</a></span>async_postStream() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt; hku::AsioHttpClient::async_postStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Streaming asynchronous POST request (with the parameters and the request body) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="a68ebd887bca3fc26b462374090d77cba" name="a68ebd887bca3fc26b462374090d77cba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68ebd887bca3fc26b462374090d77cba">&#9670;&#160;</a></span>async_request()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> &gt; hku::AsioHttpClient::async_request </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>method</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>General asynchronous HTTP request </p>
+<p>The underlying asynchronous request implementation, it supports all the HTTP methods and the custom parameters. It handles the whole process of the DNS resolution, the connection establishment, the request sending and the response receiving automatically.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">method</td><td>the HTTP method (GET, POST, PUT, DELETE, etc.) </td></tr>
+    <tr><td class="paramname">path</td><td>the request path (e.g. "/api/users") </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters (a GET request) or the form parameters (a POST form) </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer (a POST/PUT request) </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type (e.g. "application/json", "text/plain") </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response</dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="structhku_1_1_http_timeout_exception.html">HttpTimeoutException</a></td><td>on a timeout </td></tr>
+    <tr><td class="paramname">boost::system::system_error</td><td>on a network error</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>A boost::system::system_error exception is thrown on a timeout or a network error </dd>
+<dd>
+The concrete error cause can be determined by catching system_error and checking its error_code </dd>
+<dd>
+operation_aborted means it was cancelled due to a timeout </dd></dl>
+
+</div>
+</div>
+<a id="af58cf17f576f4ecce4be7b7a105b67e7" name="af58cf17f576f4ecce4be7b7a105b67e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af58cf17f576f4ecce4be7b7a105b67e7">&#9670;&#160;</a></span>async_requestStream()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> &gt; hku::AsioHttpClient::async_requestStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>method</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Streaming asynchronous HTTP request (it supports the large file download) </p>
+<p>It uses a callback function to process the response data chunks, avoiding loading everything into the memory at once. Both the Content-Length and the Transfer-Encoding: chunked modes are supported automatically.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">method</td><td>the HTTP method (GET, POST, etc.) </td></tr>
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function, it is called every time data is received </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The callback function should stay non-blocking, avoiding the time-consuming operations </dd>
+<dd>
+An exception should not be thrown in the callback, otherwise the request is terminated </dd>
+<dd>
+Pay attention to the thread safety of the shared data </dd></dl>
+
+</div>
+</div>
+<a id="a65902b1b4d276a7f71bdba2be734f499" name="a65902b1b4d276a7f71bdba2be734f499"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65902b1b4d276a7f71bdba2be734f499">&#9670;&#160;</a></span>get() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::get </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous GET request (without parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="abbf12183091fffecc863566cf5c6a11f" name="abbf12183091fffecc863566cf5c6a11f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbf12183091fffecc863566cf5c6a11f">&#9670;&#160;</a></span>get() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::get </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous GET request (with the query parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="ae9c70854f173adbc94110ac0f83d4bab" name="ae9c70854f173adbc94110ac0f83d4bab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9c70854f173adbc94110ac0f83d4bab">&#9670;&#160;</a></span>get_executor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ad9cec4956a963ed76e9946c96cee74c8">executor_type</a> hku::AsioHttpClient::get_executor </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a552027d77f6fea352afda442412f522f" name="a552027d77f6fea352afda442412f522f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a552027d77f6fea352afda442412f522f">&#9670;&#160;</a></span>getMaxHeaderSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::AsioHttpClient::getMaxHeaderSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current upper limit of the response header size </p>
+<dl class="section return"><dt>返回</dt><dd>the maximum response header size (bytes) </dd></dl>
+
+</div>
+</div>
+<a id="ac1d7ff79219f1c8e2c61adcde625f07e" name="ac1d7ff79219f1c8e2c61adcde625f07e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1d7ff79219f1c8e2c61adcde625f07e">&#9670;&#160;</a></span>getMaxResponseSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::AsioHttpClient::getMaxResponseSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current upper limit of the response body size </p>
+<dl class="section return"><dt>返回</dt><dd>the maximum response body size (bytes) </dd></dl>
+
+</div>
+</div>
+<a id="aeba7174cf7cd5dfefd0eee13d0b108c1" name="aeba7174cf7cd5dfefd0eee13d0b108c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeba7174cf7cd5dfefd0eee13d0b108c1">&#9670;&#160;</a></span>getStream() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> hku::AsioHttpClient::getStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous streaming GET request (without parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="a26009a35182ebab1ea1333cdbd4ee117" name="a26009a35182ebab1ea1333cdbd4ee117"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26009a35182ebab1ea1333cdbd4ee117">&#9670;&#160;</a></span>getStream() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> hku::AsioHttpClient::getStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous streaming GET request (with the parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="aba0fc6fcd839cf4bf76a18e0f4ccb58f" name="aba0fc6fcd839cf4bf76a18e0f4ccb58f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba0fc6fcd839cf4bf76a18e0f4ccb58f">&#9670;&#160;</a></span>getTimeout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> hku::AsioHttpClient::getTimeout </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current timeout </p>
+<dl class="section return"><dt>返回</dt><dd>the timeout (ms) </dd></dl>
+
+</div>
+</div>
+<a id="aad28a057ad7bad88e068355eb78f1ff5" name="aad28a057ad7bad88e068355eb78f1ff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad28a057ad7bad88e068355eb78f1ff5">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp; hku::AsioHttpClient::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a51fd830e82707ea1cc1db33eac97779c" name="a51fd830e82707ea1cc1db33eac97779c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51fd830e82707ea1cc1db33eac97779c">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp; hku::AsioHttpClient::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_asio_http_client.html">AsioHttpClient</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6c2e6f281afcad38f7e982e840fc0a91" name="a6c2e6f281afcad38f7e982e840fc0a91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c2e6f281afcad38f7e982e840fc0a91">&#9670;&#160;</a></span>post() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (the request body only) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a3588147a25b3b0f984fb84b843962b0c" name="a3588147a25b3b0f984fb84b843962b0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3588147a25b3b0f984fb84b843962b0c">&#9670;&#160;</a></span>post() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (the JSON data, with the request headers) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the JSON object </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a135f2a6d1d14ff759343c4a574db988f" name="a135f2a6d1d14ff759343c4a574db988f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a135f2a6d1d14ff759343c4a574db988f">&#9670;&#160;</a></span>post() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;text/plain&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (the string content, without parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">content</td><td>the request body string </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type, "text/plain" by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a0052f17515f13cb5e6fff4655a14629d" name="a0052f17515f13cb5e6fff4655a14629d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0052f17515f13cb5e6fff4655a14629d">&#9670;&#160;</a></span>post() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (with the parameters and the request body) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="a278d85634d82a5f5e7a44ac126c5da19" name="a278d85634d82a5f5e7a44ac126c5da19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a278d85634d82a5f5e7a44ac126c5da19">&#9670;&#160;</a></span>post() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (the JSON data, with the parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the JSON object </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="ac7cb76e85314d7d36ff3e98622b98108" name="ac7cb76e85314d7d36ff3e98622b98108"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7cb76e85314d7d36ff3e98622b98108">&#9670;&#160;</a></span>post() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;text/plain&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (the string content, with the parameters) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">content</td><td>the request body string </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type, "text/plain" by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="af22c32f0022f65d665e0bb55994a5017" name="af22c32f0022f65d665e0bb55994a5017"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af22c32f0022f65d665e0bb55994a5017">&#9670;&#160;</a></span>post() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::post </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous POST request (the JSON data, the simplified version) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">body</td><td>the JSON object </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response </dd></dl>
+
+</div>
+</div>
+<a id="aaf38768fd3bae8dc267535ba72b494ba" name="aaf38768fd3bae8dc267535ba72b494ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf38768fd3bae8dc267535ba72b494ba">&#9670;&#160;</a></span>postStream() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> hku::AsioHttpClient::postStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous streaming POST request (the request body only) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="a51decce03f83f7996086de9fe0080f68" name="a51decce03f83f7996086de9fe0080f68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51decce03f83f7996086de9fe0080f68">&#9670;&#160;</a></span>postStream() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> hku::AsioHttpClient::postStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronous streaming POST request (with the parameters and the request body) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object </dd></dl>
+
+</div>
+</div>
+<a id="aebcfffaa74dcb974632115f2141a47da" name="aebcfffaa74dcb974632115f2141a47da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebcfffaa74dcb974632115f2141a47da">&#9670;&#160;</a></span>request()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_response.html">AsioHttpResponse</a> hku::AsioHttpClient::request </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>method</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>General synchronous HTTP request </p>
+<p>A blocking request, it uses the asynchronous implementation internally and waits for its completion. It is suitable for a non-coroutine environment or the scenario needing a synchronous call.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">method</td><td>the HTTP method (GET, POST, PUT, DELETE, etc.) </td></tr>
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters or the form parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_response.html" title="HTTP response class">AsioHttpResponse</a> the complete HTTP response</dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="structhku_1_1_http_timeout_exception.html">HttpTimeoutException</a></td><td>on a timeout </td></tr>
+    <tr><td class="paramname">boost::system::system_error</td><td>on a network error </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab9b41feee13f20e22fe5d305bc3b686c" name="ab9b41feee13f20e22fe5d305bc3b686c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9b41feee13f20e22fe5d305bc3b686c">&#9670;&#160;</a></span>requestStream()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_asio_http_stream_response.html">AsioHttpStreamResponse</a> hku::AsioHttpClient::requestStream </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>method</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>body_len</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>content_type</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>chunk_callback</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Synchronous streaming HTTP request (it supports the large file download) </p>
+<p>A blocking streaming request, it uses a callback function to process the response data chunks. Both the Content-Length and the Transfer-Encoding: chunked modes are supported automatically.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">method</td><td>the HTTP method (GET, POST, etc.) </td></tr>
+    <tr><td class="paramname">path</td><td>request path </td></tr>
+    <tr><td class="paramname">params</td><td>the URL query parameters </td></tr>
+    <tr><td class="paramname">headers</td><td>the extra HTTP request headers </td></tr>
+    <tr><td class="paramname">body</td><td>the request body pointer </td></tr>
+    <tr><td class="paramname">body_len</td><td>the request body length </td></tr>
+    <tr><td class="paramname">content_type</td><td>the content type </td></tr>
+    <tr><td class="paramname">chunk_callback</td><td>the data chunk callback function, it is called every time data is received </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_asio_http_stream_response.html" title="Streaming HTTP response class">AsioHttpStreamResponse</a> the streaming response object</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The callback function should stay non-blocking, avoiding the time-consuming operations </dd>
+<dd>
+An exception should not be thrown in the callback, otherwise the request is terminated </dd>
+<dd>
+Pay attention to the thread safety of the shared data </dd></dl>
+
+</div>
+</div>
+<a id="a69a75decf22d7df25f6dcfc7bfa9775a" name="a69a75decf22d7df25f6dcfc7bfa9775a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69a75decf22d7df25f6dcfc7bfa9775a">&#9670;&#160;</a></span>setCaFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setCaFile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>filename</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the custom CA certificate file path </p>
+<p>It is used to verify the server certificate during an HTTPS connection. Configuration priority: the custom CA certificate &gt; the system default certificate store.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the CA certificate file path (the PEM format)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>It must be set before the HTTPS connection is established </dd>
+<dd>
+An exception is thrown at the connection when the file does not exist or its format is wrong </dd></dl>
+<dl class="section see"><dt>参见</dt><dd>HttpAsyncClient the asynchronous communication, resource management and timeout control specification, item 7 </dd></dl>
+
+</div>
+</div>
+<a id="a8caaee926d720f5d7eeba7166bf40312" name="a8caaee926d720f5d7eeba7166bf40312"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8caaee926d720f5d7eeba7166bf40312">&#9670;&#160;</a></span>setDefaultHeaders() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setDefaultHeaders </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the default request headers (the copy semantics) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">headers</td><td>the request header map, it is copied into the internal storage </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa719678a90324ea7ac85e296c0c8c051" name="aa719678a90324ea7ac85e296c0c8c051"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa719678a90324ea7ac85e296c0c8c051">&#9670;&#160;</a></span>setDefaultHeaders() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setDefaultHeaders </td>
+          <td>(</td>
+          <td class="paramtype">std::map&lt; std::string, std::string &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>headers</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the default request headers (the move semantics) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">headers</td><td>the request header map, it is moved into the internal storage </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2c41c0a94265edd362cb7575eb607644" name="a2c41c0a94265edd362cb7575eb607644"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c41c0a94265edd362cb7575eb607644">&#9670;&#160;</a></span>setMaxHeaderSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setMaxHeaderSize </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the upper limit of the response header size (bytes) </p>
+<p>It counts the status line, all the field names and values and the delimiter sequences.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>the maximum response header size, 0 resets it to DEFAULT_MAX_HEADER_SIZE</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>When the header is not complete within the limit, <a class="el" href="structhku_1_1_http_response_too_large_exception.html" title="The response exceeds the configured size limit">HttpResponseTooLargeException</a> is thrown and the connection is closed instead of being reused </dd></dl>
+
+</div>
+</div>
+<a id="ad91a71dad53fde45acc6dbd3a2107f65" name="ad91a71dad53fde45acc6dbd3a2107f65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad91a71dad53fde45acc6dbd3a2107f65">&#9670;&#160;</a></span>setMaxResponseSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setMaxResponseSize </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the upper limit of the response body size (bytes) </p>
+<p>The limit bounds the memory of a single response: the whole body is accumulated in memory by the non streaming requests, so it applies to them and to the gzip decompression output. The streaming requests keep a fixed internal chunk buffer and hand every chunk over to the callback, so they are not limited by this value on purpose.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>the maximum response body size, 0 resets it to DEFAULT_MAX_RESPONSE_SIZE</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>The default keeps the beast default size, raise it to accept a larger response </dd>
+<dd>
+When the peer declares or sends more, <a class="el" href="structhku_1_1_http_response_too_large_exception.html" title="The response exceeds the configured size limit">HttpResponseTooLargeException</a> is thrown and the connection is closed instead of being reused </dd>
+<dd>
+The setting takes effect for all the subsequent requests </dd></dl>
+
+</div>
+</div>
+<a id="af08582b2deca94d3c45f35ed6f8c55e1" name="af08582b2deca94d3c45f35ed6f8c55e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af08582b2deca94d3c45f35ed6f8c55e1">&#9670;&#160;</a></span>setTimeout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setTimeout </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a></td>          <td class="paramname"><span class="paramname"><em>ms</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the timeout </p>
+<p>It controls the timeout of every stage of the DNS resolution, the connection, the sending and the receiving.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ms</td><td>the timeout (ms)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>When ms &lt;= 0, MAX_TIMEOUT_MS (60000 ms) is used automatically as the default value </dd>
+<dd>
+The timeout setting takes effect for all the subsequent requests </dd></dl>
+
+</div>
+</div>
+<a id="ade9a414877f1c2f03cc4cbbf3b7db12c" name="ade9a414877f1c2f03cc4cbbf3b7db12c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade9a414877f1c2f03cc4cbbf3b7db12c">&#9670;&#160;</a></span>setUrl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsioHttpClient::setUrl </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>url</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the target URL </p>
+<p>It parses the URL and extracts the information such as the protocol, the host, the port and the path. The connection pool parameters are updated automatically.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">url</td><td>the complete URL (e.g. "https://api.example.com:8080/v1/users")</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>An error flag is set when the URL parsing fails </dd></dl>
+
+</div>
+</div>
+<a id="ab87b23815aeb5207c8ed12e181c95188" name="ab87b23815aeb5207c8ed12e181c95188"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab87b23815aeb5207c8ed12e181c95188">&#9670;&#160;</a></span>url()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string &amp; hku::AsioHttpClient::url </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the currently set URL </p>
+<dl class="section return"><dt>返回</dt><dd>the complete URL string </dd></dl>
+
+</div>
+</div>
+<a id="ad9cfdf1419eb3a291d15e0a907ae6c1c" name="ad9cfdf1419eb3a291d15e0a907ae6c1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9cfdf1419eb3a291d15e0a907ae6c1c">&#9670;&#160;</a></span>valid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::AsioHttpClient::valid </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check whether the client is valid </p>
+<dl class="section return"><dt>返回</dt><dd>true means the URL has been set correctly and a request can be initiated </dd></dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a5a8522b54f07192c6968b1635190b879" name="a5a8522b54f07192c6968b1635190b879"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a8522b54f07192c6968b1635190b879">&#9670;&#160;</a></span>DEFAULT_MAX_HEADER_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::AsioHttpClient::DEFAULT_MAX_HEADER_SIZE = 8 * 1024</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default upper limit of the response header (the same value as the beast default) </p>
+
+</div>
+</div>
+<a id="a1a0518cd3e6e76787d4cf92c551f9296" name="a1a0518cd3e6e76787d4cf92c551f9296"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a0518cd3e6e76787d4cf92c551f9296">&#9670;&#160;</a></span>DEFAULT_MAX_RESPONSE_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::AsioHttpClient::DEFAULT_MAX_RESPONSE_SIZE = 8 * 1024 * 1024</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default upper limit of the response body, it bounds the memory of one response (the same value as the beast default, so the behavior does not change unless it is raised) </p>
+
+</div>
+</div>
+<a id="ab4654e477c6ebca7ac0ad2be1a3c0256" name="ab4654e477c6ebca7ac0ad2be1a3c0256"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4654e477c6ebca7ac0ad2be1a3c0256">&#9670;&#160;</a></span>DEFAULT_TIMEOUT_MS</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> hku::AsioHttpClient::DEFAULT_TIMEOUT_MS = 30000</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default timeout (ms) </p>
+
+</div>
+</div>
+<a id="af95142bb4e5187005b53c92427629357" name="af95142bb4e5187005b53c92427629357"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af95142bb4e5187005b53c92427629357">&#9670;&#160;</a></span>MAX_TIMEOUT_MS</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> hku::AsioHttpClient::MAX_TIMEOUT_MS = 60000</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Maximum timeout (ms), it is used when a value &lt;= 0 is passed </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/http_client/<a class="el" href="_asio_http_client_8h_source.html">AsioHttpClient.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_asio_http_client.html">AsioHttpClient</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

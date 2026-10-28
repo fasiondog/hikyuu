@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_k_data.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,51 +74,82 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_k_data.html">KData</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">hku::KData 成员列表</div>  </div>
+  <div class="headertitle"><div class="title">hku::KData 成员列表</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>成员的完整列表，这些成员属于 <a class="el" href="classhku_1_1_k_data.html">hku::KData</a>,包括所有继承而来的类成员</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a8e58220b953e0e314c6419337bfba487">empty</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#abd2cf77708fd0d2aa638b1afad0c2c96">endPos</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a55913ef88ce81ffa0c99b28e87e0e922">getDatetimeList</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a9d357af244645be6568f164453f7e834">getKRecord</a>(size_t pos) const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a2452ea46de96f500439a2a476ff8a2cd">getKRecordByDate</a>(const Datetime &amp;datetime) const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a61120e2f852b1bdf64d34b858ae99497">getPos</a>(const Datetime &amp;datetime) const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a874d3243911f90bf507afcea7cb983e7">getQuery</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a039c14ac446470a2ad17dff15ec5ece7">getStock</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ad4cfef53b1feb9fa3aa8eddfd4f9e1ee">KData</a>()</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ac8864b281950671a8f003abe46b118d3">KData</a>(const KData &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ae61cb80b99ef176a89346f04d552885c">amo</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a028cc2841ee3e9a1e872cc4f8e27163b">back</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a8523bc8c3ea38297d6d01fc7a8fa3774">begin</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a87b8b7c5e80087b967239af9aa9f99c1">cbegin</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a78b17d2b4ac99bbc507b041695943ab0">cend</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#af07a6ceb740d6cb7f7607a00add117ea">close</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a91b4d72d2d2da709bafe6cdadf71e3b9">data</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#aefde83c2116a8a3c9079cea9dd53d159">empty</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a76f739175df50bdcee1e3dedcd525295">end</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a267e817057b7aa7fc3ad1831d21b911d">endPos</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a7a86402ef08854ee6f1a255a58521300">front</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ae8382eb9bb28143b872c442c985b95df">getDatetimeList</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a85b71c2f3373b0872e821de80b8ad0f6">getImp</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ae04df36d0ddfdc5e582478773f3cdb9c">getKData</a>(const Datetime &amp;start, const Datetime &amp;end) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ab28559489bc78f1e1ee4d5d2d1ac45f7">getKData</a>(const KQuery &amp;query) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a202b635cf96cf604b58e15aea7dde5d9">getKData</a>(const KQuery::KType &amp;ktype) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a52ec07f9075f0f5eaa8ac2d6f2f8c340">getKRecord</a>(size_t pos) const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#aafd9767218d867731674f0865b16ab8f">getKRecord</a>(Datetime datetime) const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a2a0853f2d9ba26dff6ef9733786fff92">getOtherQueryByDate</a>(const Datetime &amp;start_datetime, const Datetime &amp;end_datetime, const KQuery::KType &amp;ktype) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a39fb5f8f23f56b61b51d7b78ced29787">getPos</a>(const Datetime &amp;datetime) const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a269a5555b64059825e9add29ba0af187">getPosInStock</a>(Datetime datetime) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ad659b7b9859272c3386ebe908b4d402d">getQuery</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a803e0eaf464472be4f467b65b8e0ac38">getStock</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#af38b8e3e6515875d5dd1112ec7c9777a">getSubKData</a>(int64_t start, int64_t end=Null&lt; int64_t &gt;()) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a3508d83bfe0ea78bb8578f94d27ff69e">high</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#af756ac6ec0fd5e7a5eb025a40224bf9a">iterator</a> typedef</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ad4cfef53b1feb9fa3aa8eddfd4f9e1ee">KData</a>()</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a718fb490513896197b7cdb30772c23b0">KData</a>(const KData &amp;) noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#abb7abaae90551bd6a5cc035f42a9259c">KData</a>(const Stock &amp;stock, const KQuery &amp;query)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a7e8da947b79bdf6f66ebe3cc52ad607a">lastPos</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a940df02cd58e7935846d9e548d2b4b53">operator=</a>(const KData &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a9769e00291287d9d3f26f270d0b60037">operator[]</a>(size_t pos) const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#af7d7b2f47c99860bb3b8fa0dca0ea773">operator[]</a>(const Datetime &amp;datetime) const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a17f0993e0ab0dc440015eecab6974897">size</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a93836d23aab9f55abc245388ceb57187">startPos</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#afffc00d1d9b506238cad0c609f270161">tocsv</a>(const string &amp;filename)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a1f6f57cf95076fc37d7bb982725b8c16">toString</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_k_data.html#acd226f7a9a39126ceacaacdc313ae8d9">~KData</a>()</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a31514cb5927dbfd0f1c4bd2f247f702d">KData</a>(KDataImpPtr imp)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a88c5eb8acbee1b12e8f9125c36b9d313">KData</a>(KData &amp;&amp;)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a48e3449f99bb85a418c9ba319ec08cdf">lastPos</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a630015a28514a13d2c77e6a3e3dfd576">low</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a161dca20b57cca647c48bbf2b593a3be">open</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a3788ed1debf31454d3fbbd49a564a6bb">operator!=</a>(const KData &amp;) const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#aa46ae4bba2fcf321f9d0e74c09746e75">operator=</a>(const KData &amp;) noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a016a7da709e7c889685b66db9cb78e18">operator=</a>(KData &amp;&amp;)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ad8aa37f13400691f6b2dc65e1899701e">operator==</a>(const KData &amp;) const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a15869b0abfb3a3f8f24ee49db3653d1a">operator[]</a>(size_t pos) const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a913f5cb5f2f47d9f1674da66925c2839">operator[]</a>(Datetime datetime) const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a3de9857898714a6b6fc343579cb98f3b">size</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#aa4d7e9ee52ba4634a8988cb27f63cc61">startPos</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#afffc00d1d9b506238cad0c609f270161">tocsv</a>(const string &amp;filename)</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#ac397c3b0b5b694dd55de904822c4b6b7">toString</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#a1a0b3cdd4beb29491b0a18cee300c68d">vol</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_k_data.html#acd226f7a9a39126ceacaacdc313ae8d9">~KData</a>()</td><td class="entry"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
 </table></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

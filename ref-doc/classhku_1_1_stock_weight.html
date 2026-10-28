@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::StockWeight类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_stock_weight.html','','classhku_1_1_stock_weight-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,164 +74,168 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="classhku_1_1_stock_weight-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::StockWeight类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::StockWeight类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage security management</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>权息数据结构  
- <a href="classhku_1_1_stock_weight.html#details">更多...</a></p>
+<p>Ex-rights/ex-dividend data structure  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_stock_weight_8h_source.html">StockWeight.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:ac0d52be6a298749421f9a98e783a97de"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#ac0d52be6a298749421f9a98e783a97de">StockWeight</a> ()</td></tr>
-<tr class="memdesc:ac0d52be6a298749421f9a98e783a97de"><td class="mdescLeft">&#160;</td><td class="mdescRight">默认构造函数，返回Null&lt;StockWeight&gt;()  <a href="#ac0d52be6a298749421f9a98e783a97de">更多...</a><br /></td></tr>
-<tr class="separator:ac0d52be6a298749421f9a98e783a97de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ca65c575e97d3f53fea1173f18fea4b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a4ca65c575e97d3f53fea1173f18fea4b">StockWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a>)</td></tr>
-<tr class="separator:a4ca65c575e97d3f53fea1173f18fea4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81b9141151895dae0cb6107adb16618d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a81b9141151895dae0cb6107adb16618d">StockWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a7e6d5d8d002c913f1d08ae8f9b4cb955">countAsGift</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a2416b8c669c3d1924cd8edf1905988cd">countForSell</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a002618249590494252ea634e5e7a86f7">bonus</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a008a28578d46df354456de52d1a270dd">increasement</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a726068ac395a663b931946039c2454ab">totalCount</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#ad3edbe7bf2c4e670c9bf17e0e66874db">freeCount</a>)</td></tr>
-<tr class="separator:a81b9141151895dae0cb6107adb16618d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a> () const </td></tr>
-<tr class="memdesc:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">权息日期  <a href="#aa64e52e93eb65fe2ef271dfdfb827cc2">更多...</a><br /></td></tr>
-<tr class="separator:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a7e6d5d8d002c913f1d08ae8f9b4cb955">countAsGift</a> () const </td></tr>
-<tr class="memdesc:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股送X股  <a href="#a7e6d5d8d002c913f1d08ae8f9b4cb955">更多...</a><br /></td></tr>
-<tr class="separator:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2416b8c669c3d1924cd8edf1905988cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a2416b8c669c3d1924cd8edf1905988cd">countForSell</a> () const </td></tr>
-<tr class="memdesc:a2416b8c669c3d1924cd8edf1905988cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股配X股  <a href="#a2416b8c669c3d1924cd8edf1905988cd">更多...</a><br /></td></tr>
-<tr class="separator:a2416b8c669c3d1924cd8edf1905988cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a> () const </td></tr>
-<tr class="memdesc:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">配股价  <a href="#a4e4bfbe7829ec580e12bc9ebc78f83f3">更多...</a><br /></td></tr>
-<tr class="separator:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a002618249590494252ea634e5e7a86f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a002618249590494252ea634e5e7a86f7">bonus</a> () const </td></tr>
-<tr class="memdesc:a002618249590494252ea634e5e7a86f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股红利  <a href="#a002618249590494252ea634e5e7a86f7">更多...</a><br /></td></tr>
-<tr class="separator:a002618249590494252ea634e5e7a86f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a008a28578d46df354456de52d1a270dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a008a28578d46df354456de52d1a270dd">increasement</a> () const </td></tr>
-<tr class="memdesc:a008a28578d46df354456de52d1a270dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股转增X股  <a href="#a008a28578d46df354456de52d1a270dd">更多...</a><br /></td></tr>
-<tr class="separator:a008a28578d46df354456de52d1a270dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a726068ac395a663b931946039c2454ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a726068ac395a663b931946039c2454ab">totalCount</a> () const </td></tr>
-<tr class="memdesc:a726068ac395a663b931946039c2454ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">总股本（万股）  <a href="#a726068ac395a663b931946039c2454ab">更多...</a><br /></td></tr>
-<tr class="separator:a726068ac395a663b931946039c2454ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#ad3edbe7bf2c4e670c9bf17e0e66874db">freeCount</a> () const </td></tr>
-<tr class="memdesc:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="mdescLeft">&#160;</td><td class="mdescRight">流通股（万股）  <a href="#ad3edbe7bf2c4e670c9bf17e0e66874db">更多...</a><br /></td></tr>
-<tr class="separator:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81f9f85da803ce31dc85db642c28ef9b" id="r_a81f9f85da803ce31dc85db642c28ef9b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81f9f85da803ce31dc85db642c28ef9b">StockWeight</a> ()=default</td></tr>
+<tr class="memdesc:a81f9f85da803ce31dc85db642c28ef9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, returns Null&lt;StockWeight&gt;()  <br /></td></tr>
+<tr class="memitem:a4ca65c575e97d3f53fea1173f18fea4b" id="r_a4ca65c575e97d3f53fea1173f18fea4b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ca65c575e97d3f53fea1173f18fea4b">StockWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="#a051633a5a446540b7f44150b9902a4d0">datetime</a>)</td></tr>
+<tr class="memitem:a65a73b7dd6848a886332b212c70db2b9" id="r_a65a73b7dd6848a886332b212c70db2b9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65a73b7dd6848a886332b212c70db2b9">StockWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="#a051633a5a446540b7f44150b9902a4d0">datetime</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a84380d7726837ceafe7cb3fbce4464d6">countAsGift</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a06f4e20ba390ed311642a72a1ad51402">countForSell</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a47f66c066f945a1d3878f147b154f19b">priceForSell</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#aa7c12a59a6ccd8e2ae1e38a33f05e010">bonus</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a21304773c2581dc90507aa1b41273bee">increasement</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a052ac20f7ac7d27a97826d433fc6b3b5">totalCount</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a5004cf8e9d2bf572df5ae28f27337d66">freeCount</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a5956013388e64b71dd5fd670118776a0">suogu</a>)</td></tr>
+<tr class="memitem:a051633a5a446540b7f44150b9902a4d0" id="r_a051633a5a446540b7f44150b9902a4d0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a051633a5a446540b7f44150b9902a4d0">datetime</a> () const noexcept</td></tr>
+<tr class="memdesc:a051633a5a446540b7f44150b9902a4d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ex-rights/ex-dividend date  <br /></td></tr>
+<tr class="memitem:a84380d7726837ceafe7cb3fbce4464d6" id="r_a84380d7726837ceafe7cb3fbce4464d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84380d7726837ceafe7cb3fbce4464d6">countAsGift</a> () const noexcept</td></tr>
+<tr class="memdesc:a84380d7726837ceafe7cb3fbce4464d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bonus shares per 10 shares (X shares given per 10 shares)  <br /></td></tr>
+<tr class="memitem:a06f4e20ba390ed311642a72a1ad51402" id="r_a06f4e20ba390ed311642a72a1ad51402"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a06f4e20ba390ed311642a72a1ad51402">countForSell</a> () const noexcept</td></tr>
+<tr class="memdesc:a06f4e20ba390ed311642a72a1ad51402"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rights shares per 10 shares (X shares allotted per 10 shares)  <br /></td></tr>
+<tr class="memitem:a47f66c066f945a1d3878f147b154f19b" id="r_a47f66c066f945a1d3878f147b154f19b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a47f66c066f945a1d3878f147b154f19b">priceForSell</a> () const noexcept</td></tr>
+<tr class="memdesc:a47f66c066f945a1d3878f147b154f19b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rights issue price  <br /></td></tr>
+<tr class="memitem:aa7c12a59a6ccd8e2ae1e38a33f05e010" id="r_aa7c12a59a6ccd8e2ae1e38a33f05e010"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7c12a59a6ccd8e2ae1e38a33f05e010">bonus</a> () const noexcept</td></tr>
+<tr class="memdesc:aa7c12a59a6ccd8e2ae1e38a33f05e010"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dividend per 10 shares  <br /></td></tr>
+<tr class="memitem:a21304773c2581dc90507aa1b41273bee" id="r_a21304773c2581dc90507aa1b41273bee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a21304773c2581dc90507aa1b41273bee">increasement</a> () const noexcept</td></tr>
+<tr class="memdesc:a21304773c2581dc90507aa1b41273bee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capitalized shares per 10 shares (X shares converted per 10 shares)  <br /></td></tr>
+<tr class="memitem:a052ac20f7ac7d27a97826d433fc6b3b5" id="r_a052ac20f7ac7d27a97826d433fc6b3b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a052ac20f7ac7d27a97826d433fc6b3b5">totalCount</a> () const noexcept</td></tr>
+<tr class="memdesc:a052ac20f7ac7d27a97826d433fc6b3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total share capital (in units of 10 thousand shares)  <br /></td></tr>
+<tr class="memitem:a5004cf8e9d2bf572df5ae28f27337d66" id="r_a5004cf8e9d2bf572df5ae28f27337d66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5004cf8e9d2bf572df5ae28f27337d66">freeCount</a> () const noexcept</td></tr>
+<tr class="memdesc:a5004cf8e9d2bf572df5ae28f27337d66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Outstanding shares (in units of 10 thousand shares)  <br /></td></tr>
+<tr class="memitem:a5956013388e64b71dd5fd670118776a0" id="r_a5956013388e64b71dd5fd670118776a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5956013388e64b71dd5fd670118776a0">suogu</a> () const noexcept</td></tr>
+<tr class="memdesc:a5956013388e64b71dd5fd670118776a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Share expansion/contraction ratio (suogu)  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>权息数据结构 </p>
-</div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="ac0d52be6a298749421f9a98e783a97de"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Ex-rights/ex-dividend data structure </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a81f9f85da803ce31dc85db642c28ef9b" name="a81f9f85da803ce31dc85db642c28ef9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81f9f85da803ce31dc85db642c28ef9b">&#9670;&#160;</a></span>StockWeight() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::StockWeight::StockWeight </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default constructor, returns Null&lt;StockWeight&gt;() </p>
+
+</div>
+</div>
+<a id="a4ca65c575e97d3f53fea1173f18fea4b" name="a4ca65c575e97d3f53fea1173f18fea4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ca65c575e97d3f53fea1173f18fea4b">&#9670;&#160;</a></span>StockWeight() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::StockWeight::StockWeight </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a65a73b7dd6848a886332b212c70db2b9" name="a65a73b7dd6848a886332b212c70db2b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65a73b7dd6848a886332b212c70db2b9">&#9670;&#160;</a></span>StockWeight() <span class="overload">[3/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::StockWeight::StockWeight </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>默认构造函数，返回Null&lt;StockWeight&gt;() </p>
-
-</div>
-</div>
-<a class="anchor" id="a4ca65c575e97d3f53fea1173f18fea4b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::StockWeight::StockWeight </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a81b9141151895dae0cb6107adb16618d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::StockWeight::StockWeight </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>countAsGift</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>countAsGift</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>countForSell</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>countForSell</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>priceForSell</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>priceForSell</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>bonus</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>bonus</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>increasement</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>increasement</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>totalCount</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>totalCount</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>freeCount</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>freeCount</em></span>, </td>
         </tr>
         <tr>
+          <td class="paramkey"></td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>suogu</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a002618249590494252ea634e5e7a86f7"></a>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="aa7c12a59a6ccd8e2ae1e38a33f05e010" name="aa7c12a59a6ccd8e2ae1e38a33f05e010"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7c12a59a6ccd8e2ae1e38a33f05e010">&#9670;&#160;</a></span>bonus()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -246,22 +245,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::bonus </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>每10股红利 </p>
+<p>Dividend per 10 shares </p>
 
 </div>
 </div>
-<a class="anchor" id="a7e6d5d8d002c913f1d08ae8f9b4cb955"></a>
+<a id="a84380d7726837ceafe7cb3fbce4464d6" name="a84380d7726837ceafe7cb3fbce4464d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84380d7726837ceafe7cb3fbce4464d6">&#9670;&#160;</a></span>countAsGift()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -271,22 +272,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::countAsGift </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>每10股送X股 </p>
+<p>Bonus shares per 10 shares (X shares given per 10 shares) </p>
 
 </div>
 </div>
-<a class="anchor" id="a2416b8c669c3d1924cd8edf1905988cd"></a>
+<a id="a06f4e20ba390ed311642a72a1ad51402" name="a06f4e20ba390ed311642a72a1ad51402"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06f4e20ba390ed311642a72a1ad51402">&#9670;&#160;</a></span>countForSell()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -296,22 +299,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::countForSell </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>每10股配X股 </p>
+<p>Rights shares per 10 shares (X shares allotted per 10 shares) </p>
 
 </div>
 </div>
-<a class="anchor" id="aa64e52e93eb65fe2ef271dfdfb827cc2"></a>
+<a id="a051633a5a446540b7f44150b9902a4d0" name="a051633a5a446540b7f44150b9902a4d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a051633a5a446540b7f44150b9902a4d0">&#9670;&#160;</a></span>datetime()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -321,22 +326,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::StockWeight::datetime </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>权息日期 </p>
+<p>Ex-rights/ex-dividend date </p>
 
 </div>
 </div>
-<a class="anchor" id="ad3edbe7bf2c4e670c9bf17e0e66874db"></a>
+<a id="a5004cf8e9d2bf572df5ae28f27337d66" name="a5004cf8e9d2bf572df5ae28f27337d66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5004cf8e9d2bf572df5ae28f27337d66">&#9670;&#160;</a></span>freeCount()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -346,22 +353,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::freeCount </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>流通股（万股） </p>
+<p>Outstanding shares (in units of 10 thousand shares) </p>
 
 </div>
 </div>
-<a class="anchor" id="a008a28578d46df354456de52d1a270dd"></a>
+<a id="a21304773c2581dc90507aa1b41273bee" name="a21304773c2581dc90507aa1b41273bee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21304773c2581dc90507aa1b41273bee">&#9670;&#160;</a></span>increasement()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -371,22 +380,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::increasement </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>每10股转增X股 </p>
+<p>Capitalized shares per 10 shares (X shares converted per 10 shares) </p>
 
 </div>
 </div>
-<a class="anchor" id="a4e4bfbe7829ec580e12bc9ebc78f83f3"></a>
+<a id="a47f66c066f945a1d3878f147b154f19b" name="a47f66c066f945a1d3878f147b154f19b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47f66c066f945a1d3878f147b154f19b">&#9670;&#160;</a></span>priceForSell()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -396,22 +407,51 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::priceForSell </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>配股价 </p>
+<p>Rights issue price </p>
 
 </div>
 </div>
-<a class="anchor" id="a726068ac395a663b931946039c2454ab"></a>
+<a id="a5956013388e64b71dd5fd670118776a0" name="a5956013388e64b71dd5fd670118776a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5956013388e64b71dd5fd670118776a0">&#9670;&#160;</a></span>suogu()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::suogu </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Share expansion/contraction ratio (suogu) </p>
+
+</div>
+</div>
+<a id="a052ac20f7ac7d27a97826d433fc6b3b5" name="a052ac20f7ac7d27a97826d433fc6b3b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a052ac20f7ac7d27a97826d433fc6b3b5">&#9670;&#160;</a></span>totalCount()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -421,32 +461,43 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StockWeight::totalCount </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>总股本（万股） </p>
+<p>Total share capital (in units of 10 thousand shares) </p>
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/<a class="el" href="_stock_weight_8h_source.html">StockWeight.h</a></li>
-<li>hikyuu/<a class="el" href="_stock_weight_8cpp.html">StockWeight.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_stock_weight.html">StockWeight</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

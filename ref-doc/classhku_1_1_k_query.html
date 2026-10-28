@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::KQuery类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_k_query.html','','classhku_1_1_k_query-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,200 +74,206 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_k_query.html">KQuery</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
-<a href="classhku_1_1_k_query-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::KQuery类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::KQuery类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage security management</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>按索引方式查询K线数据条件  
- <a href="classhku_1_1_k_query.html#details">更多...</a></p>
+<p>Query condition for K-line (candlestick) data by index  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_k_query_8h_source.html">KQuery.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
+<tr class="memitem:ad257ee8b693dbe8e765950347683d944" id="r_ad257ee8b693dbe8e765950347683d944"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a> : uint8_t { <a class="el" href="#ad257ee8b693dbe8e765950347683d944ac4a8d95680124cc04a83042f8ad1023c">INDEX</a> = 0
+, <a class="el" href="#ad257ee8b693dbe8e765950347683d944a92de22d5f02fa3d0abe3693eddcc370d">DATE</a> = 1
+, <a class="el" href="#ad257ee8b693dbe8e765950347683d944ab89fa952084096ba3ade90c1d3f4f005">INVALID</a> = 2
+ }</td></tr>
+<tr class="memdesc:ad257ee8b693dbe8e765950347683d944"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query mode: by index or by date  <a href="#ad257ee8b693dbe8e765950347683d944">更多...</a><br /></td></tr>
+<tr class="memitem:a88dbc70e671f0e96e4b4d7764cef8417" id="r_a88dbc70e671f0e96e4b4d7764cef8417"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a> = 0
+, <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417ae4fcde174f86f1dbc2047cfdffa56d5e">FORWARD</a> = 1
+, <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a2812eaf8eef125cacbf3d060072203d3">BACKWARD</a> = 2
+, <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a60b42cd8cb0b63f89f1a2985da59a926">EQUAL_FORWARD</a> = 3
+, <br />
+&#160;&#160;<a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a79c5682ce5362e8a05c572026440ab1a">EQUAL_BACKWARD</a> = 4
+, <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a884142b21c79179e63e461d48a76cba7">INVALID_RECOVER_TYPE</a> = 5
+<br />
+ }</td></tr>
+<tr class="memdesc:a88dbc70e671f0e96e4b4d7764cef8417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Price adjustment type  <a href="#a88dbc70e671f0e96e4b4d7764cef8417">更多...</a><br /></td></tr>
+<tr class="memitem:a4d5db3c7c8b21c8ffe8a4cf233eaedf8" id="r_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><td class="memItemLeft" align="right" valign="top">typedef string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:ac01d2e55938fe6f62a9e9c1f4a71f189"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#ac01d2e55938fe6f62a9e9c1f4a71f189">KQuery</a> ()</td></tr>
-<tr class="memdesc:ac01d2e55938fe6f62a9e9c1f4a71f189"><td class="mdescLeft">&#160;</td><td class="mdescRight">默认构造，按索引方式查询全部日线数据，不复权  <a href="#ac01d2e55938fe6f62a9e9c1f4a71f189">更多...</a><br /></td></tr>
-<tr class="separator:ac01d2e55938fe6f62a9e9c1f4a71f189"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd0e9a31cf503d3ab5fff83c034399cf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#afd0e9a31cf503d3ab5fff83c034399cf">KQuery</a> (<a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> <a class="el" href="classhku_1_1_k_query.html#a42f5f47a6f4219eff780bfd7ef16c7cf">start</a>, <a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> <a class="el" href="classhku_1_1_k_query.html#a941c5b802fb7bb81ebff199aab1c95f0">end</a>=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; <a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> &gt;(), <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a> dataType=<a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a58c2095b55dc7968c423954663358cec">DAY</a>, <a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a> <a class="el" href="classhku_1_1_k_query.html#affbed1df95d080453f518931fe5dfeee">recoverType</a>=<a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a>, <a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a> <a class="el" href="classhku_1_1_k_query.html#a20d92d8e616e2df801dd0f2c1910bab4">queryType</a>=<a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8ac4a8d95680124cc04a83042f8ad1023c">INDEX</a>)</td></tr>
-<tr class="memdesc:afd0e9a31cf503d3ab5fff83c034399cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">K线查询，范围[start, end)  <a href="#afd0e9a31cf503d3ab5fff83c034399cf">更多...</a><br /></td></tr>
-<tr class="separator:afd0e9a31cf503d3ab5fff83c034399cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42f5f47a6f4219eff780bfd7ef16c7cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a42f5f47a6f4219eff780bfd7ef16c7cf">start</a> () const </td></tr>
-<tr class="memdesc:a42f5f47a6f4219eff780bfd7ef16c7cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">按索引方式查询时，返回指定的起始索引，否则返回Null&lt;hku_int64&gt;()  <a href="#a42f5f47a6f4219eff780bfd7ef16c7cf">更多...</a><br /></td></tr>
-<tr class="separator:a42f5f47a6f4219eff780bfd7ef16c7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a941c5b802fb7bb81ebff199aab1c95f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a941c5b802fb7bb81ebff199aab1c95f0">end</a> () const </td></tr>
-<tr class="memdesc:a941c5b802fb7bb81ebff199aab1c95f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">按索引方式查询时，返回指定的结束索引，否则返回Null&lt;hku_int64&gt;()  <a href="#a941c5b802fb7bb81ebff199aab1c95f0">更多...</a><br /></td></tr>
-<tr class="separator:a941c5b802fb7bb81ebff199aab1c95f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6f1503dbd999758f805f251308f2e5f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#ab6f1503dbd999758f805f251308f2e5f">startDatetime</a> () const </td></tr>
-<tr class="memdesc:ab6f1503dbd999758f805f251308f2e5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">按日期方式查询时，返回指定的起始日期，否则返回Null&lt;Datetime&gt;()  <a href="#ab6f1503dbd999758f805f251308f2e5f">更多...</a><br /></td></tr>
-<tr class="separator:ab6f1503dbd999758f805f251308f2e5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a483959b04f974fcd6ef4e0e089e27d0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a483959b04f974fcd6ef4e0e089e27d0b">endDatetime</a> () const </td></tr>
-<tr class="memdesc:a483959b04f974fcd6ef4e0e089e27d0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">按日期方式查询时，返回指定的结束日期，否则返回Null&lt;Datetime&gt;()  <a href="#a483959b04f974fcd6ef4e0e089e27d0b">更多...</a><br /></td></tr>
-<tr class="separator:a483959b04f974fcd6ef4e0e089e27d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20d92d8e616e2df801dd0f2c1910bab4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a20d92d8e616e2df801dd0f2c1910bab4">queryType</a> () const </td></tr>
-<tr class="memdesc:a20d92d8e616e2df801dd0f2c1910bab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取查询条件类型  <a href="#a20d92d8e616e2df801dd0f2c1910bab4">更多...</a><br /></td></tr>
-<tr class="separator:a20d92d8e616e2df801dd0f2c1910bab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a590d72ac21a771c1ee63fafcc6f96cee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a590d72ac21a771c1ee63fafcc6f96cee">kType</a> () const </td></tr>
-<tr class="memdesc:a590d72ac21a771c1ee63fafcc6f96cee"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取K线数据类型  <a href="#a590d72ac21a771c1ee63fafcc6f96cee">更多...</a><br /></td></tr>
-<tr class="separator:a590d72ac21a771c1ee63fafcc6f96cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affbed1df95d080453f518931fe5dfeee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#affbed1df95d080453f518931fe5dfeee">recoverType</a> () const </td></tr>
-<tr class="memdesc:affbed1df95d080453f518931fe5dfeee"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取复权类型  <a href="#affbed1df95d080453f518931fe5dfeee">更多...</a><br /></td></tr>
-<tr class="separator:affbed1df95d080453f518931fe5dfeee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac01d2e55938fe6f62a9e9c1f4a71f189" id="r_ac01d2e55938fe6f62a9e9c1f4a71f189"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac01d2e55938fe6f62a9e9c1f4a71f189">KQuery</a> ()</td></tr>
+<tr class="memdesc:ac01d2e55938fe6f62a9e9c1f4a71f189"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: query all daily data by index, without price adjustment  <br /></td></tr>
+<tr class="memitem:ab70150cd841682c911ac5316c482b89e" id="r_ab70150cd841682c911ac5316c482b89e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab70150cd841682c911ac5316c482b89e">KQuery</a> (<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#afc9dca0b9cfacd92ac997e5d5b39c8bc">start</a>, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#afb9030a2ed64b4b19199fe29f6b1b293">end</a>=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &gt;(), const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;dataType=<a class="el" href="#a305b6d1aff976a8b9d2460e6964308fe">DAY</a>, <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a> <a class="el" href="#a1334dec091c3b91ba27c70844c606223">recoverType</a>=<a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a>, <a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a> <a class="el" href="#a33e9e6968914d8f16c0e9c9ee909e659">queryType</a>=<a class="el" href="#ad257ee8b693dbe8e765950347683d944ac4a8d95680124cc04a83042f8ad1023c">INDEX</a>)</td></tr>
+<tr class="memdesc:ab70150cd841682c911ac5316c482b89e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query K-line data over the range [start, end)  <br /></td></tr>
+<tr class="memitem:a7cc8e3ea26b8e6152221f8ec60889bfc" id="r_a7cc8e3ea26b8e6152221f8ec60889bfc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cc8e3ea26b8e6152221f8ec60889bfc">KQuery</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> <a class="el" href="#afc9dca0b9cfacd92ac997e5d5b39c8bc">start</a>, <a class="el" href="classhku_1_1_datetime.html">Datetime</a> <a class="el" href="#afb9030a2ed64b4b19199fe29f6b1b293">end</a>=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &gt;(), const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;ktype=<a class="el" href="#a305b6d1aff976a8b9d2460e6964308fe">DAY</a>, <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a> <a class="el" href="#a1334dec091c3b91ba27c70844c606223">recoverType</a>=<a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a>)</td></tr>
+<tr class="memdesc:a7cc8e3ea26b8e6152221f8ec60889bfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query K-line data by date, over the range [start, end)  <br /></td></tr>
+<tr class="memitem:afc9dca0b9cfacd92ac997e5d5b39c8bc" id="r_afc9dca0b9cfacd92ac997e5d5b39c8bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc9dca0b9cfacd92ac997e5d5b39c8bc">start</a> () const noexcept</td></tr>
+<tr class="memdesc:afc9dca0b9cfacd92ac997e5d5b39c8bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the specified start index when querying by index, otherwise Null&lt;int64_t&gt;()  <br /></td></tr>
+<tr class="memitem:afb9030a2ed64b4b19199fe29f6b1b293" id="r_afb9030a2ed64b4b19199fe29f6b1b293"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb9030a2ed64b4b19199fe29f6b1b293">end</a> () const noexcept</td></tr>
+<tr class="memdesc:afb9030a2ed64b4b19199fe29f6b1b293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the specified end index when querying by index, otherwise Null&lt;int64_t&gt;()  <br /></td></tr>
+<tr class="memitem:a015993c712f1e5213468ceed01d57dd8" id="r_a015993c712f1e5213468ceed01d57dd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a015993c712f1e5213468ceed01d57dd8">startDatetime</a> () const</td></tr>
+<tr class="memdesc:a015993c712f1e5213468ceed01d57dd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the specified start date when querying by date, otherwise Null&lt;Datetime&gt;()  <br /></td></tr>
+<tr class="memitem:afd0cb9138ffb99b88636a3db8ce6e740" id="r_afd0cb9138ffb99b88636a3db8ce6e740"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd0cb9138ffb99b88636a3db8ce6e740">endDatetime</a> () const</td></tr>
+<tr class="memdesc:afd0cb9138ffb99b88636a3db8ce6e740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the specified end date when querying by date, otherwise Null&lt;Datetime&gt;()  <br /></td></tr>
+<tr class="memitem:a33e9e6968914d8f16c0e9c9ee909e659" id="r_a33e9e6968914d8f16c0e9c9ee909e659"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a33e9e6968914d8f16c0e9c9ee909e659">queryType</a> () const noexcept</td></tr>
+<tr class="memdesc:a33e9e6968914d8f16c0e9c9ee909e659"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the query condition type  <br /></td></tr>
+<tr class="memitem:af3174c395106121dd0d1cca7220e37bb" id="r_af3174c395106121dd0d1cca7220e37bb"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3174c395106121dd0d1cca7220e37bb">kType</a> () const noexcept</td></tr>
+<tr class="memdesc:af3174c395106121dd0d1cca7220e37bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the K-line data type  <br /></td></tr>
+<tr class="memitem:a1d8537aa576223fbcf2ba469c33a13d6" id="r_a1d8537aa576223fbcf2ba469c33a13d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d8537aa576223fbcf2ba469c33a13d6">kTypeInSeconds</a> () const</td></tr>
+<tr class="memdesc:a1d8537aa576223fbcf2ba469c33a13d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of seconds corresponding to the K-line data type  <br /></td></tr>
+<tr class="memitem:a1334dec091c3b91ba27c70844c606223" id="r_a1334dec091c3b91ba27c70844c606223"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1334dec091c3b91ba27c70844c606223">recoverType</a> () const noexcept</td></tr>
+<tr class="memdesc:a1334dec091c3b91ba27c70844c606223"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the price adjustment type  <br /></td></tr>
+<tr class="memitem:a5013a45b2c0baa425c642478748f3835" id="r_a5013a45b2c0baa425c642478748f3835"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5013a45b2c0baa425c642478748f3835">recoverType</a> (<a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a> recoverType) noexcept</td></tr>
+<tr class="memdesc:a5013a45b2c0baa425c642478748f3835"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the price adjustment type  <br /></td></tr>
+<tr class="memitem:a23ad6765519028e05ac37661943c7ad0" id="r_a23ad6765519028e05ac37661943c7ad0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23ad6765519028e05ac37661943c7ad0">hash</a> () const</td></tr>
+<tr class="memdesc:a23ad6765519028e05ac37661943c7ad0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hash value (use with care)  <br /></td></tr>
+<tr class="memitem:afaa05b8e3529c5727121865c1d0d3ff5" id="r_afaa05b8e3529c5727121865c1d0d3ff5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afaa05b8e3529c5727121865c1d0d3ff5">isRightOpening</a> () const</td></tr>
+<tr class="memdesc:afaa05b8e3529c5727121865c1d0d3ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is a right-open interval, i.e.  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 静态 Public 成员函数</h2></td></tr>
-<tr class="memitem:a30b1dbdd042f5b0ed12e72a72ca6a6da"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a30b1dbdd042f5b0ed12e72a72ca6a6da">getQueryTypeName</a> (<a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a>)</td></tr>
-<tr class="memdesc:a30b1dbdd042f5b0ed12e72a72ca6a6da"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取queryType名称，用于显示输出  <a href="#a30b1dbdd042f5b0ed12e72a72ca6a6da">更多...</a><br /></td></tr>
-<tr class="separator:a30b1dbdd042f5b0ed12e72a72ca6a6da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdccf71f96b7d229e324abe6b8225cc3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#abdccf71f96b7d229e324abe6b8225cc3">getKTypeName</a> (<a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a>)</td></tr>
-<tr class="memdesc:abdccf71f96b7d229e324abe6b8225cc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取KType名称，用于显示输出  <a href="#abdccf71f96b7d229e324abe6b8225cc3">更多...</a><br /></td></tr>
-<tr class="separator:abdccf71f96b7d229e324abe6b8225cc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d746fb19b103dee92a579fa06f0db7b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a7d746fb19b103dee92a579fa06f0db7b">getRecoverTypeName</a> (<a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a>)</td></tr>
-<tr class="memdesc:a7d746fb19b103dee92a579fa06f0db7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取recoverType名称，用于显示输出  <a href="#a7d746fb19b103dee92a579fa06f0db7b">更多...</a><br /></td></tr>
-<tr class="separator:a7d746fb19b103dee92a579fa06f0db7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a979662da3f740a40decec1ba894c35b1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#a979662da3f740a40decec1ba894c35b1">getQueryTypeEnum</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;)</td></tr>
-<tr class="memdesc:a979662da3f740a40decec1ba894c35b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据字符串名称获取相应的queryType枚举值  <a href="#a979662da3f740a40decec1ba894c35b1">更多...</a><br /></td></tr>
-<tr class="separator:a979662da3f740a40decec1ba894c35b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ababa559bc49541ca40c4b62850638047"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#ababa559bc49541ca40c4b62850638047">getKTypeEnum</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;)</td></tr>
-<tr class="memdesc:ababa559bc49541ca40c4b62850638047"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据字符串名称，获取相应的枚举值  <a href="#ababa559bc49541ca40c4b62850638047">更多...</a><br /></td></tr>
-<tr class="separator:ababa559bc49541ca40c4b62850638047"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1a718f7ed5654b812922b0436f87d27"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html#aa1a718f7ed5654b812922b0436f87d27">getRecoverTypeEnum</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;)</td></tr>
-<tr class="memdesc:aa1a718f7ed5654b812922b0436f87d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据字符串名称，获取相应的枚举值  <a href="#aa1a718f7ed5654b812922b0436f87d27">更多...</a><br /></td></tr>
-<tr class="separator:aa1a718f7ed5654b812922b0436f87d27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f2545318216ccb64b4692951cef9ed9" id="r_a5f2545318216ccb64b4692951cef9ed9"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f2545318216ccb64b4692951cef9ed9">isValidKType</a> (const string &amp;ktype)</td></tr>
+<tr class="memdesc:a5f2545318216ccb64b4692951cef9ed9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the given K-line type is valid  <br /></td></tr>
+<tr class="memitem:a5f03e990edd7586a471fa92d99870642" id="r_a5f03e990edd7586a471fa92d99870642"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f03e990edd7586a471fa92d99870642">isBaseKType</a> (const string &amp;ktype) noexcept</td></tr>
+<tr class="memdesc:a5f03e990edd7586a471fa92d99870642"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is a base ktype  <br /></td></tr>
+<tr class="memitem:a1e4e5bfcfb4a66849a9092333068fb87" id="r_a1e4e5bfcfb4a66849a9092333068fb87"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e4e5bfcfb4a66849a9092333068fb87">isExtraKType</a> (const string &amp;ktype)</td></tr>
+<tr class="memdesc:a1e4e5bfcfb4a66849a9092333068fb87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is an extended ktype  <br /></td></tr>
+<tr class="memitem:ab771cfa4983ae5b64d3d5562b9e959fb" id="r_ab771cfa4983ae5b64d3d5562b9e959fb"><td class="memItemLeft" align="right" valign="top">static vector&lt; <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab771cfa4983ae5b64d3d5562b9e959fb">getBaseKTypeList</a> () noexcept</td></tr>
+<tr class="memdesc:ab771cfa4983ae5b64d3d5562b9e959fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all base KTypes  <br /></td></tr>
+<tr class="memitem:a3599a9eaab76a8dffe9f9dcf083dc7ab" id="r_a3599a9eaab76a8dffe9f9dcf083dc7ab"><td class="memItemLeft" align="right" valign="top">static vector&lt; <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3599a9eaab76a8dffe9f9dcf083dc7ab">getExtraKTypeList</a> ()</td></tr>
+<tr class="memdesc:a3599a9eaab76a8dffe9f9dcf083dc7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all extended KTypes  <br /></td></tr>
+<tr class="memitem:a57d1ae1cf8b402f7533ac7720e62f9b8" id="r_a57d1ae1cf8b402f7533ac7720e62f9b8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57d1ae1cf8b402f7533ac7720e62f9b8">getKTypeInMin</a> (const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;ktype)</td></tr>
+<tr class="memitem:a84421e32e247a7fe618dc89311e10fb3" id="r_a84421e32e247a7fe618dc89311e10fb3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84421e32e247a7fe618dc89311e10fb3">getBaseKTypeInMin</a> (const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;ktype) noexcept</td></tr>
+<tr class="memitem:a35f067c2ea7ba337baef31cc3d3980bd" id="r_a35f067c2ea7ba337baef31cc3d3980bd"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a35f067c2ea7ba337baef31cc3d3980bd">getKTypeInSeconds</a> (const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;ktype)</td></tr>
+<tr class="memitem:a57c9b94fb9cf6cdf06518ed233252915" id="r_a57c9b94fb9cf6cdf06518ed233252915"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57c9b94fb9cf6cdf06518ed233252915">getQueryTypeName</a> (<a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a>)</td></tr>
+<tr class="memdesc:a57c9b94fb9cf6cdf06518ed233252915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the queryType, used for display output  <br /></td></tr>
+<tr class="memitem:af385e7357d0869da1f1b8732f0e9d1fa" id="r_af385e7357d0869da1f1b8732f0e9d1fa"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af385e7357d0869da1f1b8732f0e9d1fa">getKTypeName</a> (const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;)</td></tr>
+<tr class="memdesc:af385e7357d0869da1f1b8732f0e9d1fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a>, used for display output  <br /></td></tr>
+<tr class="memitem:a84716e4a4dda1c21f21ded27d56806d7" id="r_a84716e4a4dda1c21f21ded27d56806d7"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84716e4a4dda1c21f21ded27d56806d7">getRecoverTypeName</a> (<a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a>)</td></tr>
+<tr class="memdesc:a84716e4a4dda1c21f21ded27d56806d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the recoverType, used for display output  <br /></td></tr>
+<tr class="memitem:abef7e0003118ea1a132127e7daa86828" id="r_abef7e0003118ea1a132127e7daa86828"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abef7e0003118ea1a132127e7daa86828">getQueryTypeEnum</a> (const string &amp;)</td></tr>
+<tr class="memdesc:abef7e0003118ea1a132127e7daa86828"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the queryType enum value matching the given string name  <br /></td></tr>
+<tr class="memitem:a6a237a03b6dc076fcab988e50134e2f1" id="r_a6a237a03b6dc076fcab988e50134e2f1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a237a03b6dc076fcab988e50134e2f1">getKTypeEnum</a> (const string &amp;)</td></tr>
+<tr class="memdesc:a6a237a03b6dc076fcab988e50134e2f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> enum value matching the given string name  <br /></td></tr>
+<tr class="memitem:ab949b4a8cad660bf3a76c8a27d140a04" id="r_ab949b4a8cad660bf3a76c8a27d140a04"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab949b4a8cad660bf3a76c8a27d140a04">getRecoverTypeEnum</a> (const string &amp;)</td></tr>
+<tr class="memdesc:ab949b4a8cad660bf3a76c8a27d140a04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the recoverType enum value matching the given string name  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+静态 Public 属性</h2></td></tr>
+<tr class="memitem:a754928fde45cb7281c0b6bb932d2f3bc" id="r_a754928fde45cb7281c0b6bb932d2f3bc"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a754928fde45cb7281c0b6bb932d2f3bc">MIN</a></td></tr>
+<tr class="memitem:a92e18bf59bc40f5755623ecad66b8448" id="r_a92e18bf59bc40f5755623ecad66b8448"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92e18bf59bc40f5755623ecad66b8448">MIN5</a></td></tr>
+<tr class="memitem:ac0d0f066c002517e3193ca8f46475f66" id="r_ac0d0f066c002517e3193ca8f46475f66"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0d0f066c002517e3193ca8f46475f66">MIN15</a></td></tr>
+<tr class="memitem:a576ee7e219b1894c6e6cca45d6e6a998" id="r_a576ee7e219b1894c6e6cca45d6e6a998"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a576ee7e219b1894c6e6cca45d6e6a998">MIN30</a></td></tr>
+<tr class="memitem:a88d99d75b10ab3a4de00eb17e0809962" id="r_a88d99d75b10ab3a4de00eb17e0809962"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88d99d75b10ab3a4de00eb17e0809962">MIN60</a></td></tr>
+<tr class="memitem:a301e74fb372b6205f6487076b17e62aa" id="r_a301e74fb372b6205f6487076b17e62aa"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a301e74fb372b6205f6487076b17e62aa">HOUR2</a></td></tr>
+<tr class="memitem:a305b6d1aff976a8b9d2460e6964308fe" id="r_a305b6d1aff976a8b9d2460e6964308fe"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a305b6d1aff976a8b9d2460e6964308fe">DAY</a></td></tr>
+<tr class="memitem:aee4ecda677146e666c75c2f686bff246" id="r_aee4ecda677146e666c75c2f686bff246"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aee4ecda677146e666c75c2f686bff246">WEEK</a></td></tr>
+<tr class="memitem:a08645d03e78a09cfa9d712c1929b838b" id="r_a08645d03e78a09cfa9d712c1929b838b"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a08645d03e78a09cfa9d712c1929b838b">MONTH</a></td></tr>
+<tr class="memitem:a1a7193d8a0ad619d0d52d9fa7f423269" id="r_a1a7193d8a0ad619d0d52d9fa7f423269"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a7193d8a0ad619d0d52d9fa7f423269">QUARTER</a></td></tr>
+<tr class="memitem:ac6f8a0d515f2f3c91173a861186e2307" id="r_ac6f8a0d515f2f3c91173a861186e2307"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac6f8a0d515f2f3c91173a861186e2307">HALFYEAR</a></td></tr>
+<tr class="memitem:a91437db022ec687078fe0c62ae0a69ad" id="r_a91437db022ec687078fe0c62ae0a69ad"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91437db022ec687078fe0c62ae0a69ad">YEAR</a></td></tr>
+<tr class="memitem:aa3ba61121094fe9e5d2d298d07db26ec" id="r_aa3ba61121094fe9e5d2d298d07db26ec"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3ba61121094fe9e5d2d298d07db26ec">DAY3</a></td></tr>
+<tr class="memitem:a4a5cc179206ecf01e19c28d9311eddfb" id="r_a4a5cc179206ecf01e19c28d9311eddfb"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4a5cc179206ecf01e19c28d9311eddfb">DAY5</a></td></tr>
+<tr class="memitem:ae9b7eb9c13ee4f3d029da7457b227f87" id="r_ae9b7eb9c13ee4f3d029da7457b227f87"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9b7eb9c13ee4f3d029da7457b227f87">DAY7</a></td></tr>
+<tr class="memitem:ad7daf41625c1ebcc53eea8924b258957" id="r_ad7daf41625c1ebcc53eea8924b258957"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7daf41625c1ebcc53eea8924b258957">MIN3</a></td></tr>
+<tr class="memitem:a3e4599587ce59bb3066ea9323afc5f07" id="r_a3e4599587ce59bb3066ea9323afc5f07"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3e4599587ce59bb3066ea9323afc5f07">HOUR4</a></td></tr>
+<tr class="memitem:aa16c31b8babfd7d4f15ec164a6145d55" id="r_aa16c31b8babfd7d4f15ec164a6145d55"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa16c31b8babfd7d4f15ec164a6145d55">HOUR6</a></td></tr>
+<tr class="memitem:add569a47939ba687bff1af55d4b08332" id="r_add569a47939ba687bff1af55d4b08332"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add569a47939ba687bff1af55d4b08332">HOUR12</a></td></tr>
+<tr class="memitem:ae09ee388ec20eef9b85ce58ec6a4d2e8" id="r_ae09ee388ec20eef9b85ce58ec6a4d2e8"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae09ee388ec20eef9b85ce58ec6a4d2e8">TIMELINE</a></td></tr>
+<tr class="memitem:aaa540f5954f6db75acace25b3b309ab9" id="r_aaa540f5954f6db75acace25b3b309ab9"><td class="memItemLeft" align="right" valign="top">static const string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa540f5954f6db75acace25b3b309ab9">TRANS</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>按索引方式查询K线数据条件 </p>
-</div><h2 class="groupheader">成员枚举类型说明</h2>
-<a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Query condition for K-line (candlestick) data by index </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a4d5db3c7c8b21c8ffe8a4cf233eaedf8" name="a4d5db3c7c8b21c8ffe8a4cf233eaedf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">&#9670;&#160;</a></span>KType</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">hku::KQuery::KType</a></td>
+          <td class="memname">typedef string <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>查询K线类型：日线/周线等 </p>
-<table class="fieldtable">
-<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5a63a0fa71cb11fdb40f36efbe053c9b5c"></a>MIN&#160;</td><td class="fielddoc">
-<p>1分钟线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5ac9974eaa57629d69aabba151f63365c6"></a>MIN5&#160;</td><td class="fielddoc">
-<p>5分钟线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5a9149b56f7171743557fc701bf7226524"></a>MIN15&#160;</td><td class="fielddoc">
-<p>15分钟线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5a1f4337c1afd29472ac88b32375771cf3"></a>MIN30&#160;</td><td class="fielddoc">
-<p>30分钟线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5ae978079de8f0e71b07909ea95de40f5b"></a>MIN60&#160;</td><td class="fielddoc">
-<p>60分钟线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5a58c2095b55dc7968c423954663358cec"></a>DAY&#160;</td><td class="fielddoc">
-<p>日线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5ae583394abb9e4281c7e4179f901c89d8"></a>WEEK&#160;</td><td class="fielddoc">
-<p>周线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5a171ebc0d77aa86ea7504e2ce2d77e2c4"></a>MONTH&#160;</td><td class="fielddoc">
-<p>月线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5afa346c0c1ee8c0e1137309f6ba3d63da"></a>QUARTER&#160;</td><td class="fielddoc">
-<p>季线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5aa6371894ce32cbca25f26e63ee7c8aa6"></a>HALFYEAR&#160;</td><td class="fielddoc">
-<p>半年线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5a9cae476e7df4cd16f974d8db487bced8"></a>YEAR&#160;</td><td class="fielddoc">
-<p>年线 </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a8d0f696de1803fbeb83db0b0a42d4ac5acb65b4a7a27ba6e4182e0d72a6df2ea1"></a>INVALID_KTYPE&#160;</td><td class="fielddoc">
-</td></tr>
-</table>
+</div>
+</div>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">成员枚举类型说明</h2>
+<a id="ad257ee8b693dbe8e765950347683d944" name="ad257ee8b693dbe8e765950347683d944"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad257ee8b693dbe8e765950347683d944">&#9670;&#160;</a></span>QueryType</h2>
 
-</div>
-</div>
-<a class="anchor" id="af21343fecf35df0fbf19b15c993c33a8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">hku::KQuery::QueryType</a></td>
+          <td class="memname">enum <a class="el" href="#ad257ee8b693dbe8e765950347683d944">hku::KQuery::QueryType</a> : <a class="el" href="group___data_type.html#ga8519175458e586f3f5c4f8e523abcf94">uint8_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>查询方式：索引或日期 </p>
+<p>Query mode: by index or by date </p>
 <table class="fieldtable">
-<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a class="anchor" id="af21343fecf35df0fbf19b15c993c33a8ac4a8d95680124cc04a83042f8ad1023c"></a>INDEX&#160;</td><td class="fielddoc">
-<p>按索引方式查询 </p>
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="ad257ee8b693dbe8e765950347683d944ac4a8d95680124cc04a83042f8ad1023c" name="ad257ee8b693dbe8e765950347683d944ac4a8d95680124cc04a83042f8ad1023c"></a>INDEX&#160;</td><td class="fielddoc"><p>Query by index </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="af21343fecf35df0fbf19b15c993c33a8a92de22d5f02fa3d0abe3693eddcc370d"></a>DATE&#160;</td><td class="fielddoc">
-<p>按日期方式查询 </p>
+<tr><td class="fieldname"><a id="ad257ee8b693dbe8e765950347683d944a92de22d5f02fa3d0abe3693eddcc370d" name="ad257ee8b693dbe8e765950347683d944a92de22d5f02fa3d0abe3693eddcc370d"></a>DATE&#160;</td><td class="fielddoc"><p>Query by date </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="af21343fecf35df0fbf19b15c993c33a8ab89fa952084096ba3ade90c1d3f4f005"></a>INVALID&#160;</td><td class="fielddoc">
-</td></tr>
+<tr><td class="fieldname"><a id="ad257ee8b693dbe8e765950347683d944ab89fa952084096ba3ade90c1d3f4f005" name="ad257ee8b693dbe8e765950347683d944ab89fa952084096ba3ade90c1d3f4f005"></a>INVALID&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
 </div>
-<a class="anchor" id="a020ef9e50774f09215b7602a7181c63e"></a>
+<a id="a88dbc70e671f0e96e4b4d7764cef8417" name="a88dbc70e671f0e96e4b4d7764cef8417"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88dbc70e671f0e96e4b4d7764cef8417">&#9670;&#160;</a></span>RecoverType</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">hku::KQuery::RecoverType</a></td>
+          <td class="memname">enum <a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">hku::KQuery::RecoverType</a> : <a class="el" href="group___data_type.html#ga8519175458e586f3f5c4f8e523abcf94">uint8_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>复权类型 </p>
-<dl class="section note"><dt>注解</dt><dd>日线以上，如周线/月线不支持复权 </dd></dl>
+<p>Price adjustment type </p>
+<dl class="section note"><dt>注解</dt><dd>Periods above daily, e.g. weekly / monthly, do not support price adjustment </dd></dl>
 <table class="fieldtable">
-<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a class="anchor" id="a020ef9e50774f09215b7602a7181c63ea84075bc9ff92d8259715f16f51b59e87"></a>NO_RECOVER&#160;</td><td class="fielddoc">
-<p>不复权 </p>
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87" name="a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87"></a>NO_RECOVER&#160;</td><td class="fielddoc"><p>No adjustment </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a020ef9e50774f09215b7602a7181c63eae4fcde174f86f1dbc2047cfdffa56d5e"></a>FORWARD&#160;</td><td class="fielddoc">
-<p>前向复权 </p>
+<tr><td class="fieldname"><a id="a88dbc70e671f0e96e4b4d7764cef8417ae4fcde174f86f1dbc2047cfdffa56d5e" name="a88dbc70e671f0e96e4b4d7764cef8417ae4fcde174f86f1dbc2047cfdffa56d5e"></a>FORWARD&#160;</td><td class="fielddoc"><p>Forward adjustment </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a020ef9e50774f09215b7602a7181c63ea2812eaf8eef125cacbf3d060072203d3"></a>BACKWARD&#160;</td><td class="fielddoc">
-<p>后向复权 </p>
+<tr><td class="fieldname"><a id="a88dbc70e671f0e96e4b4d7764cef8417a2812eaf8eef125cacbf3d060072203d3" name="a88dbc70e671f0e96e4b4d7764cef8417a2812eaf8eef125cacbf3d060072203d3"></a>BACKWARD&#160;</td><td class="fielddoc"><p>Backward adjustment </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a020ef9e50774f09215b7602a7181c63ea60b42cd8cb0b63f89f1a2985da59a926"></a>EQUAL_FORWARD&#160;</td><td class="fielddoc">
-<p>等比前向复权 </p>
+<tr><td class="fieldname"><a id="a88dbc70e671f0e96e4b4d7764cef8417a60b42cd8cb0b63f89f1a2985da59a926" name="a88dbc70e671f0e96e4b4d7764cef8417a60b42cd8cb0b63f89f1a2985da59a926"></a>EQUAL_FORWARD&#160;</td><td class="fielddoc"><p>Equal-ratio forward adjustment </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a020ef9e50774f09215b7602a7181c63ea79c5682ce5362e8a05c572026440ab1a"></a>EQUAL_BACKWARD&#160;</td><td class="fielddoc">
-<p>等比后向复权 </p>
+<tr><td class="fieldname"><a id="a88dbc70e671f0e96e4b4d7764cef8417a79c5682ce5362e8a05c572026440ab1a" name="a88dbc70e671f0e96e4b4d7764cef8417a79c5682ce5362e8a05c572026440ab1a"></a>EQUAL_BACKWARD&#160;</td><td class="fielddoc"><p>Equal-ratio backward adjustment </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a020ef9e50774f09215b7602a7181c63ea884142b21c79179e63e461d48a76cba7"></a>INVALID_RECOVER_TYPE&#160;</td><td class="fielddoc">
-</td></tr>
+<tr><td class="fieldname"><a id="a88dbc70e671f0e96e4b4d7764cef8417a884142b21c79179e63e461d48a76cba7" name="a88dbc70e671f0e96e4b4d7764cef8417a884142b21c79179e63e461d48a76cba7"></a>INVALID_RECOVER_TYPE&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="ac01d2e55938fe6f62a9e9c1f4a71f189"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ac01d2e55938fe6f62a9e9c1f4a71f189" name="ac01d2e55938fe6f62a9e9c1f4a71f189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac01d2e55938fe6f62a9e9c1f4a71f189">&#9670;&#160;</a></span>KQuery() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -282,22 +283,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::KQuery::KQuery </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>默认构造，按索引方式查询全部日线数据，不复权 </p>
+<p>Default constructor: query all daily data by index, without price adjustment </p>
 
 </div>
 </div>
-<a class="anchor" id="afd0e9a31cf503d3ab5fff83c034399cf"></a>
+<a id="ab70150cd841682c911ac5316c482b89e" name="ab70150cd841682c911ac5316c482b89e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab70150cd841682c911ac5316c482b89e">&#9670;&#160;</a></span>KQuery() <span class="overload">[2/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -307,62 +310,96 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::KQuery::KQuery </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>&#160;</td>
-          <td class="paramname"><em>start</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>&#160;</td>
-          <td class="paramname"><em>end</em> = <code><a class="el" href="classhku_1_1_null.html">Null</a>&lt;<a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>&gt;()</code>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>end</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_null.html">Null</a>&lt;<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&gt;()</span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a>&#160;</td>
-          <td class="paramname"><em>dataType</em> = <code><a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a58c2095b55dc7968c423954663358cec">DAY</a></code>, </td>
+          <td class="paramtype">const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>dataType</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#a305b6d1aff976a8b9d2460e6964308fe">DAY</a></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a>&#160;</td>
-          <td class="paramname"><em>recoverType</em> = <code><a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a></code>, </td>
+          <td class="paramtype"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a></td>          <td class="paramname"><span class="paramname"><em>recoverType</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a>&#160;</td>
-          <td class="paramname"><em>queryType</em> = <code><a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8ac4a8d95680124cc04a83042f8ad1023c">INDEX</a></code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype"><a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a></td>          <td class="paramname"><span class="paramname"><em>queryType</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#ad257ee8b693dbe8e765950347683d944ac4a8d95680124cc04a83042f8ad1023c">INDEX</a></span>&#160;)</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>K线查询，范围[start, end) </p>
+<p>Query K-line data over the range [start, end) </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">start</td><td>起始索引，支持负数 </td></tr>
-    <tr><td class="paramname">end</td><td>结束索引（不包含本身），支持负数 </td></tr>
-    <tr><td class="paramname">dataType</td><td>K线类型 </td></tr>
-    <tr><td class="paramname">recoverType</td><td>复权类型 </td></tr>
-    <tr><td class="paramname">queryType</td><td>默认按索引方式查询 </td></tr>
+    <tr><td class="paramname">start</td><td>start index, negative values are supported </td></tr>
+    <tr><td class="paramname">end</td><td>end index (exclusive), negative values are supported </td></tr>
+    <tr><td class="paramname">dataType</td><td>K-line type </td></tr>
+    <tr><td class="paramname">recoverType</td><td>price adjustment type </td></tr>
+    <tr><td class="paramname">queryType</td><td>query by index by default </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a941c5b802fb7bb81ebff199aab1c95f0"></a>
+<a id="a7cc8e3ea26b8e6152221f8ec60889bfc" name="a7cc8e3ea26b8e6152221f8ec60889bfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cc8e3ea26b8e6152221f8ec60889bfc">&#9670;&#160;</a></span>KQuery() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::KQuery::KQuery </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>end</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_null.html">Null</a>&lt;&#160;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;&gt;()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#a305b6d1aff976a8b9d2460e6964308fe">DAY</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a></td>          <td class="paramname"><span class="paramname"><em>recoverType</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417a84075bc9ff92d8259715f16f51b59e87">NO_RECOVER</a></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Query K-line data by date, over the range [start, end) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start</td><td>start date </td></tr>
+    <tr><td class="paramname">end</td><td>end date </td></tr>
+    <tr><td class="paramname">ktype</td><td>K-line type </td></tr>
+    <tr><td class="paramname">recoverType</td><td>price adjustment type </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="afb9030a2ed64b4b19199fe29f6b1b293" name="afb9030a2ed64b4b19199fe29f6b1b293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb9030a2ed64b4b19199fe29f6b1b293">&#9670;&#160;</a></span>end()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -370,49 +407,439 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> hku::KQuery::end </td>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::KQuery::end </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>按索引方式查询时，返回指定的结束索引，否则返回Null&lt;hku_int64&gt;() </p>
+<p>Return the specified end index when querying by index, otherwise Null&lt;int64_t&gt;() </p>
 
 </div>
 </div>
-<a class="anchor" id="a483959b04f974fcd6ef4e0e089e27d0b"></a>
+<a id="afd0cb9138ffb99b88636a3db8ce6e740" name="afd0cb9138ffb99b88636a3db8ce6e740"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd0cb9138ffb99b88636a3db8ce6e740">&#9670;&#160;</a></span>endDatetime()</h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::KQuery::endDatetime </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the specified end date when querying by date, otherwise Null&lt;Datetime&gt;() </p>
+
+</div>
+</div>
+<a id="a84421e32e247a7fe618dc89311e10fb3" name="a84421e32e247a7fe618dc89311e10fb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84421e32e247a7fe618dc89311e10fb3">&#9670;&#160;</a></span>getBaseKTypeInMin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> hku::KQuery::getBaseKTypeInMin </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab771cfa4983ae5b64d3d5562b9e959fb" name="ab771cfa4983ae5b64d3d5562b9e959fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab771cfa4983ae5b64d3d5562b9e959fb">&#9670;&#160;</a></span>getBaseKTypeList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt; <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &gt; hku::KQuery::getBaseKTypeList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all base KTypes </p>
+
+</div>
+</div>
+<a id="a3599a9eaab76a8dffe9f9dcf083dc7ab" name="a3599a9eaab76a8dffe9f9dcf083dc7ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3599a9eaab76a8dffe9f9dcf083dc7ab">&#9670;&#160;</a></span>getExtraKTypeList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt; <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &gt; hku::KQuery::getExtraKTypeList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all extended KTypes </p>
+
+</div>
+</div>
+<a id="a6a237a03b6dc076fcab988e50134e2f1" name="a6a237a03b6dc076fcab988e50134e2f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a237a03b6dc076fcab988e50134e2f1">&#9670;&#160;</a></span>getKTypeEnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> hku::KQuery::getKTypeEnum </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> enum value matching the given string name </p>
+
+</div>
+</div>
+<a id="a57d1ae1cf8b402f7533ac7720e62f9b8" name="a57d1ae1cf8b402f7533ac7720e62f9b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57d1ae1cf8b402f7533ac7720e62f9b8">&#9670;&#160;</a></span>getKTypeInMin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga3f96b199539279e2100954af99986dd5">int32_t</a> hku::KQuery::getKTypeInMin </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a35f067c2ea7ba337baef31cc3d3980bd" name="a35f067c2ea7ba337baef31cc3d3980bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35f067c2ea7ba337baef31cc3d3980bd">&#9670;&#160;</a></span>getKTypeInSeconds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::KQuery::getKTypeInSeconds </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af385e7357d0869da1f1b8732f0e9d1fa" name="af385e7357d0869da1f1b8732f0e9d1fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af385e7357d0869da1f1b8732f0e9d1fa">&#9670;&#160;</a></span>getKTypeName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::KQuery::getKTypeName </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name of the <a class="el" href="#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KType</a>, used for display output </p>
+
+</div>
+</div>
+<a id="abef7e0003118ea1a132127e7daa86828" name="abef7e0003118ea1a132127e7daa86828"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abef7e0003118ea1a132127e7daa86828">&#9670;&#160;</a></span>getQueryTypeEnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a> hku::KQuery::getQueryTypeEnum </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the queryType enum value matching the given string name </p>
+
+</div>
+</div>
+<a id="a57c9b94fb9cf6cdf06518ed233252915" name="a57c9b94fb9cf6cdf06518ed233252915"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57c9b94fb9cf6cdf06518ed233252915">&#9670;&#160;</a></span>getQueryTypeName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::KQuery::getQueryTypeName </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a></td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name of the queryType, used for display output </p>
+
+</div>
+</div>
+<a id="ab949b4a8cad660bf3a76c8a27d140a04" name="ab949b4a8cad660bf3a76c8a27d140a04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab949b4a8cad660bf3a76c8a27d140a04">&#9670;&#160;</a></span>getRecoverTypeEnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a> hku::KQuery::getRecoverTypeEnum </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the recoverType enum value matching the given string name </p>
+
+</div>
+</div>
+<a id="a84716e4a4dda1c21f21ded27d56806d7" name="a84716e4a4dda1c21f21ded27d56806d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84716e4a4dda1c21f21ded27d56806d7">&#9670;&#160;</a></span>getRecoverTypeName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::KQuery::getRecoverTypeName </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a></td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name of the recoverType, used for display output </p>
+
+</div>
+</div>
+<a id="a23ad6765519028e05ac37661943c7ad0" name="a23ad6765519028e05ac37661943c7ad0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23ad6765519028e05ac37661943c7ad0">&#9670;&#160;</a></span>hash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::KQuery::hash </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Hash value (use with care) </p>
+<dl class="section note"><dt>注解</dt><dd>When end is null, the behavior of fetching K-line data is inconsistent, so do not use this method unless you know your use case </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>size_t </dd></dl>
+
+</div>
+</div>
+<a id="a5f03e990edd7586a471fa92d99870642" name="a5f03e990edd7586a471fa92d99870642"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f03e990edd7586a471fa92d99870642">&#9670;&#160;</a></span>isBaseKType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::KQuery::isBaseKType </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether it is a base ktype </p>
+
+</div>
+</div>
+<a id="a1e4e5bfcfb4a66849a9092333068fb87" name="a1e4e5bfcfb4a66849a9092333068fb87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e4e5bfcfb4a66849a9092333068fb87">&#9670;&#160;</a></span>isExtraKType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::KQuery::isExtraKType </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether it is an extended ktype </p>
+
+</div>
+</div>
+<a id="afaa05b8e3529c5727121865c1d0d3ff5" name="afaa05b8e3529c5727121865c1d0d3ff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afaa05b8e3529c5727121865c1d0d3ff5">&#9670;&#160;</a></span>isRightOpening()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::KQuery::isRightOpening </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>按日期方式查询时，返回指定的结束日期，否则返回Null&lt;Datetime&gt;() </p>
+<p>Whether it is a right-open interval, i.e. </p>
+<p>no end time was specified </p>
 
 </div>
 </div>
-<a class="anchor" id="ababa559bc49541ca40c4b62850638047"></a>
+<a id="a5f2545318216ccb64b4692951cef9ed9" name="a5f2545318216ccb64b4692951cef9ed9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f2545318216ccb64b4692951cef9ed9">&#9670;&#160;</a></span>isValidKType()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -420,25 +847,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> hku::KQuery::getKTypeEnum </td>
+          <td class="memname">bool hku::KQuery::isValidKType </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>arg</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>根据字符串名称，获取相应的枚举值 </p>
+<p>Whether the given K-line type is valid </p>
 
 </div>
 </div>
-<a class="anchor" id="abdccf71f96b7d229e324abe6b8225cc3"></a>
+<a id="af3174c395106121dd0d1cca7220e37bb" name="af3174c395106121dd0d1cca7220e37bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3174c395106121dd0d1cca7220e37bb">&#9670;&#160;</a></span>kType()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -446,154 +874,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::KQuery::getKTypeName </td>
+          <td class="memname">const string &amp; hku::KQuery::kType </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a>&#160;</td>
-          <td class="paramname"><em>dataType</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>获取KType名称，用于显示输出 </p>
-
-</div>
-</div>
-<a class="anchor" id="a979662da3f740a40decec1ba894c35b1"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">KQuery::QueryType</a> hku::KQuery::getQueryTypeEnum </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>arg</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>根据字符串名称获取相应的queryType枚举值 </p>
-
-</div>
-</div>
-<a class="anchor" id="a30b1dbdd042f5b0ed12e72a72ca6a6da"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::KQuery::getQueryTypeName </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a>&#160;</td>
-          <td class="paramname"><em>queryType</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>获取queryType名称，用于显示输出 </p>
-
-</div>
-</div>
-<a class="anchor" id="aa1a718f7ed5654b812922b0436f87d27"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">KQuery::RecoverType</a> hku::KQuery::getRecoverTypeEnum </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>arg</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>根据字符串名称，获取相应的枚举值 </p>
-
-</div>
-</div>
-<a class="anchor" id="a7d746fb19b103dee92a579fa06f0db7b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::KQuery::getRecoverTypeName </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a>&#160;</td>
-          <td class="paramname"><em>recoverType</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>获取recoverType名称，用于显示输出 </p>
-
-</div>
-</div>
-<a class="anchor" id="a590d72ac21a771c1ee63fafcc6f96cee"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KType</a> hku::KQuery::kType </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取K线数据类型 </p>
+<p>Get the K-line data type </p>
 
 </div>
 </div>
-<a class="anchor" id="a20d92d8e616e2df801dd0f2c1910bab4"></a>
+<a id="a1d8537aa576223fbcf2ba469c33a13d6" name="a1d8537aa576223fbcf2ba469c33a13d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d8537aa576223fbcf2ba469c33a13d6">&#9670;&#160;</a></span>kTypeInSeconds()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -601,24 +901,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">QueryType</a> hku::KQuery::queryType </td>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::KQuery::kTypeInSeconds </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取查询条件类型 </p>
+<p>Get the number of seconds corresponding to the K-line data type </p>
 
 </div>
 </div>
-<a class="anchor" id="affbed1df95d080453f518931fe5dfeee"></a>
+<a id="a33e9e6968914d8f16c0e9c9ee909e659" name="a33e9e6968914d8f16c0e9c9ee909e659"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33e9e6968914d8f16c0e9c9ee909e659">&#9670;&#160;</a></span>queryType()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -626,24 +928,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">RecoverType</a> hku::KQuery::recoverType </td>
+          <td class="memname"><a class="el" href="#ad257ee8b693dbe8e765950347683d944">QueryType</a> hku::KQuery::queryType </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取复权类型 </p>
+<p>Get the query condition type </p>
 
 </div>
 </div>
-<a class="anchor" id="a42f5f47a6f4219eff780bfd7ef16c7cf"></a>
+<a id="a1334dec091c3b91ba27c70844c606223" name="a1334dec091c3b91ba27c70844c606223"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1334dec091c3b91ba27c70844c606223">&#9670;&#160;</a></span>recoverType() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -651,59 +955,581 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> hku::KQuery::start </td>
+          <td class="memname"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a> hku::KQuery::recoverType </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>按索引方式查询时，返回指定的起始索引，否则返回Null&lt;hku_int64&gt;() </p>
+<p>Get the price adjustment type </p>
 
 </div>
 </div>
-<a class="anchor" id="ab6f1503dbd999758f805f251308f2e5f"></a>
+<a id="a5013a45b2c0baa425c642478748f3835" name="a5013a45b2c0baa425c642478748f3835"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5013a45b2c0baa425c642478748f3835">&#9670;&#160;</a></span>recoverType() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::KQuery::recoverType </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a88dbc70e671f0e96e4b4d7764cef8417">RecoverType</a></td>          <td class="paramname"><span class="paramname"><em>recoverType</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the price adjustment type </p>
+
+</div>
+</div>
+<a id="afc9dca0b9cfacd92ac997e5d5b39c8bc" name="afc9dca0b9cfacd92ac997e5d5b39c8bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc9dca0b9cfacd92ac997e5d5b39c8bc">&#9670;&#160;</a></span>start()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hku::KQuery::start </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the specified start index when querying by index, otherwise Null&lt;int64_t&gt;() </p>
+
+</div>
+</div>
+<a id="a015993c712f1e5213468ceed01d57dd8" name="a015993c712f1e5213468ceed01d57dd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a015993c712f1e5213468ceed01d57dd8">&#9670;&#160;</a></span>startDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::KQuery::startDatetime </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the specified start date when querying by date, otherwise Null&lt;Datetime&gt;() </p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a305b6d1aff976a8b9d2460e6964308fe" name="a305b6d1aff976a8b9d2460e6964308fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a305b6d1aff976a8b9d2460e6964308fe">&#9670;&#160;</a></span>DAY</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::DAY</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>按日期方式查询时，返回指定的起始日期，否则返回Null&lt;Datetime&gt;() </p>
+</div>
+</div>
+<a id="aa3ba61121094fe9e5d2d298d07db26ec" name="aa3ba61121094fe9e5d2d298d07db26ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3ba61121094fe9e5d2d298d07db26ec">&#9670;&#160;</a></span>DAY3</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::DAY3</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4a5cc179206ecf01e19c28d9311eddfb" name="a4a5cc179206ecf01e19c28d9311eddfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a5cc179206ecf01e19c28d9311eddfb">&#9670;&#160;</a></span>DAY5</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::DAY5</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae9b7eb9c13ee4f3d029da7457b227f87" name="ae9b7eb9c13ee4f3d029da7457b227f87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9b7eb9c13ee4f3d029da7457b227f87">&#9670;&#160;</a></span>DAY7</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::DAY7</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac6f8a0d515f2f3c91173a861186e2307" name="ac6f8a0d515f2f3c91173a861186e2307"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6f8a0d515f2f3c91173a861186e2307">&#9670;&#160;</a></span>HALFYEAR</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::HALFYEAR</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="add569a47939ba687bff1af55d4b08332" name="add569a47939ba687bff1af55d4b08332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add569a47939ba687bff1af55d4b08332">&#9670;&#160;</a></span>HOUR12</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::HOUR12</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a301e74fb372b6205f6487076b17e62aa" name="a301e74fb372b6205f6487076b17e62aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a301e74fb372b6205f6487076b17e62aa">&#9670;&#160;</a></span>HOUR2</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::HOUR2</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3e4599587ce59bb3066ea9323afc5f07" name="a3e4599587ce59bb3066ea9323afc5f07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e4599587ce59bb3066ea9323afc5f07">&#9670;&#160;</a></span>HOUR4</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::HOUR4</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa16c31b8babfd7d4f15ec164a6145d55" name="aa16c31b8babfd7d4f15ec164a6145d55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa16c31b8babfd7d4f15ec164a6145d55">&#9670;&#160;</a></span>HOUR6</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::HOUR6</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a754928fde45cb7281c0b6bb932d2f3bc" name="a754928fde45cb7281c0b6bb932d2f3bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a754928fde45cb7281c0b6bb932d2f3bc">&#9670;&#160;</a></span>MIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MIN</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac0d0f066c002517e3193ca8f46475f66" name="ac0d0f066c002517e3193ca8f46475f66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0d0f066c002517e3193ca8f46475f66">&#9670;&#160;</a></span>MIN15</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MIN15</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad7daf41625c1ebcc53eea8924b258957" name="ad7daf41625c1ebcc53eea8924b258957"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7daf41625c1ebcc53eea8924b258957">&#9670;&#160;</a></span>MIN3</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MIN3</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a576ee7e219b1894c6e6cca45d6e6a998" name="a576ee7e219b1894c6e6cca45d6e6a998"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a576ee7e219b1894c6e6cca45d6e6a998">&#9670;&#160;</a></span>MIN30</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MIN30</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a92e18bf59bc40f5755623ecad66b8448" name="a92e18bf59bc40f5755623ecad66b8448"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92e18bf59bc40f5755623ecad66b8448">&#9670;&#160;</a></span>MIN5</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MIN5</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a88d99d75b10ab3a4de00eb17e0809962" name="a88d99d75b10ab3a4de00eb17e0809962"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88d99d75b10ab3a4de00eb17e0809962">&#9670;&#160;</a></span>MIN60</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MIN60</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a08645d03e78a09cfa9d712c1929b838b" name="a08645d03e78a09cfa9d712c1929b838b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08645d03e78a09cfa9d712c1929b838b">&#9670;&#160;</a></span>MONTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::MONTH</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1a7193d8a0ad619d0d52d9fa7f423269" name="a1a7193d8a0ad619d0d52d9fa7f423269"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a7193d8a0ad619d0d52d9fa7f423269">&#9670;&#160;</a></span>QUARTER</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::QUARTER</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae09ee388ec20eef9b85ce58ec6a4d2e8" name="ae09ee388ec20eef9b85ce58ec6a4d2e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae09ee388ec20eef9b85ce58ec6a4d2e8">&#9670;&#160;</a></span>TIMELINE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::TIMELINE</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaa540f5954f6db75acace25b3b309ab9" name="aaa540f5954f6db75acace25b3b309ab9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa540f5954f6db75acace25b3b309ab9">&#9670;&#160;</a></span>TRANS</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::TRANS</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aee4ecda677146e666c75c2f686bff246" name="aee4ecda677146e666c75c2f686bff246"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee4ecda677146e666c75c2f686bff246">&#9670;&#160;</a></span>WEEK</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::WEEK</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a91437db022ec687078fe0c62ae0a69ad" name="a91437db022ec687078fe0c62ae0a69ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91437db022ec687078fe0c62ae0a69ad">&#9670;&#160;</a></span>YEAR</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string hku::KQuery::YEAR</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/<a class="el" href="_k_query_8h_source.html">KQuery.h</a></li>
-<li>hikyuu/<a class="el" href="_k_query_8cpp.html">KQuery.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_k_query.html">KQuery</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

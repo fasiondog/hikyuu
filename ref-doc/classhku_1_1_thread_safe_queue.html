@@ -1,0 +1,438 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::ThreadSafeQueue&lt; T &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_thread_safe_queue.html','','classhku_1_1_thread_safe_queue-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::ThreadSafeQueue&lt; T &gt; 模板类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Thread safe queue  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_thread_safe_queue_8h_source.html">ThreadSafeQueue.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a3f9d352fc525e59eae1faa5280b41351" id="r_a3f9d352fc525e59eae1faa5280b41351"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f9d352fc525e59eae1faa5280b41351">ThreadSafeQueue</a> ()</td></tr>
+<tr class="memdesc:a3f9d352fc525e59eae1faa5280b41351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:ad731875dcb62a27d462c4567be88a4ec" id="r_ad731875dcb62a27d462c4567be88a4ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad731875dcb62a27d462c4567be88a4ec">push</a> (T &amp;&amp;item)</td></tr>
+<tr class="memdesc:ad731875dcb62a27d462c4567be88a4ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert the element into the tail of the queue  <br /></td></tr>
+<tr class="memitem:a4fab076f980b202bc8aa924ae52abaa4" id="r_a4fab076f980b202bc8aa924ae52abaa4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4fab076f980b202bc8aa924ae52abaa4">wait_and_pop</a> (T &amp;value)</td></tr>
+<tr class="memdesc:a4fab076f980b202bc8aa924ae52abaa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait until an element is taken from the head of the queue  <br /></td></tr>
+<tr class="memitem:adfa460351fd9478f50bb01b21cd20d2d" id="r_adfa460351fd9478f50bb01b21cd20d2d"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfa460351fd9478f50bb01b21cd20d2d">wait_and_pop</a> ()</td></tr>
+<tr class="memdesc:adfa460351fd9478f50bb01b21cd20d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait until an element is taken from the head of the queue  <br /></td></tr>
+<tr class="memitem:a9a75b1bed23b814e9217bce62f60823b" id="r_a9a75b1bed23b814e9217bce62f60823b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a75b1bed23b814e9217bce62f60823b">try_pop</a> (T &amp;value)</td></tr>
+<tr class="memdesc:a9a75b1bed23b814e9217bce62f60823b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to take an element from the head of the queue; true is returned on success and false on failure  <br /></td></tr>
+<tr class="memitem:afd9d80d8e7476226a93727eace9f4460" id="r_afd9d80d8e7476226a93727eace9f4460"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd9d80d8e7476226a93727eace9f4460">try_pop</a> ()</td></tr>
+<tr class="memdesc:afd9d80d8e7476226a93727eace9f4460"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to take an element from the head of the queue; true is returned on success and false on failure  <br /></td></tr>
+<tr class="memitem:ae98dc332eed7ba3afc2783b4fe77432c" id="r_ae98dc332eed7ba3afc2783b4fe77432c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae98dc332eed7ba3afc2783b4fe77432c">empty</a> () const</td></tr>
+<tr class="memdesc:ae98dc332eed7ba3afc2783b4fe77432c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the queue is empty  <br /></td></tr>
+<tr class="memitem:ae9baae3d1f5a55ea047d5fa47c292bde" id="r_ae9baae3d1f5a55ea047d5fa47c292bde"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9baae3d1f5a55ea047d5fa47c292bde">size</a> () const</td></tr>
+<tr class="memdesc:ae9baae3d1f5a55ea047d5fa47c292bde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue size  <br /></td></tr>
+<tr class="memitem:aa80bdadccad661a43e214ac1386bb3f7" id="r_aa80bdadccad661a43e214ac1386bb3f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa80bdadccad661a43e214ac1386bb3f7">clear</a> ()</td></tr>
+<tr class="memdesc:aa80bdadccad661a43e214ac1386bb3f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the task queue  <br /></td></tr>
+<tr class="memitem:a386d4bb0c365c5e4bee9ea08f103a3e5" id="r_a386d4bb0c365c5e4bee9ea08f103a3e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a386d4bb0c365c5e4bee9ea08f103a3e5">notify_all</a> ()</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
+class hku::ThreadSafeQueue&lt; T &gt;</div><p>Thread safe queue </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a3f9d352fc525e59eae1faa5280b41351" name="a3f9d352fc525e59eae1faa5280b41351"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f9d352fc525e59eae1faa5280b41351">&#9670;&#160;</a></span>ThreadSafeQueue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::ThreadSafeQueue </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="aa80bdadccad661a43e214ac1386bb3f7" name="aa80bdadccad661a43e214ac1386bb3f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa80bdadccad661a43e214ac1386bb3f7">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear the task queue </p>
+
+</div>
+</div>
+<a id="ae98dc332eed7ba3afc2783b4fe77432c" name="ae98dc332eed7ba3afc2783b4fe77432c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae98dc332eed7ba3afc2783b4fe77432c">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the queue is empty </p>
+
+</div>
+</div>
+<a id="a386d4bb0c365c5e4bee9ea08f103a3e5" name="a386d4bb0c365c5e4bee9ea08f103a3e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a386d4bb0c365c5e4bee9ea08f103a3e5">&#9670;&#160;</a></span>notify_all()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::notify_all </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad731875dcb62a27d462c4567be88a4ec" name="ad731875dcb62a27d462c4567be88a4ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad731875dcb62a27d462c4567be88a4ec">&#9670;&#160;</a></span>push()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::push </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Insert the element into the tail of the queue </p>
+
+</div>
+</div>
+<a id="ae9baae3d1f5a55ea047d5fa47c292bde" name="ae9baae3d1f5a55ea047d5fa47c292bde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9baae3d1f5a55ea047d5fa47c292bde">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Queue size </p>
+
+</div>
+</div>
+<a id="afd9d80d8e7476226a93727eace9f4460" name="afd9d80d8e7476226a93727eace9f4460"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd9d80d8e7476226a93727eace9f4460">&#9670;&#160;</a></span>try_pop() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; T &gt; <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::try_pop </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to take an element from the head of the queue; true is returned on success and false on failure </p>
+
+</div>
+</div>
+<a id="a9a75b1bed23b814e9217bce62f60823b" name="a9a75b1bed23b814e9217bce62f60823b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a75b1bed23b814e9217bce62f60823b">&#9670;&#160;</a></span>try_pop() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::try_pop </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to take an element from the head of the queue; true is returned on success and false on failure </p>
+
+</div>
+</div>
+<a id="adfa460351fd9478f50bb01b21cd20d2d" name="adfa460351fd9478f50bb01b21cd20d2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfa460351fd9478f50bb01b21cd20d2d">&#9670;&#160;</a></span>wait_and_pop() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; T &gt; <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::wait_and_pop </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait until an element is taken from the head of the queue </p>
+
+</div>
+</div>
+<a id="a4fab076f980b202bc8aa924ae52abaa4" name="a4fab076f980b202bc8aa924ae52abaa4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fab076f980b202bc8aa924ae52abaa4">&#9670;&#160;</a></span>wait_and_pop() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_thread_safe_queue.html">hku::ThreadSafeQueue</a>&lt; T &gt;::wait_and_pop </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait until an element is taken from the head of the queue </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/thread/<a class="el" href="_thread_safe_queue_8h_source.html">ThreadSafeQueue.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_thread_safe_queue.html">ThreadSafeQueue</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/os.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('os_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">os.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * os.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2019, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2019-12-19</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *  Purpose: the cross-system function encapsulation</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *  Note: unless otherwise specified, the input and output strings are UTF8 encoded</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;Null.h&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &quot;arithmetic.h&quot;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#ifndef HKU_UTILS_API</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#define HKU_UTILS_API</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="namespacehku.html#ac5e701aa470d8cfd06db6ad93216b8d1">   30</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#ac5e701aa470d8cfd06db6ad93216b8d1">existFile</a>(<span class="keyword">const</span> std::string &amp;filename) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="namespacehku.html#a3d9673c83b8b574272d5d2314d75c341">   38</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a3d9673c83b8b574272d5d2314d75c341">createDir</a>(<span class="keyword">const</span> std::string &amp;pathname) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="namespacehku.html#aa4a5b806c50a5af5c6dfab86722dbf1d">   45</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#aa4a5b806c50a5af5c6dfab86722dbf1d">removeFile</a>(<span class="keyword">const</span> std::string &amp;filename) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="namespacehku.html#a08506a7067b7def630d30f7f2e986c44">   51</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a08506a7067b7def630d30f7f2e986c44">removeDir</a>(<span class="keyword">const</span> std::string &amp;path) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="namespacehku.html#a86c5d93cae0e173777e8e22a5b3c0bf5">   59</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a86c5d93cae0e173777e8e22a5b3c0bf5">copyFile</a>(<span class="keyword">const</span> std::string &amp;src, <span class="keyword">const</span> std::string &amp;dst,</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>                            <span class="keywordtype">bool</span> flush = <span class="keyword">false</span>) noexcept;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="namespacehku.html#a5603c716c9dd1454c28f83f7951306d9">   71</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a5603c716c9dd1454c28f83f7951306d9">renameFile</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;oldname, const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;newname,</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>                              <span class="keywordtype">bool</span> overlay = false) noexcept;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="namespacehku.html#ada6bab0b319753589dfab8c03af96ff0">   77</a></span><a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#ada6bab0b319753589dfab8c03af96ff0">getUserDir</a>();</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="namespacehku.html#a2dc312c24f7a4fa5add02e1be755837a">   82</a></span><a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a2dc312c24f7a4fa5add02e1be755837a">getCurrentDir</a>();</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="namespacehku.html#ae90ed01412d9580b458f7843885aec0d">   88</a></span><a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#ae90ed01412d9580b458f7843885aec0d">getDllSelfDir</a>();</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="namespacehku.html#a302b9d805725809b7643d077d9bed986">   93</a></span><span class="keywordtype">bool</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a302b9d805725809b7643d077d9bed986">isColorTerminal</a>() noexcept;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="namespacehku.html#aeadfe2a5412748600a8ecd1d10a81a49">  104</a></span><a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#aeadfe2a5412748600a8ecd1d10a81a49">getDiskFreeSpace</a>(const <span class="keywordtype">char</span> *path);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="namespacehku.html#af4de3220ec75afb54088e7e5e7c4299c">  107</a></span><a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#af4de3220ec75afb54088e7e5e7c4299c">getPlatform</a>();</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="namespacehku.html#acd2e94ae74c4981a72ee57d9bfbda300">  110</a></span><a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#acd2e94ae74c4981a72ee57d9bfbda300">getCpuArch</a>();</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="namespacehku.html#ad9a48eeba4578af4497c9807c8bda96f">  113</a></span><a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#ad9a48eeba4578af4497c9807c8bda96f">getSystemLanguage</a>();</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="namespacehku.html#adcdf620104c21eabf8da7a8055b737e4">  115</a></span><a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#adcdf620104c21eabf8da7a8055b737e4">getMemoryMaxSize</a>();</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="namespacehku.html#aeb16bcc7a18bdfae7f55791d33567d62">  117</a></span><a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#aeb16bcc7a18bdfae7f55791d33567d62">getMemoryIdleSize</a>();</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a08506a7067b7def630d30f7f2e986c44"><div class="ttname"><a href="namespacehku.html#a08506a7067b7def630d30f7f2e986c44">hku::removeDir</a></div><div class="ttdeci">bool HKU_UTILS_API removeDir(const std::string &amp;path) noexcept</div><div class="ttdoc">Delete a directory and the files and subdirectories it contains</div></div>
+<div class="ttc" id="anamespacehku_html_a2dc312c24f7a4fa5add02e1be755837a"><div class="ttname"><a href="namespacehku.html#a2dc312c24f7a4fa5add02e1be755837a">hku::getCurrentDir</a></div><div class="ttdeci">std::string HKU_UTILS_API getCurrentDir()</div><div class="ttdoc">Get the current path of the program</div></div>
+<div class="ttc" id="anamespacehku_html_a302b9d805725809b7643d077d9bed986"><div class="ttname"><a href="namespacehku.html#a302b9d805725809b7643d077d9bed986">hku::isColorTerminal</a></div><div class="ttdeci">bool HKU_UTILS_API isColorTerminal() noexcept</div><div class="ttdoc">Whether the output terminal supports the color control characters</div></div>
+<div class="ttc" id="anamespacehku_html_a3d9673c83b8b574272d5d2314d75c341"><div class="ttname"><a href="namespacehku.html#a3d9673c83b8b574272d5d2314d75c341">hku::createDir</a></div><div class="ttdeci">bool HKU_UTILS_API createDir(const std::string &amp;pathname) noexcept</div><div class="ttdoc">Create a directory</div></div>
+<div class="ttc" id="anamespacehku_html_a5603c716c9dd1454c28f83f7951306d9"><div class="ttname"><a href="namespacehku.html#a5603c716c9dd1454c28f83f7951306d9">hku::renameFile</a></div><div class="ttdeci">bool HKU_UTILS_API renameFile(const std::string &amp;oldname, const std::string &amp;newname, bool overlay=false) noexcept</div><div class="ttdoc">Rename or move a file or a directory</div></div>
+<div class="ttc" id="anamespacehku_html_a86c5d93cae0e173777e8e22a5b3c0bf5"><div class="ttname"><a href="namespacehku.html#a86c5d93cae0e173777e8e22a5b3c0bf5">hku::copyFile</a></div><div class="ttdeci">bool HKU_UTILS_API copyFile(const std::string &amp;src, const std::string &amp;dst, bool flush=false) noexcept</div><div class="ttdoc">Copy a file</div></div>
+<div class="ttc" id="anamespacehku_html_aa4a5b806c50a5af5c6dfab86722dbf1d"><div class="ttname"><a href="namespacehku.html#aa4a5b806c50a5af5c6dfab86722dbf1d">hku::removeFile</a></div><div class="ttdeci">bool HKU_UTILS_API removeFile(const std::string &amp;filename) noexcept</div><div class="ttdoc">Delete a file</div></div>
+<div class="ttc" id="anamespacehku_html_ac5e701aa470d8cfd06db6ad93216b8d1"><div class="ttname"><a href="namespacehku.html#ac5e701aa470d8cfd06db6ad93216b8d1">hku::existFile</a></div><div class="ttdeci">bool HKU_UTILS_API existFile(const std::string &amp;filename) noexcept</div><div class="ttdoc">Judge whether a file or a directory exists</div></div>
+<div class="ttc" id="anamespacehku_html_acd2e94ae74c4981a72ee57d9bfbda300"><div class="ttname"><a href="namespacehku.html#acd2e94ae74c4981a72ee57d9bfbda300">hku::getCpuArch</a></div><div class="ttdeci">std::string HKU_UTILS_API getCpuArch()</div><div class="ttdoc">Get the current CPU architecture name</div></div>
+<div class="ttc" id="anamespacehku_html_ad9a48eeba4578af4497c9807c8bda96f"><div class="ttname"><a href="namespacehku.html#ad9a48eeba4578af4497c9807c8bda96f">hku::getSystemLanguage</a></div><div class="ttdeci">std::string HKU_UTILS_API getSystemLanguage()</div><div class="ttdoc">Get the current system language name (returned in lowercase)</div></div>
+<div class="ttc" id="anamespacehku_html_ada6bab0b319753589dfab8c03af96ff0"><div class="ttname"><a href="namespacehku.html#ada6bab0b319753589dfab8c03af96ff0">hku::getUserDir</a></div><div class="ttdeci">std::string HKU_UTILS_API getUserDir()</div><div class="ttdoc">Get the user path</div></div>
+<div class="ttc" id="anamespacehku_html_adcdf620104c21eabf8da7a8055b737e4"><div class="ttname"><a href="namespacehku.html#adcdf620104c21eabf8da7a8055b737e4">hku::getMemoryMaxSize</a></div><div class="ttdeci">uint64_t HKU_UTILS_API getMemoryMaxSize()</div></div>
+<div class="ttc" id="anamespacehku_html_ae90ed01412d9580b458f7843885aec0d"><div class="ttname"><a href="namespacehku.html#ae90ed01412d9580b458f7843885aec0d">hku::getDllSelfDir</a></div><div class="ttdeci">std::string HKU_UTILS_API getDllSelfDir()</div><div class="ttdoc">Get the directory of the dll itself</div></div>
+<div class="ttc" id="anamespacehku_html_aeadfe2a5412748600a8ecd1d10a81a49"><div class="ttname"><a href="namespacehku.html#aeadfe2a5412748600a8ecd1d10a81a49">hku::getDiskFreeSpace</a></div><div class="ttdeci">uint64_t HKU_UTILS_API getDiskFreeSpace(const char *path)</div><div class="ttdoc">Get the size of the remaining storage space of the disk</div></div>
+<div class="ttc" id="anamespacehku_html_aeb16bcc7a18bdfae7f55791d33567d62"><div class="ttname"><a href="namespacehku.html#aeb16bcc7a18bdfae7f55791d33567d62">hku::getMemoryIdleSize</a></div><div class="ttdeci">uint64_t HKU_UTILS_API getMemoryIdleSize()</div></div>
+<div class="ttc" id="anamespacehku_html_af4de3220ec75afb54088e7e5e7c4299c"><div class="ttname"><a href="namespacehku.html#af4de3220ec75afb54088e7e5e7c4299c">hku::getPlatform</a></div><div class="ttdeci">std::string HKU_UTILS_API getPlatform()</div><div class="ttdoc">Get the current system name</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><b>os.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

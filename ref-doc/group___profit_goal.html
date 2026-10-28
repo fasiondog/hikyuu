@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: ProfitGoal 盈利目标策略</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: ProfitGoal profit goal strategy</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,36 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li class="current"><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('group___profit_goal.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,52 +74,54 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#nested-classes">类</a> &#124;
-<a href="#define-members">宏定义</a> &#124;
-<a href="#typedef-members">类型定义</a>  </div>
-  <div class="headertitle">
-<div class="title">ProfitGoal 盈利目标策略<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
+  <div class="headertitle"><div class="title">ProfitGoal profit goal strategy <div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-ProfitGoal 盈利目标策略 的协作图:</div>
+ProfitGoal profit goal strategy 的协作图:</div>
 <div class="dyncontent">
-<center><table><tr><td><img src="group___profit_goal.png" border="0" alt="" usemap="#group______profit__goal"/>
-<map name="group______profit__goal" id="group______profit__goal">
-<area shape="rect" id="node1" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="5,5,231,35"/>
-</map>
-</td></tr></table></center>
+<div class="center"><img src="group___profit_goal.png" border="0" usemap="#agroup______profit__goal" loading="lazy" alt=""/></div>
 </div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 类</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_profit_goal_base.html">hku::ProfitGoalBase</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">盈利目标策略基类  <a href="classhku_1_1_profit_goal_base.html#details">更多...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:hku_3A_3AProfitGoalBase" id="r_hku_3A_3AProfitGoalBase"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_profit_goal_base.html">hku::ProfitGoalBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class of the profit goal strategy  <a href="classhku_1_1_profit_goal_base.html#details">更多...</a><br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 宏定义</h2></td></tr>
-<tr class="memitem:ga2d861af297789dc5effbca66da48f87f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___profit_goal.html#ga2d861af297789dc5effbca66da48f87f">PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
-<tr class="memdesc:ga2d861af297789dc5effbca66da48f87f"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="#ga2d861af297789dc5effbca66da48f87f">更多...</a><br /></td></tr>
-<tr class="separator:ga2d861af297789dc5effbca66da48f87f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2d861af297789dc5effbca66da48f87f" id="r_ga2d861af297789dc5effbca66da48f87f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga2d861af297789dc5effbca66da48f87f">PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:ga2d861af297789dc5effbca66da48f87f"><td class="mdescLeft">&#160;</td><td class="mdescRight">For an inheriting subclass without private variables, this macro can be used directly for the serialization  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 类型定义</h2></td></tr>
-<tr class="memitem:ga15de439d18b21a787ee746d8dd3a906a"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; ProfitGoalBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">hku::ProfitGoalPtr</a></td></tr>
-<tr class="memdesc:ga15de439d18b21a787ee746d8dd3a906a"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型  <a href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">更多...</a><br /></td></tr>
-<tr class="separator:ga15de439d18b21a787ee746d8dd3a906a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga15de439d18b21a787ee746d8dd3a906a" id="r_ga15de439d18b21a787ee746d8dd3a906a"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_profit_goal_base.html">ProfitGoalBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga15de439d18b21a787ee746d8dd3a906a">hku::ProfitGoalPtr</a></td></tr>
+<tr class="memdesc:ga15de439d18b21a787ee746d8dd3a906a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Client programs should all use this pointer type  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:ga1035758de2864cd69e9b6ee2831e088d" id="r_ga1035758de2864cd69e9b6ee2831e088d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1035758de2864cd69e9b6ee2831e088d">hku::PG_FixedHoldDays</a> (int days=5)</td></tr>
+<tr class="memdesc:ga1035758de2864cd69e9b6ee2831e088d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Profit goal strategy of a fixed holding days  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<p>每笔交易执行前，确定交易目标，用于系统在价格达到目标价位后提示卖出交易 </p>
-<h2 class="groupheader">宏定义说明</h2>
-<a class="anchor" id="ga2d861af297789dc5effbca66da48f87f"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<p>Before every trade is executed the trading goal is determined, so that the system suggests a sell trade after the price reaches the goal price </p>
+<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">宏定义说明</h2>
+<a id="ga2d861af297789dc5effbca66da48f87f" name="ga2d861af297789dc5effbca66da48f87f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2d861af297789dc5effbca66da48f87f">&#9670;&#160;</a></span>PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -126,33 +130,94 @@ ProfitGoal 盈利目标策略 的协作图:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:\</div><div class="line">    friend <span class="keyword">class </span>boost::serialization::access; \</div><div class="line">    template&lt;class Archive&gt; \</div><div class="line">    void serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div><div class="line">        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(ProfitGoalBase); \</div><div class="line">    }</div></div><!-- fragment -->
-<p>对于没有私有变量的继承子类，可直接使用该宏定义序列化 </p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;class Drived: public ProfitGoalBase {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;    PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;public:</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    Drived();</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;    ...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;};</div></div><!-- fragment --> 
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/profitgoal/ProfitGoalBase.h&gt;</code></p>
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                                         \</div>
+<div class="line">    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;                   \</div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;                                     \</div>
+<div class="line">    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {    \</div>
+<div class="line">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(ProfitGoalBase); \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+<p>For an inheriting subclass without private variables, this macro can be used directly for the serialization </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>Drived: <span class="keyword">public</span> ProfitGoalBase {</div>
+<div class="line">    <a class="code hl_define" href="#ga2d861af297789dc5effbca66da48f87f">PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    Drived();</div>
+<div class="line">    ...</div>
+<div class="line">};</div>
+<div class="ttc" id="agroup___profit_goal_html_ga2d861af297789dc5effbca66da48f87f"><div class="ttname"><a href="#ga2d861af297789dc5effbca66da48f87f">PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="ttdeci">#define PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="ttdoc">For an inheriting subclass without private variables, this macro can be used directly for the seriali...</div><div class="ttdef"><b>定义</b> ProfitGoalBase.h:165</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
-<h2 class="groupheader">类型定义说明</h2>
-<a class="anchor" id="ga15de439d18b21a787ee746d8dd3a906a"></a>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">类型定义说明</h2>
+<a id="ga15de439d18b21a787ee746d8dd3a906a" name="ga15de439d18b21a787ee746d8dd3a906a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga15de439d18b21a787ee746d8dd3a906a">&#9670;&#160;</a></span>ProfitGoalPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;ProfitGoalBase&gt; <a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">hku::ProfitGoalPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_profit_goal_base.html">ProfitGoalBase</a>&gt; <a class="el" href="#ga15de439d18b21a787ee746d8dd3a906a">hku::ProfitGoalPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>客户程序都应使用该指针类型 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/profitgoal/ProfitGoalBase.h&gt;</code></p>
+
+<p>Client programs should all use this pointer type </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="ga1035758de2864cd69e9b6ee2831e088d" name="ga1035758de2864cd69e9b6ee2831e088d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1035758de2864cd69e9b6ee2831e088d">&#9670;&#160;</a></span>PG_FixedHoldDays()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> HKU_API hku::PG_FixedHoldDays </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>days</em></span><span class="paramdefsep"> = </span><span class="paramdefval">5</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/profitgoal/crt/PG_FixedHoldDays.h&gt;</code></p>
+
+<p>Profit goal strategy of a fixed holding days </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">days</td><td>the allowed holding days (counted in trading days), 5 days by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="namespacehku.html#a4e9d3fa5d73705442647d101556776e3">PGPtr</a></dd></dl>
+<p>Once the position (long or short) has been held for at least days trading days, the rule forces an exit on the next bar regardless of price. setTO must be called first, otherwise there is no trading-day list and the rule never takes effect. The forced exit is signalled through the goal value (0 for long, the current price for short), so the goalPrice recorded for such an exit is not a meaningful target price </p>
 
 </div>
 </div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

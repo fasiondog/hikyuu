@@ -1,0 +1,241 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/system/MomentResult.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_moment_result_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">MomentResult.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * MomentResult.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Recursive combination refactoring: the complete running result (suggestion) of a system instance at a certain moment</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *  The single-security and the aggregate forms return the [completely identical] structure, which is the premise of the nesting.</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef MOMENTRESULT_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define MOMENTRESULT_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../../DataType.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;../../Stock.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;../../trade_manage/TradeRecord.h&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &quot;../../trade_manage/FundsRecord.h&quot;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &quot;../../trade_manage/PositionRecord.h&quot;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;TradeRequest.h&quot;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &quot;TradeSuggestion.h&quot;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">   25</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> = nlohmann::json;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span></div>
+<div class="foldopen" id="foldopen00032" data-start="{" data-end="};">
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html">   32</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_struct" href="structhku_1_1_moment_result.html">MomentResult</a> {</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#ab164378160d262462cd4daae5a9f71a7">   33</a></span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#ab164378160d262462cd4daae5a9f71a7">datetime</a>;                  <span class="comment">// The corresponding moment</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a173f412e591f62b63d5ad60a0ecba2e9">   34</a></span>    <a class="code hl_class" href="classhku_1_1_funds_record.html">FundsRecord</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#a173f412e591f62b63d5ad60a0ecba2e9">funds_before_open</a>;      <span class="comment">// The [before open trade] snapshot -&gt; the denominator of the tradesOnOpen ratio</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a33015bc70029282b1746373c23173ea2">   35</a></span>    <a class="code hl_class" href="classhku_1_1_funds_record.html">FundsRecord</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#a33015bc70029282b1746373c23173ea2">funds_before_close</a>;     <span class="comment">// The [before close trade] snapshot (= after the open execution) -&gt; the denominator of the tradesOnClose ratio</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a52dab4b5ef7f213863c1e7bfad8d6d4c">   36</a></span>    <a class="code hl_class" href="classhku_1_1_funds_record.html">FundsRecord</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#a52dab4b5ef7f213863c1e7bfad8d6d4c">funds</a>;                  <span class="comment">// The final balance / total assets / market value at this moment (including the long/short and the margin trading)</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#ad89a46baf3cd22cc2683d06385b16219">   37</a></span>    std::vector&lt;PositionRecord&gt; <a class="code hl_variable" href="structhku_1_1_moment_result.html#ad89a46baf3cd22cc2683d06385b16219">positions</a>;  <span class="comment">// The current positions (multiple instruments for the aggregate form; lazily filled)</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#ae615bcbdd37f0b53307356b511d19582">   38</a></span>    <a class="code hl_typedef" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#ae615bcbdd37f0b53307356b511d19582">tradesOnOpen</a>;       <span class="comment">// The trades executed at the [open] stage</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">   39</a></span>    <a class="code hl_typedef" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">tradesOnClose</a>;      <span class="comment">// The trades executed at the [close] stage</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a3ae23cb1cdc4f7109bd8638c83d0972a">   40</a></span>    std::vector&lt;TradeRequest&gt; <a class="code hl_variable" href="structhku_1_1_moment_result.html#a3ae23cb1cdc4f7109bd8638c83d0972a">delayOnNextOpen</a>;  <span class="comment">// The requests delayed to the open of the next moment</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a09214a862fa7a0d643b8a61a6c5c1d45">   41</a></span>    <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#a09214a862fa7a0d643b8a61a6c5c1d45">suggestions</a>;    <span class="comment">// The suggestion instructions produced at this moment (the complete semantics)</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#ae8ff6cc58ce13f79c3ad4fe66b97b029">   42</a></span>    <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#ae8ff6cc58ce13f79c3ad4fe66b97b029">pendingOnNextOpen</a>;  <span class="comment">// The aggregate target orders to execute at the next</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                                            <span class="comment">// open (trade_on_close=false); the multi-instrument</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                                            <span class="comment">// counterpart of delayOnNextOpen</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">   46</a></span>    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> <a class="code hl_variable" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">ext</a>;                           <span class="comment">// The extensible area (lazily constructed, an empty object by default)</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="foldopen" id="foldopen00048" data-start="{" data-end="}">
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#aad688519463f096de65268c761262dde">   48</a></span>    <a class="code hl_typedef" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> <a class="code hl_function" href="structhku_1_1_moment_result.html#aad688519463f096de65268c761262dde">allTrades</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <a class="code hl_typedef" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> r = <a class="code hl_variable" href="structhku_1_1_moment_result.html#ae615bcbdd37f0b53307356b511d19582">tradesOnOpen</a>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        r.insert(r.end(), <a class="code hl_variable" href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">tradesOnClose</a>.begin(), <a class="code hl_variable" href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">tradesOnClose</a>.end());</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keywordflow">return</span> r;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    }</div>
+</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a44ca115a86c224b4f389d276d9fec414">   54</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="structhku_1_1_moment_result.html#a44ca115a86c224b4f389d276d9fec414">empty</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="structhku_1_1_moment_result.html#ae615bcbdd37f0b53307356b511d19582">tradesOnOpen</a>.empty() &amp;&amp; <a class="code hl_variable" href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">tradesOnClose</a>.empty() &amp;&amp; <a class="code hl_variable" href="structhku_1_1_moment_result.html#a09214a862fa7a0d643b8a61a6c5c1d45">suggestions</a>.empty();</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    }</div>
+</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="foldopen" id="foldopen00058" data-start="{" data-end="}">
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#a264d1558758e1ac35e14eae4b6b6a6b6">   58</a></span>    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> <a class="code hl_function" href="structhku_1_1_moment_result.html#a264d1558758e1ac35e14eae4b6b6a6b6">toJson</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> j;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        j[<span class="stringliteral">&quot;datetime&quot;</span>] = <a class="code hl_variable" href="structhku_1_1_moment_result.html#ab164378160d262462cd4daae5a9f71a7">datetime</a>.str();</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keyword">auto</span> append_trade = [](<a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a>&amp; arr, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_trade_record.html">TradeRecord</a>&amp; tr) {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>            <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> r;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            r[<span class="stringliteral">&quot;datetime&quot;</span>] = tr.datetime.str();</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>            r[<span class="stringliteral">&quot;number&quot;</span>] = tr.number;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>            r[<span class="stringliteral">&quot;realPrice&quot;</span>] = tr.realPrice;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>            r[<span class="stringliteral">&quot;from&quot;</span>] = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(tr.from);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            arr.push_back(r);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        };</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> open = json::array();</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; tr : <a class="code hl_variable" href="structhku_1_1_moment_result.html#ae615bcbdd37f0b53307356b511d19582">tradesOnOpen</a>) {</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>            append_trade(open, tr);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        }</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        j[<span class="stringliteral">&quot;tradesOnOpen&quot;</span>] = open;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> close = json::array();</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; tr : <a class="code hl_variable" href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">tradesOnClose</a>) {</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            append_trade(close, tr);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        }</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        j[<span class="stringliteral">&quot;tradesOnClose&quot;</span>] = close;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        j[<span class="stringliteral">&quot;suggestions&quot;</span>] = <a class="code hl_variable" href="structhku_1_1_moment_result.html#a09214a862fa7a0d643b8a61a6c5c1d45">suggestions</a>.size();</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        j[<span class="stringliteral">&quot;ext&quot;</span>] = <a class="code hl_variable" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">ext</a>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">return</span> j;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="}">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#afeac7f8d0b2d6709a8aa0722755a8f4c">   85</a></span>    T <a class="code hl_function" href="structhku_1_1_moment_result.html#afeac7f8d0b2d6709a8aa0722755a8f4c">get</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; key, <span class="keyword">const</span> T&amp; def)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">ext</a>.is_object()) {</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            <span class="keyword">auto</span> it = <a class="code hl_variable" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">ext</a>.find(key);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>            <span class="keywordflow">if</span> (it != <a class="code hl_variable" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">ext</a>.end()) {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                <span class="keywordflow">return</span> it-&gt;get&lt;T&gt;();</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>            }</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        }</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        <span class="keywordflow">return</span> def;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    }</div>
+</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="foldopen" id="foldopen00096" data-start="{" data-end="}">
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="structhku_1_1_moment_result.html#ad72dc109154d4794f6f1b8b6ea5f5bfd">   96</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="structhku_1_1_moment_result.html#ad72dc109154d4794f6f1b8b6ea5f5bfd">set</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; key, <span class="keyword">const</span> T&amp; value) {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <a class="code hl_variable" href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">ext</a>[key] = value;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    }</div>
+</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>};</div>
+</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="preprocessor">#endif </span><span class="comment">/* MOMENTRESULT_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_funds_record_html"><div class="ttname"><a href="classhku_1_1_funds_record.html">hku::FundsRecord</a></div><div class="ttdoc">Record of the current asset situation, returned by TradeManager::getFunds</div><div class="ttdef"><b>定义</b> FundsRecord.h:21</div></div>
+<div class="ttc" id="aclasshku_1_1_trade_record_html"><div class="ttname"><a href="classhku_1_1_trade_record.html">hku::TradeRecord</a></div><div class="ttdoc">Trade record</div><div class="ttdef"><b>定义</b> TradeRecord.h:64</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga331f8f4b810f375dac4596f337507d89"><div class="ttname"><a href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">hku::TradeRecordList</a></div><div class="ttdeci">vector&lt; TradeRecord &gt; TradeRecordList</div><div class="ttdef"><b>定义</b> TradeRecord.h:151</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_ac89c5611bbd8872a208fe9c18a369899"><div class="ttname"><a href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">hku::TradeSuggestionList</a></div><div class="ttdeci">vector&lt; TradeSuggestion &gt; TradeSuggestionList</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:62</div></div>
+<div class="ttc" id="anamespacehku_html_ae9a514f1ae8310455075ca506de17757"><div class="ttname"><a href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">hku::json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>定义</b> MomentResult.h:25</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html"><div class="ttname"><a href="structhku_1_1_moment_result.html">hku::MomentResult</a></div><div class="ttdoc">The complete running result (suggestion) of a system instance at a certain moment</div><div class="ttdef"><b>定义</b> MomentResult.h:32</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a09214a862fa7a0d643b8a61a6c5c1d45"><div class="ttname"><a href="structhku_1_1_moment_result.html#a09214a862fa7a0d643b8a61a6c5c1d45">hku::MomentResult::suggestions</a></div><div class="ttdeci">TradeSuggestionList suggestions</div><div class="ttdef"><b>定义</b> MomentResult.h:41</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a173f412e591f62b63d5ad60a0ecba2e9"><div class="ttname"><a href="structhku_1_1_moment_result.html#a173f412e591f62b63d5ad60a0ecba2e9">hku::MomentResult::funds_before_open</a></div><div class="ttdeci">FundsRecord funds_before_open</div><div class="ttdef"><b>定义</b> MomentResult.h:34</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a264d1558758e1ac35e14eae4b6b6a6b6"><div class="ttname"><a href="structhku_1_1_moment_result.html#a264d1558758e1ac35e14eae4b6b6a6b6">hku::MomentResult::toJson</a></div><div class="ttdeci">json toJson() const</div><div class="ttdef"><b>定义</b> MomentResult.h:58</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a33015bc70029282b1746373c23173ea2"><div class="ttname"><a href="structhku_1_1_moment_result.html#a33015bc70029282b1746373c23173ea2">hku::MomentResult::funds_before_close</a></div><div class="ttdeci">FundsRecord funds_before_close</div><div class="ttdef"><b>定义</b> MomentResult.h:35</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a3ae23cb1cdc4f7109bd8638c83d0972a"><div class="ttname"><a href="structhku_1_1_moment_result.html#a3ae23cb1cdc4f7109bd8638c83d0972a">hku::MomentResult::delayOnNextOpen</a></div><div class="ttdeci">std::vector&lt; TradeRequest &gt; delayOnNextOpen</div><div class="ttdef"><b>定义</b> MomentResult.h:40</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a44ca115a86c224b4f389d276d9fec414"><div class="ttname"><a href="structhku_1_1_moment_result.html#a44ca115a86c224b4f389d276d9fec414">hku::MomentResult::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>定义</b> MomentResult.h:54</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a52dab4b5ef7f213863c1e7bfad8d6d4c"><div class="ttname"><a href="structhku_1_1_moment_result.html#a52dab4b5ef7f213863c1e7bfad8d6d4c">hku::MomentResult::funds</a></div><div class="ttdeci">FundsRecord funds</div><div class="ttdef"><b>定义</b> MomentResult.h:36</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_a8277f3218b019fd68a7343db7c6cf158"><div class="ttname"><a href="structhku_1_1_moment_result.html#a8277f3218b019fd68a7343db7c6cf158">hku::MomentResult::ext</a></div><div class="ttdeci">json ext</div><div class="ttdef"><b>定义</b> MomentResult.h:46</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_aad688519463f096de65268c761262dde"><div class="ttname"><a href="structhku_1_1_moment_result.html#aad688519463f096de65268c761262dde">hku::MomentResult::allTrades</a></div><div class="ttdeci">TradeRecordList allTrades() const</div><div class="ttdef"><b>定义</b> MomentResult.h:48</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_ab164378160d262462cd4daae5a9f71a7"><div class="ttname"><a href="structhku_1_1_moment_result.html#ab164378160d262462cd4daae5a9f71a7">hku::MomentResult::datetime</a></div><div class="ttdeci">Datetime datetime</div><div class="ttdef"><b>定义</b> MomentResult.h:33</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_ad59bb5b92c7723dd9e9d76957d38fad3"><div class="ttname"><a href="structhku_1_1_moment_result.html#ad59bb5b92c7723dd9e9d76957d38fad3">hku::MomentResult::tradesOnClose</a></div><div class="ttdeci">TradeRecordList tradesOnClose</div><div class="ttdef"><b>定义</b> MomentResult.h:39</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_ad72dc109154d4794f6f1b8b6ea5f5bfd"><div class="ttname"><a href="structhku_1_1_moment_result.html#ad72dc109154d4794f6f1b8b6ea5f5bfd">hku::MomentResult::set</a></div><div class="ttdeci">void set(const string &amp;key, const T &amp;value)</div><div class="ttdef"><b>定义</b> MomentResult.h:96</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_ad89a46baf3cd22cc2683d06385b16219"><div class="ttname"><a href="structhku_1_1_moment_result.html#ad89a46baf3cd22cc2683d06385b16219">hku::MomentResult::positions</a></div><div class="ttdeci">std::vector&lt; PositionRecord &gt; positions</div><div class="ttdef"><b>定义</b> MomentResult.h:37</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_ae615bcbdd37f0b53307356b511d19582"><div class="ttname"><a href="structhku_1_1_moment_result.html#ae615bcbdd37f0b53307356b511d19582">hku::MomentResult::tradesOnOpen</a></div><div class="ttdeci">TradeRecordList tradesOnOpen</div><div class="ttdef"><b>定义</b> MomentResult.h:38</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_ae8ff6cc58ce13f79c3ad4fe66b97b029"><div class="ttname"><a href="structhku_1_1_moment_result.html#ae8ff6cc58ce13f79c3ad4fe66b97b029">hku::MomentResult::pendingOnNextOpen</a></div><div class="ttdeci">TradeSuggestionList pendingOnNextOpen</div><div class="ttdef"><b>定义</b> MomentResult.h:42</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html_afeac7f8d0b2d6709a8aa0722755a8f4c"><div class="ttname"><a href="structhku_1_1_moment_result.html#afeac7f8d0b2d6709a8aa0722755a8f4c">hku::MomentResult::get</a></div><div class="ttdeci">T get(const string &amp;key, const T &amp;def) const</div><div class="ttdef"><b>定义</b> MomentResult.h:85</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_be1571b252e421c31ea0682d2947607c.html">system</a></li><li class="navelem"><b>MomentResult.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+digraph "hikyuu/trade_sys/signal"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_194593d72069437dd60c2304994b6f20 {
+    graph [ bgcolor="#edf0f7", pencolor="grey50", label="trade_sys", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_194593d72069437dd60c2304994b6f20.html",tooltip=""]
+  subgraph clusterdir_01cae8b9186288471dd4e39b38208d6c {
+    graph [ bgcolor="#edf0f7", pencolor="grey25", label="", fontname=Helvetica,fontsize=10 style="filled,bold", URL="dir_01cae8b9186288471dd4e39b38208d6c.html",tooltip=""]
+    dir_01cae8b9186288471dd4e39b38208d6c [shape=plaintext, label="signal"];
+  dir_aea191c8b3faf0941c39e33f9351c1c7 [label="crt", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_aea191c8b3faf0941c39e33f9351c1c7.html",tooltip=""];
+  dir_c002281fae986a246e264948c6ab22d6 [label="imp", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_c002281fae986a246e264948c6ab22d6.html",tooltip=""];
+  }
+  }
+}

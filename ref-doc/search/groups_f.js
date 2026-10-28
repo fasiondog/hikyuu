@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['security_20management_0',['StockManage security management',['../group___stock_manage.html',1,'']]],
+  ['selection_20algorithm_1',['Selector trading object selection algorithm',['../group___selector.html',1,'']]],
+  ['selector_20trading_20object_20selection_20algorithm_2',['Selector trading object selection algorithm',['../group___selector.html',1,'']]],
+  ['sending_20agent_3',['Agent external data receiving and sending agent',['../group___agent.html',1,'']]],
+  ['signal_20generator_4',['Signal signal generator',['../group___signal.html',1,'']]],
+  ['signal_20signal_20generator_5',['Signal signal generator',['../group___signal.html',1,'']]],
+  ['slippage_20algorithm_6',['Slippage slippage algorithm',['../group___slippage.html',1,'']]],
+  ['slippage_20slippage_20algorithm_7',['Slippage slippage algorithm',['../group___slippage.html',1,'']]],
+  ['spend_20timer_20time_20consumption_20statistics_8',['Spend timer time consumption statistics',['../group___spend_timer.html',1,'']]],
+  ['sqlite3_20data_20driver_9',['SQLite3 driver, the SQLITE3 data driver',['../group___s_q_lite.html',1,'']]],
+  ['sqlite3_20driver_20the_20sqlite3_20data_20driver_10',['SQLite3 driver, the SQLITE3 data driver',['../group___s_q_lite.html',1,'']]],
+  ['statistics_11',['statistics',['../group___performance.html',1,'Performance performance statistics'],['../group___spend_timer.html',1,'Spend timer time consumption statistics']]],
+  ['stockmanage_20security_20management_12',['StockManage security management',['../group___stock_manage.html',1,'']]],
+  ['stop_20loss_20take_20profit_20strategy_13',['Stoploss stop-loss / take-profit strategy',['../group___stoploss.html',1,'']]],
+  ['stoploss_20stop_20loss_20take_20profit_20strategy_14',['Stoploss stop-loss / take-profit strategy',['../group___stoploss.html',1,'']]],
+  ['strategy_15',['strategy',['../group___money_manager.html',1,'MoneyManager money management strategy'],['../group___profit_goal.html',1,'ProfitGoal profit goal strategy'],['../group___stoploss.html',1,'Stoploss stop-loss / take-profit strategy']]],
+  ['strategy_20runtime_16',['Strategy strategy runtime',['../group___strategy.html',1,'']]],
+  ['strategy_20strategy_20runtime_17',['Strategy strategy runtime',['../group___strategy.html',1,'']]],
+  ['synthesis_18',['MultiFactor multi-factor synthesis',['../group___multi_factor.html',1,'']]],
+  ['system_19',['System trading system',['../group___system.html',1,'']]],
+  ['system_20trading_20system_20',['System trading system',['../group___system.html',1,'']]],
+  ['system_20valid_20condition_21',['Condition system valid condition',['../group___condition.html',1,'']]],
+  ['systematic_20trading_20framework_22',['TradeSystem systematic trading framework',['../group___trade_system.html',1,'']]]
+];

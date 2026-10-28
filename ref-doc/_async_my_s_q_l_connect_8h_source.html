@@ -1,0 +1,188 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/mysql/AsyncMySQLConnect.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_async_my_s_q_l_connect_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">AsyncMySQLConnect.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AsyncMySQLConnect.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2019, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2026-05-09</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef HIYUU_DB_CONNECT_MYSQL_ASYNCMYSQLCONNECT_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define HIYUU_DB_CONNECT_MYSQL_ASYNCMYSQLCONNECT_H</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;hikyuu/utilities/Parameter.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;../AsyncDBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;AsyncMySQLStatement.h&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="foldopen" id="foldopen00022" data-start="{" data-end="};">
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html">   22</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">AsyncMySQLConnect</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_async_d_b_connect_base.html#a13aea238be55fd8640d047fb39ae44f0">AsyncDBConnectBase</a> {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">   24</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">AsyncMySQLConnect</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_parameter.html">Parameter</a> &amp;param);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#a78897ca5697e3c7753ab7cc6f4502525">   25</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a78897ca5697e3c7753ab7cc6f4502525">~AsyncMySQLConnect</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#ad16c8d7d17cbb6067a85b943299b4657">   27</a></span>    <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#ad16c8d7d17cbb6067a85b943299b4657">AsyncMySQLConnect</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">AsyncMySQLConnect</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#acbe92233b63b69f144694c1b8fd5e4d6">   28</a></span>    <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">AsyncMySQLConnect</a> &amp;<a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#acbe92233b63b69f144694c1b8fd5e4d6">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">AsyncMySQLConnect</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#ac2f188c979f4ff73d4cbdac4259d8871">   30</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;bool&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#ac2f188c979f4ff73d4cbdac4259d8871">ping</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#a4950813d537c17632674ef0169eac348">   31</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;int64_t&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a4950813d537c17632674ef0169eac348">exec</a>(<span class="keyword">const</span> std::string &amp;sql_string) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#ac4aa2c93ca56440af6cfdb683534fa6f">   32</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;AsyncSQLStatementPtr&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#ac4aa2c93ca56440af6cfdb683534fa6f">getStatement</a>(</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      <span class="keyword">const</span> std::string &amp;sql_statement) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#a1e21ca5f758c5311bba4e9193f72f063">   34</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;bool&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a1e21ca5f758c5311bba4e9193f72f063">tableExist</a>(<span class="keyword">const</span> std::string &amp;tablename) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#ab15d6d4393da44c57ffdd92313df320b">   35</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#ab15d6d4393da44c57ffdd92313df320b">resetAutoIncrement</a>(<span class="keyword">const</span> std::string &amp;tablename) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#abd5da9453d2ed94a39bc60ac42567f9a">   37</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#abd5da9453d2ed94a39bc60ac42567f9a">transaction</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#a80992c60da7769fea11fc88b51a942af">   38</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a80992c60da7769fea11fc88b51a942af">commit</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#a62e91468748a66824116b7cea6454634">   39</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_connect.html#a62e91468748a66824116b7cea6454634">rollback</a>() noexcept override;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>private:</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_connect.html#ad9063ce535f53ddffea87e9b5bf85c48">   42</a></span>    friend class <a class="code hl_friend" href="classhku_1_1_async_my_s_q_l_connect.html#ad9063ce535f53ddffea87e9b5bf85c48">AsyncMySQLStatement</a>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">// The method provided to AsyncMySQLStatement to access the original connection (void* is used</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="comment">// to avoid exposing the boost.mysql types)</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">void</span> *getRawConnection() const;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="comment">// Internal helper methods</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <a class="code hl_namespace" href="namespacehku_1_1net.html">net</a>::<a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">awaitable</a>&lt;<span class="keywordtype">bool</span>&gt; tryConnect();</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_namespace" href="namespacehku_1_1net.html">net</a>::<a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">awaitable</a>&lt;<span class="keywordtype">void</span>&gt; connect();</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordtype">void</span> close();</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>private:</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    struct Impl;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <a class="code hl_namespace" href="namespacestd.html">std</a>::unique_ptr&lt;Impl&gt; m_impl;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>};</div>
+</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">#endif </span><span class="comment">/* HIYUU_DB_CONNECT_MYSQL_ASYNCMYSQLCONNECT_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_async_d_b_connect_base_html_a13aea238be55fd8640d047fb39ae44f0"><div class="ttname"><a href="classhku_1_1_async_d_b_connect_base.html#a13aea238be55fd8640d047fb39ae44f0">hku::AsyncDBConnectBase::AsyncDBConnectBase</a></div><div class="ttdeci">AsyncDBConnectBase(const Parameter &amp;param)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> AsyncDBConnectBase.h:333</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_a134dd1a4a7a39eb0a8d75331ac8a4754"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#a134dd1a4a7a39eb0a8d75331ac8a4754">hku::AsyncMySQLConnect::AsyncMySQLConnect</a></div><div class="ttdeci">AsyncMySQLConnect(const Parameter &amp;param)</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_a1e21ca5f758c5311bba4e9193f72f063"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#a1e21ca5f758c5311bba4e9193f72f063">hku::AsyncMySQLConnect::tableExist</a></div><div class="ttdeci">virtual net::awaitable&lt; bool &gt; tableExist(const std::string &amp;tablename) override</div><div class="ttdoc">Judge whether the table exists</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_a4950813d537c17632674ef0169eac348"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#a4950813d537c17632674ef0169eac348">hku::AsyncMySQLConnect::exec</a></div><div class="ttdeci">virtual net::awaitable&lt; int64_t &gt; exec(const std::string &amp;sql_string) override</div><div class="ttdoc">Execute the SQL without a result</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_a62e91468748a66824116b7cea6454634"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#a62e91468748a66824116b7cea6454634">hku::AsyncMySQLConnect::rollback</a></div><div class="ttdeci">virtual net::awaitable&lt; void &gt; rollback() noexcept override</div><div class="ttdoc">Roll back the transaction</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_a78897ca5697e3c7753ab7cc6f4502525"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#a78897ca5697e3c7753ab7cc6f4502525">hku::AsyncMySQLConnect::~AsyncMySQLConnect</a></div><div class="ttdeci">virtual ~AsyncMySQLConnect() override</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_a80992c60da7769fea11fc88b51a942af"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#a80992c60da7769fea11fc88b51a942af">hku::AsyncMySQLConnect::commit</a></div><div class="ttdeci">virtual net::awaitable&lt; void &gt; commit() override</div><div class="ttdoc">Commit the transaction; an exception is thrown on failure</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_ab15d6d4393da44c57ffdd92313df320b"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#ab15d6d4393da44c57ffdd92313df320b">hku::AsyncMySQLConnect::resetAutoIncrement</a></div><div class="ttdeci">virtual net::awaitable&lt; void &gt; resetAutoIncrement(const std::string &amp;tablename) override</div><div class="ttdoc">Reset the id in the table with an auto-increment id to start from 1</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_abd5da9453d2ed94a39bc60ac42567f9a"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#abd5da9453d2ed94a39bc60ac42567f9a">hku::AsyncMySQLConnect::transaction</a></div><div class="ttdeci">virtual net::awaitable&lt; void &gt; transaction() override</div><div class="ttdoc">Start a transaction; an exception is thrown on failure</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_ac2f188c979f4ff73d4cbdac4259d8871"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#ac2f188c979f4ff73d4cbdac4259d8871">hku::AsyncMySQLConnect::ping</a></div><div class="ttdeci">virtual net::awaitable&lt; bool &gt; ping() override</div><div class="ttdoc">The ping operation, used to judge whether it is connected</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_ac4aa2c93ca56440af6cfdb683534fa6f"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#ac4aa2c93ca56440af6cfdb683534fa6f">hku::AsyncMySQLConnect::getStatement</a></div><div class="ttdeci">virtual net::awaitable&lt; AsyncSQLStatementPtr &gt; getStatement(const std::string &amp;sql_statement) override</div><div class="ttdoc">Get the AsyncSQLStatement</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_acbe92233b63b69f144694c1b8fd5e4d6"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#acbe92233b63b69f144694c1b8fd5e4d6">hku::AsyncMySQLConnect::operator=</a></div><div class="ttdeci">AsyncMySQLConnect &amp; operator=(const AsyncMySQLConnect &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_ad16c8d7d17cbb6067a85b943299b4657"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#ad16c8d7d17cbb6067a85b943299b4657">hku::AsyncMySQLConnect::AsyncMySQLConnect</a></div><div class="ttdeci">AsyncMySQLConnect(const AsyncMySQLConnect &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html_ad9063ce535f53ddffea87e9b5bf85c48"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html#ad9063ce535f53ddffea87e9b5bf85c48">hku::AsyncMySQLConnect::AsyncMySQLStatement</a></div><div class="ttdeci">friend class AsyncMySQLStatement</div><div class="ttdef"><b>定义</b> AsyncMySQLConnect.h:42</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html"><div class="ttname"><a href="classhku_1_1_parameter.html">hku::Parameter</a></div><div class="ttdoc">Used by the classes that need the named parameter settings</div><div class="ttdef"><b>定义</b> Parameter.h:202</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html"><div class="ttname"><a href="namespacehku_1_1net.html">hku::net</a></div><div class="ttdef"><b>定义</b> net.h:61</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><a href="dir_bd37ad3b95eab063e2ce02bebf1cde6d.html">mysql</a></li><li class="navelem"><b>AsyncMySQLConnect.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

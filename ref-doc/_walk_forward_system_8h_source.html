@@ -1,0 +1,226 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/system/imp/WalkForwardSystem.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_walk_forward_system_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">WalkForwardSystem.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-09-13</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/selector/SelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../System.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="foldopen" id="foldopen00016" data-start="{" data-end="};">
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html">   16</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#acf6bd71b60d62d17c287fe9a7c8432b5">WalkForwardSystem</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_system.html#a6eecfad22acdfdc0974b4b6f9a6dbb63">System</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    CLASS_LOGGER_IMP(<a class="code hl_function" href="namespacehku.html#abb3685a68435a856cfe795091ee7dd48">SYS_WalkForward</a>)</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#acf6bd71b60d62d17c287fe9a7c8432b5">   20</a></span>    <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#acf6bd71b60d62d17c287fe9a7c8432b5">WalkForwardSystem</a>();</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#af76248aea1d489521f989f633b0aff61">   21</a></span>    <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#af76248aea1d489521f989f633b0aff61">WalkForwardSystem</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; candidate_sys_list, <span class="keyword">const</span> <a class="code hl_typedef" href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a>&amp; se,</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>                      <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; train_tm);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#afcfa5cbe5119a03cf2dca75a16bab48c">   23</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#afcfa5cbe5119a03cf2dca75a16bab48c">~WalkForwardSystem</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#aa1966c25cb4ace3f1ff29f750fac918c">   25</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#aa1966c25cb4ace3f1ff29f750fac918c">readyForRun</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#ab30c5ff580030c966369a49ac46bcd5e">   26</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#ab30c5ff580030c966369a49ac46bcd5e">run</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; kdata, <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_system.html#a06beaf226a86de27ab84825692aea9a0">reset</a> = <span class="keyword">true</span>, <span class="keywordtype">bool</span> resetAll = <span class="keyword">false</span>) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#af668419a9704995af5dab7bb708b0acb">   27</a></span>    <span class="keyword">virtual</span> <a class="code hl_struct" href="structhku_1_1_moment_result.html">MomentResult</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#af668419a9704995af5dab7bb708b0acb">runMoment</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#adc36626c05f990d697ce9e602cfc6363">   28</a></span>    <span class="keyword">virtual</span> <a class="code hl_struct" href="structhku_1_1_moment_result.html">MomentResult</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#adc36626c05f990d697ce9e602cfc6363">runMomentOnOpen</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#a61f3cfa0e1f12ef67874e0cff0516971">   29</a></span>    <span class="keyword">virtual</span> <a class="code hl_struct" href="structhku_1_1_moment_result.html">MomentResult</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#a61f3cfa0e1f12ef67874e0cff0516971">runMomentOnClose</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#aabed850027d968447bc6042728f34c36">   31</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#aabed850027d968447bc6042728f34c36">_checkParam</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_system.html#ae50ab41ec9e823857013d554658212fa">name</a>) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#a896edad88146d83abebff6e04696c52b">   32</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#a896edad88146d83abebff6e04696c52b">_reset</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#ac0be1418f007d92f67e56153e33c27d3">   33</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#ac0be1418f007d92f67e56153e33c27d3">_forceResetAll</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#abc0904aa85ec6e88921dd0555b12be94">   34</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_system.html#a5d929a7607fc7caac365ec6074393120">SystemPtr</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#abc0904aa85ec6e88921dd0555b12be94">_clone</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#a3d74e4dd1046795739226729691f506a">   36</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#a3d74e4dd1046795739226729691f506a">str</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#a1fa52b177e0913d91c7dd33bf765f029">   39</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#a1fa52b177e0913d91c7dd33bf765f029">hasPythonPart</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#adb82b9b1947c17678f24298783c087b0">   40</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_trade_record.html">TradeRecord</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#adb82b9b1947c17678f24298783c087b0">sellForceOnOpen</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keywordtype">double</span> num, <a class="code hl_typedef" href="classhku_1_1_system.html#adb3b73210759b54aee348f649eef55c9">Part</a> from) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#acc3b0774c05669c53e32ce8099dd6b5f">   41</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_trade_record.html">TradeRecord</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#acc3b0774c05669c53e32ce8099dd6b5f">sellForceOnClose</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keywordtype">double</span> num, <a class="code hl_typedef" href="classhku_1_1_system.html#adb3b73210759b54aee348f649eef55c9">Part</a> from) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#ad77ff857871748772221d0ad043b15ae">   42</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#ad77ff857871748772221d0ad043b15ae">clearDelayBuyRequest</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#ac52daaeb585a9037ab28871a6574c402">   43</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_trade_record.html">TradeRecord</a> <a class="code hl_function" href="classhku_1_1_walk_forward_system.html#ac52daaeb585a9037ab28871a6574c402">pfProcessDelaySellRequest</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">void</span> initParam();</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keywordtype">void</span> syncDataFromSystem(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp;, <span class="keywordtype">bool</span> isMoment);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="keywordtype">void</span> syncDataToSystem(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp;);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordtype">void</span> ensureWindows();</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a> windowKDataAt(<span class="keywordtype">size_t</span> index);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">size_t</span> windowIndexAt(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_struct" href="structhku_1_1_moment_result.html">MomentResult</a> driveMoment(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime, <span class="keywordtype">bool</span> open, <span class="keywordtype">bool</span> close);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> srcOpenPriceAt(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <a class="code hl_typedef" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> m_se;        <span class="comment">// The optimizing SE</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <a class="code hl_typedef" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> m_train_tm;  <span class="comment">// The account used for the optimization evaluation calculation</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> m_cur_sys;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">size_t</span> m_cur_window{<a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>()};  <span class="comment">// The window index the current candidate was set up for</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    vector&lt;KData&gt;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      m_train_kdata_list;  <span class="comment">// The [start, end) window KData of each RunRanges entry, built lazily</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    vector&lt;RunRanges&gt; m_run_ranges;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment">//========================================</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment">//========================================</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classhku_1_1_walk_forward_system.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   75</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(<a class="code hl_function" href="classhku_1_1_system.html#a6eecfad22acdfdc0974b4b6f9a6dbb63">System</a>);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_se);</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_train_tm);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    }</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>};</div>
+</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_html"><div class="ttname"><a href="classhku_1_1_k_data.html">hku::KData</a></div><div class="ttdoc">K-line (candlestick) data</div><div class="ttdef"><b>定义</b> KData.h:22</div></div>
+<div class="ttc" id="aclasshku_1_1_null_html"><div class="ttname"><a href="classhku_1_1_null.html">hku::Null</a></div><div class="ttdoc">It provides the Null value of the given type</div><div class="ttdef"><b>定义</b> Null.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html_a06beaf226a86de27ab84825692aea9a0"><div class="ttname"><a href="classhku_1_1_system.html#a06beaf226a86de27ab84825692aea9a0">hku::System::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Reset, excluding the existing trading object and the shared parts</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html_a5d929a7607fc7caac365ec6074393120"><div class="ttname"><a href="classhku_1_1_system.html#a5d929a7607fc7caac365ec6074393120">hku::System::SystemPtr</a></div><div class="ttdeci">shared_ptr&lt; System &gt; SystemPtr</div><div class="ttdef"><b>定义</b> System.h:174</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html_a6eecfad22acdfdc0974b4b6f9a6dbb63"><div class="ttname"><a href="classhku_1_1_system.html#a6eecfad22acdfdc0974b4b6f9a6dbb63">hku::System::System</a></div><div class="ttdeci">System()</div><div class="ttdoc">Default constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html_adb3b73210759b54aee348f649eef55c9"><div class="ttname"><a href="classhku_1_1_system.html#adb3b73210759b54aee348f649eef55c9">hku::System::Part</a></div><div class="ttdeci">SystemPart Part</div><div class="ttdef"><b>定义</b> System.h:73</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html_ae50ab41ec9e823857013d554658212fa"><div class="ttname"><a href="classhku_1_1_system.html#ae50ab41ec9e823857013d554658212fa">hku::System::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the name</div><div class="ttdef"><b>定义</b> System.h:552</div></div>
+<div class="ttc" id="aclasshku_1_1_trade_record_html"><div class="ttname"><a href="classhku_1_1_trade_record.html">hku::TradeRecord</a></div><div class="ttdoc">Trade record</div><div class="ttdef"><b>定义</b> TradeRecord.h:64</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_a1fa52b177e0913d91c7dd33bf765f029"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#a1fa52b177e0913d91c7dd33bf765f029">hku::WalkForwardSystem::hasPythonPart</a></div><div class="ttdeci">virtual bool hasPythonPart() const override</div><div class="ttdoc">Whether Python may be called back during a run (this system, a part, or any sub-system at any depth).</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_a3d74e4dd1046795739226729691f506a"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#a3d74e4dd1046795739226729691f506a">hku::WalkForwardSystem::str</a></div><div class="ttdeci">virtual string str() const override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_a61f3cfa0e1f12ef67874e0cff0516971"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#a61f3cfa0e1f12ef67874e0cff0516971">hku::WalkForwardSystem::runMomentOnClose</a></div><div class="ttdeci">virtual MomentResult runMomentOnClose(const Datetime &amp;datetime) override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_a896edad88146d83abebff6e04696c52b"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#a896edad88146d83abebff6e04696c52b">hku::WalkForwardSystem::_reset</a></div><div class="ttdeci">virtual void _reset() override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_aa1966c25cb4ace3f1ff29f750fac918c"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#aa1966c25cb4ace3f1ff29f750fac918c">hku::WalkForwardSystem::readyForRun</a></div><div class="ttdeci">virtual void readyForRun() override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_aabed850027d968447bc6042728f34c36"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#aabed850027d968447bc6042728f34c36">hku::WalkForwardSystem::_checkParam</a></div><div class="ttdeci">virtual void _checkParam(const string &amp;name) const override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_ab30c5ff580030c966369a49ac46bcd5e"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#ab30c5ff580030c966369a49ac46bcd5e">hku::WalkForwardSystem::run</a></div><div class="ttdeci">virtual void run(const KData &amp;kdata, bool reset=true, bool resetAll=false) override</div><div class="ttdoc">Run the system</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_abc0904aa85ec6e88921dd0555b12be94"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#abc0904aa85ec6e88921dd0555b12be94">hku::WalkForwardSystem::_clone</a></div><div class="ttdeci">virtual SystemPtr _clone() override</div><div class="ttdoc">Subclass clone interface</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_ac0be1418f007d92f67e56153e33c27d3"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#ac0be1418f007d92f67e56153e33c27d3">hku::WalkForwardSystem::_forceResetAll</a></div><div class="ttdeci">virtual void _forceResetAll() override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_ac52daaeb585a9037ab28871a6574c402"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#ac52daaeb585a9037ab28871a6574c402">hku::WalkForwardSystem::pfProcessDelaySellRequest</a></div><div class="ttdeci">virtual TradeRecord pfProcessDelaySellRequest(const Datetime &amp;date) override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_acc3b0774c05669c53e32ce8099dd6b5f"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#acc3b0774c05669c53e32ce8099dd6b5f">hku::WalkForwardSystem::sellForceOnClose</a></div><div class="ttdeci">virtual TradeRecord sellForceOnClose(const Datetime &amp;date, double num, Part from) override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_acf6bd71b60d62d17c287fe9a7c8432b5"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#acf6bd71b60d62d17c287fe9a7c8432b5">hku::WalkForwardSystem::WalkForwardSystem</a></div><div class="ttdeci">WalkForwardSystem()</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_ad77ff857871748772221d0ad043b15ae"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#ad77ff857871748772221d0ad043b15ae">hku::WalkForwardSystem::clearDelayBuyRequest</a></div><div class="ttdeci">virtual void clearDelayBuyRequest() override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_adb82b9b1947c17678f24298783c087b0"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#adb82b9b1947c17678f24298783c087b0">hku::WalkForwardSystem::sellForceOnOpen</a></div><div class="ttdeci">virtual TradeRecord sellForceOnOpen(const Datetime &amp;date, double num, Part from) override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_adc36626c05f990d697ce9e602cfc6363"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#adc36626c05f990d697ce9e602cfc6363">hku::WalkForwardSystem::runMomentOnOpen</a></div><div class="ttdeci">virtual MomentResult runMomentOnOpen(const Datetime &amp;datetime) override</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_af668419a9704995af5dab7bb708b0acb"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#af668419a9704995af5dab7bb708b0acb">hku::WalkForwardSystem::runMoment</a></div><div class="ttdeci">virtual MomentResult runMoment(const Datetime &amp;datetime) override</div><div class="ttdoc">Execute one step on the given date, called by the aggregate system (MultiSystem) or the live trading ...</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_af76248aea1d489521f989f633b0aff61"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#af76248aea1d489521f989f633b0aff61">hku::WalkForwardSystem::WalkForwardSystem</a></div><div class="ttdeci">WalkForwardSystem(const SystemList &amp;candidate_sys_list, const SelectorPtr &amp;se, const TradeManagerPtr &amp;train_tm)</div></div>
+<div class="ttc" id="aclasshku_1_1_walk_forward_system_html_afcfa5cbe5119a03cf2dca75a16bab48c"><div class="ttname"><a href="classhku_1_1_walk_forward_system.html#afcfa5cbe5119a03cf2dca75a16bab48c">hku::WalkForwardSystem::~WalkForwardSystem</a></div><div class="ttdeci">virtual ~WalkForwardSystem()=default</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="agroup___selector_html_ga567344f3fb0db473aa68e844b715ae0b"><div class="ttname"><a href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">hku::SelectorPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SelectorPtr</div><div class="ttdoc">Client programs should all use this pointer type</div><div class="ttdef"><b>定义</b> SelectorBase.h:282</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga9d7ab0c25be37c167f61358a5fa526f0"><div class="ttname"><a href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TradeManagerPtr</div><div class="ttdoc">Client programs should use this type for the actual operations</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:904</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a09fb32c38270e0b3fffde2c9387e52a3"><div class="ttname"><a href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">hku::TMPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TMPtr</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:905</div></div>
+<div class="ttc" id="anamespacehku_html_a98d36b433e7ba4fe01cb70ec3a856dbc"><div class="ttname"><a href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">hku::SYSPtr</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; SYSPtr</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:58</div></div>
+<div class="ttc" id="anamespacehku_html_aa2be5196687d3fa79339e28984e927d2"><div class="ttname"><a href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">hku::SystemList</a></div><div class="ttdeci">vector&lt; SystemPtr &gt; SystemList</div><div class="ttdef"><b>定义</b> System.h:547</div></div>
+<div class="ttc" id="anamespacehku_html_ab815b3a2995c9b5f09d53950ecca5590"><div class="ttname"><a href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">hku::SEPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SEPtr</div><div class="ttdef"><b>定义</b> SelectorBase.h:283</div></div>
+<div class="ttc" id="anamespacehku_html_abb3685a68435a856cfe795091ee7dd48"><div class="ttname"><a href="namespacehku.html#abb3685a68435a856cfe795091ee7dd48">hku::SYS_WalkForward</a></div><div class="ttdeci">SystemPtr HKU_API SYS_WalkForward(const SystemList &amp;candidate_sys_list, const TradeManagerPtr &amp;tm=TradeManagerPtr(), size_t train_len=100, size_t test_len=20, const SelectorPtr &amp;se=SE_PerformanceOptimal(), const TradeManagerPtr &amp;train_tm=TradeManagerPtr())</div></div>
+<div class="ttc" id="astructhku_1_1_moment_result_html"><div class="ttname"><a href="structhku_1_1_moment_result.html">hku::MomentResult</a></div><div class="ttdoc">The complete running result (suggestion) of a system instance at a certain moment</div><div class="ttdef"><b>定义</b> MomentResult.h:32</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_be1571b252e421c31ea0682d2947607c.html">system</a></li><li class="navelem"><a href="dir_4bf955beff79116af97b9dc98e460918.html">imp</a></li><li class="navelem"><b>WalkForwardSystem.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

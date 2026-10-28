@@ -1,0 +1,335 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/AsyncTransAction.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_async_trans_action_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">AsyncTransAction.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AsyncTransAction.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2026, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2026-05-09</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef HIKYUU_DB_CONNECT_ASYNC_TRANSACTION_H</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define HIKYUU_DB_CONNECT_ASYNC_TRANSACTION_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;AsyncDBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span></div>
+<div class="foldopen" id="foldopen00031" data-start="{" data-end="};">
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html">   31</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a> final {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">   33</a></span>    <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>() = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#a20100a4c00499c87cdd4824abaec485a">   34</a></span>    <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a20100a4c00499c87cdd4824abaec485a">AsyncAutoTransAction</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#ae29af49b67d9a6ab73da953d62deb06a">   35</a></span>    <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>&amp; <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#ae29af49b67d9a6ab73da953d62deb06a">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#a7d34018c861f731f222bec6caa17e842">   36</a></span>    <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a7d34018c861f731f222bec6caa17e842">AsyncAutoTransAction</a>(<a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#abfaf2940f61f45cb1dae2e35f544c2b8">   37</a></span>    <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>&amp; <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#abfaf2940f61f45cb1dae2e35f544c2b8">operator=</a>(<a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span></div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#a69c5b055a4bafa2ef9032beb55445bbb">   44</a></span>    <span class="keyword">static</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;std::shared_ptr&lt;AsyncAutoTransAction&gt;</a>&gt; <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a69c5b055a4bafa2ef9032beb55445bbb">create</a>(</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>      <span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; driver) {</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keyword">auto</span> action = std::shared_ptr&lt;AsyncAutoTransAction&gt;(<span class="keyword">new</span> <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>(driver));</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <span class="keyword">co_await</span> action-&gt;startTransaction();</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="keyword">co_return</span> action;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    }</div>
+</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span></div>
+<div class="foldopen" id="foldopen00052" data-start="{" data-end="}">
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#a6026971adc8c0d54a3f011f71378b54a">   52</a></span>    <span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a6026971adc8c0d54a3f011f71378b54a">connect</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keywordflow">return</span> m_driver;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    }</div>
+</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span></div>
+<div class="foldopen" id="foldopen00057" data-start="{" data-end="}">
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_async_auto_trans_action.html#ad41abd3a2cc1b4143175ddaccfd16c2e">   57</a></span>    <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#ad41abd3a2cc1b4143175ddaccfd16c2e">~AsyncAutoTransAction</a>() {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="keywordflow">if</span> (!m_started || !m_driver || !m_io_context) {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        }</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="keywordflow">if</span> (m_io_context-&gt;stopped()) {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            HKU_WARN(</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>              <span class="stringliteral">&quot;AsyncAutoTransAction: io_context stopped, the transaction cannot be committed &quot;</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>              <span class="stringliteral">&quot;and will be rolled back when the connection is closed!&quot;</span>);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        }</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="comment">// Start a detached coroutine to commit (fire and forget); it rolls back automatically</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <span class="comment">// when the commit fails</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        net::asio::co_spawn(</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          *m_io_context,</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          [driver = m_driver]() -&gt; <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>              <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>                  <span class="keyword">co_await</span> driver-&gt;commit();</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>                  <span class="keyword">co_return</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>              } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>                  HKU_ERROR(<span class="stringliteral">&quot;Failed to commit transaction! {}&quot;</span>, e.what());</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>              } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>                  HKU_ERROR(<span class="stringliteral">&quot;Failed to commit! Unknown exception!&quot;</span>);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>              }</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>              <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                  <span class="keyword">co_await</span> driver-&gt;rollback();</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>                  HKU_INFO(<span class="stringliteral">&quot;Transaction rolled back successfully!&quot;</span>);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>              } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                  HKU_ERROR(<span class="stringliteral">&quot;Failed to rollback transaction! Unknown exception!&quot;</span>);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>              }</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>          },</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          net::asio::detached);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    }</div>
+</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="comment">/* Private constructor */</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">AsyncAutoTransAction</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; driver)</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    : m_driver(driver), m_io_context(nullptr), m_started(false) {</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        HKU_CHECK(m_driver, <span class="stringliteral">&quot;Null AsyncDBConnectPtr!&quot;</span>);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    }</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="comment">/* Internal method: start the transaction */</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> startTransaction() {</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="comment">// Get the io_context of the current coroutine environment</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="keyword">auto</span> exec = <span class="keyword">co_await</span> net::this_coro::executor;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        m_io_context = &amp;<span class="keyword">static_cast&lt;</span>boost::asio::io_context&amp;<span class="keyword">&gt;</span>(exec.context());</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        <span class="comment">// Start the transaction</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keyword">co_await</span> m_driver-&gt;transaction();</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        m_started = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    }</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a> m_driver;</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    boost::asio::io_context* m_io_context = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordtype">bool</span> m_started = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>};</div>
+</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span></div>
+<div class="foldopen" id="foldopen00126" data-start="{" data-end="};">
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html">  126</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a> final {</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">  128</a></span>    <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>() = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#a1035617741ea72e5eeab263f3e5a321a">  129</a></span>    <a class="code hl_function" href="classhku_1_1_async_trans_action.html#a1035617741ea72e5eeab263f3e5a321a">AsyncTransAction</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#afddcbd2caf1ce5368691090c945acc87">  130</a></span>    <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>&amp; <a class="code hl_function" href="classhku_1_1_async_trans_action.html#afddcbd2caf1ce5368691090c945acc87">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#a6b3018f0966f1c0f08092d5e268ec989">  131</a></span>    <a class="code hl_function" href="classhku_1_1_async_trans_action.html#a6b3018f0966f1c0f08092d5e268ec989">AsyncTransAction</a>(<a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#adb7602c18a78ab39dd21dee6bc60ffa3">  132</a></span>    <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>&amp; <a class="code hl_function" href="classhku_1_1_async_trans_action.html#adb7602c18a78ab39dd21dee6bc60ffa3">operator=</a>(<a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span></div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="}">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#ad4c103dcd444853b055189eb25d4d0b5">  139</a></span>    <span class="keyword">static</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;std::shared_ptr&lt;AsyncTransAction&gt;</a>&gt; <a class="code hl_function" href="classhku_1_1_async_trans_action.html#ad4c103dcd444853b055189eb25d4d0b5">create</a>(</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>      <span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; driver) {</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        <span class="keyword">auto</span> action = std::shared_ptr&lt;AsyncTransAction&gt;(<span class="keyword">new</span> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>(driver));</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        <span class="keyword">co_await</span> action-&gt;begin();</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        <span class="keyword">co_return</span> action;</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    }</div>
+</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span></div>
+<div class="foldopen" id="foldopen00147" data-start="{" data-end="}">
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#ac3152da672385443872ddcc34b8859ec">  147</a></span>    <span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; <a class="code hl_function" href="classhku_1_1_async_trans_action.html#ac3152da672385443872ddcc34b8859ec">connect</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        <span class="keywordflow">return</span> m_driver;</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    }</div>
+</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span></div>
+<div class="foldopen" id="foldopen00155" data-start="{" data-end="}">
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#a61c044d1ae6b2dacfc5f01a32d276623">  155</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#a61c044d1ae6b2dacfc5f01a32d276623">begin</a>() {</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        <span class="keywordflow">if</span> (!m_started) {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>            <span class="comment">// Get the io_context of the current coroutine environment</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>            <span class="keyword">auto</span> exec = <span class="keyword">co_await</span> net::this_coro::executor;</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>            m_io_context = &amp;<span class="keyword">static_cast&lt;</span>boost::asio::io_context&amp;<span class="keyword">&gt;</span>(exec.context());</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>            <span class="comment">// Start the transaction</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>            <span class="keyword">co_await</span> m_driver-&gt;transaction();</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>            m_started = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>            m_committed = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        }</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>        <span class="keyword">co_return</span>;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    }</div>
+</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span></div>
+<div class="foldopen" id="foldopen00173" data-start="{" data-end="}">
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#a5836f95e67b055cf4342e658e56287ca">  173</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#a5836f95e67b055cf4342e658e56287ca">end</a>() {</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        HKU_CHECK(m_started, <span class="stringliteral">&quot;No transaction has started!&quot;</span>);</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        <span class="keywordflow">if</span> (!m_committed) {</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>            <span class="keyword">co_await</span> m_driver-&gt;commit();</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>            m_committed = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>            m_started = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        }</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <span class="keyword">co_return</span>;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    }</div>
+</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span></div>
+<div class="foldopen" id="foldopen00184" data-start="{" data-end="}">
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#af800395362287ff0e30aec24829b269e">  184</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#af800395362287ff0e30aec24829b269e">rollback</a>() {</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>        <span class="keywordflow">if</span> (m_started &amp;&amp; !m_committed) {</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>            <span class="keyword">co_await</span> m_driver-&gt;rollback();</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>            m_started = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>            m_committed = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        }</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="keyword">co_return</span>;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    }</div>
+</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span></div>
+<div class="foldopen" id="foldopen00194" data-start="{" data-end="}">
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno"><a class="line" href="classhku_1_1_async_trans_action.html#a427e71d8b6ceb35809a2047d51e64a29">  194</a></span>    <a class="code hl_function" href="classhku_1_1_async_trans_action.html#a427e71d8b6ceb35809a2047d51e64a29">~AsyncTransAction</a>() {</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        <span class="comment">// If the transaction has not been committed actively it is regarded as needing a rollback</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        <span class="keywordflow">if</span> (m_started &amp;&amp; !m_committed &amp;&amp; m_driver &amp;&amp; m_io_context) {</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            HKU_WARN(<span class="stringliteral">&quot;AsyncTransAction: The transaction is rolled back in destructor!&quot;</span>);</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>            <span class="comment">// Start a detached coroutine to roll back (fire and forget)</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>            boost::asio::co_spawn(</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>              *m_io_context,</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>              [driver = m_driver]() -&gt; <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> {</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>                  <span class="keywordflow">try</span> {</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>                      <span class="keyword">co_await</span> driver-&gt;rollback();</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>                  } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>                      HKU_WARN(<span class="stringliteral">&quot;Failed to rollback transaction! {}&quot;</span>, e.what());</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>                  } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>                      HKU_WARN(<span class="stringliteral">&quot;Failed to rollback transaction! Unknown exception!&quot;</span>);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>                  }</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>              },</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>              boost::asio::detached);</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        }</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    }</div>
+</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">AsyncTransAction</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; driver)</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    : m_driver(driver), m_io_context(nullptr), m_committed(false), m_started(false) {</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>        HKU_CHECK(m_driver, <span class="stringliteral">&quot;Null AsyncDBConnectPtr!&quot;</span>);</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    }</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>    <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a> m_driver;</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    net::asio::io_context* m_io_context = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    <span class="keywordtype">bool</span> m_committed = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    <span class="keywordtype">bool</span> m_started = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>};</div>
+</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span> </div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><span class="preprocessor">#endif </span><span class="comment">/* HIKYUU_DB_CONNECT_ASYNC_TRANSACTION_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_a20100a4c00499c87cdd4824abaec485a"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#a20100a4c00499c87cdd4824abaec485a">hku::AsyncAutoTransAction::AsyncAutoTransAction</a></div><div class="ttdeci">AsyncAutoTransAction(const AsyncAutoTransAction &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_a6026971adc8c0d54a3f011f71378b54a"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#a6026971adc8c0d54a3f011f71378b54a">hku::AsyncAutoTransAction::connect</a></div><div class="ttdeci">const AsyncDBConnectPtr &amp; connect() const</div><div class="ttdoc">Get the database connection</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:52</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_a69c5b055a4bafa2ef9032beb55445bbb"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#a69c5b055a4bafa2ef9032beb55445bbb">hku::AsyncAutoTransAction::create</a></div><div class="ttdeci">static net::awaitable&lt; std::shared_ptr&lt; AsyncAutoTransAction &gt; &gt; create(const AsyncDBConnectPtr &amp;driver)</div><div class="ttdoc">Factory method: create an instance and start the transaction automatically</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:44</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_a7d34018c861f731f222bec6caa17e842"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#a7d34018c861f731f222bec6caa17e842">hku::AsyncAutoTransAction::AsyncAutoTransAction</a></div><div class="ttdeci">AsyncAutoTransAction(AsyncAutoTransAction &amp;&amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_a878579d53c9e6bd14d2bee85ce24c57d"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#a878579d53c9e6bd14d2bee85ce24c57d">hku::AsyncAutoTransAction::AsyncAutoTransAction</a></div><div class="ttdeci">AsyncAutoTransAction()=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_abfaf2940f61f45cb1dae2e35f544c2b8"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#abfaf2940f61f45cb1dae2e35f544c2b8">hku::AsyncAutoTransAction::operator=</a></div><div class="ttdeci">AsyncAutoTransAction &amp; operator=(AsyncAutoTransAction &amp;&amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_ad41abd3a2cc1b4143175ddaccfd16c2e"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#ad41abd3a2cc1b4143175ddaccfd16c2e">hku::AsyncAutoTransAction::~AsyncAutoTransAction</a></div><div class="ttdeci">~AsyncAutoTransAction()</div><div class="ttdoc">Destructor: it commits the transaction automatically (rolls back if the commit fails)</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:57</div></div>
+<div class="ttc" id="aclasshku_1_1_async_auto_trans_action_html_ae29af49b67d9a6ab73da953d62deb06a"><div class="ttname"><a href="classhku_1_1_async_auto_trans_action.html#ae29af49b67d9a6ab73da953d62deb06a">hku::AsyncAutoTransAction::operator=</a></div><div class="ttdeci">AsyncAutoTransAction &amp; operator=(const AsyncAutoTransAction &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_a1035617741ea72e5eeab263f3e5a321a"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#a1035617741ea72e5eeab263f3e5a321a">hku::AsyncTransAction::AsyncTransAction</a></div><div class="ttdeci">AsyncTransAction(const AsyncTransAction &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_a427e71d8b6ceb35809a2047d51e64a29"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#a427e71d8b6ceb35809a2047d51e64a29">hku::AsyncTransAction::~AsyncTransAction</a></div><div class="ttdeci">~AsyncTransAction()</div><div class="ttdoc">Destructor: it rolls back automatically if it has been started but not committed</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:194</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_a5836f95e67b055cf4342e658e56287ca"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#a5836f95e67b055cf4342e658e56287ca">hku::AsyncTransAction::end</a></div><div class="ttdeci">net::awaitable&lt; void &gt; end()</div><div class="ttdoc">End and commit the transaction</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:173</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_a61c044d1ae6b2dacfc5f01a32d276623"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#a61c044d1ae6b2dacfc5f01a32d276623">hku::AsyncTransAction::begin</a></div><div class="ttdeci">net::awaitable&lt; void &gt; begin()</div><div class="ttdoc">Start the transaction (the nesting is supported)</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:155</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_a6b3018f0966f1c0f08092d5e268ec989"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#a6b3018f0966f1c0f08092d5e268ec989">hku::AsyncTransAction::AsyncTransAction</a></div><div class="ttdeci">AsyncTransAction(AsyncTransAction &amp;&amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_abc6732d5c97555ad62793c282f99e8cd"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#abc6732d5c97555ad62793c282f99e8cd">hku::AsyncTransAction::AsyncTransAction</a></div><div class="ttdeci">AsyncTransAction()=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_ac3152da672385443872ddcc34b8859ec"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#ac3152da672385443872ddcc34b8859ec">hku::AsyncTransAction::connect</a></div><div class="ttdeci">const AsyncDBConnectPtr &amp; connect() const</div><div class="ttdoc">Get the database connection</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:147</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_ad4c103dcd444853b055189eb25d4d0b5"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#ad4c103dcd444853b055189eb25d4d0b5">hku::AsyncTransAction::create</a></div><div class="ttdeci">static net::awaitable&lt; std::shared_ptr&lt; AsyncTransAction &gt; &gt; create(const AsyncDBConnectPtr &amp;driver)</div><div class="ttdoc">Factory method: create an instance and start the transaction automatically</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:139</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_adb7602c18a78ab39dd21dee6bc60ffa3"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#adb7602c18a78ab39dd21dee6bc60ffa3">hku::AsyncTransAction::operator=</a></div><div class="ttdeci">AsyncTransAction &amp; operator=(AsyncTransAction &amp;&amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_af800395362287ff0e30aec24829b269e"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#af800395362287ff0e30aec24829b269e">hku::AsyncTransAction::rollback</a></div><div class="ttdeci">net::awaitable&lt; void &gt; rollback()</div><div class="ttdoc">Roll back the transaction</div><div class="ttdef"><b>定义</b> AsyncTransAction.h:184</div></div>
+<div class="ttc" id="aclasshku_1_1_async_trans_action_html_afddcbd2caf1ce5368691090c945acc87"><div class="ttname"><a href="classhku_1_1_async_trans_action.html#afddcbd2caf1ce5368691090c945acc87">hku::AsyncTransAction::operator=</a></div><div class="ttdeci">AsyncTransAction &amp; operator=(const AsyncTransAction &amp;)=delete</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_ga99e3e0a30d3e799e021e4873e4bfc331"><div class="ttname"><a href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">hku::AsyncDBConnectPtr</a></div><div class="ttdeci">std::shared_ptr&lt; AsyncDBConnectBase &gt; AsyncDBConnectPtr</div><div class="ttdef"><b>定义</b> AsyncDBConnectBase.h:327</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><b>AsyncTransAction.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

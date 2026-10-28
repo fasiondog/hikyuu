@@ -1,0 +1,205 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/strategy/RunMultiSystemInStrategy.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_run_multi_system_in_strategy_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">RunMultiSystemInStrategy.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-08-24</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *  The live trading entry of the aggregate system (MultiSystem).</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *  Run MultiSystem in the Strategy runtime, the parent account uses the BrokerTM synchronized with</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * the broker, the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * by MultiSystem).</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> *  Invocation model: RunMultiSystemInStrategy::run() is called exactly ONCE per trading day at a</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * fixed scheduled point (see crtMultiSysStrategy: 14:50 for daily or bar-interval seconds for</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * intraday). The sub-systems replay the historical bars through their own virtual TradeManagers to</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * generate signals</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> *  (&quot;backtest&quot;); then at the final point (today&#39;s bar), the parent BrokerTM has already been</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * synchronized from the broker snapshot. If the aggregated suggestions indicate a trade, the AF</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * layer uses the parent getFunds(bar_datetime) to revalue the snapshot holdings at the queried</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> * bar&#39;s market price, corrects the order volume according to the current total assets, and places</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * orders through the broker.</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> *  Mode C (the shared real account of the legacy Portfolio) needs no extra live path: its</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> *  sub-systems place their orders ON the parent BrokerTM itself, so those trades reach the broker</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> *  exactly like the orders of the parent do, and the dual pools of the mode (the running pool and</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> *  the force-sell pool) survive from one trading day to the next because the daily replay runs with</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> *  reset=false. The broker-snapshot revaluation described below is what the AF conversions of modes</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> *  A/B use; mode C does no conversion and places no second order, so it must not be &quot;optimized&quot;</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> *  into the A/B pipeline.</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> *  Critical design contract (prevent misread):</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> *  - BrokerTM only stores cash + position quantities at the snapshot fetch time; their MARKET VALUE</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> * drifts with price as time flows. getFunds(datetime, ktype) MUST revalue the snapshot positions at</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * the queried datetime (cash stays from the snapshot). Do NOT simplify it to always return the</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * no-arg snapshot value (which uses m_datetime / lastDatetime, losing the time-precision). Do NOT</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * change AF callers to no-date getFunds() either -- AF legitimately needs the bar-time valuation to</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> * size quotas and target shares.</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> *  - There is NO zero-guard for dates earlier than the snapshot: getFunds(date) revalues the</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment"> * snapshot positions at ANY queried datetime using that moment&#39;s market price. Do NOT re-introduce</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment"> * a (datetime &gt;= m_datetime) zero guard -- it broke the bar-time valuation, because the daily bar</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> * time (00:00) is always earlier than the snapshot time carrying intraday seconds.</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/system/imp/MultiSystem.h&quot;</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &quot;Strategy.h&quot;</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span></div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="};">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html">   69</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#a4a16db3e44cd1ccebfb047a42ceb0cf0">RunMultiSystemInStrategy</a> {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html#a4a16db3e44cd1ccebfb047a42ceb0cf0">   71</a></span>    <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#a4a16db3e44cd1ccebfb047a42ceb0cf0">RunMultiSystemInStrategy</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html#aaaf1f14af5cc2a8bf59c01882b10e1c4">   82</a></span>    <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#aaaf1f14af5cc2a8bf59c01882b10e1c4">RunMultiSystemInStrategy</a>(<span class="keyword">const</span> std::shared_ptr&lt;MultiSystem&gt;&amp; ms, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; driver_stock,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                             <span class="keyword">const</span> <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>&amp; broker, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>                             <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a>&amp; costfunc);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html#afd6e07c94f6717c3687638d0fd35fb56">   85</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#afd6e07c94f6717c3687638d0fd35fb56">~RunMultiSystemInStrategy</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html#ae6a910f4b939c0ef56c69e7978f61d03">   89</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#ae6a910f4b939c0ef56c69e7978f61d03">run</a>();</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html#af5f9f944312c9d9092f75317625e0af3">   92</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#af5f9f944312c9d9092f75317625e0af3">runMomentOnOpen</a>();</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="classhku_1_1_run_multi_system_in_strategy.html#ab7ddf529d61ab9a992da892199160406">   95</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_run_multi_system_in_strategy.html#ab7ddf529d61ab9a992da892199160406">runMomentOnClose</a>();</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordtype">void</span> _refreshSubKData();</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordtype">void</span> _refreshSubKDataRecursive(<span class="keyword">const</span> std::shared_ptr&lt;MultiSystem&gt;&amp; ms);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    std::shared_ptr&lt;MultiSystem&gt; m_ms;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a> m_driver_stock;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> m_broker;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a> m_query;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>};</div>
+</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="namespacehku.html#a787ff3aac734f7a58bec3e182f8edc68">  124</a></span><a class="code hl_typedef" href="namespacehku.html#ac813d5968f62d0a03add566d7411e77c">StrategyPtr</a> HKU_API <a class="code hl_function" href="namespacehku.html#a787ff3aac734f7a58bec3e182f8edc68">crtMultiSysStrategy</a>(<span class="keyword">const</span> std::shared_ptr&lt;MultiSystem&gt;&amp; ms,</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                        <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; stk_market_code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                                        <span class="keyword">const</span> <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>&amp; broker, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a>&amp; costfunc,</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>                                        <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name = <span class="stringliteral">&quot;MultiSYSStrategy&quot;</span>,</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                                        <span class="keyword">const</span> std::vector&lt;OrderBrokerPtr&gt;&amp; other_brokers = {},</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                                        <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; config_file = <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_run_multi_system_in_strategy_html_a4a16db3e44cd1ccebfb047a42ceb0cf0"><div class="ttname"><a href="classhku_1_1_run_multi_system_in_strategy.html#a4a16db3e44cd1ccebfb047a42ceb0cf0">hku::RunMultiSystemInStrategy::RunMultiSystemInStrategy</a></div><div class="ttdeci">RunMultiSystemInStrategy()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_run_multi_system_in_strategy_html_aaaf1f14af5cc2a8bf59c01882b10e1c4"><div class="ttname"><a href="classhku_1_1_run_multi_system_in_strategy.html#aaaf1f14af5cc2a8bf59c01882b10e1c4">hku::RunMultiSystemInStrategy::RunMultiSystemInStrategy</a></div><div class="ttdeci">RunMultiSystemInStrategy(const std::shared_ptr&lt; MultiSystem &gt; &amp;ms, const Stock &amp;driver_stock, const OrderBrokerPtr &amp;broker, const KQuery &amp;query, const TradeCostPtr &amp;costfunc)</div></div>
+<div class="ttc" id="aclasshku_1_1_run_multi_system_in_strategy_html_ab7ddf529d61ab9a992da892199160406"><div class="ttname"><a href="classhku_1_1_run_multi_system_in_strategy.html#ab7ddf529d61ab9a992da892199160406">hku::RunMultiSystemInStrategy::runMomentOnClose</a></div><div class="ttdeci">void runMomentOnClose()</div><div class="ttdoc">The intraday mode: drive once at the close stage</div></div>
+<div class="ttc" id="aclasshku_1_1_run_multi_system_in_strategy_html_ae6a910f4b939c0ef56c69e7978f61d03"><div class="ttname"><a href="classhku_1_1_run_multi_system_in_strategy.html#ae6a910f4b939c0ef56c69e7978f61d03">hku::RunMultiSystemInStrategy::run</a></div><div class="ttdeci">void run()</div><div class="ttdoc">The daily full run: after refreshing the sub-system KData to the latest, rerun the whole backtesting ...</div></div>
+<div class="ttc" id="aclasshku_1_1_run_multi_system_in_strategy_html_af5f9f944312c9d9092f75317625e0af3"><div class="ttname"><a href="classhku_1_1_run_multi_system_in_strategy.html#af5f9f944312c9d9092f75317625e0af3">hku::RunMultiSystemInStrategy::runMomentOnOpen</a></div><div class="ttdeci">void runMomentOnOpen()</div><div class="ttdoc">The intraday mode: drive once at the open stage</div></div>
+<div class="ttc" id="aclasshku_1_1_run_multi_system_in_strategy_html_afd6e07c94f6717c3687638d0fd35fb56"><div class="ttname"><a href="classhku_1_1_run_multi_system_in_strategy.html#afd6e07c94f6717c3687638d0fd35fb56">hku::RunMultiSystemInStrategy::~RunMultiSystemInStrategy</a></div><div class="ttdeci">virtual ~RunMultiSystemInStrategy()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___order_broker_html_ga230f0334622d7230339a0759632b8f13"><div class="ttname"><a href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">hku::OrderBrokerPtr</a></div><div class="ttdeci">shared_ptr&lt; OrderBrokerBase &gt; OrderBrokerPtr</div><div class="ttdoc">The client program should use this type for the actual operations</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:205</div></div>
+<div class="ttc" id="agroup___trade_cost_html_ga1a3f61ad3141508e3c14ddfb326ee0ad"><div class="ttname"><a href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">hku::TradeCostPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeCostBase &gt; TradeCostPtr</div><div class="ttdoc">Trade cost algorithm pointer</div><div class="ttdef"><b>定义</b> TradeCostBase.h:172</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a787ff3aac734f7a58bec3e182f8edc68"><div class="ttname"><a href="namespacehku.html#a787ff3aac734f7a58bec3e182f8edc68">hku::crtMultiSysStrategy</a></div><div class="ttdeci">StrategyPtr HKU_API crtMultiSysStrategy(const std::shared_ptr&lt; MultiSystem &gt; &amp;ms, const string &amp;stk_market_code, const KQuery &amp;query, const OrderBrokerPtr &amp;broker, const TradeCostPtr &amp;costfunc, const string &amp;name=&quot;MultiSYSStrategy&quot;, const std::vector&lt; OrderBrokerPtr &gt; &amp;other_brokers={}, const string &amp;config_file=&quot;&quot;)</div><div class="ttdoc">Create the aggregate system strategy (the MultiSystem live trading entry)</div></div>
+<div class="ttc" id="anamespacehku_html_ac813d5968f62d0a03add566d7411e77c"><div class="ttname"><a href="namespacehku.html#ac813d5968f62d0a03add566d7411e77c">hku::StrategyPtr</a></div><div class="ttdeci">shared_ptr&lt; Strategy &gt; StrategyPtr</div><div class="ttdef"><b>定义</b> Strategy.h:336</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_60c2bae2a9cd9d92ca9ac8bb5ff61036.html">strategy</a></li><li class="navelem"><b>RunMultiSystemInStrategy.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

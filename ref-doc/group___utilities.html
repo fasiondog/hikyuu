@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: Utilities 常用独立工具集</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: Utilities program utility collection</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,36 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li class="current"><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('group___utilities.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,54 +74,1197 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#groups">模块</a>  </div>
-  <div class="headertitle">
-<div class="title">Utilities 常用独立工具集</div>  </div>
+  <div class="headertitle"><div class="title">Utilities program utility collection <div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>常用的独立工具集  
+<p>A collection of independent small functions and object utilities  
 <a href="#details">更多...</a></p>
 <div class="dynheader">
-Utilities 常用独立工具集 的协作图:</div>
+Utilities program utility collection 的协作图:</div>
 <div class="dyncontent">
-<center><table><tr><td><img src="group___utilities.png" border="0" alt="" usemap="#group______utilities"/>
-<map name="group______utilities" id="group______utilities">
-<area shape="rect" id="node1" href="group___ini_parser.html" title="IniParser 简单ini文件读取" alt="" coords="247,5,455,35"/>
-</map>
-</td></tr></table></center>
+<div class="center"><img src="group___utilities.png" border="0" usemap="#agroup______utilities" loading="lazy" alt=""/></div>
 </div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="groups"></a>
-模块</h2></td></tr>
-<tr class="memitem:group___ini_parser"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___ini_parser.html">IniParser 简单ini文件读取</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 id="header-groups" class="groupheader"><a id="groups" name="groups"></a>
+专题</h2></td></tr>
+<tr class="memitem:DBConnect" id="r_DBConnect"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___d_b_connect.html">DB Connect database connection</a></td></tr>
+<tr class="memdesc:group___d_b_connect"><td class="mdescLeft">&#160;</td><td class="mdescRight">The database connection utilities <br /></td></tr>
+<tr class="memitem:ThreadPool" id="r_ThreadPool"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___thread_pool.html">Thread Pool thread pool</a></td></tr>
+<tr class="memitem:Exception" id="r_Exception"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___exception.html">Exception handling</a></td></tr>
+<tr class="memdesc:group___exception"><td class="mdescLeft">&#160;</td><td class="mdescRight"><br /></td></tr>
+<tr class="memitem:NullTools" id="r_NullTools"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___null_tools.html">Null defines, the Null value definitions</a></td></tr>
+<tr class="memdesc:group___null_tools"><td class="mdescLeft">&#160;</td><td class="mdescRight"><br /></td></tr>
+<tr class="memitem:SpendTimer" id="r_SpendTimer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___spend_timer.html">Spend timer time consumption statistics</a></td></tr>
+<tr class="memdesc:group___spend_timer"><td class="mdescLeft">&#160;</td><td class="mdescRight"><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
+命名空间</h2></td></tr>
+<tr class="memitem:hku" id="r_hku"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Hikyuu core namespace, it contains the stock data management, the indicator implementation, the trading system framework, etc. <br /></td></tr>
+<tr class="memitem:hku_3A_3Adetail" id="r_hku_3A_3Adetail"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku_1_1detail.html">hku::detail</a></td></tr>
+<tr class="memdesc:namespacehku_1_1detail"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detection utility of the resource version interface traits <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:hku_3A_3AIniParser" id="r_hku_3A_3AIniParser"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html">hku::IniParser</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">It supports the reading of a simple ini format file <br  />
+ <a href="classhku_1_1_ini_parser.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AParameter" id="r_hku_3A_3AParameter"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_parameter.html">hku::Parameter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by the classes that need the named parameter settings  <a href="classhku_1_1_parameter.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AResourceAsioPool_3C_20ResourceType_2C_20MutexType_20_3E" id="r_hku_3A_3AResourceAsioPool_3C_20ResourceType_2C_20MutexType_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_resource_asio_pool.html">hku::ResourceAsioPool&lt; ResourceType, MutexType &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">General shared resource pool - it is suitable for the coroutine environment It uses the boost lock free queue and acquires the resources asynchronously in a coroutine  <a href="classhku_1_1_resource_asio_pool.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AResourceAsioVersionPool_3C_20ResourceType_2C_20MutexType_20_3E" id="r_hku_3A_3AResourceAsioVersionPool_3C_20ResourceType_2C_20MutexType_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_resource_asio_version_pool.html">hku::ResourceAsioVersionPool&lt; ResourceType, MutexType &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Versioned resource pool (the resource type is required to support the version interfaces)  <a href="classhku_1_1_resource_asio_version_pool.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AResourceHybridPool_3C_20ResourceType_2C_20MAX_5FTLS_5FPOOL_5FSIZE_5FLIMIT_20_3E" id="r_hku_3A_3AResourceHybridPool_3C_20ResourceType_2C_20MAX_5FTLS_5FPOOL_5FSIZE_5FLIMIT_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hybrid resource pool - it combines the synchronous TLS Pool and the synchronous <a class="el" href="classhku_1_1_resource_pool.html" title="General shared resource pool">ResourcePool</a>  <a href="classhku_1_1_resource_hybrid_pool.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AResourceHybridVersionPool_3C_20ResourceType_2C_20MAX_5FTLS_5FPOOL_5FSIZE_5FLIMIT_20_3E" id="r_hku_3A_3AResourceHybridVersionPool_3C_20ResourceType_2C_20MAX_5FTLS_5FPOOL_5FSIZE_5FLIMIT_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_resource_hybrid_version_pool.html">hku::ResourceHybridVersionPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hybrid versioned resource pool (TLS + the global shared pool + the version number management)  <a href="classhku_1_1_resource_hybrid_version_pool.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AResourcePool_3C_20ResourceType_20_3E" id="r_hku_3A_3AResourcePool_3C_20ResourceType_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_resource_pool.html">hku::ResourcePool&lt; ResourceType &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">General shared resource pool  <a href="classhku_1_1_resource_pool.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AResourceVersionPool_3C_20ResourceType_20_3E" id="r_hku_3A_3AResourceVersionPool_3C_20ResourceType_20_3E"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_resource_version_pool.html">hku::ResourceVersionPool&lt; ResourceType &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Versioned resource pool (the resource type is required to support the version interfaces)  <a href="classhku_1_1_resource_version_pool.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3ATimerManager" id="r_hku_3A_3ATimerManager"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_timer_manager.html">hku::TimerManager</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer management and scheduling  <a href="classhku_1_1_timer_manager.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:ga930756becfd0e703c19b006197691ae5" id="r_ga930756becfd0e703c19b006197691ae5"><td class="memItemLeft" align="right" valign="top">std::string HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga930756becfd0e703c19b006197691ae5">hku::utf8_to_gb</a> (const std::string &amp;szinput)</td></tr>
+<tr class="memitem:ga797274d7d8f7ace747cda508bbac8756" id="r_ga797274d7d8f7ace747cda508bbac8756"><td class="memItemLeft" align="right" valign="top">std::string HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga797274d7d8f7ace747cda508bbac8756">hku::gb_to_utf8</a> (const std::string &amp;szinput)</td></tr>
+<tr class="memitem:ga5754c65cef7e21d844086308f40e4505" id="r_ga5754c65cef7e21d844086308f40e4505"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:ga5754c65cef7e21d844086308f40e4505 template"><td class="memItemLeft" align="right" valign="top">ValueT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga5754c65cef7e21d844086308f40e4505">hku::roundEx</a> (ValueT number, int ndigits=0)</td></tr>
+<tr class="memdesc:ga5754c65cef7e21d844086308f40e4505"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round half away from zero (the Chinese traditional 四舍五入) to the given number of decimal places  <br /></td></tr>
+<tr class="memitem:ga0795cd89d292d13fe5938aa64d7d3fb6" id="r_ga0795cd89d292d13fe5938aa64d7d3fb6"><td class="memItemLeft" align="right" valign="top">template double HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga0795cd89d292d13fe5938aa64d7d3fb6">hku::roundEx</a> (double number, int ndigits)</td></tr>
+<tr class="memitem:gad70cf070b6def06118e22335d16118d9" id="r_gad70cf070b6def06118e22335d16118d9"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:gad70cf070b6def06118e22335d16118d9 template"><td class="memItemLeft" align="right" valign="top">float HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gad70cf070b6def06118e22335d16118d9">hku::roundEx</a> (float number, int ndigits)</td></tr>
+<tr class="memitem:gaa66af4191daa356490e0ba909c1ee6a6" id="r_gaa66af4191daa356490e0ba909c1ee6a6"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:gaa66af4191daa356490e0ba909c1ee6a6 template"><td class="memItemLeft" align="right" valign="top">ValueT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaa66af4191daa356490e0ba909c1ee6a6">hku::roundUp</a> (ValueT number, int ndigits=0)</td></tr>
+<tr class="memdesc:gaa66af4191daa356490e0ba909c1ee6a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncate upward, e.g.  <br /></td></tr>
+<tr class="memitem:ga0f6970ab0516449ae2fe5abce3609e3a" id="r_ga0f6970ab0516449ae2fe5abce3609e3a"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:ga0f6970ab0516449ae2fe5abce3609e3a template"><td class="memItemLeft" align="right" valign="top">ValueT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga0f6970ab0516449ae2fe5abce3609e3a">hku::roundDown</a> (ValueT number, int ndigits=0)</td></tr>
+<tr class="memdesc:ga0f6970ab0516449ae2fe5abce3609e3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncate downward, e.g.  <br /></td></tr>
+<tr class="memitem:ga9b382ae1466ebc739609e5e3b9dc8c95" id="r_ga9b382ae1466ebc739609e5e3b9dc8c95"><td class="memItemLeft" align="right" valign="top">template double HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga9b382ae1466ebc739609e5e3b9dc8c95">hku::roundUp</a> (double number, int ndigits)</td></tr>
+<tr class="memitem:ga1fb2fa5fc7d25ec75ef5acfa910f028f" id="r_ga1fb2fa5fc7d25ec75ef5acfa910f028f"><td class="memItemLeft" align="right" valign="top">template float HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1fb2fa5fc7d25ec75ef5acfa910f028f">hku::roundUp</a> (float number, int ndigits)</td></tr>
+<tr class="memitem:ga8f0f1ee31449cc859867b8b8a00c0327" id="r_ga8f0f1ee31449cc859867b8b8a00c0327"><td class="memItemLeft" align="right" valign="top">template double HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga8f0f1ee31449cc859867b8b8a00c0327">hku::roundDown</a> (double number, int ndigits)</td></tr>
+<tr class="memitem:gada5396393589f83d2275110e7e115211" id="r_gada5396393589f83d2275110e7e115211"><td class="memItemLeft" align="right" valign="top">template float HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gada5396393589f83d2275110e7e115211">hku::roundDown</a> (float number, int ndigits)</td></tr>
+<tr class="memitem:ga7223d147ee50114b470f9949d70afc73" id="r_ga7223d147ee50114b470f9949d70afc73"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:ga7223d147ee50114b470f9949d70afc73 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga7223d147ee50114b470f9949d70afc73">hku::nearly_equal</a> (ValueT a, ValueT b)</td></tr>
+<tr class="memdesc:ga7223d147ee50114b470f9949d70afc73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two floating-point values within a relative tolerance of a few ULPs.  <br /></td></tr>
+<tr class="memitem:gacab4099c8b6133f061d3b816ac280b19" id="r_gacab4099c8b6133f061d3b816ac280b19"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:gacab4099c8b6133f061d3b816ac280b19 template"><td class="memItemLeft" align="right" valign="top">ValueT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gacab4099c8b6133f061d3b816ac280b19">hku::safe_math</a> (ValueT v)</td></tr>
+<tr class="memdesc:gacab4099c8b6133f061d3b816ac280b19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Guard an element-wise math result for math indicators (LN/LOG/SQRT/ACOS/ASIN/EXP/POW, etc.): a non-finite value (NaN / +-inf) is mapped to the framework null, so that -inf from LN(0)/LOG(0) or +inf from EXP/POW overflow is not leaked downstream and does not pollute later bars; NaN is already the framework's null representation.  <br /></td></tr>
+<tr class="memitem:gaa471d0c1abcf168c4b355ef958b0ffa5" id="r_gaa471d0c1abcf168c4b355ef958b0ffa5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaa471d0c1abcf168c4b355ef958b0ffa5">hku::truncToMultiple</a> (double number, double unit)</td></tr>
+<tr class="memdesc:gaa471d0c1abcf168c4b355ef958b0ffa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncate a number to an integer multiple of the given unit (toward zero).  <br /></td></tr>
+<tr class="memitem:ga2ddeafd2f9c8af6ecb7e3a8c0e71699f" id="r_ga2ddeafd2f9c8af6ecb7e3a8c0e71699f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga2ddeafd2f9c8af6ecb7e3a8c0e71699f">hku::to_lower</a> (std::string &amp;s) noexcept</td></tr>
+<tr class="memdesc:ga2ddeafd2f9c8af6ecb7e3a8c0e71699f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an ASCII string to lowercase  <br /></td></tr>
+<tr class="memitem:gaf88993bd63a3000128845db8647cf0fa" id="r_gaf88993bd63a3000128845db8647cf0fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaf88993bd63a3000128845db8647cf0fa">hku::to_upper</a> (std::string &amp;s) noexcept</td></tr>
+<tr class="memdesc:gaf88993bd63a3000128845db8647cf0fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a string to uppercase  <br /></td></tr>
+<tr class="memitem:gacc30d77b7f51252e174e1f3ca7d0fab3" id="r_gacc30d77b7f51252e174e1f3ca7d0fab3"><td class="memItemLeft" align="right" valign="top">std::string HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gacc30d77b7f51252e174e1f3ca7d0fab3">hku::utf8_to_lower</a> (const std::string &amp;s) noexcept</td></tr>
+<tr class="memdesc:gacc30d77b7f51252e174e1f3ca7d0fab3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a UTF-8 string to lowercase  <br /></td></tr>
+<tr class="memitem:gafbbc63858be2c3e8eff02666182a4437" id="r_gafbbc63858be2c3e8eff02666182a4437"><td class="memItemLeft" align="right" valign="top">std::string HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gafbbc63858be2c3e8eff02666182a4437">hku::utf8_to_upper</a> (const std::string &amp;s) noexcept</td></tr>
+<tr class="memdesc:gafbbc63858be2c3e8eff02666182a4437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a UTF-8 string to uppercase  <br /></td></tr>
+<tr class="memitem:ga2350bda691c2ba6a3a3a22bc1f23792c" id="r_ga2350bda691c2ba6a3a3a22bc1f23792c"><td class="memItemLeft" align="right" valign="top">bool HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga2350bda691c2ba6a3a3a22bc1f23792c">hku::utf8_fold_equal</a> (const std::string &amp;s1, const std::string &amp;s2) noexcept</td></tr>
+<tr class="memdesc:ga2350bda691c2ba6a3a3a22bc1f23792c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Case folding comparison of UTF-8 strings  <br /></td></tr>
+<tr class="memitem:ga234db78c418ee5eec24ed50de85ea90c" id="r_ga234db78c418ee5eec24ed50de85ea90c"><td class="memItemLeft" align="right" valign="top">bool HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga234db78c418ee5eec24ed50de85ea90c">hku::utf8_contains</a> (const std::string &amp;s, const std::string &amp;sub) noexcept</td></tr>
+<tr class="memdesc:ga234db78c418ee5eec24ed50de85ea90c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a UTF-8 string contains a substring  <br /></td></tr>
+<tr class="memitem:gacb72fa0e392c25a69a7990a4a4b8c7b3" id="r_gacb72fa0e392c25a69a7990a4a4b8c7b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gacb72fa0e392c25a69a7990a4a4b8c7b3">hku::trim</a> (std::string &amp;s)</td></tr>
+<tr class="memdesc:gacb72fa0e392c25a69a7990a4a4b8c7b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the blanks (spaces, tabs and CRLF) at both ends of a string  <br /></td></tr>
+<tr class="memitem:ga9606b5a13c99a85b037f324afc552996" id="r_ga9606b5a13c99a85b037f324afc552996"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga9606b5a13c99a85b037f324afc552996">hku::split</a> (const std::string &amp;str, char c)</td></tr>
+<tr class="memdesc:ga9606b5a13c99a85b037f324afc552996"><td class="mdescLeft">&#160;</td><td class="mdescRight">Split a string  <br /></td></tr>
+<tr class="memitem:gab081fa7f45bccd7e2572c745d4e2d188" id="r_gab081fa7f45bccd7e2572c745d4e2d188"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gab081fa7f45bccd7e2572c745d4e2d188">hku::split</a> (const std::string &amp;str, const std::string &amp;split_str)</td></tr>
+<tr class="memitem:gab01b2a5745fca46806f5dc41b5f23ae6" id="r_gab01b2a5745fca46806f5dc41b5f23ae6"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gab01b2a5745fca46806f5dc41b5f23ae6">hku::byteToHexStr</a> (const char *bytes, size_t in_len)</td></tr>
+<tr class="memdesc:gab01b2a5745fca46806f5dc41b5f23ae6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert bytes to a hexadecimal string, e.g.  <br /></td></tr>
+<tr class="memitem:gaec84d5e475010d36a0d81d8ca5cf31f8" id="r_gaec84d5e475010d36a0d81d8ca5cf31f8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaec84d5e475010d36a0d81d8ca5cf31f8">hku::byteToHexStr</a> (const std::string &amp;bytes)</td></tr>
+<tr class="memdesc:gaec84d5e475010d36a0d81d8ca5cf31f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert bytes to a hexadecimal string, e.g.  <br /></td></tr>
+<tr class="memitem:ga13b220b75db6075d0475666c5d06a696" id="r_ga13b220b75db6075d0475666c5d06a696"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga13b220b75db6075d0475666c5d06a696">hku::byteToHexStrForPrint</a> (const char *bytes, size_t in_len)</td></tr>
+<tr class="memdesc:ga13b220b75db6075d0475666c5d06a696"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert bytes to a hexadecimal string, e.g.  <br /></td></tr>
+<tr class="memitem:ga5b811fb8a8b7bc5838d78bae33e5fa6a" id="r_ga5b811fb8a8b7bc5838d78bae33e5fa6a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga5b811fb8a8b7bc5838d78bae33e5fa6a">hku::byteToHexStrForPrint</a> (const std::string &amp;bytes)</td></tr>
+<tr class="memdesc:ga5b811fb8a8b7bc5838d78bae33e5fa6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert bytes to a hexadecimal string, e.g.  <br /></td></tr>
+<tr class="memitem:gadec247374d27eb01c5c94ff858a97893" id="r_gadec247374d27eb01c5c94ff858a97893"><td class="memItemLeft" align="right" valign="top">bool HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gadec247374d27eb01c5c94ff858a97893">hku::isInteger</a> (double num)</td></tr>
+<tr class="memdesc:gadec247374d27eb01c5c94ff858a97893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether a double is an integer  <br /></td></tr>
+<tr class="memitem:gaa70574e5c8d8dbde2c7cd80d88152393" id="r_gaa70574e5c8d8dbde2c7cd80d88152393"><td class="memItemLeft" align="right" valign="top">bool HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaa70574e5c8d8dbde2c7cd80d88152393">hku::isInteger</a> (float num)</td></tr>
+<tr class="memdesc:gaa70574e5c8d8dbde2c7cd80d88152393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether a float is an integer  <br /></td></tr>
+<tr class="memitem:ga4142534bf39534f324ab324381424b7a" id="r_ga4142534bf39534f324ab324381424b7a"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:ga4142534bf39534f324ab324381424b7a template"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4142534bf39534f324ab324381424b7a">hku::get_quantile</a> (const std::vector&lt; T &gt; &amp;vec, double quantile)</td></tr>
+<tr class="memdesc:ga4142534bf39534f324ab324381424b7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the given quantile in a sorted vector  <br /></td></tr>
+<tr class="memitem:ga1af0b2844b4c930c91f91534f3d4101b" id="r_ga1af0b2844b4c930c91f91534f3d4101b"><td class="memItemLeft" align="right" valign="top">template double HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1af0b2844b4c930c91f91534f3d4101b">hku::get_quantile</a> (const std::vector&lt; double &gt; &amp;vec, double quantile)</td></tr>
+<tr class="memitem:gadbcf4c5c097b145dafd6b3aa9fc8c0ad" id="r_gadbcf4c5c097b145dafd6b3aa9fc8c0ad"><td class="memItemLeft" align="right" valign="top">template float HKU_UTILS_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gadbcf4c5c097b145dafd6b3aa9fc8c0ad">hku::get_quantile</a> (const std::vector&lt; float &gt; &amp;vec, double quantile)</td></tr>
+<tr class="memitem:ga1b129ad2b6fa89230afa7dc30c00de7c" id="r_ga1b129ad2b6fa89230afa7dc30c00de7c"><td class="memItemLeft" align="right" valign="top">HKU_UTILS_API std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1b129ad2b6fa89230afa7dc30c00de7c">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const std::vector&lt; double &gt; &amp;p)</td></tr>
+<tr class="memitem:ga6d0845d8ecd75ef313608aa1626e4143" id="r_ga6d0845d8ecd75ef313608aa1626e4143"><td class="memItemLeft" align="right" valign="top">HKU_UTILS_API std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga6d0845d8ecd75ef313608aa1626e4143">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const std::vector&lt; float &gt; &amp;p)</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<p>常用的独立工具集 </p>
-<p>设计准则： </p><ul>
-<li>每个工具模块彼此独立不互相依赖，并且不依赖于fsd空间下 的其他模块。<br />
- </li>
-<li>保持这种独立性，便于可以独立拆分移植或在其他程序中使用。<br />
- </li>
-<li>除Boost库外，各模块尽可能不包含其他外部依赖的库。如果存在外部依赖， 将予以相应的说明。<br />
- <dl class="section note"><dt>注解</dt><dd>这里把Boost库作为C++的基础库使用，可能严重依赖于Boost库，移植时需要注意 </dd></dl>
-</li>
-</ul>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<p>A collection of independent small functions and object utilities </p>
+<p>An additional public utility collection </p>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="gab01b2a5745fca46806f5dc41b5f23ae6" name="gab01b2a5745fca46806f5dc41b5f23ae6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab01b2a5745fca46806f5dc41b5f23ae6">&#9670;&#160;</a></span>byteToHexStr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::byteToHexStr </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>in_len</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert bytes to a hexadecimal string, e.g. </p>
+<p>"abcd" is converted to "61626364" </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>the input byte array </td></tr>
+    <tr><td class="paramname">in_len</td><td>the length of the byte array </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaec84d5e475010d36a0d81d8ca5cf31f8" name="gaec84d5e475010d36a0d81d8ca5cf31f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaec84d5e475010d36a0d81d8ca5cf31f8">&#9670;&#160;</a></span>byteToHexStr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::byteToHexStr </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert bytes to a hexadecimal string, e.g. </p>
+<p>"abcd" is converted to "61626364" </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>the input in the std::string format </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga13b220b75db6075d0475666c5d06a696" name="ga13b220b75db6075d0475666c5d06a696"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga13b220b75db6075d0475666c5d06a696">&#9670;&#160;</a></span>byteToHexStrForPrint() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::byteToHexStrForPrint </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>in_len</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert bytes to a hexadecimal string, e.g. </p>
+<p>"abcd" is converted to "0x61 0x62 0x63 0x64" </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>the input byte array </td></tr>
+    <tr><td class="paramname">in_len</td><td>the length of the byte array </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga5b811fb8a8b7bc5838d78bae33e5fa6a" name="ga5b811fb8a8b7bc5838d78bae33e5fa6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5b811fb8a8b7bc5838d78bae33e5fa6a">&#9670;&#160;</a></span>byteToHexStrForPrint() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::byteToHexStrForPrint </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>bytes</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert bytes to a hexadecimal string, e.g. </p>
+<p>"abcd" is converted to "61626364" </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>the input byte array </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga797274d7d8f7ace747cda508bbac8756" name="ga797274d7d8f7ace747cda508bbac8756"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga797274d7d8f7ace747cda508bbac8756">&#9670;&#160;</a></span>gb_to_utf8()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string HKU_UTILS_API hku::gb_to_utf8 </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>szinput</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga1af0b2844b4c930c91f91534f3d4101b" name="ga1af0b2844b4c930c91f91534f3d4101b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1af0b2844b4c930c91f91534f3d4101b">&#9670;&#160;</a></span>get_quantile() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template double HKU_UTILS_API hku::get_quantile </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>vec</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>quantile</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="gadbcf4c5c097b145dafd6b3aa9fc8c0ad" name="gadbcf4c5c097b145dafd6b3aa9fc8c0ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadbcf4c5c097b145dafd6b3aa9fc8c0ad">&#9670;&#160;</a></span>get_quantile() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template float HKU_UTILS_API hku::get_quantile </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; float &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>vec</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>quantile</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga4142534bf39534f324ab324381424b7a" name="ga4142534bf39534f324ab324381424b7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4142534bf39534f324ab324381424b7a">&#9670;&#160;</a></span>get_quantile() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">T hku::get_quantile </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>vec</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>quantile</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Get the value of the given quantile in a sorted vector </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec</td><td>the sorted array </td></tr>
+    <tr><td class="paramname">quantile</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_indicator.html#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> </dd></dl>
+
+</div>
+</div>
+<a id="gadec247374d27eb01c5c94ff858a97893" name="gadec247374d27eb01c5c94ff858a97893"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadec247374d27eb01c5c94ff858a97893">&#9670;&#160;</a></span>isInteger() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool HKU_UTILS_API hku::isInteger </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Judge whether a double is an integer </p>
+
+</div>
+</div>
+<a id="gaa70574e5c8d8dbde2c7cd80d88152393" name="gaa70574e5c8d8dbde2c7cd80d88152393"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa70574e5c8d8dbde2c7cd80d88152393">&#9670;&#160;</a></span>isInteger() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool HKU_UTILS_API hku::isInteger </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Judge whether a float is an integer </p>
+
+</div>
+</div>
+<a id="ga7223d147ee50114b470f9949d70afc73" name="ga7223d147ee50114b470f9949d70afc73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7223d147ee50114b470f9949d70afc73">&#9670;&#160;</a></span>nearly_equal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueT&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::nearly_equal </td>
+          <td>(</td>
+          <td class="paramtype">ValueT</td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ValueT</td>          <td class="paramname"><span class="paramname"><em>b</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Compare two floating-point values within a relative tolerance of a few ULPs. </p>
+<p>An absolute epsilon is scale-sensitive: it misses equal-by-intent values at large magnitudes (the ULP of 1e20 is much larger than 1e-9) while falsely matching tiny non-zero values near 0. NaN never matches; infinities are equal only via ==, otherwise the tolerance band becomes inf. </p>
+
+</div>
+</div>
+<a id="ga1b129ad2b6fa89230afa7dc30c00de7c" name="ga1b129ad2b6fa89230afa7dc30c00de7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1b129ad2b6fa89230afa7dc30c00de7c">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_UTILS_API std::ostream &amp; hku::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;</td>          <td class="paramname"><span class="paramname"><em>os</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>p</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga6d0845d8ecd75ef313608aa1626e4143" name="ga6d0845d8ecd75ef313608aa1626e4143"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6d0845d8ecd75ef313608aa1626e4143">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_UTILS_API std::ostream &amp; hku::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;</td>          <td class="paramname"><span class="paramname"><em>os</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; float &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>p</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga8f0f1ee31449cc859867b8b8a00c0327" name="ga8f0f1ee31449cc859867b8b8a00c0327"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8f0f1ee31449cc859867b8b8a00c0327">&#9670;&#160;</a></span>roundDown() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template double HKU_UTILS_API hku::roundDown </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="gada5396393589f83d2275110e7e115211" name="gada5396393589f83d2275110e7e115211"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gada5396393589f83d2275110e7e115211">&#9670;&#160;</a></span>roundDown() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template float HKU_UTILS_API hku::roundDown </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga0f6970ab0516449ae2fe5abce3609e3a" name="ga0f6970ab0516449ae2fe5abce3609e3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0f6970ab0516449ae2fe5abce3609e3a">&#9670;&#160;</a></span>roundDown() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueT&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueT hku::roundDown </td>
+          <td>(</td>
+          <td class="paramtype">ValueT</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Truncate downward, e.g. </p>
+<p>10.1 is truncated to 10 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td>the data to be processed </td></tr>
+    <tr><td class="paramname">ndigits</td><td>the number of the decimal places to keep </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the processed data </dd></dl>
+
+</div>
+</div>
+<a id="ga0795cd89d292d13fe5938aa64d7d3fb6" name="ga0795cd89d292d13fe5938aa64d7d3fb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0795cd89d292d13fe5938aa64d7d3fb6">&#9670;&#160;</a></span>roundEx() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template double HKU_UTILS_API hku::roundEx </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="gad70cf070b6def06118e22335d16118d9" name="gad70cf070b6def06118e22335d16118d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad70cf070b6def06118e22335d16118d9">&#9670;&#160;</a></span>roundEx() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">float HKU_UTILS_API hku::roundEx </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga5754c65cef7e21d844086308f40e4505" name="ga5754c65cef7e21d844086308f40e4505"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5754c65cef7e21d844086308f40e4505">&#9670;&#160;</a></span>roundEx() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueT&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueT hku::roundEx </td>
+          <td>(</td>
+          <td class="paramtype">ValueT</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Round half away from zero (the Chinese traditional 四舍五入) to the given number of decimal places </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td>the data to be rounded </td></tr>
+    <tr><td class="paramname">ndigits</td><td>the number of decimal places to keep; a negative value rounds to the left of the decimal point (e.g. -2 rounds to hundreds) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the processed data </dd></dl>
+
+</div>
+</div>
+<a id="ga9b382ae1466ebc739609e5e3b9dc8c95" name="ga9b382ae1466ebc739609e5e3b9dc8c95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9b382ae1466ebc739609e5e3b9dc8c95">&#9670;&#160;</a></span>roundUp() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template double HKU_UTILS_API hku::roundUp </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga1fb2fa5fc7d25ec75ef5acfa910f028f" name="ga1fb2fa5fc7d25ec75ef5acfa910f028f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1fb2fa5fc7d25ec75ef5acfa910f028f">&#9670;&#160;</a></span>roundUp() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">template float HKU_UTILS_API hku::roundUp </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="gaa66af4191daa356490e0ba909c1ee6a6" name="gaa66af4191daa356490e0ba909c1ee6a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa66af4191daa356490e0ba909c1ee6a6">&#9670;&#160;</a></span>roundUp() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueT&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueT hku::roundUp </td>
+          <td>(</td>
+          <td class="paramtype">ValueT</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndigits</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Truncate upward, e.g. </p>
+<p>10.1 is truncated to 11 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td>the data to be processed </td></tr>
+    <tr><td class="paramname">ndigits</td><td>the number of the decimal places to keep </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the processed data </dd></dl>
+
+</div>
+</div>
+<a id="gacab4099c8b6133f061d3b816ac280b19" name="gacab4099c8b6133f061d3b816ac280b19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacab4099c8b6133f061d3b816ac280b19">&#9670;&#160;</a></span>safe_math()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueT&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueT hku::safe_math </td>
+          <td>(</td>
+          <td class="paramtype">ValueT</td>          <td class="paramname"><span class="paramname"><em>v</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Guard an element-wise math result for math indicators (LN/LOG/SQRT/ACOS/ASIN/EXP/POW, etc.): a non-finite value (NaN / +-inf) is mapped to the framework null, so that -inf from LN(0)/LOG(0) or +inf from EXP/POW overflow is not leaked downstream and does not pollute later bars; NaN is already the framework's null representation. </p>
+
+</div>
+</div>
+<a id="ga9606b5a13c99a85b037f324afc552996" name="ga9606b5a13c99a85b037f324afc552996"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9606b5a13c99a85b037f324afc552996">&#9670;&#160;</a></span>split() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::string &gt; hku::split </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Split a string </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">str</td><td>the string to be split </td></tr>
+    <tr><td class="paramname">c</td><td>the separator </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab081fa7f45bccd7e2572c745d4e2d188" name="gab081fa7f45bccd7e2572c745d4e2d188"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab081fa7f45bccd7e2572c745d4e2d188">&#9670;&#160;</a></span>split() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::string &gt; hku::split </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>split_str</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="ga2ddeafd2f9c8af6ecb7e3a8c0e71699f" name="ga2ddeafd2f9c8af6ecb7e3a8c0e71699f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2ddeafd2f9c8af6ecb7e3a8c0e71699f">&#9670;&#160;</a></span>to_lower()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::to_lower </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert an ASCII string to lowercase </p>
+
+</div>
+</div>
+<a id="gaf88993bd63a3000128845db8647cf0fa" name="gaf88993bd63a3000128845db8647cf0fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf88993bd63a3000128845db8647cf0fa">&#9670;&#160;</a></span>to_upper()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::to_upper </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert a string to uppercase </p>
+
+</div>
+</div>
+<a id="gacb72fa0e392c25a69a7990a4a4b8c7b3" name="gacb72fa0e392c25a69a7990a4a4b8c7b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacb72fa0e392c25a69a7990a4a4b8c7b3">&#9670;&#160;</a></span>trim()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::trim </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Remove the blanks (spaces, tabs and CRLF) at both ends of a string </p>
+
+</div>
+</div>
+<a id="gaa471d0c1abcf168c4b355ef958b0ffa5" name="gaa471d0c1abcf168c4b355ef958b0ffa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa471d0c1abcf168c4b355ef958b0ffa5">&#9670;&#160;</a></span>truncToMultiple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::truncToMultiple </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>unit</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Truncate a number to an integer multiple of the given unit (toward zero). </p>
+<p>Returns NaN when the result is not representable (a NaN input, or the quotient beyond the int64 range); callers must reject the order then, instead of clamping a garbage number into a max-size trade. </p>
+
+</div>
+</div>
+<a id="ga234db78c418ee5eec24ed50de85ea90c" name="ga234db78c418ee5eec24ed50de85ea90c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga234db78c418ee5eec24ed50de85ea90c">&#9670;&#160;</a></span>utf8_contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool HKU_UTILS_API hku::utf8_contains </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>sub</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Whether a UTF-8 string contains a substring </p>
+
+</div>
+</div>
+<a id="ga2350bda691c2ba6a3a3a22bc1f23792c" name="ga2350bda691c2ba6a3a3a22bc1f23792c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2350bda691c2ba6a3a3a22bc1f23792c">&#9670;&#160;</a></span>utf8_fold_equal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool HKU_UTILS_API hku::utf8_fold_equal </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s2</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Case folding comparison of UTF-8 strings </p>
+
+</div>
+</div>
+<a id="ga930756becfd0e703c19b006197691ae5" name="ga930756becfd0e703c19b006197691ae5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga930756becfd0e703c19b006197691ae5">&#9670;&#160;</a></span>utf8_to_gb()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string HKU_UTILS_API hku::utf8_to_gb </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>szinput</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+</div>
+</div>
+<a id="gacc30d77b7f51252e174e1f3ca7d0fab3" name="gacc30d77b7f51252e174e1f3ca7d0fab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacc30d77b7f51252e174e1f3ca7d0fab3">&#9670;&#160;</a></span>utf8_to_lower()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string HKU_UTILS_API hku::utf8_to_lower </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert a UTF-8 string to lowercase </p>
+
+</div>
+</div>
+<a id="gafbbc63858be2c3e8eff02666182a4437" name="gafbbc63858be2c3e8eff02666182a4437"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafbbc63858be2c3e8eff02666182a4437">&#9670;&#160;</a></span>utf8_to_upper()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string HKU_UTILS_API hku::utf8_to_upper </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/arithmetic.h&gt;</code></p>
+
+<p>Convert a UTF-8 string to uppercase </p>
+
+</div>
+</div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

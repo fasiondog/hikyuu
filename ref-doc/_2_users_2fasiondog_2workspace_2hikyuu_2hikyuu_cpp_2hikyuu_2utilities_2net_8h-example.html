@@ -1,0 +1,380 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: /Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/net.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2net_8h-example.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/net.h</div></div>
+</div><!--header-->
+<div class="contents">
+<p>Network abstraction layer</p>
+<p>Network abstraction layerIt provides a unified Asio interface, supporting the switching between Boost.Asio and the standalone Asio. The conditional compilation macro HKU_USE_BOOST_ASIO controls which implementation is used:</p><ul>
+<li>HKU_USE_BOOST_ASIO = 1 (default): Boost.Asio is used</li>
+<li>HKU_USE_BOOST_ASIO = 0: the standalone Asio is used</li>
+</ul>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/net.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span>net = <a class="code hl_namespace" href="namespacehku_1_1net.html">hku::net</a>;</div>
+<div class="line"><span class="keyword">using </span>tcp = net::tcp;</div>
+<div class="line"> </div>
+<div class="line">net::io_context ctx;</div>
+<div class="line">net::steady_timer timer(ctx);</div>
+<div class="ttc" id="anamespacehku_1_1net_html"><div class="ttname"><a href="namespacehku_1_1net.html">hku::net</a></div><div class="ttdef"><b>定义</b> net.h:61</div></div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">/*</span></div>
+<div class="line"><span class="comment"> * net.h - Network abstraction layer for Asio</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> * Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> * Created on: 2025-05-07</span></div>
+<div class="line"><span class="comment"> *     Author: fasiondog</span></div>
+<div class="line"><span class="comment"> */</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#pragma once</span></div>
+<div class="line"><span class="preprocessor">#ifndef HKU_UTILS_NET_H</span></div>
+<div class="line"><span class="preprocessor">#define HKU_UTILS_NET_H</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/config.h&quot;</span></div>
+<div class="line"></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Boost.Asio is used by default</span></div>
+<div class="line"><span class="preprocessor">#ifndef HKU_USE_BOOST_ASIO</span></div>
+<div class="line"><span class="preprocessor">#define HKU_USE_BOOST_ASIO 1</span></div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#if HKU_USE_BOOST_ASIO</span></div>
+<div class="line"><span class="comment">// Use Boost.Asio</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/co_spawn.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/detached.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/awaitable.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/use_awaitable.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/as_tuple.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/steady_timer.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/system_timer.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/ip/tcp.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/ip/udp.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/buffer.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/error.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/strand.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/executor_work_guard.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/asio/any_io_executor.hpp&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><span class="keyword">namespace </span>net {</div>
+<div class="line"><span class="comment">// Core type aliases</span></div>
+<div class="line"><span class="keyword">using </span><a id="a0" name="a0"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a3155297dc9319abf630d0ec15db79ce3">io_context</a> = boost::asio::io_context;</div>
+<div class="line"><span class="keyword">using </span><a id="a1" name="a1"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a8f8d67bd75c601b3f436cc9c848297a7">executor_type</a> = boost::asio::any_io_executor;</div>
+<div class="line"><span class="keyword">using </span><a id="a2" name="a2"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a24bf8dd034c6a07a3f6062e99a3d9464">strand</a> = boost::asio::strand&lt;boost::asio::io_context::executor_type&gt;;</div>
+<div class="line"><span class="keyword">namespace </span>asio = boost::asio;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Work guard</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor&gt;</div>
+<div class="line"><span class="keyword">using </span><a id="a3" name="a3"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a59fb03a51c85339fcac8f4212dbd58da">executor_work_guard</a> = boost::asio::executor_work_guard&lt;Executor&gt;;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// TCP related</span></div>
+<div class="line"><span class="keyword">namespace </span>ip = boost::asio::ip;</div>
+<div class="line"><span class="keyword">using </span><a id="a4" name="a4"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a90d66dfcb2657674a379c11b30089e12">tcp</a> = boost::asio::ip::tcp;</div>
+<div class="line"><span class="keyword">using </span><a id="a5" name="a5"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a9f2df3d0b28f31407443fd10c4e2dc28">udp</a> = boost::asio::ip::udp;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Timer related</span></div>
+<div class="line"><span class="keyword">using </span><a id="a6" name="a6"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a167eada9e5a8374429b702ab08681088">steady_timer</a> = boost::asio::steady_timer;</div>
+<div class="line"><span class="keyword">using </span><a id="a7" name="a7"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a3a12103505230b70e2494018f1a89688">system_timer</a> = boost::asio::system_timer;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Buffer related</span></div>
+<div class="line"><span class="keyword">using </span><a id="a8" name="a8"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a9a08ad1b7a04ba7c61756ab743552110">mutable_buffer</a> = boost::asio::mutable_buffer;</div>
+<div class="line"><span class="keyword">using </span><a id="a9" name="a9"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#aeedc6d6fb7bac133f6a9d23230125361">const_buffer</a> = boost::asio::const_buffer;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Error related</span></div>
+<div class="line"><span class="keyword">using </span><a id="a10" name="a10"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a81dbfd7a2e31d0a8b61e0fccb91c8582">error_code</a> = boost::system::error_code;</div>
+<div class="line"><span class="keyword">using </span><a id="a11" name="a11"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a6cf322c5ab2c89adeabb59c7c488690c">system_error</a> = boost::system::system_error;</div>
+<div class="line"><span class="keyword">namespace </span>error = boost::asio::error;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Coroutine related</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><span class="keyword">using </span><a id="a12" name="a12"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">awaitable</a> = boost::asio::awaitable&lt;T&gt;;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// this_coro is a namespace, not a type</span></div>
+<div class="line"><span class="keyword">namespace </span>this_coro = boost::asio::this_coro;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Wrappers of the commonly used functions and objects</span></div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a13" name="a13"></a><a class="code hl_variable" href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">use_awaitable</a> = boost::asio::use_awaitable;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a14" name="a14"></a><a class="code hl_variable" href="namespacehku_1_1net.html#adf0624b8ea0f771b7b5726e3ef6722fe">detached</a> = boost::asio::detached;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a15" name="a15"></a><a class="code hl_variable" href="namespacehku_1_1net.html#a7f5ae24d839365d50f2634d2beb6e4da">as_tuple</a> = boost::asio::as_tuple;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor, <span class="keyword">typename</span> F&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a id="a16" name="a16"></a><a class="code hl_function" href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">co_spawn</a>(<span class="keyword">const</span> Executor&amp; ex, F&amp;&amp; f) {</div>
+<div class="line">    boost::asio::co_spawn(ex, std::forward&lt;F&gt;(f), boost::asio::detached);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor, <span class="keyword">typename</span> F&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">co_spawn</a>(<span class="keyword">const</span> Executor&amp; ex, F&amp;&amp; f, boost::system::error_code&amp; ec) {</div>
+<div class="line">    boost::asio::co_spawn(ex, std::forward&lt;F&gt;(f),</div>
+<div class="line">                          boost::asio::redirect_error(boost::asio::detached, ec));</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Forwarding of the commonly used Asio functions</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a17" name="a17"></a><a class="code hl_function" href="namespacehku_1_1net.html#a8b48f61111ca429662745f8551417f4b">redirect_error</a>(Args&amp;&amp;... args)</div>
+<div class="line">  -&gt; <span class="keyword">decltype</span>(boost::asio::redirect_error(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> boost::asio::redirect_error(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a18" name="a18"></a><a class="code hl_function" href="namespacehku_1_1net.html#a091939315430c69b784e1cc96cc81711">post</a>(Args&amp;&amp;... args) -&gt; <span class="keyword">decltype</span>(boost::asio::post(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> boost::asio::post(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a19" name="a19"></a><a class="code hl_function" href="namespacehku_1_1net.html#a77888d16084d6e6b238c62254b7431bc">async_initiate</a>(Args&amp;&amp;... args)</div>
+<div class="line">  -&gt; <span class="keyword">decltype</span>(boost::asio::async_initiate(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> boost::asio::async_initiate(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a id="a20" name="a20"></a><a class="code hl_function" href="namespacehku_1_1net.html#ad918f1945435854947009952472c6825">get_associated_executor</a>(Args&amp;&amp;... args)</div>
+<div class="line">  -&gt; <span class="keyword">decltype</span>(boost::asio::get_associated_executor(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> boost::asio::get_associated_executor(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Socket types</span></div>
+<div class="line"><span class="keyword">using </span><a id="a21" name="a21"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a7d5ea0f72d2e19831d048cbeab0f036e">tcp_socket</a> = boost::asio::ip::tcp::socket;</div>
+<div class="line"><span class="keyword">using </span><a id="a22" name="a22"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#ae9d8dd4dff5b6932c04b1b9ce5f93f28">tcp_acceptor</a> = boost::asio::ip::tcp::acceptor;</div>
+<div class="line"><span class="keyword">using </span><a id="a23" name="a23"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a61c41cad0079d512828f2cebf780d8e0">tcp_resolver</a> = boost::asio::ip::tcp::resolver;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using </span><a id="a24" name="a24"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a314adbd8094519b94bee93fe73ff36de">udp_socket</a> = boost::asio::ip::udp::socket;</div>
+<div class="line"><span class="keyword">using </span><a id="a25" name="a25"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#aa11dee32bc7be84a883d1ce91d1fab3e">udp_resolver</a> = boost::asio::ip::udp::resolver;</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace net</span></div>
+<div class="line">}  <span class="comment">// namespace hku</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#else</span></div>
+<div class="line"><span class="comment">// Use the standalone Asio</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/co_spawn.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/detached.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/awaitable.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/use_awaitable.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/as_tuple.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/steady_timer.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/system_timer.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/ip/tcp.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/ip/udp.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/buffer.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/error.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/strand.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/executor_work_guard.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;asio/any_io_executor.hpp&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><span class="keyword">namespace </span>net {</div>
+<div class="line"><span class="comment">// Core type aliases</span></div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a3155297dc9319abf630d0ec15db79ce3">io_context</a> = asio::io_context;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a8f8d67bd75c601b3f436cc9c848297a7">executor_type</a> = asio::any_io_executor;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a24bf8dd034c6a07a3f6062e99a3d9464">strand</a> = asio::strand&lt;asio::io_context::executor_type&gt;;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Work guard</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor&gt;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a59fb03a51c85339fcac8f4212dbd58da">executor_work_guard</a> = asio::executor_work_guard&lt;Executor&gt;;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// TCP related</span></div>
+<div class="line"><span class="keyword">namespace </span>ip = asio::ip;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a90d66dfcb2657674a379c11b30089e12">tcp</a> = asio::ip::tcp;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a9f2df3d0b28f31407443fd10c4e2dc28">udp</a> = asio::ip::udp;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Timer related</span></div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a167eada9e5a8374429b702ab08681088">steady_timer</a> = asio::steady_timer;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a3a12103505230b70e2494018f1a89688">system_timer</a> = asio::system_timer;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Buffer related</span></div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a9a08ad1b7a04ba7c61756ab743552110">mutable_buffer</a> = asio::mutable_buffer;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#aeedc6d6fb7bac133f6a9d23230125361">const_buffer</a> = asio::const_buffer;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Error related</span></div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a81dbfd7a2e31d0a8b61e0fccb91c8582">error_code</a> = asio::error_code;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a6cf322c5ab2c89adeabb59c7c488690c">system_error</a> = asio::system_error;</div>
+<div class="line"><span class="keyword">namespace </span>error = asio::error;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Coroutine related</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">awaitable</a> = asio::awaitable&lt;T&gt;;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// this_coro is a namespace, not a type</span></div>
+<div class="line"><span class="keyword">namespace </span>this_coro = asio::this_coro;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Wrappers of the commonly used functions and objects</span></div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">use_awaitable</a> = asio::use_awaitable;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacehku_1_1net.html#adf0624b8ea0f771b7b5726e3ef6722fe">detached</a> = asio::detached;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_variable" href="namespacehku_1_1net.html#a7f5ae24d839365d50f2634d2beb6e4da">as_tuple</a> = asio::as_tuple;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor, <span class="keyword">typename</span> F&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">co_spawn</a>(<span class="keyword">const</span> Executor&amp; ex, F&amp;&amp; f) {</div>
+<div class="line">    asio::co_spawn(ex, std::forward&lt;F&gt;(f), asio::detached);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Executor, <span class="keyword">typename</span> F&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">co_spawn</a>(<span class="keyword">const</span> Executor&amp; ex, F&amp;&amp; f, asio::error_code&amp; ec) {</div>
+<div class="line">    asio::co_spawn(ex, std::forward&lt;F&gt;(f), asio::redirect_error(asio::detached, ec));</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Forwarding of the commonly used Asio functions</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_function" href="namespacehku_1_1net.html#a8b48f61111ca429662745f8551417f4b">redirect_error</a>(Args&amp;&amp;... args)</div>
+<div class="line">  -&gt; <span class="keyword">decltype</span>(asio::redirect_error(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> asio::redirect_error(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_function" href="namespacehku_1_1net.html#a091939315430c69b784e1cc96cc81711">post</a>(Args&amp;&amp;... args) -&gt; <span class="keyword">decltype</span>(asio::post(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> asio::post(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_function" href="namespacehku_1_1net.html#a77888d16084d6e6b238c62254b7431bc">async_initiate</a>(Args&amp;&amp;... args)</div>
+<div class="line">  -&gt; <span class="keyword">decltype</span>(asio::async_initiate(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> asio::async_initiate(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><span class="keyword">inline</span> <span class="keyword">auto</span> <a class="code hl_function" href="namespacehku_1_1net.html#ad918f1945435854947009952472c6825">get_associated_executor</a>(Args&amp;&amp;... args)</div>
+<div class="line">  -&gt; <span class="keyword">decltype</span>(asio::get_associated_executor(std::forward&lt;Args&gt;(args)...)) {</div>
+<div class="line">    <span class="keywordflow">return</span> asio::get_associated_executor(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Socket types</span></div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a7d5ea0f72d2e19831d048cbeab0f036e">tcp_socket</a> = asio::ip::tcp::socket;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#ae9d8dd4dff5b6932c04b1b9ce5f93f28">tcp_acceptor</a> = asio::ip::tcp::acceptor;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a61c41cad0079d512828f2cebf780d8e0">tcp_resolver</a> = asio::ip::tcp::resolver;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#a314adbd8094519b94bee93fe73ff36de">udp_socket</a> = asio::ip::udp::socket;</div>
+<div class="line"><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku_1_1net.html#aa11dee32bc7be84a883d1ce91d1fab3e">udp_resolver</a> = asio::ip::udp::resolver;</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace net</span></div>
+<div class="line">}  <span class="comment">// namespace hku</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#endif  </span><span class="comment">// HKU_UTILS_NET_H</span></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a091939315430c69b784e1cc96cc81711"><div class="ttname"><a href="namespacehku_1_1net.html#a091939315430c69b784e1cc96cc81711">hku::net::post</a></div><div class="ttdeci">auto post(Args &amp;&amp;... args) -&gt; decltype(boost::asio::post(std::forward&lt; Args &gt;(args)...))</div><div class="ttdef"><b>定义</b> net.h:121</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a167eada9e5a8374429b702ab08681088"><div class="ttname"><a href="namespacehku_1_1net.html#a167eada9e5a8374429b702ab08681088">hku::net::steady_timer</a></div><div class="ttdeci">boost::asio::steady_timer steady_timer</div><div class="ttdef"><b>定义</b> net.h:78</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a1c1f97d030153423fff50486937cd518"><div class="ttname"><a href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">hku::net::use_awaitable</a></div><div class="ttdeci">auto use_awaitable</div><div class="ttdef"><b>定义</b> net.h:98</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a24bf8dd034c6a07a3f6062e99a3d9464"><div class="ttname"><a href="namespacehku_1_1net.html#a24bf8dd034c6a07a3f6062e99a3d9464">hku::net::strand</a></div><div class="ttdeci">boost::asio::strand&lt; boost::asio::io_context::executor_type &gt; strand</div><div class="ttdef"><b>定义</b> net.h:65</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a314adbd8094519b94bee93fe73ff36de"><div class="ttname"><a href="namespacehku_1_1net.html#a314adbd8094519b94bee93fe73ff36de">hku::net::udp_socket</a></div><div class="ttdeci">boost::asio::ip::udp::socket udp_socket</div><div class="ttdef"><b>定义</b> net.h:142</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a3155297dc9319abf630d0ec15db79ce3"><div class="ttname"><a href="namespacehku_1_1net.html#a3155297dc9319abf630d0ec15db79ce3">hku::net::io_context</a></div><div class="ttdeci">boost::asio::io_context io_context</div><div class="ttdef"><b>定义</b> net.h:63</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a3a12103505230b70e2494018f1a89688"><div class="ttname"><a href="namespacehku_1_1net.html#a3a12103505230b70e2494018f1a89688">hku::net::system_timer</a></div><div class="ttdeci">boost::asio::system_timer system_timer</div><div class="ttdef"><b>定义</b> net.h:79</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a59fb03a51c85339fcac8f4212dbd58da"><div class="ttname"><a href="namespacehku_1_1net.html#a59fb03a51c85339fcac8f4212dbd58da">hku::net::executor_work_guard</a></div><div class="ttdeci">boost::asio::executor_work_guard&lt; Executor &gt; executor_work_guard</div><div class="ttdef"><b>定义</b> net.h:70</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a61c41cad0079d512828f2cebf780d8e0"><div class="ttname"><a href="namespacehku_1_1net.html#a61c41cad0079d512828f2cebf780d8e0">hku::net::tcp_resolver</a></div><div class="ttdeci">boost::asio::ip::tcp::resolver tcp_resolver</div><div class="ttdef"><b>定义</b> net.h:140</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a6cf322c5ab2c89adeabb59c7c488690c"><div class="ttname"><a href="namespacehku_1_1net.html#a6cf322c5ab2c89adeabb59c7c488690c">hku::net::system_error</a></div><div class="ttdeci">boost::system::system_error system_error</div><div class="ttdef"><b>定义</b> net.h:87</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a77888d16084d6e6b238c62254b7431bc"><div class="ttname"><a href="namespacehku_1_1net.html#a77888d16084d6e6b238c62254b7431bc">hku::net::async_initiate</a></div><div class="ttdeci">auto async_initiate(Args &amp;&amp;... args) -&gt; decltype(boost::asio::async_initiate(std::forward&lt; Args &gt;(args)...))</div><div class="ttdef"><b>定义</b> net.h:126</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a7d5ea0f72d2e19831d048cbeab0f036e"><div class="ttname"><a href="namespacehku_1_1net.html#a7d5ea0f72d2e19831d048cbeab0f036e">hku::net::tcp_socket</a></div><div class="ttdeci">boost::asio::ip::tcp::socket tcp_socket</div><div class="ttdef"><b>定义</b> net.h:138</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a7f5ae24d839365d50f2634d2beb6e4da"><div class="ttname"><a href="namespacehku_1_1net.html#a7f5ae24d839365d50f2634d2beb6e4da">hku::net::as_tuple</a></div><div class="ttdeci">auto as_tuple</div><div class="ttdef"><b>定义</b> net.h:100</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a81dbfd7a2e31d0a8b61e0fccb91c8582"><div class="ttname"><a href="namespacehku_1_1net.html#a81dbfd7a2e31d0a8b61e0fccb91c8582">hku::net::error_code</a></div><div class="ttdeci">boost::system::error_code error_code</div><div class="ttdef"><b>定义</b> net.h:86</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a8b48f61111ca429662745f8551417f4b"><div class="ttname"><a href="namespacehku_1_1net.html#a8b48f61111ca429662745f8551417f4b">hku::net::redirect_error</a></div><div class="ttdeci">auto redirect_error(Args &amp;&amp;... args) -&gt; decltype(boost::asio::redirect_error(std::forward&lt; Args &gt;(args)...))</div><div class="ttdef"><b>定义</b> net.h:115</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a8f8d67bd75c601b3f436cc9c848297a7"><div class="ttname"><a href="namespacehku_1_1net.html#a8f8d67bd75c601b3f436cc9c848297a7">hku::net::executor_type</a></div><div class="ttdeci">boost::asio::any_io_executor executor_type</div><div class="ttdef"><b>定义</b> net.h:64</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a90d66dfcb2657674a379c11b30089e12"><div class="ttname"><a href="namespacehku_1_1net.html#a90d66dfcb2657674a379c11b30089e12">hku::net::tcp</a></div><div class="ttdeci">boost::asio::ip::tcp tcp</div><div class="ttdef"><b>定义</b> net.h:74</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a9a08ad1b7a04ba7c61756ab743552110"><div class="ttname"><a href="namespacehku_1_1net.html#a9a08ad1b7a04ba7c61756ab743552110">hku::net::mutable_buffer</a></div><div class="ttdeci">boost::asio::mutable_buffer mutable_buffer</div><div class="ttdef"><b>定义</b> net.h:82</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a9f2df3d0b28f31407443fd10c4e2dc28"><div class="ttname"><a href="namespacehku_1_1net.html#a9f2df3d0b28f31407443fd10c4e2dc28">hku::net::udp</a></div><div class="ttdeci">boost::asio::ip::udp udp</div><div class="ttdef"><b>定义</b> net.h:75</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a9f9e50631a0aeab6a0885113086d5dc9"><div class="ttname"><a href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">hku::net::co_spawn</a></div><div class="ttdeci">void co_spawn(const Executor &amp;ex, F &amp;&amp;f)</div><div class="ttdef"><b>定义</b> net.h:103</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_aa11dee32bc7be84a883d1ce91d1fab3e"><div class="ttname"><a href="namespacehku_1_1net.html#aa11dee32bc7be84a883d1ce91d1fab3e">hku::net::udp_resolver</a></div><div class="ttdeci">boost::asio::ip::udp::resolver udp_resolver</div><div class="ttdef"><b>定义</b> net.h:143</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ad918f1945435854947009952472c6825"><div class="ttname"><a href="namespacehku_1_1net.html#ad918f1945435854947009952472c6825">hku::net::get_associated_executor</a></div><div class="ttdeci">auto get_associated_executor(Args &amp;&amp;... args) -&gt; decltype(boost::asio::get_associated_executor(std::forward&lt; Args &gt;(args)...))</div><div class="ttdef"><b>定义</b> net.h:132</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_adf0624b8ea0f771b7b5726e3ef6722fe"><div class="ttname"><a href="namespacehku_1_1net.html#adf0624b8ea0f771b7b5726e3ef6722fe">hku::net::detached</a></div><div class="ttdeci">auto detached</div><div class="ttdef"><b>定义</b> net.h:99</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ae9d8dd4dff5b6932c04b1b9ce5f93f28"><div class="ttname"><a href="namespacehku_1_1net.html#ae9d8dd4dff5b6932c04b1b9ce5f93f28">hku::net::tcp_acceptor</a></div><div class="ttdeci">boost::asio::ip::tcp::acceptor tcp_acceptor</div><div class="ttdef"><b>定义</b> net.h:139</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_aeedc6d6fb7bac133f6a9d23230125361"><div class="ttname"><a href="namespacehku_1_1net.html#aeedc6d6fb7bac133f6a9d23230125361">hku::net::const_buffer</a></div><div class="ttdeci">boost::asio::const_buffer const_buffer</div><div class="ttdef"><b>定义</b> net.h:83</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --> </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

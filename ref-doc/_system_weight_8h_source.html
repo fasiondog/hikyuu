@@ -1,0 +1,191 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/selector/SystemWeight.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_system_weight_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SystemWeight.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * SystemWeight.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2018-1-29</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../system/System.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span></div>
+<div class="foldopen" id="foldopen00023" data-start="{" data-end="};">
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html">   23</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">   24</a></span>    <a class="code hl_typedef" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> <a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">   25</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a>{1.0};</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">   27</a></span>    <a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#acc49c5dbc6ed5f4616272f025c327eb0">   28</a></span>    <a class="code hl_function" href="structhku_1_1_system_weight.html#acc49c5dbc6ed5f4616272f025c327eb0">SystemWeight</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a>&amp; sys_, <span class="keywordtype">double</span> weight_) : <a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a>(sys_), <a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a>(weight_) {}</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#a2fc8d81453dbe7af6c9fea66151758fa">   29</a></span>    <a class="code hl_function" href="structhku_1_1_system_weight.html#a2fc8d81453dbe7af6c9fea66151758fa">SystemWeight</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#a9a6205f814ddca0be1ceade326391800">   30</a></span>    <a class="code hl_function" href="structhku_1_1_system_weight.html#a9a6205f814ddca0be1ceade326391800">SystemWeight</a>(<a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>&amp;&amp; sw) : <a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(sw.<a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a>)), <a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a>(sw.<a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a>) {}</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#a8c482c0a07bb5e29db625b79b9682991">   31</a></span>    <a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>&amp; <a class="code hl_function" href="structhku_1_1_system_weight.html#a8c482c0a07bb5e29db625b79b9682991">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>&amp; other) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#aac0041b2e0b771b6a8d7c8821cb5a123">   32</a></span>    <a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>&amp; <a class="code hl_function" href="structhku_1_1_system_weight.html#aac0041b2e0b771b6a8d7c8821cb5a123">operator=</a>(<a class="code hl_function" href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">SystemWeight</a>&amp;&amp; other);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment">//============================================</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">//============================================</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structhku_1_1_system_weight.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   40</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">void</span> save(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a>);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a>);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    }</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="keywordtype">void</span> load(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        ar&amp; BOOST_SERIALIZATION_NVP(sys);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        ar&amp; BOOST_SERIALIZATION_NVP(weight);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    }</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    BOOST_SERIALIZATION_SPLIT_MEMBER()</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>};</div>
+</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">   57</a></span><span class="keyword">typedef</span> vector&lt;SystemWeight&gt; <a class="code hl_typedef" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="namespacehku.html#a6fb554c20f15c25570faa0021a8ceab4">   59</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp;, <span class="keyword">const</span> <a class="code hl_struct" href="structhku_1_1_system_weight.html">SystemWeight</a>&amp;);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="foldopen" id="foldopen00061" data-start="{" data-end="}">
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="namespacehku.html#a59d9d3d65d310e6f83045a7bb0907510">   61</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">operator==</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structhku_1_1_system_weight.html">SystemWeight</a>&amp; d1, <span class="keyword">const</span> <a class="code hl_struct" href="structhku_1_1_system_weight.html">SystemWeight</a>&amp; d2) {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordflow">return</span> d1.<a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a> == d2.<a class="code hl_variable" href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">sys</a> &amp;&amp; std::abs(d1.<a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a> - d2.<a class="code hl_variable" href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">weight</a>) &lt; 0.0001;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>}</div>
+</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#if FMT_VERSION &gt;= 90000</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::SystemWeight&gt; : ostream_formatter {};</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#endif </span><span class="comment">/* TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup___system_html_gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><div class="ttname"><a href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku::SystemPtr</a></div><div class="ttdeci">shared_ptr&lt; System &gt; SystemPtr</div><div class="ttdoc">Client programs should operate through this pointer</div><div class="ttdef"><b>定义</b> System.h:545</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a5c8f988e50bc4ff1a742bbc29de54119"><div class="ttname"><a href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">hku::operator==</a></div><div class="ttdeci">HKU_API Indicator operator==(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_addc86b26683f2e20b24301fce90ef431"><div class="ttname"><a href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">hku::SystemWeightList</a></div><div class="ttdeci">vector&lt; SystemWeight &gt; SystemWeightList</div><div class="ttdef"><b>定义</b> SystemWeight.h:57</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html"><div class="ttname"><a href="structhku_1_1_system_weight.html">hku::SystemWeight</a></div><div class="ttdoc">System weight; the value is interpreted by the consumer (e.g.</div><div class="ttdef"><b>定义</b> SystemWeight.h:23</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_a2fc8d81453dbe7af6c9fea66151758fa"><div class="ttname"><a href="structhku_1_1_system_weight.html#a2fc8d81453dbe7af6c9fea66151758fa">hku::SystemWeight::SystemWeight</a></div><div class="ttdeci">SystemWeight(const SystemWeight &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_a428a78815971c3e915fcc50c0ceb789c"><div class="ttname"><a href="structhku_1_1_system_weight.html#a428a78815971c3e915fcc50c0ceb789c">hku::SystemWeight::SystemWeight</a></div><div class="ttdeci">SystemWeight()=default</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_a735de046f68931d4ce2f5e840d987446"><div class="ttname"><a href="structhku_1_1_system_weight.html#a735de046f68931d4ce2f5e840d987446">hku::SystemWeight::sys</a></div><div class="ttdeci">SystemPtr sys</div><div class="ttdef"><b>定义</b> SystemWeight.h:24</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_a8c482c0a07bb5e29db625b79b9682991"><div class="ttname"><a href="structhku_1_1_system_weight.html#a8c482c0a07bb5e29db625b79b9682991">hku::SystemWeight::operator=</a></div><div class="ttdeci">SystemWeight &amp; operator=(const SystemWeight &amp;other)=default</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_a9a6205f814ddca0be1ceade326391800"><div class="ttname"><a href="structhku_1_1_system_weight.html#a9a6205f814ddca0be1ceade326391800">hku::SystemWeight::SystemWeight</a></div><div class="ttdeci">SystemWeight(SystemWeight &amp;&amp;sw)</div><div class="ttdef"><b>定义</b> SystemWeight.h:30</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_aab8297a502eccf83189a606d9bdb7d77"><div class="ttname"><a href="structhku_1_1_system_weight.html#aab8297a502eccf83189a606d9bdb7d77">hku::SystemWeight::weight</a></div><div class="ttdeci">double weight</div><div class="ttdef"><b>定义</b> SystemWeight.h:25</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_aac0041b2e0b771b6a8d7c8821cb5a123"><div class="ttname"><a href="structhku_1_1_system_weight.html#aac0041b2e0b771b6a8d7c8821cb5a123">hku::SystemWeight::operator=</a></div><div class="ttdeci">SystemWeight &amp; operator=(SystemWeight &amp;&amp;other)</div></div>
+<div class="ttc" id="astructhku_1_1_system_weight_html_acc49c5dbc6ed5f4616272f025c327eb0"><div class="ttname"><a href="structhku_1_1_system_weight.html#acc49c5dbc6ed5f4616272f025c327eb0">hku::SystemWeight::SystemWeight</a></div><div class="ttdeci">SystemWeight(const SystemPtr &amp;sys_, double weight_)</div><div class="ttdef"><b>定义</b> SystemWeight.h:28</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_3da1167a5556da8ee80b5b80dc171a54.html">selector</a></li><li class="navelem"><b>SystemWeight.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

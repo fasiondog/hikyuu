@@ -1,0 +1,188 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/plugin/PluginClient.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_plugin_client_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">PluginClient.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-04-06</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;PluginLoader.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> InterfaceT&gt;</div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html">   15</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> : <span class="keyword">public</span> InterfaceT {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">   17</a></span>    <a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a>() = <span class="keyword">delete</span>;</div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="}">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a5252ae8bf6e578db5591bdb97a8e306e">   18</a></span>    <a class="code hl_function" href="classhku_1_1_plugin_client.html#a5252ae8bf6e578db5591bdb97a8e306e">PluginClient</a>(<span class="keyword">const</span> std::string &amp;path, <span class="keyword">const</span> std::string &amp;filename) {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a> = std::make_unique&lt;PluginLoader&gt;(path);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        HKU_CHECK(<a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a>-&gt;load(filename), <span class="stringliteral">&quot;load plugin failed! {}/{}&quot;</span>, path, filename);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a> = <a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a>-&gt;instance&lt;InterfaceT&gt;();</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    }</div>
+</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a2c9e5eaa54d58695d0c16b789447ed8c">   23</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_plugin_client.html#a2c9e5eaa54d58695d0c16b789447ed8c">~PluginClient</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a2585a70a9a9a7931ea5443841eab5b94">   25</a></span>    <a class="code hl_function" href="classhku_1_1_plugin_client.html#a2585a70a9a9a7931ea5443841eab5b94">PluginClient</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a2324f4f46595bd3202add476af7f986b">   26</a></span>    <a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> &amp;<a class="code hl_function" href="classhku_1_1_plugin_client.html#a2324f4f46595bd3202add476af7f986b">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a22237ff455765c4e5fa6ae80c0795124">   28</a></span>    <a class="code hl_function" href="classhku_1_1_plugin_client.html#a22237ff455765c4e5fa6ae80c0795124">PluginClient</a>(<a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> &amp;&amp;rhs) : <a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a>(rhs.<a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a>), <a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rhs.<a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a>)) {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        rhs.m_impl = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    }</div>
+</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="foldopen" id="foldopen00032" data-start="{" data-end="}">
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a5b24a7639ac10aa180f67497b184068b">   32</a></span>    <a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> &amp;<a class="code hl_function" href="classhku_1_1_plugin_client.html#a5b24a7639ac10aa180f67497b184068b">operator=</a>(<a class="code hl_function" href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">PluginClient</a> &amp;&amp;rhs) {</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <span class="keywordflow">if</span> (<span class="keyword">this</span> != &amp;rhs) {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            <a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a> = std::move(rhs.m_loader);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>            <a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a> = rhs.m_impl;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>            rhs.m_impl = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        }</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    }</div>
+</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="}">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a579177cbc3e435b8113db638dd62e1ae">   41</a></span>    std::string <a class="code hl_function" href="classhku_1_1_plugin_client.html#a579177cbc3e435b8113db638dd62e1ae">info</a>() const noexcept<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a>-&gt;info();</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    }</div>
+</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="foldopen" id="foldopen00045" data-start="{" data-end="}">
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#aff2dd464b5951ade39b9131e6ddbe4c7">   45</a></span>    InterfaceT *<a class="code hl_function" href="classhku_1_1_plugin_client.html#aff2dd464b5951ade39b9131e6ddbe4c7">getPlugin</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    }</div>
+</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">   50</a></span>    InterfaceT *<a class="code hl_variable" href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">m_impl</a>{<span class="keyword">nullptr</span>};</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">   53</a></span>    std::unique_ptr&lt;PluginLoader&gt; <a class="code hl_variable" href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">m_loader</a>;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>};</div>
+</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a22237ff455765c4e5fa6ae80c0795124"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a22237ff455765c4e5fa6ae80c0795124">hku::PluginClient::PluginClient</a></div><div class="ttdeci">PluginClient(PluginClient &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> PluginClient.h:28</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a2324f4f46595bd3202add476af7f986b"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a2324f4f46595bd3202add476af7f986b">hku::PluginClient::operator=</a></div><div class="ttdeci">PluginClient &amp; operator=(const PluginClient &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a2585a70a9a9a7931ea5443841eab5b94"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a2585a70a9a9a7931ea5443841eab5b94">hku::PluginClient::PluginClient</a></div><div class="ttdeci">PluginClient(const PluginClient &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a2c9e5eaa54d58695d0c16b789447ed8c"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a2c9e5eaa54d58695d0c16b789447ed8c">hku::PluginClient::~PluginClient</a></div><div class="ttdeci">virtual ~PluginClient()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a5252ae8bf6e578db5591bdb97a8e306e"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a5252ae8bf6e578db5591bdb97a8e306e">hku::PluginClient::PluginClient</a></div><div class="ttdeci">PluginClient(const std::string &amp;path, const std::string &amp;filename)</div><div class="ttdef"><b>定义</b> PluginClient.h:18</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a558edc92426bd5ca7de691ea9229164f"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a558edc92426bd5ca7de691ea9229164f">hku::PluginClient::m_impl</a></div><div class="ttdeci">InterfaceT * m_impl</div><div class="ttdef"><b>定义</b> PluginClient.h:50</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a579177cbc3e435b8113db638dd62e1ae"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a579177cbc3e435b8113db638dd62e1ae">hku::PluginClient::info</a></div><div class="ttdeci">std::string info() const noexcept override</div><div class="ttdef"><b>定义</b> PluginClient.h:41</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a5b24a7639ac10aa180f67497b184068b"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a5b24a7639ac10aa180f67497b184068b">hku::PluginClient::operator=</a></div><div class="ttdeci">PluginClient &amp; operator=(PluginClient &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> PluginClient.h:32</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_a70b983b0eb878a6d0716df29e0b95b92"><div class="ttname"><a href="classhku_1_1_plugin_client.html#a70b983b0eb878a6d0716df29e0b95b92">hku::PluginClient::PluginClient</a></div><div class="ttdeci">PluginClient()=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_aa02fef3624d32896d60f7125d30e19f5"><div class="ttname"><a href="classhku_1_1_plugin_client.html#aa02fef3624d32896d60f7125d30e19f5">hku::PluginClient::m_loader</a></div><div class="ttdeci">std::unique_ptr&lt; PluginLoader &gt; m_loader</div><div class="ttdef"><b>定义</b> PluginClient.h:53</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_client_html_aff2dd464b5951ade39b9131e6ddbe4c7"><div class="ttname"><a href="classhku_1_1_plugin_client.html#aff2dd464b5951ade39b9131e6ddbe4c7">hku::PluginClient::getPlugin</a></div><div class="ttdeci">InterfaceT * getPlugin() const</div><div class="ttdef"><b>定义</b> PluginClient.h:45</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_87ef2af574cd6d7eed95297ff9678a3d.html">plugin</a></li><li class="navelem"><b>PluginClient.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

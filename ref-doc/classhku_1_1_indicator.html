@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::Indicator类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_indicator.html','','classhku_1_1_indicator-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,114 +74,195 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_indicator.html">Indicator</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pro-attribs">Protected 属性</a> &#124;
-<a href="#friends">友元</a> &#124;
-<a href="classhku_1_1_indicator-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::Indicator类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___indicator.html">Indicator 指标库</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::Indicator类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___indicator.html">Indicator indicator library</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp  
- <a href="classhku_1_1_indicator.html#details">更多...</a></p>
+<p><a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> class, concretely implemented by <a class="el" href="classhku_1_1_indicator_imp.html" title="Indicator implementation class; when defining a new indicator, this class should be inherited">IndicatorImp</a>; when implementing a new indicator, <a class="el" href="classhku_1_1_indicator_imp.html" title="Indicator implementation class; when defining a new indicator, this class should be inherited">IndicatorImp</a> should be inherited  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_indicator_8h_source.html">Indicator.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:Iterator" id="r_Iterator"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:ac8f468be2ac0597910e8171292ddcee2" id="r_ac8f468be2ac0597910e8171292ddcee2"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_indicator_imp.html#abfe6452bf4e40263d5416512e391ac5c">IndicatorImp::value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a></td></tr>
+<tr class="memitem:a402164ce6af0a2443d014aa44cb92ebb" id="r_a402164ce6af0a2443d014aa44cb92ebb"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a402164ce6af0a2443d014aa44cb92ebb">iterator</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a0b8863417f027705dd8ecf54d400ff90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a0b8863417f027705dd8ecf54d400ff90">Indicator</a> ()</td></tr>
-<tr class="separator:a0b8863417f027705dd8ecf54d400ff90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a971eb2b7331774fc1077c4a252522f48"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a971eb2b7331774fc1077c4a252522f48">Indicator</a> (const <a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a> &amp;imp)</td></tr>
-<tr class="separator:a971eb2b7331774fc1077c4a252522f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f412564757ccb7df32d353cb02379bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a3f412564757ccb7df32d353cb02379bd">Indicator</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;)</td></tr>
-<tr class="separator:a3f412564757ccb7df32d353cb02379bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a570dfbfe7e49395a29ddb816da4e622f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a570dfbfe7e49395a29ddb816da4e622f">~Indicator</a> ()</td></tr>
-<tr class="separator:a570dfbfe7e49395a29ddb816da4e622f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a953cf2a18c1b214bffdb982bb2281bca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a953cf2a18c1b214bffdb982bb2281bca">operator=</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;)</td></tr>
-<tr class="separator:a953cf2a18c1b214bffdb982bb2281bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac690ad93eedd570f8002a7775cca3145"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#ac690ad93eedd570f8002a7775cca3145">operator()</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind)</td></tr>
-<tr class="memdesc:ac690ad93eedd570f8002a7775cca3145"><td class="mdescLeft">&#160;</td><td class="mdescRight">使用已有参数计算新值，返回全新的Indicator  <a href="#ac690ad93eedd570f8002a7775cca3145">更多...</a><br /></td></tr>
-<tr class="separator:ac690ad93eedd570f8002a7775cca3145"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a04ea1245f65303c6118df123317661"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a0a04ea1245f65303c6118df123317661">name</a> () const </td></tr>
-<tr class="memdesc:a0a04ea1245f65303c6118df123317661"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标名称  <a href="#a0a04ea1245f65303c6118df123317661">更多...</a><br /></td></tr>
-<tr class="separator:a0a04ea1245f65303c6118df123317661"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7c4bcd75ba3e74fb8111af756a5d83f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#ac7c4bcd75ba3e74fb8111af756a5d83f">name</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
-<tr class="separator:ac7c4bcd75ba3e74fb8111af756a5d83f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a209fc0ac566b082dda6fd2e768fa21de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a209fc0ac566b082dda6fd2e768fa21de">long_name</a> () const </td></tr>
-<tr class="memdesc:a209fc0ac566b082dda6fd2e768fa21de"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回形如：Name(param1_val,param2_val,...)  <a href="#a209fc0ac566b082dda6fd2e768fa21de">更多...</a><br /></td></tr>
-<tr class="separator:a209fc0ac566b082dda6fd2e768fa21de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a583bd294654c9aa5e190a742fb6563e6"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a583bd294654c9aa5e190a742fb6563e6">discard</a> () const </td></tr>
-<tr class="memdesc:a583bd294654c9aa5e190a742fb6563e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">结果中需抛弃的个数  <a href="#a583bd294654c9aa5e190a742fb6563e6">更多...</a><br /></td></tr>
-<tr class="separator:a583bd294654c9aa5e190a742fb6563e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87130588c6c8ee6e8c5d72635dc02f99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a87130588c6c8ee6e8c5d72635dc02f99">setDiscard</a> (size_t <a class="el" href="classhku_1_1_indicator.html#a583bd294654c9aa5e190a742fb6563e6">discard</a>)</td></tr>
-<tr class="memdesc:a87130588c6c8ee6e8c5d72635dc02f99"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置抛弃的个数，如果小于原有的discard则无效  <a href="#a87130588c6c8ee6e8c5d72635dc02f99">更多...</a><br /></td></tr>
-<tr class="separator:a87130588c6c8ee6e8c5d72635dc02f99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc9c005cb61678b781d469755d4cc66e"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#adc9c005cb61678b781d469755d4cc66e">getResultNumber</a> () const </td></tr>
-<tr class="memdesc:adc9c005cb61678b781d469755d4cc66e"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回有几个结果集输出  <a href="#adc9c005cb61678b781d469755d4cc66e">更多...</a><br /></td></tr>
-<tr class="separator:adc9c005cb61678b781d469755d4cc66e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ce15985d1e7a2d9e2761ec730c33d02"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a2ce15985d1e7a2d9e2761ec730c33d02">empty</a> () const </td></tr>
-<tr class="memdesc:a2ce15985d1e7a2d9e2761ec730c33d02"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断是否为空  <a href="#a2ce15985d1e7a2d9e2761ec730c33d02">更多...</a><br /></td></tr>
-<tr class="separator:a2ce15985d1e7a2d9e2761ec730c33d02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13b8288fff9a13aeed375bb1ade53773"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a13b8288fff9a13aeed375bb1ade53773">size</a> () const </td></tr>
-<tr class="memdesc:a13b8288fff9a13aeed375bb1ade53773"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取大小  <a href="#a13b8288fff9a13aeed375bb1ade53773">更多...</a><br /></td></tr>
-<tr class="separator:a13b8288fff9a13aeed375bb1ade53773"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbe70a8b716893698ce8fee8871d9896"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#acbe70a8b716893698ce8fee8871d9896">operator[]</a> (size_t pos) const </td></tr>
-<tr class="memdesc:acbe70a8b716893698ce8fee8871d9896"><td class="mdescLeft">&#160;</td><td class="mdescRight">只获取第一个结果集中相应位置输出，等同于get(pos, 0)  <a href="#acbe70a8b716893698ce8fee8871d9896">更多...</a><br /></td></tr>
-<tr class="separator:acbe70a8b716893698ce8fee8871d9896"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f4505811627bdcea6cbf8b906f470f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a5f4505811627bdcea6cbf8b906f470f5">get</a> (size_t pos, size_t num=0) const </td></tr>
-<tr class="memdesc:a5f4505811627bdcea6cbf8b906f470f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取第num个结果集中指定位置的数据  <a href="#a5f4505811627bdcea6cbf8b906f470f5">更多...</a><br /></td></tr>
-<tr class="separator:a5f4505811627bdcea6cbf8b906f470f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9b6a46cbd748d3c4f15ec3c812e6955"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#ab9b6a46cbd748d3c4f15ec3c812e6955">getResult</a> (size_t num) const </td></tr>
-<tr class="separator:ab9b6a46cbd748d3c4f15ec3c812e6955"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a084eff9900b624727bb552ec0d4c52fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a084eff9900b624727bb552ec0d4c52fc">getResultAsPriceList</a> (size_t num) const </td></tr>
-<tr class="separator:a084eff9900b624727bb552ec0d4c52fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fb3576d2768b976dbfef891f871f20e"><td class="memTemplParams" colspan="2">template&lt;typename ValueType &gt; </td></tr>
-<tr class="memitem:a4fb3576d2768b976dbfef891f871f20e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a4fb3576d2768b976dbfef891f871f20e">setParam</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_indicator.html#a0a04ea1245f65303c6118df123317661">name</a>, const ValueType &amp;value)</td></tr>
-<tr class="separator:a4fb3576d2768b976dbfef891f871f20e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd24e481816cd55cde7fd3bcaa03faf1"><td class="memTemplParams" colspan="2">template&lt;typename ValueType &gt; </td></tr>
-<tr class="memitem:acd24e481816cd55cde7fd3bcaa03faf1"><td class="memTemplItemLeft" align="right" valign="top">ValueType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#acd24e481816cd55cde7fd3bcaa03faf1">getParam</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_indicator.html#a0a04ea1245f65303c6118df123317661">name</a>) const </td></tr>
-<tr class="separator:acd24e481816cd55cde7fd3bcaa03faf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f91a8c4516d09ea94effd30b21c1078"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a1f91a8c4516d09ea94effd30b21c1078">getImp</a> () const </td></tr>
-<tr class="separator:a1f91a8c4516d09ea94effd30b21c1078"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b8863417f027705dd8ecf54d400ff90" id="r_a0b8863417f027705dd8ecf54d400ff90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b8863417f027705dd8ecf54d400ff90">Indicator</a> ()</td></tr>
+<tr class="memitem:ad94e99a5943d3bd68da78d15f0bb3e72" id="r_ad94e99a5943d3bd68da78d15f0bb3e72"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad94e99a5943d3bd68da78d15f0bb3e72">Indicator</a> (const <a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a> &amp;imp) noexcept</td></tr>
+<tr class="memitem:a58991abcf4a258615db1201f043462e1" id="r_a58991abcf4a258615db1201f043462e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a58991abcf4a258615db1201f043462e1">Indicator</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind) noexcept</td></tr>
+<tr class="memitem:a5c1eed3fc1436860d8523672e1c57ac6" id="r_a5c1eed3fc1436860d8523672e1c57ac6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c1eed3fc1436860d8523672e1c57ac6">Indicator</a> (<a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&amp;ind) noexcept</td></tr>
+<tr class="memitem:a747b414b52b6a5e23c1c4126f8fd738c" id="r_a747b414b52b6a5e23c1c4126f8fd738c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a747b414b52b6a5e23c1c4126f8fd738c">~Indicator</a> ()</td></tr>
+<tr class="memitem:a00863a62e09bcab2e3c5d47db3d9476b" id="r_a00863a62e09bcab2e3c5d47db3d9476b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a00863a62e09bcab2e3c5d47db3d9476b">operator=</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;) noexcept</td></tr>
+<tr class="memitem:a9f8345afa27acfcd58044f0dfdf6ee89" id="r_a9f8345afa27acfcd58044f0dfdf6ee89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f8345afa27acfcd58044f0dfdf6ee89">operator=</a> (<a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&amp;) noexcept</td></tr>
+<tr class="memitem:ac690ad93eedd570f8002a7775cca3145" id="r_ac690ad93eedd570f8002a7775cca3145"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac690ad93eedd570f8002a7775cca3145">operator()</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind)</td></tr>
+<tr class="memdesc:ac690ad93eedd570f8002a7775cca3145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate a new value with the existing parameters, returning a brand new <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a>  <br /></td></tr>
+<tr class="memitem:a3554a0254489625f1bf9af209dff69fa" id="r_a3554a0254489625f1bf9af209dff69fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3554a0254489625f1bf9af209dff69fa">operator()</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;k) const</td></tr>
+<tr class="memdesc:a3554a0254489625f1bf9af209dff69fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new clone and use the parameter k as the context of the new instance  <br /></td></tr>
+<tr class="memitem:a25ea549a39882318a21346243492ba4b" id="r_a25ea549a39882318a21346243492ba4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25ea549a39882318a21346243492ba4b">operator()</a> ()</td></tr>
+<tr class="memdesc:a25ea549a39882318a21346243492ba4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new clone, the same as clone  <br /></td></tr>
+<tr class="memitem:a0d8300c5e5867233c3f98b1e05c3b49c" id="r_a0d8300c5e5867233c3f98b1e05c3b49c"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a> () const noexcept</td></tr>
+<tr class="memdesc:a0d8300c5e5867233c3f98b1e05c3b49c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> name  <br /></td></tr>
+<tr class="memitem:ac700bec71b92714ab6aa2410138d847e" id="r_ac700bec71b92714ab6aa2410138d847e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac700bec71b92714ab6aa2410138d847e">name</a> (const string &amp;name) noexcept</td></tr>
+<tr class="memitem:ab2e094ae26e3f12adb54451f590eda30" id="r_ab2e094ae26e3f12adb54451f590eda30"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator_imp.html#a89dfbaddbea317d601ee2e13ecc0d10f">IndicatorImp::OPType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2e094ae26e3f12adb54451f590eda30">getOPType</a> () const noexcept</td></tr>
+<tr class="memitem:a1a02b44d0758afea16f2d0fe35ab10c0" id="r_a1a02b44d0758afea16f2d0fe35ab10c0"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a02b44d0758afea16f2d0fe35ab10c0">long_name</a> () const</td></tr>
+<tr class="memdesc:a1a02b44d0758afea16f2d0fe35ab10c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">It is returned in the form: Name(param1_val,param2_val,...)  <br /></td></tr>
+<tr class="memitem:a419bc5e42c56313320a17a3919ceee35" id="r_a419bc5e42c56313320a17a3919ceee35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a419bc5e42c56313320a17a3919ceee35">clone</a> () const</td></tr>
+<tr class="memdesc:a419bc5e42c56313320a17a3919ceee35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone operation  <br /></td></tr>
+<tr class="memitem:a04fb927212c958dd7578082adfd9e109" id="r_a04fb927212c958dd7578082adfd9e109"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04fb927212c958dd7578082adfd9e109">setContext</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;)</td></tr>
+<tr class="memdesc:a04fb927212c958dd7578082adfd9e109"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the context  <br /></td></tr>
+<tr class="memitem:ab5e204d135e7ecfd57835b8f3c772740" id="r_ab5e204d135e7ecfd57835b8f3c772740"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5e204d135e7ecfd57835b8f3c772740">setContext</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;)</td></tr>
+<tr class="memitem:a45dd63a9d18510d05b78c18336c678a4" id="r_a45dd63a9d18510d05b78c18336c678a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45dd63a9d18510d05b78c18336c678a4">getContext</a> () const</td></tr>
+<tr class="memdesc:a45dd63a9d18510d05b78c18336c678a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the context  <br /></td></tr>
+<tr class="memitem:a437eb23a103e247d5395cd805b2d1e15" id="r_a437eb23a103e247d5395cd805b2d1e15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a437eb23a103e247d5395cd805b2d1e15">extend</a> ()</td></tr>
+<tr class="memdesc:a437eb23a103e247d5395cd805b2d1e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">When there is a context, the context is automatically extended to the current latest data and calculated  <br /></td></tr>
+<tr class="memitem:a6b706d7f038d417a94557602dab60924" id="r_a6b706d7f038d417a94557602dab60924"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b706d7f038d417a94557602dab60924">formula</a> () const</td></tr>
+<tr class="memdesc:a6b706d7f038d417a94557602dab60924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Display the indicator formula  <br /></td></tr>
+<tr class="memitem:a6b71e5fa8442a29de48cf4ce3d46f06c" id="r_a6b71e5fa8442a29de48cf4ce3d46f06c"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b71e5fa8442a29de48cf4ce3d46f06c">discard</a> () const noexcept</td></tr>
+<tr class="memdesc:a6b71e5fa8442a29de48cf4ce3d46f06c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of the values that need to be discarded in the result  <br /></td></tr>
+<tr class="memitem:a004790fab99f9c53b7a7dad747cdbb80" id="r_a004790fab99f9c53b7a7dad747cdbb80"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a004790fab99f9c53b7a7dad747cdbb80">setDiscard</a> (size_t <a class="el" href="#a6b71e5fa8442a29de48cf4ce3d46f06c">discard</a>) noexcept</td></tr>
+<tr class="memdesc:a004790fab99f9c53b7a7dad747cdbb80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number to discard; the value is clamped to <a class="el" href="#a7765d0795e8e72c9c6027a400f6bcfcd" title="Get the size">size()</a>.  <br /></td></tr>
+<tr class="memitem:a37fb3d1357c86a23f21716d8a4611ac8" id="r_a37fb3d1357c86a23f21716d8a4611ac8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37fb3d1357c86a23f21716d8a4611ac8">updateDiscard</a> (bool force=false) noexcept</td></tr>
+<tr class="memdesc:a37fb3d1357c86a23f21716d8a4611ac8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the discard number according to its own values; force=true forces the update, otherwise it updates starting from its current <a class="el" href="#a6b71e5fa8442a29de48cf4ce3d46f06c" title="Number of the values that need to be discarded in the result">discard()</a>  <br /></td></tr>
+<tr class="memitem:ad1b47839eb8e0bb81173200f9c193aa6" id="r_ad1b47839eb8e0bb81173200f9c193aa6"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1b47839eb8e0bb81173200f9c193aa6">getResultNumber</a> () const noexcept</td></tr>
+<tr class="memdesc:ad1b47839eb8e0bb81173200f9c193aa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return how many result sets are output  <br /></td></tr>
+<tr class="memitem:a86da48a120d2fe1eb53c89b3ea816d58" id="r_a86da48a120d2fe1eb53c89b3ea816d58"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86da48a120d2fe1eb53c89b3ea816d58">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:a86da48a120d2fe1eb53c89b3ea816d58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether it is empty  <br /></td></tr>
+<tr class="memitem:a7765d0795e8e72c9c6027a400f6bcfcd" id="r_a7765d0795e8e72c9c6027a400f6bcfcd"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7765d0795e8e72c9c6027a400f6bcfcd">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a7765d0795e8e72c9c6027a400f6bcfcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the size  <br /></td></tr>
+<tr class="memitem:a9c7c1787a302adf3b5511ab92ae4fa2a" id="r_a9c7c1787a302adf3b5511ab92ae4fa2a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c7c1787a302adf3b5511ab92ae4fa2a">operator[]</a> (size_t pos) const</td></tr>
+<tr class="memdesc:a9c7c1787a302adf3b5511ab92ae4fa2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the output at the corresponding position of the first result set only, the same as get(pos, 0)  <br /></td></tr>
+<tr class="memitem:a13e32b3bff3e785c708ec89126a88690" id="r_a13e32b3bff3e785c708ec89126a88690"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a13e32b3bff3e785c708ec89126a88690">operator[]</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a>) const</td></tr>
+<tr class="memdesc:a13e32b3bff3e785c708ec89126a88690"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the output at the corresponding position of the first result set only, the same as getByDate(date, 0)  <br /></td></tr>
+<tr class="memitem:a496449352818a699e952253b076638d5" id="r_a496449352818a699e952253b076638d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a496449352818a699e952253b076638d5">get</a> (size_t pos, size_t num=0) const</td></tr>
+<tr class="memdesc:a496449352818a699e952253b076638d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data at the given position of the num-th result set  <br /></td></tr>
+<tr class="memitem:a7f79660be049e7d02e27b24091c13283" id="r_a7f79660be049e7d02e27b24091c13283"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f79660be049e7d02e27b24091c13283">front</a> (size_t num=0) const</td></tr>
+<tr class="memitem:a65cc0365ff3690df910dca25b8d4cdab" id="r_a65cc0365ff3690df910dca25b8d4cdab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65cc0365ff3690df910dca25b8d4cdab">back</a> (size_t num=0) const</td></tr>
+<tr class="memitem:ae67c351a0ff23112c616351b07b527ca" id="r_ae67c351a0ff23112c616351b07b527ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae67c351a0ff23112c616351b07b527ca">getDatetime</a> (size_t pos) const</td></tr>
+<tr class="memdesc:ae67c351a0ff23112c616351b07b527ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the date of the given position  <br /></td></tr>
+<tr class="memitem:aa37725238d9d007419835713d6997242" id="r_aa37725238d9d007419835713d6997242"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa37725238d9d007419835713d6997242">getByDate</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> date, size_t num=0) const</td></tr>
+<tr class="memdesc:aa37725238d9d007419835713d6997242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data of the given date  <br /></td></tr>
+<tr class="memitem:a6eedb87c79fd0cca373afa71f4f4c4c3" id="r_a6eedb87c79fd0cca373afa71f4f4c4c3"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6eedb87c79fd0cca373afa71f4f4c4c3">getPos</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a>) const</td></tr>
+<tr class="memdesc:a6eedb87c79fd0cca373afa71f4f4c4c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index position corresponding to the given date  <br /></td></tr>
+<tr class="memitem:a923e66cedef9251e5572c3a5656aa4a0" id="r_a923e66cedef9251e5572c3a5656aa4a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a923e66cedef9251e5572c3a5656aa4a0">getResult</a> (size_t num) const</td></tr>
+<tr class="memdesc:a923e66cedef9251e5572c3a5656aa4a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the given result set as an indicator, its formula is not kept.  <br /></td></tr>
+<tr class="memitem:a2f473aa6004951092f51e35a66ea8f8e" id="r_a2f473aa6004951092f51e35a66ea8f8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f473aa6004951092f51e35a66ea8f8e">getResultAsPriceList</a> (size_t num) const</td></tr>
+<tr class="memdesc:a2f473aa6004951092f51e35a66ea8f8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the given result set as a <a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>  <br /></td></tr>
+<tr class="memitem:a1b173a61ac01b88abd2bd1dabc027af2" id="r_a1b173a61ac01b88abd2bd1dabc027af2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b173a61ac01b88abd2bd1dabc027af2">existNan</a> (size_t result_idx) const</td></tr>
+<tr class="memdesc:a1b173a61ac01b88abd2bd1dabc027af2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the given result set contains nan values  <br /></td></tr>
+<tr class="memitem:a26de3bb10aa44078a35175f3557c43a9" id="r_a26de3bb10aa44078a35175f3557c43a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26de3bb10aa44078a35175f3557c43a9">getDatetimeList</a> () const</td></tr>
+<tr class="memdesc:a26de3bb10aa44078a35175f3557c43a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2" title="Date list">DatetimeList</a>  <br /></td></tr>
+<tr class="memitem:a07bf71d4f54371898bba387e2012aedc" id="r_a07bf71d4f54371898bba387e2012aedc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07bf71d4f54371898bba387e2012aedc">alike</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;other) const</td></tr>
+<tr class="memdesc:a07bf71d4f54371898bba387e2012aedc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether it is equivalent to another indicator, i.e.  <br /></td></tr>
+<tr class="memitem:ad5c4f37786cc4f4e34d4f203f4defd3c" id="r_ad5c4f37786cc4f4e34d4f203f4defd3c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5c4f37786cc4f4e34d4f203f4defd3c">haveParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>) const</td></tr>
+<tr class="memitem:a4fb3576d2768b976dbfef891f871f20e" id="r_a4fb3576d2768b976dbfef891f871f20e"><td class="memTemplParams" colspan="2">template&lt;typename ValueType&gt; </td></tr>
+<tr class="memitem:a4fb3576d2768b976dbfef891f871f20e template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4fb3576d2768b976dbfef891f871f20e">setParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>, const ValueType &amp;value)</td></tr>
+<tr class="memitem:a3fe727c0d49d6236a21a63ff5a6ded28" id="r_a3fe727c0d49d6236a21a63ff5a6ded28"><td class="memTemplParams" colspan="2">template&lt;typename ValueType&gt; </td></tr>
+<tr class="memitem:a3fe727c0d49d6236a21a63ff5a6ded28 template"><td class="memItemLeft" align="right" valign="top">ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3fe727c0d49d6236a21a63ff5a6ded28">getParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>) const</td></tr>
+<tr class="memitem:a5d5ffea090c866779f9c3a6d439878ff" id="r_a5d5ffea090c866779f9c3a6d439878ff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5d5ffea090c866779f9c3a6d439878ff">haveIndParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>) const</td></tr>
+<tr class="memitem:a5cdfe10870ac17a6c442e0fa551b7cb0" id="r_a5cdfe10870ac17a6c442e0fa551b7cb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5cdfe10870ac17a6c442e0fa551b7cb0">setIndParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>, const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind)</td></tr>
+<tr class="memitem:a42bb2881b55d397cb3a6765b12d469c1" id="r_a42bb2881b55d397cb3a6765b12d469c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42bb2881b55d397cb3a6765b12d469c1">setIndParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>, const <a class="el" href="classhku_1_1_ind_param.html">IndParam</a> &amp;ind)</td></tr>
+<tr class="memitem:afaf82c3a50cfef21758f3ac85cee2235" id="r_afaf82c3a50cfef21758f3ac85cee2235"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_ind_param.html">IndParam</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afaf82c3a50cfef21758f3ac85cee2235">getIndParam</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>) const</td></tr>
+<tr class="memitem:ae8653e4cd064aee58dcf16fb856d1a86" id="r_ae8653e4cd064aee58dcf16fb856d1a86"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8653e4cd064aee58dcf16fb856d1a86">getIndParamImp</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>) const</td></tr>
+<tr class="memitem:a6084d407486786f463c781a76434d235" id="r_a6084d407486786f463c781a76434d235"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6084d407486786f463c781a76434d235">getImp</a> () const noexcept</td></tr>
+<tr class="memitem:afbafbfeceea7f2f5a5c250c7b7a510fd" id="r_afbafbfeceea7f2f5a5c250c7b7a510fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afbafbfeceea7f2f5a5c250c7b7a510fd">data</a> (size_t result_idx=0) noexcept</td></tr>
+<tr class="memitem:a9c5c830864797e6c044cd3755eb767d3" id="r_a9c5c830864797e6c044cd3755eb767d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a> const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c5c830864797e6c044cd3755eb767d3">data</a> (size_t result_idx=0) const noexcept</td></tr>
+<tr class="memitem:aafea965003adb83701bc4cd9817deabe" id="r_aafea965003adb83701bc4cd9817deabe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aafea965003adb83701bc4cd9817deabe">equal</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;other) const noexcept</td></tr>
+<tr class="memdesc:aafea965003adb83701bc4cd9817deabe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether the values of two ind are equal  <br /></td></tr>
+<tr class="memitem:aa5ead9fc57cdcf7986e4fd61e01ddc69" id="r_aa5ead9fc57cdcf7986e4fd61e01ddc69"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5ead9fc57cdcf7986e4fd61e01ddc69">isSame</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;other) const noexcept</td></tr>
+<tr class="memdesc:aa5ead9fc57cdcf7986e4fd61e01ddc69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether it is the same instance  <br /></td></tr>
+<tr class="memitem:af8bc8b00e9c065bec633de55f4f3814c" id="r_af8bc8b00e9c065bec633de55f4f3814c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8bc8b00e9c065bec633de55f4f3814c">contains</a> (const string &amp;<a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c">name</a>) const</td></tr>
+<tr class="memdesc:af8bc8b00e9c065bec633de55f4f3814c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether the indicator formula contains the indicator with the given name (for special use)  <br /></td></tr>
+<tr class="memitem:adb33ac479c16e1e4a92e49d5a63f3ac2" id="r_adb33ac479c16e1e4a92e49d5a63f3ac2"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb33ac479c16e1e4a92e49d5a63f3ac2">str</a> () const</td></tr>
+<tr class="memitem:a7bcb9c77b2e609c5b406aa78e48c8912" id="r_a7bcb9c77b2e609c5b406aa78e48c8912"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7bcb9c77b2e609c5b406aa78e48c8912">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:a4dbeb9959ccd6aed140ecf9d2282268e" id="r_a4dbeb9959ccd6aed140ecf9d2282268e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4dbeb9959ccd6aed140ecf9d2282268e">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memitem:a1b21b1b1e3bb591d3e141e5842d63105" id="r_a1b21b1b1e3bb591d3e141e5842d63105"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b21b1b1e3bb591d3e141e5842d63105">begin</a> () const</td></tr>
+<tr class="memitem:a4502b524e8a542e52944e08fd581b8b1" id="r_a4502b524e8a542e52944e08fd581b8b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4502b524e8a542e52944e08fd581b8b1">end</a> () const</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:ac450e76c6371bcf20913149ff7e88038" id="r_ac450e76c6371bcf20913149ff7e88038"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac450e76c6371bcf20913149ff7e88038">enableIncrementCalculate</a> (bool flag)</td></tr>
+<tr class="memitem:ae9000a284d91b738e18ee01d2f08587a" id="r_ae9000a284d91b738e18ee01d2f08587a"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9000a284d91b738e18ee01d2f08587a">enableIncrementCalculate</a> ()</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected 属性</h2></td></tr>
-<tr class="memitem:a9c29ddcd253645df3682ba78b4ae6476"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#a9c29ddcd253645df3682ba78b4ae6476">m_imp</a></td></tr>
-<tr class="separator:a9c29ddcd253645df3682ba78b4ae6476"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c29ddcd253645df3682ba78b4ae6476" id="r_a9c29ddcd253645df3682ba78b4ae6476"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c29ddcd253645df3682ba78b4ae6476">m_imp</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 友元</h2></td></tr>
-<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
-<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf77b54be1840ad73c4037abe5172215"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> friend std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html#aaf77b54be1840ad73c4037abe5172215">operator&lt;&lt;</a> (std::ostream &amp;, const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;)</td></tr>
-<tr class="separator:aaf77b54be1840ad73c4037abe5172215"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a115eaeb71eaefc99d968a6e744ee8d4d" id="r_a115eaeb71eaefc99d968a6e744ee8d4d"><td class="memItemLeft" align="right" valign="top">HKU_API friend std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a115eaeb71eaefc99d968a6e744ee8d4d">operator&lt;&lt;</a> (std::ostream &amp;, const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;)</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp </p>
-<p>实现新指标时，应继承IndicatorImp类，并定义相关的指标生成函数，如: </p><pre>
-class Ma: public <a class="el" href="classhku_1_1_indicator_imp.html" title="指标实现类，定义新指标时，应从此类继承 ">IndicatorImp</a> {
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p><a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> class, concretely implemented by <a class="el" href="classhku_1_1_indicator_imp.html" title="Indicator implementation class; when defining a new indicator, this class should be inherited">IndicatorImp</a>; when implementing a new indicator, <a class="el" href="classhku_1_1_indicator_imp.html" title="Indicator implementation class; when defining a new indicator, this class should be inherited">IndicatorImp</a> should be inherited </p>
+<p>When implementing a new indicator, the <a class="el" href="classhku_1_1_indicator_imp.html" title="Indicator implementation class; when defining a new indicator, this class should be inherited">IndicatorImp</a> class should be inherited and the related indicator creation function should be defined, e.g.: </p><pre>
+class Ma: public <a class="el" href="classhku_1_1_indicator_imp.html" title="Indicator implementation class; when defining a new indicator, this class should be inherited">IndicatorImp</a> {
 public:
     MA(size_t);
-    MA(const Indicator&amp;, size_t);</pre><pre>    virtual string <a class="el" href="classhku_1_1_indicator.html#a0a04ea1245f65303c6118df123317661" title="指标名称 ">name()</a> { return "MA"; }
+    MA(const Indicator&amp;, size_t);
+
+    virtual string <a class="el" href="#a0d8300c5e5867233c3f98b1e05c3b49c" title="Indicator name">name()</a> { return "MA"; }
     virtual string toString() { retun "Indicator(MA)"; }
-};</pre><pre><a class="el" href="classhku_1_1_indicator.html" title="指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp ">Indicator</a> HKU_API MA(size_t n = 30) {
-    return <a class="el" href="classhku_1_1_indicator.html" title="指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp ">Indicator</a>(IndicatorImpPtr(new MA(n)));
-}</pre><pre><a class="el" href="classhku_1_1_indicator.html" title="指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp ">Indicator</a> HKU_API MA(const <a class="el" href="classhku_1_1_indicator.html" title="指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp ">Indicator</a>&amp; indicator, size_t n = 30);
-</pre> </div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a0b8863417f027705dd8ecf54d400ff90"></a>
+};
+
+<a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> HKU_API MA(size_t n = 30) {
+    return <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a>(<a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr(new MA(n))</a>);
+}
+
+<a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> HKU_API MA(const <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a>&amp; indicator, size_t n = 30);
+</pre> </div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a402164ce6af0a2443d014aa44cb92ebb" name="a402164ce6af0a2443d014aa44cb92ebb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a402164ce6af0a2443d014aa44cb92ebb">&#9670;&#160;</a></span>iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a> <a class="el" href="#a402164ce6af0a2443d014aa44cb92ebb">hku::Indicator::iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac8f468be2ac0597910e8171292ddcee2" name="ac8f468be2ac0597910e8171292ddcee2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8f468be2ac0597910e8171292ddcee2">&#9670;&#160;</a></span>value_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classhku_1_1_indicator_imp.html#abfe6452bf4e40263d5416512e391ac5c">IndicatorImp::value_t</a> <a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">hku::Indicator::value_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2indicator_2utils_8h-example.html#a4">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/indicator/utils.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a0b8863417f027705dd8ecf54d400ff90" name="a0b8863417f027705dd8ecf54d400ff90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b8863417f027705dd8ecf54d400ff90">&#9670;&#160;</a></span>Indicator() <span class="overload">[1/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -196,52 +272,22 @@ public:
         <tr>
           <td class="memname">hku::Indicator::Indicator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a971eb2b7331774fc1077c4a252522f48"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::Indicator::Indicator </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a> &amp;&#160;</td>
-          <td class="paramname"><em>imp</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<a id="ad94e99a5943d3bd68da78d15f0bb3e72" name="ad94e99a5943d3bd68da78d15f0bb3e72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad94e99a5943d3bd68da78d15f0bb3e72">&#9670;&#160;</a></span>Indicator() <span class="overload">[2/4]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="a3f412564757ccb7df32d353cb02379bd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::Indicator::Indicator </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
-          <td class="paramname"><em>indicator</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a570dfbfe7e49395a29ddb816da4e622f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -249,57 +295,301 @@ public:
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::Indicator::~Indicator </td>
+          <td class="memname">hku::Indicator::Indicator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>imp</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a583bd294654c9aa5e190a742fb6563e6"></a>
+<a id="a58991abcf4a258615db1201f043462e1" name="a58991abcf4a258615db1201f043462e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58991abcf4a258615db1201f043462e1">&#9670;&#160;</a></span>Indicator() <span class="overload">[3/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Indicator::Indicator </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5c1eed3fc1436860d8523672e1c57ac6" name="a5c1eed3fc1436860d8523672e1c57ac6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c1eed3fc1436860d8523672e1c57ac6">&#9670;&#160;</a></span>Indicator() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Indicator::Indicator </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a747b414b52b6a5e23c1c4126f8fd738c" name="a747b414b52b6a5e23c1c4126f8fd738c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a747b414b52b6a5e23c1c4126f8fd738c">&#9670;&#160;</a></span>~Indicator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::Indicator::~Indicator </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a07bf71d4f54371898bba387e2012aedc" name="a07bf71d4f54371898bba387e2012aedc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07bf71d4f54371898bba387e2012aedc">&#9670;&#160;</a></span>alike()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::alike </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Judge whether it is equivalent to another indicator, i.e. </p>
+<p>the calculation effect is the same </p>
+
+</div>
+</div>
+<a id="a65cc0365ff3690df910dca25b8d4cdab" name="a65cc0365ff3690df910dca25b8d4cdab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65cc0365ff3690df910dca25b8d4cdab">&#9670;&#160;</a></span>back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> hku::Indicator::back </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1b21b1b1e3bb591d3e141e5842d63105" name="a1b21b1b1e3bb591d3e141e5842d63105"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b21b1b1e3bb591d3e141e5842d63105">&#9670;&#160;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a> hku::Indicator::begin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a419bc5e42c56313320a17a3919ceee35" name="a419bc5e42c56313320a17a3919ceee35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a419bc5e42c56313320a17a3919ceee35">&#9670;&#160;</a></span>clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::Indicator::clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clone operation </p>
+
+</div>
+</div>
+<a id="af8bc8b00e9c065bec633de55f4f3814c" name="af8bc8b00e9c065bec633de55f4f3814c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8bc8b00e9c065bec633de55f4f3814c">&#9670;&#160;</a></span>contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::contains </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Judge whether the indicator formula contains the indicator with the given name (for special use) </p>
+
+</div>
+</div>
+<a id="a9c5c830864797e6c044cd3755eb767d3" name="a9c5c830864797e6c044cd3755eb767d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c5c830864797e6c044cd3755eb767d3">&#9670;&#160;</a></span>data() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a> const  * hku::Indicator::data </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>result_idx</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afbafbfeceea7f2f5a5c250c7b7a510fd" name="afbafbfeceea7f2f5a5c250c7b7a510fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbafbfeceea7f2f5a5c250c7b7a510fd">&#9670;&#160;</a></span>data() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">value_t</a> * hku::Indicator::data </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>result_idx</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6b71e5fa8442a29de48cf4ce3d46f06c" name="a6b71e5fa8442a29de48cf4ce3d46f06c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b71e5fa8442a29de48cf4ce3d46f06c">&#9670;&#160;</a></span>discard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">size_t hku::Indicator::discard </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>结果中需抛弃的个数 </p>
+<p>Number of the values that need to be discarded in the result </p>
 
 </div>
 </div>
-<a class="anchor" id="a2ce15985d1e7a2d9e2761ec730c33d02"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool hku::Indicator::empty </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<a id="a86da48a120d2fe1eb53c89b3ea816d58" name="a86da48a120d2fe1eb53c89b3ea816d58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86da48a120d2fe1eb53c89b3ea816d58">&#9670;&#160;</a></span>empty()</h2>
 
-<p>判断是否为空 </p>
-
-</div>
-</div>
-<a class="anchor" id="a5f4505811627bdcea6cbf8b906f470f5"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -307,43 +597,375 @@ public:
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::Indicator::get </td>
+          <td class="memname">bool hku::Indicator::empty </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>pos</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>num</em> = <code>0</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取第num个结果集中指定位置的数据 </p>
-<dl class="params"><dt>参数</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pos</td><td>结果集中的位置 </td></tr>
-    <tr><td class="paramname">num</td><td>第几个结果集 </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>注解</dt><dd>不做下标越界检查，不会抛出异常 </dd></dl>
+<p>Judge whether it is empty </p>
 
 </div>
 </div>
-<a class="anchor" id="a1f91a8c4516d09ea94effd30b21c1078"></a>
+<a id="ae9000a284d91b738e18ee01d2f08587a" name="ae9000a284d91b738e18ee01d2f08587a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9000a284d91b738e18ee01d2f08587a">&#9670;&#160;</a></span>enableIncrementCalculate() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::enableIncrementCalculate </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac450e76c6371bcf20913149ff7e88038" name="ac450e76c6371bcf20913149ff7e88038"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac450e76c6371bcf20913149ff7e88038">&#9670;&#160;</a></span>enableIncrementCalculate() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Indicator::enableIncrementCalculate </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>flag</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4502b524e8a542e52944e08fd581b8b1" name="a4502b524e8a542e52944e08fd581b8b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4502b524e8a542e52944e08fd581b8b1">&#9670;&#160;</a></span>end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator_1_1_iterator.html">Iterator</a> hku::Indicator::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aafea965003adb83701bc4cd9817deabe" name="aafea965003adb83701bc4cd9817deabe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafea965003adb83701bc4cd9817deabe">&#9670;&#160;</a></span>equal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::equal </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Judge whether the values of two ind are equal </p>
+<dl class="section note"><dt>注解</dt><dd>The operator== overload creates a new <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a>; this function is used to compare the values of two ind </dd></dl>
+
+</div>
+</div>
+<a id="a1b173a61ac01b88abd2bd1dabc027af2" name="a1b173a61ac01b88abd2bd1dabc027af2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b173a61ac01b88abd2bd1dabc027af2">&#9670;&#160;</a></span>existNan()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::existNan </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>result_idx</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the given result set contains nan values </p>
+
+</div>
+</div>
+<a id="a437eb23a103e247d5395cd805b2d1e15" name="a437eb23a103e247d5395cd805b2d1e15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a437eb23a103e247d5395cd805b2d1e15">&#9670;&#160;</a></span>extend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Indicator::extend </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>When there is a context, the context is automatically extended to the current latest data and calculated </p>
+
+</div>
+</div>
+<a id="a6b706d7f038d417a94557602dab60924" name="a6b706d7f038d417a94557602dab60924"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b706d7f038d417a94557602dab60924">&#9670;&#160;</a></span>formula()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::Indicator::formula </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Display the indicator formula </p>
+
+</div>
+</div>
+<a id="a7f79660be049e7d02e27b24091c13283" name="a7f79660be049e7d02e27b24091c13283"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f79660be049e7d02e27b24091c13283">&#9670;&#160;</a></span>front()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> hku::Indicator::front </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a496449352818a699e952253b076638d5" name="a496449352818a699e952253b076638d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a496449352818a699e952253b076638d5">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> hku::Indicator::get </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data at the given position of the num-th result set </p>
+<p>Speed first entry: the bounds are only checked when CHECK_ACCESS_BOUND is on, so the caller must ensure 0 &lt;= pos &lt; <a class="el" href="#a7765d0795e8e72c9c6027a400f6bcfcd" title="Get the size">size()</a> and num &lt; <a class="el" href="#ad1b47839eb8e0bb81173200f9c193aa6" title="Return how many result sets are output">getResultNumber()</a></p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>the position in the result set </td></tr>
+    <tr><td class="paramname">num</td><td>the num-th result set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa37725238d9d007419835713d6997242" name="aa37725238d9d007419835713d6997242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa37725238d9d007419835713d6997242">&#9670;&#160;</a></span>getByDate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> hku::Indicator::getByDate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data of the given date </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">date</td><td>the given date </td></tr>
+    <tr><td class="paramname">num</td><td>the num-th result set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a45dd63a9d18510d05b78c18336c678a4" name="a45dd63a9d18510d05b78c18336c678a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45dd63a9d18510d05b78c18336c678a4">&#9670;&#160;</a></span>getContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::Indicator::getContext </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the context </p>
+
+</div>
+</div>
+<a id="ae67c351a0ff23112c616351b07b527ca" name="ae67c351a0ff23112c616351b07b527ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae67c351a0ff23112c616351b07b527ca">&#9670;&#160;</a></span>getDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::Indicator::getDatetime </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the date of the given position </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>the position in the result set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a26de3bb10aa44078a35175f3557c43a9" name="a26de3bb10aa44078a35175f3557c43a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26de3bb10aa44078a35175f3557c43a9">&#9670;&#160;</a></span>getDatetimeList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::Indicator::getDatetimeList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2" title="Date list">DatetimeList</a> </p>
+
+</div>
+</div>
+<a id="a6084d407486786f463c781a76434d235" name="a6084d407486786f463c781a76434d235"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6084d407486786f463c781a76434d235">&#9670;&#160;</a></span>getImp()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -353,24 +975,101 @@ public:
         <tr>
           <td class="memname"><a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a> hku::Indicator::getImp </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="acd24e481816cd55cde7fd3bcaa03faf1"></a>
+<a id="afaf82c3a50cfef21758f3ac85cee2235" name="afaf82c3a50cfef21758f3ac85cee2235"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afaf82c3a50cfef21758f3ac85cee2235">&#9670;&#160;</a></span>getIndParam()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_ind_param.html">IndParam</a> hku::Indicator::getIndParam </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae8653e4cd064aee58dcf16fb856d1a86" name="ae8653e4cd064aee58dcf16fb856d1a86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8653e4cd064aee58dcf16fb856d1a86">&#9670;&#160;</a></span>getIndParamImp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="namespacehku.html#a170c09f1367dc807002f462e4f4af03c">IndicatorImpPtr</a> hku::Indicator::getIndParamImp </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab2e094ae26e3f12adb54451f590eda30" name="ab2e094ae26e3f12adb54451f590eda30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2e094ae26e3f12adb54451f590eda30">&#9670;&#160;</a></span>getOPType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator_imp.html#a89dfbaddbea317d601ee2e13ecc0d10f">IndicatorImp::OPType</a> hku::Indicator::getOPType </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3fe727c0d49d6236a21a63ff5a6ded28" name="a3fe727c0d49d6236a21a63ff5a6ded28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fe727c0d49d6236a21a63ff5a6ded28">&#9670;&#160;</a></span>getParam()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType &gt; </div>
+template&lt;typename ValueType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -378,45 +1077,99 @@ template&lt;typename ValueType &gt; </div>
         <tr>
           <td class="memname">ValueType hku::Indicator::getParam </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ab9b6a46cbd748d3c4f15ec3c812e6955"></a>
+<a id="a6eedb87c79fd0cca373afa71f4f4c4c3" name="a6eedb87c79fd0cca373afa71f4f4c4c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6eedb87c79fd0cca373afa71f4f4c4c3">&#9670;&#160;</a></span>getPos()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::Indicator::getPos </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>date</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the index position corresponding to the given date </p>
+
+</div>
+</div>
+<a id="a923e66cedef9251e5572c3a5656aa4a0" name="a923e66cedef9251e5572c3a5656aa4a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a923e66cedef9251e5572c3a5656aa4a0">&#9670;&#160;</a></span>getResult()</h2>
+
+<div class="memitem">
+<div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::Indicator::getResult </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>num</em></td><td>)</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Get the given result set as an indicator, its formula is not kept. </p>
+<p>For an indicator that no longer needs to be calculated, the occupied memory can be released through this method. </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>the given result set </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="a084eff9900b624727bb552ec0d4c52fc"></a>
+<a id="a2f473aa6004951092f51e35a66ea8f8e" name="a2f473aa6004951092f51e35a66ea8f8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f473aa6004951092f51e35a66ea8f8e">&#9670;&#160;</a></span>getResultAsPriceList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> hku::Indicator::getResultAsPriceList </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the given result set as a <a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>the given result set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad1b47839eb8e0bb81173200f9c193aa6" name="ad1b47839eb8e0bb81173200f9c193aa6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1b47839eb8e0bb81173200f9c193aa6">&#9670;&#160;</a></span>getResultNumber()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -424,124 +1177,297 @@ template&lt;typename ValueType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> hku::Indicator::getResultAsPriceList </td>
+          <td class="memname">size_t hku::Indicator::getResultNumber </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>num</em></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return how many result sets are output </p>
+
+</div>
+</div>
+<a id="a4dbeb9959ccd6aed140ecf9d2282268e" name="a4dbeb9959ccd6aed140ecf9d2282268e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dbeb9959ccd6aed140ecf9d2282268e">&#9670;&#160;</a></span>hasPythonPart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::hasPythonPart </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="adc9c005cb61678b781d469755d4cc66e"></a>
+<a id="a5d5ffea090c866779f9c3a6d439878ff" name="a5d5ffea090c866779f9c3a6d439878ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d5ffea090c866779f9c3a6d439878ff">&#9670;&#160;</a></span>haveIndParam()</h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t hku::Indicator::getResultNumber </td>
+          <td class="memname">bool hku::Indicator::haveIndParam </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>返回有几个结果集输出 </p>
+</div>
+</div>
+<a id="ad5c4f37786cc4f4e34d4f203f4defd3c" name="ad5c4f37786cc4f4e34d4f203f4defd3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5c4f37786cc4f4e34d4f203f4defd3c">&#9670;&#160;</a></span>haveParam()</h2>
 
-</div>
-</div>
-<a class="anchor" id="a209fc0ac566b082dda6fd2e768fa21de"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::Indicator::long_name </td>
+          <td class="memname">bool hku::Indicator::haveParam </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>返回形如：Name(param1_val,param2_val,...) </p>
+</div>
+</div>
+<a id="a7bcb9c77b2e609c5b406aa78e48c8912" name="a7bcb9c77b2e609c5b406aa78e48c8912"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bcb9c77b2e609c5b406aa78e48c8912">&#9670;&#160;</a></span>isPythonObject()</h2>
 
-</div>
-</div>
-<a class="anchor" id="a0a04ea1245f65303c6118df123317661"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::Indicator::name </td>
+          <td class="memname">bool hku::Indicator::isPythonObject </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>指标名称 </p>
+</div>
+</div>
+<a id="aa5ead9fc57cdcf7986e4fd61e01ddc69" name="aa5ead9fc57cdcf7986e4fd61e01ddc69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5ead9fc57cdcf7986e4fd61e01ddc69">&#9670;&#160;</a></span>isSame()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Indicator::isSame </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Judge whether it is the same instance </p>
 
 </div>
 </div>
-<a class="anchor" id="ac7c4bcd75ba3e74fb8111af756a5d83f"></a>
+<a id="a1a02b44d0758afea16f2d0fe35ab10c0" name="a1a02b44d0758afea16f2d0fe35ab10c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a02b44d0758afea16f2d0fe35ab10c0">&#9670;&#160;</a></span>long_name()</h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::Indicator::long_name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It is returned in the form: Name(param1_val,param2_val,...) </p>
+
+</div>
+</div>
+<a id="a0d8300c5e5867233c3f98b1e05c3b49c" name="a0d8300c5e5867233c3f98b1e05c3b49c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d8300c5e5867233c3f98b1e05c3b49c">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::Indicator::name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> name </p>
+
+</div>
+</div>
+<a id="ac700bec71b92714ab6aa2410138d847e" name="ac700bec71b92714ab6aa2410138d847e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac700bec71b92714ab6aa2410138d847e">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void hku::Indicator::name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ac690ad93eedd570f8002a7775cca3145"></a>
+<a id="a25ea549a39882318a21346243492ba4b" name="a25ea549a39882318a21346243492ba4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25ea549a39882318a21346243492ba4b">&#9670;&#160;</a></span>operator()() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::Indicator::operator() </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a new clone, the same as clone </p>
+
+</div>
+</div>
+<a id="ac690ad93eedd570f8002a7775cca3145" name="ac690ad93eedd570f8002a7775cca3145"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac690ad93eedd570f8002a7775cca3145">&#9670;&#160;</a></span>operator()() <span class="overload">[2/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::Indicator::operator() </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
-          <td class="paramname"><em>ind</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>使用已有参数计算新值，返回全新的Indicator </p>
+<p>Calculate a new value with the existing parameters, returning a brand new <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="a953cf2a18c1b214bffdb982bb2281bca"></a>
+<a id="a3554a0254489625f1bf9af209dff69fa" name="a3554a0254489625f1bf9af209dff69fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3554a0254489625f1bf9af209dff69fa">&#9670;&#160;</a></span>operator()() <span class="overload">[3/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp; hku::Indicator::operator= </td>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::Indicator::operator() </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
-          <td class="paramname"><em>indicator</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>k</em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Create a new clone and use the parameter k as the context of the new instance </p>
+
 </div>
 </div>
-<a class="anchor" id="acbe70a8b716893698ce8fee8871d9896"></a>
+<a id="a00863a62e09bcab2e3c5d47db3d9476b" name="a00863a62e09bcab2e3c5d47db3d9476b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00863a62e09bcab2e3c5d47db3d9476b">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -549,48 +1475,233 @@ template&lt;typename ValueType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::Indicator::operator[] </td>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp; hku::Indicator::operator= </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9f8345afa27acfcd58044f0dfdf6ee89" name="a9f8345afa27acfcd58044f0dfdf6ee89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f8345afa27acfcd58044f0dfdf6ee89">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp; hku::Indicator::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a13e32b3bff3e785c708ec89126a88690" name="a13e32b3bff3e785c708ec89126a88690"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13e32b3bff3e785c708ec89126a88690">&#9670;&#160;</a></span>operator[]() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> hku::Indicator::operator[] </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>date</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>只获取第一个结果集中相应位置输出，等同于get(pos, 0) </p>
-<dl class="section note"><dt>注解</dt><dd>不做下标越界检查，也不抛出异常 </dd></dl>
+<p>Get the output at the corresponding position of the first result set only, the same as getByDate(date, 0) </p>
 
 </div>
 </div>
-<a class="anchor" id="a87130588c6c8ee6e8c5d72635dc02f99"></a>
+<a id="a9c7c1787a302adf3b5511ab92ae4fa2a" name="a9c7c1787a302adf3b5511ab92ae4fa2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c7c1787a302adf3b5511ab92ae4fa2a">&#9670;&#160;</a></span>operator[]() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> hku::Indicator::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the output at the corresponding position of the first result set only, the same as get(pos, 0) </p>
+
+</div>
+</div>
+<a id="ab5e204d135e7ecfd57835b8f3c772740" name="ab5e204d135e7ecfd57835b8f3c772740"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5e204d135e7ecfd57835b8f3c772740">&#9670;&#160;</a></span>setContext() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void hku::Indicator::setDiscard </td>
+          <td class="memname">void hku::Indicator::setContext </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>discard</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>设置抛弃的个数，如果小于原有的discard则无效 </p>
+</div>
+</div>
+<a id="a04fb927212c958dd7578082adfd9e109" name="a04fb927212c958dd7578082adfd9e109"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04fb927212c958dd7578082adfd9e109">&#9670;&#160;</a></span>setContext() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Indicator::setContext </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the context </p>
 
 </div>
 </div>
-<a class="anchor" id="a4fb3576d2768b976dbfef891f871f20e"></a>
+<a id="a004790fab99f9c53b7a7dad747cdbb80" name="a004790fab99f9c53b7a7dad747cdbb80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a004790fab99f9c53b7a7dad747cdbb80">&#9670;&#160;</a></span>setDiscard()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Indicator::setDiscard </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>discard</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the number to discard; the value is clamped to <a class="el" href="#a7765d0795e8e72c9c6027a400f6bcfcd" title="Get the size">size()</a>. </p>
+<p>When it grows, the extended leading slots are filled with <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>; when it shrinks, the previously discarded slots become part of the valid region, so the caller must ensure the data there reflects the current calculation (e.g. by going through _readyBuffer or a fresh _calculate beforehand) </p>
+
+</div>
+</div>
+<a id="a5cdfe10870ac17a6c442e0fa551b7cb0" name="a5cdfe10870ac17a6c442e0fa551b7cb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cdfe10870ac17a6c442e0fa551b7cb0">&#9670;&#160;</a></span>setIndParam() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Indicator::setIndParam </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a42bb2881b55d397cb3a6765b12d469c1" name="a42bb2881b55d397cb3a6765b12d469c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42bb2881b55d397cb3a6765b12d469c1">&#9670;&#160;</a></span>setIndParam() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Indicator::setIndParam </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_ind_param.html">IndParam</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4fb3576d2768b976dbfef891f871f20e" name="a4fb3576d2768b976dbfef891f871f20e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fb3576d2768b976dbfef891f871f20e">&#9670;&#160;</a></span>setParam()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType &gt; </div>
+template&lt;typename ValueType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -598,49 +1709,70 @@ template&lt;typename ValueType &gt; </div>
         <tr>
           <td class="memname">void hku::Indicator::setParam </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const ValueType &amp;&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const ValueType &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a13b8288fff9a13aeed375bb1ade53773"></a>
+<a id="a7765d0795e8e72c9c6027a400f6bcfcd" name="a7765d0795e8e72c9c6027a400f6bcfcd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7765d0795e8e72c9c6027a400f6bcfcd">&#9670;&#160;</a></span>size()</h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">size_t hku::Indicator::size </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the size </p>
+
+</div>
+</div>
+<a id="adb33ac479c16e1e4a92e49d5a63f3ac2" name="adb33ac479c16e1e4a92e49d5a63f3ac2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb33ac479c16e1e4a92e49d5a63f3ac2">&#9670;&#160;</a></span>str()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::Indicator::str </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>获取大小 </p>
+</div>
+</div>
+<a id="a37fb3d1357c86a23f21716d8a4611ac8" name="a37fb3d1357c86a23f21716d8a4611ac8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37fb3d1357c86a23f21716d8a4611ac8">&#9670;&#160;</a></span>updateDiscard()</h2>
 
-</div>
-</div>
-<h2 class="groupheader">友元及相关函数文档</h2>
-<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -648,19 +1780,27 @@ template&lt;typename ValueType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">friend class boost::serialization::access</td>
+          <td class="memname">void hku::Indicator::updateDiscard </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>force</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Update the discard number according to its own values; force=true forces the update, otherwise it updates starting from its current <a class="el" href="#a6b71e5fa8442a29de48cf4ce3d46f06c" title="Number of the values that need to be discarded in the result">discard()</a> </p>
+
 </div>
 </div>
-<a class="anchor" id="aaf77b54be1840ad73c4037abe5172215"></a>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="a115eaeb71eaefc99d968a6e744ee8d4d" name="a115eaeb71eaefc99d968a6e744ee8d4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a115eaeb71eaefc99d968a6e744ee8d4d">&#9670;&#160;</a></span>operator&lt;&lt;</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -668,34 +1808,29 @@ template&lt;typename ValueType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> friend std::ostream&amp; operator&lt;&lt; </td>
+          <td class="memname">HKU_API friend std::ostream &amp; operator&lt;&lt; </td>
           <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>os</em>, </td>
+          <td class="paramtype">std::ostream &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
-          <td class="paramname"><em>indicator</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="a9c29ddcd253645df3682ba78b4ae6476"></a>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a9c29ddcd253645df3682ba78b4ae6476" name="a9c29ddcd253645df3682ba78b4ae6476"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c29ddcd253645df3682ba78b4ae6476">&#9670;&#160;</a></span>m_imp</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -708,7 +1843,7 @@ template&lt;typename ValueType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -717,15 +1852,26 @@ template&lt;typename ValueType &gt; </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/indicator/<a class="el" href="_indicator_8h_source.html">Indicator.h</a></li>
-<li>hikyuu/indicator/<a class="el" href="_indicator_8cpp.html">Indicator.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_indicator.html">Indicator</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

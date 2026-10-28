@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::StoplossBase类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_stoploss_base.html','','classhku_1_1_stoploss_base-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,142 +74,127 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pro-attribs">Protected 属性</a> &#124;
-<a href="#friends">友元</a> &#124;
-<a href="classhku_1_1_stoploss_base-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::StoplossBase类 参考<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a> &raquo; <a class="el" href="group___stoploss.html">Stoploss 止损、止赢策略</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::StoplossBase类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a> &raquo; <a class="el" href="group___stoploss.html">Stoploss stop-loss / take-profit strategy</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>止损/止赢策略基类  
- <a href="classhku_1_1_stoploss_base.html#details">更多...</a></p>
+<p>Base class of the stop-loss / take-profit strategy  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_stoploss_base_8h_source.html">StoplossBase.h</a>&gt;</code></p>
 <div class="dynheader">
 类 hku::StoplossBase 继承关系图:</div>
 <div class="dyncontent">
-<div class="center"><img src="classhku_1_1_stoploss_base__inherit__graph.png" border="0" usemap="#hku_1_1_stoploss_base_inherit__map" alt="Inheritance graph"/></div>
-<map name="hku_1_1_stoploss_base_inherit__map" id="hku_1_1_stoploss_base_inherit__map">
-<area shape="rect" id="node2" href="classhku_1_1_fixed_percent_stoploss.html" title="固定百分比止损策略，即当价格低于买入价格的某一百分比时止损 " alt="" coords="5,83,235,112"/>
-<area shape="rect" id="node3" href="classhku_1_1_indicator_stoploss.html" title="hku::IndicatorStoploss" alt="" coords="259,83,456,112"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="center"><img src="classhku_1_1_stoploss_base__inherit__graph.png" border="0" usemap="#ahku_1_1_stoploss_base_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <div class="dynheader">
 hku::StoplossBase 的协作图:</div>
 <div class="dyncontent">
-<div class="center"><img src="classhku_1_1_stoploss_base__coll__graph.png" border="0" usemap="#hku_1_1_stoploss_base_coll__map" alt="Collaboration graph"/></div>
-<map name="hku_1_1_stoploss_base_coll__map" id="hku_1_1_stoploss_base_coll__map">
-<area shape="rect" id="node2" href="classhku_1_1_k_data.html" title="K线数据 " alt="" coords="35,5,142,35"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="center"><img src="classhku_1_1_stoploss_base__coll__graph.png" border="0" usemap="#ahku_1_1_stoploss_base_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:ad7841661b223abe039fb436eae1ba149"><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr&lt; <a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">StoplossPtr</a></td></tr>
-<tr class="separator:ad7841661b223abe039fb436eae1ba149"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad50d98f2cb30dc6e5ac603ca61d14888" id="r_ad50d98f2cb30dc6e5ac603ca61d14888"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad50d98f2cb30dc6e5ac603ca61d14888">StoplossPtr</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a3081b44d973deb320bbcd517c7e3d086"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a3081b44d973deb320bbcd517c7e3d086">StoplossBase</a> ()</td></tr>
-<tr class="separator:a3081b44d973deb320bbcd517c7e3d086"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a026b6ab57823fdb3e890668c094d3345"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a026b6ab57823fdb3e890668c094d3345">StoplossBase</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_stoploss_base.html#afb6cb22da35cc04bc927dc217a0c8210">name</a>)</td></tr>
-<tr class="separator:a026b6ab57823fdb3e890668c094d3345"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f61d7ea946e080273ddd13a8273076c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a2f61d7ea946e080273ddd13a8273076c">~StoplossBase</a> ()</td></tr>
-<tr class="separator:a2f61d7ea946e080273ddd13a8273076c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb6cb22da35cc04bc927dc217a0c8210"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#afb6cb22da35cc04bc927dc217a0c8210">name</a> () const </td></tr>
-<tr class="memdesc:afb6cb22da35cc04bc927dc217a0c8210"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取名称  <a href="#afb6cb22da35cc04bc927dc217a0c8210">更多...</a><br /></td></tr>
-<tr class="separator:afb6cb22da35cc04bc927dc217a0c8210"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2501aa61b97c5700dd3c08d36f74ff52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a2501aa61b97c5700dd3c08d36f74ff52">name</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
-<tr class="memdesc:a2501aa61b97c5700dd3c08d36f74ff52"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置名称  <a href="#a2501aa61b97c5700dd3c08d36f74ff52">更多...</a><br /></td></tr>
-<tr class="separator:a2501aa61b97c5700dd3c08d36f74ff52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c8e11a9273f10bad58ac727d50c3912"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a3c8e11a9273f10bad58ac727d50c3912">setTM</a> (const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;tm)</td></tr>
-<tr class="memdesc:a3c8e11a9273f10bad58ac727d50c3912"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置交易管理实例  <a href="#a3c8e11a9273f10bad58ac727d50c3912">更多...</a><br /></td></tr>
-<tr class="separator:a3c8e11a9273f10bad58ac727d50c3912"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d935980657f9ac5f2e9780cc7924a4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a7d935980657f9ac5f2e9780cc7924a4a">getTM</a> () const </td></tr>
-<tr class="memdesc:a7d935980657f9ac5f2e9780cc7924a4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取交易管理实例  <a href="#a7d935980657f9ac5f2e9780cc7924a4a">更多...</a><br /></td></tr>
-<tr class="separator:a7d935980657f9ac5f2e9780cc7924a4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b04ae077e756c58faf34f656175d52c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a8b04ae077e756c58faf34f656175d52c">setTO</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;kdata)</td></tr>
-<tr class="memdesc:a8b04ae077e756c58faf34f656175d52c"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置交易对象  <a href="#a8b04ae077e756c58faf34f656175d52c">更多...</a><br /></td></tr>
-<tr class="separator:a8b04ae077e756c58faf34f656175d52c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a3cfee1356ed4aa6768cd7a15ecb2fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a7a3cfee1356ed4aa6768cd7a15ecb2fc">getTO</a> () const </td></tr>
-<tr class="memdesc:a7a3cfee1356ed4aa6768cd7a15ecb2fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取交易对象  <a href="#a7a3cfee1356ed4aa6768cd7a15ecb2fc">更多...</a><br /></td></tr>
-<tr class="separator:a7a3cfee1356ed4aa6768cd7a15ecb2fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5a6baf6dde67bed9281847d73cb93df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#aa5a6baf6dde67bed9281847d73cb93df">reset</a> ()</td></tr>
-<tr class="memdesc:aa5a6baf6dde67bed9281847d73cb93df"><td class="mdescLeft">&#160;</td><td class="mdescRight">复位操作  <a href="#aa5a6baf6dde67bed9281847d73cb93df">更多...</a><br /></td></tr>
-<tr class="separator:aa5a6baf6dde67bed9281847d73cb93df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af83f5c127fcca8a019f7ad8ada9efddc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#af83f5c127fcca8a019f7ad8ada9efddc">clone</a> ()</td></tr>
-<tr class="memdesc:af83f5c127fcca8a019f7ad8ada9efddc"><td class="mdescLeft">&#160;</td><td class="mdescRight">克隆操作  <a href="#af83f5c127fcca8a019f7ad8ada9efddc">更多...</a><br /></td></tr>
-<tr class="separator:af83f5c127fcca8a019f7ad8ada9efddc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20fec855e6378cd1f1ffe5faf7a47f0c"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a20fec855e6378cd1f1ffe5faf7a47f0c">getPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)=0</td></tr>
-<tr class="memdesc:a20fec855e6378cd1f1ffe5faf7a47f0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。  <a href="#a20fec855e6378cd1f1ffe5faf7a47f0c">更多...</a><br /></td></tr>
-<tr class="separator:a20fec855e6378cd1f1ffe5faf7a47f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb7596cf703159e880265f7835a7fe57"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#afb7596cf703159e880265f7835a7fe57">getShortPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
-<tr class="memdesc:afb7596cf703159e880265f7835a7fe57"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取本次预期交易（卖空）时的计划止损价格，如果不存在止损价，则返回0。 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。  <a href="#afb7596cf703159e880265f7835a7fe57">更多...</a><br /></td></tr>
-<tr class="separator:afb7596cf703159e880265f7835a7fe57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9377a21f13d95b6127aba747e28b48c1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a9377a21f13d95b6127aba747e28b48c1">_reset</a> ()</td></tr>
-<tr class="memdesc:a9377a21f13d95b6127aba747e28b48c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类复位接口  <a href="#a9377a21f13d95b6127aba747e28b48c1">更多...</a><br /></td></tr>
-<tr class="separator:a9377a21f13d95b6127aba747e28b48c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67317d4fd461e43bfe8817402a2d509c"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a67317d4fd461e43bfe8817402a2d509c">_clone</a> ()=0</td></tr>
-<tr class="memdesc:a67317d4fd461e43bfe8817402a2d509c"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类克隆接口  <a href="#a67317d4fd461e43bfe8817402a2d509c">更多...</a><br /></td></tr>
-<tr class="separator:a67317d4fd461e43bfe8817402a2d509c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af519a91b28e64c021834e774236a1763"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#af519a91b28e64c021834e774236a1763">_calculate</a> ()=0</td></tr>
-<tr class="memdesc:af519a91b28e64c021834e774236a1763"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类计算接口，由setTO调用  <a href="#af519a91b28e64c021834e774236a1763">更多...</a><br /></td></tr>
-<tr class="separator:af519a91b28e64c021834e774236a1763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3081b44d973deb320bbcd517c7e3d086" id="r_a3081b44d973deb320bbcd517c7e3d086"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3081b44d973deb320bbcd517c7e3d086">StoplossBase</a> ()</td></tr>
+<tr class="memitem:a026b6ab57823fdb3e890668c094d3345" id="r_a026b6ab57823fdb3e890668c094d3345"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a026b6ab57823fdb3e890668c094d3345">StoplossBase</a> (const string &amp;<a class="el" href="#a6f14f0da21ffd4921e9045e78c178e2e">name</a>)</td></tr>
+<tr class="memitem:a00dcde75d8b4a1100321d5b0242c3a06" id="r_a00dcde75d8b4a1100321d5b0242c3a06"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a00dcde75d8b4a1100321d5b0242c3a06">StoplossBase</a> (const <a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a> &amp;)=default</td></tr>
+<tr class="memitem:aa5299270568d612e538e8631c6065968" id="r_aa5299270568d612e538e8631c6065968"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5299270568d612e538e8631c6065968">~StoplossBase</a> ()</td></tr>
+<tr class="memitem:a6f14f0da21ffd4921e9045e78c178e2e" id="r_a6f14f0da21ffd4921e9045e78c178e2e"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f14f0da21ffd4921e9045e78c178e2e">name</a> () const</td></tr>
+<tr class="memdesc:a6f14f0da21ffd4921e9045e78c178e2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name  <br /></td></tr>
+<tr class="memitem:a2501aa61b97c5700dd3c08d36f74ff52" id="r_a2501aa61b97c5700dd3c08d36f74ff52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2501aa61b97c5700dd3c08d36f74ff52">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:a2501aa61b97c5700dd3c08d36f74ff52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name  <br /></td></tr>
+<tr class="memitem:a3c8e11a9273f10bad58ac727d50c3912" id="r_a3c8e11a9273f10bad58ac727d50c3912"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c8e11a9273f10bad58ac727d50c3912">setTM</a> (const <a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> &amp;tm)</td></tr>
+<tr class="memdesc:a3c8e11a9273f10bad58ac727d50c3912"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the trade management instance  <br /></td></tr>
+<tr class="memitem:ab1fbbeb15c09eb51103dccf4c43fe147" id="r_ab1fbbeb15c09eb51103dccf4c43fe147"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1fbbeb15c09eb51103dccf4c43fe147">getTM</a> () const</td></tr>
+<tr class="memdesc:ab1fbbeb15c09eb51103dccf4c43fe147"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trade management instance  <br /></td></tr>
+<tr class="memitem:a8b04ae077e756c58faf34f656175d52c" id="r_a8b04ae077e756c58faf34f656175d52c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b04ae077e756c58faf34f656175d52c">setTO</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;kdata)</td></tr>
+<tr class="memdesc:a8b04ae077e756c58faf34f656175d52c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the trading object  <br /></td></tr>
+<tr class="memitem:a008ef9332c6409c53993a10cc73707cc" id="r_a008ef9332c6409c53993a10cc73707cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a008ef9332c6409c53993a10cc73707cc">getTO</a> () const</td></tr>
+<tr class="memdesc:a008ef9332c6409c53993a10cc73707cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trading object  <br /></td></tr>
+<tr class="memitem:aa5a6baf6dde67bed9281847d73cb93df" id="r_aa5a6baf6dde67bed9281847d73cb93df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5a6baf6dde67bed9281847d73cb93df">reset</a> ()</td></tr>
+<tr class="memdesc:aa5a6baf6dde67bed9281847d73cb93df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset operation  <br /></td></tr>
+<tr class="memitem:af83f5c127fcca8a019f7ad8ada9efddc" id="r_af83f5c127fcca8a019f7ad8ada9efddc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ad50d98f2cb30dc6e5ac603ca61d14888">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af83f5c127fcca8a019f7ad8ada9efddc">clone</a> ()</td></tr>
+<tr class="memdesc:af83f5c127fcca8a019f7ad8ada9efddc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone operation  <br /></td></tr>
+<tr class="memitem:a150390661180b50c84b44e4c90b1116f" id="r_a150390661180b50c84b44e4c90b1116f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a150390661180b50c84b44e4c90b1116f">getPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="memdesc:a150390661180b50c84b44e4c90b1116f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the planned stop-loss price of the current expected trade (a buy); 0 is returned if there is no stop-loss price.  <br /></td></tr>
+<tr class="memitem:a7e057abb376e2c41c53db8e110a1084e" id="r_a7e057abb376e2c41c53db8e110a1084e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e057abb376e2c41c53db8e110a1084e">getShortPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="memdesc:a7e057abb376e2c41c53db8e110a1084e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the planned stop-loss price of the current expected trade (a short sell); 0 is returned if there is no stop-loss price.  <br /></td></tr>
+<tr class="memitem:ae31cb815a1cfa191ad9dda7bd8b29a01" id="r_ae31cb815a1cfa191ad9dda7bd8b29a01"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae31cb815a1cfa191ad9dda7bd8b29a01">_getPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)=0</td></tr>
+<tr class="memdesc:ae31cb815a1cfa191ad9dda7bd8b29a01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface: compute the planned stop-loss price of the current expected trade (a buy); 0 means no stop-loss.  <br /></td></tr>
+<tr class="memitem:ac8d9337107153e68cda5bee48a9a237a" id="r_ac8d9337107153e68cda5bee48a9a237a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8d9337107153e68cda5bee48a9a237a">_getShortPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="memdesc:ac8d9337107153e68cda5bee48a9a237a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface: compute the planned stop-loss price of a short sell; default 0 (no short stop-loss is provided).  <br /></td></tr>
+<tr class="memitem:a9377a21f13d95b6127aba747e28b48c1" id="r_a9377a21f13d95b6127aba747e28b48c1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9377a21f13d95b6127aba747e28b48c1">_reset</a> ()</td></tr>
+<tr class="memdesc:a9377a21f13d95b6127aba747e28b48c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass reset interface  <br /></td></tr>
+<tr class="memitem:a67317d4fd461e43bfe8817402a2d509c" id="r_a67317d4fd461e43bfe8817402a2d509c"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="#ad50d98f2cb30dc6e5ac603ca61d14888">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67317d4fd461e43bfe8817402a2d509c">_clone</a> ()=0</td></tr>
+<tr class="memdesc:a67317d4fd461e43bfe8817402a2d509c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass clone interface  <br /></td></tr>
+<tr class="memitem:ad9c72ebc352d451f7890dc0b7021abb5" id="r_ad9c72ebc352d451f7890dc0b7021abb5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9c72ebc352d451f7890dc0b7021abb5">_calculate</a> ()</td></tr>
+<tr class="memdesc:ad9c72ebc352d451f7890dc0b7021abb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for the subclass to initialize the calculation, it is called by setTO  <br /></td></tr>
+<tr class="memitem:afbc5c751f37fef6babfb0e34b7d8d4cc" id="r_afbc5c751f37fef6babfb0e34b7d8d4cc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afbc5c751f37fef6babfb0e34b7d8d4cc">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:a45b502b10a5dfe481e4e13fc8b451dd2" id="r_a45b502b10a5dfe481e4e13fc8b451dd2"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45b502b10a5dfe481e4e13fc8b451dd2">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memdesc:a45b502b10a5dfe481e4e13fc8b451dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this component or its trade manager is defined in Python; overrides may recurse  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected 属性</h2></td></tr>
-<tr class="memitem:acdbeb5f5c981f456314b051e50629909"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#acdbeb5f5c981f456314b051e50629909">m_name</a></td></tr>
-<tr class="separator:acdbeb5f5c981f456314b051e50629909"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51365c62a5962662ee59eeb20faca137"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#a51365c62a5962662ee59eeb20faca137">m_tm</a></td></tr>
-<tr class="separator:a51365c62a5962662ee59eeb20faca137"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd0e23e762f7429db5ce1a09f2c1ae76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#abd0e23e762f7429db5ce1a09f2c1ae76">m_kdata</a></td></tr>
-<tr class="separator:abd0e23e762f7429db5ce1a09f2c1ae76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a821be8e3875b7ca6a185f682242bb79c" id="r_a821be8e3875b7ca6a185f682242bb79c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a821be8e3875b7ca6a185f682242bb79c">m_is_python_object</a> {false}</td></tr>
+<tr class="memitem:ac0bc4aa6a6da6ddfcac6e32bbf4b078d" id="r_ac0bc4aa6a6da6ddfcac6e32bbf4b078d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0bc4aa6a6da6ddfcac6e32bbf4b078d">m_calculated</a> {false}</td></tr>
+<tr class="memitem:acdbeb5f5c981f456314b051e50629909" id="r_acdbeb5f5c981f456314b051e50629909"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acdbeb5f5c981f456314b051e50629909">m_name</a></td></tr>
+<tr class="memitem:a51365c62a5962662ee59eeb20faca137" id="r_a51365c62a5962662ee59eeb20faca137"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51365c62a5962662ee59eeb20faca137">m_tm</a></td></tr>
+<tr class="memitem:abd0e23e762f7429db5ce1a09f2c1ae76" id="r_abd0e23e762f7429db5ce1a09f2c1ae76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd0e23e762f7429db5ce1a09f2c1ae76">m_kdata</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 友元</h2></td></tr>
-<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stoploss_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
-<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c" id="r_ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>止损/止赢策略基类 </p>
-<p>负责向系统提供当前计划交易的预期止损价 </p>
-</div><h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="ad7841661b223abe039fb436eae1ba149"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Base class of the stop-loss / take-profit strategy </p>
+<p>It provides the expected stop-loss price of the current planned trade to the system. The result of the subclass hook is interpreted as follows:</p><ul>
+<li>&gt; 0: the stop-loss level, expressed in the same (adjusted) price coordinate as the <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> passed to setTO; the system maps it back to the original price coordinate</li>
+<li>0: no stop-loss on this bar; the trade still takes place, without stop-loss protection</li>
+<li>negative, NaN or inf: invalid; the level is returned as <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> and the system opens the trade without stop-loss (no entry is skipped) The same rule applies when the instance is used as a take-profit, except that 0 or an invalid level only means no take-profit on this bar, the trade is not affected. </li>
+</ul>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="ad50d98f2cb30dc6e5ac603ca61d14888" name="ad50d98f2cb30dc6e5ac603ca61d14888"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad50d98f2cb30dc6e5ac603ca61d14888">&#9670;&#160;</a></span>StoplossPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef boost::shared_ptr&lt;<a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a>&gt; <a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">hku::StoplossBase::StoplossPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a>&gt; <a class="el" href="#ad50d98f2cb30dc6e5ac603ca61d14888">hku::StoplossBase::StoplossPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a3081b44d973deb320bbcd517c7e3d086"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a3081b44d973deb320bbcd517c7e3d086" name="a3081b44d973deb320bbcd517c7e3d086"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3081b44d973deb320bbcd517c7e3d086">&#9670;&#160;</a></span>StoplossBase() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::StoplossBase::StoplossBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -222,23 +202,9 @@ Protected 属性</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a026b6ab57823fdb3e890668c094d3345"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::StoplossBase::StoplossBase </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<a id="a026b6ab57823fdb3e890668c094d3345" name="a026b6ab57823fdb3e890668c094d3345"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a026b6ab57823fdb3e890668c094d3345">&#9670;&#160;</a></span>StoplossBase() <span class="overload">[2/3]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="a2f61d7ea946e080273ddd13a8273076c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -246,23 +212,75 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::StoplossBase::~StoplossBase </td>
+          <td class="memname">hku::StoplossBase::StoplossBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="af519a91b28e64c021834e774236a1763"></a>
+<a id="a00dcde75d8b4a1100321d5b0242c3a06" name="a00dcde75d8b4a1100321d5b0242c3a06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00dcde75d8b4a1100321d5b0242c3a06">&#9670;&#160;</a></span>StoplossBase() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::StoplossBase::StoplossBase </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stoploss_base.html">StoplossBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa5299270568d612e538e8631c6065968" name="aa5299270568d612e538e8631c6065968"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5299270568d612e538e8631c6065968">&#9670;&#160;</a></span>~StoplossBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::StoplossBase::~StoplossBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ad9c72ebc352d451f7890dc0b7021abb5" name="ad9c72ebc352d451f7890dc0b7021abb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9c72ebc352d451f7890dc0b7021abb5">&#9670;&#160;</a></span>_calculate()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -272,24 +290,26 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::StoplossBase::_calculate </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类计算接口，由setTO调用 </p>
+<p>Interface for the subclass to initialize the calculation, it is called by setTO </p>
 
-<p>在 <a class="el" href="classhku_1_1_indicator_stoploss.html#a8180ad5b474a01f7eff218c8ee6587c8">hku::IndicatorStoploss</a> 内被实现.</p>
+<p>被 <a class="el" href="classhku_1_1_indicator_stoploss.html#a9e5c2082705ea6ae9852c91b66324dc6">hku::IndicatorStoploss</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="a67317d4fd461e43bfe8817402a2d509c"></a>
+<a id="a67317d4fd461e43bfe8817402a2d509c" name="a67317d4fd461e43bfe8817402a2d509c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67317d4fd461e43bfe8817402a2d509c">&#9670;&#160;</a></span>_clone()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -297,26 +317,96 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">StoplossPtr</a> hku::StoplossBase::_clone </td>
+          <td class="memname">virtual <a class="el" href="#ad50d98f2cb30dc6e5ac603ca61d14888">StoplossPtr</a> hku::StoplossBase::_clone </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类克隆接口 </p>
+<p>Subclass clone interface </p>
 
-<p>在 <a class="el" href="classhku_1_1_indicator_stoploss.html#acfa00554632336dfd3ee1512793d964d">hku::IndicatorStoploss</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_indicator_stoploss.html#a1d28b1d816cc666b483e2c6b01b28546">hku::IndicatorStoploss</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9377a21f13d95b6127aba747e28b48c1"></a>
+<a id="ae31cb815a1cfa191ad9dda7bd8b29a01" name="ae31cb815a1cfa191ad9dda7bd8b29a01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae31cb815a1cfa191ad9dda7bd8b29a01">&#9670;&#160;</a></span>_getPrice()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StoplossBase::_getPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface: compute the planned stop-loss price of the current expected trade (a buy); 0 means no stop-loss. </p>
+<p>A negative or non-finite result is invalid: the public getPrice returns <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> for it and the system opens the trade without stop-loss. Used as a stop-loss it is called on the entry path only (about once or twice per trade, the level is then fixed in the position record); used as a take-profit it is called once per bar while the position is held. The returned level must use the (adjusted) price coordinate of the <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> passed to setTO </p>
+
+<p>在 <a class="el" href="classhku_1_1_indicator_stoploss.html#a990df9f7ce9da33089fbf75e24039d82">hku::IndicatorStoploss</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="ac8d9337107153e68cda5bee48a9a237a" name="ac8d9337107153e68cda5bee48a9a237a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8d9337107153e68cda5bee48a9a237a">&#9670;&#160;</a></span>_getShortPrice()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StoplossBase::_getShortPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface: compute the planned stop-loss price of a short sell; default 0 (no short stop-loss is provided). </p>
+<p>A negative or non-finite result is invalid: the public getShortPrice returns <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> for it and the system opens the short position without stop-loss. Used as a short stop-loss it is called on the entry path only; used as a short take-profit it is called once per bar while the position is held. The returned level must use the (adjusted) price coordinate of the <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> passed to setTO. </p><dl class="section note"><dt>注解</dt><dd>Unlike a long stop-loss, a short one must be above the planned trade price, and must not fall back to the long-side _getPrice result </dd></dl>
+
+<p>被 <a class="el" href="classhku_1_1_fixed_percent_stoploss.html#a41cee930141629c9a3f5009e176c50be">hku::FixedPercentStoploss</a> 重载.</p>
+
+</div>
+</div>
+<a id="a9377a21f13d95b6127aba747e28b48c1" name="a9377a21f13d95b6127aba747e28b48c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9377a21f13d95b6127aba747e28b48c1">&#9670;&#160;</a></span>_reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -326,131 +416,107 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::StoplossBase::_reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类复位接口 </p>
+<p>Subclass reset interface </p>
 
-<p>被 <a class="el" href="classhku_1_1_indicator_stoploss.html#aab41cbbd2270cff26a62976f309259ef">hku::IndicatorStoploss</a> 重载.</p>
+<p>被 <a class="el" href="classhku_1_1_indicator_stoploss.html#ae636fa46aeb743c9ade7223d31d8e659">hku::IndicatorStoploss</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="af83f5c127fcca8a019f7ad8ada9efddc"></a>
+<a id="af83f5c127fcca8a019f7ad8ada9efddc" name="af83f5c127fcca8a019f7ad8ada9efddc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af83f5c127fcca8a019f7ad8ada9efddc">&#9670;&#160;</a></span>clone()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">StoplossPtr</a> hku::StoplossBase::clone </td>
+          <td class="memname"><a class="el" href="#ad50d98f2cb30dc6e5ac603ca61d14888">StoplossPtr</a> hku::StoplossBase::clone </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>克隆操作 </p>
+<p>Clone operation </p>
 
 </div>
 </div>
-<a class="anchor" id="a20fec855e6378cd1f1ffe5faf7a47f0c"></a>
+<a id="a150390661180b50c84b44e4c90b1116f" name="a150390661180b50c84b44e4c90b1116f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a150390661180b50c84b44e4c90b1116f">&#9670;&#160;</a></span>getPrice()</h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StoplossBase::getPrice </td>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StoplossBase::getPrice </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>price</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>&#160;)</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。 </p>
-<dl class="params"><dt>参数</dt><dd>
+<p>Get the planned stop-loss price of the current expected trade (a buy); 0 is returned if there is no stop-loss price. </p>
+<p>A negative or non-finite result of the subclass hook is invalid and returned as <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>; the system then opens the trade without stop-loss (sized with the full planned price as risk). The system still skips the trade when the level is not lower than the planned buy price. It is used by the system to query the planned stop-loss price of the current trade from the stop-loss strategy module before the trade is executed. </p><dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>交易时间 </td></tr>
-    <tr><td class="paramname">price</td><td>计划买入的价格 </td></tr>
+    <tr><td class="paramname">datetime</td><td>trade time </td></tr>
+    <tr><td class="paramname">price</td><td>the planned buy price </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>注解</dt><dd>一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的 价格，比如以买入价格的30做为止损。而止赢则不考虑传入的price参数，即认为 price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价 的30作为止损，则不需要考虑price参数 </dd></dl>
-
-<p>在 <a class="el" href="classhku_1_1_indicator_stoploss.html#a05bf5b26697bdd98881d326dbeffcafe">hku::IndicatorStoploss</a> 内被实现.</p>
+<dl class="section note"><dt>注解</dt><dd>Generally the algorithms of the stop-loss and the take-profit can be interchanged, but the stop-loss can be passed the price of the planned trade, for example taking 30% of the buy price as the stop-loss. The take-profit does not consider the passed price parameter, i.e. it regards price as 0.0. In fact, even for the stop-loss it is not recommended to use the price parameter; for example 30% of the previous day's low price can be used as the stop-loss, then the price parameter does not need to be considered </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="afb7596cf703159e880265f7835a7fe57"></a>
+<a id="a7e057abb376e2c41c53db8e110a1084e" name="a7e057abb376e2c41c53db8e110a1084e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e057abb376e2c41c53db8e110a1084e">&#9670;&#160;</a></span>getShortPrice()</h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StoplossBase::getShortPrice </td>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::StoplossBase::getShortPrice </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>price</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>&#160;)</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>获取本次预期交易（卖空）时的计划止损价格，如果不存在止损价，则返回0。 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。 </p>
-<dl class="params"><dt>参数</dt><dd>
+<p>Get the planned stop-loss price of the current expected trade (a short sell); 0 is returned if there is no stop-loss price. </p>
+<p>A negative or non-finite result of the subclass hook is invalid and returned as <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>; the system then opens the short position without stop-loss (sized with the full planned price as risk). The system still skips the trade when the level is not above the planned trade price, since the cover would trigger immediately. It is used by the system to query the planned stop-loss price of the current trade from the stop-loss strategy module before the trade is executed. </p><dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>交易日期 </td></tr>
-    <tr><td class="paramname">price</td><td>计划交易的价格 </td></tr>
+    <tr><td class="paramname">datetime</td><td>trade date </td></tr>
+    <tr><td class="paramname">price</td><td>the planned trade price </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>注解</dt><dd>默认实现时，和getPrice返回结果相同 </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>Unlike a long stop-loss, a short one must be above the planned trade price. The default implementation returns 0 (no short stop-loss is provided), subclasses supporting short selling must override it; it must not fall back to the long-side getPrice result </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a7d935980657f9ac5f2e9780cc7924a4a"></a>
+<a id="ab1fbbeb15c09eb51103dccf4c43fe147" name="ab1fbbeb15c09eb51103dccf4c43fe147"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1fbbeb15c09eb51103dccf4c43fe147">&#9670;&#160;</a></span>getTM()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -458,24 +524,26 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> hku::StoplossBase::getTM </td>
+          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> hku::StoplossBase::getTM </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取交易管理实例 </p>
+<p>Get the trade management instance </p>
 
 </div>
 </div>
-<a class="anchor" id="a7a3cfee1356ed4aa6768cd7a15ecb2fc"></a>
+<a id="a008ef9332c6409c53993a10cc73707cc" name="a008ef9332c6409c53993a10cc73707cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a008ef9332c6409c53993a10cc73707cc">&#9670;&#160;</a></span>getTO()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -485,22 +553,24 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::StoplossBase::getTO </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取交易对象 </p>
+<p>Get the trading object </p>
 
 </div>
 </div>
-<a class="anchor" id="afb6cb22da35cc04bc927dc217a0c8210"></a>
+<a id="a45b502b10a5dfe481e4e13fc8b451dd2" name="a45b502b10a5dfe481e4e13fc8b451dd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45b502b10a5dfe481e4e13fc8b451dd2">&#9670;&#160;</a></span>hasPythonPart()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -508,24 +578,80 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::StoplossBase::name </td>
+          <td class="memname">virtual bool hku::StoplossBase::hasPythonPart </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取名称 </p>
+<p>Whether this component or its trade manager is defined in Python; overrides may recurse </p>
+
+<p>被 <a class="el" href="classhku_1_1_indicator_stoploss.html#afa0de70fcf440d27e37aca4c24014d95">hku::IndicatorStoploss</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2501aa61b97c5700dd3c08d36f74ff52"></a>
+<a id="afbc5c751f37fef6babfb0e34b7d8d4cc" name="afbc5c751f37fef6babfb0e34b7d8d4cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbc5c751f37fef6babfb0e34b7d8d4cc">&#9670;&#160;</a></span>isPythonObject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::StoplossBase::isPythonObject </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6f14f0da21ffd4921e9045e78c178e2e" name="a6f14f0da21ffd4921e9045e78c178e2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f14f0da21ffd4921e9045e78c178e2e">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; hku::StoplossBase::name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name </p>
+
+</div>
+</div>
+<a id="a2501aa61b97c5700dd3c08d36f74ff52" name="a2501aa61b97c5700dd3c08d36f74ff52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2501aa61b97c5700dd3c08d36f74ff52">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -535,48 +661,43 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">void hku::StoplossBase::name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>设置名称 </p>
+<p>Set the name </p>
 
 </div>
 </div>
-<a class="anchor" id="aa5a6baf6dde67bed9281847d73cb93df"></a>
+<a id="aa5a6baf6dde67bed9281847d73cb93df" name="aa5a6baf6dde67bed9281847d73cb93df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5a6baf6dde67bed9281847d73cb93df">&#9670;&#160;</a></span>reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void hku::StoplossBase::reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>复位操作 </p>
+<p>Reset operation </p>
 
 </div>
 </div>
-<a class="anchor" id="a3c8e11a9273f10bad58ac727d50c3912"></a>
+<a id="a3c8e11a9273f10bad58ac727d50c3912" name="a3c8e11a9273f10bad58ac727d50c3912"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c8e11a9273f10bad58ac727d50c3912">&#9670;&#160;</a></span>setTM()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -586,42 +707,44 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">void hku::StoplossBase::setTM </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
-          <td class="paramname"><em>tm</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>tm</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>设置交易管理实例 </p>
+<p>Set the trade management instance </p>
 
 </div>
 </div>
-<a class="anchor" id="a8b04ae077e756c58faf34f656175d52c"></a>
+<a id="a8b04ae077e756c58faf34f656175d52c" name="a8b04ae077e756c58faf34f656175d52c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b04ae077e756c58faf34f656175d52c">&#9670;&#160;</a></span>setTO()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::StoplossBase::setTO </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>kdata</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>设置交易对象 </p>
+<p>Set the trading object </p>
 
 </div>
 </div>
-<h2 class="groupheader">友元及相关函数文档</h2>
-<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="ac98d07dd8f7b70e16ccb9a01abf56b9c" name="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">&#9670;&#160;</a></span>boost::serialization::access</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -634,15 +757,61 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="abd0e23e762f7429db5ce1a09f2c1ae76"></a>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="ac0bc4aa6a6da6ddfcac6e32bbf4b078d" name="ac0bc4aa6a6da6ddfcac6e32bbf4b078d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0bc4aa6a6da6ddfcac6e32bbf4b078d">&#9670;&#160;</a></span>m_calculated</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::StoplossBase::m_calculated {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a821be8e3875b7ca6a185f682242bb79c" name="a821be8e3875b7ca6a185f682242bb79c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a821be8e3875b7ca6a185f682242bb79c">&#9670;&#160;</a></span>m_is_python_object</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::StoplossBase::m_is_python_object {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abd0e23e762f7429db5ce1a09f2c1ae76" name="abd0e23e762f7429db5ce1a09f2c1ae76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd0e23e762f7429db5ce1a09f2c1ae76">&#9670;&#160;</a></span>m_kdata</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -655,14 +824,16 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="acdbeb5f5c981f456314b051e50629909"></a>
+<a id="acdbeb5f5c981f456314b051e50629909" name="acdbeb5f5c981f456314b051e50629909"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdbeb5f5c981f456314b051e50629909">&#9670;&#160;</a></span>m_name</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -670,19 +841,21 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::StoplossBase::m_name</td>
+          <td class="memname">string hku::StoplossBase::m_name</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a51365c62a5962662ee59eeb20faca137"></a>
+<a id="a51365c62a5962662ee59eeb20faca137" name="a51365c62a5962662ee59eeb20faca137"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51365c62a5962662ee59eeb20faca137">&#9670;&#160;</a></span>m_tm</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -690,12 +863,12 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> hku::StoplossBase::m_tm</td>
+          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> hku::StoplossBase::m_tm</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -704,15 +877,26 @@ Protected 属性</h2></td></tr>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/trade_sys/stoploss/<a class="el" href="_stoploss_base_8h_source.html">StoplossBase.h</a></li>
-<li>hikyuu/trade_sys/stoploss/<a class="el" href="_stoploss_base_8cpp.html">StoplossBase.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_stoploss_base.html">StoplossBase</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

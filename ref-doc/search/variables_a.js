@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['number',['number',['../classhku_1_1_borrow_record.html#a06e444c19c7a46f7bac327444e645aa2',1,'hku::BorrowRecord::number()'],['../structhku_1_1_borrow_record_1_1_data.html#aed06a91428305609be221b04459a4a99',1,'hku::BorrowRecord::Data::number()'],['../classhku_1_1_position_record.html#a383a2e2656683197020a4c8a37c9d1e8',1,'hku::PositionRecord::number()'],['../classhku_1_1_trade_record.html#ae7f01553905e0ac2add18f10f4c1e0e6',1,'hku::TradeRecord::number()'],['../classhku_1_1_trade_request.html#a303fe095d74873840b9ff23c5284a49f',1,'hku::TradeRequest::number()']]]
+  ['limit_0',['limit',['../structhku_1_1_where_parts.html#a6c8e1b7865907d046f47362c876711de',1,'hku::WhereParts::limit'],['../structhku_1_1_l_i_m_i_t.html#a877845d51c5c4be504be9eced83d2f03',1,'hku::LIMIT::limit']]],
+  ['low_1',['low',['../structhku_1_1_spot_record.html#a0787888be352607e98c9e462e386e249',1,'hku::SpotRecord']]],
+  ['lowprice_2',['lowPrice',['../structhku_1_1_h5_record.html#a8892366f493ef5502305bc24ebf04349',1,'hku::H5Record::lowPrice'],['../classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1',1,'hku::KRecord::lowPrice']]]
 ];

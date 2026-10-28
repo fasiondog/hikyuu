@@ -1,0 +1,358 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/data_driver/kdata/mysql/KRecordTable.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_k_record_table_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">KRecordTable.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2019 fasiondog</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2020-9-27</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#ifndef HIKYUU_DATA_DRIVER_KDATA_MYSQL_KRECORDTABLE_H</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define HIKYUU_DATA_DRIVER_KDATA_MYSQL_KRECORDTABLE_H</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;../../../KQuery.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../../../KRecord.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../../../utilities/Log.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../../../utilities/db_connect/SQLStatementBase.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html">   18</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00020" data-start="{" data-end="}">
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">   20</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>()</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    : m_date(0), m_open(0.0), m_high(0.0), m_low(0.0), m_close(0.0), m_amount(0.0), m_count(0.0) {}</div>
+</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="foldopen" id="foldopen00023" data-start="{" data-end="}">
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a943febca91e2bec2314d19bc63638509">   23</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a943febca91e2bec2314d19bc63638509">KRecordTable</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype)</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    : m_db_name(fmt::format(<span class="stringliteral">&quot;{}_{}&quot;</span>, market, <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>::getKTypeName(ktype))),</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>      m_code(code),</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      m_date(0),</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      m_open(0.0),</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>      m_high(0.0),</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      m_low(0.0),</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      m_close(0.0),</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>      m_amount(0.0),</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>      m_count(0.0) {</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        HKU_CHECK(market.find(<span class="charliteral">&#39;`&#39;</span>) == string::npos &amp;&amp; market.find(<span class="charliteral">&#39;\0&#39;</span>) == string::npos &amp;&amp;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>                    code.find(<span class="charliteral">&#39;`&#39;</span>) == string::npos &amp;&amp; code.find(<span class="charliteral">&#39;\0&#39;</span>) == string::npos,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                  <span class="stringliteral">&quot;Invalid market or code! market: &#39;{}&#39;, code: &#39;{}&#39;&quot;</span>, market, code);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <a class="code hl_function" href="group___utilities.html#ga2ddeafd2f9c8af6ecb7e3a8c0e71699f">to_lower</a>(m_db_name);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    };</div>
+</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a83e12e53a370524ce9df62a74d7bf3b8">   39</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a83e12e53a370524ce9df62a74d7bf3b8">KRecordTable</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype,</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                 <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>&amp; record)</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    : <a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>(market, code, ktype) {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        m_date = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760">datetime</a>.<a class="code hl_function" href="classhku_1_1_datetime.html#aa769ee20621c6de4015a1a08bf83ba5a">ymdhm</a>();</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        m_open = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311">openPrice</a>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        m_high = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d">highPrice</a>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        m_low = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1">lowPrice</a>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        m_close = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c">closePrice</a>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        m_count = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1">transCount</a>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        m_amount = record.<a class="code hl_variable" href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba">transAmount</a>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    }</div>
+</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a7fa2a80e02d61a2a669544ccede4fb57">   51</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a7fa2a80e02d61a2a669544ccede4fb57">KRecordTable</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#ab971e12b0e699c096c27a525912850da">   52</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>&amp; <a class="code hl_function" href="classhku_1_1_k_record_table.html#ab971e12b0e699c096c27a525912850da">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00053" data-start="{" data-end="}">
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a0f954d3994b53f2bce2e2c773698471d">   53</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a0f954d3994b53f2bce2e2c773698471d">KRecordTable</a>(<a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>&amp;&amp; rhs)</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    : m_db_name(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rhs.m_db_name)),</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>      m_code(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rhs.m_code)),</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>      m_date(rhs.m_date),</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>      m_open(rhs.m_open),</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>      m_high(rhs.m_high),</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>      m_low(rhs.m_low),</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>      m_close(rhs.m_close),</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>      m_amount(rhs.m_amount),</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>      m_count(rhs.m_count) {}</div>
+</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="foldopen" id="foldopen00064" data-start="{" data-end="}">
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#ab0782cf5677b06ed08ac2e55ef1d29ff">   64</a></span>    <a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>&amp; <a class="code hl_function" href="classhku_1_1_k_record_table.html#ab0782cf5677b06ed08ac2e55ef1d29ff">operator=</a>(<a class="code hl_function" href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">KRecordTable</a>&amp;&amp; rhs) {</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keywordflow">if</span> (&amp;rhs != <span class="keyword">this</span>) {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>            m_db_name = std::move(rhs.m_db_name);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            m_code = std::move(rhs.m_code);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>            m_date = rhs.m_date;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>            m_open = rhs.m_open;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            m_high = rhs.m_high;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>            m_low = rhs.m_low;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>            m_close = rhs.m_close;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>            m_amount = rhs.m_amount;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            m_count = rhs.m_count;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        }</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    }</div>
+</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="foldopen" id="foldopen00079" data-start="{" data-end="}">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#ac0240e7afcf46a00ba360dd5b118b8ff">   79</a></span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#ac0240e7afcf46a00ba360dd5b118b8ff">date</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keywordflow">return</span> m_date == 0 ? <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;Datetime&gt;</a>() : <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>((<a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>)m_date);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    }</div>
+</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="foldopen" id="foldopen00083" data-start="{" data-end="}">
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#ae9d5eb216f85b128f1e7733cc9359f50">   83</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#ae9d5eb216f85b128f1e7733cc9359f50">open</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keywordflow">return</span> m_open;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    }</div>
+</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="foldopen" id="foldopen00087" data-start="{" data-end="}">
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#ad8ebbe085b884db5262e9ca78aa42c8f">   87</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#ad8ebbe085b884db5262e9ca78aa42c8f">high</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordflow">return</span> m_high;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    }</div>
+</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="foldopen" id="foldopen00091" data-start="{" data-end="}">
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#ac0c8f255a623b345a73c5f85dcd67fab">   91</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#ac0c8f255a623b345a73c5f85dcd67fab">low</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        <span class="keywordflow">return</span> m_low;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    }</div>
+</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="foldopen" id="foldopen00095" data-start="{" data-end="}">
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a2c86e7196c99544ef9725fcd5a4eabd5">   95</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a2c86e7196c99544ef9725fcd5a4eabd5">close</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <span class="keywordflow">return</span> m_close;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    }</div>
+</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="foldopen" id="foldopen00099" data-start="{" data-end="}">
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#aa2516bc4ca155691d4cd2581444430b1">   99</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#aa2516bc4ca155691d4cd2581444430b1">amount</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        <span class="keywordflow">return</span> m_amount;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    }</div>
+</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="foldopen" id="foldopen00103" data-start="{" data-end="}">
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a064b4a4926e5d7e168d4fc90a62a2b4d">  103</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a064b4a4926e5d7e168d4fc90a62a2b4d">count</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keywordflow">return</span> m_count;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    }</div>
+</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="foldopen" id="foldopen00107" data-start="{" data-end="}">
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a1dc34ca0ee24df8c953bed550b9f3d20">  107</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a1dc34ca0ee24df8c953bed550b9f3d20">str</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        <span class="keywordflow">return</span> fmt::format(</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>          <span class="stringliteral">&quot;KRecordTable({}(date), {}(open), {}(high), {}(low), {}(close), {}(amount), {}(count))&quot;</span>,</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>          m_date, m_open, m_high, m_low, m_close, m_amount, m_count);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    }</div>
+</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00114" data-start="{" data-end="}">
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a36d45315e8954fcb0fcf44936b2bdd79">  114</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a36d45315e8954fcb0fcf44936b2bdd79">getInsertSQL</a>() {</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keywordflow">return</span> fmt::format(</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>          <span class="stringliteral">&quot;insert into `{}`.`{}` &quot;</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>          <span class="stringliteral">&quot;(`date`, `open`, `high`, `low`, `close`, `amount`, `count`) &quot;</span></div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>          <span class="stringliteral">&quot;values (?,?,?,?,?,?,?)&quot;</span>,</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>          m_db_name, m_code);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    }</div>
+</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
+<div class="foldopen" id="foldopen00122" data-start="{" data-end="}">
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a5b7882ab3b9655b89fa890643ba04a53">  122</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a5b7882ab3b9655b89fa890643ba04a53">getUpdateSQL</a>() {</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="keywordflow">return</span> fmt::format(</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          <span class="stringliteral">&quot;update `{}`.`{}` set `open`=?, `high`=?, `low`=?, &quot;</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>          <span class="stringliteral">&quot;`close`=?, `amount`=?, `count`=? where `date`=?&quot;</span>,</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>          m_db_name, m_code);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    }</div>
+</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="foldopen" id="foldopen00129" data-start="{" data-end="}">
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a187e5f3928a4eb254f4e61c9dbf7c10d">  129</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a187e5f3928a4eb254f4e61c9dbf7c10d">getSelectSQL</a>() {</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keywordflow">return</span> fmt::format(</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>          <span class="stringliteral">&quot;select `date`,`open`,`high`, `low`, `close`, `amount`, `count` from `{}`.`{}`&quot;</span>,</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>          m_db_name, m_code);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    }</div>
+</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="foldopen" id="foldopen00135" data-start="{" data-end="}">
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#aa713407ebed201972c9fede9e98b5bfd">  135</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#aa713407ebed201972c9fede9e98b5bfd">getSelectSQLNoDB</a>() {</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        <span class="keywordflow">return</span> fmt::format(</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>          <span class="stringliteral">&quot;select `date`,`open`,`high`, `low`, `close`, `amount`, `count` from `{}`&quot;</span>, m_code);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    }</div>
+</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
+<div class="foldopen" id="foldopen00140" data-start="{" data-end="}">
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#adc662df32274cd1b8e4fa10b591b8d1a">  140</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#adc662df32274cd1b8e4fa10b591b8d1a">save</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a>&amp; st)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        st-&gt;bind(0, m_date, m_open, m_high, m_low, m_close, m_amount, m_count);</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    }</div>
+</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
+<div class="foldopen" id="foldopen00144" data-start="{" data-end="}">
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a05ce8fdcf97b77a226787e21c716f5e8">  144</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a05ce8fdcf97b77a226787e21c716f5e8">update</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a>&amp; st)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        st-&gt;bind(0, m_open, m_high, m_low, m_close, m_amount, m_count, m_date);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    }</div>
+</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
+<div class="foldopen" id="foldopen00148" data-start="{" data-end="}">
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno"><a class="line" href="classhku_1_1_k_record_table.html#a119ea11bfd2df37b1a6c9840a810d4a9">  148</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_record_table.html#a119ea11bfd2df37b1a6c9840a810d4a9">load</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a>&amp; st) {</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        st-&gt;getColumn(0, m_date, m_open, m_high, m_low, m_close, m_amount, m_count);</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    }</div>
+</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    <span class="keywordtype">string</span> m_db_name;</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="keywordtype">string</span> m_code;</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> m_date;</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_open;</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_high;</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_low;</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_close;</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_amount;</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_count;</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>};</div>
+</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="preprocessor">#endif </span><span class="comment">/* HIKYUU_DATA_DRIVER_KDATA_MYSQL_KRECORDTABLE_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html_aa769ee20621c6de4015a1a08bf83ba5a"><div class="ttname"><a href="classhku_1_1_datetime.html#aa769ee20621c6de4015a1a08bf83ba5a">hku::Datetime::ymdhm</a></div><div class="ttdeci">uint64_t ymdhm() const noexcept</div><div class="ttdoc">Return a number in the YYYYMMDDhhmm format</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K-line data record</div><div class="ttdef"><b>定义</b> KRecord.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a0554012a7cd6ef03af704ab5df3be02d"><div class="ttname"><a href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d">hku::KRecord::highPrice</a></div><div class="ttdeci">price_t highPrice</div><div class="ttdoc">High price</div><div class="ttdef"><b>定义</b> KRecord.h:24</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a115822ebcd8ad96483c0a271a385e0b1"><div class="ttname"><a href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1">hku::KRecord::transCount</a></div><div class="ttdeci">price_t transCount</div><div class="ttdoc">Trading volume (in lots); below the daily line it is the share count</div><div class="ttdef"><b>定义</b> KRecord.h:28</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a3e27bc519420832a6ff96da692119760"><div class="ttname"><a href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760">hku::KRecord::datetime</a></div><div class="ttdeci">Datetime datetime</div><div class="ttdoc">Date, format: YYYYMMDDHHMM, e.g. 200901010930</div><div class="ttdef"><b>定义</b> KRecord.h:22</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a45e4fcab73a8e7829619dfd83096c7ba"><div class="ttname"><a href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba">hku::KRecord::transAmount</a></div><div class="ttdeci">price_t transAmount</div><div class="ttdoc">Turnover amount (in units of 10 thousand yuan)</div><div class="ttdef"><b>定义</b> KRecord.h:27</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a4a97c8ace55ac7c01a21785fa6141311"><div class="ttname"><a href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311">hku::KRecord::openPrice</a></div><div class="ttdeci">price_t openPrice</div><div class="ttdoc">Open price</div><div class="ttdef"><b>定义</b> KRecord.h:23</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a6e11e1bf4ff005fb52126fbd68c94ac1"><div class="ttname"><a href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1">hku::KRecord::lowPrice</a></div><div class="ttdeci">price_t lowPrice</div><div class="ttdoc">Low price</div><div class="ttdef"><b>定义</b> KRecord.h:25</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_a9db0904a2bbebbe5e63d7d6cace1303c"><div class="ttname"><a href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c">hku::KRecord::closePrice</a></div><div class="ttdeci">price_t closePrice</div><div class="ttdoc">Close price</div><div class="ttdef"><b>定义</b> KRecord.h:26</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a05ce8fdcf97b77a226787e21c716f5e8"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a05ce8fdcf97b77a226787e21c716f5e8">hku::KRecordTable::update</a></div><div class="ttdeci">void update(const SQLStatementPtr &amp;st) const</div><div class="ttdef"><b>定义</b> KRecordTable.h:144</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a064b4a4926e5d7e168d4fc90a62a2b4d"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a064b4a4926e5d7e168d4fc90a62a2b4d">hku::KRecordTable::count</a></div><div class="ttdeci">price_t count() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:103</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a0f954d3994b53f2bce2e2c773698471d"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a0f954d3994b53f2bce2e2c773698471d">hku::KRecordTable::KRecordTable</a></div><div class="ttdeci">KRecordTable(KRecordTable &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> KRecordTable.h:53</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a119ea11bfd2df37b1a6c9840a810d4a9"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a119ea11bfd2df37b1a6c9840a810d4a9">hku::KRecordTable::load</a></div><div class="ttdeci">void load(const SQLStatementPtr &amp;st)</div><div class="ttdef"><b>定义</b> KRecordTable.h:148</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a187e5f3928a4eb254f4e61c9dbf7c10d"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a187e5f3928a4eb254f4e61c9dbf7c10d">hku::KRecordTable::getSelectSQL</a></div><div class="ttdeci">string getSelectSQL()</div><div class="ttdef"><b>定义</b> KRecordTable.h:129</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a1dc34ca0ee24df8c953bed550b9f3d20"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a1dc34ca0ee24df8c953bed550b9f3d20">hku::KRecordTable::str</a></div><div class="ttdeci">string str() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:107</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a2c86e7196c99544ef9725fcd5a4eabd5"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a2c86e7196c99544ef9725fcd5a4eabd5">hku::KRecordTable::close</a></div><div class="ttdeci">price_t close() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:95</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a36d45315e8954fcb0fcf44936b2bdd79"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a36d45315e8954fcb0fcf44936b2bdd79">hku::KRecordTable::getInsertSQL</a></div><div class="ttdeci">string getInsertSQL()</div><div class="ttdef"><b>定义</b> KRecordTable.h:114</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a5b7882ab3b9655b89fa890643ba04a53"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a5b7882ab3b9655b89fa890643ba04a53">hku::KRecordTable::getUpdateSQL</a></div><div class="ttdeci">string getUpdateSQL()</div><div class="ttdef"><b>定义</b> KRecordTable.h:122</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a64a658036f06ebfc7de53804395bba00"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a64a658036f06ebfc7de53804395bba00">hku::KRecordTable::KRecordTable</a></div><div class="ttdeci">KRecordTable()</div><div class="ttdef"><b>定义</b> KRecordTable.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a7fa2a80e02d61a2a669544ccede4fb57"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a7fa2a80e02d61a2a669544ccede4fb57">hku::KRecordTable::KRecordTable</a></div><div class="ttdeci">KRecordTable(const KRecordTable &amp;)=default</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a83e12e53a370524ce9df62a74d7bf3b8"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a83e12e53a370524ce9df62a74d7bf3b8">hku::KRecordTable::KRecordTable</a></div><div class="ttdeci">KRecordTable(const string &amp;market, const string &amp;code, const KQuery::KType &amp;ktype, const KRecord &amp;record)</div><div class="ttdef"><b>定义</b> KRecordTable.h:39</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_a943febca91e2bec2314d19bc63638509"><div class="ttname"><a href="classhku_1_1_k_record_table.html#a943febca91e2bec2314d19bc63638509">hku::KRecordTable::KRecordTable</a></div><div class="ttdeci">KRecordTable(const string &amp;market, const string &amp;code, const KQuery::KType &amp;ktype)</div><div class="ttdef"><b>定义</b> KRecordTable.h:23</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_aa2516bc4ca155691d4cd2581444430b1"><div class="ttname"><a href="classhku_1_1_k_record_table.html#aa2516bc4ca155691d4cd2581444430b1">hku::KRecordTable::amount</a></div><div class="ttdeci">price_t amount() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:99</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_aa713407ebed201972c9fede9e98b5bfd"><div class="ttname"><a href="classhku_1_1_k_record_table.html#aa713407ebed201972c9fede9e98b5bfd">hku::KRecordTable::getSelectSQLNoDB</a></div><div class="ttdeci">string getSelectSQLNoDB()</div><div class="ttdef"><b>定义</b> KRecordTable.h:135</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_ab0782cf5677b06ed08ac2e55ef1d29ff"><div class="ttname"><a href="classhku_1_1_k_record_table.html#ab0782cf5677b06ed08ac2e55ef1d29ff">hku::KRecordTable::operator=</a></div><div class="ttdeci">KRecordTable &amp; operator=(KRecordTable &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> KRecordTable.h:64</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_ab971e12b0e699c096c27a525912850da"><div class="ttname"><a href="classhku_1_1_k_record_table.html#ab971e12b0e699c096c27a525912850da">hku::KRecordTable::operator=</a></div><div class="ttdeci">KRecordTable &amp; operator=(const KRecordTable &amp;)=default</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_ac0240e7afcf46a00ba360dd5b118b8ff"><div class="ttname"><a href="classhku_1_1_k_record_table.html#ac0240e7afcf46a00ba360dd5b118b8ff">hku::KRecordTable::date</a></div><div class="ttdeci">Datetime date() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:79</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_ac0c8f255a623b345a73c5f85dcd67fab"><div class="ttname"><a href="classhku_1_1_k_record_table.html#ac0c8f255a623b345a73c5f85dcd67fab">hku::KRecordTable::low</a></div><div class="ttdeci">price_t low() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:91</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_ad8ebbe085b884db5262e9ca78aa42c8f"><div class="ttname"><a href="classhku_1_1_k_record_table.html#ad8ebbe085b884db5262e9ca78aa42c8f">hku::KRecordTable::high</a></div><div class="ttdeci">price_t high() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:87</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_adc662df32274cd1b8e4fa10b591b8d1a"><div class="ttname"><a href="classhku_1_1_k_record_table.html#adc662df32274cd1b8e4fa10b591b8d1a">hku::KRecordTable::save</a></div><div class="ttdeci">void save(const SQLStatementPtr &amp;st) const</div><div class="ttdef"><b>定义</b> KRecordTable.h:140</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_table_html_ae9d5eb216f85b128f1e7733cc9359f50"><div class="ttname"><a href="classhku_1_1_k_record_table.html#ae9d5eb216f85b128f1e7733cc9359f50">hku::KRecordTable::open</a></div><div class="ttdeci">price_t open() const</div><div class="ttdef"><b>定义</b> KRecordTable.h:83</div></div>
+<div class="ttc" id="aclasshku_1_1_null_html"><div class="ttname"><a href="classhku_1_1_null.html">hku::Null</a></div><div class="ttdoc">It provides the Null value of the given type</div><div class="ttdef"><b>定义</b> Null.h:38</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_gae515e29dd16a0cef32d5b384635f4361"><div class="ttname"><a href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">hku::SQLStatementPtr</a></div><div class="ttdeci">std::shared_ptr&lt; SQLStatementBase &gt; SQLStatementPtr</div><div class="ttdef"><b>定义</b> SQLStatementBase.h:227</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="agroup___data_type_html_ga2b6c0eff2e4f65f353dc655a1baf7f04"><div class="ttname"><a href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">hku::int64_t</a></div><div class="ttdeci">long long int64_t</div><div class="ttdef"><b>定义</b> DataType.h:99</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="agroup___utilities_html_ga2ddeafd2f9c8af6ecb7e3a8c0e71699f"><div class="ttname"><a href="group___utilities.html#ga2ddeafd2f9c8af6ecb7e3a8c0e71699f">hku::to_lower</a></div><div class="ttdeci">void to_lower(std::string &amp;s) noexcept</div><div class="ttdoc">Convert an ASCII string to lowercase</div><div class="ttdef"><b>定义</b> arithmetic.h:280</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><a href="dir_706bb32c583fde91b67e81aa3618785e.html">kdata</a></li><li class="navelem"><a href="dir_72bfbc89e6b3c540a66171eb0a60b62e.html">mysql</a></li><li class="navelem"><b>KRecordTable.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

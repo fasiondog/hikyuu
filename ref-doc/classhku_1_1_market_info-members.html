@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_market_info.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,39 +74,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">hku::MarketInfo 成员列表</div>  </div>
+  <div class="headertitle"><div class="title">hku::MarketInfo 成员列表</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>成员的完整列表，这些成员属于 <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a>,包括所有继承而来的类成员</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a5c149bffeba22e8f7c2303f9e8d658a9">code</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a31ae4fa02eb0ebf22937afabd281f329">description</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a82cd6855a18b5f9452313beb22d9816b">lastDate</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a0636329111fd2e7f9a447dc48b1d4b10">market</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a1b31e1aa7297104ff31ebdc4260cfb83">closeTime1</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ad84bd3ff571a2bf33d9926007e174842">closeTime2</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a4626e226b6be53349b0ec2c27bde2999">code</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ab0f08031b9f6128f2cb38249372a7f03">description</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ae0c6fb47e8ed2856b37659afa96e0fd4">lastDate</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a03483dad73f97a288a63ff616df5a772">market</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a5dcfb6f00c06efb088a9eb4f4568502a">MarketInfo</a>()</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ae97bb158b07e45f422005cd6d5ef9789">MarketInfo</a>(const string &amp;market, const string &amp;name, const string &amp;description, const string &amp;code, const Datetime &amp;lastDate)</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#afb4e54a42175cdb354512c28b9246e19">name</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ac37e0148e0eaa7a051ebd8b3dca58664">toString</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#a2b92bb2f4919d771c0fd5fc3770d36f4">MarketInfo</a>(const string &amp;market, const string &amp;name, const string &amp;description, const string &amp;code, const Datetime &amp;lastDate, TimeDelta openTime1, TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2)</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#af159a0af77844549674e04b4e2de16b7">MarketInfo</a>(const MarketInfo &amp;)=default</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ad6e3c2d69ba1aa68f2a2e9e82d913692">MarketInfo</a>(MarketInfo &amp;&amp;) noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#aac2f618e3c935074b200f2c6fef73669">name</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ac8ebbf1413dbd541d8e2ffee67552ca5">openTime1</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#aae100bf36cbf20a323e6c76601b773bd">openTime2</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ac48761fd0a82958454318a628d652187">operator=</a>(const MarketInfo &amp;)=default</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ad491b8ca6412944928fd5c2cb1239ec6">operator=</a>(MarketInfo &amp;&amp;) noexcept</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_market_info.html#ad943a92c0b309fdd779b32accd108d12">toString</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

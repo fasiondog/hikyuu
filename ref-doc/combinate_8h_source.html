@@ -1,0 +1,210 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/analysis/combinate.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('combinate_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">combinate.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2023 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2023-09-26</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/indicator/Indicator.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/system/System.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/trade_manage/Performance.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;hikyuu/utilities/Log.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="namespacehku.html#a10918f756d02d2d51b6f8dad15959127">   28</a></span>std::vector&lt;std::vector&lt;size_t&gt;&gt; <a class="code hl_function" href="namespacehku.html#a10918f756d02d2d51b6f8dad15959127">combinateIndex</a>(<span class="keyword">const</span> std::vector&lt;T&gt;&amp; inputs) {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">size_t</span> total = inputs.size();</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    HKU_CHECK(total &lt;= 15, <span class="stringliteral">&quot;The length of inputs exceeds the maximum limit!&quot;</span>);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    std::vector&lt;std::vector&lt;size_t&gt;&gt; result;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    std::vector&lt;size_t&gt; current;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; total; i++) {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0, len = result.size(); j &lt; len; j++) {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>            current.resize(result[j].size());</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>            std::copy(result[j].cbegin(), result[j].cend(), current.begin());</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            current.push_back(i);</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>            result.push_back(std::move(current));</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        }</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        current.clear();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        current.push_back(i);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        result.push_back(std::move(current));</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    }</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>}</div>
+</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="namespacehku.html#adf20c233517b69aec4eae838ed31db09">   58</a></span>std::vector&lt;Indicator&gt; HKU_API <a class="code hl_function" href="namespacehku.html#adf20c233517b69aec4eae838ed31db09">combinateIndicator</a>(<span class="keyword">const</span> std::vector&lt;Indicator&gt;&amp; inputs, <span class="keywordtype">int</span> n);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="namespacehku.html#a00be97a94774b684706a3f46214ec861">   71</a></span>std::map&lt;std::string, Performance&gt; HKU_API <a class="code hl_function" href="namespacehku.html#a00be97a94774b684706a3f46214ec861">combinateIndicatorAnalysis</a>(</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stk, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> tm, <a class="code hl_typedef" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> sys,</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  <span class="keyword">const</span> std::vector&lt;Indicator&gt;&amp; buy_inds, <span class="keyword">const</span> std::vector&lt;Indicator&gt;&amp; sell_inds, <span class="keywordtype">int</span> n);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span></div>
+<div class="foldopen" id="foldopen00078" data-start="{" data-end="};">
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html">   78</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a> {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2">   79</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2">combinateName</a>;  </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#a458cc9131e30ae236262c0ae9a89019f">   80</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a458cc9131e30ae236262c0ae9a89019f">market_code</a>;    </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#a539a1ace062ad4ab7cb866b578e45259">   81</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a539a1ace062ad4ab7cb866b578e45259">name</a>;           </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#a570ec7ada30b555565704a14934bb4bd">   82</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a570ec7ada30b555565704a14934bb4bd">values</a>;      </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">   84</a></span>    <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#a542bb03e85651a2f171fd17d1a785c44">   85</a></span>    <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a542bb03e85651a2f171fd17d1a785c44">CombinateAnalysisOutput</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00086" data-start="{" data-end="}">
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#a120bb868ca30132beab2ca948996db9c">   86</a></span>    <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a120bb868ca30132beab2ca948996db9c">CombinateAnalysisOutput</a>(<a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>&amp;&amp; rv)</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    : <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2">combinateName</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2">combinateName</a>)),</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>      <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a458cc9131e30ae236262c0ae9a89019f">market_code</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a458cc9131e30ae236262c0ae9a89019f">market_code</a>)),</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a539a1ace062ad4ab7cb866b578e45259">name</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a539a1ace062ad4ab7cb866b578e45259">name</a>)),</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a570ec7ada30b555565704a14934bb4bd">values</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a570ec7ada30b555565704a14934bb4bd">values</a>)) {}</div>
+</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#ad2d77af3fc69eb8dee508045feb7a0a7">   92</a></span>    <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>&amp; <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#ad2d77af3fc69eb8dee508045feb7a0a7">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00093" data-start="{" data-end="}">
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="structhku_1_1_combinate_analysis_output.html#adda500b923806f73d388ec392c9b4004">   93</a></span>    <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>&amp; <a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#adda500b923806f73d388ec392c9b4004">operator=</a>(<a class="code hl_function" href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">CombinateAnalysisOutput</a>&amp;&amp; rv) {</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        HKU_IF_RETURN(<span class="keyword">this</span> == &amp;rv, *<span class="keyword">this</span>);</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2">combinateName</a> = std::move(rv.combinateName);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a458cc9131e30ae236262c0ae9a89019f">market_code</a> = std::move(rv.market_code);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a539a1ace062ad4ab7cb866b578e45259">name</a> = std::move(rv.name);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <a class="code hl_variable" href="structhku_1_1_combinate_analysis_output.html#a570ec7ada30b555565704a14934bb4bd">values</a> = std::move(rv.values);</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    }</div>
+</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>};</div>
+</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="namespacehku.html#a1416c6fca04572081d51b6bb8d748d80">  114</a></span>vector&lt;CombinateAnalysisOutput&gt; HKU_API <a class="code hl_function" href="namespacehku.html#a1416c6fca04572081d51b6bb8d748d80">combinateIndicatorAnalysisWithBlock</a>(</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>  <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_block.html">Block</a>&amp; blk, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> tm, <a class="code hl_typedef" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> sys,</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>  <span class="keyword">const</span> std::vector&lt;Indicator&gt;&amp; buy_inds, <span class="keyword">const</span> std::vector&lt;Indicator&gt;&amp; sell_inds, <span class="keywordtype">int</span> n);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_block_html"><div class="ttname"><a href="classhku_1_1_block.html">hku::Block</a></div><div class="ttdoc">Sector (Block) class, which can be regarded as a container of securities</div><div class="ttdef"><b>定义</b> Block.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="agroup___system_html_gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><div class="ttname"><a href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku::SystemPtr</a></div><div class="ttdeci">shared_ptr&lt; System &gt; SystemPtr</div><div class="ttdoc">Client programs should operate through this pointer</div><div class="ttdef"><b>定义</b> System.h:545</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga9d7ab0c25be37c167f61358a5fa526f0"><div class="ttname"><a href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TradeManagerPtr</div><div class="ttdoc">Client programs should use this type for the actual operations</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:904</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a00be97a94774b684706a3f46214ec861"><div class="ttname"><a href="namespacehku.html#a00be97a94774b684706a3f46214ec861">hku::combinateIndicatorAnalysis</a></div><div class="ttdeci">std::map&lt; std::string, Performance &gt; HKU_API combinateIndicatorAnalysis(const Stock &amp;stk, const KQuery &amp;query, TradeManagerPtr tm, SystemPtr sys, const std::vector&lt; Indicator &gt; &amp;buy_inds, const std::vector&lt; Indicator &gt; &amp;sell_inds, int n)</div><div class="ttdoc">Combination test of the given security and the buy / sell signals</div></div>
+<div class="ttc" id="anamespacehku_html_a10918f756d02d2d51b6f8dad15959127"><div class="ttname"><a href="namespacehku.html#a10918f756d02d2d51b6f8dad15959127">hku::combinateIndex</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; size_t &gt; &gt; combinateIndex(const std::vector&lt; T &gt; &amp;inputs)</div><div class="ttdoc">Get the combinations of the given sequence indexes, returning the combination set composed of the seq...</div><div class="ttdef"><b>定义</b> combinate.h:28</div></div>
+<div class="ttc" id="anamespacehku_html_a1416c6fca04572081d51b6bb8d748d80"><div class="ttname"><a href="namespacehku.html#a1416c6fca04572081d51b6bb8d748d80">hku::combinateIndicatorAnalysisWithBlock</a></div><div class="ttdeci">vector&lt; CombinateAnalysisOutput &gt; HKU_API combinateIndicatorAnalysisWithBlock(const Block &amp;blk, const KQuery &amp;query, TradeManagerPtr tm, SystemPtr sys, const std::vector&lt; Indicator &gt; &amp;buy_inds, const std::vector&lt; Indicator &gt; &amp;sell_inds, int n)</div><div class="ttdoc">Combination test of the buy / sell signals on the given security list</div></div>
+<div class="ttc" id="anamespacehku_html_adf20c233517b69aec4eae838ed31db09"><div class="ttname"><a href="namespacehku.html#adf20c233517b69aec4eae838ed31db09">hku::combinateIndicator</a></div><div class="ttdeci">std::vector&lt; Indicator &gt; HKU_API combinateIndicator(const std::vector&lt; Indicator &gt; &amp;inputs, int n)</div><div class="ttdoc">Combine the input indicator sequence</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_a120bb868ca30132beab2ca948996db9c"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#a120bb868ca30132beab2ca948996db9c">hku::CombinateAnalysisOutput::CombinateAnalysisOutput</a></div><div class="ttdeci">CombinateAnalysisOutput(CombinateAnalysisOutput &amp;&amp;rv)</div><div class="ttdef"><b>定义</b> combinate.h:86</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_a458cc9131e30ae236262c0ae9a89019f"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#a458cc9131e30ae236262c0ae9a89019f">hku::CombinateAnalysisOutput::market_code</a></div><div class="ttdeci">string market_code</div><div class="ttdoc">Security code</div><div class="ttdef"><b>定义</b> combinate.h:80</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_a539a1ace062ad4ab7cb866b578e45259"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#a539a1ace062ad4ab7cb866b578e45259">hku::CombinateAnalysisOutput::name</a></div><div class="ttdeci">string name</div><div class="ttdoc">Security name</div><div class="ttdef"><b>定义</b> combinate.h:81</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_a542bb03e85651a2f171fd17d1a785c44"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#a542bb03e85651a2f171fd17d1a785c44">hku::CombinateAnalysisOutput::CombinateAnalysisOutput</a></div><div class="ttdeci">CombinateAnalysisOutput(const CombinateAnalysisOutput &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_a570ec7ada30b555565704a14934bb4bd"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#a570ec7ada30b555565704a14934bb4bd">hku::CombinateAnalysisOutput::values</a></div><div class="ttdeci">PriceList values</div><div class="ttdoc">The values of every statistics item</div><div class="ttdef"><b>定义</b> combinate.h:82</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_a8ec216a98f1e71536e44c24c88260aad"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#a8ec216a98f1e71536e44c24c88260aad">hku::CombinateAnalysisOutput::CombinateAnalysisOutput</a></div><div class="ttdeci">CombinateAnalysisOutput()=default</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_abfa08c28bf0ad2e6408086f6d15dbac2"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2">hku::CombinateAnalysisOutput::combinateName</a></div><div class="ttdeci">string combinateName</div><div class="ttdoc">Name of the buy / sell indicator combination</div><div class="ttdef"><b>定义</b> combinate.h:79</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_ad2d77af3fc69eb8dee508045feb7a0a7"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#ad2d77af3fc69eb8dee508045feb7a0a7">hku::CombinateAnalysisOutput::operator=</a></div><div class="ttdeci">CombinateAnalysisOutput &amp; operator=(const CombinateAnalysisOutput &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_combinate_analysis_output_html_adda500b923806f73d388ec392c9b4004"><div class="ttname"><a href="structhku_1_1_combinate_analysis_output.html#adda500b923806f73d388ec392c9b4004">hku::CombinateAnalysisOutput::operator=</a></div><div class="ttdeci">CombinateAnalysisOutput &amp; operator=(CombinateAnalysisOutput &amp;&amp;rv)</div><div class="ttdef"><b>定义</b> combinate.h:93</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_fd4ff774d23bec136cca53be21004967.html">analysis</a></li><li class="navelem"><b>combinate.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

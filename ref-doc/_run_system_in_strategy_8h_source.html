@@ -1,0 +1,164 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/strategy/RunSystemInStrategy.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_run_system_in_strategy_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">RunSystemInStrategy.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-08-24</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/system/System.h&quot;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;Strategy.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="};">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html">   14</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#acd1d10ca8184b40658c8c586d8f1414f">RunSystemInStrategy</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html#acd1d10ca8184b40658c8c586d8f1414f">   16</a></span>    <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#acd1d10ca8184b40658c8c586d8f1414f">RunSystemInStrategy</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html#a4a9ea88807654c30a0740b6531b93f2d">   17</a></span>    <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#a4a9ea88807654c30a0740b6531b93f2d">RunSystemInStrategy</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; sys, <span class="keyword">const</span> <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>&amp; broker, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>                        <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a>&amp; costfunc);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html#ac3324c33d0a96d67cfec915689536206">   19</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#ac3324c33d0a96d67cfec915689536206">~RunSystemInStrategy</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html#aad88a69fcbb6e3ab7ee7ac1859bc1380">   21</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#aad88a69fcbb6e3ab7ee7ac1859bc1380">run</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html#a5411f97aef0ca9c47754f60ff2da2de0">   23</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#a5411f97aef0ca9c47754f60ff2da2de0">runMomentOnOpen</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_run_system_in_strategy.html#ab37e6d9795f7f24cd65d97aae99d5439">   24</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_run_system_in_strategy.html#ab37e6d9795f7f24cd65d97aae99d5439">runMomentOnClose</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> m_sys;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> m_broker;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a> m_query;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    std::vector&lt;TradeRequest&gt; m_buyRequestList;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    std::vector&lt;TradeRequest&gt; m_sellRequestList;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>};</div>
+</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="namespacehku.html#a192aeeec52b370721a8b77b9c95422f1">   35</a></span><a class="code hl_typedef" href="namespacehku.html#ac813d5968f62d0a03add566d7411e77c">StrategyPtr</a> HKU_API <a class="code hl_function" href="namespacehku.html#a192aeeec52b370721a8b77b9c95422f1">crtSysStrategy</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; sys, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; stk_market_code,</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                                   <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>&amp; broker,</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                                   <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a>&amp; costfunc, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name = <span class="stringliteral">&quot;SYSStrategy&quot;</span>,</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                                   <span class="keyword">const</span> std::vector&lt;OrderBrokerPtr&gt;&amp; other_brokers = {},</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                                   <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; config_file = <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_run_system_in_strategy_html_a4a9ea88807654c30a0740b6531b93f2d"><div class="ttname"><a href="classhku_1_1_run_system_in_strategy.html#a4a9ea88807654c30a0740b6531b93f2d">hku::RunSystemInStrategy::RunSystemInStrategy</a></div><div class="ttdeci">RunSystemInStrategy(const SYSPtr &amp;sys, const OrderBrokerPtr &amp;broker, const KQuery &amp;query, const TradeCostPtr &amp;costfunc)</div></div>
+<div class="ttc" id="aclasshku_1_1_run_system_in_strategy_html_a5411f97aef0ca9c47754f60ff2da2de0"><div class="ttname"><a href="classhku_1_1_run_system_in_strategy.html#a5411f97aef0ca9c47754f60ff2da2de0">hku::RunSystemInStrategy::runMomentOnOpen</a></div><div class="ttdeci">void runMomentOnOpen(const Stock &amp;stock)</div></div>
+<div class="ttc" id="aclasshku_1_1_run_system_in_strategy_html_aad88a69fcbb6e3ab7ee7ac1859bc1380"><div class="ttname"><a href="classhku_1_1_run_system_in_strategy.html#aad88a69fcbb6e3ab7ee7ac1859bc1380">hku::RunSystemInStrategy::run</a></div><div class="ttdeci">void run(const Stock &amp;stock)</div></div>
+<div class="ttc" id="aclasshku_1_1_run_system_in_strategy_html_ab37e6d9795f7f24cd65d97aae99d5439"><div class="ttname"><a href="classhku_1_1_run_system_in_strategy.html#ab37e6d9795f7f24cd65d97aae99d5439">hku::RunSystemInStrategy::runMomentOnClose</a></div><div class="ttdeci">void runMomentOnClose(const Stock &amp;stock)</div></div>
+<div class="ttc" id="aclasshku_1_1_run_system_in_strategy_html_ac3324c33d0a96d67cfec915689536206"><div class="ttname"><a href="classhku_1_1_run_system_in_strategy.html#ac3324c33d0a96d67cfec915689536206">hku::RunSystemInStrategy::~RunSystemInStrategy</a></div><div class="ttdeci">virtual ~RunSystemInStrategy()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_run_system_in_strategy_html_acd1d10ca8184b40658c8c586d8f1414f"><div class="ttname"><a href="classhku_1_1_run_system_in_strategy.html#acd1d10ca8184b40658c8c586d8f1414f">hku::RunSystemInStrategy::RunSystemInStrategy</a></div><div class="ttdeci">RunSystemInStrategy()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___order_broker_html_ga230f0334622d7230339a0759632b8f13"><div class="ttname"><a href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">hku::OrderBrokerPtr</a></div><div class="ttdeci">shared_ptr&lt; OrderBrokerBase &gt; OrderBrokerPtr</div><div class="ttdoc">The client program should use this type for the actual operations</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:205</div></div>
+<div class="ttc" id="agroup___trade_cost_html_ga1a3f61ad3141508e3c14ddfb326ee0ad"><div class="ttname"><a href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">hku::TradeCostPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeCostBase &gt; TradeCostPtr</div><div class="ttdoc">Trade cost algorithm pointer</div><div class="ttdef"><b>定义</b> TradeCostBase.h:172</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a192aeeec52b370721a8b77b9c95422f1"><div class="ttname"><a href="namespacehku.html#a192aeeec52b370721a8b77b9c95422f1">hku::crtSysStrategy</a></div><div class="ttdeci">StrategyPtr HKU_API crtSysStrategy(const SYSPtr &amp;sys, const string &amp;stk_market_code, const KQuery &amp;query, const OrderBrokerPtr &amp;broker, const TradeCostPtr &amp;costfunc, const string &amp;name=&quot;SYSStrategy&quot;, const std::vector&lt; OrderBrokerPtr &gt; &amp;other_brokers={}, const string &amp;config_file=&quot;&quot;)</div></div>
+<div class="ttc" id="anamespacehku_html_a98d36b433e7ba4fe01cb70ec3a856dbc"><div class="ttname"><a href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">hku::SYSPtr</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; SYSPtr</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:58</div></div>
+<div class="ttc" id="anamespacehku_html_ac813d5968f62d0a03add566d7411e77c"><div class="ttname"><a href="namespacehku.html#ac813d5968f62d0a03add566d7411e77c">hku::StrategyPtr</a></div><div class="ttdeci">shared_ptr&lt; Strategy &gt; StrategyPtr</div><div class="ttdef"><b>定义</b> Strategy.h:336</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_60c2bae2a9cd9d92ca9ac8bb5ff61036.html">strategy</a></li><li class="navelem"><b>RunSystemInStrategy.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

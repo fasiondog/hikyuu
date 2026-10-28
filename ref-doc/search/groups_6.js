@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['indicator_20指标库',['Indicator 指标库',['../group___indicator.html',1,'']]],
-  ['iniparser_20简单ini文件读取',['IniParser 简单ini文件读取',['../group___ini_parser.html',1,'']]]
+  ['generator_0',['Signal signal generator',['../group___signal.html',1,'']]],
+  ['goal_20strategy_1',['ProfitGoal profit goal strategy',['../group___profit_goal.html',1,'']]]
 ];

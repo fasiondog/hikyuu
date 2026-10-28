@@ -1,0 +1,2216 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::BrokerTradeManager类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_broker_trade_manager.html','','classhku_1_1_broker_trade_manager-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::BrokerTradeManager类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="_broker_trade_manager_8h_source.html">BrokerTradeManager.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::BrokerTradeManager 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_broker_trade_manager__inherit__graph.png" border="0" usemap="#ahku_1_1_broker_trade_manager_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::BrokerTradeManager 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_broker_trade_manager__coll__graph.png" border="0" usemap="#ahku_1_1_broker_trade_manager_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a307b1ae3c771b2940aabba24269b76e3" id="r_a307b1ae3c771b2940aabba24269b76e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a307b1ae3c771b2940aabba24269b76e3">BrokerTradeManager</a> ()=default</td></tr>
+<tr class="memitem:a4e79c96c00c4fb3a159df0e7a120b955" id="r_a4e79c96c00c4fb3a159df0e7a120b955"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e79c96c00c4fb3a159df0e7a120b955">BrokerTradeManager</a> (const <a class="el" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> &amp;broker, const <a class="el" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a> &amp;costfunc=<a class="el" href="group___trade_cost.html#ga7f358c347b5477dc35f10fb8c14b894f">TC_Zero</a>(), const string &amp;<a class="el" href="classhku_1_1_trade_manager_base.html#aa0aaf73fdd695e14e1c4935552580fd6">name</a>=&quot;SYS&quot;)</td></tr>
+<tr class="memitem:a005fd8f193b59c536765c329083a1679" id="r_a005fd8f193b59c536765c329083a1679"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a005fd8f193b59c536765c329083a1679">~BrokerTradeManager</a> ()</td></tr>
+<tr class="memitem:a4c6ae8d797c8e58124d712b246b3b4f2" id="r_a4c6ae8d797c8e58124d712b246b3b4f2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c6ae8d797c8e58124d712b246b3b4f2">_reset</a> () override</td></tr>
+<tr class="memitem:a41eaebecba1e31f141a9484e401ccfdc" id="r_a41eaebecba1e31f141a9484e401ccfdc"><td class="memItemLeft" align="right" valign="top">virtual shared_ptr&lt; <a class="el" href="classhku_1_1_trade_manager_base.html">TradeManagerBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a41eaebecba1e31f141a9484e401ccfdc">_clone</a> () override</td></tr>
+<tr class="memitem:a2171c29261f4ecda94530f19c7885465" id="r_a2171c29261f4ecda94530f19c7885465"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2171c29261f4ecda94530f19c7885465">fetchAssetInfoFromBroker</a> (const <a class="el" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> &amp;broker, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &gt;()) override</td></tr>
+<tr class="memdesc:a2171c29261f4ecda94530f19c7885465"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronize the current account asset information (funds, positions, ...) from the order broker instance  <br /></td></tr>
+<tr class="memitem:a88277c77d23abdb731819d3a2c474701" id="r_a88277c77d23abdb731819d3a2c474701"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88277c77d23abdb731819d3a2c474701">updateWithWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) override</td></tr>
+<tr class="memdesc:a88277c77d23abdb731819d3a2c474701"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the current positions and trades according to the weight (adjustment) information  <br /></td></tr>
+<tr class="memitem:a36852c2b76d3f3e09892abc440d52071" id="r_a36852c2b76d3f3e09892abc440d52071"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36852c2b76d3f3e09892abc440d52071">getMarginRate</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) override</td></tr>
+<tr class="memdesc:a36852c2b76d3f3e09892abc440d52071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the margin rate of the given security  <br /></td></tr>
+<tr class="memitem:a73803223711d147367057b098da771a3" id="r_a73803223711d147367057b098da771a3"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73803223711d147367057b098da771a3">initCash</a> () const override</td></tr>
+<tr class="memdesc:a73803223711d147367057b098da771a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initial cash  <br /></td></tr>
+<tr class="memitem:aa3b3726e223311417525d1bcc144c6e8" id="r_aa3b3726e223311417525d1bcc144c6e8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3b3726e223311417525d1bcc144c6e8">initDatetime</a> () const override</td></tr>
+<tr class="memdesc:aa3b3726e223311417525d1bcc144c6e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Account creation date  <br /></td></tr>
+<tr class="memitem:afb2e26912f044aa2dc107617da493a5a" id="r_afb2e26912f044aa2dc107617da493a5a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb2e26912f044aa2dc107617da493a5a">firstDatetime</a> () const override</td></tr>
+<tr class="memdesc:afb2e26912f044aa2dc107617da493a5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Date of the first buy trade; Null&lt;Datetime&gt;() is returned if no trade has happened  <br /></td></tr>
+<tr class="memitem:a8d98053c0660f9a3073b737d1fcd04af" id="r_a8d98053c0660f9a3073b737d1fcd04af"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8d98053c0660f9a3073b737d1fcd04af">lastDatetime</a> () const override</td></tr>
+<tr class="memdesc:a8d98053c0660f9a3073b737d1fcd04af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Date of the last trade, regardless of the trade type; the account creation date is returned if no trade has happened  <br /></td></tr>
+<tr class="memitem:a75b24587fb0e9f683125eccd83e53a03" id="r_a75b24587fb0e9f683125eccd83e53a03"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75b24587fb0e9f683125eccd83e53a03">currentCash</a> () const override</td></tr>
+<tr class="memdesc:a75b24587fb0e9f683125eccd83e53a03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current cash  <br /></td></tr>
+<tr class="memitem:a3a10df180769ad35c5fd6533c53d10d7" id="r_a3a10df180769ad35c5fd6533c53d10d7"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a10df180769ad35c5fd6533c53d10d7">cash</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>) override</td></tr>
+<tr class="memdesc:a3a10df180769ad35c5fd6533c53d10d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the cash of the given date  <br /></td></tr>
+<tr class="memitem:a5fc417c00a4bfc7cb98df1220ac3b26a" id="r_a5fc417c00a4bfc7cb98df1220ac3b26a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5fc417c00a4bfc7cb98df1220ac3b26a">have</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) const override</td></tr>
+<tr class="memdesc:a5fc417c00a4bfc7cb98df1220ac3b26a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the given security is currently held  <br /></td></tr>
+<tr class="memitem:ad43110bb2fac600f34a5c4d9313b5a28" id="r_ad43110bb2fac600f34a5c4d9313b5a28"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad43110bb2fac600f34a5c4d9313b5a28">haveShort</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) const override</td></tr>
+<tr class="memdesc:ad43110bb2fac600f34a5c4d9313b5a28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the given security is currently held in the short position  <br /></td></tr>
+<tr class="memitem:a1d8d1a61f1774d5caf0ea35410d5a272" id="r_a1d8d1a61f1774d5caf0ea35410d5a272"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d8d1a61f1774d5caf0ea35410d5a272">getStockNumber</a> () const override</td></tr>
+<tr class="memdesc:a1d8d1a61f1774d5caf0ea35410d5a272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of security types currently held  <br /></td></tr>
+<tr class="memitem:a28b18825300307fdaa377aee83e79036" id="r_a28b18825300307fdaa377aee83e79036"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28b18825300307fdaa377aee83e79036">getShortStockNumber</a> () const override</td></tr>
+<tr class="memdesc:a28b18825300307fdaa377aee83e79036"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of security types currently held short  <br /></td></tr>
+<tr class="memitem:a635fa29f12de0c8b275b71a5f919ffb6" id="r_a635fa29f12de0c8b275b71a5f919ffb6"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a635fa29f12de0c8b275b71a5f919ffb6">getHoldNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) override</td></tr>
+<tr class="memdesc:a635fa29f12de0c8b275b71a5f919ffb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the held quantity of a security at the given moment  <br /></td></tr>
+<tr class="memitem:a9534f70f35a91606988178cfce008d2a" id="r_a9534f70f35a91606988178cfce008d2a"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9534f70f35a91606988178cfce008d2a">getShortHoldNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) override</td></tr>
+<tr class="memdesc:a9534f70f35a91606988178cfce008d2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the short held quantity of a security at the given moment  <br /></td></tr>
+<tr class="memitem:a45c94e328d00b1468817472a2de0508b" id="r_a45c94e328d00b1468817472a2de0508b"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45c94e328d00b1468817472a2de0508b">getDebtNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) override</td></tr>
+<tr class="memdesc:a45c94e328d00b1468817472a2de0508b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of borrowed shares at the given moment  <br /></td></tr>
+<tr class="memitem:ad936df5e81413a5c0defc30168f94d44" id="r_ad936df5e81413a5c0defc30168f94d44"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad936df5e81413a5c0defc30168f94d44">getDebtCash</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) override</td></tr>
+<tr class="memdesc:ad936df5e81413a5c0defc30168f94d44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the amount of borrowed cash at the given moment  <br /></td></tr>
+<tr class="memitem:a5dc6475e5f6768e198b25ee5ecbcf7b4" id="r_a5dc6475e5f6768e198b25ee5ecbcf7b4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5dc6475e5f6768e198b25ee5ecbcf7b4">getTradeList</a> () const override</td></tr>
+<tr class="memdesc:a5dc6475e5f6768e198b25ee5ecbcf7b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the trade records  <br /></td></tr>
+<tr class="memitem:a61f02e1c037d470c9c01b51bd2f7dbd3" id="r_a61f02e1c037d470c9c01b51bd2f7dbd3"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61f02e1c037d470c9c01b51bd2f7dbd3">getTradeList</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;start, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;end) const override</td></tr>
+<tr class="memdesc:a61f02e1c037d470c9c01b51bd2f7dbd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trade records within the given date range [start, end)  <br /></td></tr>
+<tr class="memitem:a0232c144c33aa08730c6b16c0a01de87" id="r_a0232c144c33aa08730c6b16c0a01de87"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0232c144c33aa08730c6b16c0a01de87">getPositionList</a> () const override</td></tr>
+<tr class="memdesc:a0232c144c33aa08730c6b16c0a01de87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the current position records  <br /></td></tr>
+<tr class="memitem:a724bb03d9acf0c6579ad3db7ab289a42" id="r_a724bb03d9acf0c6579ad3db7ab289a42"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a724bb03d9acf0c6579ad3db7ab289a42">getHistoryPositionList</a> () const override</td></tr>
+<tr class="memdesc:a724bb03d9acf0c6579ad3db7ab289a42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the historical position records, i.e.  <br /></td></tr>
+<tr class="memitem:a9f0324e760f42c9a77587d65573114ca" id="r_a9f0324e760f42c9a77587d65573114ca"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f0324e760f42c9a77587d65573114ca">getShortPositionList</a> () const override</td></tr>
+<tr class="memdesc:a9f0324e760f42c9a77587d65573114ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the current short position records  <br /></td></tr>
+<tr class="memitem:a2e10c40462d4199fb3e751390fcdc4ab" id="r_a2e10c40462d4199fb3e751390fcdc4ab"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e10c40462d4199fb3e751390fcdc4ab">getShortHistoryPositionList</a> () const override</td></tr>
+<tr class="memdesc:a2e10c40462d4199fb3e751390fcdc4ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the historical short position records  <br /></td></tr>
+<tr class="memitem:a870f4ab09d800e7ca4fbcdbf685b0fa9" id="r_a870f4ab09d800e7ca4fbcdbf685b0fa9"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a870f4ab09d800e7ca4fbcdbf685b0fa9">getPosition</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) override</td></tr>
+<tr class="memdesc:a870f4ab09d800e7ca4fbcdbf685b0fa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position record of the given security  <br /></td></tr>
+<tr class="memitem:aed677adc2843553f6d459ca1b738436b" id="r_aed677adc2843553f6d459ca1b738436b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed677adc2843553f6d459ca1b738436b">getShortPosition</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) const override</td></tr>
+<tr class="memdesc:aed677adc2843553f6d459ca1b738436b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the short position record of the given security  <br /></td></tr>
+<tr class="memitem:ab6b1a3aa90009bcf8245c18f9a0dfbd3" id="r_ab6b1a3aa90009bcf8245c18f9a0dfbd3"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku.html#a0cf0c35f546f15009d4873a1e8cfe80b">BorrowRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab6b1a3aa90009bcf8245c18f9a0dfbd3">getBorrowStockList</a> () const override</td></tr>
+<tr class="memdesc:ab6b1a3aa90009bcf8245c18f9a0dfbd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the list of currently borrowed shares  <br /></td></tr>
+<tr class="memitem:af8cf4cd04bd93b7999d339f2be7aa41f" id="r_af8cf4cd04bd93b7999d339f2be7aa41f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8cf4cd04bd93b7999d339f2be7aa41f">checkin</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a3a10df180769ad35c5fd6533c53d10d7">cash</a>) override</td></tr>
+<tr class="memdesc:af8cf4cd04bd93b7999d339f2be7aa41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deposit funds  <br /></td></tr>
+<tr class="memitem:aefc07d4ed72c8e46f3678bb10302f59f" id="r_aefc07d4ed72c8e46f3678bb10302f59f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aefc07d4ed72c8e46f3678bb10302f59f">checkout</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a3a10df180769ad35c5fd6533c53d10d7">cash</a>) override</td></tr>
+<tr class="memdesc:aefc07d4ed72c8e46f3678bb10302f59f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Withdraw funds  <br /></td></tr>
+<tr class="memitem:a36799beb28823f12e61a3eddf3a24ef6" id="r_a36799beb28823f12e61a3eddf3a24ef6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36799beb28823f12e61a3eddf3a24ef6">checkinStock</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double number) override</td></tr>
+<tr class="memdesc:a36799beb28823f12e61a3eddf3a24ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deposit assets  <br /></td></tr>
+<tr class="memitem:a6b672e86a1e746e63d25495402e58d19" id="r_a6b672e86a1e746e63d25495402e58d19"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b672e86a1e746e63d25495402e58d19">checkoutStock</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double number) override</td></tr>
+<tr class="memdesc:a6b672e86a1e746e63d25495402e58d19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Withdraw the current assets  <br /></td></tr>
+<tr class="memitem:a9658b900608d5126085ee16b6da894ac" id="r_a9658b900608d5126085ee16b6da894ac"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9658b900608d5126085ee16b6da894ac">buy</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> realPrice, double number, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice=0.0, <a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from=<a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a>, const string &amp;remark=&quot;&quot;) override</td></tr>
+<tr class="memdesc:a9658b900608d5126085ee16b6da894ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buy operation  <br /></td></tr>
+<tr class="memitem:a212f5604e2319616b0f23c2df083eae7" id="r_a212f5604e2319616b0f23c2df083eae7"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a212f5604e2319616b0f23c2df083eae7">sell</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> realPrice, double number=MAX_DOUBLE, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice=0.0, <a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from=<a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a>, const string &amp;remark=&quot;&quot;) override</td></tr>
+<tr class="memdesc:a212f5604e2319616b0f23c2df083eae7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sell operation  <br /></td></tr>
+<tr class="memitem:a8ad43a1627d5b6262c579dd0d0157b52" id="r_a8ad43a1627d5b6262c579dd0d0157b52"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ad43a1627d5b6262c579dd0d0157b52">sellShort</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> realPrice, double number, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice=0.0, <a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from=<a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a>, const string &amp;remark=&quot;&quot;) override</td></tr>
+<tr class="memdesc:a8ad43a1627d5b6262c579dd0d0157b52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Short sell  <br /></td></tr>
+<tr class="memitem:a4b82d5473313fa819fee17af880afbc6" id="r_a4b82d5473313fa819fee17af880afbc6"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b82d5473313fa819fee17af880afbc6">buyShort</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> realPrice, double number=MAX_DOUBLE, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice=0.0, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice=0.0, <a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from=<a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a>, const string &amp;remark=&quot;&quot;) override</td></tr>
+<tr class="memdesc:a4b82d5473313fa819fee17af880afbc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cover a short position  <br /></td></tr>
+<tr class="memitem:a0ecbf65fcd650bc517fcaef750f62e68" id="r_a0ecbf65fcd650bc517fcaef750f62e68"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ecbf65fcd650bc517fcaef750f62e68">borrowCash</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a3a10df180769ad35c5fd6533c53d10d7">cash</a>) override</td></tr>
+<tr class="memdesc:a0ecbf65fcd650bc517fcaef750f62e68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Borrow funds, the funds borrowed from other sources, such as margin financing  <br /></td></tr>
+<tr class="memitem:ad802940f46e7a9380162326d2ce399cd" id="r_ad802940f46e7a9380162326d2ce399cd"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad802940f46e7a9380162326d2ce399cd">returnCash</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="#a3a10df180769ad35c5fd6533c53d10d7">cash</a>) override</td></tr>
+<tr class="memdesc:ad802940f46e7a9380162326d2ce399cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the funds  <br /></td></tr>
+<tr class="memitem:a598845588f1e788e82c4a36e928969f1" id="r_a598845588f1e788e82c4a36e928969f1"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a598845588f1e788e82c4a36e928969f1">borrowStock</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double number) override</td></tr>
+<tr class="memdesc:a598845588f1e788e82c4a36e928969f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Borrow securities  <br /></td></tr>
+<tr class="memitem:abc9d04ce7a9cf22d4bcc17d51b832880" id="r_abc9d04ce7a9cf22d4bcc17d51b832880"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc9d04ce7a9cf22d4bcc17d51b832880">returnStock</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double number) override</td></tr>
+<tr class="memdesc:abc9d04ce7a9cf22d4bcc17d51b832880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the securities  <br /></td></tr>
+<tr class="memitem:a0083880f897a2985460927f69290ad0d" id="r_a0083880f897a2985460927f69290ad0d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_funds_record.html">FundsRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0083880f897a2985460927f69290ad0d">getFunds</a> (<a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>) const override</td></tr>
+<tr class="memdesc:a0083880f897a2985460927f69290ad0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the asset detail of the account at the current moment  <br /></td></tr>
+<tr class="memitem:a1fd7728677f873bd8fef4d483679c0ad" id="r_a1fd7728677f873bd8fef4d483679c0ad"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_funds_record.html">FundsRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fd7728677f873bd8fef4d483679c0ad">getFunds</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>) override</td></tr>
+<tr class="memdesc:a1fd7728677f873bd8fef4d483679c0ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the asset detail at the given moment: the cash and the position quantities come from the broker snapshot, the market value is revalued at <span class="tt">datetime</span> by that moment's market price (the snapshot only records the quantities; their value drifts with the price)  <br /></td></tr>
+<tr class="memitem:af30fd7df572e3d6ffa4ebf63e5874155" id="r_af30fd7df572e3d6ffa4ebf63e5874155"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af30fd7df572e3d6ffa4ebf63e5874155">addTradeRecord</a> (const <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> &amp;tr) override</td></tr>
+<tr class="memdesc:af30fd7df572e3d6ffa4ebf63e5874155"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a trade record directly  <br /></td></tr>
+<tr class="memitem:a9c98296d5470f53dfb11d53900b74965" id="r_a9c98296d5470f53dfb11d53900b74965"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c98296d5470f53dfb11d53900b74965">addPosition</a> (const <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a> &amp;pr) override</td></tr>
+<tr class="memdesc:a9c98296d5470f53dfb11d53900b74965"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a position record directly  <br /></td></tr>
+<tr class="memitem:ae5334e799fef7e230450ed5570c622e6" id="r_ae5334e799fef7e230450ed5570c622e6"><td class="memItemLeft" align="right" valign="top">virtual string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae5334e799fef7e230450ed5570c622e6">str</a> () const override</td></tr>
+<tr class="memdesc:ae5334e799fef7e230450ed5570c622e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">String output  <br /></td></tr>
+<tr class="memitem:a92559ab0243f0d9eb8011c9d0e98d4e8" id="r_a92559ab0243f0d9eb8011c9d0e98d4e8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92559ab0243f0d9eb8011c9d0e98d4e8">tocsv</a> (const string &amp;path) override</td></tr>
+<tr class="memdesc:a92559ab0243f0d9eb8011c9d0e98d4e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output the trade records, the open positions, the closed positions and the net asset value curve in the csv format  <br /></td></tr>
+<tr class="inherit_header pub_methods_classhku_1_1_trade_manager_base"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classhku_1_1_trade_manager_base')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classhku_1_1_trade_manager_base.html">hku::TradeManagerBase</a></td></tr>
+<tr class="memitem:afb58bd27f1116df7492b200d253c1d72 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_afb58bd27f1116df7492b200d253c1d72"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#afb58bd27f1116df7492b200d253c1d72">TradeManagerBase</a> ()</td></tr>
+<tr class="memitem:afd816a5e4e0e44525d9345e645a3d8f9 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_afd816a5e4e0e44525d9345e645a3d8f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#afd816a5e4e0e44525d9345e645a3d8f9">TradeManagerBase</a> (const string &amp;<a class="el" href="classhku_1_1_trade_manager_base.html#aa0aaf73fdd695e14e1c4935552580fd6">name</a>)</td></tr>
+<tr class="memitem:a27250432a8828c506ff635c28fbc7050 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a27250432a8828c506ff635c28fbc7050"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a27250432a8828c506ff635c28fbc7050">TradeManagerBase</a> (const string &amp;<a class="el" href="classhku_1_1_trade_manager_base.html#aa0aaf73fdd695e14e1c4935552580fd6">name</a>, const <a class="el" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a> &amp;<a class="el" href="classhku_1_1_trade_manager_base.html#a15887ac0c37dcfab2afca254bd6c9e76">costFunc</a>)</td></tr>
+<tr class="memitem:ab33ddd29f726da6642b3d1fa53ed0c8f inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ab33ddd29f726da6642b3d1fa53ed0c8f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ab33ddd29f726da6642b3d1fa53ed0c8f">~TradeManagerBase</a> ()</td></tr>
+<tr class="memitem:aa0aaf73fdd695e14e1c4935552580fd6 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_aa0aaf73fdd695e14e1c4935552580fd6"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#aa0aaf73fdd695e14e1c4935552580fd6">name</a> () const</td></tr>
+<tr class="memdesc:aa0aaf73fdd695e14e1c4935552580fd6 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Account name  <br /></td></tr>
+<tr class="memitem:aabda4f7a6efc510dac1135851e6f1f69 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_aabda4f7a6efc510dac1135851e6f1f69"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#aabda4f7a6efc510dac1135851e6f1f69">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:aabda4f7a6efc510dac1135851e6f1f69 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the account name  <br /></td></tr>
+<tr class="memitem:a3c3087b862e40b1cd79d77b5034dad29 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a3c3087b862e40b1cd79d77b5034dad29"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a3c3087b862e40b1cd79d77b5034dad29">precision</a> () const</td></tr>
+<tr class="memdesc:a3c3087b862e40b1cd79d77b5034dad29 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trade precision  <br /></td></tr>
+<tr class="memitem:a15887ac0c37dcfab2afca254bd6c9e76 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a15887ac0c37dcfab2afca254bd6c9e76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a15887ac0c37dcfab2afca254bd6c9e76">costFunc</a> () const</td></tr>
+<tr class="memdesc:a15887ac0c37dcfab2afca254bd6c9e76 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trade cost algorithm pointer  <br /></td></tr>
+<tr class="memitem:ab137e4b2e55ea72531535f8b989a3c71 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ab137e4b2e55ea72531535f8b989a3c71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ab137e4b2e55ea72531535f8b989a3c71">costFunc</a> (const <a class="el" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a> &amp;func)</td></tr>
+<tr class="memdesc:ab137e4b2e55ea72531535f8b989a3c71 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the trade cost algorithm pointer  <br /></td></tr>
+<tr class="memitem:afc6d0befe005173e38026a620c422cf7 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_afc6d0befe005173e38026a620c422cf7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_cost_record.html">CostRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#afc6d0befe005173e38026a620c422cf7">getBuyCost</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double num) const</td></tr>
+<tr class="memdesc:afc6d0befe005173e38026a620c422cf7 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the buy cost  <br /></td></tr>
+<tr class="memitem:a61a1a42466a3430b21db011cf2bdfebd inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a61a1a42466a3430b21db011cf2bdfebd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_cost_record.html">CostRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a61a1a42466a3430b21db011cf2bdfebd">getSellCost</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double num) const</td></tr>
+<tr class="memdesc:a61a1a42466a3430b21db011cf2bdfebd inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the sell cost  <br /></td></tr>
+<tr class="memitem:ac471c8e81473d0f2f2a14ad971980468 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ac471c8e81473d0f2f2a14ad971980468"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_cost_record.html">CostRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ac471c8e81473d0f2f2a14ad971980468">getBorrowCashCost</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_trade_manager_base.html#acc183fba2790b3d193abfe1809de0348">cash</a>)</td></tr>
+<tr class="memdesc:ac471c8e81473d0f2f2a14ad971980468 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the cost charged when the cash is credited  <br /></td></tr>
+<tr class="memitem:a99f5b67fef8d5396850514e8ecda64fd inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a99f5b67fef8d5396850514e8ecda64fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_cost_record.html">CostRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a99f5b67fef8d5396850514e8ecda64fd">getReturnCashCost</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;borrow_datetime, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;return_datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_trade_manager_base.html#acc183fba2790b3d193abfe1809de0348">cash</a>)</td></tr>
+<tr class="memdesc:a99f5b67fef8d5396850514e8ecda64fd inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the cost of repaying the margin financing  <br /></td></tr>
+<tr class="memitem:a05f9e44789ac5233e9c2fe22d98a7f37 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a05f9e44789ac5233e9c2fe22d98a7f37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_cost_record.html">CostRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a05f9e44789ac5233e9c2fe22d98a7f37">getBorrowStockCost</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double num)</td></tr>
+<tr class="memdesc:a05f9e44789ac5233e9c2fe22d98a7f37 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the cost of borrowing through securities lending  <br /></td></tr>
+<tr class="memitem:add23f86649ec6e52fec5f0e4e3f50b1d inherit pub_methods_classhku_1_1_trade_manager_base" id="r_add23f86649ec6e52fec5f0e4e3f50b1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_cost_record.html">CostRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#add23f86649ec6e52fec5f0e4e3f50b1d">getReturnStockCost</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;borrow_datetime, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;return_datetime, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, double num)</td></tr>
+<tr class="memdesc:add23f86649ec6e52fec5f0e4e3f50b1d inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the cost of returning through securities lending  <br /></td></tr>
+<tr class="memitem:aaad724b43e60a7bca187d66e5e97915d inherit pub_methods_classhku_1_1_trade_manager_base" id="r_aaad724b43e60a7bca187d66e5e97915d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#aaad724b43e60a7bca187d66e5e97915d">getBrokerLastDatetime</a> () const</td></tr>
+<tr class="memdesc:aaad724b43e60a7bca187d66e5e97915d inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">From which moment the order broker is started to place orders  <br /></td></tr>
+<tr class="memitem:ac7ea91de2820ee3d287961a03183ec65 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ac7ea91de2820ee3d287961a03183ec65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ac7ea91de2820ee3d287961a03183ec65">setBrokerLastDatetime</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date)</td></tr>
+<tr class="memdesc:ac7ea91de2820ee3d287961a03183ec65 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the moment from which the order broker starts operating  <br /></td></tr>
+<tr class="memitem:ae664d00dd4135d7eb08ddc5de77cce80 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ae664d00dd4135d7eb08ddc5de77cce80"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ae664d00dd4135d7eb08ddc5de77cce80">reset</a> ()</td></tr>
+<tr class="memdesc:ae664d00dd4135d7eb08ddc5de77cce80 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset, clearing the trade and position records  <br /></td></tr>
+<tr class="memitem:aa51333efc2ee95e2b4940d0f22f588bc inherit pub_methods_classhku_1_1_trade_manager_base" id="r_aa51333efc2ee95e2b4940d0f22f588bc"><td class="memItemLeft" align="right" valign="top">shared_ptr&lt; <a class="el" href="classhku_1_1_trade_manager_base.html">TradeManagerBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#aa51333efc2ee95e2b4940d0f22f588bc">clone</a> ()</td></tr>
+<tr class="memdesc:aa51333efc2ee95e2b4940d0f22f588bc inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform the clone operation  <br /></td></tr>
+<tr class="memitem:a493d56dfdbacc853e9e0c7eb604dcfb4 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a493d56dfdbacc853e9e0c7eb604dcfb4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a493d56dfdbacc853e9e0c7eb604dcfb4">regBroker</a> (const <a class="el" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> &amp;broker)</td></tr>
+<tr class="memdesc:a493d56dfdbacc853e9e0c7eb604dcfb4 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register an order broker  <br /></td></tr>
+<tr class="memitem:acb01f380af9b5d1ec0e70d3f19f34196 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_acb01f380af9b5d1ec0e70d3f19f34196"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#acb01f380af9b5d1ec0e70d3f19f34196">clearBroker</a> ()</td></tr>
+<tr class="memdesc:acb01f380af9b5d1ec0e70d3f19f34196 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the registered order brokers  <br /></td></tr>
+<tr class="memitem:a471c556b8026040d02500e95dacfb9af inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a471c556b8026040d02500e95dacfb9af"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku.html#ab0b0b392f97838a856ddb9d787188344">FundsList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a471c556b8026040d02500e95dacfb9af">getFundsList</a> (const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;dates, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>)</td></tr>
+<tr class="memdesc:a471c556b8026040d02500e95dacfb9af inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the daily asset records of the given date list  <br /></td></tr>
+<tr class="memitem:a0bc8fd0c625d4c9786d17046f1d673bc inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a0bc8fd0c625d4c9786d17046f1d673bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a0bc8fd0c625d4c9786d17046f1d673bc">getFundsCurve</a> (const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;dates, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>)</td></tr>
+<tr class="memdesc:a0bc8fd0c625d4c9786d17046f1d673bc inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the net value curve of the assets, including the borrowed assets  <br /></td></tr>
+<tr class="memitem:aa583d0bfa4a562d7bc3c0702db8a7c29 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_aa583d0bfa4a562d7bc3c0702db8a7c29"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#aa583d0bfa4a562d7bc3c0702db8a7c29">getProfitCurve</a> (const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;dates, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>)</td></tr>
+<tr class="memdesc:aa583d0bfa4a562d7bc3c0702db8a7c29 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the profit curve, i.e.  <br /></td></tr>
+<tr class="memitem:a44ac3a2c893b222cca006bfd238b4095 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a44ac3a2c893b222cca006bfd238b4095"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a44ac3a2c893b222cca006bfd238b4095">getProfitCumChangeCurve</a> (const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;dates, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>)</td></tr>
+<tr class="memdesc:a44ac3a2c893b222cca006bfd238b4095 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the cumulative return rate curve  <br /></td></tr>
+<tr class="memitem:a921ba39953da7db1c6609740a1961da0 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a921ba39953da7db1c6609740a1961da0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a921ba39953da7db1c6609740a1961da0">getBaseAssetsCurve</a> (const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;dates, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>)</td></tr>
+<tr class="memdesc:a921ba39953da7db1c6609740a1961da0 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the invested base asset curve  <br /></td></tr>
+<tr class="memitem:a901508ff34164ac437edbf9538082579 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a901508ff34164ac437edbf9538082579"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a901508ff34164ac437edbf9538082579">getRefTradeList</a> () const</td></tr>
+<tr class="memdesc:a901508ff34164ac437edbf9538082579 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the reference of all the trade records, avoiding copying the whole list for read-only access.  <br /></td></tr>
+<tr class="memitem:a90d60de3ddd6ef35c20a33f24e133ddc inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a90d60de3ddd6ef35c20a33f24e133ddc"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classhku_1_1_stock.html">Stock</a>, <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a90d60de3ddd6ef35c20a33f24e133ddc">getPositionDict</a> () const</td></tr>
+<tr class="memdesc:a90d60de3ddd6ef35c20a33f24e133ddc inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the dictionary of all the current position records  <br /></td></tr>
+<tr class="memitem:af282b267a46b10d1d28dbc15e03da986 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_af282b267a46b10d1d28dbc15e03da986"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_performance.html">Performance</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#af282b267a46b10d1d28dbc15e03da986">getPerformance</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>(), const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, bool ext=true)</td></tr>
+<tr class="memdesc:af282b267a46b10d1d28dbc15e03da986 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the system performance up to a given moment; datetime must be no earlier than lastDatetime, so that the current market value can be calculated  <br /></td></tr>
+<tr class="memitem:af36b00aaa9240f63630236f50f6cbb42 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_af36b00aaa9240f63630236f50f6cbb42"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#af36b00aaa9240f63630236f50f6cbb42">getMaxPullBack</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>)</td></tr>
+<tr class="memdesc:af36b00aaa9240f63630236f50f6cbb42 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum drawdown percentage (a negative number) of the account at the given moment (calculated from the close price only)  <br /></td></tr>
+<tr class="memitem:af6f027d9822c4c828a8d033b3652e697 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_af6f027d9822c4c828a8d033b3652e697"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structhku_1_1_position_ext_info.html">PositionExtInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#af6f027d9822c4c828a8d033b3652e697">getHistoryPositionExtInfoList</a> (const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, int trade_mode=0)</td></tr>
+<tr class="memdesc:af6f027d9822c4c828a8d033b3652e697 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the extended details of the historical positions of the account  <br /></td></tr>
+<tr class="memitem:a0b4088b291ee80b59ce5ad766c928579 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a0b4088b291ee80b59ce5ad766c928579"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structhku_1_1_position_ext_info.html">PositionExtInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a0b4088b291ee80b59ce5ad766c928579">getPositionExtInfoList</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;current_time=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>(), const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, int trade_mode=0)</td></tr>
+<tr class="memdesc:a0b4088b291ee80b59ce5ad766c928579 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position details after the last trade moment of the account  <br /></td></tr>
+<tr class="memitem:ae5dc8504c940f1f49bd083e67c8cd71b inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ae5dc8504c940f1f49bd083e67c8cd71b"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classhku_1_1_stock.html">Stock</a>, <a class="el" href="structhku_1_1_position_ext_info.html">PositionExtInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ae5dc8504c940f1f49bd083e67c8cd71b">getPositionExtInfoDict</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>(), const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, int trade_mode=0)</td></tr>
+<tr class="memdesc:ae5dc8504c940f1f49bd083e67c8cd71b inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position details after the last trade moment of the account, with <a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> as the key and <a class="el" href="structhku_1_1_position_ext_info.html">PositionExtInfo</a> as the value  <br /></td></tr>
+<tr class="memitem:a387dd7aca7c1ffae27bc6124e2faccaf inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a387dd7aca7c1ffae27bc6124e2faccaf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhku_1_1_position_ext_info.html">PositionExtInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a387dd7aca7c1ffae27bc6124e2faccaf">getPositionExtInfo</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;current_time=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>(), const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype=<a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>, int trade_mode=0)</td></tr>
+<tr class="memdesc:a387dd7aca7c1ffae27bc6124e2faccaf inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position details after the last trade moment of the account  <br /></td></tr>
+<tr class="memitem:ace2536bcc4a9ad04db706f50f55555e5 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_ace2536bcc4a9ad04db706f50f55555e5"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ace2536bcc4a9ad04db706f50f55555e5">getProfitPercentMonthly</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>())</td></tr>
+<tr class="memdesc:ace2536bcc4a9ad04db706f50f55555e5 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the profit percentage of each month before the given end time  <br /></td></tr>
+<tr class="memitem:a1ae5f156d16a68bcfaa95c7adb74ac6f inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a1ae5f156d16a68bcfaa95c7adb74ac6f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a1ae5f156d16a68bcfaa95c7adb74ac6f">getProfitPercentYearly</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime=<a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">Datetime::now</a>())</td></tr>
+<tr class="memdesc:a1ae5f156d16a68bcfaa95c7adb74ac6f inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the profit percentage of each year before the given end time  <br /></td></tr>
+<tr class="memitem:a2deb1af90068b4037a76039f3d60d7e7 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a2deb1af90068b4037a76039f3d60d7e7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a2deb1af90068b4037a76039f3d60d7e7">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:a5888b0339ca0e23413b1562cec315ba5 inherit pub_methods_classhku_1_1_trade_manager_base" id="r_a5888b0339ca0e23413b1562cec315ba5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a5888b0339ca0e23413b1562cec315ba5">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memdesc:a5888b0339ca0e23413b1562cec315ba5 inherit pub_methods_classhku_1_1_trade_manager_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this trade manager or its cost function is defined in Python  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-inherited" class="groupheader"><a id="inherited" name="inherited"></a>
+额外继承的成员函数</h2></td></tr>
+<tr class="inherit_header pro_attribs_classhku_1_1_trade_manager_base"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classhku_1_1_trade_manager_base')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected 属性 继承自 <a class="el" href="classhku_1_1_trade_manager_base.html">hku::TradeManagerBase</a></td></tr>
+<tr class="memitem:ac41a268ba32b83b6934bf60f66ec1390 inherit pro_attribs_classhku_1_1_trade_manager_base" id="r_ac41a268ba32b83b6934bf60f66ec1390"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ac41a268ba32b83b6934bf60f66ec1390">m_name</a></td></tr>
+<tr class="memitem:af6002980a9706c6173dc9ee6b6e7775c inherit pro_attribs_classhku_1_1_trade_manager_base" id="r_af6002980a9706c6173dc9ee6b6e7775c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#af6002980a9706c6173dc9ee6b6e7775c">m_costfunc</a></td></tr>
+<tr class="memitem:ab8065bd21770a0c59c2a30f06429fb3f inherit pro_attribs_classhku_1_1_trade_manager_base" id="r_ab8065bd21770a0c59c2a30f06429fb3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#ab8065bd21770a0c59c2a30f06429fb3f">m_broker_last_datetime</a></td></tr>
+<tr class="memitem:a01027973c15552369aa705d2ec9ab602 inherit pro_attribs_classhku_1_1_trade_manager_base" id="r_a01027973c15552369aa705d2ec9ab602"><td class="memItemLeft" align="right" valign="top">list&lt; <a class="el" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#a01027973c15552369aa705d2ec9ab602">m_broker_list</a></td></tr>
+<tr class="memitem:afdffaf64f0e65aa5e2e52b1a7974da22 inherit pro_attribs_classhku_1_1_trade_manager_base" id="r_afdffaf64f0e65aa5e2e52b1a7974da22"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager_base.html#afdffaf64f0e65aa5e2e52b1a7974da22">m_is_python_object</a> {false}</td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a307b1ae3c771b2940aabba24269b76e3" name="a307b1ae3c771b2940aabba24269b76e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a307b1ae3c771b2940aabba24269b76e3">&#9670;&#160;</a></span>BrokerTradeManager() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BrokerTradeManager::BrokerTradeManager </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4e79c96c00c4fb3a159df0e7a120b955" name="a4e79c96c00c4fb3a159df0e7a120b955"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e79c96c00c4fb3a159df0e7a120b955">&#9670;&#160;</a></span>BrokerTradeManager() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BrokerTradeManager::BrokerTradeManager </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>broker</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad">TradeCostPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>costfunc</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___trade_cost.html#ga7f358c347b5477dc35f10fb8c14b894f">TC_Zero</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;SYS&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a005fd8f193b59c536765c329083a1679" name="a005fd8f193b59c536765c329083a1679"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a005fd8f193b59c536765c329083a1679">&#9670;&#160;</a></span>~BrokerTradeManager()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::BrokerTradeManager::~BrokerTradeManager </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a41eaebecba1e31f141a9484e401ccfdc" name="a41eaebecba1e31f141a9484e401ccfdc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41eaebecba1e31f141a9484e401ccfdc">&#9670;&#160;</a></span>_clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual shared_ptr&lt; <a class="el" href="classhku_1_1_trade_manager_base.html">TradeManagerBase</a> &gt; hku::BrokerTradeManager::_clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a4053e1ecd71296106d0f7a713c8b88e2">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a4c6ae8d797c8e58124d712b246b3b4f2" name="a4c6ae8d797c8e58124d712b246b3b4f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c6ae8d797c8e58124d712b246b3b4f2">&#9670;&#160;</a></span>_reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::BrokerTradeManager::_reset </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a24b8f181746eddf995c3ea53d4b621aa">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a9c98296d5470f53dfb11d53900b74965" name="a9c98296d5470f53dfb11d53900b74965"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c98296d5470f53dfb11d53900b74965">&#9670;&#160;</a></span>addPosition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::addPosition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>pr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a position record directly </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pr</td><td>position record </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true success </dd>
+<dd>
+false failure </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a1fcfc7d8242cec250f87b5f9286cd7cd">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="af30fd7df572e3d6ffa4ebf63e5874155" name="af30fd7df572e3d6ffa4ebf63e5874155"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af30fd7df572e3d6ffa4ebf63e5874155">&#9670;&#160;</a></span>addTradeRecord()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::addTradeRecord </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>tr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a trade record directly </p>
+<dl class="section note"><dt>注解</dt><dd>If an account initialization record is added, all the existing trade and position records are cleared </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tr</td><td>the trade record to add </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>bool true success | false failure </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#ae629a3f609a69578fae132cc8eaa5d18">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a0ecbf65fcd650bc517fcaef750f62e68" name="a0ecbf65fcd650bc517fcaef750f62e68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ecbf65fcd650bc517fcaef750f62e68">&#9670;&#160;</a></span>borrowCash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::borrowCash </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>cash</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Borrow funds, the funds borrowed from other sources, such as margin financing </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>borrow time </td></tr>
+    <tr><td class="paramname">cash</td><td>borrowed cash </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a2e7d6b262d80d653f6da09ed4d364011">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a598845588f1e788e82c4a36e928969f1" name="a598845588f1e788e82c4a36e928969f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a598845588f1e788e82c4a36e928969f1">&#9670;&#160;</a></span>borrowStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::borrowStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Borrow securities </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>borrow time </td></tr>
+    <tr><td class="paramname">stock</td><td>the borrowed stock </td></tr>
+    <tr><td class="paramname">price</td><td>price per share at borrowing </td></tr>
+    <tr><td class="paramname">number</td><td>quantity at borrowing </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a51d8e3b1039a185cedd58322675f4c3c">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a9658b900608d5126085ee16b6da894ac" name="a9658b900608d5126085ee16b6da894ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9658b900608d5126085ee16b6da894ac">&#9670;&#160;</a></span>buy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> hku::BrokerTradeManager::buy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>realPrice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>stoploss</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>goalPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>planPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a></td>          <td class="paramname"><span class="paramname"><em>from</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>remark</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Buy operation </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>buy time </td></tr>
+    <tr><td class="paramname">stock</td><td>the security to buy </td></tr>
+    <tr><td class="paramname">realPrice</td><td>actual buy price </td></tr>
+    <tr><td class="paramname">number</td><td>buy quantity </td></tr>
+    <tr><td class="paramname">stoploss</td><td>stop-loss price </td></tr>
+    <tr><td class="paramname">goalPrice</td><td>target price </td></tr>
+    <tr><td class="paramname">planPrice</td><td>planned buy price </td></tr>
+    <tr><td class="paramname">from</td><td>records which system part issued the buy instruction </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the corresponding trade record; business equals BUSINESS_INVALID if the operation failed </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a3cf08c512772e06c9e2b4b3b8f2a20ec">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a4b82d5473313fa819fee17af880afbc6" name="a4b82d5473313fa819fee17af880afbc6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b82d5473313fa819fee17af880afbc6">&#9670;&#160;</a></span>buyShort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> hku::BrokerTradeManager::buyShort </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>realPrice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span><span class="paramdefsep"> = </span><span class="paramdefval">MAX_DOUBLE</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>stoploss</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>goalPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>planPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a></td>          <td class="paramname"><span class="paramname"><em>from</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>remark</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cover a short position </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>buy time </td></tr>
+    <tr><td class="paramname">stock</td><td>the security to buy </td></tr>
+    <tr><td class="paramname">realPrice</td><td>actual buy price </td></tr>
+    <tr><td class="paramname">number</td><td>sell quantity; MAX_DOUBLE means selling everything </td></tr>
+    <tr><td class="paramname">stoploss</td><td>stop-loss price </td></tr>
+    <tr><td class="paramname">goalPrice</td><td>target price </td></tr>
+    <tr><td class="paramname">planPrice</td><td>planned buy price </td></tr>
+    <tr><td class="paramname">from</td><td>records which system part issued the sell instruction </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the corresponding trade record; business equals BUSINESS_INVALID if the operation failed </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a5a4f63661041b6cf24c32d87e2fd7455">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a3a10df180769ad35c5fd6533c53d10d7" name="a3a10df180769ad35c5fd6533c53d10d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a10df180769ad35c5fd6533c53d10d7">&#9670;&#160;</a></span>cash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::BrokerTradeManager::cash </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a></td>          <td class="paramname"><span class="paramname"><em>ktype</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the cash of the given date </p>
+<dl class="section note"><dt>注解</dt><dd>Without the date parameter the positions cannot be adjusted according to the weight information </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#acc183fba2790b3d193abfe1809de0348">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="af8cf4cd04bd93b7999d339f2be7aa41f" name="af8cf4cd04bd93b7999d339f2be7aa41f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8cf4cd04bd93b7999d339f2be7aa41f">&#9670;&#160;</a></span>checkin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::checkin </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>cash</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deposit funds </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>deposit time </td></tr>
+    <tr><td class="paramname">cash</td><td>deposited amount </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a9483dd3288ced5968828f09dc74168d9">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a36799beb28823f12e61a3eddf3a24ef6" name="a36799beb28823f12e61a3eddf3a24ef6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36799beb28823f12e61a3eddf3a24ef6">&#9670;&#160;</a></span>checkinStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::checkinStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deposit assets </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>deposit date </td></tr>
+    <tr><td class="paramname">stock</td><td>the stock to deposit </td></tr>
+    <tr><td class="paramname">price</td><td>price per share of the deposited stock </td></tr>
+    <tr><td class="paramname">number</td><td>number of deposited shares </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a8edc92da9c40405a02e296ebb1b376a9">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="aefc07d4ed72c8e46f3678bb10302f59f" name="aefc07d4ed72c8e46f3678bb10302f59f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefc07d4ed72c8e46f3678bb10302f59f">&#9670;&#160;</a></span>checkout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::checkout </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>cash</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Withdraw funds </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>withdrawal time </td></tr>
+    <tr><td class="paramname">cash</td><td>withdrawn amount </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#af8c4af8c5d41258d94ab04440cc6bfc2">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a6b672e86a1e746e63d25495402e58d19" name="a6b672e86a1e746e63d25495402e58d19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b672e86a1e746e63d25495402e58d19">&#9670;&#160;</a></span>checkoutStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::checkoutStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Withdraw the current assets </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>withdrawal date </td></tr>
+    <tr><td class="paramname">stock</td><td>the stock to withdraw </td></tr>
+    <tr><td class="paramname">price</td><td>withdrawal price per share </td></tr>
+    <tr><td class="paramname">number</td><td>withdrawn quantity </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>It should never be used </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a51cbb25442fe33122ede0a0af888db7b">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a75b24587fb0e9f683125eccd83e53a03" name="a75b24587fb0e9f683125eccd83e53a03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75b24587fb0e9f683125eccd83e53a03">&#9670;&#160;</a></span>currentCash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::BrokerTradeManager::currentCash </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the current cash </p>
+<dl class="section note"><dt>注解</dt><dd>Only the current information is returned, it is not adjusted according to the weight information </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a195ac50950478fb4042c2d130587aad2">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a2171c29261f4ecda94530f19c7885465" name="a2171c29261f4ecda94530f19c7885465"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2171c29261f4ecda94530f19c7885465">&#9670;&#160;</a></span>fetchAssetInfoFromBroker()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::BrokerTradeManager::fetchAssetInfoFromBroker </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>broker</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_null.html">Null</a>&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>&gt;()</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronize the current account asset information (funds, positions, ...) from the order broker instance </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">broker</td><td>order broker instance </td></tr>
+    <tr><td class="paramname">datetime</td><td>the synchronization time; usually the current time (<a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a>), it can also be forced to a given moment </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a321ea10c23824e175656767358272755">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="afb2e26912f044aa2dc107617da493a5a" name="afb2e26912f044aa2dc107617da493a5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb2e26912f044aa2dc107617da493a5a">&#9670;&#160;</a></span>firstDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::BrokerTradeManager::firstDatetime </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Date of the first buy trade; Null&lt;Datetime&gt;() is returned if no trade has happened </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a31dccb1d9a95847091ae6961f2ed8f7f">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="ab6b1a3aa90009bcf8245c18f9a0dfbd3" name="ab6b1a3aa90009bcf8245c18f9a0dfbd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6b1a3aa90009bcf8245c18f9a0dfbd3">&#9670;&#160;</a></span>getBorrowStockList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku.html#a0cf0c35f546f15009d4873a1e8cfe80b">BorrowRecordList</a> hku::BrokerTradeManager::getBorrowStockList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the list of currently borrowed shares </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#ade731fa64a386028d4ab44fda71dc3b1">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="ad936df5e81413a5c0defc30168f94d44" name="ad936df5e81413a5c0defc30168f94d44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad936df5e81413a5c0defc30168f94d44">&#9670;&#160;</a></span>getDebtCash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::BrokerTradeManager::getDebtCash </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the amount of borrowed cash at the given moment </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a9c728ac76fa34f282f356b01d060c59b">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a45c94e328d00b1468817472a2de0508b" name="a45c94e328d00b1468817472a2de0508b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45c94e328d00b1468817472a2de0508b">&#9670;&#160;</a></span>getDebtNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual double hku::BrokerTradeManager::getDebtNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the number of borrowed shares at the given moment </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a2e68dd09122f7a834a393e621864f90d">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a1fd7728677f873bd8fef4d483679c0ad" name="a1fd7728677f873bd8fef4d483679c0ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fd7728677f873bd8fef4d483679c0ad">&#9670;&#160;</a></span>getFunds() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_funds_record.html">FundsRecord</a> hku::BrokerTradeManager::getFunds </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a></td>          <td class="paramname"><span class="paramname"><em>ktype</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the asset detail at the given moment: the cash and the position quantities come from the broker snapshot, the market value is revalued at <span class="tt">datetime</span> by that moment's market price (the snapshot only records the quantities; their value drifts with the price) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>the queried moment, or Null&lt;Datetime&gt;() for the current snapshot time </td></tr>
+    <tr><td class="paramname">ktype</td><td>the type of the date </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>asset detail </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>When datetime equals Null&lt;Datetime&gt;() it is the same as getFunds(KType) </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#aeff95060be72a4f52e6a429b830430d3">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a0083880f897a2985460927f69290ad0d" name="a0083880f897a2985460927f69290ad0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0083880f897a2985460927f69290ad0d">&#9670;&#160;</a></span>getFunds() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_funds_record.html">FundsRecord</a> hku::BrokerTradeManager::getFunds </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a></td>          <td class="paramname"><span class="paramname"><em>ktype</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the asset detail of the account at the current moment </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ktype</td><td>the type of the date </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>asset detail </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a20db1d6441883855baa1c3a5eadec7b8">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a724bb03d9acf0c6579ad3db7ab289a42" name="a724bb03d9acf0c6579ad3db7ab289a42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a724bb03d9acf0c6579ad3db7ab289a42">&#9670;&#160;</a></span>getHistoryPositionList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a> hku::BrokerTradeManager::getHistoryPositionList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all the historical position records, i.e. </p>
+<p>the closed position records </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a1f75bf35735408b6e8e14aea5fb8a6e4">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a635fa29f12de0c8b275b71a5f919ffb6" name="a635fa29f12de0c8b275b71a5f919ffb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a635fa29f12de0c8b275b71a5f919ffb6">&#9670;&#160;</a></span>getHoldNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual double hku::BrokerTradeManager::getHoldNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the held quantity of a security at the given moment </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#aef28d8efcf10b4b93ee22b7921689c2b">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a36852c2b76d3f3e09892abc440d52071" name="a36852c2b76d3f3e09892abc440d52071"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36852c2b76d3f3e09892abc440d52071">&#9670;&#160;</a></span>getMarginRate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual double hku::BrokerTradeManager::getMarginRate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the margin rate of the given security </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>date </td></tr>
+    <tr><td class="paramname">stock</td><td>the given security </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a3bec07962a8236f5a0ef9bc3d2d85706">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a870f4ab09d800e7ca4fbcdbf685b0fa9" name="a870f4ab09d800e7ca4fbcdbf685b0fa9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a870f4ab09d800e7ca4fbcdbf685b0fa9">&#9670;&#160;</a></span>getPosition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a> hku::BrokerTradeManager::getPosition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the position record of the given security </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">date</td><td>the given date </td></tr>
+    <tr><td class="paramname">stock</td><td>the given security </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#acfdf876be2f16c0ea1dfd9c99a825b8a">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a0232c144c33aa08730c6b16c0a01de87" name="a0232c144c33aa08730c6b16c0a01de87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0232c144c33aa08730c6b16c0a01de87">&#9670;&#160;</a></span>getPositionList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a> hku::BrokerTradeManager::getPositionList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all the current position records </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a8ef5742583bae908aac01b55ee4a939b">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a2e10c40462d4199fb3e751390fcdc4ab" name="a2e10c40462d4199fb3e751390fcdc4ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e10c40462d4199fb3e751390fcdc4ab">&#9670;&#160;</a></span>getShortHistoryPositionList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a> hku::BrokerTradeManager::getShortHistoryPositionList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all the historical short position records </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#ad46100c9b759b9db0074fe0b2ed3df83">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a9534f70f35a91606988178cfce008d2a" name="a9534f70f35a91606988178cfce008d2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9534f70f35a91606988178cfce008d2a">&#9670;&#160;</a></span>getShortHoldNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual double hku::BrokerTradeManager::getShortHoldNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the short held quantity of a security at the given moment </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a743b3e6f5348ab15b00ecc958f44f96c">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="aed677adc2843553f6d459ca1b738436b" name="aed677adc2843553f6d459ca1b738436b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed677adc2843553f6d459ca1b738436b">&#9670;&#160;</a></span>getShortPosition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_position_record.html">PositionRecord</a> hku::BrokerTradeManager::getShortPosition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the short position record of the given security </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock</td><td>the given security </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a67fab960aea8e32dfcb2d2df877862a9">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a9f0324e760f42c9a77587d65573114ca" name="a9f0324e760f42c9a77587d65573114ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f0324e760f42c9a77587d65573114ca">&#9670;&#160;</a></span>getShortPositionList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a> hku::BrokerTradeManager::getShortPositionList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all the current short position records </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#aaba11a2fa08774c42167084bd8230f8b">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a28b18825300307fdaa377aee83e79036" name="a28b18825300307fdaa377aee83e79036"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28b18825300307fdaa377aee83e79036">&#9670;&#160;</a></span>getShortStockNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::BrokerTradeManager::getShortStockNumber </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of security types currently held short </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a66cc4516fff4c0783d98990896ce1731">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a1d8d1a61f1774d5caf0ea35410d5a272" name="a1d8d1a61f1774d5caf0ea35410d5a272"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d8d1a61f1774d5caf0ea35410d5a272">&#9670;&#160;</a></span>getStockNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::BrokerTradeManager::getStockNumber </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of security types currently held </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#aec7a420e1c9f74d966c30ea20b2d9751">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a5dc6475e5f6768e198b25ee5ecbcf7b4" name="a5dc6475e5f6768e198b25ee5ecbcf7b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dc6475e5f6768e198b25ee5ecbcf7b4">&#9670;&#160;</a></span>getTradeList() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> hku::BrokerTradeManager::getTradeList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get all the trade records </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#ab7c8cd0fc5869ebe06cb99fc63ba8e27">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a61f02e1c037d470c9c01b51bd2f7dbd3" name="a61f02e1c037d470c9c01b51bd2f7dbd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61f02e1c037d470c9c01b51bd2f7dbd3">&#9670;&#160;</a></span>getTradeList() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> hku::BrokerTradeManager::getTradeList </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>end</em></span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the trade records within the given date range [start, end) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start</td><td>start date </td></tr>
+    <tr><td class="paramname">end</td><td>end date </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>trade record list </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a1df420a8ae788fd1df063d3d2391162a">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a5fc417c00a4bfc7cb98df1220ac3b26a" name="a5fc417c00a4bfc7cb98df1220ac3b26a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fc417c00a4bfc7cb98df1220ac3b26a">&#9670;&#160;</a></span>have()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::have </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the given security is currently held </p>
+<dl class="section note"><dt>注解</dt><dd>The date parameter is not used here, so execution in chronological order is required </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock</td><td>the given security </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true yes | false no </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a116dc0fb8dfab6898ea9622668ce84b0">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="ad43110bb2fac600f34a5c4d9313b5a28" name="ad43110bb2fac600f34a5c4d9313b5a28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad43110bb2fac600f34a5c4d9313b5a28">&#9670;&#160;</a></span>haveShort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::haveShort </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the given security is currently held in the short position </p>
+<dl class="section note"><dt>注解</dt><dd>The date parameter is not used here, so execution in chronological order is required </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock</td><td>the given security </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true yes | false no </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#ab3ad8b010c13828a4447ea9da8331622">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a73803223711d147367057b098da771a3" name="a73803223711d147367057b098da771a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73803223711d147367057b098da771a3">&#9670;&#160;</a></span>initCash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::BrokerTradeManager::initCash </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initial cash </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#aef6db6000f07bbd70bfa0612468c4275">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="aa3b3726e223311417525d1bcc144c6e8" name="aa3b3726e223311417525d1bcc144c6e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3b3726e223311417525d1bcc144c6e8">&#9670;&#160;</a></span>initDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::BrokerTradeManager::initDatetime </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Account creation date </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#af8eefc6ee79ac0a9fdb747ee416e3f18">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a8d98053c0660f9a3073b737d1fcd04af" name="a8d98053c0660f9a3073b737d1fcd04af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d98053c0660f9a3073b737d1fcd04af">&#9670;&#160;</a></span>lastDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::BrokerTradeManager::lastDatetime </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Date of the last trade, regardless of the trade type; the account creation date is returned if no trade has happened </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#adfa39a46be4eff16f7f4af95a848a817">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="ad802940f46e7a9380162326d2ce399cd" name="ad802940f46e7a9380162326d2ce399cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad802940f46e7a9380162326d2ce399cd">&#9670;&#160;</a></span>returnCash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::returnCash </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>cash</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the funds </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>return date </td></tr>
+    <tr><td class="paramname">cash</td><td>returned cash </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a57246f4c21ee459b102673a9b359acf5">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="abc9d04ce7a9cf22d4bcc17d51b832880" name="abc9d04ce7a9cf22d4bcc17d51b832880"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc9d04ce7a9cf22d4bcc17d51b832880">&#9670;&#160;</a></span>returnStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BrokerTradeManager::returnStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>price</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the securities </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>return time </td></tr>
+    <tr><td class="paramname">stock</td><td>the returned stock </td></tr>
+    <tr><td class="paramname">price</td><td>price per share at returning </td></tr>
+    <tr><td class="paramname">number</td><td>returned quantity </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true | false </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a469d03737c073d56534a1335b8613964">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a212f5604e2319616b0f23c2df083eae7" name="a212f5604e2319616b0f23c2df083eae7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a212f5604e2319616b0f23c2df083eae7">&#9670;&#160;</a></span>sell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> hku::BrokerTradeManager::sell </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>realPrice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span><span class="paramdefsep"> = </span><span class="paramdefval">MAX_DOUBLE</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>stoploss</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>goalPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>planPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a></td>          <td class="paramname"><span class="paramname"><em>from</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>remark</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sell operation </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>sell time </td></tr>
+    <tr><td class="paramname">stock</td><td>the security to sell </td></tr>
+    <tr><td class="paramname">realPrice</td><td>actual sell price </td></tr>
+    <tr><td class="paramname">number</td><td>sell quantity; MAX_DOUBLE means selling everything </td></tr>
+    <tr><td class="paramname">stoploss</td><td>new stop-loss price </td></tr>
+    <tr><td class="paramname">goalPrice</td><td>new target price </td></tr>
+    <tr><td class="paramname">planPrice</td><td>originally planned sell price </td></tr>
+    <tr><td class="paramname">from</td><td>records which system part issued the sell instruction </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the corresponding trade record; business equals BUSINESS_INVALID if the operation failed </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a151b9b6849ac9db3bcd60ad4632dca28">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a8ad43a1627d5b6262c579dd0d0157b52" name="a8ad43a1627d5b6262c579dd0d0157b52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ad43a1627d5b6262c579dd0d0157b52">&#9670;&#160;</a></span>sellShort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> hku::BrokerTradeManager::sellShort </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>realPrice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>number</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>stoploss</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>goalPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>planPrice</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a></td>          <td class="paramname"><span class="paramname"><em>from</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___system.html#gga578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">PART_INVALID</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>remark</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Short sell </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>short sell time </td></tr>
+    <tr><td class="paramname">stock</td><td>the security to short sell </td></tr>
+    <tr><td class="paramname">realPrice</td><td>actual short sell price </td></tr>
+    <tr><td class="paramname">number</td><td>sell quantity </td></tr>
+    <tr><td class="paramname">stoploss</td><td>stop-loss price </td></tr>
+    <tr><td class="paramname">goalPrice</td><td>target price </td></tr>
+    <tr><td class="paramname">planPrice</td><td>planned short sell price </td></tr>
+    <tr><td class="paramname">from</td><td>records which system part issued the buy instruction </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the corresponding trade record; business equals BUSINESS_INVALID if the operation failed </dd></dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a0859296db935225f06e68bc71845f0fb">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="ae5334e799fef7e230450ed5570c622e6" name="ae5334e799fef7e230450ed5570c622e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5334e799fef7e230450ed5570c622e6">&#9670;&#160;</a></span>str()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual string hku::BrokerTradeManager::str </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>String output </p>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#af48694a0360e129a8b5bce08d540500c">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a92559ab0243f0d9eb8011c9d0e98d4e8" name="a92559ab0243f0d9eb8011c9d0e98d4e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92559ab0243f0d9eb8011c9d0e98d4e8">&#9670;&#160;</a></span>tocsv()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::BrokerTradeManager::tocsv </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Output the trade records, the open positions, the closed positions and the net asset value curve in the csv format </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>the directory of the output files </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a04e922072d04362c7da4e77921d9cb38">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<a id="a88277c77d23abdb731819d3a2c474701" name="a88277c77d23abdb731819d3a2c474701"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88277c77d23abdb731819d3a2c474701">&#9670;&#160;</a></span>updateWithWeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::BrokerTradeManager::updateWithWeight </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the current positions and trades according to the weight (adjustment) information </p>
+<dl class="section note"><dt>注解</dt><dd>It must be called in chronological order </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>the current moment </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>重载 <a class="el" href="classhku_1_1_trade_manager_base.html#a22fbc0c639a85445164030ce3d4beed6">hku::TradeManagerBase</a> .</p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/strategy/<a class="el" href="_broker_trade_manager_8h_source.html">BrokerTradeManager.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_broker_trade_manager.html">BrokerTradeManager</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

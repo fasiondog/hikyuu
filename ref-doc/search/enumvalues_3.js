@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['eq',['EQ',['../classhku_1_1_operand_node.html#a0b7ba3f582d0bdfb6876349262b774dfa2b97ed9882d76ef5eb96dd0027865e51',1,'hku::OperandNode']]],
-  ['equal_5fbackward',['EQUAL_BACKWARD',['../classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea79c5682ce5362e8a05c572026440ab1a',1,'hku::KQuery']]],
-  ['equal_5fforward',['EQUAL_FORWARD',['../classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea60b42cd8cb0b63f89f1a2985da59a926',1,'hku::KQuery']]]
+  ['date_0',['DATE',['../classhku_1_1_k_query.html#ad257ee8b693dbe8e765950347683d944a92de22d5f02fa3d0abe3693eddcc370d',1,'hku::KQuery']]],
+  ['div_1',['DIV',['../classhku_1_1_indicator_imp.html#a89dfbaddbea317d601ee2e13ecc0d10fa94015eb46063733cde018642ce5bcd0d',1,'hku::IndicatorImp']]]
 ];

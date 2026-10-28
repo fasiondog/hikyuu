@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: boost::serialization 命名空间参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li class="current"><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="namespaces.html"><span>命名空间列表</span></a></li>
-      <li><a href="namespacemembers.html"><span>命名空间成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('namespaceboost_1_1serialization.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,685 +74,801 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceboost.html">boost</a></li><li class="navelem"><a class="el" href="namespaceboost_1_1serialization.html">serialization</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#func-members">函数</a>  </div>
-  <div class="headertitle">
-<div class="title">boost::serialization 命名空间参考</div>  </div>
+  <div class="headertitle"><div class="title">boost::serialization 命名空间参考</div></div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 函数</h2></td></tr>
-<tr class="memitem:a385c86ab96592633f8b87adeb213c8a5"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a385c86ab96592633f8b87adeb213c8a5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#a385c86ab96592633f8b87adeb213c8a5">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;blk, unsigned int version)</td></tr>
-<tr class="separator:a385c86ab96592633f8b87adeb213c8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc1b0ff0ad31e38405d864d8b7aef32d"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:adc1b0ff0ad31e38405d864d8b7aef32d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#adc1b0ff0ad31e38405d864d8b7aef32d">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;blk, unsigned int version)</td></tr>
-<tr class="separator:adc1b0ff0ad31e38405d864d8b7aef32d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af864fd6be50ce688c8f574f22c98c236"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:af864fd6be50ce688c8f574f22c98c236"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#af864fd6be50ce688c8f574f22c98c236">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;date, unsigned int version)</td></tr>
-<tr class="separator:af864fd6be50ce688c8f574f22c98c236"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1363f44c66c61f7b83493c9502ff418"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:ab1363f44c66c61f7b83493c9502ff418"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#ab1363f44c66c61f7b83493c9502ff418">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;date, unsigned int version)</td></tr>
-<tr class="separator:ab1363f44c66c61f7b83493c9502ff418"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef6b6f93895b65797eb37947ec6ee5e2"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:aef6b6f93895b65797eb37947ec6ee5e2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#aef6b6f93895b65797eb37947ec6ee5e2">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;kdata, unsigned int version)</td></tr>
-<tr class="separator:aef6b6f93895b65797eb37947ec6ee5e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae631374256e887e3a8c8c957024fb114"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:ae631374256e887e3a8c8c957024fb114"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#ae631374256e887e3a8c8c957024fb114">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;kdata, unsigned int version)</td></tr>
-<tr class="separator:ae631374256e887e3a8c8c957024fb114"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4fe631c929d5d7ab58ef44258d483c5"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:aa4fe631c929d5d7ab58ef44258d483c5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#aa4fe631c929d5d7ab58ef44258d483c5">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;query, unsigned int version)</td></tr>
-<tr class="separator:aa4fe631c929d5d7ab58ef44258d483c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b4f92121cf1daafda667753a52bc163"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a4b4f92121cf1daafda667753a52bc163"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#a4b4f92121cf1daafda667753a52bc163">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;query, unsigned int version)</td></tr>
-<tr class="separator:a4b4f92121cf1daafda667753a52bc163"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c3e311b12781da0ac2288f711f56a81"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a4c3e311b12781da0ac2288f711f56a81"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#a4c3e311b12781da0ac2288f711f56a81">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:a4c3e311b12781da0ac2288f711f56a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d7aadf29350e1b2979af38102a93f1d"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a5d7aadf29350e1b2979af38102a93f1d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#a5d7aadf29350e1b2979af38102a93f1d">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:a5d7aadf29350e1b2979af38102a93f1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fa1d42926f0617bcbfb140bd9cab30a"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a8fa1d42926f0617bcbfb140bd9cab30a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#a8fa1d42926f0617bcbfb140bd9cab30a">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:a8fa1d42926f0617bcbfb140bd9cab30a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af290baf31eaaec8377c6cf7eb9a9ecf8"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:af290baf31eaaec8377c6cf7eb9a9ecf8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#af290baf31eaaec8377c6cf7eb9a9ecf8">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:af290baf31eaaec8377c6cf7eb9a9ecf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad478ff2d567d28f73e40b7db8a7705d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#ad478ff2d567d28f73e40b7db8a7705d1">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;stock, unsigned int version)</td></tr>
-<tr class="separator:ad478ff2d567d28f73e40b7db8a7705d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5c335a44c8c12ca269e1fc0a3d421c6"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:af5c335a44c8c12ca269e1fc0a3d421c6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#af5c335a44c8c12ca269e1fc0a3d421c6">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;stock, unsigned int version)</td></tr>
-<tr class="separator:af5c335a44c8c12ca269e1fc0a3d421c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cbe2bc388862aa86dd288da26dcad75"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a6cbe2bc388862aa86dd288da26dcad75"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#a6cbe2bc388862aa86dd288da26dcad75">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:a6cbe2bc388862aa86dd288da26dcad75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb2739fd5c885948555d91a867e27eaa"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:afb2739fd5c885948555d91a867e27eaa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#afb2739fd5c885948555d91a867e27eaa">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:afb2739fd5c885948555d91a867e27eaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc590cdf526a3fcfa7eeb5e4a0cc7938"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:adc590cdf526a3fcfa7eeb5e4a0cc7938"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#adc590cdf526a3fcfa7eeb5e4a0cc7938">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:adc590cdf526a3fcfa7eeb5e4a0cc7938"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf4b4991e4549807ace2f6b63a09ac55"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:acf4b4991e4549807ace2f6b63a09ac55"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1serialization.html#acf4b4991e4549807ace2f6b63a09ac55">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;record, unsigned int version)</td></tr>
-<tr class="separator:acf4b4991e4549807ace2f6b63a09ac55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a385c86ab96592633f8b87adeb213c8a5" id="r_a385c86ab96592633f8b87adeb213c8a5"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a385c86ab96592633f8b87adeb213c8a5 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a385c86ab96592633f8b87adeb213c8a5">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;blk, unsigned int version)</td></tr>
+<tr class="memitem:adc1b0ff0ad31e38405d864d8b7aef32d" id="r_adc1b0ff0ad31e38405d864d8b7aef32d"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:adc1b0ff0ad31e38405d864d8b7aef32d template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc1b0ff0ad31e38405d864d8b7aef32d">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;blk, unsigned int version)</td></tr>
+<tr class="memitem:af864fd6be50ce688c8f574f22c98c236" id="r_af864fd6be50ce688c8f574f22c98c236"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:af864fd6be50ce688c8f574f22c98c236 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af864fd6be50ce688c8f574f22c98c236">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;date, unsigned int version)</td></tr>
+<tr class="memitem:ab1363f44c66c61f7b83493c9502ff418" id="r_ab1363f44c66c61f7b83493c9502ff418"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:ab1363f44c66c61f7b83493c9502ff418 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1363f44c66c61f7b83493c9502ff418">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;date, unsigned int version)</td></tr>
+<tr class="memitem:aef6b6f93895b65797eb37947ec6ee5e2" id="r_aef6b6f93895b65797eb37947ec6ee5e2"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:aef6b6f93895b65797eb37947ec6ee5e2 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef6b6f93895b65797eb37947ec6ee5e2">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;kdata, unsigned int version)</td></tr>
+<tr class="memitem:ae631374256e887e3a8c8c957024fb114" id="r_ae631374256e887e3a8c8c957024fb114"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:ae631374256e887e3a8c8c957024fb114 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae631374256e887e3a8c8c957024fb114">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;kdata, unsigned int version)</td></tr>
+<tr class="memitem:aa4fe631c929d5d7ab58ef44258d483c5" id="r_aa4fe631c929d5d7ab58ef44258d483c5"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:aa4fe631c929d5d7ab58ef44258d483c5 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4fe631c929d5d7ab58ef44258d483c5">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;query, unsigned int version)</td></tr>
+<tr class="memitem:a4b4f92121cf1daafda667753a52bc163" id="r_a4b4f92121cf1daafda667753a52bc163"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a4b4f92121cf1daafda667753a52bc163 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b4f92121cf1daafda667753a52bc163">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;query, unsigned int version)</td></tr>
+<tr class="memitem:a4c3e311b12781da0ac2288f711f56a81" id="r_a4c3e311b12781da0ac2288f711f56a81"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a4c3e311b12781da0ac2288f711f56a81 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c3e311b12781da0ac2288f711f56a81">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:a5d7aadf29350e1b2979af38102a93f1d" id="r_a5d7aadf29350e1b2979af38102a93f1d"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a5d7aadf29350e1b2979af38102a93f1d template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5d7aadf29350e1b2979af38102a93f1d">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:a8fa1d42926f0617bcbfb140bd9cab30a" id="r_a8fa1d42926f0617bcbfb140bd9cab30a"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a8fa1d42926f0617bcbfb140bd9cab30a template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fa1d42926f0617bcbfb140bd9cab30a">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:af290baf31eaaec8377c6cf7eb9a9ecf8" id="r_af290baf31eaaec8377c6cf7eb9a9ecf8"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:af290baf31eaaec8377c6cf7eb9a9ecf8 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af290baf31eaaec8377c6cf7eb9a9ecf8">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:a052e00e73a625c1f6a15460585911533" id="r_a052e00e73a625c1f6a15460585911533"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a052e00e73a625c1f6a15460585911533 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a052e00e73a625c1f6a15460585911533">save</a> (Archive &amp;ar, <a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a> &amp;values, unsigned int version)</td></tr>
+<tr class="memitem:ae2fe347168db2e2157c6a8e29e6a6f8a" id="r_ae2fe347168db2e2157c6a8e29e6a6f8a"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:ae2fe347168db2e2157c6a8e29e6a6f8a template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2fe347168db2e2157c6a8e29e6a6f8a">load</a> (Archive &amp;ar, <a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a> &amp;values, unsigned int version)</td></tr>
+<tr class="memitem:a1b84919cd197292ed1adee314536a9a1" id="r_a1b84919cd197292ed1adee314536a9a1"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a1b84919cd197292ed1adee314536a9a1 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b84919cd197292ed1adee314536a9a1">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;stock, unsigned int version)</td></tr>
+<tr class="memitem:af5c335a44c8c12ca269e1fc0a3d421c6" id="r_af5c335a44c8c12ca269e1fc0a3d421c6"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:af5c335a44c8c12ca269e1fc0a3d421c6 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5c335a44c8c12ca269e1fc0a3d421c6">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;stock, unsigned int version)</td></tr>
+<tr class="memitem:a6cbe2bc388862aa86dd288da26dcad75" id="r_a6cbe2bc388862aa86dd288da26dcad75"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a6cbe2bc388862aa86dd288da26dcad75 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6cbe2bc388862aa86dd288da26dcad75">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:afb2739fd5c885948555d91a867e27eaa" id="r_afb2739fd5c885948555d91a867e27eaa"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:afb2739fd5c885948555d91a867e27eaa template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb2739fd5c885948555d91a867e27eaa">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:adc590cdf526a3fcfa7eeb5e4a0cc7938" id="r_adc590cdf526a3fcfa7eeb5e4a0cc7938"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:adc590cdf526a3fcfa7eeb5e4a0cc7938 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc590cdf526a3fcfa7eeb5e4a0cc7938">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:acf4b4991e4549807ace2f6b63a09ac55" id="r_acf4b4991e4549807ace2f6b63a09ac55"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:acf4b4991e4549807ace2f6b63a09ac55 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf4b4991e4549807ace2f6b63a09ac55">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:a9c4493ef4920edd82e6725eec12e635a" id="r_a9c4493ef4920edd82e6725eec12e635a"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a9c4493ef4920edd82e6725eec12e635a template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c4493ef4920edd82e6725eec12e635a">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_time_delta.html">hku::TimeDelta</a> &amp;td, unsigned int version)</td></tr>
+<tr class="memitem:a4b6b47575588d7ccdf92ea581a49daf8" id="r_a4b6b47575588d7ccdf92ea581a49daf8"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a4b6b47575588d7ccdf92ea581a49daf8 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b6b47575588d7ccdf92ea581a49daf8">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_time_delta.html">hku::TimeDelta</a> &amp;td, unsigned int version)</td></tr>
+<tr class="memitem:a2dbd1e4955844c76367463a17a71c01e" id="r_a2dbd1e4955844c76367463a17a71c01e"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a2dbd1e4955844c76367463a17a71c01e template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2dbd1e4955844c76367463a17a71c01e">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_time_line_record.html">hku::TimeLineRecord</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:aba44506b7996299440f4491dc0686d5e" id="r_aba44506b7996299440f4491dc0686d5e"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:aba44506b7996299440f4491dc0686d5e template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba44506b7996299440f4491dc0686d5e">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_time_line_record.html">hku::TimeLineRecord</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:a8593fcfbfa08977ed3cab7ccf5c1e0f7" id="r_a8593fcfbfa08977ed3cab7ccf5c1e0f7"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:a8593fcfbfa08977ed3cab7ccf5c1e0f7 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8593fcfbfa08977ed3cab7ccf5c1e0f7">save</a> (Archive &amp;ar, const <a class="el" href="classhku_1_1_trans_record.html">hku::TransRecord</a> &amp;record, unsigned int version)</td></tr>
+<tr class="memitem:adf0f88692c9d2c32d39b1b2295a33bd2" id="r_adf0f88692c9d2c32d39b1b2295a33bd2"><td class="memTemplParams" colspan="2">template&lt;class Archive&gt; </td></tr>
+<tr class="memitem:adf0f88692c9d2c32d39b1b2295a33bd2 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf0f88692c9d2c32d39b1b2295a33bd2">load</a> (Archive &amp;ar, <a class="el" href="classhku_1_1_trans_record.html">hku::TransRecord</a> &amp;record, unsigned int version)</td></tr>
 </table>
-<h2 class="groupheader">函数说明</h2>
-<a class="anchor" id="ab1363f44c66c61f7b83493c9502ff418"></a>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="adc1b0ff0ad31e38405d864d8b7aef32d" name="adc1b0ff0ad31e38405d864d8b7aef32d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc1b0ff0ad31e38405d864d8b7aef32d">&#9670;&#160;</a></span>load() <span class="overload">[1/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>date</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>blk</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ae631374256e887e3a8c8c957024fb114"></a>
+<a id="ab1363f44c66c61f7b83493c9502ff418" name="ab1363f44c66c61f7b83493c9502ff418"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1363f44c66c61f7b83493c9502ff418">&#9670;&#160;</a></span>load() <span class="overload">[2/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="adc1b0ff0ad31e38405d864d8b7aef32d"></a>
+<a id="ae631374256e887e3a8c8c957024fb114" name="ae631374256e887e3a8c8c957024fb114"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae631374256e887e3a8c8c957024fb114">&#9670;&#160;</a></span>load() <span class="overload">[3/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;&#160;</td>
-          <td class="paramname"><em>blk</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>kdata</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a5d7aadf29350e1b2979af38102a93f1d"></a>
+<a id="a4b4f92121cf1daafda667753a52bc163" name="a4b4f92121cf1daafda667753a52bc163"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b4f92121cf1daafda667753a52bc163">&#9670;&#160;</a></span>load() <span class="overload">[4/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="acf4b4991e4549807ace2f6b63a09ac55"></a>
+<a id="a5d7aadf29350e1b2979af38102a93f1d" name="a5d7aadf29350e1b2979af38102a93f1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d7aadf29350e1b2979af38102a93f1d">&#9670;&#160;</a></span>load() <span class="overload">[5/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a4b4f92121cf1daafda667753a52bc163"></a>
+<a id="af290baf31eaaec8377c6cf7eb9a9ecf8" name="af290baf31eaaec8377c6cf7eb9a9ecf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af290baf31eaaec8377c6cf7eb9a9ecf8">&#9670;&#160;</a></span>load() <span class="overload">[6/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;&#160;</td>
-          <td class="paramname"><em>query</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="af5c335a44c8c12ca269e1fc0a3d421c6"></a>
+<a id="ae2fe347168db2e2157c6a8e29e6a6f8a" name="ae2fe347168db2e2157c6a8e29e6a6f8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2fe347168db2e2157c6a8e29e6a6f8a">&#9670;&#160;</a></span>load() <span class="overload">[7/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em>, </td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>values</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="af290baf31eaaec8377c6cf7eb9a9ecf8"></a>
+<a id="af5c335a44c8c12ca269e1fc0a3d421c6" name="af5c335a44c8c12ca269e1fc0a3d421c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5c335a44c8c12ca269e1fc0a3d421c6">&#9670;&#160;</a></span>load() <span class="overload">[8/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="afb2739fd5c885948555d91a867e27eaa"></a>
+<a id="afb2739fd5c885948555d91a867e27eaa" name="afb2739fd5c885948555d91a867e27eaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb2739fd5c885948555d91a867e27eaa">&#9670;&#160;</a></span>load() <span class="overload">[9/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a385c86ab96592633f8b87adeb213c8a5"></a>
+<a id="acf4b4991e4549807ace2f6b63a09ac55" name="acf4b4991e4549807ace2f6b63a09ac55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf4b4991e4549807ace2f6b63a09ac55">&#9670;&#160;</a></span>load() <span class="overload">[10/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void boost::serialization::save </td>
+          <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;&#160;</td>
-          <td class="paramname"><em>blk</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="aef6b6f93895b65797eb37947ec6ee5e2"></a>
+<a id="a4b6b47575588d7ccdf92ea581a49daf8" name="a4b6b47575588d7ccdf92ea581a49daf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b6b47575588d7ccdf92ea581a49daf8">&#9670;&#160;</a></span>load() <span class="overload">[11/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void boost::serialization::save </td>
+          <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">hku::TimeDelta</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>td</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="af864fd6be50ce688c8f574f22c98c236"></a>
+<a id="aba44506b7996299440f4491dc0686d5e" name="aba44506b7996299440f4491dc0686d5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba44506b7996299440f4491dc0686d5e">&#9670;&#160;</a></span>load() <span class="overload">[12/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void boost::serialization::save </td>
+          <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>date</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_line_record.html">hku::TimeLineRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="adc590cdf526a3fcfa7eeb5e4a0cc7938"></a>
+<a id="adf0f88692c9d2c32d39b1b2295a33bd2" name="adf0f88692c9d2c32d39b1b2295a33bd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf0f88692c9d2c32d39b1b2295a33bd2">&#9670;&#160;</a></span>load() <span class="overload">[13/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void boost::serialization::save </td>
+          <td class="memname">void boost::serialization::load </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_trans_record.html">hku::TransRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a4c3e311b12781da0ac2288f711f56a81"></a>
+<a id="a385c86ab96592633f8b87adeb213c8a5" name="a385c86ab96592633f8b87adeb213c8a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a385c86ab96592633f8b87adeb213c8a5">&#9670;&#160;</a></span>save() <span class="overload">[1/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::save </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">hku::Block</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>blk</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="aa4fe631c929d5d7ab58ef44258d483c5"></a>
+<a id="af864fd6be50ce688c8f574f22c98c236" name="af864fd6be50ce688c8f574f22c98c236"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af864fd6be50ce688c8f574f22c98c236">&#9670;&#160;</a></span>save() <span class="overload">[2/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::save </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;&#160;</td>
-          <td class="paramname"><em>query</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a6cbe2bc388862aa86dd288da26dcad75"></a>
+<a id="aef6b6f93895b65797eb37947ec6ee5e2" name="aef6b6f93895b65797eb37947ec6ee5e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef6b6f93895b65797eb37947ec6ee5e2">&#9670;&#160;</a></span>save() <span class="overload">[3/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::save </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">hku::KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>kdata</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a8fa1d42926f0617bcbfb140bd9cab30a"></a>
+<a id="aa4fe631c929d5d7ab58ef44258d483c5" name="aa4fe631c929d5d7ab58ef44258d483c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4fe631c929d5d7ab58ef44258d483c5">&#9670;&#160;</a></span>save() <span class="overload">[4/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Archive &gt; </div>
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::save </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;&#160;</td>
-          <td class="paramname"><em>record</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ad478ff2d567d28f73e40b7db8a7705d1"></a>
+<a id="a4c3e311b12781da0ac2288f711f56a81" name="a4c3e311b12781da0ac2288f711f56a81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c3e311b12781da0ac2288f711f56a81">&#9670;&#160;</a></span>save() <span class="overload">[5/13]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void boost::serialization::save </td>
           <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em>, </td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">hku::KRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>version</em>&#160;</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8fa1d42926f0617bcbfb140bd9cab30a" name="a8fa1d42926f0617bcbfb140bd9cab30a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fa1d42926f0617bcbfb140bd9cab30a">&#9670;&#160;</a></span>save() <span class="overload">[6/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
         </tr>
         <tr>
+          <td class="paramkey"></td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_market_info.html">hku::MarketInfo</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1b84919cd197292ed1adee314536a9a1" name="a1b84919cd197292ed1adee314536a9a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b84919cd197292ed1adee314536a9a1">&#9670;&#160;</a></span>save() <span class="overload">[7/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">hku::Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6cbe2bc388862aa86dd288da26dcad75" name="a6cbe2bc388862aa86dd288da26dcad75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cbe2bc388862aa86dd288da26dcad75">&#9670;&#160;</a></span>save() <span class="overload">[8/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adc590cdf526a3fcfa7eeb5e4a0cc7938" name="adc590cdf526a3fcfa7eeb5e4a0cc7938"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc590cdf526a3fcfa7eeb5e4a0cc7938">&#9670;&#160;</a></span>save() <span class="overload">[9/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9c4493ef4920edd82e6725eec12e635a" name="a9c4493ef4920edd82e6725eec12e635a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c4493ef4920edd82e6725eec12e635a">&#9670;&#160;</a></span>save() <span class="overload">[10/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_time_delta.html">hku::TimeDelta</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>td</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2dbd1e4955844c76367463a17a71c01e" name="a2dbd1e4955844c76367463a17a71c01e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dbd1e4955844c76367463a17a71c01e">&#9670;&#160;</a></span>save() <span class="overload">[11/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_time_line_record.html">hku::TimeLineRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8593fcfbfa08977ed3cab7ccf5c1e0f7" name="a8593fcfbfa08977ed3cab7ccf5c1e0f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8593fcfbfa08977ed3cab7ccf5c1e0f7">&#9670;&#160;</a></span>save() <span class="overload">[12/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_trans_record.html">hku::TransRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a052e00e73a625c1f6a15460585911533" name="a052e00e73a625c1f6a15460585911533"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a052e00e73a625c1f6a15460585911533">&#9670;&#160;</a></span>save() <span class="overload">[13/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Archive&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void boost::serialization::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;</td>          <td class="paramname"><span class="paramname"><em>ar</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>values</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -763,12 +876,24 @@ template&lt;class Archive &gt; </div>
 </div>
 </div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespaceboost.html">boost</a></li><li class="navelem"><a href="namespaceboost_1_1serialization.html">serialization</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

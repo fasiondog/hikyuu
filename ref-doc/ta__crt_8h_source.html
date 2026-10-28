@@ -1,0 +1,432 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/indicator_talib/ta_crt.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('ta__crt_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">ta_crt.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-12-18</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/config.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;hikyuu/indicator/Indicator.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/indicator/crt/CVAL.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#if HKU_ENABLE_TA_LIB</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#define TA_IN1_OUT_CRT(func)                        \</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">    Indicator HKU_API func();                       \</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">    inline Indicator func(const Indicator&amp; ind) {   \</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">        return func()(ind);                         \</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">    }                                               \</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">    inline Indicator func(Indicator::value_t val) { \</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">        return func(CVAL(val));                     \</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">    }</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define TA_IN1_OUT_N_CRT(func, period)                                 \</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">    Indicator HKU_API func(int n = period);                            \</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">    Indicator HKU_API func(const IndParam&amp; n);                         \</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">    inline Indicator func(const Indicator&amp; ind, int n = period) {      \</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">        return func(n)(ind);                                           \</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">    }                                                                  \</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">    inline Indicator func(const Indicator&amp; data, const IndParam&amp; n) {  \</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">        return func(n)(data);                                          \</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">    }                                                                  \</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">    inline Indicator func(const Indicator&amp; data, const Indicator&amp; n) { \</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="preprocessor">        return func(IndParam(n))(data);                                \</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">    }</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#define TA_IN2_OUT_CRT(func)                                                                     \</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">    Indicator HKU_API func(const Indicator&amp; ind1, const Indicator&amp; ind2, bool fill_null = true); \</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="preprocessor">    Indicator HKU_API func(bool fill_null = true);</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#define TA_IN2_OUT_N_CRT(func, period)                                                   \</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">    Indicator HKU_API func(const Indicator&amp; ind1, const Indicator&amp; ind2, int n = period, \</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">                           bool fill_null = true);                                       \</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">    Indicator HKU_API func(int n = period, bool fill_null = true);</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#define TA_K_OUT_CRT(func)    \</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">    Indicator HKU_API func(); \</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">    Indicator HKU_API func(const KData&amp; k);</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#define TA_K_OUT_N_CRT(func, period)        \</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">    Indicator HKU_API func(int n = period); \</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">    Indicator HKU_API func(const KData&amp; k, int n = period);</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#define TA_K_OUT_P_D_CRT(func, param_val)         \</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">    Indicator HKU_API func(double p = param_val); \</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">    Indicator HKU_API func(const KData&amp; k, double p = param_val);</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>TA_K_OUT_N_CRT(TA_ACCBANDS, 20)</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>TA_IN1_OUT_CRT(TA_ACOS)</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>TA_K_OUT_CRT(TA_AD)</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>TA_IN2_OUT_CRT(TA_ADD)</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_ADOSC(<span class="keywordtype">int</span> fast_n = 3, <span class="keywordtype">int</span> slow_n = 10);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_ADOSC(const <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">int</span> fast_n = 3, <span class="keywordtype">int</span> slow_n = 10);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>TA_K_OUT_N_CRT(TA_ADX, 14)</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>TA_K_OUT_N_CRT(TA_ADXR, 14)</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_APO(<span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> matype = 0);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_APO(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> matype = 0) {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">return</span> TA_APO(fast_n, slow_n, matype)(ind);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>}</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>TA_K_OUT_N_CRT(TA_AROON, 14)</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>TA_K_OUT_N_CRT(TA_AROONOSC, 14)</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>TA_IN1_OUT_CRT(TA_ASIN)</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>TA_IN1_OUT_CRT(TA_ATAN)</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>TA_K_OUT_N_CRT(TA_ATR, 14)</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>TA_IN1_OUT_N_CRT(TA_AVGDEV, 14)</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>TA_K_OUT_CRT(TA_AVGPRICE)</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_AVGPRICE();</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_AVGPRICE(const <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k);</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_BBANDS(<span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> nbdevup = 2., <span class="keywordtype">double</span> nbdevdn = 2., <span class="keywordtype">int</span> matype = 0);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_BBANDS(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> nbdevup = 2.,</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                           <span class="keywordtype">double</span> nbdevdn = 2., <span class="keywordtype">int</span> matype = 0) {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="keywordflow">return</span> TA_BBANDS(n, nbdevup, nbdevdn, matype)(ind);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>}</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>TA_IN2_OUT_N_CRT(TA_BETA, 5)</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>TA_K_OUT_CRT(TA_BOP)</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>TA_K_OUT_N_CRT(TA_CCI, 14)</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>TA_K_OUT_CRT(TA_CDL2CROWS)</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>TA_K_OUT_CRT(TA_CDL3BLACKCROWS)</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>TA_K_OUT_CRT(TA_CDL3INSIDE)</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>TA_K_OUT_CRT(TA_CDL3LINESTRIKE)</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>TA_K_OUT_CRT(TA_CDL3OUTSIDE)</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>TA_K_OUT_CRT(TA_CDL3STARSINSOUTH)</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>TA_K_OUT_CRT(TA_CDL3WHITESOLDIERS)</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>TA_K_OUT_P_D_CRT(TA_CDLABANDONEDBABY, 3.000000e-1)</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>TA_K_OUT_CRT(TA_CDLADVANCEBLOCK)</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>TA_K_OUT_CRT(TA_CDLBELTHOLD)</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>TA_K_OUT_CRT(TA_CDLBREAKAWAY)</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>TA_K_OUT_CRT(TA_CDLCLOSINGMARUBOZU)</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>TA_K_OUT_CRT(TA_CDLCONCEALBABYSWALL)</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>TA_K_OUT_CRT(TA_CDLCOUNTERATTACK)</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>TA_K_OUT_P_D_CRT(TA_CDLDARKCLOUDCOVER, 5.000000e-1)</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>TA_K_OUT_CRT(TA_CDLDOJI)</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>TA_K_OUT_CRT(TA_CDLDOJISTAR)</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>TA_K_OUT_CRT(TA_CDLDRAGONFLYDOJI)</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>TA_K_OUT_CRT(TA_CDLENGULFING)</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>TA_K_OUT_P_D_CRT(TA_CDLEVENINGDOJISTAR, 3.000000e-1)</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>TA_K_OUT_P_D_CRT(TA_CDLEVENINGSTAR, 3.000000e-1)</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>TA_K_OUT_CRT(TA_CDLGAPSIDESIDEWHITE)</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>TA_K_OUT_CRT(TA_CDLGRAVESTONEDOJI)</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>TA_K_OUT_CRT(TA_CDLHAMMER)</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>TA_K_OUT_CRT(TA_CDLHANGINGMAN)</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>TA_K_OUT_CRT(TA_CDLHARAMI)</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>TA_K_OUT_CRT(TA_CDLHARAMICROSS)</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>TA_K_OUT_CRT(TA_CDLHIGHWAVE)</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>TA_K_OUT_CRT(TA_CDLHIKKAKE)</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>TA_K_OUT_CRT(TA_CDLHIKKAKEMOD)</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>TA_K_OUT_CRT(TA_CDLHOMINGPIGEON)</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>TA_K_OUT_CRT(TA_CDLIDENTICAL3CROWS)</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>TA_K_OUT_CRT(TA_CDLINNECK)</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>TA_K_OUT_CRT(TA_CDLINVERTEDHAMMER)</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>TA_K_OUT_CRT(TA_CDLKICKING)</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>TA_K_OUT_CRT(TA_CDLKICKINGBYLENGTH)</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>TA_K_OUT_CRT(TA_CDLLADDERBOTTOM)</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>TA_K_OUT_CRT(TA_CDLLONGLEGGEDDOJI)</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>TA_K_OUT_CRT(TA_CDLLONGLINE)</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>TA_K_OUT_CRT(TA_CDLMARUBOZU)</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>TA_K_OUT_CRT(TA_CDLMATCHINGLOW)</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>TA_K_OUT_P_D_CRT(TA_CDLMATHOLD, 5.000000e-1)</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>TA_K_OUT_P_D_CRT(TA_CDLMORNINGDOJISTAR, 3.000000e-1)</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>TA_K_OUT_P_D_CRT(TA_CDLMORNINGSTAR, 3.000000e-1)</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>TA_K_OUT_CRT(TA_CDLONNECK)</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>TA_K_OUT_CRT(TA_CDLPIERCING)</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>TA_K_OUT_CRT(TA_CDLRICKSHAWMAN)</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>TA_K_OUT_CRT(TA_CDLRISEFALL3METHODS)</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>TA_K_OUT_CRT(TA_CDLSEPARATINGLINES)</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>TA_K_OUT_CRT(TA_CDLSHOOTINGSTAR)</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>TA_K_OUT_CRT(TA_CDLSHORTLINE)</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>TA_K_OUT_CRT(TA_CDLSPINNINGTOP)</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>TA_K_OUT_CRT(TA_CDLSTALLEDPATTERN)</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>TA_K_OUT_CRT(TA_CDLSTICKSANDWICH)</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>TA_K_OUT_CRT(TA_CDLTAKURI)</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>TA_K_OUT_CRT(TA_CDLTASUKIGAP)</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>TA_K_OUT_CRT(TA_CDLTHRUSTING)</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>TA_K_OUT_CRT(TA_CDLTRISTAR)</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>TA_K_OUT_CRT(TA_CDLUNIQUE3RIVER)</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>TA_K_OUT_CRT(TA_CDLUPSIDEGAP2CROWS)</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>TA_K_OUT_CRT(TA_CDLXSIDEGAP3METHODS)</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>TA_IN1_OUT_CRT(TA_CEIL)</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>TA_IN1_OUT_N_CRT(TA_CMO, 14)</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>TA_IN2_OUT_N_CRT(TA_CORREL, 30)</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>TA_IN1_OUT_CRT(TA_COS)</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>TA_IN1_OUT_CRT(TA_COSH)</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>TA_IN1_OUT_N_CRT(TA_DEMA, 30)</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>TA_IN2_OUT_CRT(TA_DIV)</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>TA_K_OUT_N_CRT(TA_DX, 14)</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>TA_IN1_OUT_N_CRT(TA_EMA, 30)</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>TA_IN1_OUT_CRT(TA_EXP)</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>TA_IN1_OUT_CRT(TA_FLOOR)</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>TA_IN1_OUT_CRT(TA_HT_DCPERIOD)</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>TA_IN1_OUT_CRT(TA_HT_DCPHASE)</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>TA_IN1_OUT_CRT(TA_HT_PHASOR)</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>TA_IN1_OUT_CRT(TA_HT_SINE)</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>TA_IN1_OUT_CRT(TA_HT_TRENDLINE)</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>TA_IN1_OUT_CRT(TA_HT_TRENDMODE)</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>TA_K_OUT_N_CRT(TA_IMI, 14)</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>TA_IN1_OUT_N_CRT(TA_KAMA, 30)</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>TA_IN1_OUT_N_CRT(TA_LINEARREG_ANGLE, 14)</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>TA_IN1_OUT_N_CRT(TA_LINEARREG_INTERCEPT, 14)</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>TA_IN1_OUT_N_CRT(TA_LINEARREG_SLOPE, 14)</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>TA_IN1_OUT_N_CRT(TA_LINEARREG, 14)</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>TA_IN1_OUT_CRT(TA_LN)</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>TA_IN1_OUT_CRT(TA_LOG10)</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MA(<span class="keywordtype">int</span> n = 30, <span class="keywordtype">int</span> matype = 0);</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_MA(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> n = 30, <span class="keywordtype">int</span> matype = 0) {</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="keywordflow">return</span> TA_MA(n, matype)(ind);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>}</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MACD(<span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> signal_n = 9);</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_MACD(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> signal_n = 9) {</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keywordflow">return</span> TA_MACD(fast_n, slow_n, signal_n)(ind);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>}</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MACDEXT(<span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> signal_n = 9,</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>                             <span class="keywordtype">int</span> fast_matype = 0, <span class="keywordtype">int</span> slow_matype = 0, <span class="keywordtype">int</span> signal_matype = 0);</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_MACDEXT(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26,</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>                            <span class="keywordtype">int</span> signal_n = 9, <span class="keywordtype">int</span> fast_matype = 0, <span class="keywordtype">int</span> slow_matype = 0,</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>                            <span class="keywordtype">int</span> signal_matype = 0) {</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordflow">return</span> TA_MACDEXT(fast_n, slow_n, signal_n, fast_matype, slow_matype, signal_matype)(ind);</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>}</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> </div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>TA_IN1_OUT_N_CRT(TA_MACDFIX, 9)</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MAMA(<span class="keywordtype">double</span> fast_limit = 5.000000e-1, <span class="keywordtype">double</span> slow_limit = 5.000000e-2);</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_MAMA(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">double</span> fast_limit = 5.000000e-1,</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>                         <span class="keywordtype">double</span> slow_limit = 5.000000e-2) {</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <span class="keywordflow">return</span> TA_MAMA(fast_limit, slow_limit)(ind);</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>}</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MAVP(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ref_ind, <span class="keywordtype">int</span> min_n = 2, <span class="keywordtype">int</span> max_n = 30, <span class="keywordtype">int</span> matype = 0,</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>                          <span class="keywordtype">bool</span> fill_null = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_MAVP(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind1, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind2, <span class="keywordtype">int</span> min_n = 2,</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>                         <span class="keywordtype">int</span> max_n = 30, <span class="keywordtype">int</span> matype = 0, <span class="keywordtype">bool</span> fill_null = <span class="keyword">true</span>) {</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <span class="keywordflow">return</span> TA_MAVP(ind2, min_n, max_n, matype, fill_null)(ind1);</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>}</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span> </div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>TA_IN1_OUT_N_CRT(TA_MAX, 30)</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>TA_IN1_OUT_N_CRT(TA_MAXINDEX, 30)</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>TA_K_OUT_CRT(TA_MEDPRICE)</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>TA_K_OUT_N_CRT(TA_MFI, 14)</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>TA_IN1_OUT_N_CRT(TA_MIDPOINT, 14)</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MIDPRICE(<span class="keywordtype">int</span> n = 14);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_MIDPRICE(const <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">int</span> n = 14);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>TA_IN1_OUT_N_CRT(TA_MIN, 30)</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>TA_IN1_OUT_N_CRT(TA_MININDEX, 30)</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>TA_IN1_OUT_N_CRT(TA_MINMAX, 30)</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>TA_IN1_OUT_N_CRT(TA_MINMAXINDEX, 30)</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>TA_K_OUT_N_CRT(TA_MINUS_DI, 14)</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>TA_K_OUT_N_CRT(TA_MINUS_DM, 14)</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>TA_IN1_OUT_N_CRT(TA_MOM, 10)</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>TA_IN2_OUT_CRT(TA_MULT)</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>TA_K_OUT_N_CRT(TA_NATR, 14)</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>TA_K_OUT_CRT(TA_OBV)</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>TA_K_OUT_N_CRT(TA_PLUS_DI, 14)</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>TA_K_OUT_N_CRT(TA_PLUS_DM, 14)</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_PPO(<span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> matype = 0);</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_PPO(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> fast_n = 12, <span class="keywordtype">int</span> slow_n = 26, <span class="keywordtype">int</span> matype = 0) {</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    <span class="keywordflow">return</span> TA_PPO(fast_n, slow_n, matype)(ind);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>}</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>TA_IN1_OUT_N_CRT(TA_ROC, 10)</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>TA_IN1_OUT_N_CRT(TA_ROCP, 10)</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>TA_IN1_OUT_N_CRT(TA_ROCR, 10)</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>TA_IN1_OUT_N_CRT(TA_ROCR100, 10)</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>TA_IN1_OUT_N_CRT(TA_RSI, 14)</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_SAR(<span class="keywordtype">double</span> acceleration = 0.02, <span class="keywordtype">double</span> maximum = 0.2);</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_SAR(const <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">double</span> acceleration = 0.02, <span class="keywordtype">double</span> maximum = 0.2);</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_SAREXT(<span class="keywordtype">double</span> startvalue = 0.0, <span class="keywordtype">double</span> offsetonreverse = 0.0,</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>                            <span class="keywordtype">double</span> accelerationinitlong = 0.02, <span class="keywordtype">double</span> accelerationlong = 0.02,</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>                            <span class="keywordtype">double</span> accelerationmaxlong = 0.2, <span class="keywordtype">double</span> accelerationinitshort = 0.02,</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>                            <span class="keywordtype">double</span> accelerationshort = 0.02, <span class="keywordtype">double</span> accelerationmaxshort = 0.2);</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_SAREXT(const <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">double</span> startvalue = 0.0, <span class="keywordtype">double</span> offsetonreverse = 0.0,</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>                            <span class="keywordtype">double</span> accelerationinitlong = 0.02, <span class="keywordtype">double</span> accelerationlong = 0.02,</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>                            <span class="keywordtype">double</span> accelerationmaxlong = 0.2, <span class="keywordtype">double</span> accelerationinitshort = 0.02,</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>                            <span class="keywordtype">double</span> accelerationshort = 0.02, <span class="keywordtype">double</span> accelerationmaxshort = 0.2);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>TA_IN1_OUT_CRT(TA_SIN)</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>TA_IN1_OUT_CRT(TA_SINH)</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>TA_IN1_OUT_N_CRT(TA_SMA, 30)</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>TA_IN1_OUT_CRT(TA_SQRT)</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_STDDEV(<span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> nbdev = 1.0);</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_STDDEV(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> nbdev = 1.0) {</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    <span class="keywordflow">return</span> TA_STDDEV(n, nbdev)(ind);</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>}</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_STOCH(<span class="keywordtype">int</span> fastk_n = 5, <span class="keywordtype">int</span> slowk_n = 3, <span class="keywordtype">int</span> slowk_matype = 0, <span class="keywordtype">int</span> slowd_n = 3,</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>                           <span class="keywordtype">int</span> slowd_matype = 0);</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_STOCH(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">int</span> fastk_n = 5, <span class="keywordtype">int</span> slowk_n = 3, <span class="keywordtype">int</span> slowk_matype = 0,</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>                           <span class="keywordtype">int</span> slowd_n = 3, <span class="keywordtype">int</span> slowd_matype = 0);</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span> </div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_STOCHF(<span class="keywordtype">int</span> fastk_n = 5, <span class="keywordtype">int</span> fastd_n = 3, <span class="keywordtype">int</span> fastd_matype = 0);</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_STOCHF(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">int</span> fastk_n = 5, <span class="keywordtype">int</span> fastd_n = 3, <span class="keywordtype">int</span> fastd_matype = 0);</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_STOCHRSI(<span class="keywordtype">int</span> n = 14, <span class="keywordtype">int</span> fastk_n = 5, <span class="keywordtype">int</span> fastd_n = 3, <span class="keywordtype">int</span> matype = 0);</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_STOCHRSI(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> n = 14, <span class="keywordtype">int</span> fastk_n = 5, <span class="keywordtype">int</span> fastd_n = 3,</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>                             <span class="keywordtype">int</span> matype = 0) {</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    <span class="keywordflow">return</span> TA_STOCHRSI(n, fastk_n, fastd_n, matype)(ind);</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>}</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span> </div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>TA_IN2_OUT_CRT(TA_SUB)</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>TA_IN1_OUT_N_CRT(TA_SUM, 30)</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_T3(<span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> vfactor = 7.000000e-1);</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_T3(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> vfactor = 7.000000e-1) {</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <span class="keywordflow">return</span> TA_T3(n, vfactor)(ind);</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>}</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>TA_IN1_OUT_CRT(TA_TAN)</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>TA_IN1_OUT_CRT(TA_TANH)</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>TA_IN1_OUT_N_CRT(TA_TEMA, 30)</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>TA_K_OUT_CRT(TA_TRANGE)</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>TA_IN1_OUT_N_CRT(TA_TRIMA, 30)</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>TA_IN1_OUT_N_CRT(TA_TRIX, 30)</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>TA_IN1_OUT_N_CRT(TA_TSF, 14)</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>TA_K_OUT_CRT(TA_TYPPRICE)</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_ULTOSC(<span class="keywordtype">int</span> n1 = 7, <span class="keywordtype">int</span> n2 = 14, <span class="keywordtype">int</span> n3 = 28);</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_ULTOSC(const <a class="code hl_class" href="classhku_1_1_k_data.html">KData</a>&amp; k, <span class="keywordtype">int</span> n1 = 7, <span class="keywordtype">int</span> n2 = 14, <span class="keywordtype">int</span> n3 = 28);</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> HKU_API TA_VAR(<span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> nbdev = 1.0);</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>inline <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a> TA_VAR(const <a class="code hl_class" href="classhku_1_1_indicator.html">Indicator</a>&amp; ind, <span class="keywordtype">int</span> n = 5, <span class="keywordtype">double</span> nbdev = 1.0) {</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    <span class="keywordflow">return</span> TA_VAR(n, nbdev)(ind);</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>}</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span> </div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>TA_K_OUT_CRT(TA_WCLPRICE)</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>TA_K_OUT_N_CRT(TA_WILLR, 14)</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>TA_IN1_OUT_N_CRT(TA_WMA, 30)</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span> </div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclasshku_1_1_indicator_html"><div class="ttname"><a href="classhku_1_1_indicator.html">hku::Indicator</a></div><div class="ttdoc">Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...</div><div class="ttdef"><b>定义</b> Indicator.h:40</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_html"><div class="ttname"><a href="classhku_1_1_k_data.html">hku::KData</a></div><div class="ttdoc">K-line (candlestick) data</div><div class="ttdef"><b>定义</b> KData.h:22</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_e43f677b6fbe35f314c56dcab541e461.html">indicator_talib</a></li><li class="navelem"><b>ta_crt.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

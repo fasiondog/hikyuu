@@ -1,0 +1,193 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/FileLock.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_file_lock_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">FileLock.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * FileLock.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2026 hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2026-09-20</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef HIKYUU_UTILITIES_FILELOCK_H_</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define HIKYUU_UTILITIES_FILELOCK_H_</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;hikyuu/utilities/osdef.h&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#ifndef HKU_UTILS_API</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#define HKU_UTILS_API</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="};">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html">   69</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a> {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">   77</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>(std::string <a class="code hl_function" href="classhku_1_1_file_lock.html#aa915450dabf91b1797f4e5695f45b3e6">filename</a>);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#a0ca2681c8f4b2e46ffd6ce90337ba13a">   80</a></span>    <a class="code hl_function" href="classhku_1_1_file_lock.html#a0ca2681c8f4b2e46ffd6ce90337ba13a">~FileLock</a>();</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#a523b6c85d1546e3aaf432853f687b313">   82</a></span>    <a class="code hl_function" href="classhku_1_1_file_lock.html#a523b6c85d1546e3aaf432853f687b313">FileLock</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#ad438fca2715422bd663e58ff6acaf548">   83</a></span>    <a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>&amp; <a class="code hl_function" href="classhku_1_1_file_lock.html#ad438fca2715422bd663e58ff6acaf548">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#ab5eaa761e48c928039b4db2fafddb12a">   84</a></span>    <a class="code hl_function" href="classhku_1_1_file_lock.html#ab5eaa761e48c928039b4db2fafddb12a">FileLock</a>(<a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>&amp;&amp; other) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#ae8e90d28b1d321190cd194a75282c23b">   85</a></span>    <a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>&amp; <a class="code hl_function" href="classhku_1_1_file_lock.html#ae8e90d28b1d321190cd194a75282c23b">operator=</a>(<a class="code hl_function" href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">FileLock</a>&amp;&amp; other) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#a84f28d78680aae98ce05745f49e4c145">   92</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#a84f28d78680aae98ce05745f49e4c145">tryLock</a>() noexcept;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#a37941c685b293ca897ae8fc2ffc1a88b">  103</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#a37941c685b293ca897ae8fc2ffc1a88b">waitLock</a>(<span class="keywordtype">int</span> maxAttempts = 10, <span class="keywordtype">int</span> waitTimeMs = 100) noexcept;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#adcfc2071a9e9ef3652fdec45deba7b6b">  106</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#adcfc2071a9e9ef3652fdec45deba7b6b">unlock</a>() noexcept;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span></div>
+<div class="foldopen" id="foldopen00109" data-start="{" data-end="}">
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#aa4e9036bcf255d224026c23482e1eff9">  109</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_file_lock.html#aa4e9036bcf255d224026c23482e1eff9">isLocked</a>() const noexcept {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        <span class="keywordflow">return</span> m_locked;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    }</div>
+</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span></div>
+<div class="foldopen" id="foldopen00114" data-start="{" data-end="}">
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="classhku_1_1_file_lock.html#aa915450dabf91b1797f4e5695f45b3e6">  114</a></span>    <span class="keyword">const</span> std::string&amp; <a class="code hl_function" href="classhku_1_1_file_lock.html#aa915450dabf91b1797f4e5695f45b3e6">filename</a>() const noexcept {</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keywordflow">return</span> m_filename;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    }</div>
+</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordtype">bool</span> lockFile() noexcept;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordtype">void</span> unlockFile() noexcept;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>private:</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> m_filename;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="keywordtype">bool</span> m_locked{<span class="keyword">false</span>};</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    std::unique_lock&lt;std::mutex&gt; m_localLock;  <span class="comment">// Guarantees the in-process mutual exclusion</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="preprocessor">#if HKU_OS_WINDOWS</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    <span class="keywordtype">void</span>* m_handle{<span class="keyword">nullptr</span>};  <span class="comment">// Only a valid handle is stored, INVALID_HANDLE_VALUE is not recorded</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    <span class="keywordtype">int</span> m_handle{-1};</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>};</div>
+</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="preprocessor">#endif  </span><span class="comment">// HIKYUU_UTILITIES_FILELOCK_H_</span></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_a0ca2681c8f4b2e46ffd6ce90337ba13a"><div class="ttname"><a href="classhku_1_1_file_lock.html#a0ca2681c8f4b2e46ffd6ce90337ba13a">hku::FileLock::~FileLock</a></div><div class="ttdeci">~FileLock()</div><div class="ttdoc">Destructor, it releases the lock automatically if it is still held</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_a37941c685b293ca897ae8fc2ffc1a88b"><div class="ttname"><a href="classhku_1_1_file_lock.html#a37941c685b293ca897ae8fc2ffc1a88b">hku::FileLock::waitLock</a></div><div class="ttdeci">bool waitLock(int maxAttempts=10, int waitTimeMs=100) noexcept</div><div class="ttdoc">Wait for the lock; it tries at most maxAttempts times with an interval of waitTimeMs milliseconds eve...</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_a523b6c85d1546e3aaf432853f687b313"><div class="ttname"><a href="classhku_1_1_file_lock.html#a523b6c85d1546e3aaf432853f687b313">hku::FileLock::FileLock</a></div><div class="ttdeci">FileLock(const FileLock &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_a64b995158abd81648e5d539bcb8e02cd"><div class="ttname"><a href="classhku_1_1_file_lock.html#a64b995158abd81648e5d539bcb8e02cd">hku::FileLock::FileLock</a></div><div class="ttdeci">FileLock(std::string filename)</div><div class="ttdoc">Constructor, it only records the lock file name and registers the in-process mutex,...</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_a84f28d78680aae98ce05745f49e4c145"><div class="ttname"><a href="classhku_1_1_file_lock.html#a84f28d78680aae98ce05745f49e4c145">hku::FileLock::tryLock</a></div><div class="ttdeci">bool tryLock() noexcept</div><div class="ttdoc">Try to lock (non-blocking)</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_aa4e9036bcf255d224026c23482e1eff9"><div class="ttname"><a href="classhku_1_1_file_lock.html#aa4e9036bcf255d224026c23482e1eff9">hku::FileLock::isLocked</a></div><div class="ttdeci">bool isLocked() const noexcept</div><div class="ttdoc">Whether the lock is currently held</div><div class="ttdef"><b>定义</b> FileLock.h:109</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_aa915450dabf91b1797f4e5695f45b3e6"><div class="ttname"><a href="classhku_1_1_file_lock.html#aa915450dabf91b1797f4e5695f45b3e6">hku::FileLock::filename</a></div><div class="ttdeci">const std::string &amp; filename() const noexcept</div><div class="ttdoc">Get the lock file name</div><div class="ttdef"><b>定义</b> FileLock.h:114</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_ab5eaa761e48c928039b4db2fafddb12a"><div class="ttname"><a href="classhku_1_1_file_lock.html#ab5eaa761e48c928039b4db2fafddb12a">hku::FileLock::FileLock</a></div><div class="ttdeci">FileLock(FileLock &amp;&amp;other) noexcept</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_ad438fca2715422bd663e58ff6acaf548"><div class="ttname"><a href="classhku_1_1_file_lock.html#ad438fca2715422bd663e58ff6acaf548">hku::FileLock::operator=</a></div><div class="ttdeci">FileLock &amp; operator=(const FileLock &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_adcfc2071a9e9ef3652fdec45deba7b6b"><div class="ttname"><a href="classhku_1_1_file_lock.html#adcfc2071a9e9ef3652fdec45deba7b6b">hku::FileLock::unlock</a></div><div class="ttdeci">void unlock() noexcept</div><div class="ttdoc">Unlock (it is a no-op when the lock is not held)</div></div>
+<div class="ttc" id="aclasshku_1_1_file_lock_html_ae8e90d28b1d321190cd194a75282c23b"><div class="ttname"><a href="classhku_1_1_file_lock.html#ae8e90d28b1d321190cd194a75282c23b">hku::FileLock::operator=</a></div><div class="ttdeci">FileLock &amp; operator=(FileLock &amp;&amp;other) noexcept</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><b>FileLock.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,654 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/datetime/TimeDelta.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_time_delta_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">TimeDelta.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * TimeDelta.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright(C) 2019, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2019-12-12</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef HIKYUU_DATETIME_TIMEDELTA_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define HIKYUU_DATETIME_TIMEDELTA_H</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#ifndef NOMINMAX</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#define NOMINMAX</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;chrono&gt;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;fmt/format.h&gt;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &lt;fmt/ostream.h&gt;</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &lt;boost/date_time/posix_time/posix_time.hpp&gt;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#ifndef HKU_UTILS_API</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#define HKU_UTILS_API</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">namespace </span>bt = boost::posix_time;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">namespace </span>bd = boost::gregorian;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span></div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="};">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html">   38</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> {</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">   58</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a> = 0, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">hours</a> = 0, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a> = 0,</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>                       <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">seconds</a> = 0, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a> = 0, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a> = 0);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#acef913e32b1c3de904e72501cd3d7d27">   62</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#acef913e32b1c3de904e72501cd3d7d27">TimeDelta</a>(bt::time_duration td);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00071" data-start="{" data-end="}">
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a03b18591c752bfb561a1c87f0f6b6d47">   71</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a03b18591c752bfb561a1c87f0f6b6d47">TimeDelta</a>(std::chrono::duration&lt;Rep, Period&gt; dur) {</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="comment">// Convert to microseconds</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="keyword">auto</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a> = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(dur);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> total = <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a>.count();</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordflow">if</span> (total &lt; m_min_micro_seconds || total &gt; m_max_micro_seconds) {</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;TimeDelta value out of range&quot;</span>);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        }</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        m_duration = bt::time_duration(0, 0, 0, total);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    }</div>
+</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a067807164bdadd686ffb8614bf93a79c">   82</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a067807164bdadd686ffb8614bf93a79c">TimeDelta</a>(<span class="keyword">const</span> std::string &amp;delta);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a1dbd73c1d5440b7600201a0c37b91787">   85</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#a1dbd73c1d5440b7600201a0c37b91787">TimeDelta</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> &amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span></div>
+<div class="foldopen" id="foldopen00088" data-start="{" data-end="}">
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a5f29fd0a90bb426d834d1f251b660cf6">   88</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> &amp;<a class="code hl_function" href="classhku_1_1_time_delta.html#a5f29fd0a90bb426d834d1f251b660cf6">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> &amp;other) {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="keywordflow">if</span> (<span class="keyword">this</span> != &amp;other) {</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>            m_duration = other.m_duration;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        }</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    }</div>
+</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">   96</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">   99</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">hours</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">  102</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">  105</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">seconds</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">  108</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">  111</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span></div>
+<div class="foldopen" id="foldopen00114" data-start="{" data-end="}">
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">  114</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keywordflow">return</span> m_duration.ticks();</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    }</div>
+</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span></div>
+<div class="foldopen" id="foldopen00119" data-start="{" data-end="}">
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a9f634cabf4a9c75d910e378bd94fb2a8">  119</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9f634cabf4a9c75d910e378bd94fb2a8">total_days</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keywordflow">return</span> double(<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()) / 86400000000.0;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    }</div>
+</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span></div>
+<div class="foldopen" id="foldopen00124" data-start="{" data-end="}">
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a087e8b3fe4476c4e4c74acd9225f852e">  124</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a087e8b3fe4476c4e4c74acd9225f852e">total_hours</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <span class="keywordflow">return</span> double(<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()) / 3600000000.0;</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    }</div>
+</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span></div>
+<div class="foldopen" id="foldopen00129" data-start="{" data-end="}">
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#af2846ead4f0c906d0aa94c43caf46305">  129</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#af2846ead4f0c906d0aa94c43caf46305">total_minutes</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keywordflow">return</span> double(<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()) / 60000000.0;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    }</div>
+</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span></div>
+<div class="foldopen" id="foldopen00134" data-start="{" data-end="}">
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#aa5a97d0887dfebade7485247893a8754">  134</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#aa5a97d0887dfebade7485247893a8754">total_seconds</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        <span class="keywordflow">return</span> double(<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()) / 1000000.0;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    }</div>
+</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span></div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="}">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a738be5861930ec7b62c7ace178296aad">  139</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a738be5861930ec7b62c7ace178296aad">total_milliseconds</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        <span class="keywordflow">return</span> double(<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()) / 1000.0;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    }</div>
+</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span></div>
+<div class="foldopen" id="foldopen00144" data-start="{" data-end="}">
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a49a641ab809047c64aaa0977f61a9448">  144</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a49a641ab809047c64aaa0977f61a9448">isNegative</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <span class="keywordflow">return</span> m_duration.is_negative();</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    }</div>
+</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span></div>
+<div class="foldopen" id="foldopen00149" data-start="{" data-end="}">
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ac869dbaa6f71ae3f7a1a75b753a323cd">  149</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ac869dbaa6f71ae3f7a1a75b753a323cd">abs</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">TimeDelta::fromTicks</a>(std::abs(<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>()));</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    }</div>
+</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span></div>
+<div class="foldopen" id="foldopen00154" data-start="{" data-end="}">
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a78c8022d9b7ad97e1a5180333edc2bac">  154</a></span>    bt::time_duration <a class="code hl_function" href="classhku_1_1_time_delta.html#a78c8022d9b7ad97e1a5180333edc2bac">time_duration</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        <span class="keywordflow">return</span> m_duration;</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    }</div>
+</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Duration = std::chrono::microseconds&gt;</div>
+<div class="foldopen" id="foldopen00164" data-start="{" data-end="}">
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">  164</a></span>    Duration <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        <span class="keywordflow">return</span> std::chrono::duration_cast&lt;Duration&gt;(std::chrono::microseconds(m_duration.ticks()));</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    }</div>
+</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span></div>
+<div class="foldopen" id="foldopen00169" data-start="{" data-end="}">
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#aaf308e6a7dbe956b33ae0da808f552ce">  169</a></span>    std::string <a class="code hl_function" href="classhku_1_1_time_delta.html#aaf308e6a7dbe956b33ae0da808f552ce">str</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="preprocessor">#if FMT_VERSION &gt;= 90000</span></div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        <span class="keywordflow">return</span> fmt::format(<span class="stringliteral">&quot;{} days, {:0&gt;2d}:{:0&gt;2d}:{:&lt;2.6f}&quot;</span>, <a class="code hl_function" href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">hours</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a>(),</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>                           <a class="code hl_function" href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">seconds</a>() + <span class="keywordtype">double</span>(<a class="code hl_function" href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a>() * 1000 + <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a>()) * 0.000001);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="keywordflow">return</span> fmt::format(<span class="stringliteral">&quot;{} days, {:&gt;02d}:{:&gt;02d}:{:&lt;2.6f}&quot;</span>, <a class="code hl_function" href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">hours</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a>(),</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>                           <a class="code hl_function" href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">seconds</a>() + <span class="keywordtype">double</span>(<a class="code hl_function" href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a>() * 1000 + <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a>()) * 0.000001);</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    }</div>
+</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span></div>
+<div class="foldopen" id="foldopen00180" data-start="{" data-end="}">
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a525cafee4e1bd8a7e2b515a5748e1f10">  180</a></span>    std::string <a class="code hl_function" href="classhku_1_1_time_delta.html#a525cafee4e1bd8a7e2b515a5748e1f10">repr</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        <span class="keywordflow">return</span> fmt::format(<span class="stringliteral">&quot;TimeDelta({}, {}, {}, {}, {}, {})&quot;</span>, <a class="code hl_function" href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">days</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">hours</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">minutes</a>(),</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>                           <a class="code hl_function" href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">seconds</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">milliseconds</a>(), <a class="code hl_function" href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">microseconds</a>());</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    }</div>
+</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span></div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="comment">//</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="comment">// Operator overloads, the TimeDelta related operations</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="comment">//</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span></div>
+<div class="foldopen" id="foldopen00192" data-start="{" data-end="}">
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a6331ceb4e90b1cf71d9c1349ebd13cff">  192</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a6331ceb4e90b1cf71d9c1349ebd13cff">operator+</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a>(td.m_duration + m_duration);</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    }</div>
+</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span></div>
+<div class="foldopen" id="foldopen00197" data-start="{" data-end="}">
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae53e556271ab0be83d8f68feb2917eeb">  197</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae53e556271ab0be83d8f68feb2917eeb">operator-</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a>(m_duration - td.m_duration);</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    }</div>
+</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span></div>
+<div class="foldopen" id="foldopen00202" data-start="{" data-end="}">
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a0edeff81a3b551b0dd9bd78caa1ead1a">  202</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a0edeff81a3b551b0dd9bd78caa1ead1a">operator+</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    }</div>
+</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span></div>
+<div class="foldopen" id="foldopen00207" data-start="{" data-end="}">
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#af8800c3fcf8e60ad17a0d111726b181e">  207</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#af8800c3fcf8e60ad17a0d111726b181e">operator-</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">TimeDelta::fromTicks</a>(-<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>());</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    }</div>
+</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a4fc5025a2e8c67717ecdedcff46e1ea9">  212</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a4fc5025a2e8c67717ecdedcff46e1ea9">operator*</a>(<span class="keywordtype">double</span> p) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae0c87a20e64b26f3a32a00c929e18e6b">  219</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae0c87a20e64b26f3a32a00c929e18e6b">operator/</a>(<span class="keywordtype">double</span> p) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span></div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a753cf969ffdc284a7dc946675c7355ff">  223</a></span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a753cf969ffdc284a7dc946675c7355ff">operator/</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span></div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a116903242ffa233d124677e3440c8e92">  226</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a116903242ffa233d124677e3440c8e92">floorDiv</a>(<span class="keywordtype">double</span> p) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ad1353e664af7448ee5cb69c4ea265618">  230</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ad1353e664af7448ee5cb69c4ea265618">operator%</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span> </div>
+<div class="foldopen" id="foldopen00232" data-start="{" data-end="}">
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a78f6da39c746dcad4acc81e717163fc3">  232</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a78f6da39c746dcad4acc81e717163fc3">operator==</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        <span class="keywordflow">return</span> m_duration == td.m_duration;</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    }</div>
+</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="foldopen" id="foldopen00236" data-start="{" data-end="}">
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a7e1b1ad942ac451f188e36494e1f054e">  236</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a7e1b1ad942ac451f188e36494e1f054e">operator!=</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>        <span class="keywordflow">return</span> m_duration != td.m_duration;</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    }</div>
+</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span> </div>
+<div class="foldopen" id="foldopen00240" data-start="{" data-end="}">
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a17ab194dae63558ec3154b0b9d17c30f">  240</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a17ab194dae63558ec3154b0b9d17c30f">operator&gt;</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        <span class="keywordflow">return</span> m_duration &gt; td.m_duration;</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>    }</div>
+</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
+<div class="foldopen" id="foldopen00244" data-start="{" data-end="}">
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a4091d90668775127cb2a9cb31217cf9d">  244</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a4091d90668775127cb2a9cb31217cf9d">operator&lt;</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        <span class="keywordflow">return</span> m_duration &lt; td.m_duration;</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    }</div>
+</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
+<div class="foldopen" id="foldopen00248" data-start="{" data-end="}">
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae052025c35852d78a8e9803e31e3aca1">  248</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae052025c35852d78a8e9803e31e3aca1">operator&gt;=</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        <span class="keywordflow">return</span> m_duration &gt;= td.m_duration;</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    }</div>
+</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span> </div>
+<div class="foldopen" id="foldopen00252" data-start="{" data-end="}">
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a838ba36be5e68fc056c49178abff10b8">  252</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a838ba36be5e68fc056c49178abff10b8">operator&lt;=</a>(<a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> td)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        <span class="keywordflow">return</span> m_duration &lt;= td.m_duration;</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    }</div>
+</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00264" data-start="{" data-end="}">
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#aeae6a291358a1423b4a1a09ae05c7bbf">  264</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#aeae6a291358a1423b4a1a09ae05c7bbf">operator+</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        <span class="keyword">auto</span> total_ticks = <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() + duration_us.count();</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">TimeDelta::fromTicks</a>(total_ticks);</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    }</div>
+</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00278" data-start="{" data-end="}">
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#adedbfa23572d5c0924c003cdc33d11b2">  278</a></span>    <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#adedbfa23572d5c0924c003cdc33d11b2">operator-</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        <span class="keyword">auto</span> total_ticks = <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() - duration_us.count();</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">TimeDelta::fromTicks</a>(total_ticks);</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    }</div>
+</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00292" data-start="{" data-end="}">
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#af0da5ff83cd50536fc6681f383f72c0e">  292</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#af0da5ff83cd50536fc6681f383f72c0e">operator==</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() == duration_us.count();</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    }</div>
+</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span></div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00305" data-start="{" data-end="}">
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae0e2566a201d83af50dda68398d547d1">  305</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae0e2566a201d83af50dda68398d547d1">operator!=</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>        <span class="keywordflow">return</span> !(*<span class="keyword">this</span> == <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    }</div>
+</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00317" data-start="{" data-end="}">
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#abffbd6811edd561a97362b683448c180">  317</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#abffbd6811edd561a97362b683448c180">operator&gt;</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() &gt; duration_us.count();</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>    }</div>
+</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span></div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00330" data-start="{" data-end="}">
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae8b1d72a6d0ccbb21395a27e5712160f">  330</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae8b1d72a6d0ccbb21395a27e5712160f">operator&lt;</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() &lt; duration_us.count();</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    }</div>
+</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span></div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00343" data-start="{" data-end="}">
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a9062a2e96e68015d552431733bff67f1">  343</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9062a2e96e68015d552431733bff67f1">operator&gt;=</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() &gt;= duration_us.count();</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    }</div>
+</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span></div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00356" data-start="{" data-end="}">
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#aad9ea9a614621c89a997d4591d0e5fef">  356</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#aad9ea9a614621c89a997d4591d0e5fef">operator&lt;=</a>(std::chrono::duration&lt;Rep, Period&gt; <a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>        <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(<a class="code hl_function" href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">duration</a>);</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>() &lt;= duration_us.count();</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    }</div>
+</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span></div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <span class="comment">//</span></div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    <span class="comment">// Static member functions</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <span class="comment">//</span></div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span></div>
+<div class="foldopen" id="foldopen00368" data-start="{" data-end="}">
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a56c61b6b81667e29dd86465bc566ace8">  368</a></span>    <span class="keyword">static</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a56c61b6b81667e29dd86465bc566ace8">min</a>() {</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a>(-99999999);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>    }</div>
+</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span></div>
+<div class="foldopen" id="foldopen00373" data-start="{" data-end="}">
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ae6b1c46de963a1370d2da0f5fe0598be">  373</a></span>    <span class="keyword">static</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae6b1c46de963a1370d2da0f5fe0598be">max</a>() {</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a>(99999999, 23, 59, 59, 999, 999);</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>    }</div>
+</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span></div>
+<div class="foldopen" id="foldopen00378" data-start="{" data-end="}">
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#ac6ce8778755752d8fd5348ad0565e541">  378</a></span>    <span class="keyword">static</span> <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#ac6ce8778755752d8fd5348ad0565e541">maxTicks</a>() {</div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        <span class="keywordflow">return</span> m_max_micro_seconds;</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    }</div>
+</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span></div>
+<div class="foldopen" id="foldopen00383" data-start="{" data-end="}">
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#af0c8e0193ab618b3cf9bc4d78b0b84d1">  383</a></span>    <span class="keyword">static</span> <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#af0c8e0193ab618b3cf9bc4d78b0b84d1">minTicks</a>() {</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keywordflow">return</span> m_min_micro_seconds;</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>    }</div>
+</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span></div>
+<div class="foldopen" id="foldopen00388" data-start="{" data-end="}">
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a6e3adb876b7a25dc9eac1076a5599b28">  388</a></span>    <span class="keyword">static</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a6e3adb876b7a25dc9eac1076a5599b28">resolution</a>() {</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a>(0, 0, 0, 0, 0, 1);</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>    }</div>
+</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span></div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno"><a class="line" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">  393</a></span>    <span class="keyword">static</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">fromTicks</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>);</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span> </div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>    bt::time_duration m_duration;</div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span> </div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> m_max_micro_seconds = 100000000LL * 24 * 60 * 60 * 1000000 - 1;</div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> m_min_micro_seconds = -99999999LL * 24 * 60 * 60 * 1000000;</div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> m_one_day_ticks = 24 * 60 * 60 * 1000000LL;</div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>};</div>
+</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span> </div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>std::ostream &amp;<a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream &amp;out, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td);</div>
+<div class="foldopen" id="foldopen00404" data-start="{" data-end="}">
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno"><a class="line" href="namespacehku.html#a3ae16c26aeac5a42cef40c35df055717">  404</a></span><span class="keyword">inline</span> std::ostream &amp;<a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream &amp;out, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    out &lt;&lt; td.<a class="code hl_function" href="classhku_1_1_time_delta.html#aaf308e6a7dbe956b33ae0da808f552ce">str</a>();</div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    <span class="keywordflow">return</span> out;</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>}</div>
+</div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span></div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00418" data-start="{" data-end="}">
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno"><a class="line" href="namespacehku.html#a850bb2f5ddf9c662ac80697a191a704a">  418</a></span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="namespacehku.html#a197d09c650708d79c1a6464727f515e2">operator+</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>    <span class="keywordflow">return</span> td + duration;</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>}</div>
+</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span></div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00431" data-start="{" data-end="}">
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno"><a class="line" href="namespacehku.html#a9e000e663d9ecafb6da04459dfa0e521">  431</a></span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="namespacehku.html#af40b4dac3e9bd98b9ac49632d4d4b1f1">operator-</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>    <span class="keyword">auto</span> duration_us = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(duration);</div>
+<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span>    <span class="keyword">auto</span> total_ticks = duration_us.count() - td.<a class="code hl_function" href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">ticks</a>();</div>
+<div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">TimeDelta::fromTicks</a>(total_ticks);</div>
+<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>}</div>
+</div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span></div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00446" data-start="{" data-end="}">
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno"><a class="line" href="namespacehku.html#a231d923ea97048775bb5f3ad25c11473">  446</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">operator==</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>    <span class="keywordflow">return</span> td == duration;</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>}</div>
+</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span></div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00459" data-start="{" data-end="}">
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno"><a class="line" href="namespacehku.html#a5f840a8039320049e2c2820e895a974e">  459</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a5bd8194c0579cf9e5367715d927211ae">operator!=</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span>    <span class="keywordflow">return</span> td != duration;</div>
+<div class="line"><a id="l00461" name="l00461"></a><span class="lineno">  461</span>}</div>
+</div>
+<div class="line"><a id="l00462" name="l00462"></a><span class="lineno">  462</span></div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00472" data-start="{" data-end="}">
+<div class="line"><a id="l00472" name="l00472"></a><span class="lineno"><a class="line" href="namespacehku.html#a1fd7dfd790ced61d248239ac0f82bead">  472</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a09f521fffcac8df259e53cc7e2a8e324">operator&lt;</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span>    <span class="keywordflow">return</span> td &gt; duration;</div>
+<div class="line"><a id="l00474" name="l00474"></a><span class="lineno">  474</span>}</div>
+</div>
+<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span></div>
+<div class="line"><a id="l00484" name="l00484"></a><span class="lineno">  484</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00485" data-start="{" data-end="}">
+<div class="line"><a id="l00485" name="l00485"></a><span class="lineno"><a class="line" href="namespacehku.html#af746665a479c7cc1e7e7dfb595198d33">  485</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a22aca36fce28b7b816a33cab2d8f95af">operator&gt;</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>    <span class="keywordflow">return</span> td &lt; duration;</div>
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>}</div>
+</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span></div>
+<div class="line"><a id="l00497" name="l00497"></a><span class="lineno">  497</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00498" data-start="{" data-end="}">
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno"><a class="line" href="namespacehku.html#ae7aef06922823b0a373f028bfa28023f">  498</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#aa74c97f1ed51afeb207a8a1f591423af">operator&lt;=</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>    <span class="keywordflow">return</span> td &gt;= duration;</div>
+<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>}</div>
+</div>
+<div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span></div>
+<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Rep, <span class="keyword">typename</span> Period&gt;</div>
+<div class="foldopen" id="foldopen00511" data-start="{" data-end="}">
+<div class="line"><a id="l00511" name="l00511"></a><span class="lineno"><a class="line" href="namespacehku.html#a2aee886f910091175ecded21678ea7ca">  511</a></span><span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#aa48185c3715bc6f1e0db31321f58d74f">operator&gt;=</a>(std::chrono::duration&lt;Rep, Period&gt; duration, <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> td) {</div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>    <span class="keywordflow">return</span> td &lt;= duration;</div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>}</div>
+</div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span></div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span>TimeDelta <a class="code hl_function" href="group___data_type.html#gac4d778adda9fff67bfcdde3e90ad9f67">Days</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> days);</div>
+<div class="foldopen" id="foldopen00521" data-start="{" data-end="}">
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno"><a class="line" href="group___data_type.html#gac4d778adda9fff67bfcdde3e90ad9f67">  521</a></span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="group___data_type.html#gac4d778adda9fff67bfcdde3e90ad9f67">Days</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> days) {</div>
+<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a>(days);</div>
+<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>}</div>
+</div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span></div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno"><a class="line" href="group___data_type.html#ga93a78e1b7f9f3081e4e3751352e16273">  530</a></span><a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> HKU_UTILS_API <a class="code hl_function" href="group___data_type.html#ga93a78e1b7f9f3081e4e3751352e16273">Hours</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hours);</div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span></div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno"><a class="line" href="group___data_type.html#ga1f5480b35a08930498075e281987e862">  537</a></span><a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> HKU_UTILS_API <a class="code hl_function" href="group___data_type.html#ga1f5480b35a08930498075e281987e862">Minutes</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> mins);</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span></div>
+<div class="line"><a id="l00544" name="l00544"></a><span class="lineno"><a class="line" href="group___data_type.html#gad7dcac323061d433adc758cbae2de8e9">  544</a></span><a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> HKU_UTILS_API <a class="code hl_function" href="group___data_type.html#gad7dcac323061d433adc758cbae2de8e9">Seconds</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> secs);</div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span></div>
+<div class="line"><a id="l00551" name="l00551"></a><span class="lineno"><a class="line" href="group___data_type.html#ga49d9b016994d5b62c21f9d6d9fafd263">  551</a></span><a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> HKU_UTILS_API <a class="code hl_function" href="group___data_type.html#ga49d9b016994d5b62c21f9d6d9fafd263">Milliseconds</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> milliseconds);</div>
+<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span></div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span><a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="group___data_type.html#ga3d0e82a88b60e1ddb400c877042e687e">Microseconds</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> microsecs);</div>
+<div class="foldopen" id="foldopen00559" data-start="{" data-end="}">
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno"><a class="line" href="group___data_type.html#ga3d0e82a88b60e1ddb400c877042e687e">  559</a></span><span class="keyword">inline</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="group___data_type.html#ga3d0e82a88b60e1ddb400c877042e687e">Microseconds</a>(<a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> microsecs) {</div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">TimeDelta::fromTicks</a>(microsecs);</div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>}</div>
+</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span></div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno"><a class="line" href="namespacehku.html#a9d83222f463ace70e11a073d99e0623d">  572</a></span><a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> HKU_UTILS_API <a class="code hl_function" href="namespacehku.html#a9d83222f463ace70e11a073d99e0623d">UTCOffset</a>();</div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span> </div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span> </div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacestd.html">std</a> {</div>
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span> </div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="foldopen" id="foldopen00579" data-start="{" data-end="};">
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno"><a class="line" href="classstd_1_1hash_3_01hku_1_1_time_delta_01_4.html">  579</a></span><span class="keyword">class </span>hash&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::TimeDelta&gt; {</div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00581" data-start="{" data-end="}">
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno"><a class="line" href="classstd_1_1hash_3_01hku_1_1_time_delta_01_4.html#aa3f8cc779f1c7a836264a0f969777c62">  581</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classstd_1_1hash_3_01hku_1_1_time_delta_01_4.html#aa3f8cc779f1c7a836264a0f969777c62">operator()</a>(<a class="code hl_class" href="classhku_1_1_time_delta.html">hku::TimeDelta</a> <span class="keyword">const</span> &amp;d) <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>        <span class="keywordflow">return</span> std::hash&lt;int64_t&gt;()(d.ticks());</div>
+<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>    }</div>
+</div>
+<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span>};</div>
+</div>
+<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span> </div>
+<div class="foldopen" id="foldopen00586" data-start="{" data-end="}">
+<div class="line"><a id="l00586" name="l00586"></a><span class="lineno"><a class="line" href="namespacestd.html#a1fc9ffa779580fc61032ad510ca8715d">  586</a></span><span class="keyword">inline</span> <span class="keywordtype">string</span> <a class="code hl_function" href="namespacestd.html#ab01df1f6515bec5ca434fba5f0b3d0de">to_string</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">hku::TimeDelta</a> &amp;delta) {</div>
+<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span>    <span class="keywordflow">return</span> delta.<a class="code hl_function" href="classhku_1_1_time_delta.html#aaf308e6a7dbe956b33ae0da808f552ce">str</a>();</div>
+<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span>}</div>
+</div>
+<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span> </div>
+<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>}  <span class="comment">// namespace std</span></div>
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span> </div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span><span class="preprocessor">#if FMT_VERSION &gt;= 90000</span></div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::TimeDelta&gt; {</div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>    FMT_CONSTEXPR <span class="keyword">auto</span> parse(format_parse_context &amp;ctx) -&gt; <span class="keyword">decltype</span>(ctx.begin()) {</div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>        <span class="keywordflow">return</span> ctx.end();</div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>    }</div>
+<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span> </div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> FormatContext&gt;</div>
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>    <span class="keyword">auto</span> format(<span class="keyword">const</span> hku::TimeDelta &amp;d, FormatContext &amp;ctx) <span class="keyword">const</span> -&gt; <span class="keyword">decltype</span>(ctx.out()) {</div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>        <span class="keywordflow">return</span> fmt::format_to(ctx.out(), <span class="stringliteral">&quot;{}&quot;</span>, d.str());</div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>    }</div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>};</div>
+<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span> </div>
+<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span><span class="preprocessor">#endif </span><span class="comment">/* HIKYUU_DATETIME_TIMEDELTA_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html"><div class="ttname"><a href="classhku_1_1_time_delta.html">hku::TimeDelta</a></div><div class="ttdoc">Duration, used for the time calculation</div><div class="ttdef"><b>定义</b> TimeDelta.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a03b18591c752bfb561a1c87f0f6b6d47"><div class="ttname"><a href="classhku_1_1_time_delta.html#a03b18591c752bfb561a1c87f0f6b6d47">hku::TimeDelta::TimeDelta</a></div><div class="ttdeci">TimeDelta(std::chrono::duration&lt; Rep, Period &gt; dur)</div><div class="ttdoc">Construct from std::chrono::duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:71</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a067807164bdadd686ffb8614bf93a79c"><div class="ttname"><a href="classhku_1_1_time_delta.html#a067807164bdadd686ffb8614bf93a79c">hku::TimeDelta::TimeDelta</a></div><div class="ttdeci">TimeDelta(const std::string &amp;delta)</div><div class="ttdoc">Construct from a string, the format: -1 days, hh:mm:ss.000000)</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a087e8b3fe4476c4e4c74acd9225f852e"><div class="ttname"><a href="classhku_1_1_time_delta.html#a087e8b3fe4476c4e4c74acd9225f852e">hku::TimeDelta::total_hours</a></div><div class="ttdeci">double total_hours() const</div><div class="ttdoc">Return the total hours with a fraction</div><div class="ttdef"><b>定义</b> TimeDelta.h:124</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a0edeff81a3b551b0dd9bd78caa1ead1a"><div class="ttname"><a href="classhku_1_1_time_delta.html#a0edeff81a3b551b0dd9bd78caa1ead1a">hku::TimeDelta::operator+</a></div><div class="ttdeci">TimeDelta operator+() const</div><div class="ttdoc">The + operator, it returns the same value</div><div class="ttdef"><b>定义</b> TimeDelta.h:202</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a116903242ffa233d124677e3440c8e92"><div class="ttname"><a href="classhku_1_1_time_delta.html#a116903242ffa233d124677e3440c8e92">hku::TimeDelta::floorDiv</a></div><div class="ttdeci">TimeDelta floorDiv(double p) const</div><div class="ttdoc">Floor division, the decimal part is truncated directly</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a17ab194dae63558ec3154b0b9d17c30f"><div class="ttname"><a href="classhku_1_1_time_delta.html#a17ab194dae63558ec3154b0b9d17c30f">hku::TimeDelta::operator&gt;</a></div><div class="ttdeci">bool operator&gt;(TimeDelta td) const</div><div class="ttdef"><b>定义</b> TimeDelta.h:240</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a1dbd73c1d5440b7600201a0c37b91787"><div class="ttname"><a href="classhku_1_1_time_delta.html#a1dbd73c1d5440b7600201a0c37b91787">hku::TimeDelta::TimeDelta</a></div><div class="ttdeci">TimeDelta(const TimeDelta &amp;)=default</div><div class="ttdoc">Assignment constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a4091d90668775127cb2a9cb31217cf9d"><div class="ttname"><a href="classhku_1_1_time_delta.html#a4091d90668775127cb2a9cb31217cf9d">hku::TimeDelta::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(TimeDelta td) const</div><div class="ttdef"><b>定义</b> TimeDelta.h:244</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a450612f14c6711dd7596bf5d95efa040"><div class="ttname"><a href="classhku_1_1_time_delta.html#a450612f14c6711dd7596bf5d95efa040">hku::TimeDelta::ticks</a></div><div class="ttdeci">int64_t ticks() const</div><div class="ttdoc">Get the number of the ticks, i.e.</div><div class="ttdef"><b>定义</b> TimeDelta.h:114</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a49a641ab809047c64aaa0977f61a9448"><div class="ttname"><a href="classhku_1_1_time_delta.html#a49a641ab809047c64aaa0977f61a9448">hku::TimeDelta::isNegative</a></div><div class="ttdeci">bool isNegative() const</div><div class="ttdoc">Whether it is a negative duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:144</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a4e8dea880ff28b7ea6395b5f7d9f85c6"><div class="ttname"><a href="classhku_1_1_time_delta.html#a4e8dea880ff28b7ea6395b5f7d9f85c6">hku::TimeDelta::milliseconds</a></div><div class="ttdeci">int64_t milliseconds() const</div><div class="ttdoc">Get the normalized milliseconds [0, 999]</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a4fc5025a2e8c67717ecdedcff46e1ea9"><div class="ttname"><a href="classhku_1_1_time_delta.html#a4fc5025a2e8c67717ecdedcff46e1ea9">hku::TimeDelta::operator*</a></div><div class="ttdeci">TimeDelta operator*(double p) const</div><div class="ttdoc">Multiply the duration by a coefficient, the result is rounded</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a525cafee4e1bd8a7e2b515a5748e1f10"><div class="ttname"><a href="classhku_1_1_time_delta.html#a525cafee4e1bd8a7e2b515a5748e1f10">hku::TimeDelta::repr</a></div><div class="ttdeci">std::string repr() const</div><div class="ttdoc">Convert to a string, the format: TimeDelta(days,hours,mins,secs,millisecs,microsecs)</div><div class="ttdef"><b>定义</b> TimeDelta.h:180</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a56c61b6b81667e29dd86465bc566ace8"><div class="ttname"><a href="classhku_1_1_time_delta.html#a56c61b6b81667e29dd86465bc566ace8">hku::TimeDelta::min</a></div><div class="ttdeci">static TimeDelta min()</div><div class="ttdoc">Get the minimum expressible value TimeDelta(-99999999)</div><div class="ttdef"><b>定义</b> TimeDelta.h:368</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a5f29fd0a90bb426d834d1f251b660cf6"><div class="ttname"><a href="classhku_1_1_time_delta.html#a5f29fd0a90bb426d834d1f251b660cf6">hku::TimeDelta::operator=</a></div><div class="ttdeci">TimeDelta &amp; operator=(const TimeDelta &amp;other)</div><div class="ttdoc">Copy assignment function</div><div class="ttdef"><b>定义</b> TimeDelta.h:88</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a6331ceb4e90b1cf71d9c1349ebd13cff"><div class="ttname"><a href="classhku_1_1_time_delta.html#a6331ceb4e90b1cf71d9c1349ebd13cff">hku::TimeDelta::operator+</a></div><div class="ttdeci">TimeDelta operator+(TimeDelta td) const</div><div class="ttdoc">Add two durations</div><div class="ttdef"><b>定义</b> TimeDelta.h:192</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a6533f8873544fbaee127ebe1f7d10104"><div class="ttname"><a href="classhku_1_1_time_delta.html#a6533f8873544fbaee127ebe1f7d10104">hku::TimeDelta::seconds</a></div><div class="ttdeci">int64_t seconds() const</div><div class="ttdoc">Get the normalized seconds [0, 59]</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a65f6b09fab81bbd255e2c7b3eb3f6faa"><div class="ttname"><a href="classhku_1_1_time_delta.html#a65f6b09fab81bbd255e2c7b3eb3f6faa">hku::TimeDelta::minutes</a></div><div class="ttdeci">int64_t minutes() const</div><div class="ttdoc">Get the normalized minutes [0, 59]</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a6e3adb876b7a25dc9eac1076a5599b28"><div class="ttname"><a href="classhku_1_1_time_delta.html#a6e3adb876b7a25dc9eac1076a5599b28">hku::TimeDelta::resolution</a></div><div class="ttdeci">static TimeDelta resolution()</div><div class="ttdoc">Get the expression precision 1 microsecond, TimeDelta(0, 0, 0, 0, 0, 1)</div><div class="ttdef"><b>定义</b> TimeDelta.h:388</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a731dd68a298dde33ed5f823fbb62fb52"><div class="ttname"><a href="classhku_1_1_time_delta.html#a731dd68a298dde33ed5f823fbb62fb52">hku::TimeDelta::hours</a></div><div class="ttdeci">int64_t hours() const</div><div class="ttdoc">Get the normalized hours [0, 23]</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a738be5861930ec7b62c7ace178296aad"><div class="ttname"><a href="classhku_1_1_time_delta.html#a738be5861930ec7b62c7ace178296aad">hku::TimeDelta::total_milliseconds</a></div><div class="ttdeci">double total_milliseconds() const</div><div class="ttdoc">Return the total milliseconds with a fraction</div><div class="ttdef"><b>定义</b> TimeDelta.h:139</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a753cf969ffdc284a7dc946675c7355ff"><div class="ttname"><a href="classhku_1_1_time_delta.html#a753cf969ffdc284a7dc946675c7355ff">hku::TimeDelta::operator/</a></div><div class="ttdeci">double operator/(TimeDelta td) const</div><div class="ttdoc">Divide two durations to get their ratio.</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a78c8022d9b7ad97e1a5180333edc2bac"><div class="ttname"><a href="classhku_1_1_time_delta.html#a78c8022d9b7ad97e1a5180333edc2bac">hku::TimeDelta::time_duration</a></div><div class="ttdeci">bt::time_duration time_duration() const</div><div class="ttdoc">Convert to boost::posix_time::time_duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:154</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a78f6da39c746dcad4acc81e717163fc3"><div class="ttname"><a href="classhku_1_1_time_delta.html#a78f6da39c746dcad4acc81e717163fc3">hku::TimeDelta::operator==</a></div><div class="ttdeci">bool operator==(TimeDelta td) const</div><div class="ttdef"><b>定义</b> TimeDelta.h:232</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a7e1b1ad942ac451f188e36494e1f054e"><div class="ttname"><a href="classhku_1_1_time_delta.html#a7e1b1ad942ac451f188e36494e1f054e">hku::TimeDelta::operator!=</a></div><div class="ttdeci">bool operator!=(TimeDelta td) const</div><div class="ttdef"><b>定义</b> TimeDelta.h:236</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a838ba36be5e68fc056c49178abff10b8"><div class="ttname"><a href="classhku_1_1_time_delta.html#a838ba36be5e68fc056c49178abff10b8">hku::TimeDelta::operator&lt;=</a></div><div class="ttdeci">bool operator&lt;=(TimeDelta td) const</div><div class="ttdef"><b>定义</b> TimeDelta.h:252</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a9062a2e96e68015d552431733bff67f1"><div class="ttname"><a href="classhku_1_1_time_delta.html#a9062a2e96e68015d552431733bff67f1">hku::TimeDelta::operator&gt;=</a></div><div class="ttdeci">bool operator&gt;=(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Compare whether it is greater than or equal to a chrono duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:343</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a97945aed5a10dba6b6cd3bb4cc398fd6"><div class="ttname"><a href="classhku_1_1_time_delta.html#a97945aed5a10dba6b6cd3bb4cc398fd6">hku::TimeDelta::microseconds</a></div><div class="ttdeci">int64_t microseconds() const</div><div class="ttdoc">Get the normalized microseconds [0, 999]</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a9d8901b88a1e74717baf240f37d79b08"><div class="ttname"><a href="classhku_1_1_time_delta.html#a9d8901b88a1e74717baf240f37d79b08">hku::TimeDelta::fromTicks</a></div><div class="ttdeci">static TimeDelta fromTicks(int64_t ticks)</div><div class="ttdoc">Create from the ticks</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_a9f634cabf4a9c75d910e378bd94fb2a8"><div class="ttname"><a href="classhku_1_1_time_delta.html#a9f634cabf4a9c75d910e378bd94fb2a8">hku::TimeDelta::total_days</a></div><div class="ttdeci">double total_days() const</div><div class="ttdoc">Return the total days with a fraction</div><div class="ttdef"><b>定义</b> TimeDelta.h:119</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_aa5a97d0887dfebade7485247893a8754"><div class="ttname"><a href="classhku_1_1_time_delta.html#aa5a97d0887dfebade7485247893a8754">hku::TimeDelta::total_seconds</a></div><div class="ttdeci">double total_seconds() const</div><div class="ttdoc">Return the total seconds with a fraction</div><div class="ttdef"><b>定义</b> TimeDelta.h:134</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_aad9ea9a614621c89a997d4591d0e5fef"><div class="ttname"><a href="classhku_1_1_time_delta.html#aad9ea9a614621c89a997d4591d0e5fef">hku::TimeDelta::operator&lt;=</a></div><div class="ttdeci">bool operator&lt;=(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Compare whether it is less than or equal to a chrono duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:356</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_aaf308e6a7dbe956b33ae0da808f552ce"><div class="ttname"><a href="classhku_1_1_time_delta.html#aaf308e6a7dbe956b33ae0da808f552ce">hku::TimeDelta::str</a></div><div class="ttdeci">std::string str() const</div><div class="ttdoc">Convert to a string, the format: -1 days hh:mm:ss.000000)</div><div class="ttdef"><b>定义</b> TimeDelta.h:169</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_abe21cf3b9bdf500bb36c446a9938d7da"><div class="ttname"><a href="classhku_1_1_time_delta.html#abe21cf3b9bdf500bb36c446a9938d7da">hku::TimeDelta::duration</a></div><div class="ttdeci">Duration duration() const</div><div class="ttdoc">Convert to std::chrono::duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:164</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_abffbd6811edd561a97362b683448c180"><div class="ttname"><a href="classhku_1_1_time_delta.html#abffbd6811edd561a97362b683448c180">hku::TimeDelta::operator&gt;</a></div><div class="ttdeci">bool operator&gt;(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Compare whether it is greater than a chrono duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:317</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ac6ce8778755752d8fd5348ad0565e541"><div class="ttname"><a href="classhku_1_1_time_delta.html#ac6ce8778755752d8fd5348ad0565e541">hku::TimeDelta::maxTicks</a></div><div class="ttdeci">static int64_t maxTicks()</div><div class="ttdoc">The maximum number of the ticks supported</div><div class="ttdef"><b>定义</b> TimeDelta.h:378</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ac869dbaa6f71ae3f7a1a75b753a323cd"><div class="ttname"><a href="classhku_1_1_time_delta.html#ac869dbaa6f71ae3f7a1a75b753a323cd">hku::TimeDelta::abs</a></div><div class="ttdeci">TimeDelta abs() const</div><div class="ttdoc">Calculate the absolute value</div><div class="ttdef"><b>定义</b> TimeDelta.h:149</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_acef913e32b1c3de904e72501cd3d7d27"><div class="ttname"><a href="classhku_1_1_time_delta.html#acef913e32b1c3de904e72501cd3d7d27">hku::TimeDelta::TimeDelta</a></div><div class="ttdeci">TimeDelta(bt::time_duration td)</div><div class="ttdoc">Construct from boost::posix_time::time_duration</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ad1353e664af7448ee5cb69c4ea265618"><div class="ttname"><a href="classhku_1_1_time_delta.html#ad1353e664af7448ee5cb69c4ea265618">hku::TimeDelta::operator%</a></div><div class="ttdeci">TimeDelta operator%(TimeDelta td) const</div><div class="ttdoc">The remainder of the division of two durations.</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ad51fe836c4e013ab4a838c1c2e8ccfae"><div class="ttname"><a href="classhku_1_1_time_delta.html#ad51fe836c4e013ab4a838c1c2e8ccfae">hku::TimeDelta::days</a></div><div class="ttdeci">int64_t days() const</div><div class="ttdoc">Get the normalized number of the days</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_adedbfa23572d5c0924c003cdc33d11b2"><div class="ttname"><a href="classhku_1_1_time_delta.html#adedbfa23572d5c0924c003cdc33d11b2">hku::TimeDelta::operator-</a></div><div class="ttdeci">TimeDelta operator-(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Subtract a chrono duration from the duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:278</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae052025c35852d78a8e9803e31e3aca1"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae052025c35852d78a8e9803e31e3aca1">hku::TimeDelta::operator&gt;=</a></div><div class="ttdeci">bool operator&gt;=(TimeDelta td) const</div><div class="ttdef"><b>定义</b> TimeDelta.h:248</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae0c87a20e64b26f3a32a00c929e18e6b"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae0c87a20e64b26f3a32a00c929e18e6b">hku::TimeDelta::operator/</a></div><div class="ttdeci">TimeDelta operator/(double p) const</div><div class="ttdoc">Divide the duration by a coefficient, the result is rounded.</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae0e2566a201d83af50dda68398d547d1"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae0e2566a201d83af50dda68398d547d1">hku::TimeDelta::operator!=</a></div><div class="ttdeci">bool operator!=(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Compare whether it is not equal to a chrono duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:305</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae53e556271ab0be83d8f68feb2917eeb"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae53e556271ab0be83d8f68feb2917eeb">hku::TimeDelta::operator-</a></div><div class="ttdeci">TimeDelta operator-(TimeDelta td) const</div><div class="ttdoc">Subtract two durations</div><div class="ttdef"><b>定义</b> TimeDelta.h:197</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae640491fce702951dc0e67d76a591d47"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae640491fce702951dc0e67d76a591d47">hku::TimeDelta::TimeDelta</a></div><div class="ttdeci">TimeDelta(int64_t days=0, int64_t hours=0, int64_t minutes=0, int64_t seconds=0, int64_t milliseconds=0, int64_t microseconds=0)</div><div class="ttdoc">Constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae6b1c46de963a1370d2da0f5fe0598be"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae6b1c46de963a1370d2da0f5fe0598be">hku::TimeDelta::max</a></div><div class="ttdeci">static TimeDelta max()</div><div class="ttdoc">Get the maximum expressible value TimeDelta(99999999, 23, 59, 59, 999, 999)</div><div class="ttdef"><b>定义</b> TimeDelta.h:373</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_ae8b1d72a6d0ccbb21395a27e5712160f"><div class="ttname"><a href="classhku_1_1_time_delta.html#ae8b1d72a6d0ccbb21395a27e5712160f">hku::TimeDelta::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Compare whether it is less than a chrono duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:330</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_aeae6a291358a1423b4a1a09ae05c7bbf"><div class="ttname"><a href="classhku_1_1_time_delta.html#aeae6a291358a1423b4a1a09ae05c7bbf">hku::TimeDelta::operator+</a></div><div class="ttdeci">TimeDelta operator+(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Add a chrono duration to the duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:264</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_af0c8e0193ab618b3cf9bc4d78b0b84d1"><div class="ttname"><a href="classhku_1_1_time_delta.html#af0c8e0193ab618b3cf9bc4d78b0b84d1">hku::TimeDelta::minTicks</a></div><div class="ttdeci">static int64_t minTicks()</div><div class="ttdoc">The minimum number of the ticks supported</div><div class="ttdef"><b>定义</b> TimeDelta.h:383</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_af0da5ff83cd50536fc6681f383f72c0e"><div class="ttname"><a href="classhku_1_1_time_delta.html#af0da5ff83cd50536fc6681f383f72c0e">hku::TimeDelta::operator==</a></div><div class="ttdeci">bool operator==(std::chrono::duration&lt; Rep, Period &gt; duration) const</div><div class="ttdoc">Compare whether it is equal to a chrono duration</div><div class="ttdef"><b>定义</b> TimeDelta.h:292</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_af2846ead4f0c906d0aa94c43caf46305"><div class="ttname"><a href="classhku_1_1_time_delta.html#af2846ead4f0c906d0aa94c43caf46305">hku::TimeDelta::total_minutes</a></div><div class="ttdeci">double total_minutes() const</div><div class="ttdoc">Return the total minutes with a fraction</div><div class="ttdef"><b>定义</b> TimeDelta.h:129</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html_af8800c3fcf8e60ad17a0d111726b181e"><div class="ttname"><a href="classhku_1_1_time_delta.html#af8800c3fcf8e60ad17a0d111726b181e">hku::TimeDelta::operator-</a></div><div class="ttdeci">TimeDelta operator-() const</div><div class="ttdoc">The - operator, it gives the negative value, equivalent to TimeDelta(0) minus itself</div><div class="ttdef"><b>定义</b> TimeDelta.h:207</div></div>
+<div class="ttc" id="aclassstd_1_1hash_3_01hku_1_1_time_delta_01_4_html_aa3f8cc779f1c7a836264a0f969777c62"><div class="ttname"><a href="classstd_1_1hash_3_01hku_1_1_time_delta_01_4.html#aa3f8cc779f1c7a836264a0f969777c62">std::hash&lt; hku::TimeDelta &gt;::operator()</a></div><div class="ttdeci">size_t operator()(hku::TimeDelta const &amp;d) const noexcept</div><div class="ttdef"><b>定义</b> TimeDelta.h:581</div></div>
+<div class="ttc" id="agroup___data_type_html_ga1f5480b35a08930498075e281987e862"><div class="ttname"><a href="group___data_type.html#ga1f5480b35a08930498075e281987e862">hku::Minutes</a></div><div class="ttdeci">TimeDelta HKU_UTILS_API Minutes(int64_t mins)</div><div class="ttdoc">Quick creation function of TimeDelta</div></div>
+<div class="ttc" id="agroup___data_type_html_ga2b6c0eff2e4f65f353dc655a1baf7f04"><div class="ttname"><a href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">hku::int64_t</a></div><div class="ttdeci">long long int64_t</div><div class="ttdef"><b>定义</b> DataType.h:99</div></div>
+<div class="ttc" id="agroup___data_type_html_ga3d0e82a88b60e1ddb400c877042e687e"><div class="ttname"><a href="group___data_type.html#ga3d0e82a88b60e1ddb400c877042e687e">hku::Microseconds</a></div><div class="ttdeci">TimeDelta Microseconds(int64_t microsecs)</div><div class="ttdoc">Quick creation function of TimeDelta</div><div class="ttdef"><b>定义</b> TimeDelta.h:559</div></div>
+<div class="ttc" id="agroup___data_type_html_ga49d9b016994d5b62c21f9d6d9fafd263"><div class="ttname"><a href="group___data_type.html#ga49d9b016994d5b62c21f9d6d9fafd263">hku::Milliseconds</a></div><div class="ttdeci">TimeDelta HKU_UTILS_API Milliseconds(int64_t milliseconds)</div><div class="ttdoc">Quick creation function of TimeDelta</div></div>
+<div class="ttc" id="agroup___data_type_html_ga93a78e1b7f9f3081e4e3751352e16273"><div class="ttname"><a href="group___data_type.html#ga93a78e1b7f9f3081e4e3751352e16273">hku::Hours</a></div><div class="ttdeci">TimeDelta HKU_UTILS_API Hours(int64_t hours)</div><div class="ttdoc">Quick creation function of TimeDelta</div></div>
+<div class="ttc" id="agroup___data_type_html_gac4d778adda9fff67bfcdde3e90ad9f67"><div class="ttname"><a href="group___data_type.html#gac4d778adda9fff67bfcdde3e90ad9f67">hku::Days</a></div><div class="ttdeci">TimeDelta Days(int64_t days)</div><div class="ttdoc">Quick creation function of TimeDelta</div><div class="ttdef"><b>定义</b> TimeDelta.h:521</div></div>
+<div class="ttc" id="agroup___data_type_html_gad7dcac323061d433adc758cbae2de8e9"><div class="ttname"><a href="group___data_type.html#gad7dcac323061d433adc758cbae2de8e9">hku::Seconds</a></div><div class="ttdeci">TimeDelta HKU_UTILS_API Seconds(int64_t secs)</div><div class="ttdoc">Quick creation function of TimeDelta</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a09f521fffcac8df259e53cc7e2a8e324"><div class="ttname"><a href="namespacehku.html#a09f521fffcac8df259e53cc7e2a8e324">hku::operator&lt;</a></div><div class="ttdeci">HKU_API Indicator operator&lt;(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a197d09c650708d79c1a6464727f515e2"><div class="ttname"><a href="namespacehku.html#a197d09c650708d79c1a6464727f515e2">hku::operator+</a></div><div class="ttdeci">HKU_API Indicator operator+(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a22aca36fce28b7b816a33cab2d8f95af"><div class="ttname"><a href="namespacehku.html#a22aca36fce28b7b816a33cab2d8f95af">hku::operator&gt;</a></div><div class="ttdeci">HKU_API Indicator operator&gt;(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a5bd8194c0579cf9e5367715d927211ae"><div class="ttname"><a href="namespacehku.html#a5bd8194c0579cf9e5367715d927211ae">hku::operator!=</a></div><div class="ttdeci">HKU_API Indicator operator!=(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a5c8f988e50bc4ff1a742bbc29de54119"><div class="ttname"><a href="namespacehku.html#a5c8f988e50bc4ff1a742bbc29de54119">hku::operator==</a></div><div class="ttdeci">HKU_API Indicator operator==(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a9d83222f463ace70e11a073d99e0623d"><div class="ttname"><a href="namespacehku.html#a9d83222f463ace70e11a073d99e0623d">hku::UTCOffset</a></div><div class="ttdeci">TimeDelta HKU_UTILS_API UTCOffset()</div><div class="ttdoc">Get the current UTC time offset of the local machine</div></div>
+<div class="ttc" id="anamespacehku_html_aa48185c3715bc6f1e0db31321f58d74f"><div class="ttname"><a href="namespacehku.html#aa48185c3715bc6f1e0db31321f58d74f">hku::operator&gt;=</a></div><div class="ttdeci">HKU_API Indicator operator&gt;=(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_aa74c97f1ed51afeb207a8a1f591423af"><div class="ttname"><a href="namespacehku.html#aa74c97f1ed51afeb207a8a1f591423af">hku::operator&lt;=</a></div><div class="ttdeci">HKU_API Indicator operator&lt;=(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_af40b4dac3e9bd98b9ac49632d4d4b1f1"><div class="ttname"><a href="namespacehku.html#af40b4dac3e9bd98b9ac49632d4d4b1f1">hku::operator-</a></div><div class="ttdeci">HKU_API Indicator operator-(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="anamespacestd_html_ab01df1f6515bec5ca434fba5f0b3d0de"><div class="ttname"><a href="namespacestd.html#ab01df1f6515bec5ca434fba5f0b3d0de">std::to_string</a></div><div class="ttdeci">string to_string(const hku::Indicator &amp;ind)</div><div class="ttdef"><b>定义</b> Indicator.h:538</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6c023aab3947d59a55643624239cd0f6.html">datetime</a></li><li class="navelem"><b>TimeDelta.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

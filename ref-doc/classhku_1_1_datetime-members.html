@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_datetime.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,51 +74,109 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">hku::Datetime 成员列表</div>  </div>
+  <div class="headertitle"><div class="title">hku::Datetime 成员列表</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>成员的完整列表，这些成员属于 <a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a>,包括所有继承而来的类成员</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a7138f0d3c15d315c2409a7ae16b4e839">date</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a860ec98845685546511f10ce65d2e242">Datetime</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ad03ca87c8e59e97714e96f8f02f37bee">Datetime</a>(const Datetime &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#adf38738cc2315801adcd49e694d4247c">Datetime</a>(int year, int month, int day, int hh=0, int mm=0, int sec=0)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a613aac38aafa80b255c60ce98b7b2d68">Datetime</a>(const bd::date &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a7e119ab0999267d3724b9a03273c150c">Datetime</a>(const bt::ptime &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#acbe2993496da9d8d15cf44703faf48a5">Datetime</a>(unsigned long long)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#abbde993605695b8337d5cf01b5dfd5e9">Datetime</a>(const std::string &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a14f7041ce8ea7475bdae3d4294783e50">day</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a84780e0f23beb6cbec4116a60a805925">hour</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a1dc83e34e56842596105a78934c8a5be">max</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a0f88d3517ddaef614cef7d455826cfb7">min</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a12846abc6c6fcb9ea1884d437cb65911">minute</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a43074f7909e6b00c277b7e0a0f6e6220">month</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af1524d543b6836d229fe177989c35162">now</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aeaa91f76b2994cb6a89520d581816341">number</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#acbdc7a3291297361c93a76d61ee072f1">ptime</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a941c84fbbdcf35091541b06568dd8031">second</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a0da04172de09c50bf5f081aaefae5ca9">toString</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a95fe099da4885c4e349cdf48a26a73e2">year</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a93f7a48d426e3de3bfde7303c969d39e">date</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a733a7111d82cd3e8e20fed2e1989b891">dateOfWeek</a>(int day) const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a860ec98845685546511f10ce65d2e242">Datetime</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ad03ca87c8e59e97714e96f8f02f37bee">Datetime</a>(const Datetime &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a4f9b6ca9080f56216fa7ab1fa9b26d04">Datetime</a>(long year, long month, long day, long hh=0, long mm=0, long sec=0, long millisec=0, long microsec=0)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a613aac38aafa80b255c60ce98b7b2d68">Datetime</a>(const bd::date &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a7e119ab0999267d3724b9a03273c150c">Datetime</a>(const bt::ptime &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#acbe2993496da9d8d15cf44703faf48a5">Datetime</a>(unsigned long long)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#abbde993605695b8337d5cf01b5dfd5e9">Datetime</a>(const std::string &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a3c7fdd66d9c1b2a30ae9446c2d35828b">day</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aed83b74f7ba67a1b22de52a1fcc80129">dayOfWeek</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ae76c0eaaa7003d4f4daaa3dd662f7b58">dayOfYear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aba175ef682f4c47432e847c30c7972c9">endOfDay</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af6d679f6ae5c7bd9de36621c03b2faf9">endOfHalfyear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a3a898e7fb6b8ea2479de44abac18e1a3">endOfMonth</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a256433e20f84f8e0577098306f672280">endOfQuarter</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a065157ae7971486d1f89dc6ada60ce26">endOfWeek</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a90043e1c0141fcc25fe8261f9ea1a4fb">endOfYear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af488182c1b109b76823d99d8950e33b8">fromHex</a>(uint64_t time)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ae250207a19516551a46d1757baae8750">fromLocalTime</a>(std::chrono::local_time&lt; Duration &gt; local_time)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">static</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ae09a551d32f26c3f7b857b0262690572">fromTimePointUTC</a>(std::chrono::time_point&lt; Clock, Duration &gt; time_point)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">static</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af36ca17e3dd57eb88680d886cf18896b">fromTimestamp</a>(int64_t timestamp)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aac4977b30d8648521b35fc0705cc27d1">fromTimestampUTC</a>(int64_t timestamp)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a0b688a2c9c9d6c22c4790f8056239870">hex</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a5873e0a514e211aeb31cdbd52d5c403d">hour</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a640604a1d089417e13ba1b349290f87e">isNull</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a2016c6d99dd992305361023a4e7db32e">max</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aac5cb9094b8e84f85b90d69c5ce6acc9">microsecond</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aba4bc84c03010e985b7674ae938a2ca8">millisecond</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a7bcda9336692499ddbe71bdb66c7acad">min</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a4b4e8b3abd0e71269d4267fb78a273b2">minute</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ac37ce81598d4bca9cdf2ad834fadec0c">month</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a21dd3f71cf2cad0df6880d3be8675fa1">nextDay</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af2acbf81ee2029b553f4a34c3b9644c3">nextHalfyear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ab3e8b194e0b644089a2436f7e11ed3e5">nextMonth</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a1c55442e4ab749bcf277b38538e11c2c">nextQuarter</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a0680b8813326c8be6d75f39bfabc861d">nextWeek</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a15b8f6b42ac64f6ad3861fc6a180ae1f">nextYear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a3a8b7bc02a8f268dd75b05010117df3f">now</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#abebfd4c593ec71dfd216c30be6c9c322">number</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a0cf335ae4735276f83562d58e9834a9b">operator+</a>(TimeDelta d) const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ac09b98ac18a9352b8c0672d14d9fd0c3">operator+</a>(std::chrono::duration&lt; Rep, Period &gt; duration) const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a2a52f8330c115f4965925ef3e5a3d5e0">operator-</a>(TimeDelta d) const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a6df6d7321bf2e371f3bef6a50aae5f0e">operator-</a>(std::chrono::duration&lt; Rep, Period &gt; duration) const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aa5b5d255f9fcec5262ce927672a92130">operator=</a>(const Datetime &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af844900b8b1249c4a445ea018ea03592">preDay</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a31c10404b8af8d4a09e93dbfb0f533d2">preHalfyear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ac21b7391888370e1ed1391a0af151422">preMonth</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aa8663302923434e1b6dae5fd7365b54a">preQuarter</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af81bfeb206325e155d04c2b2864e66dd">preWeek</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ab58c42cb45e940e707fe305c5115aad5">preYear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a870093ed7fadbabd5157b6a0e8e0cfb2">ptime</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a55869c9ae4bd99659b241fa2604b488b">repr</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a5e1773128c40a9954ab68a4e19ad5f22">second</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a43aa60a6190ebd5e585d3f0c03b17858">startOfDay</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a44d758f7a024e6d82f597558c4aa2f38">startOfHalfyear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a698d90bcbf732c9d875f15634547e80f">startOfMonth</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a88f6636a9f69c05e3c3f2e6b480d4abd">startOfQuarter</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a8c8a4b2d8feef60a31272ea0fed30725">startOfWeek</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a040c42a0c721d305acf72d9e51d50a21">startOfYear</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a57a3ca27af692556d18634febc59fe0d">str</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aa46496aa7b150e57018405a55d3ae4d5">ticks</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a212bb61d2114684f9a62727de23ac76c">timestamp</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a86ab326b06699a2c74aa48e599aa2334">timestampUTC</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a0370f39b9df87745c22616285396a8e3">to_local_time</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a7fc99dea7ed7540a927d1e8d1c892bc0">to_time_t</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#af8b73f4abe7857bec2d947653eb92dd6">today</a>()</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a9e4a9f377df71bbf69992eb9efd6784e">year</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#add648aba83eeb7d7ac132004a9c64429">ym</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#ae2d25eff528ec6b6781a776a7591fc86">ymd</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#adc918350219f93ecd5c4adc6d06d4f5a">ymdh</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#aa769ee20621c6de4015a1a08bf83ba5a">ymdhm</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_datetime.html#a1bda670438b048b60ca6df5c0aa037fe">ymdhms</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

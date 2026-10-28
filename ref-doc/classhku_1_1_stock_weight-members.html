@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_stock_weight.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,42 +74,48 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">hku::StockWeight 成员列表</div>  </div>
+  <div class="headertitle"><div class="title">hku::StockWeight 成员列表</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>成员的完整列表，这些成员属于 <a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a>,包括所有继承而来的类成员</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a002618249590494252ea634e5e7a86f7">bonus</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a7e6d5d8d002c913f1d08ae8f9b4cb955">countAsGift</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a2416b8c669c3d1924cd8edf1905988cd">countForSell</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#ad3edbe7bf2c4e670c9bf17e0e66874db">freeCount</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a008a28578d46df354456de52d1a270dd">increasement</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#ac0d52be6a298749421f9a98e783a97de">StockWeight</a>()</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a4ca65c575e97d3f53fea1173f18fea4b">StockWeight</a>(const Datetime &amp;datetime)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a81b9141151895dae0cb6107adb16618d">StockWeight</a>(const Datetime &amp;datetime, price_t countAsGift, price_t countForSell, price_t priceForSell, price_t bonus, price_t increasement, price_t totalCount, price_t freeCount)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a726068ac395a663b931946039c2454ab">totalCount</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#aa7c12a59a6ccd8e2ae1e38a33f05e010">bonus</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a84380d7726837ceafe7cb3fbce4464d6">countAsGift</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a06f4e20ba390ed311642a72a1ad51402">countForSell</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a051633a5a446540b7f44150b9902a4d0">datetime</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a5004cf8e9d2bf572df5ae28f27337d66">freeCount</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a21304773c2581dc90507aa1b41273bee">increasement</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a47f66c066f945a1d3878f147b154f19b">priceForSell</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a81f9f85da803ce31dc85db642c28ef9b">StockWeight</a>()=default</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a4ca65c575e97d3f53fea1173f18fea4b">StockWeight</a>(const Datetime &amp;datetime)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a65a73b7dd6848a886332b212c70db2b9">StockWeight</a>(const Datetime &amp;datetime, price_t countAsGift, price_t countForSell, price_t priceForSell, price_t bonus, price_t increasement, price_t totalCount, price_t freeCount, price_t suogu)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a5956013388e64b71dd5fd670118776a0">suogu</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a052ac20f7ac7d27a97826d433fc6b3b5">totalCount</a>() const noexcept</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

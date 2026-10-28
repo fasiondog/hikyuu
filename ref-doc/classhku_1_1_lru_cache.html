@@ -1,0 +1,841 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::LruCache&lt; KeyType, ValueType, Lock &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_lru_cache.html','','classhku_1_1_lru_cache-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::LruCache&lt; KeyType, ValueType, Lock &gt; 模板类 参考<span class="mlabels"><span class="mlabel final">final</span></span></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>LRU (Least Recently Used) Cache implementation (not a strictly defined LRU, in order to improve the concurrent reading performance)  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_lru_cache_8h_source.html">LruCache.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a6d6c28dc2363b8ac3c163770fac45503" id="r_a6d6c28dc2363b8ac3c163770fac45503"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> = KeyType</td></tr>
+<tr class="memitem:a87667a306a0ff8dd7df0312564bd87c4" id="r_a87667a306a0ff8dd7df0312564bd87c4"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> = ValueType</td></tr>
+<tr class="memitem:aff7f6eee6e1fd5c7a9faa2a28fce85b2" id="r_aff7f6eee6e1fd5c7a9faa2a28fce85b2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> = size_t</td></tr>
+<tr class="memitem:acc2b876d2ad307b4d2056c5af46ed5cd" id="r_acc2b876d2ad307b4d2056c5af46ed5cd"><td class="memItemLeft" align="right" valign="top">typedef Lock&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc2b876d2ad307b4d2056c5af46ed5cd">lock_type</a></td></tr>
+<tr class="memitem:ae241e326a28fd407a3fecab40d94d30d" id="r_ae241e326a28fd407a3fecab40d94d30d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae241e326a28fd407a3fecab40d94d30d">UniqueGuard</a> = std::unique_lock&lt;<a class="el" href="#acc2b876d2ad307b4d2056c5af46ed5cd">lock_type</a>&gt;</td></tr>
+<tr class="memitem:acf395d8ef56efa0043074487a9ee4f43" id="r_acf395d8ef56efa0043074487a9ee4f43"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf395d8ef56efa0043074487a9ee4f43">SharedGuard</a> = std::shared_lock&lt;<a class="el" href="#acc2b876d2ad307b4d2056c5af46ed5cd">lock_type</a>&gt;</td></tr>
+<tr class="memitem:af4b06ec2d8a6c413e50f65a451c3c447" id="r_af4b06ec2d8a6c413e50f65a451c3c447"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4b06ec2d8a6c413e50f65a451c3c447">CacheValue</a> = std::pair&lt;<a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a>, std::atomic&lt;bool&gt;&gt;</td></tr>
+<tr class="memitem:a87f871ba06c64547c0ed8e72701d3894" id="r_a87f871ba06c64547c0ed8e72701d3894"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87f871ba06c64547c0ed8e72701d3894">LruList</a> = std::list&lt;<a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a>&gt;</td></tr>
+<tr class="memitem:a69ab022ca1e862f5e63e1d0c9c58514b" id="r_a69ab022ca1e862f5e63e1d0c9c58514b"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69ab022ca1e862f5e63e1d0c9c58514b">CacheMap</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a6cd182342814a3c7d066bc664699498b" id="r_a6cd182342814a3c7d066bc664699498b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6cd182342814a3c7d066bc664699498b">LruCache</a> (<a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="#a20b464b1703160879d1f8d81aff160fd">capacity</a>=64, <a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="#ac2b1af4fa32e97cb89d34f62dd6ce79a">overflow</a>=8)</td></tr>
+<tr class="memdesc:a6cd182342814a3c7d066bc664699498b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:a426b00319a35b22d51100ab3eb5aaa18" id="r_a426b00319a35b22d51100ab3eb5aaa18"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a426b00319a35b22d51100ab3eb5aaa18">~LruCache</a> ()</td></tr>
+<tr class="memitem:afaff0ed91fc758c3d4330e8f47a9bdb1" id="r_afaff0ed91fc758c3d4330e8f47a9bdb1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afaff0ed91fc758c3d4330e8f47a9bdb1">insert</a> (const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;key, const <a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> &amp;value)</td></tr>
+<tr class="memdesc:afaff0ed91fc758c3d4330e8f47a9bdb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a key-value pair  <br /></td></tr>
+<tr class="memitem:a133dcc53704119aec652504fd63f83bc" id="r_a133dcc53704119aec652504fd63f83bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a133dcc53704119aec652504fd63f83bc">insert</a> (const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;key, <a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> &amp;&amp;value)</td></tr>
+<tr class="memdesc:a133dcc53704119aec652504fd63f83bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a key-value pair (the move version)  <br /></td></tr>
+<tr class="memitem:aea0bf43f8dbad145b9387726a7344921" id="r_aea0bf43f8dbad145b9387726a7344921"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea0bf43f8dbad145b9387726a7344921">get</a> (const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;key)</td></tr>
+<tr class="memdesc:aea0bf43f8dbad145b9387726a7344921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value corresponding to the key  <br /></td></tr>
+<tr class="memitem:a27540754ec64eb409cac672bfdc3adba" id="r_a27540754ec64eb409cac672bfdc3adba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a27540754ec64eb409cac672bfdc3adba">tryGet</a> (const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;key, <a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> &amp;value)</td></tr>
+<tr class="memdesc:a27540754ec64eb409cac672bfdc3adba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to get the value corresponding to the key  <br /></td></tr>
+<tr class="memitem:a46bf695787bedab28ad8b9213874af03" id="r_a46bf695787bedab28ad8b9213874af03"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46bf695787bedab28ad8b9213874af03">contains</a> (const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;key)</td></tr>
+<tr class="memdesc:a46bf695787bedab28ad8b9213874af03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether the given key is contained  <br /></td></tr>
+<tr class="memitem:adc59b93fb226444e400297793e81bc54" id="r_adc59b93fb226444e400297793e81bc54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc59b93fb226444e400297793e81bc54">remove</a> (const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;key)</td></tr>
+<tr class="memdesc:adc59b93fb226444e400297793e81bc54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the given key  <br /></td></tr>
+<tr class="memitem:a282acc0820c5eb6e994afa6c1311a182" id="r_a282acc0820c5eb6e994afa6c1311a182"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a282acc0820c5eb6e994afa6c1311a182">clear</a> ()</td></tr>
+<tr class="memdesc:a282acc0820c5eb6e994afa6c1311a182"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the cache  <br /></td></tr>
+<tr class="memitem:a4fc624c58f61c821a394738697324a5d" id="r_a4fc624c58f61c821a394738697324a5d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4fc624c58f61c821a394738697324a5d">size</a> () const</td></tr>
+<tr class="memdesc:a4fc624c58f61c821a394738697324a5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current size of the cache  <br /></td></tr>
+<tr class="memitem:a87ad65f8918d96356952f8579af7a583" id="r_a87ad65f8918d96356952f8579af7a583"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87ad65f8918d96356952f8579af7a583">empty</a> () const</td></tr>
+<tr class="memdesc:a87ad65f8918d96356952f8579af7a583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether the cache is empty  <br /></td></tr>
+<tr class="memitem:a20b464b1703160879d1f8d81aff160fd" id="r_a20b464b1703160879d1f8d81aff160fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20b464b1703160879d1f8d81aff160fd">capacity</a> () const</td></tr>
+<tr class="memdesc:a20b464b1703160879d1f8d81aff160fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the cache capacity  <br /></td></tr>
+<tr class="memitem:ac2b1af4fa32e97cb89d34f62dd6ce79a" id="r_ac2b1af4fa32e97cb89d34f62dd6ce79a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2b1af4fa32e97cb89d34f62dd6ce79a">overflow</a> () const</td></tr>
+<tr class="memdesc:ac2b1af4fa32e97cb89d34f62dd6ce79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the cache overflow capacity  <br /></td></tr>
+<tr class="memitem:a17497ad720d10a99bcdad0d80a886e38" id="r_a17497ad720d10a99bcdad0d80a886e38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a17497ad720d10a99bcdad0d80a886e38">resize</a> (<a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="#a20b464b1703160879d1f8d81aff160fd">capacity</a>)</td></tr>
+<tr class="memdesc:a17497ad720d10a99bcdad0d80a886e38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the cache capacity  <br /></td></tr>
+<tr class="memitem:a9bede80aa72ebdd274420c0414a2365f" id="r_a9bede80aa72ebdd274420c0414a2365f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9bede80aa72ebdd274420c0414a2365f">setOverflow</a> (<a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="#ac2b1af4fa32e97cb89d34f62dd6ce79a">overflow</a>)</td></tr>
+<tr class="memdesc:a9bede80aa72ebdd274420c0414a2365f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the cache overflow capacity  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt;<br />
+class hku::LruCache&lt; KeyType, ValueType, Lock &gt;</div><p>LRU (Least Recently Used) Cache implementation (not a strictly defined LRU, in order to improve the concurrent reading performance) </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">KeyType</td><td>the key type, it must support hashing and equality comparison </td></tr>
+    <tr><td class="paramname">ValueType</td><td>the value type, it must support the copy and move operations </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a69ab022ca1e862f5e63e1d0c9c58514b" name="a69ab022ca1e862f5e63e1d0c9c58514b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69ab022ca1e862f5e63e1d0c9c58514b">&#9670;&#160;</a></span>CacheMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::CacheMap</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>初始值:</b><div class="fragment"><div class="line"> </div>
+<div class="line">      std::unordered_map&lt;key_type, std::pair&lt;typename LruList::iterator, CacheValue&gt;&gt;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af4b06ec2d8a6c413e50f65a451c3c447" name="af4b06ec2d8a6c413e50f65a451c3c447"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4b06ec2d8a6c413e50f65a451c3c447">&#9670;&#160;</a></span>CacheValue</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::CacheValue = std::pair&lt;<a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a>, std::atomic&lt;bool&gt;&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6d6c28dc2363b8ac3c163770fac45503" name="a6d6c28dc2363b8ac3c163770fac45503"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d6c28dc2363b8ac3c163770fac45503">&#9670;&#160;</a></span>key_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::key_type = KeyType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acc2b876d2ad307b4d2056c5af46ed5cd" name="acc2b876d2ad307b4d2056c5af46ed5cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc2b876d2ad307b4d2056c5af46ed5cd">&#9670;&#160;</a></span>lock_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Lock <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::lock_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87f871ba06c64547c0ed8e72701d3894" name="a87f871ba06c64547c0ed8e72701d3894"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87f871ba06c64547c0ed8e72701d3894">&#9670;&#160;</a></span>LruList</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::LruList = std::list&lt;<a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acf395d8ef56efa0043074487a9ee4f43" name="acf395d8ef56efa0043074487a9ee4f43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf395d8ef56efa0043074487a9ee4f43">&#9670;&#160;</a></span>SharedGuard</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::SharedGuard = std::shared_lock&lt;<a class="el" href="#acc2b876d2ad307b4d2056c5af46ed5cd">lock_type</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff7f6eee6e1fd5c7a9faa2a28fce85b2" name="aff7f6eee6e1fd5c7a9faa2a28fce85b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">&#9670;&#160;</a></span>size_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::size_type = size_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae241e326a28fd407a3fecab40d94d30d" name="ae241e326a28fd407a3fecab40d94d30d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae241e326a28fd407a3fecab40d94d30d">&#9670;&#160;</a></span>UniqueGuard</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::UniqueGuard = std::unique_lock&lt;<a class="el" href="#acc2b876d2ad307b4d2056c5af46ed5cd">lock_type</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87667a306a0ff8dd7df0312564bd87c4" name="a87667a306a0ff8dd7df0312564bd87c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87667a306a0ff8dd7df0312564bd87c4">&#9670;&#160;</a></span>value_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::value_type = ValueType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a6cd182342814a3c7d066bc664699498b" name="a6cd182342814a3c7d066bc664699498b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cd182342814a3c7d066bc664699498b">&#9670;&#160;</a></span>LruCache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::LruCache </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a></td>          <td class="paramname"><span class="paramname"><em>capacity</em></span><span class="paramdefsep"> = </span><span class="paramdefval">64</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a></td>          <td class="paramname"><span class="paramname"><em>overflow</em></span><span class="paramdefsep"> = </span><span class="paramdefval">8</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">capacity</td><td>cache capacity, 64 by default; 0 means an unlimited capacity </td></tr>
+    <tr><td class="paramname">overflow</td><td>overflow capacity, 8 by default; it allows the cache to temporarily exceed the given capacity The eviction mechanism is triggered only when the cache size &gt;= the capacity + the overflow capacity </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a426b00319a35b22d51100ab3eb5aaa18" name="a426b00319a35b22d51100ab3eb5aaa18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a426b00319a35b22d51100ab3eb5aaa18">&#9670;&#160;</a></span>~LruCache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::~<a class="el" href="classhku_1_1_lru_cache.html">LruCache</a> </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a20b464b1703160879d1f8d81aff160fd" name="a20b464b1703160879d1f8d81aff160fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20b464b1703160879d1f8d81aff160fd">&#9670;&#160;</a></span>capacity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::capacity </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the cache capacity </p>
+<dl class="section return"><dt>返回</dt><dd>cache capacity </dd></dl>
+
+</div>
+</div>
+<a id="a282acc0820c5eb6e994afa6c1311a182" name="a282acc0820c5eb6e994afa6c1311a182"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a282acc0820c5eb6e994afa6c1311a182">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear the cache </p>
+
+</div>
+</div>
+<a id="a46bf695787bedab28ad8b9213874af03" name="a46bf695787bedab28ad8b9213874af03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46bf695787bedab28ad8b9213874af03">&#9670;&#160;</a></span>contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::contains </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check whether the given key is contained </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>key </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true is returned if it exists, otherwise false </dd></dl>
+
+</div>
+</div>
+<a id="a87ad65f8918d96356952f8579af7a583" name="a87ad65f8918d96356952f8579af7a583"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87ad65f8918d96356952f8579af7a583">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check whether the cache is empty </p>
+<dl class="section return"><dt>返回</dt><dd>true is returned when it is empty, otherwise false </dd></dl>
+
+</div>
+</div>
+<a id="aea0bf43f8dbad145b9387726a7344921" name="aea0bf43f8dbad145b9387726a7344921"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea0bf43f8dbad145b9387726a7344921">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::get </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the value corresponding to the key </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>key </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the value is returned if it exists, otherwise the default constructed value of ValueType is returned </dd></dl>
+
+</div>
+</div>
+<a id="afaff0ed91fc758c3d4330e8f47a9bdb1" name="afaff0ed91fc758c3d4330e8f47a9bdb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afaff0ed91fc758c3d4330e8f47a9bdb1">&#9670;&#160;</a></span>insert() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::insert </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Insert a key-value pair </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>key </td></tr>
+    <tr><td class="paramname">value</td><td>value </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a133dcc53704119aec652504fd63f83bc" name="a133dcc53704119aec652504fd63f83bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a133dcc53704119aec652504fd63f83bc">&#9670;&#160;</a></span>insert() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::insert </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Insert a key-value pair (the move version) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>key </td></tr>
+    <tr><td class="paramname">value</td><td>value (an rvalue reference) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac2b1af4fa32e97cb89d34f62dd6ce79a" name="ac2b1af4fa32e97cb89d34f62dd6ce79a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2b1af4fa32e97cb89d34f62dd6ce79a">&#9670;&#160;</a></span>overflow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::overflow </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the cache overflow capacity </p>
+<dl class="section return"><dt>返回</dt><dd>cache overflow capacity </dd></dl>
+
+</div>
+</div>
+<a id="adc59b93fb226444e400297793e81bc54" name="adc59b93fb226444e400297793e81bc54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc59b93fb226444e400297793e81bc54">&#9670;&#160;</a></span>remove()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::remove </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Delete the given key </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>the key to be deleted </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true is returned on a successful deletion, false when it does not exist </dd></dl>
+
+</div>
+</div>
+<a id="a17497ad720d10a99bcdad0d80a886e38" name="a17497ad720d10a99bcdad0d80a886e38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17497ad720d10a99bcdad0d80a886e38">&#9670;&#160;</a></span>resize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::resize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a></td>          <td class="paramname"><span class="paramname"><em>capacity</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the cache capacity </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">capacity</td><td>the new capacity; 0 means an unlimited capacity </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9bede80aa72ebdd274420c0414a2365f" name="a9bede80aa72ebdd274420c0414a2365f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bede80aa72ebdd274420c0414a2365f">&#9670;&#160;</a></span>setOverflow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::setOverflow </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a></td>          <td class="paramname"><span class="paramname"><em>overflow</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the cache overflow capacity </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">overflow</td><td>the new overflow capacity </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4fc624c58f61c821a394738697324a5d" name="a4fc624c58f61c821a394738697324a5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fc624c58f61c821a394738697324a5d">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#aff7f6eee6e1fd5c7a9faa2a28fce85b2">size_type</a> <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current size of the cache </p>
+<dl class="section return"><dt>返回</dt><dd>the current number of the cache elements </dd></dl>
+
+</div>
+</div>
+<a id="a27540754ec64eb409cac672bfdc3adba" name="a27540754ec64eb409cac672bfdc3adba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27540754ec64eb409cac672bfdc3adba">&#9670;&#160;</a></span>tryGet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename KeyType, typename ValueType, class Lock = NullLock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_lru_cache.html">hku::LruCache</a>&lt; KeyType, ValueType, Lock &gt;::tryGet </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a6d6c28dc2363b8ac3c163770fac45503">key_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a87667a306a0ff8dd7df0312564bd87c4">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to get the value corresponding to the key </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>key </td></tr>
+    <tr><td class="paramname">value</td><td>the reference parameter used to receive the value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true is returned if the key exists, otherwise false </dd></dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_lru_cache_8h_source.html">LruCache.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_lru_cache.html">LruCache</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

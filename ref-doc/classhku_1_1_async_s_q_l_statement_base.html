@@ -1,0 +1,1803 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::AsyncSQLStatementBase类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_async_s_q_l_statement_base.html','','classhku_1_1_async_s_q_l_statement_base-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::AsyncSQLStatementBase类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___d_b_connect.html">DB Connect database connection</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Base class of the asynchronous SQL statement  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_async_s_q_l_statement_base_8h_source.html">AsyncSQLStatementBase.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::AsyncSQLStatementBase 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_async_s_q_l_statement_base__inherit__graph.png" border="0" usemap="#ahku_1_1_async_s_q_l_statement_base_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::AsyncSQLStatementBase 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_async_s_q_l_statement_base__coll__graph.png" border="0" usemap="#ahku_1_1_async_s_q_l_statement_base_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a8b22b7fa76e2d51cea827c81f567919d" id="r_a8b22b7fa76e2d51cea827c81f567919d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b22b7fa76e2d51cea827c81f567919d">AsyncSQLStatementBase</a> (<a class="el" href="classhku_1_1_async_d_b_connect_base.html">AsyncDBConnectBase</a> *driver, const std::string &amp;sql_statement)</td></tr>
+<tr class="memdesc:a8b22b7fa76e2d51cea827c81f567919d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:adc518a0a1171de544dc9a3966e026a1f" id="r_adc518a0a1171de544dc9a3966e026a1f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc518a0a1171de544dc9a3966e026a1f">~AsyncSQLStatementBase</a> ()=default</td></tr>
+<tr class="memitem:a0fd8803b6072777df115aed80a72b4fd" id="r_a0fd8803b6072777df115aed80a72b4fd"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0fd8803b6072777df115aed80a72b4fd">getSqlString</a> () const</td></tr>
+<tr class="memdesc:a0fd8803b6072777df115aed80a72b4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the expression SQL statement passed at construction  <br /></td></tr>
+<tr class="memitem:acf49c99d215367b50a4dd2e17602302b" id="r_acf49c99d215367b50a4dd2e17602302b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_async_d_b_connect_base.html">AsyncDBConnectBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf49c99d215367b50a4dd2e17602302b">getConnect</a> () const</td></tr>
+<tr class="memdesc:acf49c99d215367b50a4dd2e17602302b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data driver  <br /></td></tr>
+<tr class="memitem:aa60e60f4e8200b281f01540d6db1e05b" id="r_aa60e60f4e8200b281f01540d6db1e05b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa60e60f4e8200b281f01540d6db1e05b">exec</a> ()</td></tr>
+<tr class="memdesc:aa60e60f4e8200b281f01540d6db1e05b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the SQL  <br /></td></tr>
+<tr class="memitem:acd61848cc3efb1d173cc96295719ff4b" id="r_acd61848cc3efb1d173cc96295719ff4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd61848cc3efb1d173cc96295719ff4b">moveNext</a> ()</td></tr>
+<tr class="memdesc:acd61848cc3efb1d173cc96295719ff4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move to the next result  <br /></td></tr>
+<tr class="memitem:a87cdaaaace24e64e79d0ea049982e84b" id="r_a87cdaaaace24e64e79d0ea049982e84b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87cdaaaace24e64e79d0ea049982e84b">getLastRowid</a> ()</td></tr>
+<tr class="memdesc:a87cdaaaace24e64e79d0ea049982e84b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the rowid of the last record inserted by the INSERT execution, it is not thread safe  <br /></td></tr>
+<tr class="memitem:a3033561df74e01bb222b743874244827" id="r_a3033561df74e01bb222b743874244827"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3033561df74e01bb222b743874244827">getColumn</a> (int idx, double &amp;item)</td></tr>
+<tr class="memdesc:a3033561df74e01bb222b743874244827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data given by idx into item.  <br /></td></tr>
+<tr class="memitem:a0c30c0f360c6f67d6fbed9f40d6818f7" id="r_a0c30c0f360c6f67d6fbed9f40d6818f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0c30c0f360c6f67d6fbed9f40d6818f7">getColumn</a> (int idx, float &amp;item)</td></tr>
+<tr class="memdesc:a0c30c0f360c6f67d6fbed9f40d6818f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data given by idx into item  <br /></td></tr>
+<tr class="memitem:a685138cc26c2852228192a1156ffeae0" id="r_a685138cc26c2852228192a1156ffeae0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a685138cc26c2852228192a1156ffeae0">getColumn</a> (int idx, std::string &amp;item)</td></tr>
+<tr class="memdesc:a685138cc26c2852228192a1156ffeae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data given by idx into item  <br /></td></tr>
+<tr class="memitem:a1fbd8d8e504aab242aa8f339c96d49e4" id="r_a1fbd8d8e504aab242aa8f339c96d49e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fbd8d8e504aab242aa8f339c96d49e4">getColumn</a> (int idx, <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;item)</td></tr>
+<tr class="memdesc:a1fbd8d8e504aab242aa8f339c96d49e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data given by idx into item  <br /></td></tr>
+<tr class="memitem:aaa5e9763186a4e43a67a832d6f932c00" id="r_aaa5e9763186a4e43a67a832d6f932c00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa5e9763186a4e43a67a832d6f932c00">getColumn</a> (int idx, std::vector&lt; char &gt; &amp;item)</td></tr>
+<tr class="memitem:afce76a37c16faafb857330769fc400c5" id="r_afce76a37c16faafb857330769fc400c5"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:afce76a37c16faafb857330769fc400c5 template"><td class="memItemLeft" align="right" valign="top">std::enable_if&lt; std::numeric_limits&lt; T &gt;::is_integer &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afce76a37c16faafb857330769fc400c5">getColumn</a> (int idx, T &amp;item)</td></tr>
+<tr class="memdesc:afce76a37c16faafb857330769fc400c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data given by idx into item  <br /></td></tr>
+<tr class="memitem:afce76a37c16faafb857330769fc400c5" id="r_afce76a37c16faafb857330769fc400c5"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:afce76a37c16faafb857330769fc400c5 template"><td class="memItemLeft" align="right" valign="top">std::enable_if&lt;!std::numeric_limits&lt; T &gt;::is_integer &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afce76a37c16faafb857330769fc400c5">getColumn</a> (int idx, T &amp;item)</td></tr>
+<tr class="memdesc:afce76a37c16faafb857330769fc400c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the data given by idx into item  <br /></td></tr>
+<tr class="memitem:a8da269d3a9a2135bfdc09942ebd224a9" id="r_a8da269d3a9a2135bfdc09942ebd224a9"><td class="memTemplParams" colspan="2">template&lt;typename T, typename... Args&gt; </td></tr>
+<tr class="memitem:a8da269d3a9a2135bfdc09942ebd224a9 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8da269d3a9a2135bfdc09942ebd224a9">getColumn</a> (int idx, T &amp;item, Args &amp;...rest)</td></tr>
+<tr class="memdesc:a8da269d3a9a2135bfdc09942ebd224a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the given data into item1, item2 and item3 sequentially starting from the given idx  <br /></td></tr>
+<tr class="memitem:a3ec69bfde68d4a035845425faa198663" id="r_a3ec69bfde68d4a035845425faa198663"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ec69bfde68d4a035845425faa198663">bind</a> (int idx)</td></tr>
+<tr class="memdesc:a3ec69bfde68d4a035845425faa198663"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind null to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:af9253be8e2edc0248013ac70b7c60465" id="r_af9253be8e2edc0248013ac70b7c60465"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af9253be8e2edc0248013ac70b7c60465">bind</a> (int idx, float item)</td></tr>
+<tr class="memdesc:af9253be8e2edc0248013ac70b7c60465"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:ab52decb83dd17159ed5e283012b70a7b" id="r_ab52decb83dd17159ed5e283012b70a7b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab52decb83dd17159ed5e283012b70a7b">bind</a> (int idx, double item)</td></tr>
+<tr class="memdesc:ab52decb83dd17159ed5e283012b70a7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:a1e062de0a114816750a96418ba6dfeab" id="r_a1e062de0a114816750a96418ba6dfeab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e062de0a114816750a96418ba6dfeab">bind</a> (int idx, const std::string &amp;item)</td></tr>
+<tr class="memdesc:a1e062de0a114816750a96418ba6dfeab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:af9e2abd3dceca0907d40f4fd65d4b4ed" id="r_af9e2abd3dceca0907d40f4fd65d4b4ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af9e2abd3dceca0907d40f4fd65d4b4ed">bind</a> (int idx, const char *item, size_t len)</td></tr>
+<tr class="memdesc:af9e2abd3dceca0907d40f4fd65d4b4ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the string type item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:a0150f152684ebfaf4a0d4acb5a7dff7f" id="r_a0150f152684ebfaf4a0d4acb5a7dff7f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0150f152684ebfaf4a0d4acb5a7dff7f">bind</a> (int idx, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;item)</td></tr>
+<tr class="memdesc:a0150f152684ebfaf4a0d4acb5a7dff7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> type item to the given SQL parameter  <br /></td></tr>
+<tr class="memitem:a6af0c70df87bfc9359812f3a132a505c" id="r_a6af0c70df87bfc9359812f3a132a505c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6af0c70df87bfc9359812f3a132a505c">bindBlob</a> (int idx, const std::string &amp;item)</td></tr>
+<tr class="memdesc:a6af0c70df87bfc9359812f3a132a505c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:a59b4406f042d99f6ae5889df06c16134" id="r_a59b4406f042d99f6ae5889df06c16134"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59b4406f042d99f6ae5889df06c16134">bindBlob</a> (int idx, const std::vector&lt; char &gt; &amp;time)</td></tr>
+<tr class="memdesc:a59b4406f042d99f6ae5889df06c16134"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:acc76285baaafa9ee1f5296c042493bb5" id="r_acc76285baaafa9ee1f5296c042493bb5"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:acc76285baaafa9ee1f5296c042493bb5 template"><td class="memItemLeft" align="right" valign="top">std::enable_if&lt; std::numeric_limits&lt; T &gt;::is_integer &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc76285baaafa9ee1f5296c042493bb5">bind</a> (int idx, const T &amp;item)</td></tr>
+<tr class="memdesc:acc76285baaafa9ee1f5296c042493bb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:acc76285baaafa9ee1f5296c042493bb5" id="r_acc76285baaafa9ee1f5296c042493bb5"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:acc76285baaafa9ee1f5296c042493bb5 template"><td class="memItemLeft" align="right" valign="top">std::enable_if&lt;!std::numeric_limits&lt; T &gt;::is_integer &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc76285baaafa9ee1f5296c042493bb5">bind</a> (int idx, const T &amp;item)</td></tr>
+<tr class="memdesc:acc76285baaafa9ee1f5296c042493bb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:af72e1baed5c091c38a2624a9ffad165f" id="r_af72e1baed5c091c38a2624a9ffad165f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af72e1baed5c091c38a2624a9ffad165f">bind</a> (int idx, const std::vector&lt; char &gt; &amp;item)</td></tr>
+<tr class="memitem:a756fd8946b2f5e8e771bac3fe2616da4" id="r_a756fd8946b2f5e8e771bac3fe2616da4"><td class="memTemplParams" colspan="2">template&lt;typename T, typename... Args&gt; </td></tr>
+<tr class="memitem:a756fd8946b2f5e8e771bac3fe2616da4 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a756fd8946b2f5e8e771bac3fe2616da4">bind</a> (int idx, const T &amp;, const Args &amp;...rest)</td></tr>
+<tr class="memdesc:a756fd8946b2f5e8e771bac3fe2616da4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind the value of item to the SQL parameter given by idx  <br /></td></tr>
+<tr class="memitem:a166e77df2d8e80ed288e73290277f03b" id="r_a166e77df2d8e80ed288e73290277f03b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a166e77df2d8e80ed288e73290277f03b">bind_params</a> (const <a class="el" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> &amp;params)</td></tr>
+<tr class="memdesc:a166e77df2d8e80ed288e73290277f03b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a full set of condition values to the anonymous placeholders of the statement, in order  <br /></td></tr>
+<tr class="memitem:a3ec5216fe0e7feef318dba634cc19f21" id="r_a3ec5216fe0e7feef318dba634cc19f21"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ec5216fe0e7feef318dba634cc19f21">getNumColumns</a> () const</td></tr>
+<tr class="memdesc:a3ec5216fe0e7feef318dba634cc19f21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of the table columns  <br /></td></tr>
+<tr class="memitem:aa513f91bc22571d6b3059be6ab40bfbe" id="r_aa513f91bc22571d6b3059be6ab40bfbe"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa513f91bc22571d6b3059be6ab40bfbe">sub_exec</a> ()=0</td></tr>
+<tr class="memdesc:aa513f91bc22571d6b3059be6ab40bfbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:aa38fb6e212519fe3b663f287238bc753" id="r_aa38fb6e212519fe3b663f287238bc753"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa38fb6e212519fe3b663f287238bc753">sub_moveNext</a> ()=0</td></tr>
+<tr class="memdesc:aa38fb6e212519fe3b663f287238bc753"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a93a193c0947fc8ac2114a0618072eac5" id="r_a93a193c0947fc8ac2114a0618072eac5"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93a193c0947fc8ac2114a0618072eac5">sub_getLastRowid</a> ()=0</td></tr>
+<tr class="memdesc:a93a193c0947fc8ac2114a0618072eac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a2b4c7113c57e7c0fcded7c6dfb0981a8" id="r_a2b4c7113c57e7c0fcded7c6dfb0981a8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b4c7113c57e7c0fcded7c6dfb0981a8">sub_bindNull</a> (int idx)=0</td></tr>
+<tr class="memdesc:a2b4c7113c57e7c0fcded7c6dfb0981a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a6f217ee50cecb95966fb5e1a5ade1b6c" id="r_a6f217ee50cecb95966fb5e1a5ade1b6c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f217ee50cecb95966fb5e1a5ade1b6c">sub_bindInt</a> (int idx, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> value)=0</td></tr>
+<tr class="memdesc:a6f217ee50cecb95966fb5e1a5ade1b6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a8e3faa8cf0e346acab13aa88001e067d" id="r_a8e3faa8cf0e346acab13aa88001e067d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e3faa8cf0e346acab13aa88001e067d">sub_bindUInt64</a> (int idx, <a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> value)</td></tr>
+<tr class="memdesc:a8e3faa8cf0e346acab13aa88001e067d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:af3ad726430a9a095f9c00c7f91007d79" id="r_af3ad726430a9a095f9c00c7f91007d79"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3ad726430a9a095f9c00c7f91007d79">sub_bindDouble</a> (int idx, double item)=0</td></tr>
+<tr class="memdesc:af3ad726430a9a095f9c00c7f91007d79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a5bf14fbe8acde39d7f3f15bcb95e751e" id="r_a5bf14fbe8acde39d7f3f15bcb95e751e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5bf14fbe8acde39d7f3f15bcb95e751e">sub_bindDatetime</a> (int idx, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;item)=0</td></tr>
+<tr class="memdesc:a5bf14fbe8acde39d7f3f15bcb95e751e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:ab1a9b42d72315d613b7feceb8b8c8935" id="r_ab1a9b42d72315d613b7feceb8b8c8935"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1a9b42d72315d613b7feceb8b8c8935">sub_bindText</a> (int idx, const std::string &amp;item)=0</td></tr>
+<tr class="memdesc:ab1a9b42d72315d613b7feceb8b8c8935"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:adff6ffbdf40fe2922f6c48ed24518096" id="r_adff6ffbdf40fe2922f6c48ed24518096"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adff6ffbdf40fe2922f6c48ed24518096">sub_bindText</a> (int idx, const char *item, size_t len)=0</td></tr>
+<tr class="memdesc:adff6ffbdf40fe2922f6c48ed24518096"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a39e8b066d86c35320dc6449e74f021ff" id="r_a39e8b066d86c35320dc6449e74f021ff"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39e8b066d86c35320dc6449e74f021ff">sub_bindBlob</a> (int idx, const std::string &amp;item)=0</td></tr>
+<tr class="memdesc:a39e8b066d86c35320dc6449e74f021ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:ab8a5452ec26ec1467f0fef0efadab799" id="r_ab8a5452ec26ec1467f0fef0efadab799"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8a5452ec26ec1467f0fef0efadab799">sub_bindBlob</a> (int idx, const std::vector&lt; char &gt; &amp;item)=0</td></tr>
+<tr class="memdesc:ab8a5452ec26ec1467f0fef0efadab799"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a34c3fa18202ca504144ee5f0a73e4003" id="r_a34c3fa18202ca504144ee5f0a73e4003"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34c3fa18202ca504144ee5f0a73e4003">sub_getNumColumns</a> () const =0</td></tr>
+<tr class="memdesc:a34c3fa18202ca504144ee5f0a73e4003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:ab850ca0123290237ed91f29092c0af66" id="r_ab850ca0123290237ed91f29092c0af66"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab850ca0123290237ed91f29092c0af66">sub_getColumnAsInt64</a> (int idx, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &amp;)=0</td></tr>
+<tr class="memdesc:ab850ca0123290237ed91f29092c0af66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:aae6fe8f469184c26c027f2e77366661b" id="r_aae6fe8f469184c26c027f2e77366661b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae6fe8f469184c26c027f2e77366661b">sub_getColumnAsUInt64</a> (int idx, <a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> &amp;item)</td></tr>
+<tr class="memdesc:aae6fe8f469184c26c027f2e77366661b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a7123c5f8aa9e0199d5d038b874daf20f" id="r_a7123c5f8aa9e0199d5d038b874daf20f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7123c5f8aa9e0199d5d038b874daf20f">sub_getColumnAsDouble</a> (int idx, double &amp;)=0</td></tr>
+<tr class="memdesc:a7123c5f8aa9e0199d5d038b874daf20f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:ad44455f62b6c20649306493313d1288b" id="r_ad44455f62b6c20649306493313d1288b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad44455f62b6c20649306493313d1288b">sub_getColumnAsDatetime</a> (int idx, <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;)=0</td></tr>
+<tr class="memdesc:ad44455f62b6c20649306493313d1288b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a6b93352628a35a2040232a6c847926fb" id="r_a6b93352628a35a2040232a6c847926fb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b93352628a35a2040232a6c847926fb">sub_getColumnAsText</a> (int idx, std::string &amp;)=0</td></tr>
+<tr class="memdesc:a6b93352628a35a2040232a6c847926fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a07a361eb775aa32c1009588454f67273" id="r_a07a361eb775aa32c1009588454f67273"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07a361eb775aa32c1009588454f67273">sub_getColumnAsBlob</a> (int idx, std::string &amp;)=0</td></tr>
+<tr class="memdesc:a07a361eb775aa32c1009588454f67273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+<tr class="memitem:a95f57f2c601c8854c1ffdd18bb16a7c3" id="r_a95f57f2c601c8854c1ffdd18bb16a7c3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95f57f2c601c8854c1ffdd18bb16a7c3">sub_getColumnAsBlob</a> (int idx, std::vector&lt; char &gt; &amp;)=0</td></tr>
+<tr class="memdesc:a95f57f2c601c8854c1ffdd18bb16a7c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected 属性</h2></td></tr>
+<tr class="memitem:a7f3fd2f57a5b886be94de29de2dd8c95" id="r_a7f3fd2f57a5b886be94de29de2dd8c95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_async_d_b_connect_base.html">AsyncDBConnectBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f3fd2f57a5b886be94de29de2dd8c95">m_driver</a></td></tr>
+<tr class="memdesc:a7f3fd2f57a5b886be94de29de2dd8c95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Database connection  <br /></td></tr>
+<tr class="memitem:abbfa984bf2a2c7f174518725c992bd36" id="r_abbfa984bf2a2c7f174518725c992bd36"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbfa984bf2a2c7f174518725c992bd36">m_sql_string</a></td></tr>
+<tr class="memdesc:abbfa984bf2a2c7f174518725c992bd36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Original SQL statement  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Base class of the asynchronous SQL statement </p>
+<p>It provides an asynchronous SQL statement execution interface based on the boost::asio coroutine. All the I/O operations (such as exec, moveNext and getColumn) return an awaitable.</p>
+<dl class="section note"><dt>注解</dt><dd>It keeps the same bind and getColumn interface design as <a class="el" href="classhku_1_1_s_q_l_statement_base.html" title="Base class of the SQL statement">SQLStatementBase</a> </dd>
+<dd>
+Only the I/O intensive operations are made asynchronous; the local operations such as the data binding stay synchronous </dd></dl>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a8b22b7fa76e2d51cea827c81f567919d" name="a8b22b7fa76e2d51cea827c81f567919d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b22b7fa76e2d51cea827c81f567919d">&#9670;&#160;</a></span>AsyncSQLStatementBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsyncSQLStatementBase::AsyncSQLStatementBase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_async_d_b_connect_base.html">AsyncDBConnectBase</a> *</td>          <td class="paramname"><span class="paramname"><em>driver</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>sql_statement</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">driver</td><td>database connection </td></tr>
+    <tr><td class="paramname">sql_statement</td><td>SQL statement </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adc518a0a1171de544dc9a3966e026a1f" name="adc518a0a1171de544dc9a3966e026a1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc518a0a1171de544dc9a3966e026a1f">&#9670;&#160;</a></span>~AsyncSQLStatementBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::AsyncSQLStatementBase::~AsyncSQLStatementBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a3ec69bfde68d4a035845425faa198663" name="a3ec69bfde68d4a035845425faa198663"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ec69bfde68d4a035845425faa198663">&#9670;&#160;</a></span>bind() <span class="overload">[1/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind null to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="af9e2abd3dceca0907d40f4fd65d4b4ed" name="af9e2abd3dceca0907d40f4fd65d4b4ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9e2abd3dceca0907d40f4fd65d4b4ed">&#9670;&#160;</a></span>bind() <span class="overload">[2/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>item</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>len</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bind the string type item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="a0150f152684ebfaf4a0d4acb5a7dff7f" name="a0150f152684ebfaf4a0d4acb5a7dff7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0150f152684ebfaf4a0d4acb5a7dff7f">&#9670;&#160;</a></span>bind() <span class="overload">[3/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind the <a class="el" href="classhku_1_1_datetime.html" title="Date type">Datetime</a> type item to the given SQL parameter </p>
+
+</div>
+</div>
+<a id="a1e062de0a114816750a96418ba6dfeab" name="a1e062de0a114816750a96418ba6dfeab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e062de0a114816750a96418ba6dfeab">&#9670;&#160;</a></span>bind() <span class="overload">[4/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="af72e1baed5c091c38a2624a9ffad165f" name="af72e1baed5c091c38a2624a9ffad165f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af72e1baed5c091c38a2624a9ffad165f">&#9670;&#160;</a></span>bind() <span class="overload">[5/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; char &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a756fd8946b2f5e8e771bac3fe2616da4" name="a756fd8946b2f5e8e771bac3fe2616da4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a756fd8946b2f5e8e771bac3fe2616da4">&#9670;&#160;</a></span>bind() <span class="overload">[6/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename... Args&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Args &amp;...</td>          <td class="paramname"><span class="paramname"><em>rest</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="acc76285baaafa9ee1f5296c042493bb5" name="acc76285baaafa9ee1f5296c042493bb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc76285baaafa9ee1f5296c042493bb5">&#9670;&#160;</a></span>bind() <span class="overload">[7/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if&lt;!std::numeric_limits&lt; T &gt;::is_integer &gt;::type hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="acc76285baaafa9ee1f5296c042493bb5" name="acc76285baaafa9ee1f5296c042493bb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc76285baaafa9ee1f5296c042493bb5">&#9670;&#160;</a></span>bind() <span class="overload">[8/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if&lt;!std::numeric_limits&lt; T &gt;::is_integer &gt;::type hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="ab52decb83dd17159ed5e283012b70a7b" name="ab52decb83dd17159ed5e283012b70a7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab52decb83dd17159ed5e283012b70a7b">&#9670;&#160;</a></span>bind() <span class="overload">[9/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="af9253be8e2edc0248013ac70b7c60465" name="af9253be8e2edc0248013ac70b7c60465"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9253be8e2edc0248013ac70b7c60465">&#9670;&#160;</a></span>bind() <span class="overload">[10/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="a166e77df2d8e80ed288e73290277f03b" name="a166e77df2d8e80ed288e73290277f03b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a166e77df2d8e80ed288e73290277f03b">&#9670;&#160;</a></span>bind_params()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bind_params </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind a full set of condition values to the anonymous placeholders of the statement, in order </p>
+<p>It stays synchronous, like the other bind operations, and has to be the only binder of the statement. </p><dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_s_q_l_statement_base.html#a5e3337a9f1faa14d9ac4eb3b4f119a5c" title="Bind a full set of condition values to the anonymous placeholders of the statement,...">SQLStatementBase::bind_params</a> </dd></dl>
+
+</div>
+</div>
+<a id="a6af0c70df87bfc9359812f3a132a505c" name="a6af0c70df87bfc9359812f3a132a505c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6af0c70df87bfc9359812f3a132a505c">&#9670;&#160;</a></span>bindBlob() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bindBlob </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="a59b4406f042d99f6ae5889df06c16134" name="a59b4406f042d99f6ae5889df06c16134"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59b4406f042d99f6ae5889df06c16134">&#9670;&#160;</a></span>bindBlob() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::bindBlob </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; char &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>time</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bind the value of item to the SQL parameter given by idx </p>
+
+</div>
+</div>
+<a id="aa60e60f4e8200b281f01540d6db1e05b" name="aa60e60f4e8200b281f01540d6db1e05b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa60e60f4e8200b281f01540d6db1e05b">&#9670;&#160;</a></span>exec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt; hku::AsyncSQLStatementBase::exec </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Execute the SQL </p>
+
+</div>
+</div>
+<a id="a1fbd8d8e504aab242aa8f339c96d49e4" name="a1fbd8d8e504aab242aa8f339c96d49e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fbd8d8e504aab242aa8f339c96d49e4">&#9670;&#160;</a></span>getColumn() <span class="overload">[1/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data given by idx into item </p>
+
+</div>
+</div>
+<a id="a3033561df74e01bb222b743874244827" name="a3033561df74e01bb222b743874244827"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3033561df74e01bb222b743874244827">&#9670;&#160;</a></span>getColumn() <span class="overload">[2/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data given by idx into item. </p>
+<p>A SQL NULL column is mapped to the type's <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null</a> sentinel, </p><dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_s_q_l_statement_base.html#ab34342e73982866c9940d09d7114dfce" title="Get the data given by idx into item">SQLStatementBase::getColumn</a> </dd></dl>
+
+</div>
+</div>
+<a id="a0c30c0f360c6f67d6fbed9f40d6818f7" name="a0c30c0f360c6f67d6fbed9f40d6818f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c30c0f360c6f67d6fbed9f40d6818f7">&#9670;&#160;</a></span>getColumn() <span class="overload">[3/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data given by idx into item </p>
+
+</div>
+</div>
+<a id="a685138cc26c2852228192a1156ffeae0" name="a685138cc26c2852228192a1156ffeae0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a685138cc26c2852228192a1156ffeae0">&#9670;&#160;</a></span>getColumn() <span class="overload">[4/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data given by idx into item </p>
+
+</div>
+</div>
+<a id="aaa5e9763186a4e43a67a832d6f932c00" name="aaa5e9763186a4e43a67a832d6f932c00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa5e9763186a4e43a67a832d6f932c00">&#9670;&#160;</a></span>getColumn() <span class="overload">[5/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; char &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afce76a37c16faafb857330769fc400c5" name="afce76a37c16faafb857330769fc400c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afce76a37c16faafb857330769fc400c5">&#9670;&#160;</a></span>getColumn() <span class="overload">[6/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if&lt;!std::numeric_limits&lt; T &gt;::is_integer &gt;::type hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the data given by idx into item </p>
+
+</div>
+</div>
+<a id="afce76a37c16faafb857330769fc400c5" name="afce76a37c16faafb857330769fc400c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afce76a37c16faafb857330769fc400c5">&#9670;&#160;</a></span>getColumn() <span class="overload">[7/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if&lt;!std::numeric_limits&lt; T &gt;::is_integer &gt;::type hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the data given by idx into item </p>
+
+</div>
+</div>
+<a id="a8da269d3a9a2135bfdc09942ebd224a9" name="a8da269d3a9a2135bfdc09942ebd224a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8da269d3a9a2135bfdc09942ebd224a9">&#9670;&#160;</a></span>getColumn() <span class="overload">[8/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename... Args&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::AsyncSQLStatementBase::getColumn </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Args &amp;...</td>          <td class="paramname"><span class="paramname"><em>rest</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the given data into item1, item2 and item3 sequentially starting from the given idx </p>
+
+</div>
+</div>
+<a id="acf49c99d215367b50a4dd2e17602302b" name="acf49c99d215367b50a4dd2e17602302b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf49c99d215367b50a4dd2e17602302b">&#9670;&#160;</a></span>getConnect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_async_d_b_connect_base.html">AsyncDBConnectBase</a> * hku::AsyncSQLStatementBase::getConnect </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the data driver </p>
+
+</div>
+</div>
+<a id="a87cdaaaace24e64e79d0ea049982e84b" name="a87cdaaaace24e64e79d0ea049982e84b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87cdaaaace24e64e79d0ea049982e84b">&#9670;&#160;</a></span>getLastRowid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::AsyncSQLStatementBase::getLastRowid </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the rowid of the last record inserted by the INSERT execution, it is not thread safe </p>
+
+</div>
+</div>
+<a id="a3ec5216fe0e7feef318dba634cc19f21" name="a3ec5216fe0e7feef318dba634cc19f21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ec5216fe0e7feef318dba634cc19f21">&#9670;&#160;</a></span>getNumColumns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int hku::AsyncSQLStatementBase::getNumColumns </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the number of the table columns </p>
+
+</div>
+</div>
+<a id="a0fd8803b6072777df115aed80a72b4fd" name="a0fd8803b6072777df115aed80a72b4fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fd8803b6072777df115aed80a72b4fd">&#9670;&#160;</a></span>getSqlString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string &amp; hku::AsyncSQLStatementBase::getSqlString </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the expression SQL statement passed at construction </p>
+
+</div>
+</div>
+<a id="acd61848cc3efb1d173cc96295719ff4b" name="acd61848cc3efb1d173cc96295719ff4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd61848cc3efb1d173cc96295719ff4b">&#9670;&#160;</a></span>moveNext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt; hku::AsyncSQLStatementBase::moveNext </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Move to the next result </p>
+
+</div>
+</div>
+<a id="a39e8b066d86c35320dc6449e74f021ff" name="a39e8b066d86c35320dc6449e74f021ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39e8b066d86c35320dc6449e74f021ff">&#9670;&#160;</a></span>sub_bindBlob() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindBlob </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a8c5af7c112475ebeedcd710a0367d151">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a06b2aa58e64ac7a80a9710da0f767706">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="ab8a5452ec26ec1467f0fef0efadab799" name="ab8a5452ec26ec1467f0fef0efadab799"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8a5452ec26ec1467f0fef0efadab799">&#9670;&#160;</a></span>sub_bindBlob() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindBlob </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; char &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a9b78e1f73afeef2b6b02297ce1a2232a">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#af6e7807342bc4001ccf515ef177f45b5">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a5bf14fbe8acde39d7f3f15bcb95e751e" name="a5bf14fbe8acde39d7f3f15bcb95e751e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bf14fbe8acde39d7f3f15bcb95e751e">&#9670;&#160;</a></span>sub_bindDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindDatetime </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a0f9502b52e76f0181387a04b50a30237">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a2d06c6418b9ecc2b5c9fca5216f2f780">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="af3ad726430a9a095f9c00c7f91007d79" name="af3ad726430a9a095f9c00c7f91007d79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3ad726430a9a095f9c00c7f91007d79">&#9670;&#160;</a></span>sub_bindDouble()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindDouble </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a44a6a84e660823187335978c1d003b18">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#ab26d624d7dbcf779ff7e6814a59ba9dc">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a6f217ee50cecb95966fb5e1a5ade1b6c" name="a6f217ee50cecb95966fb5e1a5ade1b6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f217ee50cecb95966fb5e1a5ade1b6c">&#9670;&#160;</a></span>sub_bindInt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindInt </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a31043ca8b44c21bd198a387c72e0e325">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#ae88477e28ca98a0e8b1de6291891129a">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a2b4c7113c57e7c0fcded7c6dfb0981a8" name="a2b4c7113c57e7c0fcded7c6dfb0981a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b4c7113c57e7c0fcded7c6dfb0981a8">&#9670;&#160;</a></span>sub_bindNull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindNull </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a73af708fa20ea30c2ead9bb3faa9180e">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a4714079b1485166110be9373e19763f7">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="adff6ffbdf40fe2922f6c48ed24518096" name="adff6ffbdf40fe2922f6c48ed24518096"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adff6ffbdf40fe2922f6c48ed24518096">&#9670;&#160;</a></span>sub_bindText() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindText </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>item</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>len</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#ad8700a83a6745b4c59dae465c49c2b79">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#ae711fa480038c3a80728c34fe23532d0">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="ab1a9b42d72315d613b7feceb8b8c8935" name="ab1a9b42d72315d613b7feceb8b8c8935"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1a9b42d72315d613b7feceb8b8c8935">&#9670;&#160;</a></span>sub_bindText() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindText </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a307c294dcc2f96dff279692bfb2e9a0a">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a01c02bfee0c8bfde5030bc1f0ef09076">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a8e3faa8cf0e346acab13aa88001e067d" name="a8e3faa8cf0e346acab13aa88001e067d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e3faa8cf0e346acab13aa88001e067d">&#9670;&#160;</a></span>sub_bindUInt64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_bindUInt64 </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a></td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec69bfde68d4a035845425faa198663" title="Bind null to the SQL parameter given by idx">bind</a>. Drivers with a native unsigned binding channel should override it </dd></dl>
+
+<p>被 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#af32150be2d9ced5d305ffcb99ecce0d1">hku::AsyncMySQLStatement</a> 重载.</p>
+
+</div>
+</div>
+<a id="aa513f91bc22571d6b3059be6ab40bfbe" name="aa513f91bc22571d6b3059be6ab40bfbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa513f91bc22571d6b3059be6ab40bfbe">&#9670;&#160;</a></span>sub_exec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt; hku::AsyncSQLStatementBase::sub_exec </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#aa60e60f4e8200b281f01540d6db1e05b" title="Execute the SQL">exec</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a3018c8b6bff5c8a693972fc294871c73">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#aa1b3931f90ce1121e050b6e6c65566e3">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a07a361eb775aa32c1009588454f67273" name="a07a361eb775aa32c1009588454f67273"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07a361eb775aa32c1009588454f67273">&#9670;&#160;</a></span>sub_getColumnAsBlob() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsBlob </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a8599975a5da6b993627c98da9c9d2a6c">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a6332004300cc2ca9a2bc33d311318a5b">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a95f57f2c601c8854c1ffdd18bb16a7c3" name="a95f57f2c601c8854c1ffdd18bb16a7c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95f57f2c601c8854c1ffdd18bb16a7c3">&#9670;&#160;</a></span>sub_getColumnAsBlob() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsBlob </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; char &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a9c05dc67cdd0873b069627a61efbed9f">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a1b376d584bc86580a68dc078b7a133b3">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="ad44455f62b6c20649306493313d1288b" name="ad44455f62b6c20649306493313d1288b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad44455f62b6c20649306493313d1288b">&#9670;&#160;</a></span>sub_getColumnAsDatetime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsDatetime </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a1394680314f77f8f748ff965c1e97f12">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a0889999325a4057be1328d0b7feb7f37">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a7123c5f8aa9e0199d5d038b874daf20f" name="a7123c5f8aa9e0199d5d038b874daf20f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7123c5f8aa9e0199d5d038b874daf20f">&#9670;&#160;</a></span>sub_getColumnAsDouble()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsDouble </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a2a2899543a465e9ffe38fdb8896dc0aa">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a09ed57896ddef98ada522bdff9a2e400">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="ab850ca0123290237ed91f29092c0af66" name="ab850ca0123290237ed91f29092c0af66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab850ca0123290237ed91f29092c0af66">&#9670;&#160;</a></span>sub_getColumnAsInt64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsInt64 </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#ab4a60b2e9ca9da6bf88dc4bc38788e87">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a7c376697569f53b87e1303b277993a99">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a6b93352628a35a2040232a6c847926fb" name="a6b93352628a35a2040232a6c847926fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b93352628a35a2040232a6c847926fb">&#9670;&#160;</a></span>sub_getColumnAsText()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsText </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#aad0719156a25f84cd4046710aeb78a29">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a5339e4645ff6183844718746eb317f91">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="aae6fe8f469184c26c027f2e77366661b" name="aae6fe8f469184c26c027f2e77366661b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae6fe8f469184c26c027f2e77366661b">&#9670;&#160;</a></span>sub_getColumnAsUInt64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::AsyncSQLStatementBase::sub_getColumnAsUInt64 </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>item</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3033561df74e01bb222b743874244827" title="Get the data given by idx into item.">getColumn</a>. Drivers that expose an unsigned column flag should override it </dd></dl>
+
+<p>被 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a58df009caa155b4b5e1c609def29c6e1">hku::AsyncMySQLStatement</a> 重载.</p>
+
+</div>
+</div>
+<a id="a93a193c0947fc8ac2114a0618072eac5" name="a93a193c0947fc8ac2114a0618072eac5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93a193c0947fc8ac2114a0618072eac5">&#9670;&#160;</a></span>sub_getLastRowid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::AsyncSQLStatementBase::sub_getLastRowid </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a87cdaaaace24e64e79d0ea049982e84b" title="Get the rowid of the last record inserted by the INSERT execution, it is not thread safe">getLastRowid</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a2613b4d0d9542875961a2c0ce3007c20">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#ad0d167647b9f1e830a5fee8f03b89a73">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a34c3fa18202ca504144ee5f0a73e4003" name="a34c3fa18202ca504144ee5f0a73e4003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34c3fa18202ca504144ee5f0a73e4003">&#9670;&#160;</a></span>sub_getNumColumns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int hku::AsyncSQLStatementBase::sub_getNumColumns </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a3ec5216fe0e7feef318dba634cc19f21" title="Get the number of the table columns">getNumColumns</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a15e6f96d58f2f3f61c140eab800f9ff3">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a7153abda4facc7dd1a6c0099a8119a3d">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="aa38fb6e212519fe3b663f287238bc753" name="aa38fb6e212519fe3b663f287238bc753"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa38fb6e212519fe3b663f287238bc753">&#9670;&#160;</a></span>sub_moveNext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt; hku::AsyncSQLStatementBase::sub_moveNext </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#acd61848cc3efb1d173cc96295719ff4b" title="Move to the next result">moveNext</a> </dd></dl>
+
+<p>在 <a class="el" href="classhku_1_1_async_my_s_q_l_statement.html#a7160b99f2312a275c17d53b54c03d105">hku::AsyncMySQLStatement</a> , 以及 <a class="el" href="classhku_1_1_async_s_q_lite_statement.html#a43a4fed7f7b009ecaba6ea7e184f924c">hku::AsyncSQLiteStatement</a> 内被实现.</p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a7f3fd2f57a5b886be94de29de2dd8c95" name="a7f3fd2f57a5b886be94de29de2dd8c95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f3fd2f57a5b886be94de29de2dd8c95">&#9670;&#160;</a></span>m_driver</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_async_d_b_connect_base.html">AsyncDBConnectBase</a>* hku::AsyncSQLStatementBase::m_driver</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Database connection </p>
+
+</div>
+</div>
+<a id="abbfa984bf2a2c7f174518725c992bd36" name="abbfa984bf2a2c7f174518725c992bd36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbfa984bf2a2c7f174518725c992bd36">&#9670;&#160;</a></span>m_sql_string</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string hku::AsyncSQLStatementBase::m_sql_string</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Original SQL statement </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/db_connect/<a class="el" href="_async_s_q_l_statement_base_8h_source.html">AsyncSQLStatementBase.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_async_s_q_l_statement_base.html">AsyncSQLStatementBase</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

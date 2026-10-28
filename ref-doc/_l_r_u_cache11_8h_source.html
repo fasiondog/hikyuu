@@ -1,0 +1,386 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/LRUCache11.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_l_r_u_cache11_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">LRUCache11.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * LRUCache11 - a templated C++11 based LRU cache class that allows</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> * specification of</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * key, value and optionally the map container type (defaults to</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> * std::unordered_map)</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> * By using the std::unordered_map and a linked list of keys it allows O(1) insert, delete</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * and</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * refresh operations.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * This is a header-only library and all you need is the LRUCache11.hpp file</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * Github: https://github.com/mohaps/lrucache11</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * This is a follow-up to the LRUCache project -</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * https://github.com/mohaps/lrucache</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * Copyright (c) 2012-22 SAURAV MOHAPATRA &lt;mohaps@gmail.com&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> * Permission to use, copy, modify, and distribute this software for any</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * purpose with or without fee is hereby granted, provided that the above</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * copyright notice and this permission notice appear in all copies.</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> * THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL WARRANTIES</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">#include &lt;list&gt;</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#include &lt;thread&gt;</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="foldopen" id="foldopen00040" data-start="{" data-end="}">
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="namespacelru11.html">   40</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacelru11.html">lru11</a> {</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> * a noop lockable concept that can be used in place of std::mutex</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment"> */</span></div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="};">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classlru11_1_1_null_lock.html">   44</a></span><span class="keyword">class </span><a class="code hl_class" href="classlru11_1_1_null_lock.html">NullLock</a> {</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classlru11_1_1_null_lock.html#a1ad3002bb49e9c536e536f7f84150d14">   46</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classlru11_1_1_null_lock.html#a1ad3002bb49e9c536e536f7f84150d14">lock</a>() {}</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classlru11_1_1_null_lock.html#afeed987e753d3c9cb2f2fb5f5c58f356">   47</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classlru11_1_1_null_lock.html#afeed987e753d3c9cb2f2fb5f5c58f356">unlock</a>() {}</div>
+<div class="foldopen" id="foldopen00048" data-start="{" data-end="}">
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classlru11_1_1_null_lock.html#a48ec5905898a88e8b37c55dcab0a099e">   48</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classlru11_1_1_null_lock.html#a48ec5905898a88e8b37c55dcab0a099e">try_lock</a>() {</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    }</div>
+</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>};</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
+<div class="foldopen" id="foldopen00056" data-start="{" data-end="};">
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classlru11_1_1_key_not_found.html">   56</a></span><span class="keyword">class </span><a class="code hl_function" href="classlru11_1_1_key_not_found.html#add1d76a6d749ed4a0780006263bed2c7">KeyNotFound</a> : <span class="keyword">public</span> std::invalid_argument {</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classlru11_1_1_key_not_found.html#add1d76a6d749ed4a0780006263bed2c7">   58</a></span>    <a class="code hl_function" href="classlru11_1_1_key_not_found.html#add1d76a6d749ed4a0780006263bed2c7">KeyNotFound</a>() : <a class="code hl_namespace" href="namespacestd.html">std</a>::invalid_argument(<span class="stringliteral">&quot;key_not_found&quot;</span>) {}</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>};</div>
+</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> K, <span class="keyword">typename</span> V&gt;</div>
+<div class="foldopen" id="foldopen00062" data-start="{" data-end="};">
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="structlru11_1_1_key_value_pair.html">   62</a></span><span class="keyword">struct </span><a class="code hl_function" href="structlru11_1_1_key_value_pair.html#aaa7b7f3b4d123d0c232740d845323ccf">KeyValuePair</a> {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="structlru11_1_1_key_value_pair.html#a61ed3d956eaf16705f9f6302530876b4">   64</a></span>    K <a class="code hl_variable" href="structlru11_1_1_key_value_pair.html#a61ed3d956eaf16705f9f6302530876b4">key</a>;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="structlru11_1_1_key_value_pair.html#a16f8569c73e55865aac7fee383007158">   65</a></span>    V <a class="code hl_variable" href="structlru11_1_1_key_value_pair.html#a16f8569c73e55865aac7fee383007158">value</a>;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="structlru11_1_1_key_value_pair.html#aaa7b7f3b4d123d0c232740d845323ccf">   67</a></span>    <a class="code hl_function" href="structlru11_1_1_key_value_pair.html#aaa7b7f3b4d123d0c232740d845323ccf">KeyValuePair</a>(K k, V v) : <a class="code hl_variable" href="structlru11_1_1_key_value_pair.html#a61ed3d956eaf16705f9f6302530876b4">key</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(k)), <a class="code hl_variable" href="structlru11_1_1_key_value_pair.html#a16f8569c73e55865aac7fee383007158">value</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(v)) {}</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>};</div>
+</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="keyword">template</span> &lt;<span class="keyword">class </span>Key, <span class="keyword">class </span>Value, <span class="keyword">class </span>Lock = NullLock,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>          <span class="keyword">class </span>Map =</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>            std::unordered_map&lt;Key, typename std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt;::iterator&gt;&gt;</div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="};">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html">   85</a></span><span class="keyword">class </span><a class="code hl_function" href="classlru11_1_1_cache.html#a69a0e81e98534fc16bc2338dfc8013a5">Cache</a> {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a127e5d893104aeb8c930bd336543f2e1">   87</a></span>    <span class="keyword">typedef</span> <a class="code hl_struct" href="structlru11_1_1_key_value_pair.html">KeyValuePair&lt;Key, Value&gt;</a> <a class="code hl_typedef" href="classlru11_1_1_cache.html#a127e5d893104aeb8c930bd336543f2e1">node_type</a>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a6ccfadba850efde2a167aa946486bde5">   88</a></span>    <span class="keyword">typedef</span> std::list&lt;KeyValuePair&lt;Key, Value&gt;&gt; <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6ccfadba850efde2a167aa946486bde5">list_type</a>;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a6ec408686f93b8da0375c17c817622d8">   89</a></span>    <span class="keyword">typedef</span> Map <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6ec408686f93b8da0375c17c817622d8">map_type</a>;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a41ad4f5198e342e02f3ef3b39777f373">   90</a></span>    <span class="keyword">typedef</span> Lock <a class="code hl_typedef" href="classlru11_1_1_cache.html#a41ad4f5198e342e02f3ef3b39777f373">lock_type</a>;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">   91</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> = std::lock_guard&lt;lock_type&gt;;</div>
+<div class="foldopen" id="foldopen00101" data-start="{" data-end="}">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a69a0e81e98534fc16bc2338dfc8013a5">  101</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a69a0e81e98534fc16bc2338dfc8013a5">Cache</a>(<span class="keywordtype">size_t</span> maxSize = 64, <span class="keywordtype">size_t</span> elasticity = 10)</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    : maxSize_(maxSize), elasticity_(elasticity) {}</div>
+</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a0ec32ccdfe845b0e824496adf577e34d">  103</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a0ec32ccdfe845b0e824496adf577e34d">~Cache</a>() = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00104" data-start="{" data-end="}">
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#aef21643a4db6a9c0f873fbfa9849018f">  104</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classlru11_1_1_cache.html#aef21643a4db6a9c0f873fbfa9849018f">size</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keywordflow">return</span> cache_.size();</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00108" data-start="{" data-end="}">
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#aafd70e5e7c3a7714c2ad2b3ed5d27e58">  108</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classlru11_1_1_cache.html#aafd70e5e7c3a7714c2ad2b3ed5d27e58">empty</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        <span class="keywordflow">return</span> cache_.empty();</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#ac8b55077c5abbd9945394702750a8afb">  112</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classlru11_1_1_cache.html#ac8b55077c5abbd9945394702750a8afb">clear</a>() {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        cache_.clear();</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        keys_.clear();</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00117" data-start="{" data-end="}">
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a72801db36bfd7defc56939a93920ce1f">  117</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a72801db36bfd7defc56939a93920ce1f">insert</a>(<span class="keyword">const</span> Key&amp; k, <span class="keyword">const</span> Value&amp; v) {</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        <span class="keyword">const</span> <span class="keyword">auto</span> iter = cache_.find(k);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keywordflow">if</span> (iter != cache_.end()) {</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>            iter-&gt;second-&gt;value = v;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>            keys_.splice(keys_.begin(), keys_, iter-&gt;second);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        }</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        keys_.emplace_front(k, v);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        cache_[k] = keys_.begin();</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <a class="code hl_function" href="classlru11_1_1_cache.html#af9441a972228fe2eb097454c15688c70">prune</a>();</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00130" data-start="{" data-end="}">
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a2d4c1907b8a7607970d0baea3d383e00">  130</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a2d4c1907b8a7607970d0baea3d383e00">insert</a>(<span class="keyword">const</span> Key&amp; k, Value&amp;&amp; v) {</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="keyword">const</span> <span class="keyword">auto</span> iter = cache_.find(k);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        <span class="keywordflow">if</span> (iter != cache_.end()) {</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>            iter-&gt;second-&gt;value = std::move(v);</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>            keys_.splice(keys_.begin(), keys_, iter-&gt;second);</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>        }</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        keys_.emplace_front(k, std::move(v));</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        cache_[k] = keys_.begin();</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        <a class="code hl_function" href="classlru11_1_1_cache.html#af9441a972228fe2eb097454c15688c70">prune</a>();</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00143" data-start="{" data-end="}">
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#af1000e528ffbc3d3af364a17733ed6af">  143</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classlru11_1_1_cache.html#af1000e528ffbc3d3af364a17733ed6af">tryGet</a>(<span class="keyword">const</span> Key&amp; kIn, Value&amp; vOut) {</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <span class="keyword">const</span> <span class="keyword">auto</span> iter = cache_.find(kIn);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        <span class="keywordflow">if</span> (iter == cache_.end()) {</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        }</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        keys_.splice(keys_.begin(), keys_, iter-&gt;second);</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        vOut = iter-&gt;second-&gt;value;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    }</div>
+</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span></div>
+<div class="foldopen" id="foldopen00159" data-start="{" data-end="}">
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#abe63c6e275d872efeb64d65152f3386d">  159</a></span>    Value&amp; <a class="code hl_function" href="classlru11_1_1_cache.html#abe63c6e275d872efeb64d65152f3386d">get</a>(<span class="keyword">const</span> Key&amp; k) {</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        <span class="keyword">const</span> <span class="keyword">auto</span> iter = cache_.find(k);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="keywordflow">if</span> (iter == cache_.end()) {</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>            <span class="keywordflow">throw</span> <a class="code hl_class" href="classlru11_1_1_key_not_found.html">KeyNotFound</a>();</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        }</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        keys_.splice(keys_.begin(), keys_, iter-&gt;second);</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>        <span class="keywordflow">return</span> iter-&gt;second-&gt;value;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    }</div>
+</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span></div>
+<div class="foldopen" id="foldopen00171" data-start="{" data-end="}">
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a63ed35fc34418e15c040b57de68931fc">  171</a></span>    Value <a class="code hl_function" href="classlru11_1_1_cache.html#a63ed35fc34418e15c040b57de68931fc">getCopy</a>(<span class="keyword">const</span> Key&amp; k) {</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classlru11_1_1_cache.html#abe63c6e275d872efeb64d65152f3386d">get</a>(k);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00174" data-start="{" data-end="}">
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a84d6cf31575e6f0cd86d6875c584748c">  174</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a84d6cf31575e6f0cd86d6875c584748c">remove</a>(<span class="keyword">const</span> Key&amp; k) {</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        <span class="keyword">auto</span> iter = cache_.find(k);</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <span class="keywordflow">if</span> (iter == cache_.end()) {</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        }</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        keys_.erase(iter-&gt;second);</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        cache_.erase(iter);</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00184" data-start="{" data-end="}">
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#acb54d4e0df59c867d97b125baccfa678">  184</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classlru11_1_1_cache.html#acb54d4e0df59c867d97b125baccfa678">contains</a>(<span class="keyword">const</span> Key&amp; k)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        <span class="keywordflow">return</span> cache_.find(k) != cache_.end();</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    }</div>
+</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
+<div class="foldopen" id="foldopen00189" data-start="{" data-end="}">
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a03095fcc4df1756aaf8765201946abfb">  189</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a03095fcc4df1756aaf8765201946abfb">getMaxSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="keywordflow">return</span> maxSize_;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00192" data-start="{" data-end="}">
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a07aaa205f52778da78261d27447a1f39">  192</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a07aaa205f52778da78261d27447a1f39">getElasticity</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        <span class="keywordflow">return</span> elasticity_;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    }</div>
+</div>
+<div class="foldopen" id="foldopen00195" data-start="{" data-end="}">
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a15465e3f7cbe2194cb31a17fe5972225">  195</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a15465e3f7cbe2194cb31a17fe5972225">getMaxAllowedSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        <span class="keywordflow">return</span> maxSize_ + elasticity_;</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    }</div>
+</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> F&gt;</div>
+<div class="foldopen" id="foldopen00199" data-start="{" data-end="}">
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#a23019466ee76516f05a82b17e9b71897">  199</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classlru11_1_1_cache.html#a23019466ee76516f05a82b17e9b71897">cwalk</a>(F&amp; f)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">Guard</a> g(lock_);</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        std::for_each(keys_.begin(), keys_.end(), f);</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    }</div>
+</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="keyword">protected</span>:</div>
+<div class="foldopen" id="foldopen00205" data-start="{" data-end="}">
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno"><a class="line" href="classlru11_1_1_cache.html#af9441a972228fe2eb097454c15688c70">  205</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classlru11_1_1_cache.html#af9441a972228fe2eb097454c15688c70">prune</a>() {</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        <span class="keywordtype">size_t</span> maxAllowed = maxSize_ + elasticity_;</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        <span class="keywordflow">if</span> (maxSize_ == 0 || cache_.size() &lt; maxAllowed) {</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>            <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        }</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        <span class="keywordtype">size_t</span> count = 0;</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>        <span class="keywordflow">while</span> (cache_.size() &gt; maxSize_) {</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>            cache_.erase(keys_.back().key);</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>            keys_.pop_back();</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>            ++count;</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>        }</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        <span class="keywordflow">return</span> count;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    }</div>
+</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    <span class="comment">// Disallow copying.</span></div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    <a class="code hl_function" href="classlru11_1_1_cache.html#a69a0e81e98534fc16bc2338dfc8013a5">Cache</a>(<span class="keyword">const</span> <a class="code hl_class" href="classlru11_1_1_cache.html">Cache</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    <a class="code hl_class" href="classlru11_1_1_cache.html">Cache</a>&amp; operator=(<span class="keyword">const</span> <a class="code hl_class" href="classlru11_1_1_cache.html">Cache</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    <span class="keyword">mutable</span> Lock lock_;</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    Map cache_;</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    <a class="code hl_typedef" href="classlru11_1_1_cache.html#a6ccfadba850efde2a167aa946486bde5">list_type</a> keys_;</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    <span class="keywordtype">size_t</span> maxSize_;</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <span class="keywordtype">size_t</span> elasticity_;</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>};</div>
+</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>}  <span class="comment">// namespace lru11</span></div>
+</div>
+<div class="ttc" id="aclasslru11_1_1_cache_html"><div class="ttname"><a href="classlru11_1_1_cache.html">lru11::Cache</a></div><div class="ttdef"><b>定义</b> LRUCache11.h:85</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a03095fcc4df1756aaf8765201946abfb"><div class="ttname"><a href="classlru11_1_1_cache.html#a03095fcc4df1756aaf8765201946abfb">lru11::Cache::getMaxSize</a></div><div class="ttdeci">size_t getMaxSize() const</div><div class="ttdef"><b>定义</b> LRUCache11.h:189</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a07aaa205f52778da78261d27447a1f39"><div class="ttname"><a href="classlru11_1_1_cache.html#a07aaa205f52778da78261d27447a1f39">lru11::Cache::getElasticity</a></div><div class="ttdeci">size_t getElasticity() const</div><div class="ttdef"><b>定义</b> LRUCache11.h:192</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a0ec32ccdfe845b0e824496adf577e34d"><div class="ttname"><a href="classlru11_1_1_cache.html#a0ec32ccdfe845b0e824496adf577e34d">lru11::Cache::~Cache</a></div><div class="ttdeci">virtual ~Cache()=default</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a127e5d893104aeb8c930bd336543f2e1"><div class="ttname"><a href="classlru11_1_1_cache.html#a127e5d893104aeb8c930bd336543f2e1">lru11::Cache::node_type</a></div><div class="ttdeci">KeyValuePair&lt; Key, Value &gt; node_type</div><div class="ttdef"><b>定义</b> LRUCache11.h:87</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a15465e3f7cbe2194cb31a17fe5972225"><div class="ttname"><a href="classlru11_1_1_cache.html#a15465e3f7cbe2194cb31a17fe5972225">lru11::Cache::getMaxAllowedSize</a></div><div class="ttdeci">size_t getMaxAllowedSize() const</div><div class="ttdef"><b>定义</b> LRUCache11.h:195</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a23019466ee76516f05a82b17e9b71897"><div class="ttname"><a href="classlru11_1_1_cache.html#a23019466ee76516f05a82b17e9b71897">lru11::Cache::cwalk</a></div><div class="ttdeci">void cwalk(F &amp;f) const</div><div class="ttdef"><b>定义</b> LRUCache11.h:199</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a2d4c1907b8a7607970d0baea3d383e00"><div class="ttname"><a href="classlru11_1_1_cache.html#a2d4c1907b8a7607970d0baea3d383e00">lru11::Cache::insert</a></div><div class="ttdeci">void insert(const Key &amp;k, Value &amp;&amp;v)</div><div class="ttdef"><b>定义</b> LRUCache11.h:130</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a41ad4f5198e342e02f3ef3b39777f373"><div class="ttname"><a href="classlru11_1_1_cache.html#a41ad4f5198e342e02f3ef3b39777f373">lru11::Cache::lock_type</a></div><div class="ttdeci">Lock lock_type</div><div class="ttdef"><b>定义</b> LRUCache11.h:90</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a63ed35fc34418e15c040b57de68931fc"><div class="ttname"><a href="classlru11_1_1_cache.html#a63ed35fc34418e15c040b57de68931fc">lru11::Cache::getCopy</a></div><div class="ttdeci">Value getCopy(const Key &amp;k)</div><div class="ttdoc">returns a copy of the stored object (if found)</div><div class="ttdef"><b>定义</b> LRUCache11.h:171</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a69a0e81e98534fc16bc2338dfc8013a5"><div class="ttname"><a href="classlru11_1_1_cache.html#a69a0e81e98534fc16bc2338dfc8013a5">lru11::Cache::Cache</a></div><div class="ttdeci">Cache(size_t maxSize=64, size_t elasticity=10)</div><div class="ttdoc">the maxSize is the soft limit of keys and (maxSize + elasticity) is the hard limit the cache is allow...</div><div class="ttdef"><b>定义</b> LRUCache11.h:101</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a6ccfadba850efde2a167aa946486bde5"><div class="ttname"><a href="classlru11_1_1_cache.html#a6ccfadba850efde2a167aa946486bde5">lru11::Cache::list_type</a></div><div class="ttdeci">std::list&lt; KeyValuePair&lt; Key, Value &gt; &gt; list_type</div><div class="ttdef"><b>定义</b> LRUCache11.h:88</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a6cd796ff1cf429e2a7c8ea5ed53c9ea6"><div class="ttname"><a href="classlru11_1_1_cache.html#a6cd796ff1cf429e2a7c8ea5ed53c9ea6">lru11::Cache::Guard</a></div><div class="ttdeci">std::lock_guard&lt; lock_type &gt; Guard</div><div class="ttdef"><b>定义</b> LRUCache11.h:91</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a6ec408686f93b8da0375c17c817622d8"><div class="ttname"><a href="classlru11_1_1_cache.html#a6ec408686f93b8da0375c17c817622d8">lru11::Cache::map_type</a></div><div class="ttdeci">Map map_type</div><div class="ttdef"><b>定义</b> LRUCache11.h:89</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a72801db36bfd7defc56939a93920ce1f"><div class="ttname"><a href="classlru11_1_1_cache.html#a72801db36bfd7defc56939a93920ce1f">lru11::Cache::insert</a></div><div class="ttdeci">void insert(const Key &amp;k, const Value &amp;v)</div><div class="ttdef"><b>定义</b> LRUCache11.h:117</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_a84d6cf31575e6f0cd86d6875c584748c"><div class="ttname"><a href="classlru11_1_1_cache.html#a84d6cf31575e6f0cd86d6875c584748c">lru11::Cache::remove</a></div><div class="ttdeci">bool remove(const Key &amp;k)</div><div class="ttdef"><b>定义</b> LRUCache11.h:174</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_aafd70e5e7c3a7714c2ad2b3ed5d27e58"><div class="ttname"><a href="classlru11_1_1_cache.html#aafd70e5e7c3a7714c2ad2b3ed5d27e58">lru11::Cache::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>定义</b> LRUCache11.h:108</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_abe63c6e275d872efeb64d65152f3386d"><div class="ttname"><a href="classlru11_1_1_cache.html#abe63c6e275d872efeb64d65152f3386d">lru11::Cache::get</a></div><div class="ttdeci">Value &amp; get(const Key &amp;k)</div><div class="ttdoc">The const reference returned here is only guaranteed to be valid till the next insert/delete It is ch...</div><div class="ttdef"><b>定义</b> LRUCache11.h:159</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_ac8b55077c5abbd9945394702750a8afb"><div class="ttname"><a href="classlru11_1_1_cache.html#ac8b55077c5abbd9945394702750a8afb">lru11::Cache::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>定义</b> LRUCache11.h:112</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_acb54d4e0df59c867d97b125baccfa678"><div class="ttname"><a href="classlru11_1_1_cache.html#acb54d4e0df59c867d97b125baccfa678">lru11::Cache::contains</a></div><div class="ttdeci">bool contains(const Key &amp;k) const</div><div class="ttdef"><b>定义</b> LRUCache11.h:184</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_aef21643a4db6a9c0f873fbfa9849018f"><div class="ttname"><a href="classlru11_1_1_cache.html#aef21643a4db6a9c0f873fbfa9849018f">lru11::Cache::size</a></div><div class="ttdeci">size_t size() const</div><div class="ttdef"><b>定义</b> LRUCache11.h:104</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_af1000e528ffbc3d3af364a17733ed6af"><div class="ttname"><a href="classlru11_1_1_cache.html#af1000e528ffbc3d3af364a17733ed6af">lru11::Cache::tryGet</a></div><div class="ttdeci">bool tryGet(const Key &amp;kIn, Value &amp;vOut)</div><div class="ttdef"><b>定义</b> LRUCache11.h:143</div></div>
+<div class="ttc" id="aclasslru11_1_1_cache_html_af9441a972228fe2eb097454c15688c70"><div class="ttname"><a href="classlru11_1_1_cache.html#af9441a972228fe2eb097454c15688c70">lru11::Cache::prune</a></div><div class="ttdeci">size_t prune()</div><div class="ttdef"><b>定义</b> LRUCache11.h:205</div></div>
+<div class="ttc" id="aclasslru11_1_1_key_not_found_html"><div class="ttname"><a href="classlru11_1_1_key_not_found.html">lru11::KeyNotFound</a></div><div class="ttdoc">error raised when a key not in cache is passed to get()</div><div class="ttdef"><b>定义</b> LRUCache11.h:56</div></div>
+<div class="ttc" id="aclasslru11_1_1_key_not_found_html_add1d76a6d749ed4a0780006263bed2c7"><div class="ttname"><a href="classlru11_1_1_key_not_found.html#add1d76a6d749ed4a0780006263bed2c7">lru11::KeyNotFound::KeyNotFound</a></div><div class="ttdeci">KeyNotFound()</div><div class="ttdef"><b>定义</b> LRUCache11.h:58</div></div>
+<div class="ttc" id="aclasslru11_1_1_null_lock_html"><div class="ttname"><a href="classlru11_1_1_null_lock.html">lru11::NullLock</a></div><div class="ttdef"><b>定义</b> LRUCache11.h:44</div></div>
+<div class="ttc" id="aclasslru11_1_1_null_lock_html_a1ad3002bb49e9c536e536f7f84150d14"><div class="ttname"><a href="classlru11_1_1_null_lock.html#a1ad3002bb49e9c536e536f7f84150d14">lru11::NullLock::lock</a></div><div class="ttdeci">void lock()</div><div class="ttdef"><b>定义</b> LRUCache11.h:46</div></div>
+<div class="ttc" id="aclasslru11_1_1_null_lock_html_a48ec5905898a88e8b37c55dcab0a099e"><div class="ttname"><a href="classlru11_1_1_null_lock.html#a48ec5905898a88e8b37c55dcab0a099e">lru11::NullLock::try_lock</a></div><div class="ttdeci">bool try_lock()</div><div class="ttdef"><b>定义</b> LRUCache11.h:48</div></div>
+<div class="ttc" id="aclasslru11_1_1_null_lock_html_afeed987e753d3c9cb2f2fb5f5c58f356"><div class="ttname"><a href="classlru11_1_1_null_lock.html#afeed987e753d3c9cb2f2fb5f5c58f356">lru11::NullLock::unlock</a></div><div class="ttdeci">void unlock()</div><div class="ttdef"><b>定义</b> LRUCache11.h:47</div></div>
+<div class="ttc" id="anamespacelru11_html"><div class="ttname"><a href="namespacelru11.html">lru11</a></div><div class="ttdef"><b>定义</b> LRUCache11.h:40</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="astructlru11_1_1_key_value_pair_html"><div class="ttname"><a href="structlru11_1_1_key_value_pair.html">lru11::KeyValuePair</a></div><div class="ttdef"><b>定义</b> LRUCache11.h:62</div></div>
+<div class="ttc" id="astructlru11_1_1_key_value_pair_html_a16f8569c73e55865aac7fee383007158"><div class="ttname"><a href="structlru11_1_1_key_value_pair.html#a16f8569c73e55865aac7fee383007158">lru11::KeyValuePair&lt; Key, Value &gt;::value</a></div><div class="ttdeci">Value value</div><div class="ttdef"><b>定义</b> LRUCache11.h:65</div></div>
+<div class="ttc" id="astructlru11_1_1_key_value_pair_html_a61ed3d956eaf16705f9f6302530876b4"><div class="ttname"><a href="structlru11_1_1_key_value_pair.html#a61ed3d956eaf16705f9f6302530876b4">lru11::KeyValuePair&lt; Key, Value &gt;::key</a></div><div class="ttdeci">Key key</div><div class="ttdef"><b>定义</b> LRUCache11.h:64</div></div>
+<div class="ttc" id="astructlru11_1_1_key_value_pair_html_aaa7b7f3b4d123d0c232740d845323ccf"><div class="ttname"><a href="structlru11_1_1_key_value_pair.html#aaa7b7f3b4d123d0c232740d845323ccf">lru11::KeyValuePair::KeyValuePair</a></div><div class="ttdeci">KeyValuePair(K k, V v)</div><div class="ttdef"><b>定义</b> LRUCache11.h:67</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><b>LRUCache11.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

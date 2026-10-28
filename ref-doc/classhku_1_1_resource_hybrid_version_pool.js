@@ -1,0 +1,27 @@
+var classhku_1_1_resource_hybrid_version_pool =
+[
+    [ "GlobalPoolType", "classhku_1_1_resource_hybrid_version_pool.html#adeb05630df61b307e837f4e1114583bc", null ],
+    [ "TlsPoolType", "classhku_1_1_resource_hybrid_version_pool.html#a9f732345f6bf09e9880391fc57d2b055", null ],
+    [ "ResourceHybridVersionPool", "classhku_1_1_resource_hybrid_version_pool.html#a4d717d5eb1f69be6413912da4b78ef42", null ],
+    [ "~ResourceHybridVersionPool", "classhku_1_1_resource_hybrid_version_pool.html#a16c867f5b07362336f8743b726f1e813", null ],
+    [ "ResourceHybridVersionPool", "classhku_1_1_resource_hybrid_version_pool.html#a1cc481339141e30d6770d173127d8475", null ],
+    [ "ResourceHybridVersionPool", "classhku_1_1_resource_hybrid_version_pool.html#ae6581255d00a919b388ff81f6f85565c", null ],
+    [ "get", "classhku_1_1_resource_hybrid_version_pool.html#aad08d4a12026113dba6707d529ee543f", null ],
+    [ "getAndWait", "classhku_1_1_resource_hybrid_version_pool.html#aa366b5bcf97ba735e1cfcc01e8767157", null ],
+    [ "getFromGlobalPool", "classhku_1_1_resource_hybrid_version_pool.html#a35c11f607659a5e9e986241c41813364", null ],
+    [ "getFromTlsPool", "classhku_1_1_resource_hybrid_version_pool.html#a4dfe8ae43d8d7ba236ec0dc81eea99f3", null ],
+    [ "getParam", "classhku_1_1_resource_hybrid_version_pool.html#a8ca1ddc8234db6dcbaee055024cdacb3", null ],
+    [ "getVersion", "classhku_1_1_resource_hybrid_version_pool.html#a8405c8022a2762bf3ba002396a2ec6ae", null ],
+    [ "getWaitFor", "classhku_1_1_resource_hybrid_version_pool.html#a2151ac11869492e0531390da3e710063", null ],
+    [ "globalPool", "classhku_1_1_resource_hybrid_version_pool.html#a42f47fa52b5809aa73cddfca7af421d8", null ],
+    [ "haveParam", "classhku_1_1_resource_hybrid_version_pool.html#a41c6c981e944e3576a96d745f1c53afe", null ],
+    [ "incVersion", "classhku_1_1_resource_hybrid_version_pool.html#adb62ad9ec7d2201ceca8b74350e094e4", null ],
+    [ "maxGlobalPoolSize", "classhku_1_1_resource_hybrid_version_pool.html#ace35286905434f64148fdf0af4e2005f", null ],
+    [ "maxTlsPoolSize", "classhku_1_1_resource_hybrid_version_pool.html#abd8cc50a5bab224c094be14a48f9b6c5", null ],
+    [ "operator=", "classhku_1_1_resource_hybrid_version_pool.html#aa4de16eaa1f58838bcb8059a05219107", null ],
+    [ "operator=", "classhku_1_1_resource_hybrid_version_pool.html#ab80f091e1940a6318f650aab77adce00", null ],
+    [ "setParam", "classhku_1_1_resource_hybrid_version_pool.html#a94832b5f086fc4fa5300a8bd2274ba10", null ],
+    [ "setParameter", "classhku_1_1_resource_hybrid_version_pool.html#a00c2881df025e18bb208cb4c2b89a794", null ],
+    [ "setParameter", "classhku_1_1_resource_hybrid_version_pool.html#abdbf6409f28b20206cd0ae58a4cddd52", null ],
+    [ "tlsPool", "classhku_1_1_resource_hybrid_version_pool.html#a2af648e91553e42535f5ac7d1d74dab5", null ]
+];

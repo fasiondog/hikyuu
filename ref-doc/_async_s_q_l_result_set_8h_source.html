@@ -1,0 +1,479 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/AsyncSQLResultSet.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_async_s_q_l_result_set_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">AsyncSQLResultSet.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#ab4f5f093925c87b03d72a7dc17070675">    1</a></span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2023 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2026-05-07</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;iterator&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/utilities/arithmetic.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;hikyuu/utilities/Log.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;hikyuu/utilities/osdef.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;../net.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;AsyncDBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> TableT, <span class="keywordtype">size_t</span> page_size&gt;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_async_s_q_l_result_set_iterator.html">AsyncSQLResultSetIterator</a>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> TableT, <span class="keywordtype">size_t</span> page_size = 100&gt;</div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="};">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html">   41</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#adf316a5798b8b685fad7f5c02f174e93">AsyncSQLResultSet</a> {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_async_s_q_l_result_set_iterator.html">AsyncSQLResultSetIterator</a>&lt;TableT, page_size&gt;;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#if CPP_STANDARD &gt;= CPP_STANDARD_17</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="classhku_1_1_async_s_q_l_result_set.html#afb50c15b3aa27f6ca15332ceba594fd3">PSIZE</a> = page_size;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#afb50c15b3aa27f6ca15332ceba594fd3">   48</a></span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="classhku_1_1_async_s_q_l_result_set.html#afb50c15b3aa27f6ca15332ceba594fd3">PSIZE</a> = page_size;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#adf316a5798b8b685fad7f5c02f174e93">   51</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#adf316a5798b8b685fad7f5c02f174e93">AsyncSQLResultSet</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
+<div class="foldopen" id="foldopen00058" data-start="{" data-end="}">
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a24fd3f987bdb02ee5b8a2f541c9976fa">   58</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a24fd3f987bdb02ee5b8a2f541c9976fa">AsyncSQLResultSet</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; connect, <span class="keyword">const</span> std::string&amp; sql)</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    : m_connect(connect), m_sql_template(<span class="stringliteral">&quot;SELECT * FROM {} WHERE {} {} LIMIT {} OFFSET {}&quot;</span>) {</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="comment">// the plain path: the clauses can only be located in the text the caller wrote</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <a class="code hl_struct" href="structhku_1_1_where_parts.html">WhereParts</a> parts = <a class="code hl_function" href="namespacehku.html#aaaa80f58b25cf24355601f9d9e108243">splitWhereParts</a>(sql);</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        _setup(parts.<a class="code hl_variable" href="structhku_1_1_where_parts.html#a704995ac5c20e254b0358e4c8f8d7dee">where</a>, parts.<a class="code hl_variable" href="structhku_1_1_where_parts.html#a415709fff3f1a1547880a2499ae8317d">orderBy</a>, parts.<a class="code hl_variable" href="structhku_1_1_where_parts.html#a6c8e1b7865907d046f47362c876711de">limit</a>, <a class="code hl_typedef" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a>{});</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    }</div>
+</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span></div>
+<div class="foldopen" id="foldopen00070" data-start="{" data-end="}">
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a483f8db57fc1b403af7970fa33049ddb">   70</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a483f8db57fc1b403af7970fa33049ddb">AsyncSQLResultSet</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; connect, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_d_b_condition.html">DBCondition</a>&amp; cond)</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    : m_connect(connect), m_sql_template(<span class="stringliteral">&quot;SELECT * FROM {} WHERE {} {} LIMIT {} OFFSET {}&quot;</span>) {</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="comment">// a condition already carries its parts, nothing has to be parsed out of the text</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        _setup(cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#a095a1761cab1b7235a2461f03d773366">sql</a>(), cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#ae65fa1322305ab12c5fb6e15a6bf9792">getOrderBy</a>(), cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#ac7a1c149d5bbfdd704e46df3b38c17eb">getLimit</a>(), cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#a28eae81a2b6d59f97b4bfadaec2e188e">params</a>());</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    }</div>
+</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span></div>
+<div class="foldopen" id="foldopen00077" data-start="{" data-end="}">
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#ac13f0ff98cb2cb8a662a1a11ae11d939">   77</a></span>    <span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a>&amp; <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#ac13f0ff98cb2cb8a662a1a11ae11d939">getConnect</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="keywordflow">return</span> m_connect;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    }</div>
+</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">   81</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">const_iterator</a> = <a class="code hl_class" href="classhku_1_1_async_s_q_l_result_set_iterator.html">AsyncSQLResultSetIterator&lt;TableT, page_size&gt;</a>;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">   82</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">iterator</a> = <a class="code hl_class" href="classhku_1_1_async_s_q_l_result_set_iterator.html">AsyncSQLResultSetIterator&lt;TableT, page_size&gt;</a>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="foldopen" id="foldopen00088" data-start="{" data-end="}">
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a738a715b54d6a26be5ff76ba3ac51da1">   88</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;const_iterator&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a738a715b54d6a26be5ff76ba3ac51da1">cbegin</a>() {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="keyword">co_return</span> <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">const_iterator</a>(<span class="keyword">this</span>, 0);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    }</div>
+</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span></div>
+<div class="foldopen" id="foldopen00096" data-start="{" data-end="}">
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a7c93b94128c38a8b4055fbc565dbb18b">   96</a></span>    <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">const_iterator</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a7c93b94128c38a8b4055fbc565dbb18b">cend</a>() {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">const_iterator</a>(<span class="keyword">this</span>, <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>());</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    }</div>
+</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span></div>
+<div class="foldopen" id="foldopen00104" data-start="{" data-end="}">
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a862a780abd0e57bcd7552ab2fa20e208">  104</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;iterator&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a862a780abd0e57bcd7552ab2fa20e208">begin</a>() {</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        <span class="keyword">co_return</span> <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">iterator</a>(<span class="keyword">this</span>, 0);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    }</div>
+</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span></div>
+<div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#ac13c74c1708a28baaac9f422fc79e275">  112</a></span>    <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">iterator</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#ac13c74c1708a28baaac9f422fc79e275">end</a>() {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">iterator</a>(<span class="keyword">this</span>, <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>());</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    }</div>
+</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span></div>
+<div class="foldopen" id="foldopen00121" data-start="{" data-end="}">
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a747eda6a67a30add46877f22f6155d3a">  121</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;size_t&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a747eda6a67a30add46877f22f6155d3a">size</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">if</span> (!m_connect) {</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>            <span class="keyword">co_return</span> 0;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        }</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        std::string sql =</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>          fmt::format(<span class="stringliteral">&quot;select count(1) from {} where {}&quot;</span>, TableT::getTableName(), m_where);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <span class="keywordtype">size_t</span> total = <span class="keyword">co_await</span> m_connect-&gt;queryNumber&lt;<span class="keywordtype">size_t</span>&gt;(sql, 0, m_params);</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <span class="comment">// the row limit of the condition caps the reported size, the pages are cut the same way</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <span class="keyword">co_return</span> m_limit &gt;= 0 ? std::min(total, <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(m_limit)) : total;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    }</div>
+</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span></div>
+<div class="foldopen" id="foldopen00137" data-start="{" data-end="}">
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#aa83bbb783cf5e18514969256a9ccc344">  137</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;bool&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#aa83bbb783cf5e18514969256a9ccc344">empty</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        <span class="keywordtype">size_t</span> sz = <span class="keyword">co_await</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a747eda6a67a30add46877f22f6155d3a">size</a>();</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="keyword">co_return</span> sz == 0;</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    }</div>
+</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span></div>
+<div class="foldopen" id="foldopen00148" data-start="{" data-end="}">
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a4a022b52561b0c475d40b52396623d1c">  148</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;size_t&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a4a022b52561b0c475d40b52396623d1c">getPageCount</a>() {</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        <span class="keywordtype">size_t</span> total = <span class="keyword">co_await</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a747eda6a67a30add46877f22f6155d3a">size</a>();</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <span class="keywordtype">size_t</span> n = total / page_size;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        <span class="keyword">co_return</span> n* page_size &gt;= total ? n : n + 1;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    }</div>
+</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span></div>
+<div class="foldopen" id="foldopen00159" data-start="{" data-end="}">
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#aa76541bb699706b05e81b515c46ceb9c">  159</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;std::vector&lt;TableT&gt;</a>&gt; <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#aa76541bb699706b05e81b515c46ceb9c">getPage</a>(<span class="keywordtype">size_t</span> page) {</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <span class="keywordflow">if</span> (!_connectOrPage(page)) {</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>            <span class="keyword">co_return</span> std::vector&lt;TableT&gt;{};</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        }</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        <span class="keyword">co_return</span> <span class="keyword">co_await</span> _loadPage(page);</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    }</div>
+</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span></div>
+<div class="foldopen" id="foldopen00171" data-start="{" data-end="}">
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a8664ab48af76c65acc0a3c02618a1ddc">  171</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;TableT&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a8664ab48af76c65acc0a3c02618a1ddc">at</a>(<span class="keywordtype">size_t</span> index) {</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        TableT result = <span class="keyword">co_await</span> get(index);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>        HKU_CHECK_THROW(result.valid(), std::out_of_range, <span class="stringliteral">&quot;Index is over&quot;</span>);</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="keyword">co_return</span> result;</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    }</div>
+</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span></div>
+<div class="foldopen" id="foldopen00182" data-start="{" data-end="}">
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set.html#a3f6e264e021eeedf1b1eb73f8687951d">  182</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;TableT&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set.html#a3f6e264e021eeedf1b1eb73f8687951d">operator_bracket</a>(<span class="keywordtype">size_t</span> index) {</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        <span class="keyword">co_return</span> <span class="keyword">co_await</span> get(index);</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    }</div>
+</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keywordtype">void</span> _setup(<span class="keyword">const</span> std::string&amp; where, <span class="keyword">const</span> std::string&amp; orderBy, <span class="keywordtype">int</span> limit,</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>                <a class="code hl_typedef" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> params) {</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        m_params = std::move(params);</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        m_limit = limit;</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span> </div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        std::string text = where;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <a class="code hl_function" href="group___utilities.html#gacb72fa0e392c25a69a7990a4a4b8c7b3">trim</a>(text);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        m_where = text.empty() ? <span class="stringliteral">&quot;1=1&quot;</span> : text;</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        <span class="keywordflow">if</span> (orderBy.empty()) {</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>            m_orderby_inner = <span class="stringliteral">&quot;ORDER BY id&quot;</span>;</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>            m_orderby_inner = fmt::format(<span class="stringliteral">&quot;{}, id ASC&quot;</span>, orderBy);</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>            m_orderby_outer = m_orderby_inner;</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        }</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    }</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span></div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <span class="keywordtype">size_t</span> _pageLimit(<span class="keywordtype">size_t</span> page)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        <span class="keywordflow">if</span> (m_limit &lt; 0) {</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>            <span class="keywordflow">return</span> page_size;</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        }</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>        <span class="keyword">const</span> <span class="keywordtype">size_t</span> offset = page * page_size;</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>        <span class="keyword">const</span> <span class="keywordtype">size_t</span> left = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(m_limit);</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        <span class="keywordflow">return</span> offset &gt;= left ? 0 : std::min(page_size, left - offset);</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    }</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span></div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    <span class="keywordtype">bool</span> _connectOrPage(<span class="keywordtype">size_t</span> page)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        <span class="keywordflow">return</span> m_connect &amp;&amp; _pageLimit(page) &gt; 0;</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    }</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    std::string _selectSQL(<span class="keywordtype">size_t</span> page)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        <span class="keywordflow">return</span> fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                           m_orderby_inner, _pageLimit(page), page * page_size);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    }</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;std::vector&lt;TableT&gt;</a>&gt; _loadPage(<span class="keywordtype">size_t</span> page) {</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>        std::vector&lt;TableT&gt; result;</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        <span class="keyword">auto</span> st = <span class="keyword">co_await</span> m_connect-&gt;getStatementWithParams(_selectSQL(page), m_params);</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        <span class="keyword">co_await</span> st-&gt;exec();</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>        <span class="keywordflow">while</span> (<span class="keyword">co_await</span> st-&gt;moveNext()) {</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>            TableT tmp;</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>            tmp.load(st);</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>            result.push_back(tmp);</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        }</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        <span class="keyword">co_return</span> result;</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>    }</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;TableT&gt;</a> get(<span class="keywordtype">size_t</span> index) {</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>        TableT result{Null&lt;TableT&gt;()};</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>        <span class="keywordflow">if</span> (index == Null&lt;size_t&gt;()) {</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            <span class="keyword">co_return</span> result;</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        }</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        <span class="keywordtype">size_t</span> page = index / page_size;</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        <span class="keywordflow">if</span> (m_connect &amp;&amp; page != m_current_page) {</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>            m_buffer.clear();</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>            <span class="keywordflow">if</span> (_connectOrPage(page)) {</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>                m_buffer = <span class="keyword">co_await</span> _loadPage(page);</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>            }</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>            m_current_page = page;</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>        }</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span> </div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordflow">if</span> (m_buffer.empty()) {</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>            <span class="keyword">co_return</span> result;</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        }</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>        <span class="keywordtype">size_t</span> pos = index - page * page_size;</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>        <span class="keywordflow">if</span> (pos &gt;= m_buffer.size()) {</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            <span class="keyword">co_return</span> result;</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>        }</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        result = m_buffer[index - page * page_size];</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        <span class="keyword">co_return</span> result;</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    }</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a> m_connect;</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    std::vector&lt;TableT&gt; m_buffer;</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    std::string m_where;</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    std::string m_sql_template;</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    std::string m_orderby_inner;</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    std::string m_orderby_outer;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>    <a class="code hl_typedef" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> m_params;</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>    <span class="keywordtype">int</span> m_limit = -1;</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <span class="keywordtype">size_t</span> m_current_page = Null&lt;size_t&gt;();</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>};</div>
+</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span> </div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> TableT, <span class="keywordtype">size_t</span> page_size&gt;</div>
+<div class="foldopen" id="foldopen00290" data-start="{" data-end="};">
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html">  290</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">AsyncSQLResultSetIterator</a> {</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a7092d38d34d80b5c591e1ada1c46bc5e">  292</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a7092d38d34d80b5c591e1ada1c46bc5e">ResultSet</a> = <a class="code hl_class" href="classhku_1_1_async_s_q_l_result_set.html">AsyncSQLResultSet&lt;TableT, page_size&gt;</a>;</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">  294</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">AsyncSQLResultSetIterator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a8d4592e5d30f57ac3f91ba92eef18043">  295</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a8d4592e5d30f57ac3f91ba92eef18043">~AsyncSQLResultSetIterator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span> </div>
+<div class="foldopen" id="foldopen00297" data-start="{" data-end="}">
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a86c7fe65f81f9246fdb4473efe27736d">  297</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a86c7fe65f81f9246fdb4473efe27736d">AsyncSQLResultSetIterator</a>(<a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a7092d38d34d80b5c591e1ada1c46bc5e">ResultSet</a>* result_set, <span class="keywordtype">size_t</span> index)</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    : m_set(result_set), m_index(index) {</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>        <span class="comment">// Note: co_await cannot be used directly in the constructor, it needs to be initialized</span></div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>        <span class="comment">// outside</span></div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    }</div>
+</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span></div>
+<div class="foldopen" id="foldopen00307" data-start="{" data-end="}">
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a399a718703f11fed46328d36f565ee3b">  307</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a399a718703f11fed46328d36f565ee3b">init</a>() {</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>        <span class="keywordflow">if</span> (m_index != <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>()) {</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>            m_value = <span class="keyword">co_await</span> m_set-&gt;get(m_index);</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>            <span class="keywordflow">if</span> (!m_value.valid()) {</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                m_index = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>();</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>            }</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>        }</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>        <span class="keyword">co_return</span>;</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    }</div>
+</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span> </div>
+<div class="foldopen" id="foldopen00317" data-start="{" data-end="}">
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a0e1ffac76565ba3cfdc19bf86053c1a4">  317</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a0e1ffac76565ba3cfdc19bf86053c1a4">AsyncSQLResultSetIterator</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">AsyncSQLResultSetIterator</a>&amp; other)</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>    : m_set(other.m_set), m_index(other.m_index), m_value(other.m_value) {}</div>
+</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
+<div class="foldopen" id="foldopen00320" data-start="{" data-end="}">
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a13310895d6e78ac57d449d279a0c7c88">  320</a></span>    <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">AsyncSQLResultSetIterator</a>&amp; <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a13310895d6e78ac57d449d279a0c7c88">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">AsyncSQLResultSetIterator</a>&amp; other) {</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>        <span class="keywordflow">if</span> (<span class="keyword">this</span> == &amp;other)</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>        m_index = other.m_index;</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>        m_set = other.m_set;</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>        m_value = other.m_value;</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>    }</div>
+</div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span> </div>
+<div class="foldopen" id="foldopen00329" data-start="{" data-end="}">
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#ac9d064d8434fdf8a7961f35f4570c063">  329</a></span>    <span class="keyword">const</span> TableT&amp; <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#ac9d064d8434fdf8a7961f35f4570c063">operator*</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>        <span class="keywordflow">return</span> m_value;</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    }</div>
+</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span> </div>
+<div class="foldopen" id="foldopen00333" data-start="{" data-end="}">
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a427f0f6b3ba217bb3dc644c4935835af">  333</a></span>    TableT&amp; <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a427f0f6b3ba217bb3dc644c4935835af">operator*</a>() {</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>        <span class="keywordflow">return</span> m_value;</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    }</div>
+</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span> </div>
+<div class="foldopen" id="foldopen00337" data-start="{" data-end="}">
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#acfb2454a801bdbe5d45afeae6f2db17a">  337</a></span>    <span class="keyword">const</span> TableT* <span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#acfb2454a801bdbe5d45afeae6f2db17a">operator-&gt;</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>        <span class="keywordflow">return</span> &amp;m_value;</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    }</div>
+</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span> </div>
+<div class="foldopen" id="foldopen00341" data-start="{" data-end="}">
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a5b6529f2af4c8e649acbaa8d240c2d5a">  341</a></span>    TableT* <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a5b6529f2af4c8e649acbaa8d240c2d5a">operator-&gt;</a>() {</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>        <span class="keywordflow">return</span> &amp;m_value;</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    }</div>
+</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span></div>
+<div class="foldopen" id="foldopen00349" data-start="{" data-end="}">
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a8bab38b29b79880ecd783eab3aa02423">  349</a></span>    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;AsyncSQLResultSetIterator&gt;</a> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a8bab38b29b79880ecd783eab3aa02423">operator_pre_increment</a>() {</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>        HKU_CHECK_THROW(m_index != <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>(), std::logic_error,</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>                        <span class="stringliteral">&quot;Cannot increment an end iterator.&quot;</span>);</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>        m_index++;</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        m_value = <span class="keyword">co_await</span> m_set-&gt;get(m_index);</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>        <span class="keywordflow">if</span> (!m_value.valid()) {</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>            m_index = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>();</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        }</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>        <span class="keyword">co_return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    }</div>
+</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span> </div>
+<div class="foldopen" id="foldopen00360" data-start="{" data-end="}">
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno"><a class="line" href="classhku_1_1_async_s_q_l_result_set_iterator.html#af9d5f9a5e7be3381c3794f762490a320">  360</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#af9d5f9a5e7be3381c3794f762490a320">operator!=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">AsyncSQLResultSetIterator</a>&amp; iter)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>        <span class="keywordflow">return</span> m_index != iter.m_index;</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    }</div>
+</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span> </div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    <a class="code hl_typedef" href="classhku_1_1_async_s_q_l_result_set_iterator.html#a7092d38d34d80b5c591e1ada1c46bc5e">ResultSet</a>* m_set = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>    <span class="keywordtype">size_t</span> m_index = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>();</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>    TableT m_value;</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>};</div>
+</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span> </div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html">hku::AsyncSQLResultSet</a></div><div class="ttdoc">Asynchronous SQL query result set</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:41</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a24fd3f987bdb02ee5b8a2f541c9976fa"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a24fd3f987bdb02ee5b8a2f541c9976fa">hku::AsyncSQLResultSet::AsyncSQLResultSet</a></div><div class="ttdeci">AsyncSQLResultSet(const AsyncDBConnectPtr &amp;connect, const std::string &amp;sql)</div><div class="ttdoc">Build a new asynchronous paged query result instance</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:58</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a3a50fcf0e6485b2e4680899f642c1eac"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a3a50fcf0e6485b2e4680899f642c1eac">hku::AsyncSQLResultSet::const_iterator</a></div><div class="ttdeci">AsyncSQLResultSetIterator&lt; TableT, page_size &gt; const_iterator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:81</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a3f6e264e021eeedf1b1eb73f8687951d"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a3f6e264e021eeedf1b1eb73f8687951d">hku::AsyncSQLResultSet::operator_bracket</a></div><div class="ttdeci">net::awaitable&lt; TableT &gt; operator_bracket(size_t index)</div><div class="ttdoc">Get the data of the given index (the subscript operator)</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:182</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a483f8db57fc1b403af7970fa33049ddb"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a483f8db57fc1b403af7970fa33049ddb">hku::AsyncSQLResultSet::AsyncSQLResultSet</a></div><div class="ttdeci">AsyncSQLResultSet(const AsyncDBConnectPtr &amp;connect, const DBCondition &amp;cond)</div><div class="ttdoc">Build a new asynchronous paged query result instance from a condition</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:70</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a4a022b52561b0c475d40b52396623d1c"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a4a022b52561b0c475d40b52396623d1c">hku::AsyncSQLResultSet::getPageCount</a></div><div class="ttdeci">net::awaitable&lt; size_t &gt; getPageCount()</div><div class="ttdoc">Get the number of the pages of the current data set</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:148</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a738a715b54d6a26be5ff76ba3ac51da1"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a738a715b54d6a26be5ff76ba3ac51da1">hku::AsyncSQLResultSet::cbegin</a></div><div class="ttdeci">net::awaitable&lt; const_iterator &gt; cbegin()</div><div class="ttdoc">Get the begin iterator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:88</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a747eda6a67a30add46877f22f6155d3a"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a747eda6a67a30add46877f22f6155d3a">hku::AsyncSQLResultSet::size</a></div><div class="ttdeci">net::awaitable&lt; size_t &gt; size() const</div><div class="ttdoc">Get the data set size at the current moment</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:121</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a7c93b94128c38a8b4055fbc565dbb18b"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a7c93b94128c38a8b4055fbc565dbb18b">hku::AsyncSQLResultSet::cend</a></div><div class="ttdeci">const_iterator cend()</div><div class="ttdoc">Get the end iterator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:96</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a862a780abd0e57bcd7552ab2fa20e208"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a862a780abd0e57bcd7552ab2fa20e208">hku::AsyncSQLResultSet::begin</a></div><div class="ttdeci">net::awaitable&lt; iterator &gt; begin()</div><div class="ttdoc">Get the begin iterator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:104</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_a8664ab48af76c65acc0a3c02618a1ddc"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#a8664ab48af76c65acc0a3c02618a1ddc">hku::AsyncSQLResultSet::at</a></div><div class="ttdeci">net::awaitable&lt; TableT &gt; at(size_t index)</div><div class="ttdoc">Get the data of the given index</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:171</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_aa76541bb699706b05e81b515c46ceb9c"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#aa76541bb699706b05e81b515c46ceb9c">hku::AsyncSQLResultSet::getPage</a></div><div class="ttdeci">net::awaitable&lt; std::vector&lt; TableT &gt; &gt; getPage(size_t page)</div><div class="ttdoc">Get all the data in the given page</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:159</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_aa83bbb783cf5e18514969256a9ccc344"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#aa83bbb783cf5e18514969256a9ccc344">hku::AsyncSQLResultSet::empty</a></div><div class="ttdeci">net::awaitable&lt; bool &gt; empty() const</div><div class="ttdoc">Whether the current data set is empty</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:137</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_ac13c74c1708a28baaac9f422fc79e275"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#ac13c74c1708a28baaac9f422fc79e275">hku::AsyncSQLResultSet::end</a></div><div class="ttdeci">iterator end()</div><div class="ttdoc">Get the end iterator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:112</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_ac13f0ff98cb2cb8a662a1a11ae11d939"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#ac13f0ff98cb2cb8a662a1a11ae11d939">hku::AsyncSQLResultSet::getConnect</a></div><div class="ttdeci">const AsyncDBConnectPtr &amp; getConnect() const</div><div class="ttdoc">Get its database connection</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:77</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_adf316a5798b8b685fad7f5c02f174e93"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#adf316a5798b8b685fad7f5c02f174e93">hku::AsyncSQLResultSet::AsyncSQLResultSet</a></div><div class="ttdeci">AsyncSQLResultSet()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_aea0eaf064e67924b819b47c85c44464a"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#aea0eaf064e67924b819b47c85c44464a">hku::AsyncSQLResultSet::iterator</a></div><div class="ttdeci">AsyncSQLResultSetIterator&lt; TableT, page_size &gt; iterator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:82</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_html_afb50c15b3aa27f6ca15332ceba594fd3"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set.html#afb50c15b3aa27f6ca15332ceba594fd3">hku::AsyncSQLResultSet::PSIZE</a></div><div class="ttdeci">static const int PSIZE</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:48</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html">hku::AsyncSQLResultSetIterator</a></div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:290</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a0e1ffac76565ba3cfdc19bf86053c1a4"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a0e1ffac76565ba3cfdc19bf86053c1a4">hku::AsyncSQLResultSetIterator::AsyncSQLResultSetIterator</a></div><div class="ttdeci">AsyncSQLResultSetIterator(const AsyncSQLResultSetIterator &amp;other)</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:317</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a13310895d6e78ac57d449d279a0c7c88"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a13310895d6e78ac57d449d279a0c7c88">hku::AsyncSQLResultSetIterator::operator=</a></div><div class="ttdeci">AsyncSQLResultSetIterator &amp; operator=(const AsyncSQLResultSetIterator &amp;other)</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:320</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a399a718703f11fed46328d36f565ee3b"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a399a718703f11fed46328d36f565ee3b">hku::AsyncSQLResultSetIterator::init</a></div><div class="ttdeci">net::awaitable&lt; void &gt; init()</div><div class="ttdoc">Initialize the iterator values</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:307</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a427f0f6b3ba217bb3dc644c4935835af"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a427f0f6b3ba217bb3dc644c4935835af">hku::AsyncSQLResultSetIterator::operator*</a></div><div class="ttdeci">TableT &amp; operator*()</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:333</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a5b6529f2af4c8e649acbaa8d240c2d5a"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a5b6529f2af4c8e649acbaa8d240c2d5a">hku::AsyncSQLResultSetIterator::operator-&gt;</a></div><div class="ttdeci">TableT * operator-&gt;()</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:341</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a7092d38d34d80b5c591e1ada1c46bc5e"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a7092d38d34d80b5c591e1ada1c46bc5e">hku::AsyncSQLResultSetIterator::ResultSet</a></div><div class="ttdeci">AsyncSQLResultSet&lt; TableT, page_size &gt; ResultSet</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:292</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a86c7fe65f81f9246fdb4473efe27736d"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a86c7fe65f81f9246fdb4473efe27736d">hku::AsyncSQLResultSetIterator::AsyncSQLResultSetIterator</a></div><div class="ttdeci">AsyncSQLResultSetIterator(ResultSet *result_set, size_t index)</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:297</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a8bab38b29b79880ecd783eab3aa02423"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a8bab38b29b79880ecd783eab3aa02423">hku::AsyncSQLResultSetIterator::operator_pre_increment</a></div><div class="ttdeci">net::awaitable&lt; AsyncSQLResultSetIterator &gt; operator_pre_increment()</div><div class="ttdoc">Prefix increment operator</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:349</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_a8d4592e5d30f57ac3f91ba92eef18043"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#a8d4592e5d30f57ac3f91ba92eef18043">hku::AsyncSQLResultSetIterator::~AsyncSQLResultSetIterator</a></div><div class="ttdeci">~AsyncSQLResultSetIterator()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_ac9d064d8434fdf8a7961f35f4570c063"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#ac9d064d8434fdf8a7961f35f4570c063">hku::AsyncSQLResultSetIterator::operator*</a></div><div class="ttdeci">const TableT &amp; operator*() const</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:329</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_acfb2454a801bdbe5d45afeae6f2db17a"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#acfb2454a801bdbe5d45afeae6f2db17a">hku::AsyncSQLResultSetIterator::operator-&gt;</a></div><div class="ttdeci">const TableT *const operator-&gt;() const</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:337</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_aefde1ddf77ab30f022ca38f50bbb3ed5"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#aefde1ddf77ab30f022ca38f50bbb3ed5">hku::AsyncSQLResultSetIterator::AsyncSQLResultSetIterator</a></div><div class="ttdeci">AsyncSQLResultSetIterator()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_result_set_iterator_html_af9d5f9a5e7be3381c3794f762490a320"><div class="ttname"><a href="classhku_1_1_async_s_q_l_result_set_iterator.html#af9d5f9a5e7be3381c3794f762490a320">hku::AsyncSQLResultSetIterator::operator!=</a></div><div class="ttdeci">bool operator!=(const AsyncSQLResultSetIterator &amp;iter) const</div><div class="ttdef"><b>定义</b> AsyncSQLResultSet.h:360</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html"><div class="ttname"><a href="classhku_1_1_d_b_condition.html">hku::DBCondition</a></div><div class="ttdoc">Query condition of a table model query.</div><div class="ttdef"><b>定义</b> DBCondition.h:212</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_a095a1761cab1b7235a2461f03d773366"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#a095a1761cab1b7235a2461f03d773366">hku::DBCondition::sql</a></div><div class="ttdeci">const std::string &amp; sql() const</div><div class="ttdoc">The filter part with numbered ?</div><div class="ttdef"><b>定义</b> DBCondition.h:252</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_a28eae81a2b6d59f97b4bfadaec2e188e"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#a28eae81a2b6d59f97b4bfadaec2e188e">hku::DBCondition::params</a></div><div class="ttdeci">const BoundValues &amp; params() const</div><div class="ttdoc">The values of the placeholders of sql(), in placeholder order</div><div class="ttdef"><b>定义</b> DBCondition.h:257</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_ac7a1c149d5bbfdd704e46df3b38c17eb"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#ac7a1c149d5bbfdd704e46df3b38c17eb">hku::DBCondition::getLimit</a></div><div class="ttdeci">int getLimit() const</div><div class="ttdoc">The row limit set by LIMIT, -1 when there is none</div><div class="ttdef"><b>定义</b> DBCondition.h:272</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_ae65fa1322305ab12c5fb6e15a6bf9792"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#ae65fa1322305ab12c5fb6e15a6bf9792">hku::DBCondition::getOrderBy</a></div><div class="ttdeci">const std::string &amp; getOrderBy() const</div><div class="ttdoc">The trailing order-by clause, including its leading space, empty when there is none</div><div class="ttdef"><b>定义</b> DBCondition.h:267</div></div>
+<div class="ttc" id="aclasshku_1_1_null_html"><div class="ttname"><a href="classhku_1_1_null.html">hku::Null</a></div><div class="ttdoc">It provides the Null value of the given type</div><div class="ttdef"><b>定义</b> Null.h:38</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_ga74b9c3d6f48f40f6208924675acfb321"><div class="ttname"><a href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">hku::BoundValues</a></div><div class="ttdeci">std::vector&lt; BoundValue &gt; BoundValues</div><div class="ttdef"><b>定义</b> DBCondition.h:135</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_ga99e3e0a30d3e799e021e4873e4bfc331"><div class="ttname"><a href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">hku::AsyncDBConnectPtr</a></div><div class="ttdeci">std::shared_ptr&lt; AsyncDBConnectBase &gt; AsyncDBConnectPtr</div><div class="ttdef"><b>定义</b> AsyncDBConnectBase.h:327</div></div>
+<div class="ttc" id="agroup___utilities_html_gacb72fa0e392c25a69a7990a4a4b8c7b3"><div class="ttname"><a href="group___utilities.html#gacb72fa0e392c25a69a7990a4a4b8c7b3">hku::trim</a></div><div class="ttdeci">void trim(std::string &amp;s)</div><div class="ttdoc">Remove the blanks (spaces, tabs and CRLF) at both ends of a string</div><div class="ttdef"><b>定义</b> arithmetic.h:302</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_aaaa80f58b25cf24355601f9d9e108243"><div class="ttname"><a href="namespacehku.html#aaaa80f58b25cf24355601f9d9e108243">hku::splitWhereParts</a></div><div class="ttdeci">HKU_UTILS_API WhereParts splitWhereParts(const std::string &amp;where)</div><div class="ttdoc">Split a plain (hand-written) where clause into its parts.</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html"><div class="ttname"><a href="structhku_1_1_where_parts.html">hku::WhereParts</a></div><div class="ttdoc">The parts of a plain where clause: the filter, the trailing order-by and the row limit</div><div class="ttdef"><b>定义</b> DBCondition.h:148</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html_a415709fff3f1a1547880a2499ae8317d"><div class="ttname"><a href="structhku_1_1_where_parts.html#a415709fff3f1a1547880a2499ae8317d">hku::WhereParts::orderBy</a></div><div class="ttdeci">std::string orderBy</div><div class="ttdef"><b>定义</b> DBCondition.h:150</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html_a6c8e1b7865907d046f47362c876711de"><div class="ttname"><a href="structhku_1_1_where_parts.html#a6c8e1b7865907d046f47362c876711de">hku::WhereParts::limit</a></div><div class="ttdeci">int limit</div><div class="ttdef"><b>定义</b> DBCondition.h:151</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html_a704995ac5c20e254b0358e4c8f8d7dee"><div class="ttname"><a href="structhku_1_1_where_parts.html#a704995ac5c20e254b0358e4c8f8d7dee">hku::WhereParts::where</a></div><div class="ttdeci">std::string where</div><div class="ttdef"><b>定义</b> DBCondition.h:149</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><b>AsyncSQLResultSet.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

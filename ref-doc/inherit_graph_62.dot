@@ -1,0 +1,9 @@
+digraph "类继承关系图"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node0 [id="Node000000",label="hku::IndParam",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_ind_param.html",tooltip="Dynamic indicator parameter, used as the parameter of the other indicators"];
+}

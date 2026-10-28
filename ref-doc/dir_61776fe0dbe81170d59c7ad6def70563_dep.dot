@@ -1,0 +1,12 @@
+digraph "hikyuu/data_driver/base_info/sqlite"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_814473b652813f9f34411f57578f38f1 {
+    graph [ bgcolor="#edf0f7", pencolor="grey50", label="base_info", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_814473b652813f9f34411f57578f38f1.html",tooltip=""]
+  dir_61776fe0dbe81170d59c7ad6def70563 [label="sqlite", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_61776fe0dbe81170d59c7ad6def70563.html",tooltip=""];
+  }
+}

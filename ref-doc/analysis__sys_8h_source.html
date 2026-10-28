@@ -1,0 +1,189 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/analysis/analysis_sys.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('analysis__sys_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">analysis_sys.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2023 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2023-12-25</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/system/System.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;hikyuu/trade_manage/Performance.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/utilities/thread/thread.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="}">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="namespacehku.html">   14</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="namespacehku.html#a6bb0652f669b4bde4d2ddb985fa8a772">   24</a></span><a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> <a class="code hl_function" href="namespacehku.html#a6bb0652f669b4bde4d2ddb985fa8a772">getAnalysisCalendar</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stk_list, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="foldopen" id="foldopen00026" data-start="{" data-end="};">
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html">   26</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a> {</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#aa17683da281999e4d0a455ec16c613e9">   27</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#aa17683da281999e4d0a455ec16c613e9">market_code</a>;  </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#ab0eb8159891311b0ad942434dc42ad57">   28</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#ab0eb8159891311b0ad942434dc42ad57">name</a>;         </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#a9508ab9700bc1587daadc099bef252d7">   29</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#a9508ab9700bc1587daadc099bef252d7">values</a>;    </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">   31</a></span>    <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#a6900e8f312f0b8484de7066ca7961b68">   32</a></span>    <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#a6900e8f312f0b8484de7066ca7961b68">AnalysisSystemOutput</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>&amp; other) = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00033" data-start="{" data-end="}">
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#a8b13501bbfbc1158b4d6d4559c52b440">   33</a></span>    <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#a8b13501bbfbc1158b4d6d4559c52b440">AnalysisSystemOutput</a>(<a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>&amp;&amp; rv)</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    : <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#aa17683da281999e4d0a455ec16c613e9">market_code</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#aa17683da281999e4d0a455ec16c613e9">market_code</a>)),</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>      <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#ab0eb8159891311b0ad942434dc42ad57">name</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#ab0eb8159891311b0ad942434dc42ad57">name</a>)),</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>      <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#a9508ab9700bc1587daadc099bef252d7">values</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rv.<a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#a9508ab9700bc1587daadc099bef252d7">values</a>)) {}</div>
+</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#a77ab405448c793a482c8323d530eb70a">   38</a></span>    <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>&amp; <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#a77ab405448c793a482c8323d530eb70a">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structhku_1_1_analysis_system_output.html#a77ab00920c5beb6b46d094fd19529f3f">   39</a></span>    <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>&amp; <a class="code hl_function" href="structhku_1_1_analysis_system_output.html#a77ab00920c5beb6b46d094fd19529f3f">operator=</a>(<a class="code hl_function" href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">AnalysisSystemOutput</a>&amp;&amp; rv) {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        HKU_IF_RETURN(<span class="keyword">this</span> == &amp;rv, *<span class="keyword">this</span>);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#aa17683da281999e4d0a455ec16c613e9">market_code</a> = std::move(rv.market_code);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#ab0eb8159891311b0ad942434dc42ad57">name</a> = std::move(rv.name);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <a class="code hl_variable" href="structhku_1_1_analysis_system_output.html#a9508ab9700bc1587daadc099bef252d7">values</a> = std::move(rv.values);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    }</div>
+</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>};</div>
+</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="namespacehku.html#a9b64e21d1bd237ca0ec6f6ce0c4c13be">   58</a></span>vector&lt;AnalysisSystemOutput&gt; HKU_API <a class="code hl_function" href="namespacehku.html#a9b64e21d1bd237ca0ec6f6ce0c4c13be">analysisSystemList</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; sys_list,</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>                                                        <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stk_list,</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>                                                        <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="namespacehku.html#aca0c3047885b8d5a90ad5493b03c123c">   69</a></span>vector&lt;AnalysisSystemOutput&gt; HKU_API <a class="code hl_function" href="namespacehku.html#a9b64e21d1bd237ca0ec6f6ce0c4c13be">analysisSystemList</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; sys_list,</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>                                                        <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stk, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="namespacehku.html#a376748a662a6295eab22b424b6ac3d48">   84</a></span>std::pair&lt;double, SYSPtr&gt; HKU_API <a class="code hl_function" href="namespacehku.html#a376748a662a6295eab22b424b6ac3d48">findOptimalSystem</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; sys_list, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stk,</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>                                                    <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; sort_key,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                                                    <span class="keywordtype">int</span> sort_mode = 0);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="namespacehku.html#ad0e0647707eada982bd8e0c0b966f2ec">   88</a></span>std::pair&lt;double, SYSPtr&gt; HKU_API <a class="code hl_function" href="namespacehku.html#ad0e0647707eada982bd8e0c0b966f2ec">findOptimalSystemMulti</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; sys_list,</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                                                         <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stk, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                                                         <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; sort_key, <span class="keywordtype">int</span> sort_mode = 0);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>}  <span class="comment">// namespace hku</span></div>
+</div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="agroup___data_type_html_gaeb6c8c0a18561345f892e2c4be1f5ef2"><div class="ttname"><a href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">hku::DatetimeList</a></div><div class="ttdeci">std::vector&lt; Datetime &gt; DatetimeList</div><div class="ttdoc">Date list</div><div class="ttdef"><b>定义</b> Datetime.h:375</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga4a4df6bef18cec4791cca9bd27a4e973"><div class="ttname"><a href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">hku::StockList</a></div><div class="ttdeci">vector&lt; Stock &gt; StockList</div><div class="ttdef"><b>定义</b> Stock.h:409</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a376748a662a6295eab22b424b6ac3d48"><div class="ttname"><a href="namespacehku.html#a376748a662a6295eab22b424b6ac3d48">hku::findOptimalSystem</a></div><div class="ttdeci">std::pair&lt; double, SYSPtr &gt; HKU_API findOptimalSystem(const SystemList &amp;sys_list, const Stock &amp;stk, const KQuery &amp;query, const string &amp;sort_key, int sort_mode=0)</div><div class="ttdoc">Run all the system strategies on the given stock and collect the statistics, and return the system in...</div></div>
+<div class="ttc" id="anamespacehku_html_a6bb0652f669b4bde4d2ddb985fa8a772"><div class="ttname"><a href="namespacehku.html#a6bb0652f669b4bde4d2ddb985fa8a772">hku::getAnalysisCalendar</a></div><div class="ttdeci">DatetimeList getAnalysisCalendar(const StockList &amp;stk_list, const KQuery &amp;query)</div><div class="ttdoc">Get the trading calendar for an analysis run.</div></div>
+<div class="ttc" id="anamespacehku_html_a9b64e21d1bd237ca0ec6f6ce0c4c13be"><div class="ttname"><a href="namespacehku.html#a9b64e21d1bd237ca0ec6f6ce0c4c13be">hku::analysisSystemList</a></div><div class="ttdeci">vector&lt; AnalysisSystemOutput &gt; HKU_API analysisSystemList(const SystemList &amp;sys_list, const StockList &amp;stk_list, const KQuery &amp;query)</div><div class="ttdoc">Run the statistics of all the given system strategies; every system in the system list should be an i...</div></div>
+<div class="ttc" id="anamespacehku_html_aa2be5196687d3fa79339e28984e927d2"><div class="ttname"><a href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">hku::SystemList</a></div><div class="ttdeci">vector&lt; SystemPtr &gt; SystemList</div><div class="ttdef"><b>定义</b> System.h:547</div></div>
+<div class="ttc" id="anamespacehku_html_ad0e0647707eada982bd8e0c0b966f2ec"><div class="ttname"><a href="namespacehku.html#ad0e0647707eada982bd8e0c0b966f2ec">hku::findOptimalSystemMulti</a></div><div class="ttdeci">std::pair&lt; double, SYSPtr &gt; HKU_API findOptimalSystemMulti(const SystemList &amp;sys_list, const Stock &amp;stk, const KQuery &amp;query, const string &amp;sort_key, int sort_mode=0)</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_a6900e8f312f0b8484de7066ca7961b68"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#a6900e8f312f0b8484de7066ca7961b68">hku::AnalysisSystemOutput::AnalysisSystemOutput</a></div><div class="ttdeci">AnalysisSystemOutput(const AnalysisSystemOutput &amp;other)=default</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_a77ab00920c5beb6b46d094fd19529f3f"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#a77ab00920c5beb6b46d094fd19529f3f">hku::AnalysisSystemOutput::operator=</a></div><div class="ttdeci">AnalysisSystemOutput &amp; operator=(AnalysisSystemOutput &amp;&amp;rv)</div><div class="ttdef"><b>定义</b> analysis_sys.h:39</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_a77ab405448c793a482c8323d530eb70a"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#a77ab405448c793a482c8323d530eb70a">hku::AnalysisSystemOutput::operator=</a></div><div class="ttdeci">AnalysisSystemOutput &amp; operator=(const AnalysisSystemOutput &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_a8b13501bbfbc1158b4d6d4559c52b440"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#a8b13501bbfbc1158b4d6d4559c52b440">hku::AnalysisSystemOutput::AnalysisSystemOutput</a></div><div class="ttdeci">AnalysisSystemOutput(AnalysisSystemOutput &amp;&amp;rv)</div><div class="ttdef"><b>定义</b> analysis_sys.h:33</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_a9508ab9700bc1587daadc099bef252d7"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#a9508ab9700bc1587daadc099bef252d7">hku::AnalysisSystemOutput::values</a></div><div class="ttdeci">PriceList values</div><div class="ttdoc">The values of every statistics item</div><div class="ttdef"><b>定义</b> analysis_sys.h:29</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_aa17683da281999e4d0a455ec16c613e9"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#aa17683da281999e4d0a455ec16c613e9">hku::AnalysisSystemOutput::market_code</a></div><div class="ttdeci">string market_code</div><div class="ttdoc">Security code</div><div class="ttdef"><b>定义</b> analysis_sys.h:27</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_ab0eb8159891311b0ad942434dc42ad57"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#ab0eb8159891311b0ad942434dc42ad57">hku::AnalysisSystemOutput::name</a></div><div class="ttdeci">string name</div><div class="ttdoc">Security name (list overload) or system name (single stock overload)</div><div class="ttdef"><b>定义</b> analysis_sys.h:28</div></div>
+<div class="ttc" id="astructhku_1_1_analysis_system_output_html_ab4a3c542d8fe0ddcb864cdb3b75ceb88"><div class="ttname"><a href="structhku_1_1_analysis_system_output.html#ab4a3c542d8fe0ddcb864cdb3b75ceb88">hku::AnalysisSystemOutput::AnalysisSystemOutput</a></div><div class="ttdeci">AnalysisSystemOutput()=default</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_fd4ff774d23bec136cca53be21004967.html">analysis</a></li><li class="navelem"><b>analysis_sys.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

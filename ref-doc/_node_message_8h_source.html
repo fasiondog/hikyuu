@@ -1,0 +1,181 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/node/NodeMessage.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_node_message_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">NodeMessage.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2019 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2022-03-27</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;nng/nng.h&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;hikyuu/utilities/Log.h&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;NodeError.h&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> = nlohmann::json;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#define NODE_STATUS_TIMEOUT \</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">    150                          </span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define NODE_STATUS_INTERVAL 60  </span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> * Message format</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * req -&gt;</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> *  {&quot;cmd&quot;: int, ...}</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> * &lt;- res</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> *  {&quot;ret&quot;: code, &quot;msg&quot;: str}  // msg is the error information returned on an error (optional)</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span></div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="namespacehku.html#a6de19e283d1b09508d855f5f787c8b62">   44</a></span><span class="keyword">inline</span> <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> <a class="code hl_function" href="namespacehku.html#a6de19e283d1b09508d855f5f787c8b62">decodeMsg</a>(nng_msg *msg) {</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    HKU_ASSERT(msg != <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">size_t</span> len = nng_msg_len(msg);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_typedef" href="group___data_type.html#ga8519175458e586f3f5c4f8e523abcf94">uint8_t</a> *data = (<a class="code hl_typedef" href="group___data_type.html#ga8519175458e586f3f5c4f8e523abcf94">uint8_t</a> *)nng_msg_body(msg);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> result = json::from_msgpack(data, data + len);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}</div>
+</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span></div>
+<div class="foldopen" id="foldopen00060" data-start="{" data-end="}">
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="namespacehku.html#a4694a713b6e4baaf0a96a51aaa96be12">   60</a></span><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku.html#a4694a713b6e4baaf0a96a51aaa96be12">encodeMsg</a>(nng_msg *msg, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> &amp;in) {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    HKU_ASSERT(msg != <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    nng_msg_clear(msg);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    std::vector&lt;std::uint8_t&gt; v = json::to_msgpack(in);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">int</span> rv = nng_msg_append(msg, v.data(), v.size());</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    NODE_NNG_CHECK(rv, <span class="stringliteral">&quot;Failed nng_msg_append!&quot;</span>);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>}</div>
+</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span></div>
+<div class="foldopen" id="foldopen00075" data-start="{" data-end="}">
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="namespacehku.html#a73014bc73d747a24ed4bc105181524c4">   75</a></span><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku.html#a73014bc73d747a24ed4bc105181524c4">errorMsg</a>(nng_msg *msg, <a class="code hl_enumeration" href="namespacehku.html#a6eabb8a65ea9f384273e8bee6f1a4d4a">NodeErrorCode</a> errcode, <span class="keyword">const</span> std::string &amp;errmsg) {</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> res;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    res[<span class="stringliteral">&quot;ret&quot;</span>] = errcode;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    res[<span class="stringliteral">&quot;msg&quot;</span>] = errmsg;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <a class="code hl_function" href="namespacehku.html#a4694a713b6e4baaf0a96a51aaa96be12">encodeMsg</a>(msg, res);</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>}</div>
+</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="agroup___data_type_html_ga8519175458e586f3f5c4f8e523abcf94"><div class="ttname"><a href="group___data_type.html#ga8519175458e586f3f5c4f8e523abcf94">hku::uint8_t</a></div><div class="ttdeci">unsigned char uint8_t</div><div class="ttdef"><b>定义</b> DataType.h:119</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a4694a713b6e4baaf0a96a51aaa96be12"><div class="ttname"><a href="namespacehku.html#a4694a713b6e4baaf0a96a51aaa96be12">hku::encodeMsg</a></div><div class="ttdeci">void encodeMsg(nng_msg *msg, const json &amp;in)</div><div class="ttdoc">Message encoding</div><div class="ttdef"><b>定义</b> NodeMessage.h:60</div></div>
+<div class="ttc" id="anamespacehku_html_a6de19e283d1b09508d855f5f787c8b62"><div class="ttname"><a href="namespacehku.html#a6de19e283d1b09508d855f5f787c8b62">hku::decodeMsg</a></div><div class="ttdeci">json decodeMsg(nng_msg *msg)</div><div class="ttdoc">Decode the message; the message type and the message body must match</div><div class="ttdef"><b>定义</b> NodeMessage.h:44</div></div>
+<div class="ttc" id="anamespacehku_html_a6eabb8a65ea9f384273e8bee6f1a4d4a"><div class="ttname"><a href="namespacehku.html#a6eabb8a65ea9f384273e8bee6f1a4d4a">hku::NodeErrorCode</a></div><div class="ttdeci">NodeErrorCode</div><div class="ttdoc">Node return code</div><div class="ttdef"><b>定义</b> NodeError.h:17</div></div>
+<div class="ttc" id="anamespacehku_html_a73014bc73d747a24ed4bc105181524c4"><div class="ttname"><a href="namespacehku.html#a73014bc73d747a24ed4bc105181524c4">hku::errorMsg</a></div><div class="ttdeci">void errorMsg(nng_msg *msg, NodeErrorCode errcode, const std::string &amp;errmsg)</div><div class="ttdoc">Build an error message response</div><div class="ttdef"><b>定义</b> NodeMessage.h:75</div></div>
+<div class="ttc" id="anamespacehku_html_ae9a514f1ae8310455075ca506de17757"><div class="ttname"><a href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">hku::json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>定义</b> MomentResult.h:25</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_455cfda4f050b6b78de598e8d6b73501.html">node</a></li><li class="navelem"><b>NodeMessage.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

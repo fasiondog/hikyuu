@@ -1,0 +1,401 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: /Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</div></div>
+</div><!--header-->
+<div class="contents">
+<p>Initialize the global default parameters (optional)</p>
+<p>Initialize the global default parameters (optional)</p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">param</td><td>the default resource creation parameters</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>It should be called once at the program startup to set the global default values </dd>
+<dd>
+These default values are used when the no-argument version of getInstance() is called afterwards </dd>
+<dd>
+Parameter{} is used if this method is not called </dd>
+<dd>
+The maximum number of the resources is determined by the template parameter MAX_POOL_SIZE_LIMIT (32 by default)</dd></dl>
+<div class="fragment"><div class="line"><span class="comment">// Initialize it at the program startup</span></div>
+<div class="line">Parameter defaultParam;</div>
+<div class="line">defaultParam.set(<span class="stringliteral">&quot;host&quot;</span>, <span class="stringliteral">&quot;localhost&quot;</span>);</div>
+<div class="line">defaultParam.set(<span class="stringliteral">&quot;port&quot;</span>, 3306);</div>
+<div class="line">ResourceTlsVersionPool&lt;MyResource&gt;::init(defaultParam);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// No parameter is needed for the later usage</span></div>
+<div class="line"><span class="keyword">auto</span>&amp; pool = ResourceTlsVersionPool&lt;MyResource&gt;::getInstance();</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="preprocessor">#pragma once</span></div>
+<div class="line"><span class="preprocessor">#ifndef HKU_UTILS_RESOURCE_TLS_VERSION_POOL_H</span></div>
+<div class="line"><span class="preprocessor">#define HKU_UTILS_RESOURCE_TLS_VERSION_POOL_H</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;array&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;expected.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;Parameter.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;Log.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;ResourceVersionTraits.h&quot;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ResourceType, <span class="keywordtype">size_t</span> MAX_POOL_SIZE_LIMIT = 2&gt;</div>
+<div class="line"><span class="keyword">class </span>ResourceTlsVersionPool {</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    <span class="comment">// Compile-time check: ResourceType must support getVersion and setVersion</span></div>
+<div class="line">    <span class="keyword">static_assert</span>(detail::has_resource_getVersion_v&lt;ResourceType&gt;,</div>
+<div class="line">                  <span class="stringliteral">&quot;ResourceType must implement getVersion() method.&quot;</span>);</div>
+<div class="line">    <span class="keyword">static_assert</span>(detail::has_resource_setVersion_v&lt;ResourceType&gt;,</div>
+<div class="line">                  <span class="stringliteral">&quot;ResourceType must implement setVersion(int) method.&quot;</span>);</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> <a id="a0" name="a0"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#afafed4e1d71f8ef3e961b66496f1cc7e">init</a>(<span class="keyword">const</span> <a id="a1" name="a1"></a><a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param) {</div>
+<div class="line">        <a id="a2" name="a2"></a><a class="code hl_variable" href="namespacehku.html#a0c77628e18ddca5c75f73a22eabf9974">ms_defaultParam</a> = param;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">static</span> ResourceTlsVersionPool &amp;<a id="a3" name="a3"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">getInstance</a>() {</div>
+<div class="line">        <span class="keyword">thread_local</span> <span class="keyword">static</span> ResourceTlsVersionPool instance(<a class="code hl_variable" href="namespacehku.html#a0c77628e18ddca5c75f73a22eabf9974">ms_defaultParam</a>);</div>
+<div class="line">        <span class="keywordflow">return</span> instance;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">virtual</span> <a id="a4" name="a4"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#ae00bc82c9114d3517400d0c54a701cbb">~ResourceTlsVersionPool</a>() {</div>
+<div class="line">        <span class="comment">// The idle resources are ring-distributed starting from m_head, so release them through</span></div>
+<div class="line">        <span class="comment">// releaseIdleResource() which walks the slots with the correct modulo indexing</span></div>
+<div class="line">        <a id="a5" name="a5"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#a2f669700a32ca76a6283fd76c4ae883f">releaseIdleResource</a>();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">struct </span>ResourceDeleter {</div>
+<div class="line">        ResourceTlsVersionPool *<a id="a6" name="a6"></a><a class="code hl_variable" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a149b682a0a8ef47aefa906c16dc75456">pool</a>;</div>
+<div class="line">        std::thread::id <a id="a7" name="a7"></a><a class="code hl_variable" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a6a25ade3ef1560709b7d3d582b882ca4">owner_thread_id</a>;  <span class="comment">// Records the thread ID when the resource is acquired</span></div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordtype">void</span> <a id="a8" name="a8"></a><a class="code hl_function" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a95061fd9f689e68d3d610a9d31edbced">operator()</a>(ResourceType *resource)<span class="keyword"> const </span>{</div>
+<div class="line">            <span class="keywordflow">if</span> (!resource) {</div>
+<div class="line">                <span class="keywordflow">return</span>;</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            <span class="keyword">auto</span> current_thread = std::this_thread::get_id();</div>
+<div class="line">            <span class="keywordflow">if</span> (current_thread != <a class="code hl_variable" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a6a25ade3ef1560709b7d3d582b882ca4">owner_thread_id</a>) {</div>
+<div class="line">                <span class="comment">// A cross-thread return: the resource is deleted directly to avoid accessing the</span></div>
+<div class="line">                <span class="comment">// thread_local variables. The owner pool state (maintained by its owner thread</span></div>
+<div class="line">                <span class="comment">// only) is not touched, so the pool capacity consumed here is never recovered</span></div>
+<div class="line">                <span class="comment">// afterwards.</span></div>
+<div class="line">                HKU_WARN(</div>
+<div class="line">                  <span class="stringliteral">&quot;Resource returned from different thread, deleting directly to avoid &quot;</span></div>
+<div class="line">                  <span class="stringliteral">&quot;undefined behavior&quot;</span>);</div>
+<div class="line">                <span class="keyword">delete</span> resource;</div>
+<div class="line">            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a149b682a0a8ef47aefa906c16dc75456">pool</a>) {</div>
+<div class="line">                <span class="comment">// A same-thread return: it is returned to the pool normally</span></div>
+<div class="line">                <a class="code hl_variable" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a149b682a0a8ef47aefa906c16dc75456">pool</a>-&gt;<a id="a9" name="a9"></a>returnResource(resource);</div>
+<div class="line">            } <span class="keywordflow">else</span> {</div>
+<div class="line">                <span class="comment">// The pool is empty (possibly during the destruction), delete it directly</span></div>
+<div class="line">                <span class="keyword">delete</span> resource;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    };</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;ResourceType&gt; <a id="a10" name="a10"></a><a class="code hl_typedef" href="classhku_1_1_resource_tls_version_pool.html#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a11" name="a11"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#abf81c627b81e41c0324d63e93fb9f9d6">syncVersion</a>(<span class="keywordtype">int</span> version, <span class="keyword">const</span> <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param) {</div>
+<div class="line">        <span class="keywordflow">if</span> (version == m_version) {</div>
+<div class="line">            <span class="keywordflow">return</span>;  <span class="comment">// The version is the same, no update is needed</span></div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Release all the idle old version resources</span></div>
+<div class="line">        <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#a2f669700a32ca76a6283fd76c4ae883f">releaseIdleResource</a>();</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Update the version and the parameters</span></div>
+<div class="line">        m_version = version;</div>
+<div class="line">        m_param = param;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">int</span> <a id="a12" name="a12"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#ae5b3ca45eadf568c8ffd9be829a03cfa">getVersion</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_version;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    stdx::expected&lt;ResourcePtr, std::string&gt; <a id="a13" name="a13"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#ae73379d118908fa440cc0e5eb3ae9c44">get</a>() {</div>
+<div class="line">        <span class="comment">// 1. Try to get it from the idle list (dequeue from the head of the Ring Buffer)</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_freeCount &gt; 0) {</div>
+<div class="line">            ResourceType *p = m_resourceList[m_head];</div>
+<div class="line">            m_resourceList[m_head] = <span class="keyword">nullptr</span>;</div>
+<div class="line">            m_head = (m_head + 1) % MAX_POOL_SIZE_LIMIT;</div>
+<div class="line">            m_freeCount--;</div>
+<div class="line"> </div>
+<div class="line">            <span class="comment">// Check whether the resource version matches</span></div>
+<div class="line">            <span class="keywordflow">if</span> (p-&gt;getVersion() != m_version) {</div>
+<div class="line">                <span class="comment">// The version does not match, destroy the old resource</span></div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">                m_count--;</div>
+<div class="line"> </div>
+<div class="line">                <span class="comment">// Try to create a new version resource</span></div>
+<div class="line">                <span class="keywordflow">if</span> (m_count &lt; m_maxCount) {</div>
+<div class="line">                    <span class="keywordflow">try</span> {</div>
+<div class="line">                        p = <span class="keyword">new</span> ResourceType(m_param);</div>
+<div class="line">                        p-&gt;setVersion(m_version);</div>
+<div class="line">                        m_count++;</div>
+<div class="line">                        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_resource_tls_version_pool.html#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a>(p, ResourceDeleter{<span class="keyword">this</span>, std::this_thread::get_id()});</div>
+<div class="line">                    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">                        <span class="keywordflow">return</span> stdx::unexpected(</div>
+<div class="line">                          fmt::format(<span class="stringliteral">&quot;Failed to create resource: {}&quot;</span>, e.what()));</div>
+<div class="line">                    } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                        <span class="keywordflow">return</span> stdx::unexpected(<span class="stringliteral">&quot;Failed to create resource: Unknown error&quot;</span>);</div>
+<div class="line">                    }</div>
+<div class="line">                } <span class="keywordflow">else</span> {</div>
+<div class="line">                    <span class="keywordflow">return</span> stdx::unexpected(<span class="stringliteral">&quot;No available resources and maximum pool size reached&quot;</span>);</div>
+<div class="line">                }</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            <span class="comment">// The version matches, return normally</span></div>
+<div class="line">            <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_resource_tls_version_pool.html#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a>(p, ResourceDeleter{<span class="keyword">this</span>, std::this_thread::get_id()});</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 2. There is no idle resource, check whether a new one can be created</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_count &gt;= m_maxCount) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::unexpected(<span class="stringliteral">&quot;No available resources and maximum pool size reached&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 3. Create a new resource</span></div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">try</span> {</div>
+<div class="line">            p = <span class="keyword">new</span> ResourceType(m_param);</div>
+<div class="line">            p-&gt;setVersion(m_version);</div>
+<div class="line">        } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::unexpected(fmt::format(<span class="stringliteral">&quot;Failed to create resource: {}&quot;</span>, e.what()));</div>
+<div class="line">        } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::unexpected(<span class="stringliteral">&quot;Failed to create resource: Unknown error&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        m_count++;</div>
+<div class="line">        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_resource_tls_version_pool.html#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a>(p, ResourceDeleter{<span class="keyword">this</span>, std::this_thread::get_id()});</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    stdx::expected&lt;std::unique_ptr&lt;ResourceType&gt;, std::string&gt; <a id="a14" name="a14"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#af3b49755cc7cccddf063ffcc8880b807">createStandalone</a>() {</div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">try</span> {</div>
+<div class="line">            p = <span class="keyword">new</span> ResourceType(m_param);</div>
+<div class="line">            p-&gt;setVersion(m_version);</div>
+<div class="line">        } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::unexpected(</div>
+<div class="line">              fmt::format(<span class="stringliteral">&quot;Failed to create standalone resource: {}&quot;</span>, e.what()));</div>
+<div class="line">        } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::unexpected(<span class="stringliteral">&quot;Failed to create standalone resource: Unknown error&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Return a standard unique_ptr with the default deleter (a direct delete)</span></div>
+<div class="line">        <span class="keywordflow">return</span> std::unique_ptr&lt;ResourceType&gt;(p);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a15" name="a15"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#abf14458dbed38dc517fdd6681647038c">count</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_count;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a16" name="a16"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#ac67187323a1cfb87292a8255042aa5b5">idleCount</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_freeCount;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a17" name="a17"></a><a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#aa4626dbdcee011748df020d88534cfb4">maxCount</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_maxCount;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#aa4626dbdcee011748df020d88534cfb4">maxCount</a>(<span class="keywordtype">size_t</span> num) {</div>
+<div class="line">        <span class="keywordflow">if</span> (num &gt; MAX_POOL_SIZE_LIMIT) {</div>
+<div class="line">            HKU_WARN(<span class="stringliteral">&quot;maxCount({}) exceeds physical limit ({}), truncated to {}&quot;</span>, num,</div>
+<div class="line">                     MAX_POOL_SIZE_LIMIT, MAX_POOL_SIZE_LIMIT);</div>
+<div class="line">            m_maxCount = MAX_POOL_SIZE_LIMIT;</div>
+<div class="line">        } <span class="keywordflow">else</span> {</div>
+<div class="line">            m_maxCount = num;</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_resource_tls_version_pool.html#a2f669700a32ca76a6283fd76c4ae883f">releaseIdleResource</a>() {</div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; m_freeCount; ++i) {</div>
+<div class="line">            <span class="keywordtype">size_t</span> idx = (m_head + i) % MAX_POOL_SIZE_LIMIT;</div>
+<div class="line">            <span class="keywordflow">if</span> (m_resourceList[idx]) {</div>
+<div class="line">                <span class="keyword">delete</span> m_resourceList[idx];</div>
+<div class="line">                m_resourceList[idx] = <span class="keyword">nullptr</span>;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">        m_count -= m_freeCount;</div>
+<div class="line">        m_freeCount = 0;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    ResourceTlsVersionPool(<span class="keyword">const</span> ResourceTlsVersionPool &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    ResourceTlsVersionPool &amp;operator=(<span class="keyword">const</span> ResourceTlsVersionPool &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> ResourceTlsVersionPool(<span class="keyword">const</span> <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param) : m_param(param), m_version(0) {</div>
+<div class="line">        m_resourceList.fill(<span class="keyword">nullptr</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    ResourceTlsVersionPool() : m_version(0) {</div>
+<div class="line">        m_resourceList.fill(<span class="keyword">nullptr</span>);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keywordtype">void</span> returnResource(ResourceType *p) {</div>
+<div class="line">        <span class="keywordflow">if</span> (!p) {</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Check whether the resource version matches</span></div>
+<div class="line">        <span class="keywordflow">if</span> (p-&gt;getVersion() != m_version) {</div>
+<div class="line">            <span class="comment">// The version does not match, destroy it directly</span></div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            m_count--;</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// The version matches, return it to the pool</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_freeCount &lt; MAX_POOL_SIZE_LIMIT) {</div>
+<div class="line">            m_resourceList[m_tail] = p;</div>
+<div class="line">            m_tail = (m_tail + 1) % MAX_POOL_SIZE_LIMIT;</div>
+<div class="line">            m_freeCount++;</div>
+<div class="line">        } <span class="keywordflow">else</span> {</div>
+<div class="line">            <span class="comment">// If the Ring Buffer is full, delete the resource directly</span></div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            m_count--;</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keywordtype">size_t</span> m_maxCount = MAX_POOL_SIZE_LIMIT;  <span class="comment">// The logical resource upper limit (configurable at</span></div>
+<div class="line">                                              <span class="comment">// runtime, it cannot exceed the physical capacity)</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_count = 0;      <span class="comment">// The number of the currently active resources (including the idle and</span></div>
+<div class="line">                             <span class="comment">// the used ones); maintained by the owner thread only</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_freeCount = 0;  <span class="comment">// The number of the idle resources</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_head = 0;       <span class="comment">// The head index of the Ring Buffer (the dequeue position)</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_tail = 0;       <span class="comment">// The tail index of the Ring Buffer (the enqueue position)</span></div>
+<div class="line">    <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> m_param;       <span class="comment">// Resource creation parameters</span></div>
+<div class="line">    <span class="keywordtype">int</span> m_version = 0;       <span class="comment">// The version number of the current thread</span></div>
+<div class="line">    std::array&lt;ResourceType *, MAX_POOL_SIZE_LIMIT&gt;</div>
+<div class="line">      m_resourceList{};  <span class="comment">// The idle resource array (the Ring Buffer, the physical capacity is</span></div>
+<div class="line">                         <span class="comment">// fixed)</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keyword">static</span> <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> <a class="code hl_variable" href="namespacehku.html#a0c77628e18ddca5c75f73a22eabf9974">ms_defaultParam</a>;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Static member initialization</span></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ResourceType, <span class="keywordtype">size_t</span> MAX_POOL_SIZE_LIMIT&gt;</div>
+<div class="line"><a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> ResourceTlsVersionPool&lt;ResourceType, MAX_POOL_SIZE_LIMIT&gt;::ms_defaultParam{};</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace hku</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#endif </span><span class="comment">/* HKU_UTILS_RESOURCE_TLS_VERSION_POOL_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_a13cd85da7db19a00087419e4b81cf0eb"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#a13cd85da7db19a00087419e4b81cf0eb">hku::ResourceTlsVersionPool::ResourcePtr</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; ResourcePtr</div><div class="ttdoc">The resource instance pointer type (the lifetime is managed with shared_ptr)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:213</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_a2f669700a32ca76a6283fd76c4ae883f"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#a2f669700a32ca76a6283fd76c4ae883f">hku::ResourceTlsVersionPool::releaseIdleResource</a></div><div class="ttdeci">void releaseIdleResource()</div><div class="ttdoc">Release all the currently idle resources</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:383</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_aa4626dbdcee011748df020d88534cfb4"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#aa4626dbdcee011748df020d88534cfb4">hku::ResourceTlsVersionPool::maxCount</a></div><div class="ttdeci">size_t maxCount() const</div><div class="ttdoc">Get the maximum number of the resources allowed (the logical upper limit)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:366</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_abf14458dbed38dc517fdd6681647038c"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#abf14458dbed38dc517fdd6681647038c">hku::ResourceTlsVersionPool::count</a></div><div class="ttdeci">size_t count() const</div><div class="ttdoc">The number of the currently active resources (including the idle and the used ones)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:356</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_abf81c627b81e41c0324d63e93fb9f9d6"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#abf81c627b81e41c0324d63e93fb9f9d6">hku::ResourceTlsVersionPool::syncVersion</a></div><div class="ttdeci">void syncVersion(int version, const Parameter &amp;param)</div><div class="ttdoc">Synchronously update the version and the parameters (called by HybridVersionPool)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:224</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_ac67187323a1cfb87292a8255042aa5b5"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#ac67187323a1cfb87292a8255042aa5b5">hku::ResourceTlsVersionPool::idleCount</a></div><div class="ttdeci">size_t idleCount() const</div><div class="ttdoc">The current number of the idle resources</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:361</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_adb0598a712d14cb651f44e7ff9511c90"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#adb0598a712d14cb651f44e7ff9511c90">hku::ResourceTlsVersionPool::getInstance</a></div><div class="ttdeci">static ResourceTlsVersionPool &amp; getInstance()</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:168</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_ae00bc82c9114d3517400d0c54a701cbb"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#ae00bc82c9114d3517400d0c54a701cbb">hku::ResourceTlsVersionPool::~ResourceTlsVersionPool</a></div><div class="ttdeci">virtual ~ResourceTlsVersionPool()</div><div class="ttdoc">Destructor, it releases all the cached resources of the current thread</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:176</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_ae5b3ca45eadf568c8ffd9be829a03cfa"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#ae5b3ca45eadf568c8ffd9be829a03cfa">hku::ResourceTlsVersionPool::getVersion</a></div><div class="ttdeci">int getVersion() const</div><div class="ttdoc">Get the current version number</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:242</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_ae73379d118908fa440cc0e5eb3ae9c44"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#ae73379d118908fa440cc0e5eb3ae9c44">hku::ResourceTlsVersionPool::get</a></div><div class="ttdeci">stdx::expected&lt; ResourcePtr, std::string &gt; get()</div><div class="ttdoc">Get an available resource</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:260</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_af3b49755cc7cccddf063ffcc8880b807"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#af3b49755cc7cccddf063ffcc8880b807">hku::ResourceTlsVersionPool::createStandalone</a></div><div class="ttdeci">stdx::expected&lt; std::unique_ptr&lt; ResourceType &gt;, std::string &gt; createStandalone()</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:339</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_version_pool_html_afafed4e1d71f8ef3e961b66496f1cc7e"><div class="ttname"><a href="classhku_1_1_resource_tls_version_pool.html#afafed4e1d71f8ef3e961b66496f1cc7e">hku::ResourceTlsVersionPool::init</a></div><div class="ttdeci">static void init(const Parameter &amp;param)</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:145</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a0c77628e18ddca5c75f73a22eabf9974"><div class="ttname"><a href="namespacehku.html#a0c77628e18ddca5c75f73a22eabf9974">hku::ms_defaultParam</a></div><div class="ttdeci">Parameter ResourceTlsPool&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::ms_defaultParam</div><div class="ttdef"><b>定义</b> ResourceTlsPool.h:408</div></div>
+<div class="ttc" id="anamespacehku_html_ac354a2ce9a6e6b3de1e91127fa79f686"><div class="ttname"><a href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">hku::Parameter</a></div><div class="ttdeci">class HKU_API Parameter</div><div class="ttdef"><b>定义</b> Stock.h:30</div></div>
+<div class="ttc" id="astructhku_1_1_resource_tls_version_pool_1_1_resource_deleter_html_a149b682a0a8ef47aefa906c16dc75456"><div class="ttname"><a href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a149b682a0a8ef47aefa906c16dc75456">hku::ResourceTlsVersionPool::ResourceDeleter::pool</a></div><div class="ttdeci">ResourceTlsVersionPool * pool</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:184</div></div>
+<div class="ttc" id="astructhku_1_1_resource_tls_version_pool_1_1_resource_deleter_html_a6a25ade3ef1560709b7d3d582b882ca4"><div class="ttname"><a href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a6a25ade3ef1560709b7d3d582b882ca4">hku::ResourceTlsVersionPool::ResourceDeleter::owner_thread_id</a></div><div class="ttdeci">std::thread::id owner_thread_id</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:185</div></div>
+<div class="ttc" id="astructhku_1_1_resource_tls_version_pool_1_1_resource_deleter_html_a95061fd9f689e68d3d610a9d31edbced"><div class="ttname"><a href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#a95061fd9f689e68d3d610a9d31edbced">hku::ResourceTlsVersionPool::ResourceDeleter::operator()</a></div><div class="ttdeci">void operator()(ResourceType *resource) const</div><div class="ttdef"><b>定义</b> ResourceTlsVersionPool.h:187</div></div>
+</div><!-- fragment --> </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

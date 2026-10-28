@@ -1,0 +1,183 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/sqlite/SQLiteConnect.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_s_q_lite_connect_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SQLiteConnect.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * SQLiteConnect.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2019, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2019-7-1</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef HIYUU_DB_CONNECT_SQLITE_SQLITECONNECT_H</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define HIYUU_DB_CONNECT_SQLITE_SQLITECONNECT_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;sqlite3.h&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../DBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;SQLiteStatement.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="};">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html">   28</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#addd4e0a198b349001b4f9d20ddc6b124">SQLiteConnect</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_d_b_connect_base.html#a88315b5360d9eb71a6f4996e624fd94c">DBConnectBase</a> {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#addd4e0a198b349001b4f9d20ddc6b124">   42</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#addd4e0a198b349001b4f9d20ddc6b124">SQLiteConnect</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_parameter.html">Parameter</a> &amp;param);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#a96d910125da7d390e7caf26d5075357c">   45</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#a96d910125da7d390e7caf26d5075357c">~SQLiteConnect</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#ac3493328a218f53e58c56bebf974a36e">   48</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#ac3493328a218f53e58c56bebf974a36e">ping</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#aa12e3d5ac0860ff353ab5f83231fe0a1">   50</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#aa12e3d5ac0860ff353ab5f83231fe0a1">transaction</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#a0196b04c3858c932d9f3045ae5720a4e">   51</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#a0196b04c3858c932d9f3045ae5720a4e">commit</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#aa7560b4112077ebc4ef4ba4b725c0a39">   52</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#aa7560b4112077ebc4ef4ba4b725c0a39">rollback</a>() noexcept override;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#ae765029bf921e9e409d05c34a59c3742">   53</a></span>    virtual <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#ae765029bf921e9e409d05c34a59c3742">exec</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;sql_string) override;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#a2a6d82cea2c421cce647e00e6c566683">   54</a></span>    virtual <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#a2a6d82cea2c421cce647e00e6c566683">getStatement</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;sql_statement) override;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#ae49075be2bf6349fdc13002076220ff9">   55</a></span>    virtual <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#ae49075be2bf6349fdc13002076220ff9">tableExist</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;tablename) override;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#add8baf664c1b1534e0c12713738b549e">   56</a></span>    virtual <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#add8baf664c1b1534e0c12713738b549e">resetAutoIncrement</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;tablename) override;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#ae891d29a5444bb7044a4fd7faf500109">   68</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#ae891d29a5444bb7044a4fd7faf500109">check</a>(<span class="keywordtype">bool</span> quick = false) noexcept;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#ac3d4c3fd158cbe421cc2144ecdf06557">   81</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_connect.html#ac3d4c3fd158cbe421cc2144ecdf06557">backup</a>(const <span class="keywordtype">char</span> *zFilename, <span class="keywordtype">int</span> n_page = -1, <span class="keywordtype">int</span> step_sleep = 250) noexcept;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>private:</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordtype">void</span> close();</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>private:</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_connect.html#a0a17f1a3d0dc2e1fb4a5aaf20ab771b9">   87</a></span>    friend class <a class="code hl_friend" href="classhku_1_1_s_q_lite_connect.html#a0a17f1a3d0dc2e1fb4a5aaf20ab771b9">SQLiteStatement</a>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> m_dbname;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    sqlite3 *m_db;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>};</div>
+</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="namespacehku.html#aa10c7b5fd8114832067a849e5395474b">   92</a></span>typedef <a class="code hl_namespace" href="namespacestd.html">std</a>::shared_ptr&lt;<a class="code hl_class" href="classhku_1_1_s_q_lite_connect.html">SQLiteConnect</a>&gt; <a class="code hl_typedef" href="namespacehku.html#aa10c7b5fd8114832067a849e5395474b">SQLiteConnectPtr</a>;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="preprocessor">#endif </span><span class="comment">/* HIYUU_DB_MANAGER_SQLITE_SQLITECONNECT_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_d_b_connect_base_html_a88315b5360d9eb71a6f4996e624fd94c"><div class="ttname"><a href="classhku_1_1_d_b_connect_base.html#a88315b5360d9eb71a6f4996e624fd94c">hku::DBConnectBase::DBConnectBase</a></div><div class="ttdeci">DBConnectBase(const Parameter &amp;param)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> DBConnectBase.h:382</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html"><div class="ttname"><a href="classhku_1_1_parameter.html">hku::Parameter</a></div><div class="ttdoc">Used by the classes that need the named parameter settings</div><div class="ttdef"><b>定义</b> Parameter.h:202</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html">hku::SQLiteConnect</a></div><div class="ttdoc">SQLite connection</div><div class="ttdef"><b>定义</b> SQLiteConnect.h:28</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_a0196b04c3858c932d9f3045ae5720a4e"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#a0196b04c3858c932d9f3045ae5720a4e">hku::SQLiteConnect::commit</a></div><div class="ttdeci">virtual void commit() override</div><div class="ttdoc">Commit the transaction; an exception is thrown on failure</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_a0a17f1a3d0dc2e1fb4a5aaf20ab771b9"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#a0a17f1a3d0dc2e1fb4a5aaf20ab771b9">hku::SQLiteConnect::SQLiteStatement</a></div><div class="ttdeci">friend class SQLiteStatement</div><div class="ttdef"><b>定义</b> SQLiteConnect.h:87</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_a2a6d82cea2c421cce647e00e6c566683"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#a2a6d82cea2c421cce647e00e6c566683">hku::SQLiteConnect::getStatement</a></div><div class="ttdeci">virtual SQLStatementPtr getStatement(const std::string &amp;sql_statement) override</div><div class="ttdoc">Get the SQLStatement</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_a96d910125da7d390e7caf26d5075357c"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#a96d910125da7d390e7caf26d5075357c">hku::SQLiteConnect::~SQLiteConnect</a></div><div class="ttdeci">virtual ~SQLiteConnect() override</div><div class="ttdoc">Destructor</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_aa12e3d5ac0860ff353ab5f83231fe0a1"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#aa12e3d5ac0860ff353ab5f83231fe0a1">hku::SQLiteConnect::transaction</a></div><div class="ttdeci">virtual void transaction() override</div><div class="ttdoc">Start a transaction; an exception is thrown on failure</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_aa7560b4112077ebc4ef4ba4b725c0a39"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#aa7560b4112077ebc4ef4ba4b725c0a39">hku::SQLiteConnect::rollback</a></div><div class="ttdeci">virtual void rollback() noexcept override</div><div class="ttdoc">Roll back the transaction</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_ac3493328a218f53e58c56bebf974a36e"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#ac3493328a218f53e58c56bebf974a36e">hku::SQLiteConnect::ping</a></div><div class="ttdeci">virtual bool ping() override</div><div class="ttdoc">false is returned if the sqlite file is invalid</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_ac3d4c3fd158cbe421cc2144ecdf06557"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#ac3d4c3fd158cbe421cc2144ecdf06557">hku::SQLiteConnect::backup</a></div><div class="ttdeci">bool backup(const char *zFilename, int n_page=-1, int step_sleep=250) noexcept</div><div class="ttdoc">Back up the database online, without affecting the operations of the other database connections</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_add8baf664c1b1534e0c12713738b549e"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#add8baf664c1b1534e0c12713738b549e">hku::SQLiteConnect::resetAutoIncrement</a></div><div class="ttdeci">virtual void resetAutoIncrement(const std::string &amp;tablename) override</div><div class="ttdoc">Reset the id in the table with an auto-increment id to start from 1</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_addd4e0a198b349001b4f9d20ddc6b124"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#addd4e0a198b349001b4f9d20ddc6b124">hku::SQLiteConnect::SQLiteConnect</a></div><div class="ttdeci">SQLiteConnect(const Parameter &amp;param)</div><div class="ttdoc">Constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_ae49075be2bf6349fdc13002076220ff9"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#ae49075be2bf6349fdc13002076220ff9">hku::SQLiteConnect::tableExist</a></div><div class="ttdeci">virtual bool tableExist(const std::string &amp;tablename) override</div><div class="ttdoc">Judge whether the table exists</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_ae765029bf921e9e409d05c34a59c3742"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#ae765029bf921e9e409d05c34a59c3742">hku::SQLiteConnect::exec</a></div><div class="ttdeci">virtual int64_t exec(const std::string &amp;sql_string) override</div><div class="ttdoc">Execute the SQL without a result</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_connect_html_ae891d29a5444bb7044a4fd7faf500109"><div class="ttname"><a href="classhku_1_1_s_q_lite_connect.html#ae891d29a5444bb7044a4fd7faf500109">hku::SQLiteConnect::check</a></div><div class="ttdeci">bool check(bool quick=false) noexcept</div><div class="ttdoc">Check the database</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_gae515e29dd16a0cef32d5b384635f4361"><div class="ttname"><a href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">hku::SQLStatementPtr</a></div><div class="ttdeci">std::shared_ptr&lt; SQLStatementBase &gt; SQLStatementPtr</div><div class="ttdef"><b>定义</b> SQLStatementBase.h:227</div></div>
+<div class="ttc" id="agroup___data_type_html_ga2b6c0eff2e4f65f353dc655a1baf7f04"><div class="ttname"><a href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">hku::int64_t</a></div><div class="ttdeci">long long int64_t</div><div class="ttdef"><b>定义</b> DataType.h:99</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_aa10c7b5fd8114832067a849e5395474b"><div class="ttname"><a href="namespacehku.html#aa10c7b5fd8114832067a849e5395474b">hku::SQLiteConnectPtr</a></div><div class="ttdeci">std::shared_ptr&lt; SQLiteConnect &gt; SQLiteConnectPtr</div><div class="ttdef"><b>定义</b> SQLiteConnect.h:92</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><a href="dir_22517f5458a7819cb7338454b9c24008.html">sqlite</a></li><li class="navelem"><b>SQLiteConnect.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

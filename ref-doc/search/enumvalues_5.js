@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['ge',['GE',['../classhku_1_1_operand_node.html#a0b7ba3f582d0bdfb6876349262b774dfa0978c558bd52b8ea73050b77ee7e5479',1,'hku::OperandNode']]],
-  ['gt',['GT',['../classhku_1_1_operand_node.html#a0b7ba3f582d0bdfb6876349262b774dfaa4e221df3c14fe29a249a4eacdaf52aa',1,'hku::OperandNode']]]
+  ['forward_0',['FORWARD',['../classhku_1_1_k_query.html#a88dbc70e671f0e96e4b4d7764cef8417ae4fcde174f86f1dbc2047cfdffa56d5e',1,'hku::KQuery']]]
 ];

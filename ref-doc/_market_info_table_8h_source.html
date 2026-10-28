@@ -1,0 +1,293 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/data_driver/base_info/table/MarketInfoTable.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_market_info_table_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">MarketInfoTable.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * MarketInfoTable.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2019 fasiondog</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2019-8-11</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../../../utilities/db_connect/SQLStatementBase.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html">   18</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_market_info_table.html#a6d168f8fdddfb5434b3356f9cb3c2787">MarketInfoTable</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00020" data-start="{" data-end="}">
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a6d168f8fdddfb5434b3356f9cb3c2787">   20</a></span>    <a class="code hl_function" href="classhku_1_1_market_info_table.html#a6d168f8fdddfb5434b3356f9cb3c2787">MarketInfoTable</a>()</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    : m_marketid(0),</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>      m_lastDate(0),</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      m_openTime1(0),</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>      m_closeTime1(0),</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>      m_openTime2(0),</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      m_closeTime2(0) {}</div>
+</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a6d72698b6ec05ac8f09b08bee6d9ac3c">   28</a></span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a6d72698b6ec05ac8f09b08bee6d9ac3c">id</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        <span class="keywordflow">return</span> m_marketid;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    }</div>
+</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="foldopen" id="foldopen00032" data-start="{" data-end="}">
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#ad6d365c0b052f8fc1401ea6f81be2578">   32</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_market_info_table.html#ad6d365c0b052f8fc1401ea6f81be2578">market</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <span class="keywordflow">return</span> m_market;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    }</div>
+</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="foldopen" id="foldopen00036" data-start="{" data-end="}">
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a88a4f197bf5041fd1c4d1ea49d1ee273">   36</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_market_info_table.html#a88a4f197bf5041fd1c4d1ea49d1ee273">name</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="keywordflow">return</span> m_name;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    }</div>
+</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="foldopen" id="foldopen00040" data-start="{" data-end="}">
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#abba9c7910a1893ee2669ddd4be291d95">   40</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_market_info_table.html#abba9c7910a1893ee2669ddd4be291d95">description</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordflow">return</span> m_description;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    }</div>
+</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a3a9911fa0fa76b7c51873d96cdb78e51">   44</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_market_info_table.html#a3a9911fa0fa76b7c51873d96cdb78e51">code</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="keywordflow">return</span> m_code;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    }</div>
+</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="foldopen" id="foldopen00048" data-start="{" data-end="}">
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a4486b103d9008797e2978a5c0dc4460e">   48</a></span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a4486b103d9008797e2978a5c0dc4460e">lastDate</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        HKU_CHECK(m_lastDate &lt;= 99999999, <span class="stringliteral">&quot;Invalid lastDate: {}!&quot;</span>, m_lastDate);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>(m_lastDate * 10000LL);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    }</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="foldopen" id="foldopen00053" data-start="{" data-end="}">
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#ac7be9028d286075acf2d59cc4573fec5">   53</a></span>    <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_market_info_table.html#ac7be9028d286075acf2d59cc4573fec5">openTime1</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keywordflow">return</span> _transTimeDelta(m_openTime1);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    }</div>
+</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="foldopen" id="foldopen00057" data-start="{" data-end="}">
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a0531828556dceddf40388a34e92dabcf">   57</a></span>    <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a0531828556dceddf40388a34e92dabcf">closeTime1</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="keywordflow">return</span> _transTimeDelta(m_closeTime1);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    }</div>
+</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="foldopen" id="foldopen00061" data-start="{" data-end="}">
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a39b19d0e1e0517ab7f398ba835e454d7">   61</a></span>    <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a39b19d0e1e0517ab7f398ba835e454d7">openTime2</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="keywordflow">return</span> _transTimeDelta(m_openTime2);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    }</div>
+</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="foldopen" id="foldopen00065" data-start="{" data-end="}">
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#ac186923277f6e0d8419338649d30ee6f">   65</a></span>    <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="code hl_function" href="classhku_1_1_market_info_table.html#ac186923277f6e0d8419338649d30ee6f">closeTime2</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        <span class="keywordflow">return</span> _transTimeDelta(m_closeTime2);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    }</div>
+</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a> _transTimeDelta(<a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> time)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> hours = time / 100;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        HKU_CHECK(hours &gt;= 0 &amp;&amp; hours &lt;= 23, <span class="stringliteral">&quot;Invalid time: {}!&quot;</span>, time);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> mins = time - hours * 100;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        HKU_CHECK(mins &gt;= 0 &amp;&amp; mins &lt;= 59, <span class="stringliteral">&quot;Invalid time: {}!&quot;</span>, time);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classhku_1_1_time_delta.html">TimeDelta</a>(0, hours, mins);</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00079" data-start="{" data-end="}">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a042352df55c7de64fed456fa4623d10d">   79</a></span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code hl_function" href="classhku_1_1_market_info_table.html#a042352df55c7de64fed456fa4623d10d">getInsertSQL</a>() {</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keywordflow">return</span> <span class="stringliteral">&quot;insert into `market` &quot;</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>               <span class="stringliteral">&quot;(`marketid`, `market`, `name`, `description`, `code`, `lastDate`,&quot;</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>               <span class="stringliteral">&quot; `openTime1`, `closeTime1`, `openTime2`, `closeTime2`) &quot;</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>               <span class="stringliteral">&quot;values (?,?,?,?,?,?,?,?,?,?)&quot;</span>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    }</div>
+</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="foldopen" id="foldopen00086" data-start="{" data-end="}">
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a9eecb438a6e25d8c352c64d47af9f3e9">   86</a></span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code hl_function" href="classhku_1_1_market_info_table.html#a9eecb438a6e25d8c352c64d47af9f3e9">getUpdateSQL</a>() {</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">return</span> <span class="stringliteral">&quot;update `market` set `market`=?, `name`=?, `description`=?, &quot;</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>               <span class="stringliteral">&quot;`code`=?, `lastDate`=?, `openTime1`=?, `closeTime1`=?, &quot;</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>               <span class="stringliteral">&quot;`openTime2=`=?, `closeTime2`=? where `marketid`=?&quot;</span>;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    }</div>
+</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="foldopen" id="foldopen00092" data-start="{" data-end="}">
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a494033a9b526adab3e5675db9bc9d73b">   92</a></span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code hl_function" href="classhku_1_1_market_info_table.html#a494033a9b526adab3e5675db9bc9d73b">getSelectSQL</a>() {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        <span class="keywordflow">return</span> <span class="stringliteral">&quot;select `marketid`,`market`,`name`, `description`, `code`, `lastDate`, &quot;</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>               <span class="stringliteral">&quot;`openTime1`, `closeTime1`, `openTime2`, `closeTime2` from `market`&quot;</span>;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    }</div>
+</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
+<div class="foldopen" id="foldopen00097" data-start="{" data-end="}">
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a11a2f94a5fb752e94434b42411bf1286">   97</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a11a2f94a5fb752e94434b42411bf1286">save</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a>&amp; st)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        st-&gt;bind(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate, m_openTime1,</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                 m_closeTime1, m_openTime2, m_closeTime2);</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    }</div>
+</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="foldopen" id="foldopen00102" data-start="{" data-end="}">
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a039ccd5dc810a23632e6f5f9ab049e7b">  102</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a039ccd5dc810a23632e6f5f9ab049e7b">update</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a>&amp; st)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        st-&gt;bind(0, m_market, m_name, m_description, m_code, m_lastDate, m_openTime1, m_closeTime1,</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>                 m_openTime2, m_closeTime2, m_marketid);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    }</div>
+</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="foldopen" id="foldopen00107" data-start="{" data-end="}">
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="classhku_1_1_market_info_table.html#a232d5aa1e5048015298e8f20718626ce">  107</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_market_info_table.html#a232d5aa1e5048015298e8f20718626ce">load</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">SQLStatementPtr</a>&amp; st) {</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        st-&gt;getColumn(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate,</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                      m_openTime1, m_closeTime1, m_openTime2, m_closeTime2);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    }</div>
+</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> m_marketid;</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordtype">string</span> m_market;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordtype">string</span> m_name;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <span class="keywordtype">string</span> m_description;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordtype">string</span> m_code;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> m_lastDate;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> m_openTime1;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> m_closeTime1;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> m_openTime2;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> m_closeTime2;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>};</div>
+</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="preprocessor">#endif </span><span class="comment">/* HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a039ccd5dc810a23632e6f5f9ab049e7b"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a039ccd5dc810a23632e6f5f9ab049e7b">hku::MarketInfoTable::update</a></div><div class="ttdeci">void update(const SQLStatementPtr &amp;st) const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:102</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a042352df55c7de64fed456fa4623d10d"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a042352df55c7de64fed456fa4623d10d">hku::MarketInfoTable::getInsertSQL</a></div><div class="ttdeci">static const char * getInsertSQL()</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:79</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a0531828556dceddf40388a34e92dabcf"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a0531828556dceddf40388a34e92dabcf">hku::MarketInfoTable::closeTime1</a></div><div class="ttdeci">TimeDelta closeTime1() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:57</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a11a2f94a5fb752e94434b42411bf1286"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a11a2f94a5fb752e94434b42411bf1286">hku::MarketInfoTable::save</a></div><div class="ttdeci">void save(const SQLStatementPtr &amp;st) const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:97</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a232d5aa1e5048015298e8f20718626ce"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a232d5aa1e5048015298e8f20718626ce">hku::MarketInfoTable::load</a></div><div class="ttdeci">void load(const SQLStatementPtr &amp;st)</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:107</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a39b19d0e1e0517ab7f398ba835e454d7"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a39b19d0e1e0517ab7f398ba835e454d7">hku::MarketInfoTable::openTime2</a></div><div class="ttdeci">TimeDelta openTime2() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:61</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a3a9911fa0fa76b7c51873d96cdb78e51"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a3a9911fa0fa76b7c51873d96cdb78e51">hku::MarketInfoTable::code</a></div><div class="ttdeci">const string &amp; code() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:44</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a4486b103d9008797e2978a5c0dc4460e"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a4486b103d9008797e2978a5c0dc4460e">hku::MarketInfoTable::lastDate</a></div><div class="ttdeci">Datetime lastDate() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:48</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a494033a9b526adab3e5675db9bc9d73b"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a494033a9b526adab3e5675db9bc9d73b">hku::MarketInfoTable::getSelectSQL</a></div><div class="ttdeci">static const char * getSelectSQL()</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:92</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a6d168f8fdddfb5434b3356f9cb3c2787"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a6d168f8fdddfb5434b3356f9cb3c2787">hku::MarketInfoTable::MarketInfoTable</a></div><div class="ttdeci">MarketInfoTable()</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a6d72698b6ec05ac8f09b08bee6d9ac3c"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a6d72698b6ec05ac8f09b08bee6d9ac3c">hku::MarketInfoTable::id</a></div><div class="ttdeci">uint64_t id() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:28</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a88a4f197bf5041fd1c4d1ea49d1ee273"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a88a4f197bf5041fd1c4d1ea49d1ee273">hku::MarketInfoTable::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:36</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_a9eecb438a6e25d8c352c64d47af9f3e9"><div class="ttname"><a href="classhku_1_1_market_info_table.html#a9eecb438a6e25d8c352c64d47af9f3e9">hku::MarketInfoTable::getUpdateSQL</a></div><div class="ttdeci">static const char * getUpdateSQL()</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:86</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_abba9c7910a1893ee2669ddd4be291d95"><div class="ttname"><a href="classhku_1_1_market_info_table.html#abba9c7910a1893ee2669ddd4be291d95">hku::MarketInfoTable::description</a></div><div class="ttdeci">const string &amp; description() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:40</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_ac186923277f6e0d8419338649d30ee6f"><div class="ttname"><a href="classhku_1_1_market_info_table.html#ac186923277f6e0d8419338649d30ee6f">hku::MarketInfoTable::closeTime2</a></div><div class="ttdeci">TimeDelta closeTime2() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:65</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_ac7be9028d286075acf2d59cc4573fec5"><div class="ttname"><a href="classhku_1_1_market_info_table.html#ac7be9028d286075acf2d59cc4573fec5">hku::MarketInfoTable::openTime1</a></div><div class="ttdeci">TimeDelta openTime1() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:53</div></div>
+<div class="ttc" id="aclasshku_1_1_market_info_table_html_ad6d365c0b052f8fc1401ea6f81be2578"><div class="ttname"><a href="classhku_1_1_market_info_table.html#ad6d365c0b052f8fc1401ea6f81be2578">hku::MarketInfoTable::market</a></div><div class="ttdeci">const string &amp; market() const</div><div class="ttdef"><b>定义</b> MarketInfoTable.h:32</div></div>
+<div class="ttc" id="aclasshku_1_1_time_delta_html"><div class="ttname"><a href="classhku_1_1_time_delta.html">hku::TimeDelta</a></div><div class="ttdoc">Duration, used for the time calculation</div><div class="ttdef"><b>定义</b> TimeDelta.h:38</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_gae515e29dd16a0cef32d5b384635f4361"><div class="ttname"><a href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">hku::SQLStatementPtr</a></div><div class="ttdeci">std::shared_ptr&lt; SQLStatementBase &gt; SQLStatementPtr</div><div class="ttdef"><b>定义</b> SQLStatementBase.h:227</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="agroup___data_type_html_ga2b6c0eff2e4f65f353dc655a1baf7f04"><div class="ttname"><a href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">hku::int64_t</a></div><div class="ttdeci">long long int64_t</div><div class="ttdef"><b>定义</b> DataType.h:99</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><a href="dir_814473b652813f9f34411f57578f38f1.html">base_info</a></li><li class="navelem"><a href="dir_909cb50340df8ecfe7eb04124d6e5f10.html">table</a></li><li class="navelem"><b>MarketInfoTable.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

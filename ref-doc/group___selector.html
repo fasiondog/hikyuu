@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: Selector 交易对象选择算法</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: Selector trading object selection algorithm</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,36 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li class="current"><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('group___selector.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,55 +74,82 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#nested-classes">类</a> &#124;
-<a href="#define-members">宏定义</a> &#124;
-<a href="#typedef-members">类型定义</a>  </div>
-  <div class="headertitle">
-<div class="title">Selector 交易对象选择算法<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___portfolio.html">Portfolio 投资组合管理</a></div></div>  </div>
+  <div class="headertitle"><div class="title">Selector trading object selection algorithm <div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___portfolio.html">Portfolio portfolio management</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Selector 交易对象选择算法 的协作图:</div>
+Selector trading object selection algorithm 的协作图:</div>
 <div class="dyncontent">
-<center><table><tr><td><img src="group___selector.png" border="0" alt="" usemap="#group______selector"/>
-<map name="group______selector" id="group______selector">
-<area shape="rect" id="node1" href="group___portfolio.html" title="Portfolio 投资组合管理" alt="" coords="5,5,193,35"/>
-</map>
-</td></tr></table></center>
+<div class="center"><img src="group___selector.png" border="0" usemap="#agroup______selector" loading="lazy" alt=""/></div>
 </div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 类</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html">hku::SelectorBase</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">交易对象选择模块  <a href="classhku_1_1_selector_base.html#details">更多...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:hku_3A_3AScoresFilterBase" id="r_hku_3A_3AScoresFilterBase"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_scores_filter_base.html">hku::ScoresFilterBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Score filter  <a href="classhku_1_1_scores_filter_base.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3AOperatorValueSelector" id="r_hku_3A_3AOperatorValueSelector"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_operator_value_selector.html">hku::OperatorValueSelector</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms only the weight of each selected system and keeps the order returned by the wrapped selector: the sign and the ordering are part of the expression semantics and are left to the concrete selector or the downstream filter (e.g.  <a href="classhku_1_1_operator_value_selector.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3ASelectorBase" id="r_hku_3A_3ASelectorBase"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html">hku::SelectorBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trading object selection module  <a href="classhku_1_1_selector_base.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:hku_3A_3ASystemWeight" id="r_hku_3A_3ASystemWeight"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhku_1_1_system_weight.html">hku::SystemWeight</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhku_1_1_system.html" title="Base class of the trading system">System</a> weight; the value is interpreted by the consumer (e.g.  <a href="structhku_1_1_system_weight.html#details">更多...</a><br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 宏定义</h2></td></tr>
-<tr class="memitem:ga01ef47cd774b77cd653d0155895570ff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___selector.html#ga01ef47cd774b77cd653d0155895570ff">SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
-<tr class="memdesc:ga01ef47cd774b77cd653d0155895570ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="#ga01ef47cd774b77cd653d0155895570ff">更多...</a><br /></td></tr>
-<tr class="separator:ga01ef47cd774b77cd653d0155895570ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga01ef47cd774b77cd653d0155895570ff" id="r_ga01ef47cd774b77cd653d0155895570ff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga01ef47cd774b77cd653d0155895570ff">SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:ga01ef47cd774b77cd653d0155895570ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">For an inheriting subclass without private variables, this macro can be used directly for the serialization  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 类型定义</h2></td></tr>
-<tr class="memitem:ga241a7320b6a0abbbfe087fcb7e19679d"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; Portfolio &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___selector.html#ga241a7320b6a0abbbfe087fcb7e19679d">hku::PortfolioPtr</a></td></tr>
-<tr class="memdesc:ga241a7320b6a0abbbfe087fcb7e19679d"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型  <a href="group___selector.html#ga241a7320b6a0abbbfe087fcb7e19679d">更多...</a><br /></td></tr>
-<tr class="separator:ga241a7320b6a0abbbfe087fcb7e19679d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga567344f3fb0db473aa68e844b715ae0b"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; SelectorBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">hku::SelectorPtr</a></td></tr>
-<tr class="memdesc:ga567344f3fb0db473aa68e844b715ae0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型  <a href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">更多...</a><br /></td></tr>
-<tr class="separator:ga567344f3fb0db473aa68e844b715ae0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga567344f3fb0db473aa68e844b715ae0b" id="r_ga567344f3fb0db473aa68e844b715ae0b"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">hku::SelectorPtr</a></td></tr>
+<tr class="memdesc:ga567344f3fb0db473aa68e844b715ae0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Client programs should all use this pointer type  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:gaec8091e220f70e082003d9387802237c" id="r_gaec8091e220f70e082003d9387802237c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaec8091e220f70e082003d9387802237c">hku::SE_Fixed</a> (double weight=1.0)</td></tr>
+<tr class="memdesc:gaec8091e220f70e082003d9387802237c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fixed selector, it selects the given trading system every day  <br /></td></tr>
+<tr class="memitem:ga0106797a336a48585851888ff46fabcf" id="r_ga0106797a336a48585851888ff46fabcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga0106797a336a48585851888ff46fabcf">hku::SE_Fixed</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stock_list, const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;sys, double weight=1.0)</td></tr>
+<tr class="memdesc:ga0106797a336a48585851888ff46fabcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fixed selector, it selects the given trading system every day  <br /></td></tr>
+<tr class="memitem:gaa9a17b6dbb7da962664402519de22591" id="r_gaa9a17b6dbb7da962664402519de22591"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaa9a17b6dbb7da962664402519de22591">hku::SE_MultiFactor</a> ()</td></tr>
+<tr class="memdesc:gaa9a17b6dbb7da962664402519de22591"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an empty MultiFactor selector without a factor set  <br /></td></tr>
+<tr class="memitem:gab57ceec60978a435d32213114d74b907" id="r_gab57ceec60978a435d32213114d74b907"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gab57ceec60978a435d32213114d74b907">hku::SE_MultiFactor</a> (const <a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> &amp;mf, int topn=10)</td></tr>
+<tr class="memdesc:gab57ceec60978a435d32213114d74b907"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor  <br /></td></tr>
+<tr class="memitem:gaa95570adbbaeb8a4f904a8dea8a37d6d" id="r_gaa95570adbbaeb8a4f904a8dea8a37d6d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaa95570adbbaeb8a4f904a8dea8a37d6d">hku::SE_MultiFactor</a> (const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;src_inds, int topn=10, int ic_n=5, int ic_rolling_n=120, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;ref_stk=<a class="el" href="classhku_1_1_stock.html">Stock</a>(), bool spearman=true, const string &amp;mode=&quot;MF_ICIRWeight&quot;)</td></tr>
+<tr class="memdesc:gaa95570adbbaeb8a4f904a8dea8a37d6d"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor, it supports multiple factor input ways  <br /></td></tr>
+<tr class="memitem:gaec00fb7f4e492712e2aa7bd3d4c4d14f" id="r_gaec00fb7f4e492712e2aa7bd3d4c4d14f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaec00fb7f4e492712e2aa7bd3d4c4d14f">hku::SE_MultiFactor</a> (const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;src_inds, int topn=10, int ic_n=5, int ic_rolling_n=120, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;ref_stk=<a class="el" href="classhku_1_1_stock.html">Stock</a>(), bool spearman=true, const string &amp;mode=&quot;MF_ICIRWeight&quot;)</td></tr>
+<tr class="memdesc:gaec00fb7f4e492712e2aa7bd3d4c4d14f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience interface for creating the MultiFactor stock selection algorithm based on an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>  <br /></td></tr>
+<tr class="memitem:ga6acf4404d1068e2485ddefcea054e187" id="r_ga6acf4404d1068e2485ddefcea054e187"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga6acf4404d1068e2485ddefcea054e187">hku::SE_MultiFactor2</a> ()</td></tr>
+<tr class="memdesc:ga6acf4404d1068e2485ddefcea054e187"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an empty MultiFactor2 selector without a factor set  <br /></td></tr>
+<tr class="memitem:ga4904e32348828a03c48288892860be7e" id="r_ga4904e32348828a03c48288892860be7e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4904e32348828a03c48288892860be7e">hku::SE_MultiFactor2</a> (const <a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> &amp;mf, const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;filter=<a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">SCFilter_IgnoreNan</a>())</td></tr>
+<tr class="memdesc:ga4904e32348828a03c48288892860be7e"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor  <br /></td></tr>
+<tr class="memitem:gaf7dabea671e235437f17df5861076395" id="r_gaf7dabea671e235437f17df5861076395"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaf7dabea671e235437f17df5861076395">hku::SE_MultiFactor2</a> (const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;factorset, int ic_n=5, int ic_rolling_n=120, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;ref_stk=<a class="el" href="classhku_1_1_stock.html">Stock</a>(), bool spearman=true, const string &amp;mode=&quot;MF_ICIRWeight&quot;, const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;filter=<a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">SCFilter_IgnoreNan</a>())</td></tr>
+<tr class="memdesc:gaf7dabea671e235437f17df5861076395"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor, it supports multiple factor input ways  <br /></td></tr>
+<tr class="memitem:ga86d232a80b1e3736fdd26c2f0e6aa79d" id="r_ga86d232a80b1e3736fdd26c2f0e6aa79d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga86d232a80b1e3736fdd26c2f0e6aa79d">hku::SE_MultiFactor2</a> (const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;src_inds, int ic_n=5, int ic_rolling_n=120, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;ref_stk=<a class="el" href="classhku_1_1_stock.html">Stock</a>(), bool spearman=true, const string &amp;mode=&quot;MF_ICIRWeight&quot;, const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;filter=<a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">SCFilter_IgnoreNan</a>())</td></tr>
+<tr class="memdesc:ga86d232a80b1e3736fdd26c2f0e6aa79d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience interface for creating the MultiFactor2 stock selection algorithm based on an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>  <br /></td></tr>
+<tr class="memitem:gae186e47e6479eee8033b4fc21bca6606" id="r_gae186e47e6479eee8033b4fc21bca6606"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gae186e47e6479eee8033b4fc21bca6606">hku::SE_Signal</a> ()</td></tr>
+<tr class="memdesc:gae186e47e6479eee8033b4fc21bca6606"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal selector, it selects with the system buy signals only  <br /></td></tr>
+<tr class="memitem:ga309f2ced2c982151aeaa0a2b4e29b3bb" id="r_ga309f2ced2c982151aeaa0a2b4e29b3bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga309f2ced2c982151aeaa0a2b4e29b3bb">hku::SE_Signal</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stock_list, const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;sys)</td></tr>
+<tr class="memdesc:ga309f2ced2c982151aeaa0a2b4e29b3bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal selector, it selects with the system buy signals only  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<p>选择交易对象 </p>
-<h2 class="groupheader">宏定义说明</h2>
-<a class="anchor" id="ga01ef47cd774b77cd653d0155895570ff"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<p>Select the trading object </p>
+<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">宏定义说明</h2>
+<a id="ga01ef47cd774b77cd653d0155895570ff" name="ga01ef47cd774b77cd653d0155895570ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga01ef47cd774b77cd653d0155895570ff">&#9670;&#160;</a></span>SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -129,47 +158,575 @@ Selector 交易对象选择算法 的协作图:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:\</div><div class="line">    friend <span class="keyword">class </span>boost::serialization::access; \</div><div class="line">    template&lt;class Archive&gt; \</div><div class="line">    void serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div><div class="line">        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase); \</div><div class="line">    }</div></div><!-- fragment -->
-<p>对于没有私有变量的继承子类，可直接使用该宏定义序列化 </p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;class Drived: public SelectorBase {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;    SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;public:</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    Drived();</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;    ...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;};</div></div><!-- fragment --> 
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/SelectorBase.h&gt;</code></p>
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                                       \</div>
+<div class="line">    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;                 \</div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;                                   \</div>
+<div class="line">    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {  \</div>
+<div class="line">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase); \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+<p>For an inheriting subclass without private variables, this macro can be used directly for the serialization </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>Drived: <span class="keyword">public</span> SelectorBase {</div>
+<div class="line">    <a class="code hl_define" href="#ga01ef47cd774b77cd653d0155895570ff">SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</a></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    Drived();</div>
+<div class="line">    ...</div>
+<div class="line">};</div>
+<div class="ttc" id="agroup___selector_html_ga01ef47cd774b77cd653d0155895570ff"><div class="ttname"><a href="#ga01ef47cd774b77cd653d0155895570ff">SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="ttdeci">#define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="ttdoc">For an inheriting subclass without private variables, this macro can be used directly for the seriali...</div><div class="ttdef"><b>定义</b> SelectorBase.h:259</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
-<h2 class="groupheader">类型定义说明</h2>
-<a class="anchor" id="ga241a7320b6a0abbbfe087fcb7e19679d"></a>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">类型定义说明</h2>
+<a id="ga567344f3fb0db473aa68e844b715ae0b" name="ga567344f3fb0db473aa68e844b715ae0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga567344f3fb0db473aa68e844b715ae0b">&#9670;&#160;</a></span>SelectorPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;Portfolio&gt; <a class="el" href="group___selector.html#ga241a7320b6a0abbbfe087fcb7e19679d">hku::PortfolioPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a>&gt; <a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">hku::SelectorPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>客户程序都应使用该指针类型 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/SelectorBase.h&gt;</code></p>
+
+<p>Client programs should all use this pointer type </p>
 
 </div>
 </div>
-<a class="anchor" id="ga567344f3fb0db473aa68e844b715ae0b"></a>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="ga0106797a336a48585851888ff46fabcf" name="ga0106797a336a48585851888ff46fabcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0106797a336a48585851888ff46fabcf">&#9670;&#160;</a></span>SE_Fixed() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;SelectorBase&gt; <a class="el" href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">hku::SelectorPtr</a></td>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_Fixed </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock_list</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>sys</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>weight</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1.0</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>客户程序都应使用该指针类型 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_Fixed.h&gt;</code></p>
+
+<p>Fixed selector, it selects the given trading system every day </p>
+<p>It creates the corresponding trading system with the prototype system for every given stock </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock_list</td><td>the given stock list </td></tr>
+    <tr><td class="paramname">sys</td><td>prototype system </td></tr>
+    <tr><td class="paramname">weight</td><td>fixed weight </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaec8091e220f70e082003d9387802237c" name="gaec8091e220f70e082003d9387802237c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaec8091e220f70e082003d9387802237c">&#9670;&#160;</a></span>SE_Fixed() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_Fixed </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>weight</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1.0</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_Fixed.h&gt;</code></p>
+
+<p>Fixed selector, it selects the given trading system every day </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">weight</td><td>fixed weight </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaa9a17b6dbb7da962664402519de22591" name="gaa9a17b6dbb7da962664402519de22591"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa9a17b6dbb7da962664402519de22591">&#9670;&#160;</a></span>SE_MultiFactor() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_MultiFactor </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor.h&gt;</code></p>
+
+<p>Create an empty MultiFactor selector without a factor set </p>
+<p>For testing only; not exported to Python. The factor set is set later </p><dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaa95570adbbaeb8a4f904a8dea8a37d6d" name="gaa95570adbbaeb8a4f904a8dea8a37d6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa95570adbbaeb8a4f904a8dea8a37d6d">&#9670;&#160;</a></span>SE_MultiFactor() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_MultiFactor </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>src_inds</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>topn</em></span><span class="paramdefsep"> = </span><span class="paramdefval">10</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">5</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_rolling_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">120</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ref_stk</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_stock.html">Stock</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>spearman</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;MF_ICIRWeight&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor.h&gt;</code></p>
+
+<p><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor, it supports multiple factor input ways </p>
+<p>Three creation ways are supported:</p><ol type="1">
+<li>Use a pre-created MultiFactor object directly</li>
+<li>Create it directly with a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> object</li>
+<li>Use an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> (it is converted into a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> internally and automatically)</li>
+</ol>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src_inds</td><td>the factor input, it can be a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> object or an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> </td></tr>
+    <tr><td class="paramname">topn</td><td>select the first topn systems in the time cross-section only; less than or equal to 0 means no limit </td></tr>
+    <tr><td class="paramname">ic_n</td><td>the ic_n day return corresponding to the ic </td></tr>
+    <tr><td class="paramname">ic_rolling_n</td><td>the period for calculating the rolling IC (i.e. the n-day moving average of the IC) </td></tr>
+    <tr><td class="paramname">ref_stk</td><td>the reference security, used for the date alignment, sh000001 when it is not given </td></tr>
+    <tr><td class="paramname">spearman</td><td>spearman is used to calculate the correlation coefficient by default, otherwise pearson </td></tr>
+    <tr><td class="paramname">mode</td><td>"MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight", the name of the factor synthesis algorithm </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaec00fb7f4e492712e2aa7bd3d4c4d14f" name="gaec00fb7f4e492712e2aa7bd3d4c4d14f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaec00fb7f4e492712e2aa7bd3d4c4d14f">&#9670;&#160;</a></span>SE_MultiFactor() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> hku::SE_MultiFactor </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>src_inds</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>topn</em></span><span class="paramdefsep"> = </span><span class="paramdefval">10</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">5</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_rolling_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">120</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ref_stk</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_stock.html">Stock</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>spearman</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;MF_ICIRWeight&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor.h&gt;</code></p>
+
+<p>Convenience interface for creating the MultiFactor stock selection algorithm based on an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> </p>
+<p>It converts the <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> into a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> internally and then calls the main function </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src_inds</td><td>the original factor list </td></tr>
+    <tr><td class="paramname">topn</td><td>select the first topn systems in the time cross-section only; less than or equal to 0 means no limit </td></tr>
+    <tr><td class="paramname">ic_n</td><td>the ic_n day return corresponding to the ic </td></tr>
+    <tr><td class="paramname">ic_rolling_n</td><td>the period for calculating the rolling IC (i.e. the n-day moving average of the IC) </td></tr>
+    <tr><td class="paramname">ref_stk</td><td>the reference security, used for the date alignment, sh000001 when it is not given </td></tr>
+    <tr><td class="paramname">spearman</td><td>spearman is used to calculate the correlation coefficient by default, otherwise pearson </td></tr>
+    <tr><td class="paramname">mode</td><td>"MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight", the name of the factor synthesis algorithm </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gab57ceec60978a435d32213114d74b907" name="gab57ceec60978a435d32213114d74b907"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab57ceec60978a435d32213114d74b907">&#9670;&#160;</a></span>SE_MultiFactor() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_MultiFactor </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mf</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>topn</em></span><span class="paramdefsep"> = </span><span class="paramdefval">10</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor.h&gt;</code></p>
+
+<p><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mf</td><td>the MultiFactor instance </td></tr>
+    <tr><td class="paramname">topn</td><td>select the first topn systems in the time cross-section only </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga6acf4404d1068e2485ddefcea054e187" name="ga6acf4404d1068e2485ddefcea054e187"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6acf4404d1068e2485ddefcea054e187">&#9670;&#160;</a></span>SE_MultiFactor2() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_MultiFactor2 </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor2.h&gt;</code></p>
+
+<p>Create an empty MultiFactor2 selector without a factor set </p>
+<p>For testing only; not exported to Python. The factor set is set later </p><dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaf7dabea671e235437f17df5861076395" name="gaf7dabea671e235437f17df5861076395"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf7dabea671e235437f17df5861076395">&#9670;&#160;</a></span>SE_MultiFactor2() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_MultiFactor2 </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>factorset</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">5</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_rolling_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">120</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ref_stk</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_stock.html">Stock</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>spearman</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;MF_ICIRWeight&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">SCFilter_IgnoreNan</a>()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor2.h&gt;</code></p>
+
+<p><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor, it supports multiple factor input ways </p>
+<p>Three creation ways are supported:</p><ol type="1">
+<li>Use a pre-created MultiFactor object directly</li>
+<li>Create it directly with a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> object</li>
+<li>Use an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> (it is converted into a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> internally and automatically)</li>
+</ol>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">factorset</td><td>the factor input, it can be a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> object or an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> </td></tr>
+    <tr><td class="paramname">ic_n</td><td>the ic_n day return corresponding to the ic </td></tr>
+    <tr><td class="paramname">ic_rolling_n</td><td>the period for calculating the rolling IC (i.e. the n-day moving average of the IC) </td></tr>
+    <tr><td class="paramname">ref_stk</td><td>the reference security, used for the date alignment, sh000001 when it is not given </td></tr>
+    <tr><td class="paramname">spearman</td><td>spearman is used to calculate the correlation coefficient by default, otherwise pearson </td></tr>
+    <tr><td class="paramname">mode</td><td>"MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight", the name of the factor synthesis algorithm </td></tr>
+    <tr><td class="paramname">filter</td><td>the score filter </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga86d232a80b1e3736fdd26c2f0e6aa79d" name="ga86d232a80b1e3736fdd26c2f0e6aa79d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga86d232a80b1e3736fdd26c2f0e6aa79d">&#9670;&#160;</a></span>SE_MultiFactor2() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> hku::SE_MultiFactor2 </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>src_inds</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">5</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_rolling_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">120</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ref_stk</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_stock.html">Stock</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>spearman</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;MF_ICIRWeight&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">SCFilter_IgnoreNan</a>()</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor2.h&gt;</code></p>
+
+<p>Convenience interface for creating the MultiFactor2 stock selection algorithm based on an <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> </p>
+<p>It converts the <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> into a <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> internally and then calls the main function </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src_inds</td><td>the original factor list </td></tr>
+    <tr><td class="paramname">ic_n</td><td>the ic_n day return corresponding to the ic </td></tr>
+    <tr><td class="paramname">ic_rolling_n</td><td>the period for calculating the rolling IC (i.e. the n-day moving average of the IC) </td></tr>
+    <tr><td class="paramname">ref_stk</td><td>the reference security, used for the date alignment, sh000001 when it is not given </td></tr>
+    <tr><td class="paramname">spearman</td><td>spearman is used to calculate the correlation coefficient by default, otherwise pearson </td></tr>
+    <tr><td class="paramname">mode</td><td>"MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight", the name of the factor synthesis algorithm </td></tr>
+    <tr><td class="paramname">filter</td><td>the score filter </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga4904e32348828a03c48288892860be7e" name="ga4904e32348828a03c48288892860be7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4904e32348828a03c48288892860be7e">&#9670;&#160;</a></span>SE_MultiFactor2() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b">SelectorPtr</a> HKU_API hku::SE_MultiFactor2 </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mf</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">SCFilter_IgnoreNan</a>()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_MultiFactor2.h&gt;</code></p>
+
+<p><a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> selection algorithm based on MultiFactor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mf</td><td>the MultiFactor instance </td></tr>
+    <tr><td class="paramname">filter</td><td>the score filter </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#ga567344f3fb0db473aa68e844b715ae0b" title="Client programs should all use this pointer type">SelectorPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="gae186e47e6479eee8033b4fc21bca6606" name="gae186e47e6479eee8033b4fc21bca6606"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae186e47e6479eee8033b4fc21bca6606">&#9670;&#160;</a></span>SE_Signal() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> HKU_API hku::SE_Signal </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_Signal.h&gt;</code></p>
+
+<p>Signal selector, it selects with the system buy signals only </p>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga309f2ced2c982151aeaa0a2b4e29b3bb" name="ga309f2ced2c982151aeaa0a2b4e29b3bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga309f2ced2c982151aeaa0a2b4e29b3bb">&#9670;&#160;</a></span>SE_Signal() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> HKU_API hku::SE_Signal </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock_list</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>sys</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/selector/crt/SE_Signal.h&gt;</code></p>
+
+<p>Signal selector, it selects with the system buy signals only </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock_list</td><td>stock list </td></tr>
+    <tr><td class="paramname">sys</td><td>prototype system </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

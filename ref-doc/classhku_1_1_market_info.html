@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::MarketInfo类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_market_info.html','','classhku_1_1_market_info-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,132 +74,153 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="classhku_1_1_market_info-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::MarketInfo类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::MarketInfo类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage security management</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>市场信息记录  
- <a href="classhku_1_1_market_info.html#details">更多...</a></p>
+<p>Market information record  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_market_info_8h_source.html">MarketInfo.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a5dcfb6f00c06efb088a9eb4f4568502a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#a5dcfb6f00c06efb088a9eb4f4568502a">MarketInfo</a> ()</td></tr>
-<tr class="memdesc:a5dcfb6f00c06efb088a9eb4f4568502a"><td class="mdescLeft">&#160;</td><td class="mdescRight">默认构造函数，返回Null&lt;MarketInfo&gt;()  <a href="#a5dcfb6f00c06efb088a9eb4f4568502a">更多...</a><br /></td></tr>
-<tr class="separator:a5dcfb6f00c06efb088a9eb4f4568502a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae97bb158b07e45f422005cd6d5ef9789"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#ae97bb158b07e45f422005cd6d5ef9789">MarketInfo</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_market_info.html#a0636329111fd2e7f9a447dc48b1d4b10">market</a>, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_market_info.html#afb4e54a42175cdb354512c28b9246e19">name</a>, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_market_info.html#a31ae4fa02eb0ebf22937afabd281f329">description</a>, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_market_info.html#a5c149bffeba22e8f7c2303f9e8d658a9">code</a>, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_market_info.html#a82cd6855a18b5f9452313beb22d9816b">lastDate</a>)</td></tr>
-<tr class="separator:ae97bb158b07e45f422005cd6d5ef9789"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0636329111fd2e7f9a447dc48b1d4b10"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#a0636329111fd2e7f9a447dc48b1d4b10">market</a> () const </td></tr>
-<tr class="memdesc:a0636329111fd2e7f9a447dc48b1d4b10"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取市场简称  <a href="#a0636329111fd2e7f9a447dc48b1d4b10">更多...</a><br /></td></tr>
-<tr class="separator:a0636329111fd2e7f9a447dc48b1d4b10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb4e54a42175cdb354512c28b9246e19"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#afb4e54a42175cdb354512c28b9246e19">name</a> () const </td></tr>
-<tr class="memdesc:afb4e54a42175cdb354512c28b9246e19"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取市场名称  <a href="#afb4e54a42175cdb354512c28b9246e19">更多...</a><br /></td></tr>
-<tr class="separator:afb4e54a42175cdb354512c28b9246e19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31ae4fa02eb0ebf22937afabd281f329"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#a31ae4fa02eb0ebf22937afabd281f329">description</a> () const </td></tr>
-<tr class="memdesc:a31ae4fa02eb0ebf22937afabd281f329"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取市场描述  <a href="#a31ae4fa02eb0ebf22937afabd281f329">更多...</a><br /></td></tr>
-<tr class="separator:a31ae4fa02eb0ebf22937afabd281f329"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c149bffeba22e8f7c2303f9e8d658a9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#a5c149bffeba22e8f7c2303f9e8d658a9">code</a> () const </td></tr>
-<tr class="memdesc:a5c149bffeba22e8f7c2303f9e8d658a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取该市场对应的指数代码  <a href="#a5c149bffeba22e8f7c2303f9e8d658a9">更多...</a><br /></td></tr>
-<tr class="separator:a5c149bffeba22e8f7c2303f9e8d658a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82cd6855a18b5f9452313beb22d9816b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#a82cd6855a18b5f9452313beb22d9816b">lastDate</a> () const </td></tr>
-<tr class="memdesc:a82cd6855a18b5f9452313beb22d9816b"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取市场数据的最后更新日期  <a href="#a82cd6855a18b5f9452313beb22d9816b">更多...</a><br /></td></tr>
-<tr class="separator:a82cd6855a18b5f9452313beb22d9816b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac37e0148e0eaa7a051ebd8b3dca58664"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_market_info.html#ac37e0148e0eaa7a051ebd8b3dca58664">toString</a> () const </td></tr>
-<tr class="memdesc:ac37e0148e0eaa7a051ebd8b3dca58664"><td class="mdescLeft">&#160;</td><td class="mdescRight">仅用于python的__str__  <a href="#ac37e0148e0eaa7a051ebd8b3dca58664">更多...</a><br /></td></tr>
-<tr class="separator:ac37e0148e0eaa7a051ebd8b3dca58664"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dcfb6f00c06efb088a9eb4f4568502a" id="r_a5dcfb6f00c06efb088a9eb4f4568502a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5dcfb6f00c06efb088a9eb4f4568502a">MarketInfo</a> ()</td></tr>
+<tr class="memdesc:a5dcfb6f00c06efb088a9eb4f4568502a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, returns Null&lt;MarketInfo&gt;()  <br /></td></tr>
+<tr class="memitem:a2b92bb2f4919d771c0fd5fc3770d36f4" id="r_a2b92bb2f4919d771c0fd5fc3770d36f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b92bb2f4919d771c0fd5fc3770d36f4">MarketInfo</a> (const string &amp;<a class="el" href="#a03483dad73f97a288a63ff616df5a772">market</a>, const string &amp;<a class="el" href="#aac2f618e3c935074b200f2c6fef73669">name</a>, const string &amp;<a class="el" href="#ab0f08031b9f6128f2cb38249372a7f03">description</a>, const string &amp;<a class="el" href="#a4626e226b6be53349b0ec2c27bde2999">code</a>, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="#ae0c6fb47e8ed2856b37659afa96e0fd4">lastDate</a>, <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="el" href="#ac8ebbf1413dbd541d8e2ffee67552ca5">openTime1</a>, <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="el" href="#a1b31e1aa7297104ff31ebdc4260cfb83">closeTime1</a>, <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="el" href="#aae100bf36cbf20a323e6c76601b773bd">openTime2</a>, <a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> <a class="el" href="#ad84bd3ff571a2bf33d9926007e174842">closeTime2</a>)</td></tr>
+<tr class="memitem:af159a0af77844549674e04b4e2de16b7" id="r_af159a0af77844549674e04b4e2de16b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af159a0af77844549674e04b4e2de16b7">MarketInfo</a> (const <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;)=default</td></tr>
+<tr class="memitem:ac48761fd0a82958454318a628d652187" id="r_ac48761fd0a82958454318a628d652187"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac48761fd0a82958454318a628d652187">operator=</a> (const <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;)=default</td></tr>
+<tr class="memitem:ad6e3c2d69ba1aa68f2a2e9e82d913692" id="r_ad6e3c2d69ba1aa68f2a2e9e82d913692"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad6e3c2d69ba1aa68f2a2e9e82d913692">MarketInfo</a> (<a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;&amp;) noexcept</td></tr>
+<tr class="memitem:ad491b8ca6412944928fd5c2cb1239ec6" id="r_ad491b8ca6412944928fd5c2cb1239ec6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad491b8ca6412944928fd5c2cb1239ec6">operator=</a> (<a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;&amp;) noexcept</td></tr>
+<tr class="memitem:a03483dad73f97a288a63ff616df5a772" id="r_a03483dad73f97a288a63ff616df5a772"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03483dad73f97a288a63ff616df5a772">market</a> () const noexcept</td></tr>
+<tr class="memdesc:a03483dad73f97a288a63ff616df5a772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the market abbreviation  <br /></td></tr>
+<tr class="memitem:aac2f618e3c935074b200f2c6fef73669" id="r_aac2f618e3c935074b200f2c6fef73669"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac2f618e3c935074b200f2c6fef73669">name</a> () const noexcept</td></tr>
+<tr class="memdesc:aac2f618e3c935074b200f2c6fef73669"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the market name  <br /></td></tr>
+<tr class="memitem:ab0f08031b9f6128f2cb38249372a7f03" id="r_ab0f08031b9f6128f2cb38249372a7f03"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0f08031b9f6128f2cb38249372a7f03">description</a> () const noexcept</td></tr>
+<tr class="memdesc:ab0f08031b9f6128f2cb38249372a7f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the market description  <br /></td></tr>
+<tr class="memitem:a4626e226b6be53349b0ec2c27bde2999" id="r_a4626e226b6be53349b0ec2c27bde2999"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4626e226b6be53349b0ec2c27bde2999">code</a> () const noexcept</td></tr>
+<tr class="memdesc:a4626e226b6be53349b0ec2c27bde2999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index code corresponding to the market  <br /></td></tr>
+<tr class="memitem:ae0c6fb47e8ed2856b37659afa96e0fd4" id="r_ae0c6fb47e8ed2856b37659afa96e0fd4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0c6fb47e8ed2856b37659afa96e0fd4">lastDate</a> () const noexcept</td></tr>
+<tr class="memdesc:ae0c6fb47e8ed2856b37659afa96e0fd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last update date of the market data  <br /></td></tr>
+<tr class="memitem:ac8ebbf1413dbd541d8e2ffee67552ca5" id="r_ac8ebbf1413dbd541d8e2ffee67552ca5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8ebbf1413dbd541d8e2ffee67552ca5">openTime1</a> () const noexcept</td></tr>
+<tr class="memdesc:ac8ebbf1413dbd541d8e2ffee67552ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opening time of session 1  <br /></td></tr>
+<tr class="memitem:a1b31e1aa7297104ff31ebdc4260cfb83" id="r_a1b31e1aa7297104ff31ebdc4260cfb83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b31e1aa7297104ff31ebdc4260cfb83">closeTime1</a> () const noexcept</td></tr>
+<tr class="memdesc:a1b31e1aa7297104ff31ebdc4260cfb83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closing time of session 1  <br /></td></tr>
+<tr class="memitem:aae100bf36cbf20a323e6c76601b773bd" id="r_aae100bf36cbf20a323e6c76601b773bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae100bf36cbf20a323e6c76601b773bd">openTime2</a> () const noexcept</td></tr>
+<tr class="memdesc:aae100bf36cbf20a323e6c76601b773bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opening time of session 2  <br /></td></tr>
+<tr class="memitem:ad84bd3ff571a2bf33d9926007e174842" id="r_ad84bd3ff571a2bf33d9926007e174842"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad84bd3ff571a2bf33d9926007e174842">closeTime2</a> () const noexcept</td></tr>
+<tr class="memdesc:ad84bd3ff571a2bf33d9926007e174842"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closing time of session 2  <br /></td></tr>
+<tr class="memitem:ad943a92c0b309fdd779b32accd108d12" id="r_ad943a92c0b309fdd779b32accd108d12"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad943a92c0b309fdd779b32accd108d12">toString</a> () const</td></tr>
+<tr class="memdesc:ad943a92c0b309fdd779b32accd108d12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by <b>str</b> of python only  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>市场信息记录 </p>
-</div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a5dcfb6f00c06efb088a9eb4f4568502a"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Market information record </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a5dcfb6f00c06efb088a9eb4f4568502a" name="a5dcfb6f00c06efb088a9eb4f4568502a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dcfb6f00c06efb088a9eb4f4568502a">&#9670;&#160;</a></span>MarketInfo() <span class="overload">[1/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::MarketInfo::MarketInfo </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>默认构造函数，返回Null&lt;MarketInfo&gt;() </p>
+<p>Default constructor, returns Null&lt;MarketInfo&gt;() </p>
 
 </div>
 </div>
-<a class="anchor" id="ae97bb158b07e45f422005cd6d5ef9789"></a>
+<a id="a2b92bb2f4919d771c0fd5fc3770d36f4" name="a2b92bb2f4919d771c0fd5fc3770d36f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b92bb2f4919d771c0fd5fc3770d36f4">&#9670;&#160;</a></span>MarketInfo() <span class="overload">[2/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::MarketInfo::MarketInfo </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>market</em>, </td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>market</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>description</em>, </td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>description</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>code</em>, </td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>code</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>lastDate</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>lastDate</em></span>, </td>
         </tr>
         <tr>
+          <td class="paramkey"></td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>openTime1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>closeTime1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>openTime2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a></td>          <td class="paramname"><span class="paramname"><em>closeTime2</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">market</td><td>市场简称 </td></tr>
-    <tr><td class="paramname">name</td><td>市场名称 </td></tr>
-    <tr><td class="paramname">description</td><td>市场描述 </td></tr>
-    <tr><td class="paramname">code</td><td>基本指数：用于读取该市场的交易日历 </td></tr>
-    <tr><td class="paramname">lastDate</td><td>市场当前最后日期 </td></tr>
+    <tr><td class="paramname">market</td><td>market abbreviation </td></tr>
+    <tr><td class="paramname">name</td><td>market name </td></tr>
+    <tr><td class="paramname">description</td><td>market description </td></tr>
+    <tr><td class="paramname">code</td><td>base index: used to read the trading calendar of the market </td></tr>
+    <tr><td class="paramname">lastDate</td><td>current last date of the market </td></tr>
+    <tr><td class="paramname">openTime1</td><td>start time of trading session 1 </td></tr>
+    <tr><td class="paramname">closeTime1</td><td>end time of trading session 1 </td></tr>
+    <tr><td class="paramname">openTime2</td><td>start time of trading session 2 </td></tr>
+    <tr><td class="paramname">closeTime2</td><td>end time of trading session 2 </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a5c149bffeba22e8f7c2303f9e8d658a9"></a>
+<a id="af159a0af77844549674e04b4e2de16b7" name="af159a0af77844549674e04b4e2de16b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af159a0af77844549674e04b4e2de16b7">&#9670;&#160;</a></span>MarketInfo() <span class="overload">[3/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -212,24 +228,24 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&amp; hku::MarketInfo::code </td>
+          <td class="memname">hku::MarketInfo::MarketInfo </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取该市场对应的指数代码 </p>
+</div>
+</div>
+<a id="ad6e3c2d69ba1aa68f2a2e9e82d913692" name="ad6e3c2d69ba1aa68f2a2e9e82d913692"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6e3c2d69ba1aa68f2a2e9e82d913692">&#9670;&#160;</a></span>MarketInfo() <span class="overload">[4/4]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="a31ae4fa02eb0ebf22937afabd281f329"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -237,24 +253,133 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&amp; hku::MarketInfo::description </td>
+          <td class="memname">hku::MarketInfo::MarketInfo </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a1b31e1aa7297104ff31ebdc4260cfb83" name="a1b31e1aa7297104ff31ebdc4260cfb83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b31e1aa7297104ff31ebdc4260cfb83">&#9670;&#160;</a></span>closeTime1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::MarketInfo::closeTime1 </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取市场描述 </p>
+<p>Closing time of session 1 </p>
 
 </div>
 </div>
-<a class="anchor" id="a82cd6855a18b5f9452313beb22d9816b"></a>
+<a id="ad84bd3ff571a2bf33d9926007e174842" name="ad84bd3ff571a2bf33d9926007e174842"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad84bd3ff571a2bf33d9926007e174842">&#9670;&#160;</a></span>closeTime2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::MarketInfo::closeTime2 </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Closing time of session 2 </p>
+
+</div>
+</div>
+<a id="a4626e226b6be53349b0ec2c27bde2999" name="a4626e226b6be53349b0ec2c27bde2999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4626e226b6be53349b0ec2c27bde2999">&#9670;&#160;</a></span>code()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; hku::MarketInfo::code </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the index code corresponding to the market </p>
+
+</div>
+</div>
+<a id="ab0f08031b9f6128f2cb38249372a7f03" name="ab0f08031b9f6128f2cb38249372a7f03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0f08031b9f6128f2cb38249372a7f03">&#9670;&#160;</a></span>description()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; hku::MarketInfo::description </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the market description </p>
+
+</div>
+</div>
+<a id="ae0c6fb47e8ed2856b37659afa96e0fd4" name="ae0c6fb47e8ed2856b37659afa96e0fd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0c6fb47e8ed2856b37659afa96e0fd4">&#9670;&#160;</a></span>lastDate()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -264,22 +389,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::MarketInfo::lastDate </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取市场数据的最后更新日期 </p>
+<p>Get the last update date of the market data </p>
 
 </div>
 </div>
-<a class="anchor" id="a0636329111fd2e7f9a447dc48b1d4b10"></a>
+<a id="a03483dad73f97a288a63ff616df5a772" name="a03483dad73f97a288a63ff616df5a772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03483dad73f97a288a63ff616df5a772">&#9670;&#160;</a></span>market()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -287,24 +414,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&amp; hku::MarketInfo::market </td>
+          <td class="memname">const string &amp; hku::MarketInfo::market </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取市场简称 </p>
+<p>Get the market abbreviation </p>
 
 </div>
 </div>
-<a class="anchor" id="afb4e54a42175cdb354512c28b9246e19"></a>
+<a id="aac2f618e3c935074b200f2c6fef73669" name="aac2f618e3c935074b200f2c6fef73669"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac2f618e3c935074b200f2c6fef73669">&#9670;&#160;</a></span>name()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -312,51 +441,168 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&amp; hku::MarketInfo::name </td>
+          <td class="memname">const string &amp; hku::MarketInfo::name </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取市场名称 </p>
+<p>Get the market name </p>
 
 </div>
 </div>
-<a class="anchor" id="ac37e0148e0eaa7a051ebd8b3dca58664"></a>
+<a id="ac8ebbf1413dbd541d8e2ffee67552ca5" name="ac8ebbf1413dbd541d8e2ffee67552ca5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8ebbf1413dbd541d8e2ffee67552ca5">&#9670;&#160;</a></span>openTime1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::MarketInfo::openTime1 </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Opening time of session 1 </p>
+
+</div>
+</div>
+<a id="aae100bf36cbf20a323e6c76601b773bd" name="aae100bf36cbf20a323e6c76601b773bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae100bf36cbf20a323e6c76601b773bd">&#9670;&#160;</a></span>openTime2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_time_delta.html">TimeDelta</a> hku::MarketInfo::openTime2 </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Opening time of session 2 </p>
+
+</div>
+</div>
+<a id="ac48761fd0a82958454318a628d652187" name="ac48761fd0a82958454318a628d652187"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac48761fd0a82958454318a628d652187">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp; hku::MarketInfo::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad491b8ca6412944928fd5c2cb1239ec6" name="ad491b8ca6412944928fd5c2cb1239ec6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad491b8ca6412944928fd5c2cb1239ec6">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp; hku::MarketInfo::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad943a92c0b309fdd779b32accd108d12" name="ad943a92c0b309fdd779b32accd108d12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad943a92c0b309fdd779b32accd108d12">&#9670;&#160;</a></span>toString()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::MarketInfo::toString </td>
+          <td class="memname">string hku::MarketInfo::toString </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>仅用于python的__str__ </p>
+<p>Used by <b>str</b> of python only </p>
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/<a class="el" href="_market_info_8h_source.html">MarketInfo.h</a></li>
-<li>hikyuu/<a class="el" href="_market_info_8cpp.html">MarketInfo.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_market_info.html">MarketInfo</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

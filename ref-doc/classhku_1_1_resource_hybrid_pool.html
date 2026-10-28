@@ -1,0 +1,766 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::ResourceHybridPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_resource_hybrid_pool.html','','classhku_1_1_resource_hybrid_pool-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::ResourceHybridPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; 模板类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Hybrid resource pool - it combines the synchronous TLS Pool and the synchronous <a class="el" href="classhku_1_1_resource_pool.html" title="General shared resource pool">ResourcePool</a>  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_resource_hybrid_pool_8h_source.html">ResourceHybridPool.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a41a1c0f36ba5b85911d2e72bcb7493b1" id="r_a41a1c0f36ba5b85911d2e72bcb7493b1"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a41a1c0f36ba5b85911d2e72bcb7493b1">TlsPoolType</a> = <a class="el" href="classhku_1_1_resource_tls_pool.html">ResourceTlsPool</a>&lt;ResourceType, MAX_TLS_POOL_SIZE_LIMIT&gt;</td></tr>
+<tr class="memdesc:a41a1c0f36ba5b85911d2e72bcb7493b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">TLS Pool type alias  <br /></td></tr>
+<tr class="memitem:a182102bbf319cf6e0e02a0f4aacc70f8" id="r_a182102bbf319cf6e0e02a0f4aacc70f8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a182102bbf319cf6e0e02a0f4aacc70f8">GlobalPoolType</a> = <a class="el" href="classhku_1_1_resource_pool.html">ResourcePool</a>&lt;ResourceType&gt;</td></tr>
+<tr class="memdesc:a182102bbf319cf6e0e02a0f4aacc70f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global shared pool type alias (std::mutex is used to support the multi-thread concurrent access)  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ab6b7f40aca7683245d5b562844a5c882" id="r_ab6b7f40aca7683245d5b562844a5c882"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> (const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;param, size_t max_tls_pool_size=MAX_TLS_POOL_SIZE_LIMIT, size_t max_global_pool_size=64)</td></tr>
+<tr class="memdesc:ab6b7f40aca7683245d5b562844a5c882"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:a5af3859565ee758bcb6bf82968edaa2c" id="r_a5af3859565ee758bcb6bf82968edaa2c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5af3859565ee758bcb6bf82968edaa2c">~ResourceHybridPool</a> ()=default</td></tr>
+<tr class="memdesc:a5af3859565ee758bcb6bf82968edaa2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor  <br /></td></tr>
+<tr class="memitem:ab72902e36d9722aa71349505febe4cbc" id="r_ab72902e36d9722aa71349505febe4cbc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab72902e36d9722aa71349505febe4cbc">ResourceHybridPool</a> (const <a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ab72902e36d9722aa71349505febe4cbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The copy is forbidden  <br /></td></tr>
+<tr class="memitem:aadff026a1c7c350263324cbabfaba437" id="r_aadff026a1c7c350263324cbabfaba437"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aadff026a1c7c350263324cbabfaba437">operator=</a> (const <a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp;)=delete</td></tr>
+<tr class="memitem:aba8cbec5e584e98d01fe4f4a82820fb2" id="r_aba8cbec5e584e98d01fe4f4a82820fb2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba8cbec5e584e98d01fe4f4a82820fb2">ResourceHybridPool</a> (<a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="memdesc:aba8cbec5e584e98d01fe4f4a82820fb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The move is allowed  <br /></td></tr>
+<tr class="memitem:a0285702767428f1bde29ef32adc3d1ac" id="r_a0285702767428f1bde29ef32adc3d1ac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0285702767428f1bde29ef32adc3d1ac">operator=</a> (<a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="memitem:a3a79370a1d40e80cbf10795feb44be1c" id="r_a3a79370a1d40e80cbf10795feb44be1c"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; ResourceType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a79370a1d40e80cbf10795feb44be1c">get</a> ()</td></tr>
+<tr class="memdesc:a3a79370a1d40e80cbf10795feb44be1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an available resource; a null pointer is returned when the maximum number of the resources allowed is exceeded  <br /></td></tr>
+<tr class="memitem:aa2e58d318d1ab302895bd325b09fa54c" id="r_aa2e58d318d1ab302895bd325b09fa54c"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; ResourceType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa2e58d318d1ab302895bd325b09fa54c">getWaitFor</a> (<a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> ms_timeout)</td></tr>
+<tr class="memdesc:aa2e58d318d1ab302895bd325b09fa54c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an available resource within the given timeout  <br /></td></tr>
+<tr class="memitem:a931a1ccba220093ea38d686d186ab531" id="r_a931a1ccba220093ea38d686d186ab531"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; ResourceType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a931a1ccba220093ea38d686d186ab531">getAndWait</a> ()</td></tr>
+<tr class="memdesc:a931a1ccba220093ea38d686d186ab531"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an available resource; if the maximum number of the resources allowed is exceeded, it blocks and waits until an idle resource is obtained  <br /></td></tr>
+<tr class="memitem:a2deb36e1d874d4b87878ed2b54e1c94c" id="r_a2deb36e1d874d4b87878ed2b54e1c94c"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; ResourceType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2deb36e1d874d4b87878ed2b54e1c94c">getFromTlsPool</a> ()</td></tr>
+<tr class="memdesc:a2deb36e1d874d4b87878ed2b54e1c94c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Acquire the resource from the TLS Pool only (synchronously)  <br /></td></tr>
+<tr class="memitem:aa4bcd9896b342598f3e7e557a0a453b0" id="r_aa4bcd9896b342598f3e7e557a0a453b0"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; ResourceType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4bcd9896b342598f3e7e557a0a453b0">getFromGlobalPool</a> ()</td></tr>
+<tr class="memdesc:aa4bcd9896b342598f3e7e557a0a453b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Acquire the resource from the global shared pool only (synchronously)  <br /></td></tr>
+<tr class="memitem:a5e77da82941ed9f6ff3ce3672055bb33" id="r_a5e77da82941ed9f6ff3ce3672055bb33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a41a1c0f36ba5b85911d2e72bcb7493b1">TlsPoolType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e77da82941ed9f6ff3ce3672055bb33">tlsPool</a> ()</td></tr>
+<tr class="memdesc:a5e77da82941ed9f6ff3ce3672055bb33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the TLS Pool reference  <br /></td></tr>
+<tr class="memitem:aa3b49be5364d4ddcb0ea0100f526fab6" id="r_aa3b49be5364d4ddcb0ea0100f526fab6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a182102bbf319cf6e0e02a0f4aacc70f8">GlobalPoolType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3b49be5364d4ddcb0ea0100f526fab6">globalPool</a> ()</td></tr>
+<tr class="memdesc:aa3b49be5364d4ddcb0ea0100f526fab6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the global shared pool reference  <br /></td></tr>
+<tr class="memitem:a637a618856ef80f5d0589f425e46d740" id="r_a637a618856ef80f5d0589f425e46d740"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a637a618856ef80f5d0589f425e46d740">maxTlsPoolSize</a> () const</td></tr>
+<tr class="memdesc:a637a618856ef80f5d0589f425e46d740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum number of the resources actually used by the TLS pool  <br /></td></tr>
+<tr class="memitem:a4230f9b5178802d5142c77b7720e0976" id="r_a4230f9b5178802d5142c77b7720e0976"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4230f9b5178802d5142c77b7720e0976">maxGlobalPoolSize</a> () const</td></tr>
+<tr class="memdesc:a4230f9b5178802d5142c77b7720e0976"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum number of the resources of the global shared pool  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt;<br />
+class hku::ResourceHybridPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;</div><p>Hybrid resource pool - it combines the synchronous TLS Pool and the synchronous <a class="el" href="classhku_1_1_resource_pool.html" title="General shared resource pool">ResourcePool</a> </p>
+<p>It provides a two-level resource acquisition strategy:</p><ol type="1">
+<li>The resource is preferentially acquired quickly from the thread local synchronous pool (TLS Pool) (lock free, high performance)</li>
+<li>If the TLS Pool is unavailable, the resource is acquired from the global shared pool (<a class="el" href="classhku_1_1_resource_pool.html" title="General shared resource pool">ResourcePool</a>) (locked, multi-thread supported)</li>
+</ol>
+<p><b>Important limitations</b>:</p><ul>
+<li>It is not suitable for the coroutine environment: the TLS Pool would cause a failed cross-thread return of the resource when the coroutine thread migrates</li>
+<li>It provides the synchronous interfaces only, the asynchronous methods such as asyncGet() are not supported</li>
+<li>It is suitable for the traditional multi-thread model only, ensuring that the resource is acquired and released within the same thread</li>
+<li>For the coroutine environment, it is recommended to use a purely global shared pool (such as <a class="el" href="classhku_1_1_resource_asio_pool.html" title="General shared resource pool - it is suitable for the coroutine environment It uses the boost lock fr...">ResourceAsioPool</a>)</li>
+</ul>
+<p>This design balances the performance and the flexibility:</p><ul>
+<li>The ordinary synchronous code uses the TLS Pool and gets the best performance (lock free)</li>
+<li>When the TLS Pool resources are exhausted it degrades automatically to the global shared pool (locked but supporting the multi-thread sharing)</li>
+<li>The global pool is protected with std::mutex, ensuring the thread safety</li>
+</ul>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ResourceType</td><td>the resource type, it must support the constructor ResourceType(const Parameter&amp;) </td></tr>
+    <tr><td class="paramname">MAX_TLS_POOL_SIZE_LIMIT</td><td>the upper limit of the TLS pool physical capacity, 2 by default (fixed at compile time, used for the std::array allocation)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Usage example</dt><dd><div class="fragment"><div class="line"><span class="comment">// Step 1: initialize the parameters</span></div>
+<div class="line"><a class="code hl_class" href="classhku_1_1_parameter.html">Parameter</a> param;</div>
+<div class="line">param.<a class="code hl_function" href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">set</a>(<span class="stringliteral">&quot;host&quot;</span>, <span class="stringliteral">&quot;localhost&quot;</span>);</div>
+<div class="line">param.<a class="code hl_function" href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">set</a>(<span class="stringliteral">&quot;port&quot;</span>, 3306);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Step 2a: use the default TLS pool size (the template parameter)</span></div>
+<div class="line"><a class="code hl_function" href="#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool&lt;MyResource&gt;</a> pool(param, 64);  <span class="comment">// The global shared pool has at most 64</span></div>
+<div class="line">resources</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Step 2b: give the actually used size of the TLS pool at runtime (it cannot exceed the template</span></div>
+<div class="line"><span class="comment">// parameter)</span></div>
+<div class="line"><a class="code hl_function" href="#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool&lt;MyResource, 64&gt;</a> pool(param, 64, 16);  <span class="comment">// The TLS pool actually uses 16 and the</span></div>
+<div class="line">                                                         <span class="comment">// global pool uses 64</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Step 3: acquire synchronously (the TLS Pool has the priority)</span></div>
+<div class="line"><span class="keyword">auto</span> resource = pool.get();</div>
+<div class="line"><span class="keywordflow">if</span> (resource) {</div>
+<div class="line">    resource-&gt;doWork();</div>
+<div class="line">}</div>
+<div class="ttc" id="aclasshku_1_1_parameter_html"><div class="ttname"><a href="classhku_1_1_parameter.html">hku::Parameter</a></div><div class="ttdoc">Used by the classes that need the named parameter settings</div><div class="ttdef"><b>定义</b> Parameter.h:202</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a5a06d1c39381362db1bac88f55d9472e"><div class="ttname"><a href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">hku::Parameter::set</a></div><div class="ttdeci">void set(const string &amp;name, const ValueType &amp;value)</div><div class="ttdoc">Set the given parameter value</div><div class="ttdef"><b>定义</b> Parameter.h:489</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_ab6b7f40aca7683245d5b562844a5c882"><div class="ttname"><a href="#ab6b7f40aca7683245d5b562844a5c882">hku::ResourceHybridPool::ResourceHybridPool</a></div><div class="ttdeci">ResourceHybridPool(const Parameter &amp;param, size_t max_tls_pool_size=MAX_TLS_POOL_SIZE_LIMIT, size_t max_global_pool_size=64)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:112</div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section note"><dt>注解</dt><dd>Two independent resource pool instances are maintained internally </dd>
+<dd>
+The TLS Pool is thread local, every thread has an independent instance </dd>
+<dd>
+The actually used size of the TLS Pool can be given at construction (through the max_tls_pool_size parameter), but it cannot exceed the template parameter MAX_TLS_POOL_SIZE_LIMIT </dd>
+<dd>
+The size of the Global Pool can also be given at construction, it is not limited by the template parameter </dd></dl>
+<dl class="section warning"><dt>警告</dt><dd>It is not recommended to use it in the coroutine environment; the thread migration of the coroutine would make the TLS Pool resource reuse impossible </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a182102bbf319cf6e0e02a0f4aacc70f8" name="a182102bbf319cf6e0e02a0f4aacc70f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a182102bbf319cf6e0e02a0f4aacc70f8">&#9670;&#160;</a></span>GlobalPoolType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::GlobalPoolType = <a class="el" href="classhku_1_1_resource_pool.html">ResourcePool</a>&lt;ResourceType&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Global shared pool type alias (std::mutex is used to support the multi-thread concurrent access) </p>
+
+</div>
+</div>
+<a id="a41a1c0f36ba5b85911d2e72bcb7493b1" name="a41a1c0f36ba5b85911d2e72bcb7493b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41a1c0f36ba5b85911d2e72bcb7493b1">&#9670;&#160;</a></span>TlsPoolType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::TlsPoolType = <a class="el" href="classhku_1_1_resource_tls_pool.html">ResourceTlsPool</a>&lt;ResourceType, MAX_TLS_POOL_SIZE_LIMIT&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>TLS Pool type alias </p>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ab6b7f40aca7683245d5b562844a5c882" name="ab6b7f40aca7683245d5b562844a5c882"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6b7f40aca7683245d5b562844a5c882">&#9670;&#160;</a></span>ResourceHybridPool() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::ResourceHybridPool </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>param</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>max_tls_pool_size</em></span><span class="paramdefsep"> = </span><span class="paramdefval">MAX_TLS_POOL_SIZE_LIMIT</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>max_global_pool_size</em></span><span class="paramdefsep"> = </span><span class="paramdefval">64</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">param</td><td>resource creation parameters </td></tr>
+    <tr><td class="paramname">max_tls_pool_size</td><td>the maximum number of the resources actually used by the TLS pool, by default equal to the template parameter MAX_TLS_POOL_SIZE_LIMIT this value cannot exceed MAX_TLS_POOL_SIZE_LIMIT, otherwise it is truncated if it is set to 0 the TLS Pool is completely disabled and all the requests are acquired from the global shared pool </td></tr>
+    <tr><td class="paramname">max_global_pool_size</td><td>the maximum number of the resources of the global shared pool (Global Pool), 64 by default</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>The actual size of the TLS pool is controlled by max_tls_pool_size, but the capacity of the underlying array is still MAX_TLS_POOL_SIZE_LIMIT </dd>
+<dd>
+If max_tls_pool_size &gt; MAX_TLS_POOL_SIZE_LIMIT it is adjusted automatically to MAX_TLS_POOL_SIZE_LIMIT </dd>
+<dd>
+If max_tls_pool_size == 0 the TLS Pool is disabled and it degrades directly to the global shared pool </dd></dl>
+
+</div>
+</div>
+<a id="a5af3859565ee758bcb6bf82968edaa2c" name="a5af3859565ee758bcb6bf82968edaa2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5af3859565ee758bcb6bf82968edaa2c">&#9670;&#160;</a></span>~ResourceHybridPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::~<a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor </p>
+
+</div>
+</div>
+<a id="ab72902e36d9722aa71349505febe4cbc" name="ab72902e36d9722aa71349505febe4cbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab72902e36d9722aa71349505febe4cbc">&#9670;&#160;</a></span>ResourceHybridPool() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::ResourceHybridPool </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The copy is forbidden </p>
+
+</div>
+</div>
+<a id="aba8cbec5e584e98d01fe4f4a82820fb2" name="aba8cbec5e584e98d01fe4f4a82820fb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba8cbec5e584e98d01fe4f4a82820fb2">&#9670;&#160;</a></span>ResourceHybridPool() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::ResourceHybridPool </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The move is allowed </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a3a79370a1d40e80cbf10795feb44be1c" name="a3a79370a1d40e80cbf10795feb44be1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a79370a1d40e80cbf10795feb44be1c">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; ResourceType &gt; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::get </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get an available resource; a null pointer is returned when the maximum number of the resources allowed is exceeded </p>
+<dl class="section return"><dt>返回</dt><dd>ResourcePtr the resource pointer, nullptr is returned on failure</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The acquisition strategy:<ol type="1">
+<li>If the TLS Pool is disabled, it is acquired from the global pool directly</li>
+<li>Otherwise it is preferentially acquired from the TLS Pool (the fast path, lock free)</li>
+<li>If the TLS Pool fails it degrades automatically to the global shared pool</li>
+<li>If the global pool also fails, nullptr is returned</li>
+</ol>
+</dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classhku_1_1_create_resource_exception.html" title="New resource creation failure exception">CreateResourceException</a></td><td>the new resource creation may throw an exception </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a931a1ccba220093ea38d686d186ab531" name="a931a1ccba220093ea38d686d186ab531"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a931a1ccba220093ea38d686d186ab531">&#9670;&#160;</a></span>getAndWait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; ResourceType &gt; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::getAndWait </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get an available resource; if the maximum number of the resources allowed is exceeded, it blocks and waits until an idle resource is obtained </p>
+<dl class="section return"><dt>返回</dt><dd>ResourcePtr the resource pointer</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The acquisition strategy:<ol type="1">
+<li>First try to acquire it from the TLS Pool (the fast path, lock free)</li>
+<li>If the TLS Pool fails it degrades automatically to the global shared pool and waits for an idle resource indefinitely</li>
+<li>If the resource creation fails, <a class="el" href="classhku_1_1_create_resource_exception.html" title="New resource creation failure exception">CreateResourceException</a> is thrown</li>
+</ol>
+</dd>
+<dd>
+This method blocks the current thread until a resource is acquired </dd>
+<dd>
+Use it with caution: if the resource pool is full and no resource is returned, it would block forever </dd>
+<dd>
+It is suitable for the scenarios where a resource must be acquired, but it must be guaranteed that the resource will be returned finally</dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classhku_1_1_get_resource_timeout_exception.html" title="Resource acquisition timeout exception">GetResourceTimeoutException</a></td><td>theoretically it does not time out (ms_timeout=0), but it may be thrown for other reasons </td></tr>
+    <tr><td class="paramname"><a class="el" href="classhku_1_1_create_resource_exception.html" title="New resource creation failure exception">CreateResourceException</a></td><td>the new resource creation failed </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa4bcd9896b342598f3e7e557a0a453b0" name="aa4bcd9896b342598f3e7e557a0a453b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4bcd9896b342598f3e7e557a0a453b0">&#9670;&#160;</a></span>getFromGlobalPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; ResourceType &gt; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::getFromGlobalPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Acquire the resource from the global shared pool only (synchronously) </p>
+<dl class="section return"><dt>返回</dt><dd>ResourcePtr the resource pointer, nullptr is returned on failure</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>This method may throw <a class="el" href="classhku_1_1_create_resource_exception.html" title="New resource creation failure exception">CreateResourceException</a> </dd></dl>
+
+</div>
+</div>
+<a id="a2deb36e1d874d4b87878ed2b54e1c94c" name="a2deb36e1d874d4b87878ed2b54e1c94c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2deb36e1d874d4b87878ed2b54e1c94c">&#9670;&#160;</a></span>getFromTlsPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; ResourceType &gt; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::getFromTlsPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Acquire the resource from the TLS Pool only (synchronously) </p>
+<dl class="section return"><dt>返回</dt><dd>ResourcePtr the resource pointer, nullptr is returned on failure </dd></dl>
+
+</div>
+</div>
+<a id="aa2e58d318d1ab302895bd325b09fa54c" name="aa2e58d318d1ab302895bd325b09fa54c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2e58d318d1ab302895bd325b09fa54c">&#9670;&#160;</a></span>getWaitFor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; ResourceType &gt; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::getWaitFor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a></td>          <td class="paramname"><span class="paramname"><em>ms_timeout</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get an available resource within the given timeout </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ms_timeout</td><td>the timeout in milliseconds </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>ResourcePtr the resource pointer</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The acquisition strategy:<ol type="1">
+<li>First try to acquire it from the TLS Pool (the fast path, lock free)</li>
+<li>If the TLS Pool fails it degrades automatically to the global shared pool and waits for the given time</li>
+<li>If it times out or the creation fails, <a class="el" href="classhku_1_1_get_resource_timeout_exception.html" title="Resource acquisition timeout exception">GetResourceTimeoutException</a> is thrown</li>
+</ol>
+</dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classhku_1_1_get_resource_timeout_exception.html" title="Resource acquisition timeout exception">GetResourceTimeoutException</a></td><td>timeout or the resources are exhausted </td></tr>
+    <tr><td class="paramname"><a class="el" href="classhku_1_1_create_resource_exception.html" title="New resource creation failure exception">CreateResourceException</a></td><td>the new resource creation failed </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa3b49be5364d4ddcb0ea0100f526fab6" name="aa3b49be5364d4ddcb0ea0100f526fab6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3b49be5364d4ddcb0ea0100f526fab6">&#9670;&#160;</a></span>globalPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a182102bbf319cf6e0e02a0f4aacc70f8">GlobalPoolType</a> &amp; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::globalPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the global shared pool reference </p>
+
+</div>
+</div>
+<a id="a4230f9b5178802d5142c77b7720e0976" name="a4230f9b5178802d5142c77b7720e0976"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4230f9b5178802d5142c77b7720e0976">&#9670;&#160;</a></span>maxGlobalPoolSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::maxGlobalPoolSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the maximum number of the resources of the global shared pool </p>
+
+</div>
+</div>
+<a id="a637a618856ef80f5d0589f425e46d740" name="a637a618856ef80f5d0589f425e46d740"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a637a618856ef80f5d0589f425e46d740">&#9670;&#160;</a></span>maxTlsPoolSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::maxTlsPoolSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the maximum number of the resources actually used by the TLS pool </p>
+
+</div>
+</div>
+<a id="aadff026a1c7c350263324cbabfaba437" name="aadff026a1c7c350263324cbabfaba437"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aadff026a1c7c350263324cbabfaba437">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0285702767428f1bde29ef32adc3d1ac" name="a0285702767428f1bde29ef32adc3d1ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0285702767428f1bde29ef32adc3d1ac">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a> &amp; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5e77da82941ed9f6ff3ce3672055bb33" name="a5e77da82941ed9f6ff3ce3672055bb33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e77da82941ed9f6ff3ce3672055bb33">&#9670;&#160;</a></span>tlsPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_TLS_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a41a1c0f36ba5b85911d2e72bcb7493b1">TlsPoolType</a> &amp; <a class="el" href="classhku_1_1_resource_hybrid_pool.html">hku::ResourceHybridPool</a>&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::tlsPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the TLS Pool reference </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_resource_hybrid_pool_8h_source.html">ResourceHybridPool.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_resource_hybrid_pool.html">ResourceHybridPool</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

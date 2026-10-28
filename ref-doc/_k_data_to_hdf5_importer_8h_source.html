@@ -1,0 +1,178 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/plugin/KDataToHdf5Importer.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_k_data_to_hdf5_importer_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">KDataToHdf5Importer.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-05-06</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/DataType.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;interface/ImportKDataToHdf5PluginInterface.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html">   15</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a10be1a6b242b295c333426a443bb7dd1">KDataToHdf5Importer</a> {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a10be1a6b242b295c333426a443bb7dd1">   17</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a10be1a6b242b295c333426a443bb7dd1">KDataToHdf5Importer</a>();</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a445c123709bfd88ac9acc220dba7d193">   18</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a445c123709bfd88ac9acc220dba7d193">~KDataToHdf5Importer</a>();</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a801c7a4a5fb04cc1b74cbd9a39a459a3">   20</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a801c7a4a5fb04cc1b74cbd9a39a459a3">setConfig</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; datapath, <span class="keyword">const</span> vector&lt;string&gt;&amp; markets = {<span class="stringliteral">&quot;SH&quot;</span>, <span class="stringliteral">&quot;SZ&quot;</span>, <span class="stringliteral">&quot;BJ&quot;</span>},</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>                   <span class="keyword">const</span> vector&lt;string&gt;&amp; ktypes = {<span class="stringliteral">&quot;DAY&quot;</span>, <span class="stringliteral">&quot;MIN&quot;</span>, <span class="stringliteral">&quot;MIN5&quot;</span>, <span class="stringliteral">&quot;TIMELINE&quot;</span>, <span class="stringliteral">&quot;TRANSDATA&quot;</span>},</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>                   <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; baseinfo_path = <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a4bd3e9af3d0cd8b7d36c842adab507f4">   24</a></span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a4bd3e9af3d0cd8b7d36c842adab507f4">getLastDatetime</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#af9b777eda0e5ced529d10af9b957b0f3">   26</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#af9b777eda0e5ced529d10af9b957b0f3">addKRecordList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> vector&lt;KRecord&gt;&amp; krecords,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                        <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a205ca382bc7f026394c95b9ba2b3d95d">   29</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a205ca382bc7f026394c95b9ba2b3d95d">addTimeLineList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#gaebd46ac2ec5d96c77771eb3f60a60997">TimeLineList</a>&amp; timeline);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#aa20ad1a73dc970c3f07abf056dbbdc53">   31</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#aa20ad1a73dc970c3f07abf056dbbdc53">addTransList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#ae3757aa2a030e73a8d8ea312d7669ce6">TransRecordList</a>&amp; translist);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a6508ba91f22edaed8cb75480290c5c87">   33</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a6508ba91f22edaed8cb75480290c5c87">updateIndex</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype);</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#aabbc81e40b4bb09e86cefb8d06551095">   35</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#aabbc81e40b4bb09e86cefb8d06551095">remove</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype,</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> start);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#afcdc1ea260e7b3750d465f1751b4116f">   38</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#afcdc1ea260e7b3750d465f1751b4116f">addMarket</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; description,</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                   <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; index_code, <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> open1 = 930, <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> close1 = 1130,</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                   <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> open2 = 1300, <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> close2 = 1500);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_to_hdf5_importer.html#a1e5811301b7c00a692c854cfb4da9d99">   42</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_to_hdf5_importer.html#a1e5811301b7c00a692c854cfb4da9d99">addStockType</a>(<a class="code hl_typedef" href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">uint32_t</a> type_id, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; description, <a class="code hl_typedef" href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">uint32_t</a> precision = 2,</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                      <span class="keywordtype">double</span> tick = 0.01, <span class="keywordtype">double</span> tick_value = 0.01, <span class="keywordtype">double</span> min_trade = 1,</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                      <span class="keywordtype">double</span> max_trade = 1000000);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="classhku_1_1_import_k_data_to_hdf5_plugin_interface.html">ImportKDataToHdf5PluginInterface</a>* m_plugin{<span class="keyword">nullptr</span>};</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>};</div>
+</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_import_k_data_to_hdf5_plugin_interface_html"><div class="ttname"><a href="classhku_1_1_import_k_data_to_hdf5_plugin_interface.html">hku::ImportKDataToHdf5PluginInterface</a></div><div class="ttdef"><b>定义</b> ImportKDataToHdf5PluginInterface.h:18</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a10be1a6b242b295c333426a443bb7dd1"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a10be1a6b242b295c333426a443bb7dd1">hku::KDataToHdf5Importer::KDataToHdf5Importer</a></div><div class="ttdeci">KDataToHdf5Importer()</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a1e5811301b7c00a692c854cfb4da9d99"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a1e5811301b7c00a692c854cfb4da9d99">hku::KDataToHdf5Importer::addStockType</a></div><div class="ttdeci">bool addStockType(uint32_t type_id, const string &amp;description, uint32_t precision=2, double tick=0.01, double tick_value=0.01, double min_trade=1, double max_trade=1000000)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a205ca382bc7f026394c95b9ba2b3d95d"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a205ca382bc7f026394c95b9ba2b3d95d">hku::KDataToHdf5Importer::addTimeLineList</a></div><div class="ttdeci">void addTimeLineList(const string &amp;market, const string &amp;code, const TimeLineList &amp;timeline)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a445c123709bfd88ac9acc220dba7d193"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a445c123709bfd88ac9acc220dba7d193">hku::KDataToHdf5Importer::~KDataToHdf5Importer</a></div><div class="ttdeci">virtual ~KDataToHdf5Importer()</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a4bd3e9af3d0cd8b7d36c842adab507f4"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a4bd3e9af3d0cd8b7d36c842adab507f4">hku::KDataToHdf5Importer::getLastDatetime</a></div><div class="ttdeci">Datetime getLastDatetime(const string &amp;market, const string &amp;code, const KQuery::KType &amp;ktype)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a6508ba91f22edaed8cb75480290c5c87"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a6508ba91f22edaed8cb75480290c5c87">hku::KDataToHdf5Importer::updateIndex</a></div><div class="ttdeci">void updateIndex(const string &amp;market, const string &amp;code, const KQuery::KType &amp;ktype)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_a801c7a4a5fb04cc1b74cbd9a39a459a3"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#a801c7a4a5fb04cc1b74cbd9a39a459a3">hku::KDataToHdf5Importer::setConfig</a></div><div class="ttdeci">bool setConfig(const string &amp;datapath, const vector&lt; string &gt; &amp;markets={&quot;SH&quot;, &quot;SZ&quot;, &quot;BJ&quot;}, const vector&lt; string &gt; &amp;ktypes={&quot;DAY&quot;, &quot;MIN&quot;, &quot;MIN5&quot;, &quot;TIMELINE&quot;, &quot;TRANSDATA&quot;}, const string &amp;baseinfo_path=&quot;&quot;)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_aa20ad1a73dc970c3f07abf056dbbdc53"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#aa20ad1a73dc970c3f07abf056dbbdc53">hku::KDataToHdf5Importer::addTransList</a></div><div class="ttdeci">void addTransList(const string &amp;market, const string &amp;code, const TransRecordList &amp;translist)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_aabbc81e40b4bb09e86cefb8d06551095"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#aabbc81e40b4bb09e86cefb8d06551095">hku::KDataToHdf5Importer::remove</a></div><div class="ttdeci">void remove(const string &amp;market, const string &amp;code, const KQuery::KType &amp;ktype, Datetime start)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_af9b777eda0e5ced529d10af9b957b0f3"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#af9b777eda0e5ced529d10af9b957b0f3">hku::KDataToHdf5Importer::addKRecordList</a></div><div class="ttdeci">void addKRecordList(const string &amp;market, const string &amp;code, const vector&lt; KRecord &gt; &amp;krecords, const KQuery::KType &amp;ktype)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_to_hdf5_importer_html_afcdc1ea260e7b3750d465f1751b4116f"><div class="ttname"><a href="classhku_1_1_k_data_to_hdf5_importer.html#afcdc1ea260e7b3750d465f1751b4116f">hku::KDataToHdf5Importer::addMarket</a></div><div class="ttdeci">bool addMarket(const string &amp;market, const string &amp;name, const string &amp;description, const string &amp;index_code, uint64_t open1=930, uint64_t close1=1130, uint64_t open2=1300, uint64_t close2=1500)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="agroup___data_type_html_gacefea155cc989d0eea72c2c053981f06"><div class="ttname"><a href="group___data_type.html#gacefea155cc989d0eea72c2c053981f06">hku::uint32_t</a></div><div class="ttdeci">unsigned uint32_t</div><div class="ttdef"><b>定义</b> DataType.h:111</div></div>
+<div class="ttc" id="agroup___stock_manage_html_gaebd46ac2ec5d96c77771eb3f60a60997"><div class="ttname"><a href="group___stock_manage.html#gaebd46ac2ec5d96c77771eb3f60a60997">hku::TimeLineList</a></div><div class="ttdeci">vector&lt; TimeLineRecord &gt; TimeLineList</div><div class="ttdoc">Time-sharing (intraday) line</div><div class="ttdef"><b>定义</b> TimeLineRecord.h:36</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_ae3757aa2a030e73a8d8ea312d7669ce6"><div class="ttname"><a href="namespacehku.html#ae3757aa2a030e73a8d8ea312d7669ce6">hku::TransRecordList</a></div><div class="ttdeci">vector&lt; TransRecord &gt; TransRecordList</div><div class="ttdef"><b>定义</b> TransRecord.h:38</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_991d4c37e893a0798e9e63870536be30.html">plugin</a></li><li class="navelem"><b>KDataToHdf5Importer.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

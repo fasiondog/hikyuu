@@ -1,0 +1,146 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/multifactor/imp/ICMultiFactor.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_i_c_multi_factor_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">ICMultiFactor.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-03-13</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;../MultiFactorBase.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="};">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classhku_1_1_i_c_multi_factor.html">   14</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_i_c_multi_factor.html#a30b3b0826068d7b016b96aa61e6e959f">ICMultiFactor</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_multi_factor_base.html#ab1167772cda0944b40b1af8985d38b59">MultiFactorBase</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    MULTIFACTOR_IMP(<a class="code hl_function" href="classhku_1_1_i_c_multi_factor.html#a30b3b0826068d7b016b96aa61e6e959f">ICMultiFactor</a>)</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    MULTIFACTOR_NO_PRIVATE_MEMBER_SERIALIZATION</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classhku_1_1_i_c_multi_factor.html#a30b3b0826068d7b016b96aa61e6e959f">   19</a></span>    <a class="code hl_function" href="classhku_1_1_i_c_multi_factor.html#a30b3b0826068d7b016b96aa61e6e959f">ICMultiFactor</a>();</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_i_c_multi_factor.html#a37bdf8e813def6fcfd53a332fc036bf6">   20</a></span>    <a class="code hl_function" href="classhku_1_1_i_c_multi_factor.html#a37bdf8e813def6fcfd53a332fc036bf6">ICMultiFactor</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stks, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; ref_stk, <span class="keywordtype">int</span> ic_n,</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>                  <span class="keywordtype">int</span> ic_rolling_n, <span class="keywordtype">bool</span> spearman, <span class="keywordtype">int</span> mode, <span class="keywordtype">bool</span> save_all_factors);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_i_c_multi_factor.html#affc54f50167a450b8fe240b4cbe92456">   22</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_i_c_multi_factor.html#affc54f50167a450b8fe240b4cbe92456">~ICMultiFactor</a>() <span class="keyword">override</span> = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_i_c_multi_factor.html#a0fd257414361b882c774d09cb7e001ef">   24</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_i_c_multi_factor.html#a0fd257414361b882c774d09cb7e001ef">_checkParam</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_multi_factor_base.html#a861fdea2d699cbb8a3c9a7d30943b9a2">name</a>) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>};</div>
+</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_i_c_multi_factor_html_a0fd257414361b882c774d09cb7e001ef"><div class="ttname"><a href="classhku_1_1_i_c_multi_factor.html#a0fd257414361b882c774d09cb7e001ef">hku::ICMultiFactor::_checkParam</a></div><div class="ttdeci">virtual void _checkParam(const string &amp;name) const override</div></div>
+<div class="ttc" id="aclasshku_1_1_i_c_multi_factor_html_a30b3b0826068d7b016b96aa61e6e959f"><div class="ttname"><a href="classhku_1_1_i_c_multi_factor.html#a30b3b0826068d7b016b96aa61e6e959f">hku::ICMultiFactor::ICMultiFactor</a></div><div class="ttdeci">ICMultiFactor()</div></div>
+<div class="ttc" id="aclasshku_1_1_i_c_multi_factor_html_a37bdf8e813def6fcfd53a332fc036bf6"><div class="ttname"><a href="classhku_1_1_i_c_multi_factor.html#a37bdf8e813def6fcfd53a332fc036bf6">hku::ICMultiFactor::ICMultiFactor</a></div><div class="ttdeci">ICMultiFactor(const StockList &amp;stks, const KQuery &amp;query, const Stock &amp;ref_stk, int ic_n, int ic_rolling_n, bool spearman, int mode, bool save_all_factors)</div></div>
+<div class="ttc" id="aclasshku_1_1_i_c_multi_factor_html_affc54f50167a450b8fe240b4cbe92456"><div class="ttname"><a href="classhku_1_1_i_c_multi_factor.html#affc54f50167a450b8fe240b4cbe92456">hku::ICMultiFactor::~ICMultiFactor</a></div><div class="ttdeci">virtual ~ICMultiFactor() override=default</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_base_html_a861fdea2d699cbb8a3c9a7d30943b9a2"><div class="ttname"><a href="classhku_1_1_multi_factor_base.html#a861fdea2d699cbb8a3c9a7d30943b9a2">hku::MultiFactorBase::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the name</div><div class="ttdef"><b>定义</b> MultiFactorBase.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_base_html_ab1167772cda0944b40b1af8985d38b59"><div class="ttname"><a href="classhku_1_1_multi_factor_base.html#ab1167772cda0944b40b1af8985d38b59">hku::MultiFactorBase::MultiFactorBase</a></div><div class="ttdeci">MultiFactorBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga4a4df6bef18cec4791cca9bd27a4e973"><div class="ttname"><a href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">hku::StockList</a></div><div class="ttdeci">vector&lt; Stock &gt; StockList</div><div class="ttdef"><b>定义</b> Stock.h:409</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_39f6b1e06d9f13fb6caf6be56e472fdc.html">multifactor</a></li><li class="navelem"><a href="dir_22394f5a4486d39cb6fa10c3f153ed37.html">imp</a></li><li class="navelem"><b>ICMultiFactor.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

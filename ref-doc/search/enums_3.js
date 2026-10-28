@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['querytype',['QueryType',['../classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8',1,'hku::KQuery']]]
+  ['nodeerrorcode_0',['NodeErrorCode',['../namespacehku.html#a6eabb8a65ea9f384273e8bee6f1a4d4a',1,'hku']]]
 ];

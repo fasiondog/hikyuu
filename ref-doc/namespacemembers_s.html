@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 命名空间成员</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,75 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li class="current"><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="namespaces.html"><span>命名空间列表</span></a></li>
-      <li class="current"><a href="namespacemembers.html"><span>命名空间成员</span></a></li>
-    </ul>
-  </div>
-  <div id="navrow3" class="tabs2">
-    <ul class="tablist">
-      <li class="current"><a href="namespacemembers.html"><span>全部</span></a></li>
-      <li><a href="namespacemembers_func.html"><span>函数</span></a></li>
-      <li><a href="namespacemembers_vars.html"><span>变量</span></a></li>
-      <li><a href="namespacemembers_type.html"><span>类型定义</span></a></li>
-      <li><a href="namespacemembers_enum.html"><span>枚举</span></a></li>
-      <li><a href="namespacemembers_eval.html"><span>枚举值</span></a></li>
-    </ul>
-  </div>
-  <div id="navrow4" class="tabs3">
-    <ul class="tablist">
-      <li><a href="namespacemembers.html#index_a"><span>a</span></a></li>
-      <li><a href="namespacemembers_b.html#index_b"><span>b</span></a></li>
-      <li><a href="namespacemembers_c.html#index_c"><span>c</span></a></li>
-      <li><a href="namespacemembers_d.html#index_d"><span>d</span></a></li>
-      <li><a href="namespacemembers_e.html#index_e"><span>e</span></a></li>
-      <li><a href="namespacemembers_g.html#index_g"><span>g</span></a></li>
-      <li><a href="namespacemembers_h.html#index_h"><span>h</span></a></li>
-      <li><a href="namespacemembers_i.html#index_i"><span>i</span></a></li>
-      <li><a href="namespacemembers_k.html#index_k"><span>k</span></a></li>
-      <li><a href="namespacemembers_l.html#index_l"><span>l</span></a></li>
-      <li><a href="namespacemembers_m.html#index_m"><span>m</span></a></li>
-      <li><a href="namespacemembers_o.html#index_o"><span>o</span></a></li>
-      <li><a href="namespacemembers_p.html#index_p"><span>p</span></a></li>
-      <li><a href="namespacemembers_r.html#index_r"><span>r</span></a></li>
-      <li class="current"><a href="namespacemembers_s.html#index_s"><span>s</span></a></li>
-      <li><a href="namespacemembers_t.html#index_t"><span>t</span></a></li>
-      <li><a href="namespacemembers_u.html#index_u"><span>u</span></a></li>
-      <li><a href="namespacemembers_v.html#index_v"><span>v</span></a></li>
-      <li><a href="namespacemembers_w.html#index_w"><span>w</span></a></li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('namespacemembers_s.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -111,119 +74,165 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="contents">
-<div class="textblock">这里列出了所有命名空间成员，并附带其说明文档:</div>
+<div class="textblock">这里列出了所有命名空间成员，并附带其对应命名空间的说明文档:</div>
 
-<h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
-<li>SAFTYLOSS()
-: <a class="el" href="group___indicator.html#ga5b0f3de68507e786f1b942b7965a9d6a">hku</a>
-</li>
-<li>save()
-: <a class="el" href="namespaceboost_1_1serialization.html#af864fd6be50ce688c8f574f22c98c236">boost::serialization</a>
-</li>
-<li>SelectorPtr
-: <a class="el" href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">hku</a>
-</li>
-<li>SG_Bool()
-: <a class="el" href="group___signal.html#gad2fd595c66ba1a3c67048f6696948a0b">hku</a>
-</li>
-<li>SG_Cross()
-: <a class="el" href="group___signal.html#gaa4f9c7cd592beb5bf82c3f7beca226e1">hku</a>
-</li>
-<li>SG_CrossGold()
-: <a class="el" href="group___signal.html#ga6f68f24bd209bae9bb753dde172a0ef8">hku</a>
-</li>
-<li>SG_Flex()
-: <a class="el" href="group___signal.html#ga8edc2d64855239124c81f8a26d9da743">hku</a>
-</li>
-<li>SG_Single()
-: <a class="el" href="group___signal.html#gac5d05e751350c029be71ff59c20d0af8">hku</a>
-</li>
-<li>SG_Single2()
-: <a class="el" href="group___signal.html#gabba00831b85d2b9f65bf4d71c50bdb32">hku</a>
-</li>
-<li>SGPtr
-: <a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">hku</a>
-</li>
-<li>SignalPtr
-: <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku</a>
-</li>
-<li>SlippagePtr
-: <a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">hku</a>
-</li>
-<li>SLPtr
-: <a class="el" href="namespacehku.html#af0dead133e6e0a2039f723c34a5712ca">hku</a>
-</li>
-<li>SMA()
-: <a class="el" href="group___indicator.html#ga32d2f253e1346410baebeeb77d4a5ae1">hku</a>
-</li>
-<li>SP_FixedPercent()
-: <a class="el" href="namespacehku.html#a4054bc678dc2b50a5fb54e4047053408">hku</a>
-</li>
-<li>SP_FixedValue()
-: <a class="el" href="namespacehku.html#ac64ea1b2a7ada643e2b4b23aecb1dcd7">hku</a>
-</li>
-<li>SPPtr
-: <a class="el" href="namespacehku.html#a4c358c2f451fb955748f23789783818b">hku</a>
-</li>
-<li>ST_FixedPercent()
-: <a class="el" href="group___stoploss.html#ga5a2cec06849e6d38fcc2239d3d81996c">hku</a>
-</li>
-<li>ST_Indicator()
-: <a class="el" href="namespacehku.html#a0fdac36543dd57a50a7f0c2caa120765">hku</a>
-</li>
-<li>ST_Saftyloss()
-: <a class="el" href="group___stoploss.html#gac1477a5155489134a14763126380a50e">hku</a>
-</li>
-<li>STDEV()
-: <a class="el" href="group___indicator.html#gab7c2354df4af84a2137455a2f732e3b1">hku</a>
-</li>
-<li>StockList
-: <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">hku</a>
-</li>
-<li>StockManager
-: <a class="el" href="namespacehku.html#a9eae0a131b910844c89c8498433ec3fd">hku</a>
-</li>
-<li>StockWeightList
-: <a class="el" href="group___stock_manage.html#gad921bee33eb497a123cca24413202f7c">hku</a>
-</li>
-<li>StoplossPtr
-: <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">hku</a>
-</li>
-<li>string
-: <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">hku</a>
-</li>
-<li>StringList
-: <a class="el" href="group___data_type.html#ga019b144477dcda33671dfa6a203db696">hku</a>
-</li>
-<li>SYS_Simple()
-: <a class="el" href="group___system.html#ga41d47100e54b4af948d55c99a5f25a44">hku</a>
-</li>
-<li>SYSPtr
-: <a class="el" href="namespacehku.html#adf5f6ae86475a737d926a40cdc3c81da">hku</a>
-</li>
-<li>SystemList
-: <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">hku</a>
-</li>
-<li>SystemPart
-: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">hku</a>
-</li>
-<li>SystemPtr
-: <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku</a>
-</li>
+<h3 class="doxsection"><a id="index_s" name="index_s"></a>- s -</h3><ul>
+<li>safe_math()&#160;:&#160;<a class="el" href="group___utilities.html#gacab4099c8b6133f061d3b816ac280b19">hku</a></li>
+<li>SAFTYLOSS()&#160;:&#160;<a class="el" href="group___indicator.html#ga39c33f81116169903f0f2a092d9fc726">hku</a></li>
+<li>save()&#160;:&#160;<a class="el" href="namespaceboost_1_1serialization.html#a385c86ab96592633f8b87adeb213c8a5">boost::serialization</a></li>
+<li>saveFactor()&#160;:&#160;<a class="el" href="namespacehku.html#a872d1f2c42eafc1bec7b24e028f68220">hku</a></li>
+<li>saveFactorSet()&#160;:&#160;<a class="el" href="namespacehku.html#a46a20e1155c6679593087d382e6340af">hku</a></li>
+<li>saveSpecialFactorValues()&#160;:&#160;<a class="el" href="namespacehku.html#a5c6e62c6698b7225ba3c4cea12f973dd">hku</a></li>
+<li>SCFilter_AmountLimit()&#160;:&#160;<a class="el" href="group___multi_factor.html#ga686ab90fd4d8be4f4e8b1379c7b4edeb">hku</a></li>
+<li>SCFilter_Group()&#160;:&#160;<a class="el" href="group___multi_factor.html#ga97fe9991bb0eac243a987228ee8715bd">hku</a></li>
+<li>SCFilter_IgnoreNan()&#160;:&#160;<a class="el" href="group___multi_factor.html#gadbd587a4c23e5ed001eae79f09bf5dc4">hku</a></li>
+<li>SCFilter_LessOrEqualValue()&#160;:&#160;<a class="el" href="group___multi_factor.html#ga99aefed3552f77b38b78da573878f047">hku</a></li>
+<li>SCFilter_Price()&#160;:&#160;<a class="el" href="group___multi_factor.html#gae51351c29ab656d750089c7471f51de5">hku</a></li>
+<li>SCFilter_TopN()&#160;:&#160;<a class="el" href="group___multi_factor.html#ga888030072a1d2cad62087797718660f5">hku</a></li>
+<li>SCFilterPtr&#160;:&#160;<a class="el" href="namespacehku.html#aee4ab810128efe0871d4e11611f72d39">hku</a></li>
+<li>ScoreList&#160;:&#160;<a class="el" href="namespacehku.html#ae12270b2fa4d7184ec376d77a0eb64a6">hku</a></li>
+<li>ScoreRecordList&#160;:&#160;<a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">hku</a></li>
+<li>ScoresFilterPtr&#160;:&#160;<a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">hku</a></li>
+<li>SE_EvaluateOptimal()&#160;:&#160;<a class="el" href="namespacehku.html#a8c34dae79259bdbb60e5f74257cf1d68">hku</a></li>
+<li>SE_Fixed()&#160;:&#160;<a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">hku</a></li>
+<li>SE_MaxFundsOptimal()&#160;:&#160;<a class="el" href="namespacehku.html#aefcc807c6bf1332e512b30c8a247903c">hku</a></li>
+<li>SE_MultiFactor()&#160;:&#160;<a class="el" href="group___selector.html#gaa9a17b6dbb7da962664402519de22591">hku</a></li>
+<li>SE_MultiFactor2()&#160;:&#160;<a class="el" href="group___selector.html#ga6acf4404d1068e2485ddefcea054e187">hku</a></li>
+<li>SE_PerformanceOptimal()&#160;:&#160;<a class="el" href="namespacehku.html#a789daa83a8bcaa918a82d6e837863679">hku</a></li>
+<li>SE_Signal()&#160;:&#160;<a class="el" href="group___selector.html#gae186e47e6479eee8033b4fc21bca6606">hku</a></li>
+<li>Seconds()&#160;:&#160;<a class="el" href="group___data_type.html#gad7dcac323061d433adc758cbae2de8e9">hku</a></li>
+<li>SelectorPtr&#160;:&#160;<a class="el" href="group___selector.html#ga567344f3fb0db473aa68e844b715ae0b">hku</a></li>
+<li>sendFeedback()&#160;:&#160;<a class="el" href="namespacehku.html#adb54cfa18d67651a42f14589f83eb4df">hku</a></li>
+<li>sendPythonVersionFeedBack()&#160;:&#160;<a class="el" href="namespacehku.html#ac6e61b766185d8e723e8e3eaf172f1bf">hku</a></li>
+<li>SEPtr&#160;:&#160;<a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">hku</a></li>
+<li>set_log_level()&#160;:&#160;<a class="el" href="namespacehku.html#a2e82f9232fe62f10fee9bee431dd33c7">hku</a></li>
+<li>setInterruptChecker()&#160;:&#160;<a class="el" href="namespacehku_1_1ipc.html#ad2a381e74c44cfac6c03a7bfc636aa8a">hku::ipc</a></li>
+<li>setPythonInInteractive()&#160;:&#160;<a class="el" href="namespacehku.html#adcb861fff1cea42e7e45f95fbf714098">hku</a></li>
+<li>setPythonInJupyter()&#160;:&#160;<a class="el" href="namespacehku.html#af8987b34a53a3275fd132de7605b5f43">hku</a></li>
+<li>setRunningInPython()&#160;:&#160;<a class="el" href="namespacehku.html#a5834ba0c376bfab546a2b0f4084f9027">hku</a></li>
+<li>setShmServerRole()&#160;:&#160;<a class="el" href="namespacehku.html#a6308c564c2380f8f1f3d78d41216d917">hku</a></li>
+<li>SG_Add()&#160;:&#160;<a class="el" href="namespacehku.html#a57077014c7cea7d987883697b1b744d5">hku</a></li>
+<li>SG_AllwaysBuy()&#160;:&#160;<a class="el" href="group___signal.html#ga4d713a86427929bdecdfe3d8cb2ea5e2">hku</a></li>
+<li>SG_And()&#160;:&#160;<a class="el" href="namespacehku.html#adf5db762a28679653a650177eb250683">hku</a></li>
+<li>SG_Band()&#160;:&#160;<a class="el" href="namespacehku.html#a5236a4225c3bf821d9fa64df63cd340c">hku</a></li>
+<li>SG_Bool()&#160;:&#160;<a class="el" href="group___signal.html#ga0d3b71aa1e295f6dd51f9594ff909074">hku</a></li>
+<li>SG_Buy()&#160;:&#160;<a class="el" href="namespacehku.html#a5e535c325658491d6baf2b4273179c0e">hku</a></li>
+<li>SG_Cross()&#160;:&#160;<a class="el" href="group___signal.html#ga292e9f84ccca1df8e5b63e6bce2174e8">hku</a></li>
+<li>SG_CrossGold()&#160;:&#160;<a class="el" href="group___signal.html#ga9b0a025ac2fc3e0324e7da81682d0c7b">hku</a></li>
+<li>SG_Cycle()&#160;:&#160;<a class="el" href="namespacehku.html#adb3d34769b96394da7ade31229900926">hku</a></li>
+<li>SG_Div()&#160;:&#160;<a class="el" href="namespacehku.html#a943e14c2494d18556f231d9f585cf2fe">hku</a></li>
+<li>SG_Flex()&#160;:&#160;<a class="el" href="group___signal.html#ga61d1916379cea1a3f945a5c43002c83e">hku</a></li>
+<li>SG_Manual()&#160;:&#160;<a class="el" href="namespacehku.html#a417f9dae2b87a00852c7bac5c0323148">hku</a></li>
+<li>SG_Mul()&#160;:&#160;<a class="el" href="namespacehku.html#a26549f43bda11cea048686f4b2520b91">hku</a></li>
+<li>SG_OneSide()&#160;:&#160;<a class="el" href="group___signal.html#gacaffcc0512e061f6c8519fd20f494e0e">hku</a></li>
+<li>SG_Or()&#160;:&#160;<a class="el" href="namespacehku.html#af80254261d55ab767b3dd9cdb3d354ff">hku</a></li>
+<li>SG_Sell()&#160;:&#160;<a class="el" href="namespacehku.html#a4db188e8787e46295a8e4e09baa1a7a3">hku</a></li>
+<li>SG_Single()&#160;:&#160;<a class="el" href="group___signal.html#ga42a7b7cd89321f553c18697750c4fdbd">hku</a></li>
+<li>SG_Single2()&#160;:&#160;<a class="el" href="group___signal.html#ga5e4bc4437f81ed248790a482d402cc37">hku</a></li>
+<li>SG_Sub()&#160;:&#160;<a class="el" href="namespacehku.html#acfa164d59205b43626aad8e9a475d710">hku</a></li>
+<li>SGN()&#160;:&#160;<a class="el" href="group___indicator.html#gae5d024e5b8092973ee08aeec7ed7699b">hku</a></li>
+<li>SGPtr&#160;:&#160;<a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">hku</a></li>
+<li>shmClient()&#160;:&#160;<a class="el" href="namespacehku_1_1ipc.html#a94750e1ab8eed3439ed6c959df4ab4b1">hku::ipc</a></li>
+<li>shmMirrorRealtimeUpdate()&#160;:&#160;<a class="el" href="namespacehku_1_1ipc.html#ac512d5faf91c9bc2316aa50089fd5845">hku::ipc</a></li>
+<li>SignalPtr&#160;:&#160;<a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku</a></li>
+<li>SIGNED_POWER()&#160;:&#160;<a class="el" href="group___indicator.html#ga8873ed055589b9808812da205d757880">hku</a></li>
+<li>SIN()&#160;:&#160;<a class="el" href="group___indicator.html#ga94c18a5115e5cb1f4439e8755d0218aa">hku</a></li>
+<li>SKEW()&#160;:&#160;<a class="el" href="group___indicator.html#ga7781fba0375282fef4dcef952b43a14f">hku</a></li>
+<li>SLICE()&#160;:&#160;<a class="el" href="group___indicator.html#gaf6d49851d76ed78b0ae1ee9a78d6488e">hku</a></li>
+<li>SlippagePtr&#160;:&#160;<a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">hku</a></li>
+<li>SLOPE()&#160;:&#160;<a class="el" href="namespacehku.html#aa8c08110a184cf67e43b9da939683ff0">hku</a></li>
+<li>SMA()&#160;:&#160;<a class="el" href="group___indicator.html#gabc0eb9194d975ce24094aea68451c490">hku</a></li>
+<li>SP_FixedPercent()&#160;:&#160;<a class="el" href="namespacehku.html#a57cbc7b95efd7a62a17bf53ade335085">hku</a></li>
+<li>SP_FixedValue()&#160;:&#160;<a class="el" href="namespacehku.html#ad998b3b75f2dc43338f12b90a6f52f8f">hku</a></li>
+<li>SP_LogNormal()&#160;:&#160;<a class="el" href="namespacehku.html#a49a4266c3887fae98683498f7c258be5">hku</a></li>
+<li>SP_Normal()&#160;:&#160;<a class="el" href="namespacehku.html#a84895b8db38240a342d1fd35e308c4cd">hku</a></li>
+<li>SP_TruncNormal()&#160;:&#160;<a class="el" href="namespacehku.html#aac3bb40cb29a833a709d1f603981dbb1">hku</a></li>
+<li>SP_Uniform()&#160;:&#160;<a class="el" href="namespacehku.html#ae8817d3a5b7a38d17f634be14786bbf4">hku</a></li>
+<li>SPEARMAN()&#160;:&#160;<a class="el" href="group___indicator.html#gadcc15c94f036450b629826c9c3e10fb0">hku</a></li>
+<li>split()&#160;:&#160;<a class="el" href="group___utilities.html#ga9606b5a13c99a85b037f324afc552996">hku</a></li>
+<li>splitWhereParts()&#160;:&#160;<a class="el" href="namespacehku.html#aaaa80f58b25cf24355601f9d9e108243">hku</a></li>
+<li>spotAgentIsConnected()&#160;:&#160;<a class="el" href="namespacehku.html#ad993bd5253c5490f669571bf820b8f30">hku</a></li>
+<li>spotAgentIsRunning()&#160;:&#160;<a class="el" href="namespacehku.html#abe03a9d919fc5f7f0fd8b78fb8ffabea">hku</a></li>
+<li>SPPtr&#160;:&#160;<a class="el" href="namespacehku.html#a4c358c2f451fb955748f23789783818b">hku</a></li>
+<li>sqlIdentifier()&#160;:&#160;<a class="el" href="namespacehku.html#a024b732f5036cc539eb6076533b447aa">hku</a></li>
+<li>SQLiteConnectPtr&#160;:&#160;<a class="el" href="namespacehku.html#aa10c7b5fd8114832067a849e5395474b">hku</a></li>
+<li>SQLStatementPtr&#160;:&#160;<a class="el" href="group___d_b_connect.html#gae515e29dd16a0cef32d5b384635f4361">hku</a></li>
+<li>sqlStringLiteral()&#160;:&#160;<a class="el" href="namespacehku.html#a39f726b6fd68281d4be01a673e844b54">hku</a></li>
+<li>SQRT()&#160;:&#160;<a class="el" href="group___indicator.html#ga0083754957e3acea27f6676307f752d5">hku</a></li>
+<li>ST_FixedPercent()&#160;:&#160;<a class="el" href="group___stoploss.html#ga5a2cec06849e6d38fcc2239d3d81996c">hku</a></li>
+<li>ST_Indicator()&#160;:&#160;<a class="el" href="namespacehku.html#a2b673ca6308f56ae77312dd6cccaf618">hku</a></li>
+<li>ST_Saftyloss()&#160;:&#160;<a class="el" href="group___stoploss.html#gac1477a5155489134a14763126380a50e">hku</a></li>
+<li>startDataServer()&#160;:&#160;<a class="el" href="namespacehku.html#afb6883303b36bc0eff06d8855c923d52">hku</a></li>
+<li>startShmServer()&#160;:&#160;<a class="el" href="group___data_driver.html#gaf36b69bcd21916261902681e02c38118">hku</a></li>
+<li>startSpotAgent()&#160;:&#160;<a class="el" href="group___agent.html#ga0ad932e1f540479e147e6f929a299c27">hku</a></li>
+<li>STDEV()&#160;:&#160;<a class="el" href="group___indicator.html#gabf364927458cbc97dac0e734868dfe90">hku</a></li>
+<li>STDP()&#160;:&#160;<a class="el" href="group___indicator.html#gacdc6c550b6532a107e5b4aa9e2848a50">hku</a></li>
+<li>steady_timer&#160;:&#160;<a class="el" href="namespacehku_1_1net.html#a167eada9e5a8374429b702ab08681088">hku::net</a></li>
+<li>STKTYPE()&#160;:&#160;<a class="el" href="group___indicator.html#ga98326b7e86c7fd7e567bc7700eb3d062">hku</a></li>
+<li>StockList&#160;:&#160;<a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">hku</a></li>
+<li>StockManager&#160;:&#160;<a class="el" href="namespacehku.html#a9eae0a131b910844c89c8498433ec3fd">hku</a></li>
+<li>StockWeightList&#160;:&#160;<a class="el" href="group___stock_manage.html#gad921bee33eb497a123cca24413202f7c">hku</a></li>
+<li>stopDataServer()&#160;:&#160;<a class="el" href="namespacehku.html#abd0d8e7b7aff9914493b659aad77dcb2">hku</a></li>
+<li>StoplossPtr&#160;:&#160;<a class="el" href="group___stoploss.html#ga1d1301414ef86b6ffa450a5f322cb781">hku</a></li>
+<li>stopShmServer()&#160;:&#160;<a class="el" href="group___data_driver.html#ga6422fbbbefbe7455d02329487ae670c2">hku</a></li>
+<li>stopSpotAgent()&#160;:&#160;<a class="el" href="group___agent.html#ga8f9c0b587a197881aec1b8a842da79e7">hku</a></li>
+<li>STPtr&#160;:&#160;<a class="el" href="namespacehku.html#a8c23288164c83f9857538176ee7936ca">hku</a></li>
+<li>strand&#160;:&#160;<a class="el" href="namespacehku_1_1net.html#a24bf8dd034c6a07a3f6062e99a3d9464">hku::net</a></li>
+<li>StrategyPtr&#160;:&#160;<a class="el" href="namespacehku.html#ac813d5968f62d0a03add566d7411e77c">hku</a></li>
+<li>string_to_any()&#160;:&#160;<a class="el" href="namespacehku.html#a976fa151848797a20dd81b12949ec5a2">hku</a></li>
+<li>string_to_any&lt; double &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#aeaf1797be9d105aeada7a8dd3bd5e84f">hku</a></li>
+<li>string_to_any&lt; float &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#af368a1d23d61924f77bb4f1da8cdf0dd">hku</a></li>
+<li>string_to_any&lt; int &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#a0b0a6c16d3e211e414a4c364035b1814">hku</a></li>
+<li>string_to_any&lt; long &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#ad7e8be15cbe042cb9851efee460fd14c">hku</a></li>
+<li>string_to_any&lt; long double &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#ae8d3877ead16181feafd762a40294ce8">hku</a></li>
+<li>string_to_any&lt; long long &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#ae7c7bdca311e5080db2d3a38fba5ffbd">hku</a></li>
+<li>string_to_any&lt; unsigned int &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#aac3e19adf55f53251eaa76107bba823a">hku</a></li>
+<li>string_to_any&lt; unsigned long &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#aeabd7293d5f8522619e1b35d75ec1e87">hku</a></li>
+<li>string_to_any&lt; unsigned long long &gt;()&#160;:&#160;<a class="el" href="namespacehku.html#afa9484bc202d835f20c6b55d2d7112e6">hku</a></li>
+<li>StringList&#160;:&#160;<a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">hku</a></li>
+<li>SubSystemContextList&#160;:&#160;<a class="el" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">hku</a></li>
+<li>SUCCESS&#160;:&#160;<a class="el" href="namespacehku.html#a6eabb8a65ea9f384273e8bee6f1a4d4aa6999962c2e2095e33b6669b53fe1dffa">hku</a></li>
+<li>SuggestionType&#160;:&#160;<a class="el" href="namespacehku.html#a614669a9afe4fd6dff3b575ad2f8622e">hku</a></li>
+<li>SUM()&#160;:&#160;<a class="el" href="group___indicator.html#ga9a69b6e23f3c9f857f3bb5696e94e33d">hku</a></li>
+<li>SUMBARS()&#160;:&#160;<a class="el" href="group___indicator.html#gace4140408b125686bad94a3a42a115ce">hku</a></li>
+<li>supportChineseSimple()&#160;:&#160;<a class="el" href="namespacehku.html#a3388df06a0d6888da5514363f4138307">hku</a></li>
+<li>swap()&#160;:&#160;<a class="el" href="namespacehku.html#a285e7f05c948a0a2028c1f39e18f37a4">hku</a></li>
+<li>SYS_Simple()&#160;:&#160;<a class="el" href="group___system.html#ga41d47100e54b4af948d55c99a5f25a44">hku</a></li>
+<li>SYS_WalkForward()&#160;:&#160;<a class="el" href="namespacehku.html#abb3685a68435a856cfe795091ee7dd48">hku</a></li>
+<li>sysinfo_clean()&#160;:&#160;<a class="el" href="namespacehku.html#a2bd17146e5cafb5ef80de47cfc8d2a8c">hku</a></li>
+<li>sysinfo_init()&#160;:&#160;<a class="el" href="namespacehku.html#afe4da0fb57da51e568b5e912252ddbd5">hku</a></li>
+<li>SYSPtr&#160;:&#160;<a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">hku</a></li>
+<li>system_error&#160;:&#160;<a class="el" href="namespacehku_1_1net.html#a6cf322c5ab2c89adeabb59c7c488690c">hku::net</a></li>
+<li>system_timer&#160;:&#160;<a class="el" href="namespacehku_1_1net.html#a3a12103505230b70e2494018f1a89688">hku::net</a></li>
+<li>SystemList&#160;:&#160;<a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">hku</a></li>
+<li>SystemPart&#160;:&#160;<a class="el" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">hku</a></li>
+<li>SystemPtr&#160;:&#160;<a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku</a></li>
+<li>SystemWeightList&#160;:&#160;<a class="el" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">hku</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

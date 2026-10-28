@@ -1,0 +1,17 @@
+digraph "hikyuu/trade_sys/selector"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_194593d72069437dd60c2304994b6f20 {
+    graph [ bgcolor="#edf0f7", pencolor="grey50", label="trade_sys", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_194593d72069437dd60c2304994b6f20.html",tooltip=""]
+  subgraph clusterdir_3da1167a5556da8ee80b5b80dc171a54 {
+    graph [ bgcolor="#edf0f7", pencolor="grey25", label="", fontname=Helvetica,fontsize=10 style="filled,bold", URL="dir_3da1167a5556da8ee80b5b80dc171a54.html",tooltip=""]
+    dir_3da1167a5556da8ee80b5b80dc171a54 [shape=plaintext, label="selector"];
+  dir_ab86cc436a47b82b7c996888dde22ea7 [label="crt", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_ab86cc436a47b82b7c996888dde22ea7.html",tooltip=""];
+  dir_b4f9f0a55d87869bef0586870d14f68d [label="imp", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_b4f9f0a55d87869bef0586870d14f68d.html",tooltip=""];
+  }
+  }
+}

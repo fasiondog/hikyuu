@@ -1,0 +1,1656 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::MultiFactorBase类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_multi_factor_base.html','','classhku_1_1_multi_factor_base-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::MultiFactorBase类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a> &raquo; <a class="el" href="group___multi_factor.html">MultiFactor multi-factor synthesis</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Multi-factor synthesis; when there is only one factor it is equivalent to a simple score board  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_multi_factor_base_8h_source.html">MultiFactorBase.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::MultiFactorBase 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_multi_factor_base__inherit__graph.png" border="0" usemap="#ahku_1_1_multi_factor_base_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::MultiFactorBase 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_multi_factor_base__coll__graph.png" border="0" usemap="#ahku_1_1_multi_factor_base_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a6b0369d09742862d4cd06abfc38619d7" id="r_a6b0369d09742862d4cd06abfc38619d7"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_indicator.html#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b0369d09742862d4cd06abfc38619d7">value_t</a></td></tr>
+<tr class="memitem:ae14bf8d50ad746b01a1bd41cdf076135" id="r_ae14bf8d50ad746b01a1bd41cdf076135"><td class="memItemLeft" align="right" valign="top">typedef std::shared_ptr&lt; <a class="el" href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae14bf8d50ad746b01a1bd41cdf076135">MultiFactorPtr</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ab1167772cda0944b40b1af8985d38b59" id="r_ab1167772cda0944b40b1af8985d38b59"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1167772cda0944b40b1af8985d38b59">MultiFactorBase</a> ()</td></tr>
+<tr class="memitem:ae2deda2bfddbc6e7419a339718a3ecb3" id="r_ae2deda2bfddbc6e7419a339718a3ecb3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2deda2bfddbc6e7419a339718a3ecb3">MultiFactorBase</a> (const string &amp;<a class="el" href="#a861fdea2d699cbb8a3c9a7d30943b9a2">name</a>)</td></tr>
+<tr class="memitem:a18a4afac3aaff3dd61b241c13a764bf4" id="r_a18a4afac3aaff3dd61b241c13a764bf4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18a4afac3aaff3dd61b241c13a764bf4">MultiFactorBase</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stks, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query, const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;ref_stk, const string &amp;<a class="el" href="#a861fdea2d699cbb8a3c9a7d30943b9a2">name</a>, int ic_n, bool spearman, int mode, bool save_all_factors)</td></tr>
+<tr class="memitem:aebf53c4db92ed7cf8b240f60a7703ef6" id="r_aebf53c4db92ed7cf8b240f60a7703ef6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebf53c4db92ed7cf8b240f60a7703ef6">MultiFactorBase</a> (const <a class="el" href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a> &amp;)</td></tr>
+<tr class="memitem:ab0c491214db003dc62f7a595214236cd" id="r_ab0c491214db003dc62f7a595214236cd"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0c491214db003dc62f7a595214236cd">~MultiFactorBase</a> ()=default</td></tr>
+<tr class="memitem:a861fdea2d699cbb8a3c9a7d30943b9a2" id="r_a861fdea2d699cbb8a3c9a7d30943b9a2"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a861fdea2d699cbb8a3c9a7d30943b9a2">name</a> () const</td></tr>
+<tr class="memdesc:a861fdea2d699cbb8a3c9a7d30943b9a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name  <br /></td></tr>
+<tr class="memitem:a7d3b79460fd8b8707a9a10263325c6f5" id="r_a7d3b79460fd8b8707a9a10263325c6f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d3b79460fd8b8707a9a10263325c6f5">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:a7d3b79460fd8b8707a9a10263325c6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name  <br /></td></tr>
+<tr class="memitem:a420ded40f01915046f12d942c82d484c" id="r_a420ded40f01915046f12d942c82d484c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a420ded40f01915046f12d942c82d484c">getDatetimeList</a> ()</td></tr>
+<tr class="memdesc:a420ded40f01915046f12d942c82d484c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the reference date list  <br /></td></tr>
+<tr class="memitem:ac3e6523a0b2ada4af630d1c120a47152" id="r_ac3e6523a0b2ada4af630d1c120a47152"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3e6523a0b2ada4af630d1c120a47152">getQuery</a> () const</td></tr>
+<tr class="memdesc:ac3e6523a0b2ada4af630d1c120a47152"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the query range  <br /></td></tr>
+<tr class="memitem:ad14bd5b2074aa0b5a31ac313ae413d1b" id="r_ad14bd5b2074aa0b5a31ac313ae413d1b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad14bd5b2074aa0b5a31ac313ae413d1b">setQuery</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memdesc:ad14bd5b2074aa0b5a31ac313ae413d1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the query range  <br /></td></tr>
+<tr class="memitem:a2f49531aec377e702f4031dadefdaa19" id="r_a2f49531aec377e702f4031dadefdaa19"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f49531aec377e702f4031dadefdaa19">getRefStock</a> () const</td></tr>
+<tr class="memdesc:a2f49531aec377e702f4031dadefdaa19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the reference security  <br /></td></tr>
+<tr class="memitem:a9e57dfc51e0f4349c053a1531f56008c" id="r_a9e57dfc51e0f4349c053a1531f56008c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e57dfc51e0f4349c053a1531f56008c">setRefStock</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stk)</td></tr>
+<tr class="memdesc:a9e57dfc51e0f4349c053a1531f56008c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the reference security  <br /></td></tr>
+<tr class="memitem:a9a5694dc64ee28f9328939c1a370dd63" id="r_a9a5694dc64ee28f9328939c1a370dd63"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a5694dc64ee28f9328939c1a370dd63">getStockList</a> () const</td></tr>
+<tr class="memdesc:a9a5694dc64ee28f9328939c1a370dd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the security list  <br /></td></tr>
+<tr class="memitem:a8217e7ce146bb8bf88fef9b40109d450" id="r_a8217e7ce146bb8bf88fef9b40109d450"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8217e7ce146bb8bf88fef9b40109d450">setStockList</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stks)</td></tr>
+<tr class="memdesc:a8217e7ce146bb8bf88fef9b40109d450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the security list of the calculation range  <br /></td></tr>
+<tr class="memitem:a31190e5622994331cf9cf4d8dd796446" id="r_a31190e5622994331cf9cf4d8dd796446"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31190e5622994331cf9cf4d8dd796446">getStockListNumber</a> () const</td></tr>
+<tr class="memdesc:a31190e5622994331cf9cf4d8dd796446"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current number of the securities in the security list  <br /></td></tr>
+<tr class="memitem:ab3088a69057922be5136211a6976ec72" id="r_ab3088a69057922be5136211a6976ec72"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3088a69057922be5136211a6976ec72">getRefFactorSet</a> () const</td></tr>
+<tr class="memdesc:ab3088a69057922be5136211a6976ec72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the original factor set  <br /></td></tr>
+<tr class="memitem:ab5da7f88d170f2c0e82fde7cc08e0d3d" id="r_ab5da7f88d170f2c0e82fde7cc08e0d3d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5da7f88d170f2c0e82fde7cc08e0d3d">setRefFactorSet</a> (const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;factorset)</td></tr>
+<tr class="memdesc:ab5da7f88d170f2c0e82fde7cc08e0d3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the original factor set  <br /></td></tr>
+<tr class="memitem:a4caf285d935ea50d908d03f3b70336d0" id="r_a4caf285d935ea50d908d03f3b70336d0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4caf285d935ea50d908d03f3b70336d0">getFactor</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;)</td></tr>
+<tr class="memdesc:a4caf285d935ea50d908d03f3b70336d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the synthesized factor of the given security  <br /></td></tr>
+<tr class="memitem:ae69017d96f559db664171409eff68a64" id="r_ae69017d96f559db664171409eff68a64"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae69017d96f559db664171409eff68a64">getAllFactors</a> ()</td></tr>
+<tr class="memdesc:ae69017d96f559db664171409eff68a64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the new factors synthesized from all the securities, in the same order as the passed security portfolio  <br /></td></tr>
+<tr class="memitem:a644b419da5e3db269c7239a442220284" id="r_a644b419da5e3db269c7239a442220284"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a644b419da5e3db269c7239a442220284">getScores</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;)</td></tr>
+<tr class="memdesc:a644b419da5e3db269c7239a442220284"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the factor values of the given date cross-section; the order follows the <span class="tt">mode</span> parameter: 0-descending, 1-ascending, 2-no sorting  <br /></td></tr>
+<tr class="memitem:aec800069c6031582aa25ddabf125e77f" id="r_aec800069c6031582aa25ddabf125e77f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec800069c6031582aa25ddabf125e77f">getScores</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date, size_t start, size_t end=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; size_t &gt;())</td></tr>
+<tr class="memitem:a20ee1d08478a1fc28a4bbf88e0d15cd9" id="r_a20ee1d08478a1fc28a4bbf88e0d15cd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20ee1d08478a1fc28a4bbf88e0d15cd9">getScores</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date, size_t start, size_t end, std::function&lt; bool(const <a class="el" href="structhku_1_1_score_record.html">ScoreRecord</a> &amp;)&gt; &amp;&amp;filter)</td></tr>
+<tr class="memdesc:a20ee1d08478a1fc28a4bbf88e0d15cd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the factor values (scores) within the given date cross-section range [start, end], and filter them through filter  <br /></td></tr>
+<tr class="memitem:a43cd9cc3de675177ff709d1031e7de12" id="r_a43cd9cc3de675177ff709d1031e7de12"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43cd9cc3de675177ff709d1031e7de12">getScores</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date, size_t start, size_t end, std::function&lt; bool(const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, const <a class="el" href="structhku_1_1_score_record.html">ScoreRecord</a> &amp;)&gt; &amp;&amp;filter)</td></tr>
+<tr class="memitem:ab37cdb7c82a6e929cd6597180c18df64" id="r_ab37cdb7c82a6e929cd6597180c18df64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab37cdb7c82a6e929cd6597180c18df64">getScores</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;date, size_t start, size_t end, const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;filter)</td></tr>
+<tr class="memdesc:ab37cdb7c82a6e929cd6597180c18df64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the factor values (scores) within the given date cross-section range [start, end], filtered by filter  <br /></td></tr>
+<tr class="memitem:a2222744f9748bf07323eabeddc6a0285" id="r_a2222744f9748bf07323eabeddc6a0285"><td class="memItemLeft" align="right" valign="top">const vector&lt; <a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2222744f9748bf07323eabeddc6a0285">getAllScores</a> ()</td></tr>
+<tr class="memdesc:a2222744f9748bf07323eabeddc6a0285"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the cross-section data; the order of each date follows the <span class="tt">mode</span> parameter: 0-descending, 1-ascending, 2-no sorting  <br /></td></tr>
+<tr class="memitem:a9696a3ff1b9a756cc0b5038a3e6d6802" id="r_a9696a3ff1b9a756cc0b5038a3e6d6802"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9696a3ff1b9a756cc0b5038a3e6d6802">getIC</a> (int ndays=0)</td></tr>
+<tr class="memdesc:a9696a3ff1b9a756cc0b5038a3e6d6802"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the IC of the synthesized factor, its length is the same as the reference dates (the non-strict IC mode)  <br /></td></tr>
+<tr class="memitem:a296815ce03204a9f02f3294a4916cd81" id="r_a296815ce03204a9f02f3294a4916cd81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a296815ce03204a9f02f3294a4916cd81">getICIR</a> (int ir_n, int ic_n=0)</td></tr>
+<tr class="memdesc:a296815ce03204a9f02f3294a4916cd81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ICIR of the synthesized factor  <br /></td></tr>
+<tr class="memitem:ab67cb19ee67c4bf96dc10d4a07cf6386" id="r_ab67cb19ee67c4bf96dc10d4a07cf6386"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab67cb19ee67c4bf96dc10d4a07cf6386">getAllSrcFactors</a> ()</td></tr>
+<tr class="memdesc:ab67cb19ee67c4bf96dc10d4a07cf6386"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the processed original factor values (normalized and standardized).  <br /></td></tr>
+<tr class="memitem:a9a0a0c97bb6c1dfa6092bf86c8941371" id="r_a9a0a0c97bb6c1dfa6092bf86c8941371"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a0a0c97bb6c1dfa6092bf86c8941371">setNormalize</a> (<a class="el" href="namespacehku.html#ab405d278c9530b86ce529624fe31768b">NormPtr</a> norm)</td></tr>
+<tr class="memdesc:a9a0a0c97bb6c1dfa6092bf86c8941371"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the factor standardization / normalization operation  <br /></td></tr>
+<tr class="memitem:a7cf4ea5aa639c77ded015df67d8a1101" id="r_a7cf4ea5aa639c77ded015df67d8a1101"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cf4ea5aa639c77ded015df67d8a1101">addSpecialNormalize</a> (const string &amp;<a class="el" href="#a861fdea2d699cbb8a3c9a7d30943b9a2">name</a>, <a class="el" href="namespacehku.html#a6ef59405f1e64abd8717bb1bf8c6e21a">NormalizePtr</a> norm, const string &amp;category=&quot;&quot;, const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;style_inds=<a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>())</td></tr>
+<tr class="memdesc:a7cf4ea5aa639c77ded015df67d8a1101"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply the given standardization / normalization, industry neutralization and style factor neutralization operations to the indicator with the given name.  <br /></td></tr>
+<tr class="memitem:a82e6223e665a9be34d70084e35233686" id="r_a82e6223e665a9be34d70084e35233686"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a82e6223e665a9be34d70084e35233686">reset</a> ()</td></tr>
+<tr class="memitem:a0dc119dfd8c35db8a2bfecd2a1724000" id="r_a0dc119dfd8c35db8a2bfecd2a1724000"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ae14bf8d50ad746b01a1bd41cdf076135">MultiFactorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0dc119dfd8c35db8a2bfecd2a1724000">clone</a> ()</td></tr>
+<tr class="memitem:af6690e326d45587320b886b2f6167f56" id="r_af6690e326d45587320b886b2f6167f56"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6690e326d45587320b886b2f6167f56">_reset</a> ()</td></tr>
+<tr class="memitem:a63c3ae232df5bf21308f8e288864df10" id="r_a63c3ae232df5bf21308f8e288864df10"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="#ae14bf8d50ad746b01a1bd41cdf076135">MultiFactorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63c3ae232df5bf21308f8e288864df10">_clone</a> ()=0</td></tr>
+<tr class="memitem:ad7a5ae790a9c11d5ffaf0bdb0367166b" id="r_ad7a5ae790a9c11d5ffaf0bdb0367166b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7a5ae790a9c11d5ffaf0bdb0367166b">_calculate</a> (const vector&lt; <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &gt; &amp;)=0</td></tr>
+<tr class="memitem:aab04d3f545e1b5b0093e35dde39821c2" id="r_aab04d3f545e1b5b0093e35dde39821c2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab04d3f545e1b5b0093e35dde39821c2">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:aaddf3909cffd5a33e3b8a69438ca8132" id="r_aaddf3909cffd5a33e3b8a69438ca8132"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaddf3909cffd5a33e3b8a69438ca8132">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memdesc:aaddf3909cffd5a33e3b8a69438ca8132"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this multi-factor, its factors, normalizers, or style indicators are Python  <br /></td></tr>
+<tr class="memitem:a370f70654e45822beae2f35b0bcc9259" id="r_a370f70654e45822beae2f35b0bcc9259"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a370f70654e45822beae2f35b0bcc9259">calculate</a> ()</td></tr>
+<tr class="memdesc:a370f70654e45822beae2f35b0bcc9259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the calculation.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:adc083ac248e7531c190cf99a2b2fd306" id="r_adc083ac248e7531c190cf99a2b2fd306"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc083ac248e7531c190cf99a2b2fd306">_getAllReturns</a> (int ndays) const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected 属性</h2></td></tr>
+<tr class="memitem:a3889dd8e734abbbdc7f8437d3dc005c4" id="r_a3889dd8e734abbbdc7f8437d3dc005c4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3889dd8e734abbbdc7f8437d3dc005c4">m_is_python_object</a> {false}</td></tr>
+<tr class="memitem:a9d5935502b9aa18d900a75c10be76ca3" id="r_a9d5935502b9aa18d900a75c10be76ca3"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d5935502b9aa18d900a75c10be76ca3">m_name</a></td></tr>
+<tr class="memitem:af80cc7d3f15559659fa7b9aef53cbb17" id="r_af80cc7d3f15559659fa7b9aef53cbb17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_factor_set.html">FactorSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af80cc7d3f15559659fa7b9aef53cbb17">m_factorset</a></td></tr>
+<tr class="memitem:a3956a950451dbd657dd78521c3d219f6" id="r_a3956a950451dbd657dd78521c3d219f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3956a950451dbd657dd78521c3d219f6">m_stks</a></td></tr>
+<tr class="memitem:ae54ff89a86dbdef8e8b6aa80472ad63a" id="r_ae54ff89a86dbdef8e8b6aa80472ad63a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae54ff89a86dbdef8e8b6aa80472ad63a">m_ref_stk</a></td></tr>
+<tr class="memitem:a564c4cd925ea2b536b20fde7c6e125d9" id="r_a564c4cd925ea2b536b20fde7c6e125d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a564c4cd925ea2b536b20fde7c6e125d9">m_query</a></td></tr>
+<tr class="memitem:a5381a27223027d701474c98a1782b704" id="r_a5381a27223027d701474c98a1782b704"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab405d278c9530b86ce529624fe31768b">NormPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5381a27223027d701474c98a1782b704">m_norm</a></td></tr>
+<tr class="memitem:a85b1c09684ef8ab4f46ecf896fc6615b" id="r_a85b1c09684ef8ab4f46ecf896fc6615b"><td class="memItemLeft" align="right" valign="top">unordered_map&lt; string, <a class="el" href="namespacehku.html#ab405d278c9530b86ce529624fe31768b">NormPtr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85b1c09684ef8ab4f46ecf896fc6615b">m_special_norms</a></td></tr>
+<tr class="memitem:a389c6483bd24db707df83b05a32af18b" id="r_a389c6483bd24db707df83b05a32af18b"><td class="memItemLeft" align="right" valign="top">unordered_map&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a389c6483bd24db707df83b05a32af18b">m_special_category</a></td></tr>
+<tr class="memitem:a31af5fa5b3d225615f5437c7a859522c" id="r_a31af5fa5b3d225615f5437c7a859522c"><td class="memItemLeft" align="right" valign="top">unordered_map&lt; string, <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31af5fa5b3d225615f5437c7a859522c">m_special_style_inds</a></td></tr>
+<tr class="memitem:a258b59262f0c46bcc7cd20ed261d56d3" id="r_a258b59262f0c46bcc7cd20ed261d56d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a258b59262f0c46bcc7cd20ed261d56d3">m_ref_dates</a></td></tr>
+<tr class="memitem:afdff83086cc51abf660588b135dab7d5" id="r_afdff83086cc51abf660588b135dab7d5"><td class="memItemLeft" align="right" valign="top">unordered_map&lt; <a class="el" href="classhku_1_1_stock.html">Stock</a>, size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afdff83086cc51abf660588b135dab7d5">m_stk_map</a></td></tr>
+<tr class="memitem:a1b3d173b2d66662527f7dfa492f00d24" id="r_a1b3d173b2d66662527f7dfa492f00d24"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b3d173b2d66662527f7dfa492f00d24">m_all_factors</a></td></tr>
+<tr class="memitem:a0ba927c714683da197c3776ab6171358" id="r_a0ba927c714683da197c3776ab6171358"><td class="memItemLeft" align="right" valign="top">unordered_map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ba927c714683da197c3776ab6171358">m_date_index</a></td></tr>
+<tr class="memitem:a3864281d01312d2a5df82668da4f928d" id="r_a3864281d01312d2a5df82668da4f928d"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3864281d01312d2a5df82668da4f928d">m_stk_factor_by_date</a></td></tr>
+<tr class="memitem:a83bb250bed040e2c665b69f54adc1a67" id="r_a83bb250bed040e2c665b69f54adc1a67"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a83bb250bed040e2c665b69f54adc1a67">m_ic</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:aa16d541ebb947f5d0d18b02ec4b6a3ef" id="r_aa16d541ebb947f5d0d18b02ec4b6a3ef"><td class="memItemLeft" align="right" valign="top">HKU_API std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa16d541ebb947f5d0d18b02ec4b6a3ef">operator&lt;&lt;</a> (std::ostream &amp;, const <a class="el" href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a> &amp;)</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Multi-factor synthesis; when there is only one factor it is equivalent to a simple score board </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="ae14bf8d50ad746b01a1bd41cdf076135" name="ae14bf8d50ad746b01a1bd41cdf076135"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae14bf8d50ad746b01a1bd41cdf076135">&#9670;&#160;</a></span>MultiFactorPtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::shared_ptr&lt;<a class="el" href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a>&gt; <a class="el" href="#ae14bf8d50ad746b01a1bd41cdf076135">hku::MultiFactorBase::MultiFactorPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6b0369d09742862d4cd06abfc38619d7" name="a6b0369d09742862d4cd06abfc38619d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b0369d09742862d4cd06abfc38619d7">&#9670;&#160;</a></span>value_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classhku_1_1_indicator.html#ac8f468be2ac0597910e8171292ddcee2">Indicator::value_t</a> <a class="el" href="#a6b0369d09742862d4cd06abfc38619d7">hku::MultiFactorBase::value_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ab1167772cda0944b40b1af8985d38b59" name="ab1167772cda0944b40b1af8985d38b59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1167772cda0944b40b1af8985d38b59">&#9670;&#160;</a></span>MultiFactorBase() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::MultiFactorBase::MultiFactorBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae2deda2bfddbc6e7419a339718a3ecb3" name="ae2deda2bfddbc6e7419a339718a3ecb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2deda2bfddbc6e7419a339718a3ecb3">&#9670;&#160;</a></span>MultiFactorBase() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::MultiFactorBase::MultiFactorBase </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a18a4afac3aaff3dd61b241c13a764bf4" name="a18a4afac3aaff3dd61b241c13a764bf4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18a4afac3aaff3dd61b241c13a764bf4">&#9670;&#160;</a></span>MultiFactorBase() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::MultiFactorBase::MultiFactorBase </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stks</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ref_stk</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>spearman</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>mode</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>save_all_factors</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aebf53c4db92ed7cf8b240f60a7703ef6" name="aebf53c4db92ed7cf8b240f60a7703ef6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebf53c4db92ed7cf8b240f60a7703ef6">&#9670;&#160;</a></span>MultiFactorBase() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::MultiFactorBase::MultiFactorBase </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab0c491214db003dc62f7a595214236cd" name="ab0c491214db003dc62f7a595214236cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0c491214db003dc62f7a595214236cd">&#9670;&#160;</a></span>~MultiFactorBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::MultiFactorBase::~MultiFactorBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ad7a5ae790a9c11d5ffaf0bdb0367166b" name="ad7a5ae790a9c11d5ffaf0bdb0367166b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7a5ae790a9c11d5ffaf0bdb0367166b">&#9670;&#160;</a></span>_calculate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> hku::MultiFactorBase::_calculate </td>
+          <td>(</td>
+          <td class="paramtype">const vector&lt; <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在 <a class="el" href="classhku_1_1_weight_multi_factor.html#a2a949ef601e7b103588c6f44b356bb55">hku::WeightMultiFactor</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a63c3ae232df5bf21308f8e288864df10" name="a63c3ae232df5bf21308f8e288864df10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63c3ae232df5bf21308f8e288864df10">&#9670;&#160;</a></span>_clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="#ae14bf8d50ad746b01a1bd41cdf076135">MultiFactorPtr</a> hku::MultiFactorBase::_clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>在 <a class="el" href="classhku_1_1_weight_multi_factor.html#a538d1f32147a6267c95e71be6189b124">hku::WeightMultiFactor</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="adc083ac248e7531c190cf99a2b2fd306" name="adc083ac248e7531c190cf99a2b2fd306"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc083ac248e7531c190cf99a2b2fd306">&#9670;&#160;</a></span>_getAllReturns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> hku::MultiFactorBase::_getAllReturns </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndays</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af6690e326d45587320b886b2f6167f56" name="af6690e326d45587320b886b2f6167f56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6690e326d45587320b886b2f6167f56">&#9670;&#160;</a></span>_reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::MultiFactorBase::_reset </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7cf4ea5aa639c77ded015df67d8a1101" name="a7cf4ea5aa639c77ded015df67d8a1101"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cf4ea5aa639c77ded015df67d8a1101">&#9670;&#160;</a></span>addSpecialNormalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::addSpecialNormalize </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a6ef59405f1e64abd8717bb1bf8c6e21a">NormalizePtr</a></td>          <td class="paramname"><span class="paramname"><em>norm</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>category</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>style_inds</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Apply the given standardization / normalization, industry neutralization and style factor neutralization operations to the indicator with the given name. </p>
+<dl class="section note"><dt>注解</dt><dd>The standardization, the industry neutralization and the style factor neutralization are independent of each other; they can be given together or separately. </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>indicator name </td></tr>
+    <tr><td class="paramname">norm</td><td>the standardization operation </td></tr>
+    <tr><td class="paramname">category</td><td>the block category the indicator belongs to (it needs to be given for the neutralization) </td></tr>
+    <tr><td class="paramname">style_inds</td><td>the style list of the indicator </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a370f70654e45822beae2f35b0bcc9259" name="a370f70654e45822beae2f35b0bcc9259"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a370f70654e45822beae2f35b0bcc9259">&#9670;&#160;</a></span>calculate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::calculate </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Execute the calculation. </p>
+<p>It is calculated automatically when the result is got by default.</p>
+<p>Concurrency semantics (PR1):</p><ul>
+<li>Multiple threads are supported to trigger calculate / getter for the first time on the same uncalculated instance at the same time;</li>
+<li>After a successful calculation, multiple threads are allowed to read concurrently;</li>
+<li>The getter is not supported to be concurrent with reset/setQuery/setStockList/setRefFactorSet/setParam;</li>
+<li>It is not supported that another thread modifies the instance while the caller holds the internal reference returned by the getter.</li>
+</ul>
+<p>Failure semantics:</p><ul>
+<li>When the calculation throws an exception, the derived cache of the base class is cleaned up and m_calculated stays false;</li>
+<li>The exception propagates upward, the next caller can recalculate (DCLP, not single-flight). </li>
+</ul>
+
+</div>
+</div>
+<a id="a0dc119dfd8c35db8a2bfecd2a1724000" name="a0dc119dfd8c35db8a2bfecd2a1724000"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0dc119dfd8c35db8a2bfecd2a1724000">&#9670;&#160;</a></span>clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ae14bf8d50ad746b01a1bd41cdf076135">MultiFactorPtr</a> hku::MultiFactorBase::clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae69017d96f559db664171409eff68a64" name="ae69017d96f559db664171409eff68a64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae69017d96f559db664171409eff68a64">&#9670;&#160;</a></span>getAllFactors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &amp; hku::MultiFactorBase::getAllFactors </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the new factors synthesized from all the securities, in the same order as the passed security portfolio </p>
+<dl class="section note"><dt>注解</dt><dd>Returns a reference to the internal list; <a class="el" href="#a82e6223e665a9be34d70084e35233686">reset()</a> or a recalculation clears it. </dd></dl>
+
+</div>
+</div>
+<a id="a2222744f9748bf07323eabeddc6a0285" name="a2222744f9748bf07323eabeddc6a0285"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2222744f9748bf07323eabeddc6a0285">&#9670;&#160;</a></span>getAllScores()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const vector&lt; <a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> &gt; &amp; hku::MultiFactorBase::getAllScores </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get all the cross-section data; the order of each date follows the <span class="tt">mode</span> parameter: 0-descending, 1-ascending, 2-no sorting </p>
+<dl class="section note"><dt>注解</dt><dd>Returns a reference to the internal container; <a class="el" href="#a82e6223e665a9be34d70084e35233686">reset()</a> or a recalculation clears it. </dd></dl>
+
+</div>
+</div>
+<a id="ab67cb19ee67c4bf96dc10d4a07cf6386" name="ab67cb19ee67c4bf96dc10d4a07cf6386"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab67cb19ee67c4bf96dc10d4a07cf6386">&#9670;&#160;</a></span>getAllSrcFactors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt; <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> &gt; hku::MultiFactorBase::getAllSrcFactors </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get all the processed original factor values (normalized and standardized). </p>
+<p>It is calculated every time. </p><dl class="section note"><dt>注解</dt><dd>Considering the memory usage, this data is not cached; it is generally used for the testing or when you want to view the processed original factor values </dd>
+<dd>
+It must be called after a calculation has been triggered (e.g. getScores / getAllScores / calculate); on an uncalculated instance the reference date list is still empty, so the normalization / neutralization is skipped and the raw aligned factors are returned </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>vector&lt;IndicatorList&gt; stks x inds </dd></dl>
+
+</div>
+</div>
+<a id="a420ded40f01915046f12d942c82d484c" name="a420ded40f01915046f12d942c82d484c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a420ded40f01915046f12d942c82d484c">&#9670;&#160;</a></span>getDatetimeList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp; hku::MultiFactorBase::getDatetimeList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the reference date list </p>
+<dl class="section note"><dt>注解</dt><dd>Returns a reference to the internal list; <a class="el" href="#a82e6223e665a9be34d70084e35233686">reset()</a> or a recalculation clears it. Copy it if it must outlive the call. </dd></dl>
+
+</div>
+</div>
+<a id="a4caf285d935ea50d908d03f3b70336d0" name="a4caf285d935ea50d908d03f3b70336d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4caf285d935ea50d908d03f3b70336d0">&#9670;&#160;</a></span>getFactor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp; hku::MultiFactorBase::getFactor </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the synthesized factor of the given security </p>
+<dl class="section note"><dt>注解</dt><dd>Returns a reference to an element of the internal list; <a class="el" href="#a82e6223e665a9be34d70084e35233686">reset()</a> or a recalculation destroys it, so copy the value before either can happen. </dd></dl>
+
+</div>
+</div>
+<a id="a9696a3ff1b9a756cc0b5038a3e6d6802" name="a9696a3ff1b9a756cc0b5038a3e6d6802"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9696a3ff1b9a756cc0b5038a3e6d6802">&#9670;&#160;</a></span>getIC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::MultiFactorBase::getIC </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ndays</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the IC of the synthesized factor, its length is the same as the reference dates (the non-strict IC mode) </p>
+<dl class="section note"><dt>注解</dt><dd>For a new factor using the IC/ICIR weighting, ndays had better stay consistent with ic_n; but for a new factor calculated with the equal weight, ic_n does not have to be used. Therefore a special value 0 is added to ndays, meaning the IC is calculated directly with the ic_n parameter </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ndays</td><td>calculate the IC value relative to the ndays day return </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a296815ce03204a9f02f3294a4916cd81" name="a296815ce03204a9f02f3294a4916cd81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a296815ce03204a9f02f3294a4916cd81">&#9670;&#160;</a></span>getICIR()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::MultiFactorBase::getICIR </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ir_n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ic_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the ICIR of the synthesized factor </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ir_n</td><td>the n window for calculating the IR </td></tr>
+    <tr><td class="paramname">ic_n</td><td>the n window for calculating the IC </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac3e6523a0b2ada4af630d1c120a47152" name="ac3e6523a0b2ada4af630d1c120a47152"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3e6523a0b2ada4af630d1c120a47152">&#9670;&#160;</a></span>getQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp; hku::MultiFactorBase::getQuery </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the query range </p>
+
+</div>
+</div>
+<a id="ab3088a69057922be5136211a6976ec72" name="ab3088a69057922be5136211a6976ec72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3088a69057922be5136211a6976ec72">&#9670;&#160;</a></span>getRefFactorSet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp; hku::MultiFactorBase::getRefFactorSet </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the original factor set </p>
+
+</div>
+</div>
+<a id="a2f49531aec377e702f4031dadefdaa19" name="a2f49531aec377e702f4031dadefdaa19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f49531aec377e702f4031dadefdaa19">&#9670;&#160;</a></span>getRefStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp; hku::MultiFactorBase::getRefStock </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the reference security </p>
+
+</div>
+</div>
+<a id="a644b419da5e3db269c7239a442220284" name="a644b419da5e3db269c7239a442220284"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a644b419da5e3db269c7239a442220284">&#9670;&#160;</a></span>getScores() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> hku::MultiFactorBase::getScores </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get all the factor values of the given date cross-section; the order follows the <span class="tt">mode</span> parameter: 0-descending, 1-ascending, 2-no sorting </p>
+
+</div>
+</div>
+<a id="ab37cdb7c82a6e929cd6597180c18df64" name="ab37cdb7c82a6e929cd6597180c18df64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab37cdb7c82a6e929cd6597180c18df64">&#9670;&#160;</a></span>getScores() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> hku::MultiFactorBase::getScores </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>end</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the factor values (scores) within the given date cross-section range [start, end], filtered by filter </p>
+<dl class="section note"><dt>注解</dt><dd>A pure C++ filter only copies the records it keeps; a Python filter runs after the slice is copied out, because it may recalculate the MF and invalidate the internal cross-section </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">date</td><td>the given date; if the date is not in the reference dates (e.g. a non-trading day), an empty list is returned and a warning is logged </td></tr>
+    <tr><td class="paramname">start</td><td>the sorting start point </td></tr>
+    <tr><td class="paramname">end</td><td>the sorting end point (excluded) </td></tr>
+    <tr><td class="paramname">filter</td><td>the scores filter </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a43cd9cc3de675177ff709d1031e7de12" name="a43cd9cc3de675177ff709d1031e7de12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43cd9cc3de675177ff709d1031e7de12">&#9670;&#160;</a></span>getScores() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> hku::MultiFactorBase::getScores </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>end</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; bool(const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, const <a class="el" href="structhku_1_1_score_record.html">ScoreRecord</a> &amp;)&gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20ee1d08478a1fc28a4bbf88e0d15cd9" name="a20ee1d08478a1fc28a4bbf88e0d15cd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20ee1d08478a1fc28a4bbf88e0d15cd9">&#9670;&#160;</a></span>getScores() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> hku::MultiFactorBase::getScores </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>end</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; bool(const <a class="el" href="structhku_1_1_score_record.html">ScoreRecord</a> &amp;)&gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the factor values (scores) within the given date cross-section range [start, end], and filter them through filter </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">date</td><td>the given date; if the date is not in the reference dates (e.g. a non-trading day), an empty list is returned and a warning is logged </td></tr>
+    <tr><td class="paramname">start</td><td>the sorting start point </td></tr>
+    <tr><td class="paramname">end</td><td>the sorting end point (excluded) </td></tr>
+    <tr><td class="paramname">filter</td><td>the filter function </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aec800069c6031582aa25ddabf125e77f" name="aec800069c6031582aa25ddabf125e77f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec800069c6031582aa25ddabf125e77f">&#9670;&#160;</a></span>getScores() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> hku::MultiFactorBase::getScores </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>date</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>end</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_null.html">Null</a>&lt;&#160;size_t&#160;&gt;()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9a5694dc64ee28f9328939c1a370dd63" name="a9a5694dc64ee28f9328939c1a370dd63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a5694dc64ee28f9328939c1a370dd63">&#9670;&#160;</a></span>getStockList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp; hku::MultiFactorBase::getStockList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the security list </p>
+
+</div>
+</div>
+<a id="a31190e5622994331cf9cf4d8dd796446" name="a31190e5622994331cf9cf4d8dd796446"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31190e5622994331cf9cf4d8dd796446">&#9670;&#160;</a></span>getStockListNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::MultiFactorBase::getStockListNumber </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current number of the securities in the security list </p>
+
+</div>
+</div>
+<a id="aaddf3909cffd5a33e3b8a69438ca8132" name="aaddf3909cffd5a33e3b8a69438ca8132"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaddf3909cffd5a33e3b8a69438ca8132">&#9670;&#160;</a></span>hasPythonPart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::MultiFactorBase::hasPythonPart </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether this multi-factor, its factors, normalizers, or style indicators are Python </p>
+
+</div>
+</div>
+<a id="aab04d3f545e1b5b0093e35dde39821c2" name="aab04d3f545e1b5b0093e35dde39821c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab04d3f545e1b5b0093e35dde39821c2">&#9670;&#160;</a></span>isPythonObject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::MultiFactorBase::isPythonObject </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a861fdea2d699cbb8a3c9a7d30943b9a2" name="a861fdea2d699cbb8a3c9a7d30943b9a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a861fdea2d699cbb8a3c9a7d30943b9a2">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; hku::MultiFactorBase::name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name </p>
+
+</div>
+</div>
+<a id="a7d3b79460fd8b8707a9a10263325c6f5" name="a7d3b79460fd8b8707a9a10263325c6f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d3b79460fd8b8707a9a10263325c6f5">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::name </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the name </p>
+
+</div>
+</div>
+<a id="a82e6223e665a9be34d70084e35233686" name="a82e6223e665a9be34d70084e35233686"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82e6223e665a9be34d70084e35233686">&#9670;&#160;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::reset </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9a0a0c97bb6c1dfa6092bf86c8941371" name="a9a0a0c97bb6c1dfa6092bf86c8941371"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a0a0c97bb6c1dfa6092bf86c8941371">&#9670;&#160;</a></span>setNormalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::setNormalize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#ab405d278c9530b86ce529624fe31768b">NormPtr</a></td>          <td class="paramname"><span class="paramname"><em>norm</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the factor standardization / normalization operation </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">norm</td><td>the standardization operation </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad14bd5b2074aa0b5a31ac313ae413d1b" name="ad14bd5b2074aa0b5a31ac313ae413d1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad14bd5b2074aa0b5a31ac313ae413d1b">&#9670;&#160;</a></span>setQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::setQuery </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the query range </p>
+
+</div>
+</div>
+<a id="ab5da7f88d170f2c0e82fde7cc08e0d3d" name="ab5da7f88d170f2c0e82fde7cc08e0d3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5da7f88d170f2c0e82fde7cc08e0d3d">&#9670;&#160;</a></span>setRefFactorSet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::setRefFactorSet </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>factorset</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the original factor set </p>
+
+</div>
+</div>
+<a id="a9e57dfc51e0f4349c053a1531f56008c" name="a9e57dfc51e0f4349c053a1531f56008c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e57dfc51e0f4349c053a1531f56008c">&#9670;&#160;</a></span>setRefStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::setRefStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stk</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the reference security </p>
+
+</div>
+</div>
+<a id="a8217e7ce146bb8bf88fef9b40109d450" name="a8217e7ce146bb8bf88fef9b40109d450"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8217e7ce146bb8bf88fef9b40109d450">&#9670;&#160;</a></span>setStockList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::MultiFactorBase::setStockList </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stks</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the security list of the calculation range </p>
+<dl class="section note"><dt>注解</dt><dd>Duplicates are not rejected: each occurrence is counted separately in the cross-section (so it shifts the equal-weight denominator), and the last occurrence wins in the stock index. </dd></dl>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="aa16d541ebb947f5d0d18b02ec4b6a3ef" name="aa16d541ebb947f5d0d18b02ec4b6a3ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa16d541ebb947f5d0d18b02ec4b6a3ef">&#9670;&#160;</a></span>operator&lt;&lt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API std::ostream &amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a1b3d173b2d66662527f7dfa492f00d24" name="a1b3d173b2d66662527f7dfa492f00d24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b3d173b2d66662527f7dfa492f00d24">&#9670;&#160;</a></span>m_all_factors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> hku::MultiFactorBase::m_all_factors</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0ba927c714683da197c3776ab6171358" name="a0ba927c714683da197c3776ab6171358"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ba927c714683da197c3776ab6171358">&#9670;&#160;</a></span>m_date_index</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unordered_map&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>, size_t&gt; hku::MultiFactorBase::m_date_index</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af80cc7d3f15559659fa7b9aef53cbb17" name="af80cc7d3f15559659fa7b9aef53cbb17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af80cc7d3f15559659fa7b9aef53cbb17">&#9670;&#160;</a></span>m_factorset</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_factor_set.html">FactorSet</a> hku::MultiFactorBase::m_factorset</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a83bb250bed040e2c665b69f54adc1a67" name="a83bb250bed040e2c665b69f54adc1a67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83bb250bed040e2c665b69f54adc1a67">&#9670;&#160;</a></span>m_ic</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::MultiFactorBase::m_ic</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3889dd8e734abbbdc7f8437d3dc005c4" name="a3889dd8e734abbbdc7f8437d3dc005c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3889dd8e734abbbdc7f8437d3dc005c4">&#9670;&#160;</a></span>m_is_python_object</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::MultiFactorBase::m_is_python_object {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9d5935502b9aa18d900a75c10be76ca3" name="a9d5935502b9aa18d900a75c10be76ca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d5935502b9aa18d900a75c10be76ca3">&#9670;&#160;</a></span>m_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::MultiFactorBase::m_name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5381a27223027d701474c98a1782b704" name="a5381a27223027d701474c98a1782b704"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5381a27223027d701474c98a1782b704">&#9670;&#160;</a></span>m_norm</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab405d278c9530b86ce529624fe31768b">NormPtr</a> hku::MultiFactorBase::m_norm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a564c4cd925ea2b536b20fde7c6e125d9" name="a564c4cd925ea2b536b20fde7c6e125d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a564c4cd925ea2b536b20fde7c6e125d9">&#9670;&#160;</a></span>m_query</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_query.html">KQuery</a> hku::MultiFactorBase::m_query</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a258b59262f0c46bcc7cd20ed261d56d3" name="a258b59262f0c46bcc7cd20ed261d56d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a258b59262f0c46bcc7cd20ed261d56d3">&#9670;&#160;</a></span>m_ref_dates</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::MultiFactorBase::m_ref_dates</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae54ff89a86dbdef8e8b6aa80472ad63a" name="ae54ff89a86dbdef8e8b6aa80472ad63a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae54ff89a86dbdef8e8b6aa80472ad63a">&#9670;&#160;</a></span>m_ref_stk</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::MultiFactorBase::m_ref_stk</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a389c6483bd24db707df83b05a32af18b" name="a389c6483bd24db707df83b05a32af18b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a389c6483bd24db707df83b05a32af18b">&#9670;&#160;</a></span>m_special_category</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unordered_map&lt;string, string&gt; hku::MultiFactorBase::m_special_category</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a85b1c09684ef8ab4f46ecf896fc6615b" name="a85b1c09684ef8ab4f46ecf896fc6615b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85b1c09684ef8ab4f46ecf896fc6615b">&#9670;&#160;</a></span>m_special_norms</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unordered_map&lt;string, <a class="el" href="namespacehku.html#ab405d278c9530b86ce529624fe31768b">NormPtr</a>&gt; hku::MultiFactorBase::m_special_norms</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a31af5fa5b3d225615f5437c7a859522c" name="a31af5fa5b3d225615f5437c7a859522c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31af5fa5b3d225615f5437c7a859522c">&#9670;&#160;</a></span>m_special_style_inds</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unordered_map&lt;string, <a class="el" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a>&gt; hku::MultiFactorBase::m_special_style_inds</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3864281d01312d2a5df82668da4f928d" name="a3864281d01312d2a5df82668da4f928d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3864281d01312d2a5df82668da4f928d">&#9670;&#160;</a></span>m_stk_factor_by_date</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;<a class="el" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&gt; hku::MultiFactorBase::m_stk_factor_by_date</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afdff83086cc51abf660588b135dab7d5" name="afdff83086cc51abf660588b135dab7d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdff83086cc51abf660588b135dab7d5">&#9670;&#160;</a></span>m_stk_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unordered_map&lt;<a class="el" href="classhku_1_1_stock.html">Stock</a>, size_t&gt; hku::MultiFactorBase::m_stk_map</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3956a950451dbd657dd78521c3d219f6" name="a3956a950451dbd657dd78521c3d219f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3956a950451dbd657dd78521c3d219f6">&#9670;&#160;</a></span>m_stks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> hku::MultiFactorBase::m_stks</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/trade_sys/multifactor/<a class="el" href="_multi_factor_base_8h_source.html">MultiFactorBase.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_multi_factor_base.html">MultiFactorBase</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

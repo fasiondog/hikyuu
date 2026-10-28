@@ -1,0 +1,36 @@
+var group___slippage =
+[
+    [ "hku::SlippageBase", "classhku_1_1_slippage_base.html", [
+      [ "SlippagePtr", "classhku_1_1_slippage_base.html#a1cd0b87be5905c8c82cb967d37330470", null ],
+      [ "SlippageBase", "classhku_1_1_slippage_base.html#a10ee530a56c90d9a311fb8ecf353e362", null ],
+      [ "SlippageBase", "classhku_1_1_slippage_base.html#a25509cc6ad986422ef7f078c20641403", null ],
+      [ "SlippageBase", "classhku_1_1_slippage_base.html#afdb4be03d931646257789bdf4e9f31ce", null ],
+      [ "~SlippageBase", "classhku_1_1_slippage_base.html#aa0ab2f8181bc00b28f705420ccd4c95a", null ],
+      [ "_calculate", "classhku_1_1_slippage_base.html#a7e8f39f24dfe630c3024408c862ecac0", null ],
+      [ "_clone", "classhku_1_1_slippage_base.html#a7debb68625d6194b4025ff5754e5e822", null ],
+      [ "_getRealBuyPrice", "classhku_1_1_slippage_base.html#a93fee19cc696d7d5af79aa8e4ea9bfc3", null ],
+      [ "_getRealBuyShortPrice", "classhku_1_1_slippage_base.html#af9e16bd5addb2e85096ead3574e2b6e0", null ],
+      [ "_getRealSellPrice", "classhku_1_1_slippage_base.html#a482a7f71c7474d98e73649f465ecc200", null ],
+      [ "_getRealSellShortPrice", "classhku_1_1_slippage_base.html#a04e77b0e70b03d63ba4fba9f42090cba", null ],
+      [ "_reset", "classhku_1_1_slippage_base.html#ae454499093f6b9a61b3a3900fc637c4e", null ],
+      [ "clone", "classhku_1_1_slippage_base.html#a9cb94d875f3b47fc1953a619e4d8ae30", null ],
+      [ "getRealBuyPrice", "classhku_1_1_slippage_base.html#a94d0bc3b60b0d342473d361ea0b6f852", null ],
+      [ "getRealBuyShortPrice", "classhku_1_1_slippage_base.html#a8b24d501415cdf5ce7578372e5fe6f4a", null ],
+      [ "getRealSellPrice", "classhku_1_1_slippage_base.html#a19235ea08ac45f1b7754cddc500284b4", null ],
+      [ "getRealSellShortPrice", "classhku_1_1_slippage_base.html#a40fa408a9fb3cef96698e5bf6bd9740e", null ],
+      [ "getTO", "classhku_1_1_slippage_base.html#a3d765436239750a991109fbed60e25f7", null ],
+      [ "hasPythonPart", "classhku_1_1_slippage_base.html#a1ed165c230c8d50027e15cad8a328ee8", null ],
+      [ "isPythonObject", "classhku_1_1_slippage_base.html#a6e1e2c77d718dd2dba397e64fa38dcba", null ],
+      [ "name", "classhku_1_1_slippage_base.html#aeaef0a16c436b18e37e6a3bd7b232ddb", null ],
+      [ "name", "classhku_1_1_slippage_base.html#aac8522fafdd0c12ffac81449f7bc9c18", null ],
+      [ "reset", "classhku_1_1_slippage_base.html#a72d34d0d09f7bcf23f135a6a832cb6b2", null ],
+      [ "setTO", "classhku_1_1_slippage_base.html#a175f58435fc40deae78bd13103a030c3", null ],
+      [ "boost::serialization::access", "classhku_1_1_slippage_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c", null ],
+      [ "m_calculated", "classhku_1_1_slippage_base.html#acf0d13709db645b3f7cff7cfae3af327", null ],
+      [ "m_is_python_object", "classhku_1_1_slippage_base.html#aa41a3e8cb452a0945536b255eb687ca4", null ],
+      [ "m_kdata", "classhku_1_1_slippage_base.html#a291fed0853ef2274b5bbc5381f1b3d01", null ],
+      [ "m_name", "classhku_1_1_slippage_base.html#ac4db5af99ce5e460f0b0118505e0b48f", null ]
+    ] ],
+    [ "SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION", "group___slippage.html#ga54f3973ef6ca144a75c02b0b97d36649", null ],
+    [ "hku::SlippagePtr", "group___slippage.html#ga049e6ab56e4c995847c08232913198e1", null ]
+];

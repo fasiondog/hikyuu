@@ -1,0 +1,156 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/portfolio/crt/PF_WithoutAF.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_p_f___without_a_f_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">PF_WithoutAF.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * PF_WithoutAF.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2025-02-18</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *  PF is a preset configuration of MultiSystem, so this factory directly returns MultiSystemPtr,</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *  no shell class is introduced. The returned aggregate system runs in</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> *  **mode C &quot;Shared Account Compatibility&quot;**: no shadow account is created, every sub-system</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> *  trades directly on the single real account of the parent (shared_tm) and is sized by its own</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> *  MM; the parent only gates the entry with the SE, keeps the running pool driven and performs no</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *  L2 conversion (see the MultiSystem class comment for the full semantics).</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> *  The name literally means &quot;portfolio without a fund allocation algorithm&quot;, which is exactly what</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> *  mode C is. During the three-mode refactoring this factory was temporarily mapped onto mode A;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> *  it is now restored to mode C so that it keeps reproducing the Portfolio of the previous release</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *  with no change on the strategy side, and the mode A preset moved to PF_SignalAggregate.</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#ifndef TRADE_SYS_PORTFOLIO_CRT_PF_WITHOUTAF_H_</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#define TRADE_SYS_PORTFOLIO_CRT_PF_WITHOUTAF_H_</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &quot;../../system/imp/MultiSystem.h&quot;</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &quot;../../selector/SelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#include &quot;../../allocatefunds/crt/AF_EqualWeight.h&quot;</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#include &quot;../../selector/crt/SE_Fixed.h&quot;</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="group___portfolio.html#ga8a2bd839d627835d5c54a5f82ef3beea">   90</a></span><a class="code hl_typedef" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API <a class="code hl_function" href="group___portfolio.html#ga8a2bd839d627835d5c54a5f82ef3beea">PF_WithoutAF</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a>&amp; tm = <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>(),</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                                    <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a>&amp; se = <a class="code hl_function" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>(), <span class="keywordtype">int</span> adjust_cycle = 1,</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                                    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; adjust_mode = <span class="stringliteral">&quot;query&quot;</span>,</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                                    <span class="keywordtype">bool</span> delay_to_trading_day = <span class="keyword">true</span>, <span class="keywordtype">bool</span> trade_on_close = <span class="keyword">true</span>,</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>                                    <span class="keywordtype">bool</span> sys_use_self_tm = <span class="keyword">false</span>, <span class="keywordtype">bool</span> sell_at_not_selected = <span class="keyword">false</span>,</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>                                    <span class="keywordtype">bool</span> keep_watch_force_sell = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#endif </span><span class="comment">/* TRADE_SYS_PORTFOLIO_CRT_PF_WITHOUTAF_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup___portfolio_html_ga8a2bd839d627835d5c54a5f82ef3beea"><div class="ttname"><a href="group___portfolio.html#ga8a2bd839d627835d5c54a5f82ef3beea">hku::PF_WithoutAF</a></div><div class="ttdeci">MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr &amp;tm=TradeManagerPtr(), const SEPtr &amp;se=SE_Fixed(), int adjust_cycle=1, const string &amp;adjust_mode=&quot;query&quot;, bool delay_to_trading_day=true, bool trade_on_close=true, bool sys_use_self_tm=false, bool sell_at_not_selected=false, bool keep_watch_force_sell=false)</div><div class="ttdoc">Portfolio without a fund allocation algorithm</div></div>
+<div class="ttc" id="agroup___selector_html_gaec8091e220f70e082003d9387802237c"><div class="ttname"><a href="group___selector.html#gaec8091e220f70e082003d9387802237c">hku::SE_Fixed</a></div><div class="ttdeci">SelectorPtr HKU_API SE_Fixed(double weight=1.0)</div><div class="ttdoc">Fixed selector, it selects the given trading system every day</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga9d7ab0c25be37c167f61358a5fa526f0"><div class="ttname"><a href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TradeManagerPtr</div><div class="ttdoc">Client programs should use this type for the actual operations</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:904</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a09fb32c38270e0b3fffde2c9387e52a3"><div class="ttname"><a href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">hku::TMPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TMPtr</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:905</div></div>
+<div class="ttc" id="anamespacehku_html_ab815b3a2995c9b5f09d53950ecca5590"><div class="ttname"><a href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">hku::SEPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SEPtr</div><div class="ttdef"><b>定义</b> SelectorBase.h:283</div></div>
+<div class="ttc" id="anamespacehku_html_ab85b5da3d08bc3431ea34eeb11ae8afc"><div class="ttname"><a href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">hku::MultiSystemPtr</a></div><div class="ttdeci">shared_ptr&lt; MultiSystem &gt; MultiSystemPtr</div><div class="ttdef"><b>定义</b> MultiSystem.h:963</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_a60c48821b72d3eea87d425308f18364.html">portfolio</a></li><li class="navelem"><a href="dir_9ce5e03763e1e5af391e76205d9e518b.html">crt</a></li><li class="navelem"><b>PF_WithoutAF.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+var group___stoploss =
+[
+    [ "hku::StoplossBase", "classhku_1_1_stoploss_base.html", [
+      [ "StoplossPtr", "classhku_1_1_stoploss_base.html#ad50d98f2cb30dc6e5ac603ca61d14888", null ],
+      [ "StoplossBase", "classhku_1_1_stoploss_base.html#a3081b44d973deb320bbcd517c7e3d086", null ],
+      [ "StoplossBase", "classhku_1_1_stoploss_base.html#a026b6ab57823fdb3e890668c094d3345", null ],
+      [ "StoplossBase", "classhku_1_1_stoploss_base.html#a00dcde75d8b4a1100321d5b0242c3a06", null ],
+      [ "~StoplossBase", "classhku_1_1_stoploss_base.html#aa5299270568d612e538e8631c6065968", null ],
+      [ "_calculate", "classhku_1_1_stoploss_base.html#ad9c72ebc352d451f7890dc0b7021abb5", null ],
+      [ "_clone", "classhku_1_1_stoploss_base.html#a67317d4fd461e43bfe8817402a2d509c", null ],
+      [ "_getPrice", "classhku_1_1_stoploss_base.html#ae31cb815a1cfa191ad9dda7bd8b29a01", null ],
+      [ "_getShortPrice", "classhku_1_1_stoploss_base.html#ac8d9337107153e68cda5bee48a9a237a", null ],
+      [ "_reset", "classhku_1_1_stoploss_base.html#a9377a21f13d95b6127aba747e28b48c1", null ],
+      [ "clone", "classhku_1_1_stoploss_base.html#af83f5c127fcca8a019f7ad8ada9efddc", null ],
+      [ "getPrice", "classhku_1_1_stoploss_base.html#a150390661180b50c84b44e4c90b1116f", null ],
+      [ "getShortPrice", "classhku_1_1_stoploss_base.html#a7e057abb376e2c41c53db8e110a1084e", null ],
+      [ "getTM", "classhku_1_1_stoploss_base.html#ab1fbbeb15c09eb51103dccf4c43fe147", null ],
+      [ "getTO", "classhku_1_1_stoploss_base.html#a008ef9332c6409c53993a10cc73707cc", null ],
+      [ "hasPythonPart", "classhku_1_1_stoploss_base.html#a45b502b10a5dfe481e4e13fc8b451dd2", null ],
+      [ "isPythonObject", "classhku_1_1_stoploss_base.html#afbc5c751f37fef6babfb0e34b7d8d4cc", null ],
+      [ "name", "classhku_1_1_stoploss_base.html#a6f14f0da21ffd4921e9045e78c178e2e", null ],
+      [ "name", "classhku_1_1_stoploss_base.html#a2501aa61b97c5700dd3c08d36f74ff52", null ],
+      [ "reset", "classhku_1_1_stoploss_base.html#aa5a6baf6dde67bed9281847d73cb93df", null ],
+      [ "setTM", "classhku_1_1_stoploss_base.html#a3c8e11a9273f10bad58ac727d50c3912", null ],
+      [ "setTO", "classhku_1_1_stoploss_base.html#a8b04ae077e756c58faf34f656175d52c", null ],
+      [ "boost::serialization::access", "classhku_1_1_stoploss_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c", null ],
+      [ "m_calculated", "classhku_1_1_stoploss_base.html#ac0bc4aa6a6da6ddfcac6e32bbf4b078d", null ],
+      [ "m_is_python_object", "classhku_1_1_stoploss_base.html#a821be8e3875b7ca6a185f682242bb79c", null ],
+      [ "m_kdata", "classhku_1_1_stoploss_base.html#abd0e23e762f7429db5ce1a09f2c1ae76", null ],
+      [ "m_name", "classhku_1_1_stoploss_base.html#acdbeb5f5c981f456314b051e50629909", null ],
+      [ "m_tm", "classhku_1_1_stoploss_base.html#a51365c62a5962662ee59eeb20faca137", null ]
+    ] ],
+    [ "STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION", "group___stoploss.html#ga83617390ba65540e3a286bab83b98df0", null ],
+    [ "hku::StoplossPtr", "group___stoploss.html#ga1d1301414ef86b6ffa450a5f322cb781", null ],
+    [ "hku::ST_FixedPercent", "group___stoploss.html#ga5a2cec06849e6d38fcc2239d3d81996c", null ],
+    [ "hku::ST_Saftyloss", "group___stoploss.html#gac1477a5155489134a14763126380a50e", null ]
+];

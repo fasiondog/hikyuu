@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::StockMapIterator类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_stock_map_iterator.html','','classhku_1_1_stock_map_iterator-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,139 +74,136 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="classhku_1_1_stock_map_iterator-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::StockMapIterator类 参考</div>  </div>
+  <div class="headertitle"><div class="title">hku::StockMapIterator类 参考</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="_stock_map_iterator_8h_source.html">StockMapIterator.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:ae2524a8e7ca4a97adb8f7e0efb95971d"><td class="memItemLeft" align="right" valign="top">typedef unordered_map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_stock.html">Stock</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#ae2524a8e7ca4a97adb8f7e0efb95971d">stock_map_t</a></td></tr>
-<tr class="separator:ae2524a8e7ca4a97adb8f7e0efb95971d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5144cb0f7ed8ef6eff3bc14654c8d46a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a5144cb0f7ed8ef6eff3bc14654c8d46a">value_type</a></td></tr>
-<tr class="separator:a5144cb0f7ed8ef6eff3bc14654c8d46a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa74392ec45477fc63fe948a774d2165a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_stock.html">Stock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#aa74392ec45477fc63fe948a774d2165a">pointer</a></td></tr>
-<tr class="separator:aa74392ec45477fc63fe948a774d2165a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96bff265da39f0e195c79dd7c69de7ca"><td class="memItemLeft" align="right" valign="top">typedef const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a96bff265da39f0e195c79dd7c69de7ca">reference</a></td></tr>
-<tr class="separator:a96bff265da39f0e195c79dd7c69de7ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8746d158d80d814c9365b42a4871828b"><td class="memItemLeft" align="right" valign="top">typedef stock_map_t::const_iterator::difference_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a8746d158d80d814c9365b42a4871828b">difference_type</a></td></tr>
-<tr class="separator:a8746d158d80d814c9365b42a4871828b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f896fa00e4b8459be613f8746221a17"><td class="memItemLeft" align="right" valign="top">typedef std::input_iterator_tag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a9f896fa00e4b8459be613f8746221a17">iterator_category</a></td></tr>
-<tr class="separator:a9f896fa00e4b8459be613f8746221a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2524a8e7ca4a97adb8f7e0efb95971d" id="r_ae2524a8e7ca4a97adb8f7e0efb95971d"><td class="memItemLeft" align="right" valign="top">typedef unordered_map&lt; string, <a class="el" href="classhku_1_1_stock.html">Stock</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2524a8e7ca4a97adb8f7e0efb95971d">stock_map_t</a></td></tr>
+<tr class="memitem:a5144cb0f7ed8ef6eff3bc14654c8d46a" id="r_a5144cb0f7ed8ef6eff3bc14654c8d46a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5144cb0f7ed8ef6eff3bc14654c8d46a">value_type</a></td></tr>
+<tr class="memitem:a28cb7943dca89c78b4bdd233a588fe05" id="r_a28cb7943dca89c78b4bdd233a588fe05"><td class="memItemLeft" align="right" valign="top">typedef const <a class="el" href="classhku_1_1_stock.html">Stock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28cb7943dca89c78b4bdd233a588fe05">pointer</a></td></tr>
+<tr class="memitem:a96bff265da39f0e195c79dd7c69de7ca" id="r_a96bff265da39f0e195c79dd7c69de7ca"><td class="memItemLeft" align="right" valign="top">typedef const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96bff265da39f0e195c79dd7c69de7ca">reference</a></td></tr>
+<tr class="memitem:a8746d158d80d814c9365b42a4871828b" id="r_a8746d158d80d814c9365b42a4871828b"><td class="memItemLeft" align="right" valign="top">typedef stock_map_t::const_iterator::difference_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8746d158d80d814c9365b42a4871828b">difference_type</a></td></tr>
+<tr class="memitem:afb776d9415f47c5bf0117cc2e6e7decd" id="r_afb776d9415f47c5bf0117cc2e6e7decd"><td class="memItemLeft" align="right" valign="top">typedef std::forward_iterator_tag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb776d9415f47c5bf0117cc2e6e7decd">iterator_category</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a7b9ccbcbcad15392a9dbd44eb3fdddb9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a7b9ccbcbcad15392a9dbd44eb3fdddb9">StockMapIterator</a> ()</td></tr>
-<tr class="separator:a7b9ccbcbcad15392a9dbd44eb3fdddb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96b3f17d7b169a22077effd63a326719"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a96b3f17d7b169a22077effd63a326719">StockMapIterator</a> (const stock_map_t::const_iterator &amp;iter)</td></tr>
-<tr class="separator:a96b3f17d7b169a22077effd63a326719"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90bd9a6a8994e6a0a32d8eb210fde753"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a90bd9a6a8994e6a0a32d8eb210fde753">StockMapIterator</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter)</td></tr>
-<tr class="separator:a90bd9a6a8994e6a0a32d8eb210fde753"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afebda9ca7e07005f2e30a29af1d71974"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#afebda9ca7e07005f2e30a29af1d71974">operator++</a> ()</td></tr>
-<tr class="separator:afebda9ca7e07005f2e30a29af1d71974"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48499bd25874238bfa3313020a2a6797"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a48499bd25874238bfa3313020a2a6797">operator++</a> (int)</td></tr>
-<tr class="separator:a48499bd25874238bfa3313020a2a6797"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace5d570ea2306677e14769095775ce19"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#ace5d570ea2306677e14769095775ce19">operator==</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter) const </td></tr>
-<tr class="separator:ace5d570ea2306677e14769095775ce19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68ccd843f0419be7bb75c3b507ec23c7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a68ccd843f0419be7bb75c3b507ec23c7">operator!=</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter) const </td></tr>
-<tr class="separator:a68ccd843f0419be7bb75c3b507ec23c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32a3126428f8b87dc4e61b2c15385837"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a32a3126428f8b87dc4e61b2c15385837">operator*</a> () const </td></tr>
-<tr class="separator:a32a3126428f8b87dc4e61b2c15385837"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ef7fb13d225a9d8528f496febbe967f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_map_iterator.html#a4ef7fb13d225a9d8528f496febbe967f">operator-&gt;</a> () const </td></tr>
-<tr class="separator:a4ef7fb13d225a9d8528f496febbe967f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b9ccbcbcad15392a9dbd44eb3fdddb9" id="r_a7b9ccbcbcad15392a9dbd44eb3fdddb9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b9ccbcbcad15392a9dbd44eb3fdddb9">StockMapIterator</a> ()</td></tr>
+<tr class="memitem:a96b3f17d7b169a22077effd63a326719" id="r_a96b3f17d7b169a22077effd63a326719"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96b3f17d7b169a22077effd63a326719">StockMapIterator</a> (const stock_map_t::const_iterator &amp;iter)</td></tr>
+<tr class="memitem:a90bd9a6a8994e6a0a32d8eb210fde753" id="r_a90bd9a6a8994e6a0a32d8eb210fde753"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90bd9a6a8994e6a0a32d8eb210fde753">StockMapIterator</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter)</td></tr>
+<tr class="memitem:ae63e13445fc2ccfe7388d3aeac6954b2" id="r_ae63e13445fc2ccfe7388d3aeac6954b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae63e13445fc2ccfe7388d3aeac6954b2">operator=</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter)</td></tr>
+<tr class="memitem:ad871c691b7d37a4db107222de91dc607" id="r_ad871c691b7d37a4db107222de91dc607"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad871c691b7d37a4db107222de91dc607">operator++</a> ()</td></tr>
+<tr class="memitem:a02d43dad0078d5dadbd324d7c7b69f22" id="r_a02d43dad0078d5dadbd324d7c7b69f22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02d43dad0078d5dadbd324d7c7b69f22">operator++</a> (int)</td></tr>
+<tr class="memitem:ad7a98193cdb8603c753bff18a10e900b" id="r_ad7a98193cdb8603c753bff18a10e900b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7a98193cdb8603c753bff18a10e900b">operator==</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter) const</td></tr>
+<tr class="memitem:a32cea0aeec6d561c07b0394df5cdd365" id="r_a32cea0aeec6d561c07b0394df5cdd365"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a32cea0aeec6d561c07b0394df5cdd365">operator!=</a> (const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;iter) const</td></tr>
+<tr class="memitem:ac1aaaf18a07b44fdec43e63bfeb633f2" id="r_ac1aaaf18a07b44fdec43e63bfeb633f2"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1aaaf18a07b44fdec43e63bfeb633f2">operator*</a> () const</td></tr>
+<tr class="memitem:aa4a8cb42eed3b46ab5b0f337e7a4d901" id="r_aa4a8cb42eed3b46ab5b0f337e7a4d901"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4a8cb42eed3b46ab5b0f337e7a4d901">operator-&gt;</a> () const</td></tr>
 </table>
-<h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="a8746d158d80d814c9365b42a4871828b"></a>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a8746d158d80d814c9365b42a4871828b" name="a8746d158d80d814c9365b42a4871828b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8746d158d80d814c9365b42a4871828b">&#9670;&#160;</a></span>difference_type</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef stock_map_t::const_iterator::difference_type <a class="el" href="classhku_1_1_stock_map_iterator.html#a8746d158d80d814c9365b42a4871828b">hku::StockMapIterator::difference_type</a></td>
+          <td class="memname">typedef stock_map_t::const_iterator::difference_type <a class="el" href="#a8746d158d80d814c9365b42a4871828b">hku::StockMapIterator::difference_type</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a9f896fa00e4b8459be613f8746221a17"></a>
+<a id="afb776d9415f47c5bf0117cc2e6e7decd" name="afb776d9415f47c5bf0117cc2e6e7decd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb776d9415f47c5bf0117cc2e6e7decd">&#9670;&#160;</a></span>iterator_category</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::input_iterator_tag <a class="el" href="classhku_1_1_stock_map_iterator.html#a9f896fa00e4b8459be613f8746221a17">hku::StockMapIterator::iterator_category</a></td>
+          <td class="memname">typedef std::forward_iterator_tag <a class="el" href="#afb776d9415f47c5bf0117cc2e6e7decd">hku::StockMapIterator::iterator_category</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="aa74392ec45477fc63fe948a774d2165a"></a>
+<a id="a28cb7943dca89c78b4bdd233a588fe05" name="a28cb7943dca89c78b4bdd233a588fe05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28cb7943dca89c78b4bdd233a588fe05">&#9670;&#160;</a></span>pointer</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classhku_1_1_stock.html">Stock</a>* <a class="el" href="classhku_1_1_stock_map_iterator.html#aa74392ec45477fc63fe948a774d2165a">hku::StockMapIterator::pointer</a></td>
+          <td class="memname">typedef const <a class="el" href="classhku_1_1_stock.html">Stock</a>* <a class="el" href="#a28cb7943dca89c78b4bdd233a588fe05">hku::StockMapIterator::pointer</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a96bff265da39f0e195c79dd7c69de7ca"></a>
+<a id="a96bff265da39f0e195c79dd7c69de7ca" name="a96bff265da39f0e195c79dd7c69de7ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96bff265da39f0e195c79dd7c69de7ca">&#9670;&#160;</a></span>reference</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef const <a class="el" href="classhku_1_1_stock.html">Stock</a>&amp; <a class="el" href="classhku_1_1_stock_map_iterator.html#a96bff265da39f0e195c79dd7c69de7ca">hku::StockMapIterator::reference</a></td>
+          <td class="memname">typedef const <a class="el" href="classhku_1_1_stock.html">Stock</a>&amp; <a class="el" href="#a96bff265da39f0e195c79dd7c69de7ca">hku::StockMapIterator::reference</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ae2524a8e7ca4a97adb8f7e0efb95971d"></a>
+<a id="ae2524a8e7ca4a97adb8f7e0efb95971d" name="ae2524a8e7ca4a97adb8f7e0efb95971d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2524a8e7ca4a97adb8f7e0efb95971d">&#9670;&#160;</a></span>stock_map_t</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef unordered_map&lt;<a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_stock.html">Stock</a>&gt; <a class="el" href="classhku_1_1_stock_map_iterator.html#ae2524a8e7ca4a97adb8f7e0efb95971d">hku::StockMapIterator::stock_map_t</a></td>
+          <td class="memname">typedef unordered_map&lt;string, <a class="el" href="classhku_1_1_stock.html">Stock</a>&gt; <a class="el" href="#ae2524a8e7ca4a97adb8f7e0efb95971d">hku::StockMapIterator::stock_map_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a5144cb0f7ed8ef6eff3bc14654c8d46a"></a>
+<a id="a5144cb0f7ed8ef6eff3bc14654c8d46a" name="a5144cb0f7ed8ef6eff3bc14654c8d46a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5144cb0f7ed8ef6eff3bc14654c8d46a">&#9670;&#160;</a></span>value_type</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classhku_1_1_stock.html">Stock</a> <a class="el" href="classhku_1_1_stock_map_iterator.html#a5144cb0f7ed8ef6eff3bc14654c8d46a">hku::StockMapIterator::value_type</a></td>
+          <td class="memname">typedef <a class="el" href="classhku_1_1_stock.html">Stock</a> <a class="el" href="#a5144cb0f7ed8ef6eff3bc14654c8d46a">hku::StockMapIterator::value_type</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a7b9ccbcbcad15392a9dbd44eb3fdddb9"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a7b9ccbcbcad15392a9dbd44eb3fdddb9" name="a7b9ccbcbcad15392a9dbd44eb3fdddb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b9ccbcbcad15392a9dbd44eb3fdddb9">&#9670;&#160;</a></span>StockMapIterator() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -221,20 +213,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::StockMapIterator::StockMapIterator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a96b3f17d7b169a22077effd63a326719"></a>
+<a id="a96b3f17d7b169a22077effd63a326719" name="a96b3f17d7b169a22077effd63a326719"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96b3f17d7b169a22077effd63a326719">&#9670;&#160;</a></span>StockMapIterator() <span class="overload">[2/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -244,21 +238,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::StockMapIterator::StockMapIterator </td>
           <td>(</td>
-          <td class="paramtype">const stock_map_t::const_iterator &amp;&#160;</td>
-          <td class="paramname"><em>iter</em></td><td>)</td>
+          <td class="paramtype">const stock_map_t::const_iterator &amp;</td>          <td class="paramname"><span class="paramname"><em>iter</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a90bd9a6a8994e6a0a32d8eb210fde753"></a>
+<a id="a90bd9a6a8994e6a0a32d8eb210fde753" name="a90bd9a6a8994e6a0a32d8eb210fde753"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90bd9a6a8994e6a0a32d8eb210fde753">&#9670;&#160;</a></span>StockMapIterator() <span class="overload">[3/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -268,22 +263,23 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::StockMapIterator::StockMapIterator </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;&#160;</td>
-          <td class="paramname"><em>iter</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>iter</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a68ccd843f0419be7bb75c3b507ec23c7"></a>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a32cea0aeec6d561c07b0394df5cdd365" name="a32cea0aeec6d561c07b0394df5cdd365"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32cea0aeec6d561c07b0394df5cdd365">&#9670;&#160;</a></span>operator!=()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -293,21 +289,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bool hku::StockMapIterator::operator!= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;&#160;</td>
-          <td class="paramname"><em>iter</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>iter</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a32a3126428f8b87dc4e61b2c15385837"></a>
+<a id="ac1aaaf18a07b44fdec43e63bfeb633f2" name="ac1aaaf18a07b44fdec43e63bfeb633f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1aaaf18a07b44fdec43e63bfeb633f2">&#9670;&#160;</a></span>operator*()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -315,22 +312,24 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classhku_1_1_stock.html">Stock</a>&amp; hku::StockMapIterator::operator* </td>
+          <td class="memname">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp; hku::StockMapIterator::operator* </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="afebda9ca7e07005f2e30a29af1d71974"></a>
+<a id="ad871c691b7d37a4db107222de91dc607" name="ad871c691b7d37a4db107222de91dc607"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad871c691b7d37a4db107222de91dc607">&#9670;&#160;</a></span>operator++() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -338,22 +337,24 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a>&amp; hku::StockMapIterator::operator++ </td>
+          <td class="memname"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp; hku::StockMapIterator::operator++ </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a48499bd25874238bfa3313020a2a6797"></a>
+<a id="a02d43dad0078d5dadbd324d7c7b69f22" name="a02d43dad0078d5dadbd324d7c7b69f22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02d43dad0078d5dadbd324d7c7b69f22">&#9670;&#160;</a></span>operator++() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -361,23 +362,24 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> hku::StockMapIterator::operator++ </td>
+          <td class="memname"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> hku::StockMapIterator::operator++ </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a4ef7fb13d225a9d8528f496febbe967f"></a>
+<a id="aa4a8cb42eed3b46ab5b0f337e7a4d901" name="aa4a8cb42eed3b46ab5b0f337e7a4d901"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4a8cb42eed3b46ab5b0f337e7a4d901">&#9670;&#160;</a></span>operator-&gt;()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -385,22 +387,49 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classhku_1_1_stock.html">Stock</a>* const hku::StockMapIterator::operator-&gt; </td>
+          <td class="memname">const <a class="el" href="classhku_1_1_stock.html">Stock</a> *const hku::StockMapIterator::operator-&gt; </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ace5d570ea2306677e14769095775ce19"></a>
+<a id="ae63e13445fc2ccfe7388d3aeac6954b2" name="ae63e13445fc2ccfe7388d3aeac6954b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae63e13445fc2ccfe7388d3aeac6954b2">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp; hku::StockMapIterator::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>iter</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad7a98193cdb8603c753bff18a10e900b" name="ad7a98193cdb8603c753bff18a10e900b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7a98193cdb8603c753bff18a10e900b">&#9670;&#160;</a></span>operator==()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -410,14 +439,13 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bool hku::StockMapIterator::operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;&#160;</td>
-          <td class="paramname"><em>iter</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>iter</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -428,12 +456,24 @@ Public 成员函数</h2></td></tr>
 <li>hikyuu/<a class="el" href="_stock_map_iterator_8h_source.html">StockMapIterator.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

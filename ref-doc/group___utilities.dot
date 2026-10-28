@@ -1,0 +1,21 @@
+digraph "Utilities program utility collection"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir=LR;
+  Node3 [id="Node000003",label="DB Connect database\l connection",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___d_b_connect.html",tooltip="The database connection utilities"];
+  Node5 [id="Node000005",label="Exception handling",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___exception.html",tooltip=" "];
+  Node2 [id="Node000002",label="Hikyuu core engine\l library",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___hikyuu.html",tooltip="The core library, it contains the stock data management, the indicator implementation,..."];
+  Node6 [id="Node000006",label="Null defines, the Null\l value definitions",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___null_tools.html",tooltip=" "];
+  Node7 [id="Node000007",label="Spend timer time consumption\l statistics",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___spend_timer.html",tooltip=" "];
+  Node4 [id="Node000004",label="Thread Pool thread pool",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___thread_pool.html",tooltip=" "];
+  Node1 [id="Node000001",label="Utilities program utility\l collection",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="A collection of independent small functions and object utilities"];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node4 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node5 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node6 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node7 [shape=plaintext, dir="back", style="solid"];
+}

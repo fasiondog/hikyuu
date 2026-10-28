@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: Portfolio 投资组合管理</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: Portfolio portfolio management</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,36 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li class="current"><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('group___portfolio.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,46 +74,452 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#groups">模块</a>  </div>
-  <div class="headertitle">
-<div class="title">Portfolio 投资组合管理<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a></div></div>  </div>
+  <div class="headertitle"><div class="title">Portfolio portfolio management <div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Portfolio 投资组合管理 的协作图:</div>
+Portfolio portfolio management 的协作图:</div>
 <div class="dyncontent">
-<center><table><tr><td><img src="group___portfolio.png" border="0" alt="" usemap="#group______portfolio"/>
-<map name="group______portfolio" id="group______portfolio">
-<area shape="rect" id="node2" href="group___selector.html" title="Selector 交易对象选择算法" alt="" coords="473,5,692,35"/>
-<area shape="rect" id="node3" href="group___allocate_money.html" title="AllocateMoney 资金分配算法模块" alt="" coords="449,59,716,88"/>
-<area shape="rect" id="node4" href="group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等 " alt="" coords="5,32,165,61"/>
-</map>
-</td></tr></table></center>
+<div class="center"><img src="group___portfolio.png" border="0" usemap="#agroup______portfolio" loading="lazy" alt=""/></div>
 </div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="groups"></a>
-模块</h2></td></tr>
-<tr class="memitem:group___selector"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___selector.html">Selector 交易对象选择算法</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:group___allocate_money"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___allocate_money.html">AllocateMoney 资金分配算法模块</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 id="header-groups" class="groupheader"><a id="groups" name="groups"></a>
+专题</h2></td></tr>
+<tr class="memitem:Selector" id="r_Selector"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___selector.html">Selector trading object selection algorithm</a></td></tr>
+<tr class="memitem:AllocateFunds" id="r_AllocateFunds"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___allocate_funds.html">Allocate Funds asset allocation algorithm module</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:ga843a0ad8db5864b455768447f56fbd2d" id="r_ga843a0ad8db5864b455768447f56fbd2d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga843a0ad8db5864b455768447f56fbd2d">hku::PortfolioPtr</a> = <a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a></td></tr>
+<tr class="memdesc:ga843a0ad8db5864b455768447f56fbd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">master compatibility alias: in master PF_Simple / PF_WithoutAF return <a class="el" href="#ga843a0ad8db5864b455768447f56fbd2d" title="master compatibility alias: in master PF_Simple / PF_WithoutAF return PortfolioPtr.">PortfolioPtr</a>.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:gadd3bcbc7d6a7679da18193f5973937ba" id="r_gadd3bcbc7d6a7679da18193f5973937ba"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:gadd3bcbc7d6a7679da18193f5973937ba template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gadd3bcbc7d6a7679da18193f5973937ba">hku::PF_ModeA</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:gadd3bcbc7d6a7679da18193f5973937ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alias of PF_SignalAggregate: mode A "Signal Aggregation"  <br /></td></tr>
+<tr class="memitem:ga28f3e70f90b4844e6490318c61649a37" id="r_ga28f3e70f90b4844e6490318c61649a37"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:ga28f3e70f90b4844e6490318c61649a37 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga28f3e70f90b4844e6490318c61649a37">hku::PF_ModeB</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:ga28f3e70f90b4844e6490318c61649a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alias of PF_Simple: mode B "Fund Allocation"  <br /></td></tr>
+<tr class="memitem:gae447247e145304d1113724e497c9b314" id="r_gae447247e145304d1113724e497c9b314"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:gae447247e145304d1113724e497c9b314 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gae447247e145304d1113724e497c9b314">hku::PF_ModeC</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:gae447247e145304d1113724e497c9b314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alias of PF_WithoutAF: mode C "Shared Account Compatibility"  <br /></td></tr>
+<tr class="memitem:gae0bdca7939870e84f48b8b4a7d0f3a4c" id="r_gae0bdca7939870e84f48b8b4a7d0f3a4c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gae0bdca7939870e84f48b8b4a7d0f3a4c">hku::PF_SignalAggregate</a> (const <a class="el" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> &amp;tm=<a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>(), const <a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> &amp;se=<a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>(), const <a class="el" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">AFPtr</a> &amp;af=<a class="el" href="group___allocate_funds.html#gaa11ab7e810d297ed48c3493aaa6b1226">AF_EqualWeight</a>(), int adjust_cycle=1, const string &amp;adjust_mode=&quot;query&quot;, bool delay_to_trading_day=true, bool trade_on_close=true, bool sell_at_not_selected=false, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> sub_init_cash=100000.0)</td></tr>
+<tr class="memdesc:gae0bdca7939870e84f48b8b4a7d0f3a4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Portfolio running in mode A "Signal Aggregation" (the signal sources + the parent uniform ordering)  <br /></td></tr>
+<tr class="memitem:ga3f4d9be5f2f143688f763f2844d27f2a" id="r_ga3f4d9be5f2f143688f763f2844d27f2a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3f4d9be5f2f143688f763f2844d27f2a">hku::PF_Simple</a> (const <a class="el" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> &amp;tm=<a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>(), const <a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> &amp;se=<a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>(), const <a class="el" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">AFPtr</a> &amp;af=<a class="el" href="group___allocate_funds.html#gaa11ab7e810d297ed48c3493aaa6b1226">AF_EqualWeight</a>(), int adjust_cycle=1, const string &amp;adjust_mode=&quot;query&quot;, bool delay_to_trading_day=true, bool trade_on_close=true, bool sell_at_not_selected=true)</td></tr>
+<tr class="memdesc:ga3f4d9be5f2f143688f763f2844d27f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a portfolio  <br /></td></tr>
+<tr class="memitem:ga8a2bd839d627835d5c54a5f82ef3beea" id="r_ga8a2bd839d627835d5c54a5f82ef3beea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga8a2bd839d627835d5c54a5f82ef3beea">hku::PF_WithoutAF</a> (const <a class="el" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> &amp;tm=<a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>(), const <a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> &amp;se=<a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>(), int adjust_cycle=1, const string &amp;adjust_mode=&quot;query&quot;, bool delay_to_trading_day=true, bool trade_on_close=true, bool sys_use_self_tm=false, bool sell_at_not_selected=false, bool keep_watch_force_sell=false)</td></tr>
+<tr class="memdesc:ga8a2bd839d627835d5c54a5f82ef3beea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Portfolio without a fund allocation algorithm  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<p>投资组合管理系统 </p>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<p>The portfolio management system </p>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">类型定义说明</h2>
+<a id="ga843a0ad8db5864b455768447f56fbd2d" name="ga843a0ad8db5864b455768447f56fbd2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga843a0ad8db5864b455768447f56fbd2d">&#9670;&#160;</a></span>PortfolioPtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#ga843a0ad8db5864b455768447f56fbd2d">hku::PortfolioPtr</a> = <a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/system/imp/MultiSystem.h&gt;</code></p>
+
+<p>master compatibility alias: in master PF_Simple / PF_WithoutAF return <a class="el" href="#ga843a0ad8db5864b455768447f56fbd2d" title="master compatibility alias: in master PF_Simple / PF_WithoutAF return PortfolioPtr.">PortfolioPtr</a>. </p>
+<p>Here PF is a preset configuration of <a class="el" href="classhku_1_1_multi_system.html">MultiSystem</a>, this alias is kept so that the existing <span class="tt"><a class="el" href="#ga843a0ad8db5864b455768447f56fbd2d" title="master compatibility alias: in master PF_Simple / PF_WithoutAF return PortfolioPtr.">PortfolioPtr</a> pf = PF_Simple(...)</span> keeps compiling (the Portfolio class methods are no longer supported). </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="gadd3bcbc7d6a7679da18193f5973937ba" name="gadd3bcbc7d6a7679da18193f5973937ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadd3bcbc7d6a7679da18193f5973937ba">&#9670;&#160;</a></span>PF_ModeA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> hku::PF_ModeA </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...</td>          <td class="paramname"><span class="paramname"><em>args</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/portfolio/crt/PF_Mode.h&gt;</code></p>
+
+<p>Alias of PF_SignalAggregate: mode A "Signal Aggregation" </p>
+
+</div>
+</div>
+<a id="ga28f3e70f90b4844e6490318c61649a37" name="ga28f3e70f90b4844e6490318c61649a37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga28f3e70f90b4844e6490318c61649a37">&#9670;&#160;</a></span>PF_ModeB()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> hku::PF_ModeB </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...</td>          <td class="paramname"><span class="paramname"><em>args</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/portfolio/crt/PF_Mode.h&gt;</code></p>
+
+<p>Alias of PF_Simple: mode B "Fund Allocation" </p>
+
+</div>
+</div>
+<a id="gae447247e145304d1113724e497c9b314" name="gae447247e145304d1113724e497c9b314"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae447247e145304d1113724e497c9b314">&#9670;&#160;</a></span>PF_ModeC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> hku::PF_ModeC </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...</td>          <td class="paramname"><span class="paramname"><em>args</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/portfolio/crt/PF_Mode.h&gt;</code></p>
+
+<p>Alias of PF_WithoutAF: mode C "Shared Account Compatibility" </p>
+
+</div>
+</div>
+<a id="gae0bdca7939870e84f48b8b4a7d0f3a4c" name="gae0bdca7939870e84f48b8b4a7d0f3a4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae0bdca7939870e84f48b8b4a7d0f3a4c">&#9670;&#160;</a></span>PF_SignalAggregate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API hku::PF_SignalAggregate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>tm</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>se</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">AFPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>af</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___allocate_funds.html#gaa11ab7e810d297ed48c3493aaa6b1226">AF_EqualWeight</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>adjust_cycle</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>adjust_mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;query&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>delay_to_trading_day</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>trade_on_close</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>sell_at_not_selected</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>sub_init_cash</em></span><span class="paramdefsep"> = </span><span class="paramdefval">100000.0</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/portfolio/crt/PF_SignalAggregate.h&gt;</code></p>
+
+<p>Portfolio running in mode A "Signal Aggregation" (the signal sources + the parent uniform ordering) </p>
+<pre>
+Description of the rebalancing mode adjust_mode:
+ - In the "query" mode it follows the ktype in the input parameter query; at this time
+adjust_cycle determines the cycle interval with the ktype in query;
+ - In the "day" mode adjust_cycle is the number of the days between the rebalancing;
+ - In the "week" | "month" | "quarter" | "year" mode, adjust_cycle is the corresponding N-th day
+of every week, the n-th day of every month, the n-th day of every quarter and the n-th day of
+every year; when delay_to_trading_day is false, the rebalancing is skipped if that day is not a
+trading day; when delay_to_trading_day is true, it is postponed to the first trading day within
+the current cycle if that day is not a trading day
+</pre> <dl class="section note"><dt>注解</dt><dd>The sub-systems always use their own shadow accounts (TM_SUB, shared_tm=false), so the real account of the parent is only touched by the orders of the parent itself. The suggestions are converted into the target positions by the AF L2 (weight x net exposure ratio x the parent net assets, aggregated per instrument) and the L3 portfolio risk control applies. On a rebalancing day a sub-system the SE does not admit contributes a zero signal (its instruments drop out of the parent target); the shadow itself keeps running. </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tm</td><td>trade account </td></tr>
+    <tr><td class="paramname">se</td><td>system selector </td></tr>
+    <tr><td class="paramname">af</td><td>the portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3), equal weight by default </td></tr>
+    <tr><td class="paramname">adjust_cycle</td><td>the rebalancing cycle (affected by adjust_mode), 1 by default; a negative value throws at set time, 0 is warned and treated as 1 at readyForRun, and a value that can never reach a driven day of the period is warned but kept </td></tr>
+    <tr><td class="paramname">adjust_mode</td><td>the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year" </td></tr>
+    <tr><td class="paramname">delay_to_trading_day</td><td>when it is true, it is postponed to the first trading day within the current cycle if the rebalancing day is not a trading day </td></tr>
+    <tr><td class="paramname">trade_on_close</td><td>execute the trade at the close </td></tr>
+    <tr><td class="paramname">sell_at_not_selected</td><td>whether to force selling the stocks not selected on the rebalancing day, false by default </td></tr>
+    <tr><td class="paramname">sub_init_cash</td><td>the signal cash of every sub-system shadow account (never reset, the shadow runs continuously) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the portfolio instance (<a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a>) </dd></dl>
+
+</div>
+</div>
+<a id="ga3f4d9be5f2f143688f763f2844d27f2a" name="ga3f4d9be5f2f143688f763f2844d27f2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3f4d9be5f2f143688f763f2844d27f2a">&#9670;&#160;</a></span>PF_Simple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API hku::PF_Simple </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>tm</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>se</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">AFPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>af</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___allocate_funds.html#gaa11ab7e810d297ed48c3493aaa6b1226">AF_EqualWeight</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>adjust_cycle</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>adjust_mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;query&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>delay_to_trading_day</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>trade_on_close</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>sell_at_not_selected</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/portfolio/crt/PF_Simple.h&gt;</code></p>
+
+<p>Create a portfolio </p>
+<pre>
+Description of the rebalancing mode adjust_mode:
+ - In the "query" mode it follows the ktype in the input parameter query; at this time
+adjust_cycle determines the cycle interval with the ktype in query;
+ - In the "day" mode adjust_cycle is the number of the days between the rebalancing;
+ - In the "week" | "month" | "quarter" | "year" mode, adjust_cycle is the corresponding N-th day
+of every week, the n-th day of every month, the n-th day of every quarter and the n-th day of
+every year; when delay_to_trading_day is false, the rebalancing is skipped if that day is not a
+trading day; when delay_to_trading_day is true, it is postponed to the first trading day within
+the current cycle if that day is not a trading day; for example, if the rebalancing is specified
+on the 1st day of every month but the 1st is not a trading day, it is postponed to the first
+trading day of that month
+</pre> <dl class="section note"><dt>注解</dt><dd>Returns <a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> running in mode B "Fund Allocation": on the rebalancing day the AF allocates the quota to every selected sub-system (L1) and the sub-system is calibrated to the quota before it is driven; the sub-system suggestions are mirrored by the parent (L2 pass-through) and the L3 portfolio risk control is skipped. The unselected sub-systems are force cleared on the rebalancing day by default (aligned with the legacy SimplePortfolio); pass sell_at_not_selected=false to keep them running (they only skip the quota calibration). adjust_mode / delay_to_trading_day follow the runtime period rule inside <a class="el" href="classhku_1_1_multi_system.html">MultiSystem</a>. </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tm</td><td>trade account </td></tr>
+    <tr><td class="paramname">se</td><td>system selector </td></tr>
+    <tr><td class="paramname">af</td><td>fund allocation algorithm (<a class="el" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68" title="The pointer type that the client programs should use">AFPtr</a>, carrying the L1/L2/L3 layers, see <a class="el" href="classhku_1_1_allocate_funds_base.html" title="Base class of the portfolio-level fund allocation (AF).">AllocateFundsBase</a>) </td></tr>
+    <tr><td class="paramname">adjust_cycle</td><td>the rebalancing cycle (affected by adjust_mode), 1 by default; a negative value throws at set time, 0 is warned and treated as 1 at readyForRun, and a value that can never reach a driven day of the period is warned but kept </td></tr>
+    <tr><td class="paramname">adjust_mode</td><td>the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year" </td></tr>
+    <tr><td class="paramname">delay_to_trading_day</td><td>when it is true, it is postponed to the first trading day within the current cycle if the rebalancing day is not a trading day </td></tr>
+    <tr><td class="paramname">trade_on_close</td><td>execute the trade at the close </td></tr>
+    <tr><td class="paramname">sell_at_not_selected</td><td>whether to force selling the stocks not selected on the rebalancing day, true by default (aligned with the legacy SimplePortfolio) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the portfolio instance (<a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a>) </dd></dl>
+
+</div>
+</div>
+<a id="ga8a2bd839d627835d5c54a5f82ef3beea" name="ga8a2bd839d627835d5c54a5f82ef3beea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8a2bd839d627835d5c54a5f82ef3beea">&#9670;&#160;</a></span>PF_WithoutAF()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API hku::PF_WithoutAF </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>tm</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>se</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>()</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>adjust_cycle</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>adjust_mode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;query&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>delay_to_trading_day</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>trade_on_close</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>sys_use_self_tm</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>sell_at_not_selected</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>keep_watch_force_sell</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/portfolio/crt/PF_WithoutAF.h&gt;</code></p>
+
+<p>Portfolio without a fund allocation algorithm </p>
+<pre>
+Description of the rebalancing mode adjust_mode:
+ - In the "query" mode it follows the ktype in the input parameter query; at this time
+adjust_cycle determines the cycle interval with the ktype in query;
+ - In the "day" mode adjust_cycle is the number of the days between the rebalancing;
+ - In the "week" | "month" | "quarter" | "year" mode, adjust_cycle is the corresponding N-th day
+of every week, the n-th day of every month, the n-th day of every quarter and the n-th day of
+every year; when delay_to_trading_day is false, the rebalancing is skipped if that day is not a
+trading day; when delay_to_trading_day is true, it is postponed to the first trading day within
+the current cycle if that day is not a trading day; for example, if the rebalancing is specified
+on the 1st day of every month but the 1st is not a trading day, it is postponed to the first
+trading day of that month
+</pre> <dl class="section note"><dt>注解</dt><dd>In the mode without a fund allocation algorithm, only all buying and selling at the open or all buying and selling at the close is supported! </dd>
+<dd>
+Returns <a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> running in mode C "Shared Account Compatibility" (the legacy Portfolio behavior): the sub-systems share the real account of the parent and are sized by their own MM (so they compete for the same cash, in the pool admission order), the AF is only the mode carrier here (L1 takes no quota, L2 needs no conversion, L3 is off by default) and the parent never places an extra order. </dd></dl>
+<dl class="section warning"><dt>警告</dt><dd>With the default sell_at_not_selected=false, a sub-system that the SE stops admitting while it still holds is driven ONE last time and then FROZEN: its stop-loss, profit goal and sell signals stop working and the position is never closed (the legacy engine behavior). Set keep_watch_force_sell=true to keep driving it until it is flat, or sell_at_not_selected=true to liquidate it at once. </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>On a rebalancing day a sub-system that the SE stops admitting leaves the running pool no matter whether it still holds: sell_at_not_selected=true liquidates it at once, while the default false gives it ONE last drive (so a sell signal of that very day is still realized) and then stops following it (the position is left as the legacy engine did), unless keep_watch_force_sell keeps it driven. The driven set follows the SE semantics: an "all selected" SE (e.g. SE_Fixed) degenerates mode C into driving every sub-system every day. </dd>
+<dd>
+sys_use_self_tm is kept for the signature compatibility only: in mode C the sub-systems always share the real account of the parent, so it is ignored with a warning. </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tm</td><td>trade account </td></tr>
+    <tr><td class="paramname">se</td><td>system selector </td></tr>
+    <tr><td class="paramname">adjust_cycle</td><td>the rebalancing cycle (affected by adjust_mode), 1 by default; a negative value throws at set time, 0 is warned and treated as 1 at readyForRun, and a value that can never reach a driven day of the period is warned but kept </td></tr>
+    <tr><td class="paramname">adjust_mode</td><td>the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year" </td></tr>
+    <tr><td class="paramname">delay_to_trading_day</td><td>when it is true, it is postponed to the first trading day within the current cycle if the rebalancing day is not a trading day </td></tr>
+    <tr><td class="paramname">trade_on_close</td><td>execute the trade at the close </td></tr>
+    <tr><td class="paramname">sys_use_self_tm</td><td>kept for the signature compatibility only: mode C always shares the real account of the parent with its sub-systems, so it is ignored with a warning </td></tr>
+    <tr><td class="paramname">sell_at_not_selected</td><td>whether to force selling the stocks not selected on the rebalancing day, false by default </td></tr>
+    <tr><td class="paramname">keep_watch_force_sell</td><td>keep driving the removed still-holding sub-systems when the forced liquidation is off (watch-only: their own exit logic keeps running until they are flat; nothing is force-sold), false by default </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the portfolio instance (<a class="el" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a>) </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

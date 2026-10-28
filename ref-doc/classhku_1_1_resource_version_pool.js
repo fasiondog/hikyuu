@@ -1,0 +1,26 @@
+var classhku_1_1_resource_version_pool =
+[
+    [ "ResourcePtr", "classhku_1_1_resource_version_pool.html#a8977678733517487cfa6c003e1711794", null ],
+    [ "ResourceVersionPool", "classhku_1_1_resource_version_pool.html#a17a80dde0167444e61396149f4f17de9", null ],
+    [ "ResourceVersionPool", "classhku_1_1_resource_version_pool.html#adbfc96838a9737b7995d384c2663a37f", null ],
+    [ "ResourceVersionPool", "classhku_1_1_resource_version_pool.html#a5a4668b0d9971923a0132e5b30e5fb35", null ],
+    [ "~ResourceVersionPool", "classhku_1_1_resource_version_pool.html#af4d70dcdaebcdf88c5ddc53ed6d01604", null ],
+    [ "count", "classhku_1_1_resource_version_pool.html#a168574ff86b5d89f90bfc6cf3bc1a488", null ],
+    [ "get", "classhku_1_1_resource_version_pool.html#a700b62e6559af22ee1a5be93709272b3", null ],
+    [ "getAndWait", "classhku_1_1_resource_version_pool.html#ac1248cc62a323878697e49cf5bd21deb", null ],
+    [ "getParam", "classhku_1_1_resource_version_pool.html#adb595cc70e1617deb547a9d75e6ab162", null ],
+    [ "getVersion", "classhku_1_1_resource_version_pool.html#a9cb3af63e2e67fdbd7b04ba9906f193e", null ],
+    [ "getWaitFor", "classhku_1_1_resource_version_pool.html#a7f8ecb785813c8bbcbced273a0a645a2", null ],
+    [ "haveParam", "classhku_1_1_resource_version_pool.html#a0dd6e493807c054e0abe790b8f368e93", null ],
+    [ "idleCount", "classhku_1_1_resource_version_pool.html#ab932291e4f78c449987d1bafacd861c0", null ],
+    [ "incVersion", "classhku_1_1_resource_version_pool.html#ab56dd23e7b4bb7f0f42575af6da7a1de", null ],
+    [ "maxIdleSize", "classhku_1_1_resource_version_pool.html#a32d797109c9cd8c224db1b9978a74b8c", null ],
+    [ "maxIdleSize", "classhku_1_1_resource_version_pool.html#a3d006a3eb665b751c810894af2b28797", null ],
+    [ "maxPoolSize", "classhku_1_1_resource_version_pool.html#a3032b8dc80d50f3e64cb37b56acf0527", null ],
+    [ "maxPoolSize", "classhku_1_1_resource_version_pool.html#ac8601deac078f61739fdd76c9bd8b2e1", null ],
+    [ "operator=", "classhku_1_1_resource_version_pool.html#a595b5650e15c236e2cef3e1a71b80d49", null ],
+    [ "releaseIdleResource", "classhku_1_1_resource_version_pool.html#afbbaf43eb860c2d82909261926988b5c", null ],
+    [ "setParam", "classhku_1_1_resource_version_pool.html#addaceec4b9013eacb6dddd67af09eb45", null ],
+    [ "setParameter", "classhku_1_1_resource_version_pool.html#a86e846aee6f579417853222687a15477", null ],
+    [ "setParameter", "classhku_1_1_resource_version_pool.html#ab2f670e4d3128a8aa5d3242b494499a3", null ]
+];

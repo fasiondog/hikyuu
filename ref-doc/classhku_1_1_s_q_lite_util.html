@@ -1,0 +1,446 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::SQLiteUtil类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_s_q_lite_util.html','','classhku_1_1_s_q_lite_util-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::SQLiteUtil类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___d_b_connect.html">DB Connect database connection</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Collection of the other SQLite related operation methods  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_s_q_lite_util_8h_source.html">SQLiteUtil.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a8ecb7243b78128304a03eccb429d924a" id="r_a8ecb7243b78128304a03eccb429d924a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ecb7243b78128304a03eccb429d924a">BackupResult</a> { <a class="el" href="#a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6">BACKUP_SUCCESS</a> = 0
+, <a class="el" href="#a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb">BACKUP_FAILED_INVALID_SRC</a> = 1
+, <a class="el" href="#a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341">BACKUP_FAILED_EXECUTE</a> = 2
+, <a class="el" href="#a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8">BACKUP_FAILED_OTHER</a> = 3
+ }</td></tr>
+<tr class="memitem:acf1c30b903641b8633dcf7c3f07d44ad" id="r_acf1c30b903641b8633dcf7c3f07d44ad"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ad">RecoverResult</a> { <br />
+&#160;&#160;<a class="el" href="#acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951">RECOVER_SUCCESS</a> = 0
+, <a class="el" href="#acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276">RECOVER_FAILED_BACKUP_NOT_EXIST</a>
+, <a class="el" href="#acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16">RECOVER_FAILED_BACKUP_INVALID</a>
+, <a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13">RECOVER_FAILED_INVALID_DST</a>
+, <br />
+&#160;&#160;<a class="el" href="#acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b">RECOVER_FAILED_EXECUTE</a>
+, <a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9">RECOVER_FAILED_OTHER</a>
+<br />
+ }</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a53306af5cc7c87f2d005eb2054abc421" id="r_a53306af5cc7c87f2d005eb2054abc421"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a53306af5cc7c87f2d005eb2054abc421">SQLiteUtil</a> ()=default</td></tr>
+<tr class="memitem:a2607248256eb495ecf5e404df2dc9d59" id="r_a2607248256eb495ecf5e404df2dc9d59"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2607248256eb495ecf5e404df2dc9d59">~SQLiteUtil</a> ()=default</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a6f52534a252059bab928e9bfda430f33" id="r_a6f52534a252059bab928e9bfda430f33"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="#a8ecb7243b78128304a03eccb429d924a">BackupResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f52534a252059bab928e9bfda430f33">onlineBackup</a> (const std::shared_ptr&lt; <a class="el" href="classhku_1_1_s_q_lite_connect.html">SQLiteConnect</a> &gt; &amp;conn, const std::string &amp;dst, int n_page=-1, int step_sleep=250) noexcept</td></tr>
+<tr class="memdesc:a6f52534a252059bab928e9bfda430f33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Back up the database online, without affecting the operations of the other database connections  <br /></td></tr>
+<tr class="memitem:a4c8fbe10806df65fc2cb9761c975cbca" id="r_a4c8fbe10806df65fc2cb9761c975cbca"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="#a8ecb7243b78128304a03eccb429d924a">BackupResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c8fbe10806df65fc2cb9761c975cbca">onlineBackup</a> (const std::string &amp;src, const std::string &amp;dst, int n_page=-1, int step_sleep=250) noexcept</td></tr>
+<tr class="memdesc:a4c8fbe10806df65fc2cb9761c975cbca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Back up the database online, without affecting the operations of the other database connections  <br /></td></tr>
+<tr class="memitem:a970f12d67457c8c5cd0bd30e1b264881" id="r_a970f12d67457c8c5cd0bd30e1b264881"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ad">RecoverResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a970f12d67457c8c5cd0bd30e1b264881">recoverFromBackup</a> (const std::string &amp;backup, const std::string &amp;dst, bool save_bad=false) noexcept</td></tr>
+<tr class="memdesc:a970f12d67457c8c5cd0bd30e1b264881"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recover the database from the given backup file  <br /></td></tr>
+<tr class="memitem:a1f0bc3fcd6ec02607976363442fb0f44" id="r_a1f0bc3fcd6ec02607976363442fb0f44"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1f0bc3fcd6ec02607976363442fb0f44">removeDBFile</a> (const std::string &amp;dbfilename)</td></tr>
+<tr class="memdesc:a1f0bc3fcd6ec02607976363442fb0f44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to delete the database related files (the main file and the journal file)  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Collection of the other SQLite related operation methods </p>
+</div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">成员枚举类型说明</h2>
+<a id="a8ecb7243b78128304a03eccb429d924a" name="a8ecb7243b78128304a03eccb429d924a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ecb7243b78128304a03eccb429d924a">&#9670;&#160;</a></span>BackupResult</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a8ecb7243b78128304a03eccb429d924a">hku::SQLiteUtil::BackupResult</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6" name="a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6"></a>BACKUP_SUCCESS&#160;</td><td class="fielddoc"><p>Backup succeeded </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb" name="a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb"></a>BACKUP_FAILED_INVALID_SRC&#160;</td><td class="fielddoc"><p>The given source data to be backed up is invalid </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341" name="a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341"></a>BACKUP_FAILED_EXECUTE&#160;</td><td class="fielddoc"><p>An error occurred in the backup execution </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8" name="a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8"></a>BACKUP_FAILED_OTHER&#160;</td><td class="fielddoc"><p>The backup failed for other reasons </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="acf1c30b903641b8633dcf7c3f07d44ad" name="acf1c30b903641b8633dcf7c3f07d44ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf1c30b903641b8633dcf7c3f07d44ad">&#9670;&#160;</a></span>RecoverResult</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ad">hku::SQLiteUtil::RecoverResult</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951" name="acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951"></a>RECOVER_SUCCESS&#160;</td><td class="fielddoc"><p>Recovery succeeded </p>
+</td></tr>
+<tr><td class="fieldname"><a id="acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276" name="acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276"></a>RECOVER_FAILED_BACKUP_NOT_EXIST&#160;</td><td class="fielddoc"><p>The given backup file does not exist </p>
+</td></tr>
+<tr><td class="fieldname"><a id="acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16" name="acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16"></a>RECOVER_FAILED_BACKUP_INVALID&#160;</td><td class="fielddoc"><p>The given backup file is not a valid database file </p>
+</td></tr>
+<tr><td class="fieldname"><a id="acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13" name="acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13"></a>RECOVER_FAILED_INVALID_DST&#160;</td><td class="fielddoc"><p>The given recovery target file name is invalid or the file is occupied and cannot be deleted </p>
+</td></tr>
+<tr><td class="fieldname"><a id="acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b" name="acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b"></a>RECOVER_FAILED_EXECUTE&#160;</td><td class="fielddoc"><p>The recovery execution failed </p>
+</td></tr>
+<tr><td class="fieldname"><a id="acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9" name="acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9"></a>RECOVER_FAILED_OTHER&#160;</td><td class="fielddoc"><p>The recovery failed for other reasons </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a53306af5cc7c87f2d005eb2054abc421" name="a53306af5cc7c87f2d005eb2054abc421"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53306af5cc7c87f2d005eb2054abc421">&#9670;&#160;</a></span>SQLiteUtil()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::SQLiteUtil::SQLiteUtil </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2607248256eb495ecf5e404df2dc9d59" name="a2607248256eb495ecf5e404df2dc9d59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2607248256eb495ecf5e404df2dc9d59">&#9670;&#160;</a></span>~SQLiteUtil()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::SQLiteUtil::~SQLiteUtil </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a6f52534a252059bab928e9bfda430f33" name="a6f52534a252059bab928e9bfda430f33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f52534a252059bab928e9bfda430f33">&#9670;&#160;</a></span>onlineBackup() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a8ecb7243b78128304a03eccb429d924a">BackupResult</a> hku::SQLiteUtil::onlineBackup </td>
+          <td>(</td>
+          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="classhku_1_1_s_q_lite_connect.html">SQLiteConnect</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>conn</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>dst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>n_page</em></span><span class="paramdefsep"> = </span><span class="paramdefval">-1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_sleep</em></span><span class="paramdefsep"> = </span><span class="paramdefval">250</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Back up the database online, without affecting the operations of the other database connections </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">conn</td><td>the database connection to be backed up </td></tr>
+    <tr><td class="paramname">dst</td><td>the backup database name </td></tr>
+    <tr><td class="paramname">n_page</td><td>the number of the pages backed up in every loop of the batch backup; when it is less than or equal to 0 the backup is done in one go without batching </td></tr>
+    <tr><td class="paramname">step_sleep</td><td>the sleep interval in milliseconds after every loop of the batch backup, so as to yield the CPU </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4c8fbe10806df65fc2cb9761c975cbca" name="a4c8fbe10806df65fc2cb9761c975cbca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c8fbe10806df65fc2cb9761c975cbca">&#9670;&#160;</a></span>onlineBackup() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a8ecb7243b78128304a03eccb429d924a">BackupResult</a> hku::SQLiteUtil::onlineBackup </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>src</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>dst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>n_page</em></span><span class="paramdefsep"> = </span><span class="paramdefval">-1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_sleep</em></span><span class="paramdefsep"> = </span><span class="paramdefval">250</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Back up the database online, without affecting the operations of the other database connections </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src</td><td>the database name to be backed up </td></tr>
+    <tr><td class="paramname">dst</td><td>the backup database name </td></tr>
+    <tr><td class="paramname">n_page</td><td>the number of the pages backed up in every loop of the batch backup; when it is less than or equal to 0 the backup is done in one go without batching </td></tr>
+    <tr><td class="paramname">step_sleep</td><td>the sleep interval in milliseconds after every loop of the batch backup, so as to yield the CPU </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a970f12d67457c8c5cd0bd30e1b264881" name="a970f12d67457c8c5cd0bd30e1b264881"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a970f12d67457c8c5cd0bd30e1b264881">&#9670;&#160;</a></span>recoverFromBackup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ad">RecoverResult</a> hku::SQLiteUtil::recoverFromBackup </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>backup</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>dst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>save_bad</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Recover the database from the given backup file </p>
+<dl class="section note"><dt>注解</dt><dd>The database file to be recovered may be deleted first during the recovery; if the corrupted database needs to be kept, please give the save_bad parameter </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">backup</td><td>the given backup file </td></tr>
+    <tr><td class="paramname">dst</td><td>the data to be recovered </td></tr>
+    <tr><td class="paramname">save_bad</td><td>whether to keep the corrupted data; dst and dst-journal are saved separately with the suffix .bad added </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#acf1c30b903641b8633dcf7c3f07d44ad">RecoverResult</a> </dd></dl>
+
+</div>
+</div>
+<a id="a1f0bc3fcd6ec02607976363442fb0f44" name="a1f0bc3fcd6ec02607976363442fb0f44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f0bc3fcd6ec02607976363442fb0f44">&#9670;&#160;</a></span>removeDBFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SQLiteUtil::removeDBFile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>dbfilename</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to delete the database related files (the main file and the journal file) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dbfilename</td><td>database file name </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true success is returned when both the given database file and its journal file are deleted successfully or do not exist </dd>
+<dd>
+false a deletion failure is returned if either the given database file or its journal file fails to be deleted </dd></dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/db_connect/sqlite/<a class="el" href="_s_q_lite_util_8h_source.html">SQLiteUtil.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_s_q_lite_util.html">SQLiteUtil</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

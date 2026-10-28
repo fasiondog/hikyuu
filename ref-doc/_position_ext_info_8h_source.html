@@ -1,0 +1,276 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_manage/PositionExtInfo.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_position_ext_info_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">PositionExtInfo.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-05-30</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;PositionRecord.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// Extended position information (it is suitable for the one-buy-one-sell case only; for the</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">// one-buy-multiple-sell case some statistics are inaccurate and are for reference only)</span></div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html">   15</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a> final {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">   16</a></span>    <a class="code hl_class" href="classhku_1_1_position_record.html">PositionRecord</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">   17</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a>{0.};       <span class="comment">// Maximum of the high prices in the period</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">   18</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">minLowPrice</a>{0.0};       <span class="comment">// Minimum of the low prices in the period</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">   19</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a>{0.};      <span class="comment">// Maximum of the close prices in the period</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">   20</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">minClosePrice</a>{0.0};     <span class="comment">// Minimum of the close prices in the period</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">   21</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a>{0.};  <span class="comment">// Current close price</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">   22</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">maxPullBack1</a>{0.};       <span class="comment">// Maximum drawdown ratio 1 (calculated from the maximum and</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>                                    <span class="comment">// the minimum close prices only) (negative)</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">   24</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">maxPullBack2</a>{0.};       <span class="comment">// Maximum drawdown ratio 2 (calculated from the maximum high</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                                    <span class="comment">// price and the minimum low price in the period) (negative)</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">   26</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">currentProfit</a>{0.};      <span class="comment">// Current floating profit and loss (excluding the estimated</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                                    <span class="comment">// sell cost)</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span></div>
+<div class="foldopen" id="foldopen00031" data-start="{" data-end="}">
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a2604244fdfb0c41f44d7dedc1677c211">   31</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#a2604244fdfb0c41f44d7dedc1677c211">currentPullBack1</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        HKU_IF_RETURN(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a> &lt;= 0., 0.);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> ret = (<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a> - <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a>) / <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <span class="keywordflow">return</span> ret &gt; 0. ? 0. : ret;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    }</div>
+</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span></div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a43856773a75495fa6b36e2cc8bcf9f24">   39</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#a43856773a75495fa6b36e2cc8bcf9f24">currentPullBack2</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        HKU_IF_RETURN(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a> &lt;= 0., 0.);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> ret = (<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a> - <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a>) / <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keywordflow">return</span> ret &gt; 0. ? 0. : ret;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    }</div>
+</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span></div>
+<div class="foldopen" id="foldopen00047" data-start="{" data-end="}">
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a3606a8d1c887195b50889bb53d43a1f4">   47</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#a3606a8d1c887195b50889bb53d43a1f4">maxFloatingProfit1</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> ret = <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a> * <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.number + <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.sellMoney - <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.buyMoney;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="keywordflow">return</span> ret &lt; 0. ? 0. : ret;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    }</div>
+</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span></div>
+<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#ab37670797680d41fb08563b443ea0f89">   54</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#ab37670797680d41fb08563b443ea0f89">maxFloatingProfit2</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> ret = <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a> * <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.number + <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.sellMoney - <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.buyMoney;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordflow">return</span> ret &lt; 0. ? 0. : ret;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    }</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span></div>
+<div class="foldopen" id="foldopen00061" data-start="{" data-end="}">
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a3b80b44f581838225d862eb1b05a3a54">   61</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#a3b80b44f581838225d862eb1b05a3a54">minLossProfit1</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> ret = <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">minClosePrice</a> * <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.number + <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.sellMoney - <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.buyMoney;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="keywordflow">return</span> ret &gt; 0. ? 0. : ret;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    }</div>
+</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span></div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="}">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#aa0409341868a99c1974b3b10e157865a">   69</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#aa0409341868a99c1974b3b10e157865a">minLossProfit2</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> ret = <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">minLowPrice</a> * <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.number + <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.sellMoney - <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>.buyMoney;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <span class="keywordflow">return</span> ret &gt; 0. ? 0. : ret;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    }</div>
+</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">   74</a></span>    <a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a4d7c6636cbf6d9325bfd1f1e5a541e07">   75</a></span>    <a class="code hl_function" href="structhku_1_1_position_ext_info.html#a4d7c6636cbf6d9325bfd1f1e5a541e07">PositionExtInfo</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#ae9bcf521e59539e4acdd0a6beb7b00f5">   76</a></span>    <a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>&amp; <a class="code hl_function" href="structhku_1_1_position_ext_info.html#ae9bcf521e59539e4acdd0a6beb7b00f5">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="foldopen" id="foldopen00078" data-start="{" data-end="}">
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#a09930088fff03e9d38dcdab9b7f407c3">   78</a></span>    <a class="code hl_function" href="structhku_1_1_position_ext_info.html#a09930088fff03e9d38dcdab9b7f407c3">PositionExtInfo</a>(<a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>&amp;&amp; rhs)</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    : <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>)),</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a>),</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">minLowPrice</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">minLowPrice</a>),</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a>),</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">minClosePrice</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">minClosePrice</a>),</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a>),</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">maxPullBack1</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">maxPullBack1</a>),</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">maxPullBack2</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">maxPullBack2</a>),</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>      <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">currentProfit</a>(rhs.<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">currentProfit</a>) {}</div>
+</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="foldopen" id="foldopen00089" data-start="{" data-end="}">
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#ab8d4d0fd6802c682fe56ff373ba9bf9c">   89</a></span>    <a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>&amp; <a class="code hl_function" href="structhku_1_1_position_ext_info.html#ab8d4d0fd6802c682fe56ff373ba9bf9c">operator=</a>(<a class="code hl_function" href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">PositionExtInfo</a>&amp;&amp; rhs) {</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        <span class="keywordflow">if</span> (<span class="keyword">this</span> != &amp;rhs) {</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a> = std::move(rhs.position);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a> = rhs.maxHighPrice;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">minLowPrice</a> = rhs.minLowPrice;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a> = rhs.maxClosePrice;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">minClosePrice</a> = rhs.minClosePrice;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a> = rhs.currentClosePrice;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">maxPullBack1</a> = rhs.maxPullBack1;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">maxPullBack2</a> = rhs.maxPullBack2;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>            <a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">currentProfit</a> = rhs.currentProfit;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        }</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    }</div>
+</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment">//===================</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment">//===================</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="structhku_1_1_position_ext_info.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">  109</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordtype">void</span> save(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">position</a>);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">maxHighPrice</a>);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">minLowPrice</a>);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">maxClosePrice</a>);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">minClosePrice</a>);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">currentClosePrice</a>);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">maxPullBack1</a>);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">maxPullBack2</a>);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">currentProfit</a>);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    }</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="keywordtype">void</span> load(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        ar&amp; BOOST_SERIALIZATION_NVP(position);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        ar&amp; BOOST_SERIALIZATION_NVP(maxHighPrice);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        ar&amp; BOOST_SERIALIZATION_NVP(minLowPrice);</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        ar&amp; BOOST_SERIALIZATION_NVP(maxClosePrice);</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        ar&amp; BOOST_SERIALIZATION_NVP(minClosePrice);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        ar&amp; BOOST_SERIALIZATION_NVP(currentClosePrice);</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        ar&amp; BOOST_SERIALIZATION_NVP(maxPullBack1);</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        ar&amp; BOOST_SERIALIZATION_NVP(maxPullBack2);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        ar&amp; BOOST_SERIALIZATION_NVP(currentProfit);</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    }</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    BOOST_SERIALIZATION_SPLIT_MEMBER()</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>};</div>
+</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_position_record_html"><div class="ttname"><a href="classhku_1_1_position_record.html">hku::PositionRecord</a></div><div class="ttdoc">Position record</div><div class="ttdef"><b>定义</b> PositionRecord.h:22</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a09930088fff03e9d38dcdab9b7f407c3"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a09930088fff03e9d38dcdab9b7f407c3">hku::PositionExtInfo::PositionExtInfo</a></div><div class="ttdeci">PositionExtInfo(PositionExtInfo &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:78</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a21a676a738ef79d3e97b56107f50a178"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a21a676a738ef79d3e97b56107f50a178">hku::PositionExtInfo::maxHighPrice</a></div><div class="ttdeci">price_t maxHighPrice</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:17</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a2604244fdfb0c41f44d7dedc1677c211"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a2604244fdfb0c41f44d7dedc1677c211">hku::PositionExtInfo::currentPullBack1</a></div><div class="ttdeci">price_t currentPullBack1() const</div><div class="ttdoc">Current drawdown ratio 1 (calculated from the maximum close price and the current close price only)</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:31</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a34d015f44b10d3e6a2f693c1deb2f763"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a34d015f44b10d3e6a2f693c1deb2f763">hku::PositionExtInfo::position</a></div><div class="ttdeci">PositionRecord position</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:16</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a3606a8d1c887195b50889bb53d43a1f4"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a3606a8d1c887195b50889bb53d43a1f4">hku::PositionExtInfo::maxFloatingProfit1</a></div><div class="ttdeci">price_t maxFloatingProfit1() const</div><div class="ttdoc">Maximum floating profit 1 in the period (positive, calculated from the close prices only,...</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:47</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a3b80b44f581838225d862eb1b05a3a54"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a3b80b44f581838225d862eb1b05a3a54">hku::PositionExtInfo::minLossProfit1</a></div><div class="ttdeci">price_t minLossProfit1() const</div><div class="ttdoc">Maximum floating loss 1 in the period (negative, calculated from the close prices only,...</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:61</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a43856773a75495fa6b36e2cc8bcf9f24"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a43856773a75495fa6b36e2cc8bcf9f24">hku::PositionExtInfo::currentPullBack2</a></div><div class="ttdeci">price_t currentPullBack2() const</div><div class="ttdoc">Current drawdown percentage 2 (calculated from the maximum high price in the period and the current c...</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:39</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a4d7c6636cbf6d9325bfd1f1e5a541e07"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a4d7c6636cbf6d9325bfd1f1e5a541e07">hku::PositionExtInfo::PositionExtInfo</a></div><div class="ttdeci">PositionExtInfo(const PositionExtInfo &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_a6de283f2c811d30fd50a54b42e6ba774"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#a6de283f2c811d30fd50a54b42e6ba774">hku::PositionExtInfo::maxPullBack1</a></div><div class="ttdeci">price_t maxPullBack1</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:22</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_aa0409341868a99c1974b3b10e157865a"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#aa0409341868a99c1974b3b10e157865a">hku::PositionExtInfo::minLossProfit2</a></div><div class="ttdeci">price_t minLossProfit2() const</div><div class="ttdoc">Maximum floating loss 2 in the period (negative, calculated from the low prices in the period only,...</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:69</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_aa76de218a5361bb7e1ef1b64cd856f8d"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#aa76de218a5361bb7e1ef1b64cd856f8d">hku::PositionExtInfo::maxClosePrice</a></div><div class="ttdeci">price_t maxClosePrice</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:19</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_aacebc448b070bee090969c722d5701d8"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#aacebc448b070bee090969c722d5701d8">hku::PositionExtInfo::minClosePrice</a></div><div class="ttdeci">price_t minClosePrice</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:20</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_aae5799a5cc6348a5b12630c57df6e9a7"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7">hku::PositionExtInfo::currentProfit</a></div><div class="ttdeci">price_t currentProfit</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:26</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_ab37670797680d41fb08563b443ea0f89"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#ab37670797680d41fb08563b443ea0f89">hku::PositionExtInfo::maxFloatingProfit2</a></div><div class="ttdeci">price_t maxFloatingProfit2() const</div><div class="ttdoc">Maximum floating profit 2 in the period (positive, calculated from the maximum of the high prices,...</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:54</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_ab8d4d0fd6802c682fe56ff373ba9bf9c"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#ab8d4d0fd6802c682fe56ff373ba9bf9c">hku::PositionExtInfo::operator=</a></div><div class="ttdeci">PositionExtInfo &amp; operator=(PositionExtInfo &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:89</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_ae9bcf521e59539e4acdd0a6beb7b00f5"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#ae9bcf521e59539e4acdd0a6beb7b00f5">hku::PositionExtInfo::operator=</a></div><div class="ttdeci">PositionExtInfo &amp; operator=(const PositionExtInfo &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_aeefdbb67dbbd47af2506242a623e0349"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#aeefdbb67dbbd47af2506242a623e0349">hku::PositionExtInfo::maxPullBack2</a></div><div class="ttdeci">price_t maxPullBack2</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:24</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_af34a33d661f421999ba717efd31890c5"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5">hku::PositionExtInfo::currentClosePrice</a></div><div class="ttdeci">price_t currentClosePrice</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:21</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_af65b97703fc3f3b5f64024a9570b36e7"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#af65b97703fc3f3b5f64024a9570b36e7">hku::PositionExtInfo::PositionExtInfo</a></div><div class="ttdeci">PositionExtInfo()=default</div></div>
+<div class="ttc" id="astructhku_1_1_position_ext_info_html_afa0c27a71ca6f9a406a2e4e57c7f8ce7"><div class="ttname"><a href="structhku_1_1_position_ext_info.html#afa0c27a71ca6f9a406a2e4e57c7f8ce7">hku::PositionExtInfo::minLowPrice</a></div><div class="ttdeci">price_t minLowPrice</div><div class="ttdef"><b>定义</b> PositionExtInfo.h:18</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></li><li class="navelem"><b>PositionExtInfo.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

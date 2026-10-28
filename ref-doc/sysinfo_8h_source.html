@@ -1,0 +1,223 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/global/sysinfo.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('sysinfo_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">sysinfo.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2023 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2023-09-26</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;hikyuu/utilities/datetime/Datetime.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#ifndef HKU_API</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define HKU_API</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="namespacehku.html#afe4da0fb57da51e568b5e912252ddbd5">   19</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku.html#afe4da0fb57da51e568b5e912252ddbd5">sysinfo_init</a>();</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="namespacehku.html#a2bd17146e5cafb5ef80de47cfc8d2a8c">   20</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku.html#a2bd17146e5cafb5ef80de47cfc8d2a8c">sysinfo_clean</a>();</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="namespacehku.html#ab26a3a3f5947a93dc602bf93d74486ed">   26</a></span>std::string HKU_API <a class="code hl_function" href="namespacehku.html#ab26a3a3f5947a93dc602bf93d74486ed">getVersion</a>();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="namespacehku.html#aaebf5f4a9e7146b9bac5330a619bd262">   31</a></span>std::string HKU_API <a class="code hl_function" href="namespacehku.html#aaebf5f4a9e7146b9bac5330a619bd262">getVersionWithBuild</a>();</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment">/* Get the version number including the Git commit information */</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="namespacehku.html#abe4abde4406e5f838d1ee7c3b4366877">   34</a></span>std::string HKU_API <a class="code hl_function" href="namespacehku.html#abe4abde4406e5f838d1ee7c3b4366877">getVersionWithGit</a>();</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="namespacehku.html#adc10098f6f63f494ad91e256faef975e">   39</a></span><span class="keywordtype">bool</span> HKU_API <a class="code hl_function" href="namespacehku.html#adc10098f6f63f494ad91e256faef975e">CanUpgrade</a>();</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="};">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html">   41</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_function" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">LatestVersionInfo</a> {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">   42</a></span>    <span class="keywordtype">int</span> <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a>{1003001};</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#a8d02a1834c1639bad41db705623f31e4">   43</a></span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a8d02a1834c1639bad41db705623f31e4">release_date</a>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#a18a6a657c37a49972b90d48f8e315348">   44</a></span>    std::string <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a18a6a657c37a49972b90d48f8e315348">remark</a>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">   45</a></span>    <a class="code hl_function" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">LatestVersionInfo</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#ab08afbea2d6d007c1a324361627d815b">   46</a></span>    <a class="code hl_function" href="structhku_1_1_latest_version_info.html#ab08afbea2d6d007c1a324361627d815b">LatestVersionInfo</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">LatestVersionInfo</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="foldopen" id="foldopen00047" data-start="{" data-end="}">
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#ad67464c51726d593ad3ee3b73de4ebde">   47</a></span>    <a class="code hl_function" href="structhku_1_1_latest_version_info.html#ad67464c51726d593ad3ee3b73de4ebde">LatestVersionInfo</a>(<a class="code hl_function" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">LatestVersionInfo</a>&amp;&amp; rhs)</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    : <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a>(rhs.<a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a>), <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a8d02a1834c1639bad41db705623f31e4">release_date</a>(rhs.<a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a8d02a1834c1639bad41db705623f31e4">release_date</a>), <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a18a6a657c37a49972b90d48f8e315348">remark</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::move(rhs.<a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a18a6a657c37a49972b90d48f8e315348">remark</a>)) {}</div>
+</div>
+<div class="foldopen" id="foldopen00049" data-start="{" data-end="}">
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#a3ab0f4f5c3148f9f5696e1294bd29cc5">   49</a></span>    <a class="code hl_function" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">LatestVersionInfo</a>&amp; <a class="code hl_function" href="structhku_1_1_latest_version_info.html#a3ab0f4f5c3148f9f5696e1294bd29cc5">operator=</a>(<a class="code hl_function" href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">LatestVersionInfo</a>&amp;&amp; rhs) {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keywordflow">if</span> (<span class="keyword">this</span> == &amp;rhs) {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        }</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a> = rhs.version;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a8d02a1834c1639bad41db705623f31e4">release_date</a> = rhs.release_date;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a18a6a657c37a49972b90d48f8e315348">remark</a> = std::move(rhs.remark);</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    }</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span></div>
+<div class="foldopen" id="foldopen00062" data-start="{" data-end="}">
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="structhku_1_1_latest_version_info.html#a8699c727ab36964ca053d001e3e58d69">   62</a></span>    std::string <a class="code hl_function" href="structhku_1_1_latest_version_info.html#a8699c727ab36964ca053d001e3e58d69">version_str</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="namespacestd.html#ab01df1f6515bec5ca434fba5f0b3d0de">std::to_string</a>(<a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a> / 1000000) + <span class="stringliteral">&quot;.&quot;</span> + <a class="code hl_function" href="namespacestd.html#ab01df1f6515bec5ca434fba5f0b3d0de">std::to_string</a>((<a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a> / 1000) % 1000) +</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>               <span class="stringliteral">&quot;.&quot;</span> + <a class="code hl_function" href="namespacestd.html#ab01df1f6515bec5ca434fba5f0b3d0de">std::to_string</a>(<a class="code hl_variable" href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">version</a> % 1000);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    }</div>
+</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>};</div>
+</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="namespacehku.html#af8ded98713a6fc53c4eef3d0a6e98db7">   68</a></span><a class="code hl_struct" href="structhku_1_1_latest_version_info.html">LatestVersionInfo</a> HKU_API <a class="code hl_function" href="namespacehku.html#af8ded98713a6fc53c4eef3d0a6e98db7">getLatestVersionInfo</a>();</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="namespacehku.html#a74cb59184409221d66ce25cbcea7b2a2">   70</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku.html#a74cb59184409221d66ce25cbcea7b2a2">updateSysInfoExpiredTime</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> time);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment">// License expiration reminder</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="namespacehku.html#a0b20ec227e2ec554ed76363bd9c2488c">   73</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a0b20ec227e2ec554ed76363bd9c2488c">reminderLicenseExpiration</a>();</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="namespacehku.html#adb54cfa18d67651a42f14589f83eb4df">   76</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#adb54cfa18d67651a42f14589f83eb4df">sendFeedback</a>();</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="namespacehku.html#ac6e61b766185d8e723e8e3eaf172f1bf">   79</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#ac6e61b766185d8e723e8e3eaf172f1bf">sendPythonVersionFeedBack</a>(<span class="keywordtype">int</span> major, <span class="keywordtype">int</span> minor, <span class="keywordtype">int</span> micro);</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="namespacehku.html#a1ed179fd705346a68a94d0c892a2db07">   82</a></span><span class="keywordtype">bool</span> HKU_API <a class="code hl_function" href="namespacehku.html#a1ed179fd705346a68a94d0c892a2db07">runningInPython</a>();</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="namespacehku.html#a05a4de7e6d2c60259d8014f8167ef1cb">   85</a></span><span class="keywordtype">bool</span> HKU_API <a class="code hl_function" href="namespacehku.html#a05a4de7e6d2c60259d8014f8167ef1cb">pythonInJupyter</a>();</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="namespacehku.html#a388ac769a54f1f6df04ac059acd582a7">   88</a></span><span class="keywordtype">bool</span> HKU_API <a class="code hl_function" href="namespacehku.html#a388ac769a54f1f6df04ac059acd582a7">pythonInInteractive</a>();</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="namespacehku.html#a5834ba0c376bfab546a2b0f4084f9027">   91</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a5834ba0c376bfab546a2b0f4084f9027">setRunningInPython</a>(<span class="keywordtype">bool</span> inpython);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="namespacehku.html#adcb861fff1cea42e7e45f95fbf714098">   94</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#adcb861fff1cea42e7e45f95fbf714098">setPythonInInteractive</a>(<span class="keywordtype">bool</span> interactive);</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="namespacehku.html#af8987b34a53a3275fd132de7605b5f43">   97</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#af8987b34a53a3275fd132de7605b5f43">setPythonInJupyter</a>(<span class="keywordtype">bool</span> injupyter);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a05a4de7e6d2c60259d8014f8167ef1cb"><div class="ttname"><a href="namespacehku.html#a05a4de7e6d2c60259d8014f8167ef1cb">hku::pythonInJupyter</a></div><div class="ttdeci">bool HKU_API pythonInJupyter()</div><div class="ttdoc">Whether it is currently running in the Jupyter environment</div></div>
+<div class="ttc" id="anamespacehku_html_a0b20ec227e2ec554ed76363bd9c2488c"><div class="ttname"><a href="namespacehku.html#a0b20ec227e2ec554ed76363bd9c2488c">hku::reminderLicenseExpiration</a></div><div class="ttdeci">void HKU_API reminderLicenseExpiration()</div></div>
+<div class="ttc" id="anamespacehku_html_a1ed179fd705346a68a94d0c892a2db07"><div class="ttname"><a href="namespacehku.html#a1ed179fd705346a68a94d0c892a2db07">hku::runningInPython</a></div><div class="ttdeci">bool HKU_API runningInPython()</div><div class="ttdoc">Whether it is currently running in the python environment</div></div>
+<div class="ttc" id="anamespacehku_html_a2bd17146e5cafb5ef80de47cfc8d2a8c"><div class="ttname"><a href="namespacehku.html#a2bd17146e5cafb5ef80de47cfc8d2a8c">hku::sysinfo_clean</a></div><div class="ttdeci">void sysinfo_clean()</div></div>
+<div class="ttc" id="anamespacehku_html_a388ac769a54f1f6df04ac059acd582a7"><div class="ttname"><a href="namespacehku.html#a388ac769a54f1f6df04ac059acd582a7">hku::pythonInInteractive</a></div><div class="ttdeci">bool HKU_API pythonInInteractive()</div><div class="ttdoc">Whether python is running in the interactive mode</div></div>
+<div class="ttc" id="anamespacehku_html_a5834ba0c376bfab546a2b0f4084f9027"><div class="ttname"><a href="namespacehku.html#a5834ba0c376bfab546a2b0f4084f9027">hku::setRunningInPython</a></div><div class="ttdeci">void HKU_API setRunningInPython(bool inpython)</div><div class="ttdoc">Set whether it is running under python</div></div>
+<div class="ttc" id="anamespacehku_html_a74cb59184409221d66ce25cbcea7b2a2"><div class="ttname"><a href="namespacehku.html#a74cb59184409221d66ce25cbcea7b2a2">hku::updateSysInfoExpiredTime</a></div><div class="ttdeci">void updateSysInfoExpiredTime(Datetime time)</div></div>
+<div class="ttc" id="anamespacehku_html_aaebf5f4a9e7146b9bac5330a619bd262"><div class="ttname"><a href="namespacehku.html#aaebf5f4a9e7146b9bac5330a619bd262">hku::getVersionWithBuild</a></div><div class="ttdeci">std::string HKU_API getVersionWithBuild()</div><div class="ttdoc">Get the detailed version number, including the build time</div></div>
+<div class="ttc" id="anamespacehku_html_ab26a3a3f5947a93dc602bf93d74486ed"><div class="ttname"><a href="namespacehku.html#ab26a3a3f5947a93dc602bf93d74486ed">hku::getVersion</a></div><div class="ttdeci">std::string HKU_API getVersion()</div><div class="ttdoc">Get the current version number of Hikyuu</div></div>
+<div class="ttc" id="anamespacehku_html_abe4abde4406e5f838d1ee7c3b4366877"><div class="ttname"><a href="namespacehku.html#abe4abde4406e5f838d1ee7c3b4366877">hku::getVersionWithGit</a></div><div class="ttdeci">std::string HKU_API getVersionWithGit()</div></div>
+<div class="ttc" id="anamespacehku_html_ac6e61b766185d8e723e8e3eaf172f1bf"><div class="ttname"><a href="namespacehku.html#ac6e61b766185d8e723e8e3eaf172f1bf">hku::sendPythonVersionFeedBack</a></div><div class="ttdeci">void HKU_API sendPythonVersionFeedBack(int major, int minor, int micro)</div><div class="ttdoc">Used to send the python version information</div></div>
+<div class="ttc" id="anamespacehku_html_adb54cfa18d67651a42f14589f83eb4df"><div class="ttname"><a href="namespacehku.html#adb54cfa18d67651a42f14589f83eb4df">hku::sendFeedback</a></div><div class="ttdeci">void HKU_API sendFeedback()</div><div class="ttdoc">Send the feedback information</div></div>
+<div class="ttc" id="anamespacehku_html_adc10098f6f63f494ad91e256faef975e"><div class="ttname"><a href="namespacehku.html#adc10098f6f63f494ad91e256faef975e">hku::CanUpgrade</a></div><div class="ttdeci">bool HKU_API CanUpgrade()</div><div class="ttdoc">Judge whether there is a newer version to upgrade to</div></div>
+<div class="ttc" id="anamespacehku_html_adcb861fff1cea42e7e45f95fbf714098"><div class="ttname"><a href="namespacehku.html#adcb861fff1cea42e7e45f95fbf714098">hku::setPythonInInteractive</a></div><div class="ttdeci">void HKU_API setPythonInInteractive(bool interactive)</div><div class="ttdoc">Set whether python runs in the interactive mode</div></div>
+<div class="ttc" id="anamespacehku_html_af8987b34a53a3275fd132de7605b5f43"><div class="ttname"><a href="namespacehku.html#af8987b34a53a3275fd132de7605b5f43">hku::setPythonInJupyter</a></div><div class="ttdeci">void HKU_API setPythonInJupyter(bool injupyter)</div><div class="ttdoc">Set whether it is running in the Jupyter environment</div></div>
+<div class="ttc" id="anamespacehku_html_af8ded98713a6fc53c4eef3d0a6e98db7"><div class="ttname"><a href="namespacehku.html#af8ded98713a6fc53c4eef3d0a6e98db7">hku::getLatestVersionInfo</a></div><div class="ttdeci">LatestVersionInfo HKU_API getLatestVersionInfo()</div></div>
+<div class="ttc" id="anamespacehku_html_afe4da0fb57da51e568b5e912252ddbd5"><div class="ttname"><a href="namespacehku.html#afe4da0fb57da51e568b5e912252ddbd5">hku::sysinfo_init</a></div><div class="ttdeci">void sysinfo_init()</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="anamespacestd_html_ab01df1f6515bec5ca434fba5f0b3d0de"><div class="ttname"><a href="namespacestd.html#ab01df1f6515bec5ca434fba5f0b3d0de">std::to_string</a></div><div class="ttdeci">string to_string(const hku::Indicator &amp;ind)</div><div class="ttdef"><b>定义</b> Indicator.h:538</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html"><div class="ttname"><a href="structhku_1_1_latest_version_info.html">hku::LatestVersionInfo</a></div><div class="ttdef"><b>定义</b> sysinfo.h:41</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_a18a6a657c37a49972b90d48f8e315348"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#a18a6a657c37a49972b90d48f8e315348">hku::LatestVersionInfo::remark</a></div><div class="ttdeci">std::string remark</div><div class="ttdef"><b>定义</b> sysinfo.h:44</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_a1d2b70b5aa92e8751c5c7b2e46848425"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#a1d2b70b5aa92e8751c5c7b2e46848425">hku::LatestVersionInfo::version</a></div><div class="ttdeci">int version</div><div class="ttdef"><b>定义</b> sysinfo.h:42</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_a3ab0f4f5c3148f9f5696e1294bd29cc5"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#a3ab0f4f5c3148f9f5696e1294bd29cc5">hku::LatestVersionInfo::operator=</a></div><div class="ttdeci">LatestVersionInfo &amp; operator=(LatestVersionInfo &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> sysinfo.h:49</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_a8699c727ab36964ca053d001e3e58d69"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#a8699c727ab36964ca053d001e3e58d69">hku::LatestVersionInfo::version_str</a></div><div class="ttdeci">std::string version_str() const</div><div class="ttdoc">Get the version as a dotted string, e.g.</div><div class="ttdef"><b>定义</b> sysinfo.h:62</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_a8d02a1834c1639bad41db705623f31e4"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#a8d02a1834c1639bad41db705623f31e4">hku::LatestVersionInfo::release_date</a></div><div class="ttdeci">Datetime release_date</div><div class="ttdef"><b>定义</b> sysinfo.h:43</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_ab08afbea2d6d007c1a324361627d815b"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#ab08afbea2d6d007c1a324361627d815b">hku::LatestVersionInfo::LatestVersionInfo</a></div><div class="ttdeci">LatestVersionInfo(const LatestVersionInfo &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_ad67464c51726d593ad3ee3b73de4ebde"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#ad67464c51726d593ad3ee3b73de4ebde">hku::LatestVersionInfo::LatestVersionInfo</a></div><div class="ttdeci">LatestVersionInfo(LatestVersionInfo &amp;&amp;rhs)</div><div class="ttdef"><b>定义</b> sysinfo.h:47</div></div>
+<div class="ttc" id="astructhku_1_1_latest_version_info_html_aedf8e78e2905a2cb56c8cca3958a4f9f"><div class="ttname"><a href="structhku_1_1_latest_version_info.html#aedf8e78e2905a2cb56c8cca3958a4f9f">hku::LatestVersionInfo::LatestVersionInfo</a></div><div class="ttdeci">LatestVersionInfo()=default</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_91fb09ec7b72bcc04f519cb3bd4f30a4.html">global</a></li><li class="navelem"><b>sysinfo.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

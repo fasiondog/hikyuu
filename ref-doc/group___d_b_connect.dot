@@ -1,0 +1,13 @@
+digraph "DB Connect database connection"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir=LR;
+  Node1 [id="Node000001",label="DB Connect database\l connection",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="The database connection utilities"];
+  Node3 [id="Node000003",label="SQLite3 driver, the\l SQLITE3 data driver",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___s_q_lite.html",tooltip=" "];
+  Node2 [id="Node000002",label="Utilities program utility\l collection",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___utilities.html",tooltip="A collection of independent small functions and object utilities"];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, dir="back", style="solid"];
+}

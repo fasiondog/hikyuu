@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::KData类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_k_data.html','','classhku_1_1_k_data-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,88 +74,146 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_k_data.html">KData</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="classhku_1_1_k_data-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::KData类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::KData类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage security management</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>K线数据  
- <a href="classhku_1_1_k_data.html#details">更多...</a></p>
+<p>K-line (candlestick) data  
+ <a href="#details">更多...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_k_d_a_t_a_8h_source.html">KData.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_k_data_8h_source.html">KData.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:const_5Fiterator" id="r_const_5Fiterator"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:af756ac6ec0fd5e7a5eb025a40224bf9a" id="r_af756ac6ec0fd5e7a5eb025a40224bf9a"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af756ac6ec0fd5e7a5eb025a40224bf9a">iterator</a> = <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:ad4cfef53b1feb9fa3aa8eddfd4f9e1ee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#ad4cfef53b1feb9fa3aa8eddfd4f9e1ee">KData</a> ()</td></tr>
-<tr class="separator:ad4cfef53b1feb9fa3aa8eddfd4f9e1ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8864b281950671a8f003abe46b118d3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#ac8864b281950671a8f003abe46b118d3">KData</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;)</td></tr>
-<tr class="separator:ac8864b281950671a8f003abe46b118d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb7abaae90551bd6a5cc035f42a9259c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#abb7abaae90551bd6a5cc035f42a9259c">KData</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
-<tr class="separator:abb7abaae90551bd6a5cc035f42a9259c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd226f7a9a39126ceacaacdc313ae8d9"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#acd226f7a9a39126ceacaacdc313ae8d9">~KData</a> ()</td></tr>
-<tr class="separator:acd226f7a9a39126ceacaacdc313ae8d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a940df02cd58e7935846d9e548d2b4b53"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a940df02cd58e7935846d9e548d2b4b53">operator=</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;)</td></tr>
-<tr class="separator:a940df02cd58e7935846d9e548d2b4b53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17f0993e0ab0dc440015eecab6974897"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a17f0993e0ab0dc440015eecab6974897">size</a> () const </td></tr>
-<tr class="separator:a17f0993e0ab0dc440015eecab6974897"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e58220b953e0e314c6419337bfba487"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a8e58220b953e0e314c6419337bfba487">empty</a> () const </td></tr>
-<tr class="separator:a8e58220b953e0e314c6419337bfba487"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55913ef88ce81ffa0c99b28e87e0e922"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a55913ef88ce81ffa0c99b28e87e0e922">getDatetimeList</a> () const </td></tr>
-<tr class="separator:a55913ef88ce81ffa0c99b28e87e0e922"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d357af244645be6568f164453f7e834"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_record.html">KRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a9d357af244645be6568f164453f7e834">getKRecord</a> (size_t pos) const </td></tr>
-<tr class="memdesc:a9d357af244645be6568f164453f7e834"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定位置的KRecord，未作越界检查  <a href="#a9d357af244645be6568f164453f7e834">更多...</a><br /></td></tr>
-<tr class="separator:a9d357af244645be6568f164453f7e834"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2452ea46de96f500439a2a476ff8a2cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_record.html">KRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a2452ea46de96f500439a2a476ff8a2cd">getKRecordByDate</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const </td></tr>
-<tr class="memdesc:a2452ea46de96f500439a2a476ff8a2cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">按日期查询KRecord  <a href="#a2452ea46de96f500439a2a476ff8a2cd">更多...</a><br /></td></tr>
-<tr class="separator:a2452ea46de96f500439a2a476ff8a2cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9769e00291287d9d3f26f270d0b60037"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_record.html">KRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a9769e00291287d9d3f26f270d0b60037">operator[]</a> (size_t pos) const </td></tr>
-<tr class="memdesc:a9769e00291287d9d3f26f270d0b60037"><td class="mdescLeft">&#160;</td><td class="mdescRight">同getKRecord  <a href="#a9769e00291287d9d3f26f270d0b60037">更多...</a><br /></td></tr>
-<tr class="separator:a9769e00291287d9d3f26f270d0b60037"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7d7b2f47c99860bb3b8fa0dca0ea773"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_record.html">KRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#af7d7b2f47c99860bb3b8fa0dca0ea773">operator[]</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const </td></tr>
-<tr class="memdesc:af7d7b2f47c99860bb3b8fa0dca0ea773"><td class="mdescLeft">&#160;</td><td class="mdescRight">同getKRecordByDate  <a href="#af7d7b2f47c99860bb3b8fa0dca0ea773">更多...</a><br /></td></tr>
-<tr class="separator:af7d7b2f47c99860bb3b8fa0dca0ea773"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61120e2f852b1bdf64d34b858ae99497"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a61120e2f852b1bdf64d34b858ae99497">getPos</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const </td></tr>
-<tr class="memdesc:a61120e2f852b1bdf64d34b858ae99497"><td class="mdescLeft">&#160;</td><td class="mdescRight">按日期查询对应的索引位置  <a href="#a61120e2f852b1bdf64d34b858ae99497">更多...</a><br /></td></tr>
-<tr class="separator:a61120e2f852b1bdf64d34b858ae99497"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a874d3243911f90bf507afcea7cb983e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a874d3243911f90bf507afcea7cb983e7">getQuery</a> () const </td></tr>
-<tr class="memdesc:a874d3243911f90bf507afcea7cb983e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取关联的KQuery  <a href="#a874d3243911f90bf507afcea7cb983e7">更多...</a><br /></td></tr>
-<tr class="separator:a874d3243911f90bf507afcea7cb983e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a039c14ac446470a2ad17dff15ec5ece7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a039c14ac446470a2ad17dff15ec5ece7">getStock</a> () const </td></tr>
-<tr class="memdesc:a039c14ac446470a2ad17dff15ec5ece7"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取关联的Stock，如果没有关联返回Null&lt;Stock&gt;  <a href="#a039c14ac446470a2ad17dff15ec5ece7">更多...</a><br /></td></tr>
-<tr class="separator:a039c14ac446470a2ad17dff15ec5ece7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93836d23aab9f55abc245388ceb57187"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a93836d23aab9f55abc245388ceb57187">startPos</a> () const </td></tr>
-<tr class="memdesc:a93836d23aab9f55abc245388ceb57187"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取在原始K线记录中对应的起始位置，如果为空返回0  <a href="#a93836d23aab9f55abc245388ceb57187">更多...</a><br /></td></tr>
-<tr class="separator:a93836d23aab9f55abc245388ceb57187"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e8da947b79bdf6f66ebe3cc52ad607a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a7e8da947b79bdf6f66ebe3cc52ad607a">lastPos</a> () const </td></tr>
-<tr class="memdesc:a7e8da947b79bdf6f66ebe3cc52ad607a"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1  <a href="#a7e8da947b79bdf6f66ebe3cc52ad607a">更多...</a><br /></td></tr>
-<tr class="separator:a7e8da947b79bdf6f66ebe3cc52ad607a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd2cf77708fd0d2aa638b1afad0c2c96"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#abd2cf77708fd0d2aa638b1afad0c2c96">endPos</a> () const </td></tr>
-<tr class="memdesc:abd2cf77708fd0d2aa638b1afad0c2c96"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1  <a href="#abd2cf77708fd0d2aa638b1afad0c2c96">更多...</a><br /></td></tr>
-<tr class="separator:abd2cf77708fd0d2aa638b1afad0c2c96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afffc00d1d9b506238cad0c609f270161"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#afffc00d1d9b506238cad0c609f270161">tocsv</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;filename)</td></tr>
-<tr class="memdesc:afffc00d1d9b506238cad0c609f270161"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出数据到指定的文件中  <a href="#afffc00d1d9b506238cad0c609f270161">更多...</a><br /></td></tr>
-<tr class="separator:afffc00d1d9b506238cad0c609f270161"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f6f57cf95076fc37d7bb982725b8c16"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data.html#a1f6f57cf95076fc37d7bb982725b8c16">toString</a> () const </td></tr>
-<tr class="separator:a1f6f57cf95076fc37d7bb982725b8c16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4cfef53b1feb9fa3aa8eddfd4f9e1ee" id="r_ad4cfef53b1feb9fa3aa8eddfd4f9e1ee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad4cfef53b1feb9fa3aa8eddfd4f9e1ee">KData</a> ()</td></tr>
+<tr class="memitem:a718fb490513896197b7cdb30772c23b0" id="r_a718fb490513896197b7cdb30772c23b0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a718fb490513896197b7cdb30772c23b0">KData</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;) noexcept</td></tr>
+<tr class="memitem:abb7abaae90551bd6a5cc035f42a9259c" id="r_abb7abaae90551bd6a5cc035f42a9259c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb7abaae90551bd6a5cc035f42a9259c">KData</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memitem:a31514cb5927dbfd0f1c4bd2f247f702d" id="r_a31514cb5927dbfd0f1c4bd2f247f702d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31514cb5927dbfd0f1c4bd2f247f702d">KData</a> (<a class="el" href="namespacehku.html#a03f95e2a1f93a1349d1a706b3e6fbe6d">KDataImpPtr</a> imp)</td></tr>
+<tr class="memitem:acd226f7a9a39126ceacaacdc313ae8d9" id="r_acd226f7a9a39126ceacaacdc313ae8d9"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd226f7a9a39126ceacaacdc313ae8d9">~KData</a> ()</td></tr>
+<tr class="memitem:aa46ae4bba2fcf321f9d0e74c09746e75" id="r_aa46ae4bba2fcf321f9d0e74c09746e75"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa46ae4bba2fcf321f9d0e74c09746e75">operator=</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;) noexcept</td></tr>
+<tr class="memitem:a88c5eb8acbee1b12e8f9125c36b9d313" id="r_a88c5eb8acbee1b12e8f9125c36b9d313"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88c5eb8acbee1b12e8f9125c36b9d313">KData</a> (<a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&amp;)</td></tr>
+<tr class="memitem:a016a7da709e7c889685b66db9cb78e18" id="r_a016a7da709e7c889685b66db9cb78e18"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a016a7da709e7c889685b66db9cb78e18">operator=</a> (<a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&amp;)</td></tr>
+<tr class="memitem:a3de9857898714a6b6fc343579cb98f3b" id="r_a3de9857898714a6b6fc343579cb98f3b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3de9857898714a6b6fc343579cb98f3b">size</a> () const noexcept</td></tr>
+<tr class="memitem:aefde83c2116a8a3c9079cea9dd53d159" id="r_aefde83c2116a8a3c9079cea9dd53d159"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aefde83c2116a8a3c9079cea9dd53d159">empty</a> () const noexcept</td></tr>
+<tr class="memitem:ad8aa37f13400691f6b2dc65e1899701e" id="r_ad8aa37f13400691f6b2dc65e1899701e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8aa37f13400691f6b2dc65e1899701e">operator==</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;) const noexcept</td></tr>
+<tr class="memdesc:ad8aa37f13400691f6b2dc65e1899701e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> as a lightweight "is this the same sequence, and has its content changed
+at the tail" check, used mainly by the downstream cache guards to decide whether to recompute  <br /></td></tr>
+<tr class="memitem:a3788ed1debf31454d3fbbd49a564a6bb" id="r_a3788ed1debf31454d3fbbd49a564a6bb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3788ed1debf31454d3fbbd49a564a6bb">operator!=</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;) const noexcept</td></tr>
+<tr class="memitem:ae8382eb9bb28143b872c442c985b95df" id="r_ae8382eb9bb28143b872c442c985b95df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8382eb9bb28143b872c442c985b95df">getDatetimeList</a> () const</td></tr>
+<tr class="memitem:a52ec07f9075f0f5eaa8ac2d6f2f8c340" id="r_a52ec07f9075f0f5eaa8ac2d6f2f8c340"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52ec07f9075f0f5eaa8ac2d6f2f8c340">getKRecord</a> (size_t pos) const noexcept</td></tr>
+<tr class="memdesc:a52ec07f9075f0f5eaa8ac2d6f2f8c340"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classhku_1_1_k_record.html" title="K-line data record">KRecord</a> at the given position, the null record is returned when it is out of range  <br /></td></tr>
+<tr class="memitem:aafd9767218d867731674f0865b16ab8f" id="r_aafd9767218d867731674f0865b16ab8f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aafd9767218d867731674f0865b16ab8f">getKRecord</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> datetime) const noexcept</td></tr>
+<tr class="memdesc:aafd9767218d867731674f0865b16ab8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query the <a class="el" href="classhku_1_1_k_record.html" title="K-line data record">KRecord</a> by date  <br /></td></tr>
+<tr class="memitem:a15869b0abfb3a3f8f24ee49db3653d1a" id="r_a15869b0abfb3a3f8f24ee49db3653d1a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15869b0abfb3a3f8f24ee49db3653d1a">operator[]</a> (size_t pos) const noexcept</td></tr>
+<tr class="memdesc:a15869b0abfb3a3f8f24ee49db3653d1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as getKRecord  <br /></td></tr>
+<tr class="memitem:a913f5cb5f2f47d9f1674da66925c2839" id="r_a913f5cb5f2f47d9f1674da66925c2839"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a913f5cb5f2f47d9f1674da66925c2839">operator[]</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> datetime) const</td></tr>
+<tr class="memdesc:a913f5cb5f2f47d9f1674da66925c2839"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as getKRecord  <br /></td></tr>
+<tr class="memitem:a7a86402ef08854ee6f1a255a58521300" id="r_a7a86402ef08854ee6f1a255a58521300"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a86402ef08854ee6f1a255a58521300">front</a> () const</td></tr>
+<tr class="memitem:a028cc2841ee3e9a1e872cc4f8e27163b" id="r_a028cc2841ee3e9a1e872cc4f8e27163b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a028cc2841ee3e9a1e872cc4f8e27163b">back</a> () const</td></tr>
+<tr class="memitem:ae04df36d0ddfdc5e582478773f3cdb9c" id="r_ae04df36d0ddfdc5e582478773f3cdb9c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae04df36d0ddfdc5e582478773f3cdb9c">getKData</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;start, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="#a76f739175df50bdcee1e3dedcd525295">end</a>) const</td></tr>
+<tr class="memdesc:ae04df36d0ddfdc5e582478773f3cdb9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a new <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> from the current one, keeping the data type and price adjustment type unchanged  <br /></td></tr>
+<tr class="memitem:ab28559489bc78f1e1ee4d5d2d1ac45f7" id="r_ab28559489bc78f1e1ee4d5d2d1ac45f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab28559489bc78f1e1ee4d5d2d1ac45f7">getKData</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query) const</td></tr>
+<tr class="memitem:a202b635cf96cf604b58e15aea7dde5d9" id="r_a202b635cf96cf604b58e15aea7dde5d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a202b635cf96cf604b58e15aea7dde5d9">getKData</a> (const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype) const</td></tr>
+<tr class="memdesc:a202b635cf96cf604b58e15aea7dde5d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the K-line data of another type over the same time range, e.g.  <br /></td></tr>
+<tr class="memitem:af38b8e3e6515875d5dd1112ec7c9777a" id="r_af38b8e3e6515875d5dd1112ec7c9777a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af38b8e3e6515875d5dd1112ec7c9777a">getSubKData</a> (<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> start, <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> <a class="el" href="#a76f739175df50bdcee1e3dedcd525295">end</a>=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &gt;()) const</td></tr>
+<tr class="memdesc:af38b8e3e6515875d5dd1112ec7c9777a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the subset [start, end) by index  <br /></td></tr>
+<tr class="memitem:a39fb5f8f23f56b61b51d7b78ced29787" id="r_a39fb5f8f23f56b61b51d7b78ced29787"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39fb5f8f23f56b61b51d7b78ced29787">getPos</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const noexcept</td></tr>
+<tr class="memdesc:a39fb5f8f23f56b61b51d7b78ced29787"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index position of the given date.  <br /></td></tr>
+<tr class="memitem:a269a5555b64059825e9add29ba0af187" id="r_a269a5555b64059825e9add29ba0af187"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a269a5555b64059825e9add29ba0af187">getPosInStock</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> datetime) const</td></tr>
+<tr class="memdesc:a269a5555b64059825e9add29ba0af187"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position in the original K-line record by date  <br /></td></tr>
+<tr class="memitem:ad659b7b9859272c3386ebe908b4d402d" id="r_ad659b7b9859272c3386ebe908b4d402d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad659b7b9859272c3386ebe908b4d402d">getQuery</a> () const</td></tr>
+<tr class="memdesc:ad659b7b9859272c3386ebe908b4d402d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the associated <a class="el" href="classhku_1_1_k_query.html" title="Query condition for K-line (candlestick) data by index">KQuery</a>  <br /></td></tr>
+<tr class="memitem:a803e0eaf464472be4f467b65b8e0ac38" id="r_a803e0eaf464472be4f467b65b8e0ac38"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a803e0eaf464472be4f467b65b8e0ac38">getStock</a> () const</td></tr>
+<tr class="memdesc:a803e0eaf464472be4f467b65b8e0ac38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the associated <a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a>; <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null&lt;Stock&gt;</a> is returned if there is no association  <br /></td></tr>
+<tr class="memitem:aa4d7e9ee52ba4634a8988cb27f63cc61" id="r_aa4d7e9ee52ba4634a8988cb27f63cc61"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4d7e9ee52ba4634a8988cb27f63cc61">startPos</a> () const</td></tr>
+<tr class="memdesc:aa4d7e9ee52ba4634a8988cb27f63cc61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the start position in the original K-line record; 0 if it is empty  <br /></td></tr>
+<tr class="memitem:a48e3449f99bb85a418c9ba319ec08cdf" id="r_a48e3449f99bb85a418c9ba319ec08cdf"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a48e3449f99bb85a418c9ba319ec08cdf">lastPos</a> () const</td></tr>
+<tr class="memdesc:a48e3449f99bb85a418c9ba319ec08cdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position of the last record in the original K-line record; 0 if it is empty, otherwise endPos - 1  <br /></td></tr>
+<tr class="memitem:a267e817057b7aa7fc3ad1831d21b911d" id="r_a267e817057b7aa7fc3ad1831d21b911d"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a267e817057b7aa7fc3ad1831d21b911d">endPos</a> () const</td></tr>
+<tr class="memdesc:a267e817057b7aa7fc3ad1831d21b911d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position of the next record after the range in the original K-line record; 0 if it is empty, otherwise lastPos + 1  <br /></td></tr>
+<tr class="memitem:afffc00d1d9b506238cad0c609f270161" id="r_afffc00d1d9b506238cad0c609f270161"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afffc00d1d9b506238cad0c609f270161">tocsv</a> (const string &amp;filename)</td></tr>
+<tr class="memdesc:afffc00d1d9b506238cad0c609f270161"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the data to the given file  <br /></td></tr>
+<tr class="memitem:ac397c3b0b5b694dd55de904822c4b6b7" id="r_ac397c3b0b5b694dd55de904822c4b6b7"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac397c3b0b5b694dd55de904822c4b6b7">toString</a> () const</td></tr>
+<tr class="memitem:a161dca20b57cca647c48bbf2b593a3be" id="r_a161dca20b57cca647c48bbf2b593a3be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a161dca20b57cca647c48bbf2b593a3be">open</a> () const</td></tr>
+<tr class="memdesc:a161dca20b57cca647c48bbf2b593a3be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open price  <br /></td></tr>
+<tr class="memitem:a3508d83bfe0ea78bb8578f94d27ff69e" id="r_a3508d83bfe0ea78bb8578f94d27ff69e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3508d83bfe0ea78bb8578f94d27ff69e">high</a> () const</td></tr>
+<tr class="memdesc:a3508d83bfe0ea78bb8578f94d27ff69e"><td class="mdescLeft">&#160;</td><td class="mdescRight">High price  <br /></td></tr>
+<tr class="memitem:af07a6ceb740d6cb7f7607a00add117ea" id="r_af07a6ceb740d6cb7f7607a00add117ea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af07a6ceb740d6cb7f7607a00add117ea">close</a> () const</td></tr>
+<tr class="memdesc:af07a6ceb740d6cb7f7607a00add117ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close price  <br /></td></tr>
+<tr class="memitem:a630015a28514a13d2c77e6a3e3dfd576" id="r_a630015a28514a13d2c77e6a3e3dfd576"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a630015a28514a13d2c77e6a3e3dfd576">low</a> () const</td></tr>
+<tr class="memdesc:a630015a28514a13d2c77e6a3e3dfd576"><td class="mdescLeft">&#160;</td><td class="mdescRight">Low price  <br /></td></tr>
+<tr class="memitem:a1a0b3cdd4beb29491b0a18cee300c68d" id="r_a1a0b3cdd4beb29491b0a18cee300c68d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a0b3cdd4beb29491b0a18cee300c68d">vol</a> () const</td></tr>
+<tr class="memdesc:a1a0b3cdd4beb29491b0a18cee300c68d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trading volume  <br /></td></tr>
+<tr class="memitem:ae61cb80b99ef176a89346f04d552885c" id="r_ae61cb80b99ef176a89346f04d552885c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae61cb80b99ef176a89346f04d552885c">amo</a> () const</td></tr>
+<tr class="memdesc:ae61cb80b99ef176a89346f04d552885c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trading amount  <br /></td></tr>
+<tr class="memitem:a2a0853f2d9ba26dff6ef9733786fff92" id="r_a2a0853f2d9ba26dff6ef9733786fff92"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2a0853f2d9ba26dff6ef9733786fff92">getOtherQueryByDate</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;start_datetime, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;end_datetime, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype) const</td></tr>
+<tr class="memdesc:a2a0853f2d9ba26dff6ef9733786fff92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Special purpose!  <br /></td></tr>
+<tr class="memitem:a91b4d72d2d2da709bafe6cdadf71e3b9" id="r_a91b4d72d2d2da709bafe6cdadf71e3b9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91b4d72d2d2da709bafe6cdadf71e3b9">data</a> () const noexcept</td></tr>
+<tr class="memitem:a85b71c2f3373b0872e821de80b8ad0f6" id="r_a85b71c2f3373b0872e821de80b8ad0f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a03f95e2a1f93a1349d1a706b3e6fbe6d">KDataImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85b71c2f3373b0872e821de80b8ad0f6">getImp</a> () const noexcept</td></tr>
+<tr class="memitem:a8523bc8c3ea38297d6d01fc7a8fa3774" id="r_a8523bc8c3ea38297d6d01fc7a8fa3774"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8523bc8c3ea38297d6d01fc7a8fa3774">begin</a> () const</td></tr>
+<tr class="memitem:a76f739175df50bdcee1e3dedcd525295" id="r_a76f739175df50bdcee1e3dedcd525295"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76f739175df50bdcee1e3dedcd525295">end</a> () const</td></tr>
+<tr class="memitem:a87b8b7c5e80087b967239af9aa9f99c1" id="r_a87b8b7c5e80087b967239af9aa9f99c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87b8b7c5e80087b967239af9aa9f99c1">cbegin</a> () const</td></tr>
+<tr class="memitem:a78b17d2b4ac99bbc507b041695943ab0" id="r_a78b17d2b4ac99bbc507b041695943ab0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78b17d2b4ac99bbc507b041695943ab0">cend</a> () const</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>K线数据 </p>
-</div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="ad4cfef53b1feb9fa3aa8eddfd4f9e1ee"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>K-line (candlestick) data </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="af756ac6ec0fd5e7a5eb025a40224bf9a" name="af756ac6ec0fd5e7a5eb025a40224bf9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af756ac6ec0fd5e7a5eb025a40224bf9a">&#9670;&#160;</a></span>iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#af756ac6ec0fd5e7a5eb025a40224bf9a">hku::KData::iterator</a> = <a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ad4cfef53b1feb9fa3aa8eddfd4f9e1ee" name="ad4cfef53b1feb9fa3aa8eddfd4f9e1ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4cfef53b1feb9fa3aa8eddfd4f9e1ee">&#9670;&#160;</a></span>KData() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::KData::KData </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a718fb490513896197b7cdb30772c23b0" name="a718fb490513896197b7cdb30772c23b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a718fb490513896197b7cdb30772c23b0">&#9670;&#160;</a></span>KData() <span class="overload">[2/5]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -170,70 +223,68 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">hku::KData::KData </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>x</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ac8864b281950671a8f003abe46b118d3"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::KData::KData </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<a id="abb7abaae90551bd6a5cc035f42a9259c" name="abb7abaae90551bd6a5cc035f42a9259c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb7abaae90551bd6a5cc035f42a9259c">&#9670;&#160;</a></span>KData() <span class="overload">[3/5]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="abb7abaae90551bd6a5cc035f42a9259c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::KData::KData </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td>
-          <td class="paramname"><em>query</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="acd226f7a9a39126ceacaacdc313ae8d9"></a>
+<a id="a31514cb5927dbfd0f1c4bd2f247f702d" name="a31514cb5927dbfd0f1c4bd2f247f702d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31514cb5927dbfd0f1c4bd2f247f702d">&#9670;&#160;</a></span>KData() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::KData::KData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a03f95e2a1f93a1349d1a706b3e6fbe6d">KDataImpPtr</a></td>          <td class="paramname"><span class="paramname"><em>imp</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acd226f7a9a39126ceacaacdc313ae8d9" name="acd226f7a9a39126ceacaacdc313ae8d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd226f7a9a39126ceacaacdc313ae8d9">&#9670;&#160;</a></span>~KData()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -243,21 +294,211 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">virtual hku::KData::~KData </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a8e58220b953e0e314c6419337bfba487"></a>
+<a id="a88c5eb8acbee1b12e8f9125c36b9d313" name="a88c5eb8acbee1b12e8f9125c36b9d313"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88c5eb8acbee1b12e8f9125c36b9d313">&#9670;&#160;</a></span>KData() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::KData::KData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>x</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ae61cb80b99ef176a89346f04d552885c" name="ae61cb80b99ef176a89346f04d552885c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae61cb80b99ef176a89346f04d552885c">&#9670;&#160;</a></span>amo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::KData::amo </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Trading amount </p>
+
+</div>
+</div>
+<a id="a028cc2841ee3e9a1e872cc4f8e27163b" name="a028cc2841ee3e9a1e872cc4f8e27163b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a028cc2841ee3e9a1e872cc4f8e27163b">&#9670;&#160;</a></span>back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KData::back </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8523bc8c3ea38297d6d01fc7a8fa3774" name="a8523bc8c3ea38297d6d01fc7a8fa3774"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8523bc8c3ea38297d6d01fc7a8fa3774">&#9670;&#160;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a> hku::KData::begin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87b8b7c5e80087b967239af9aa9f99c1" name="a87b8b7c5e80087b967239af9aa9f99c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87b8b7c5e80087b967239af9aa9f99c1">&#9670;&#160;</a></span>cbegin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a> hku::KData::cbegin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a78b17d2b4ac99bbc507b041695943ab0" name="a78b17d2b4ac99bbc507b041695943ab0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78b17d2b4ac99bbc507b041695943ab0">&#9670;&#160;</a></span>cend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a> hku::KData::cend </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af07a6ceb740d6cb7f7607a00add117ea" name="af07a6ceb740d6cb7f7607a00add117ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af07a6ceb740d6cb7f7607a00add117ea">&#9670;&#160;</a></span>close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::KData::close </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Close price </p>
+
+</div>
+</div>
+<a id="a91b4d72d2d2da709bafe6cdadf71e3b9" name="a91b4d72d2d2da709bafe6cdadf71e3b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91b4d72d2d2da709bafe6cdadf71e3b9">&#9670;&#160;</a></span>data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> * hku::KData::data </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aefde83c2116a8a3c9079cea9dd53d159" name="aefde83c2116a8a3c9079cea9dd53d159"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefde83c2116a8a3c9079cea9dd53d159">&#9670;&#160;</a></span>empty()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -267,20 +508,47 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bool hku::KData::empty </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="abd2cf77708fd0d2aa638b1afad0c2c96"></a>
+<a id="a76f739175df50bdcee1e3dedcd525295" name="a76f739175df50bdcee1e3dedcd525295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76f739175df50bdcee1e3dedcd525295">&#9670;&#160;</a></span>end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data_1_1const__iterator.html">const_iterator</a> hku::KData::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a267e817057b7aa7fc3ad1831d21b911d" name="a267e817057b7aa7fc3ad1831d21b911d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a267e817057b7aa7fc3ad1831d21b911d">&#9670;&#160;</a></span>endPos()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -290,22 +558,49 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">size_t hku::KData::endPos </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1 </p>
+<p>Get the position of the next record after the range in the original K-line record; 0 if it is empty, otherwise lastPos + 1 </p>
 
 </div>
 </div>
-<a class="anchor" id="a55913ef88ce81ffa0c99b28e87e0e922"></a>
+<a id="a7a86402ef08854ee6f1a255a58521300" name="a7a86402ef08854ee6f1a255a58521300"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a86402ef08854ee6f1a255a58521300">&#9670;&#160;</a></span>front()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KData::front </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae8382eb9bb28143b872c442c985b95df" name="ae8382eb9bb28143b872c442c985b95df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8382eb9bb28143b872c442c985b95df">&#9670;&#160;</a></span>getDatetimeList()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -315,20 +610,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::KData::getDatetimeList </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a9d357af244645be6568f164453f7e834"></a>
+<a id="a85b71c2f3373b0872e821de80b8ad0f6" name="a85b71c2f3373b0872e821de80b8ad0f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85b71c2f3373b0872e821de80b8ad0f6">&#9670;&#160;</a></span>getImp()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -336,25 +633,98 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_record.html">KRecord</a> hku::KData::getKRecord </td>
+          <td class="memname"><a class="el" href="namespacehku.html#a03f95e2a1f93a1349d1a706b3e6fbe6d">KDataImpPtr</a> hku::KData::getImp </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取指定位置的KRecord，未作越界检查 </p>
+</div>
+</div>
+<a id="ae04df36d0ddfdc5e582478773f3cdb9c" name="ae04df36d0ddfdc5e582478773f3cdb9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae04df36d0ddfdc5e582478773f3cdb9c">&#9670;&#160;</a></span>getKData() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::KData::getKData </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>end</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get a new <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> from the current one, keeping the data type and price adjustment type unchanged </p>
+<dl class="section note"><dt>注解</dt><dd>The new <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> is not necessarily a subset of the original one </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start</td><td>start date </td></tr>
+    <tr><td class="paramname">end</td><td>end date </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="a2452ea46de96f500439a2a476ff8a2cd"></a>
+<a id="ab28559489bc78f1e1ee4d5d2d1ac45f7" name="ab28559489bc78f1e1ee4d5d2d1ac45f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab28559489bc78f1e1ee4d5d2d1ac45f7">&#9670;&#160;</a></span>getKData() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::KData::getKData </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a202b635cf96cf604b58e15aea7dde5d9" name="a202b635cf96cf604b58e15aea7dde5d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a202b635cf96cf604b58e15aea7dde5d9">&#9670;&#160;</a></span>getKData() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::KData::getKData </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the K-line data of another type over the same time range, e.g. </p>
+<p>the minute data corresponding to the daily data </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ktype</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> </dd></dl>
+
+</div>
+</div>
+<a id="aafd9767218d867731674f0865b16ab8f" name="aafd9767218d867731674f0865b16ab8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafd9767218d867731674f0865b16ab8f">&#9670;&#160;</a></span>getKRecord() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -362,25 +732,96 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_record.html">KRecord</a> hku::KData::getKRecordByDate </td>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KData::getKRecord </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>按日期查询KRecord </p>
+<p>Query the <a class="el" href="classhku_1_1_k_record.html" title="K-line data record">KRecord</a> by date </p>
 
 </div>
 </div>
-<a class="anchor" id="a61120e2f852b1bdf64d34b858ae99497"></a>
+<a id="a52ec07f9075f0f5eaa8ac2d6f2f8c340" name="a52ec07f9075f0f5eaa8ac2d6f2f8c340"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52ec07f9075f0f5eaa8ac2d6f2f8c340">&#9670;&#160;</a></span>getKRecord() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KData::getKRecord </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the <a class="el" href="classhku_1_1_k_record.html" title="K-line data record">KRecord</a> at the given position, the null record is returned when it is out of range </p>
+
+</div>
+</div>
+<a id="a2a0853f2d9ba26dff6ef9733786fff92" name="a2a0853f2d9ba26dff6ef9733786fff92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a0853f2d9ba26dff6ef9733786fff92">&#9670;&#160;</a></span>getOtherQueryByDate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_query.html">KQuery</a> hku::KData::getOtherQueryByDate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>start_datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>end_datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Special purpose! </p>
+<p>Use with care! Get a query condition by date for another K-line type over the given date range, based on the current K-line range </p><dl class="section note"><dt>注解</dt><dd><ol type="1">
+<li>The given date range must fall inside the current K-line data range, otherwise it is truncated to the K-line range</li>
+<li>The precision of start_datetime / end_datetime should match the current <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a></li>
+<li>If the original end condition is Null&lt;Datetime&gt;() and end_datetime is not given, the returned query condition is Null&lt;Datetime&gt;() </li>
+</ol>
+</dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_datetime</td><td></td></tr>
+    <tr><td class="paramname">end_datetime</td><td></td></tr>
+    <tr><td class="paramname">ktype</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> </dd></dl>
+
+</div>
+</div>
+<a id="a39fb5f8f23f56b61b51d7b78ced29787" name="a39fb5f8f23f56b61b51d7b78ced29787"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39fb5f8f23f56b61b51d7b78ced29787">&#9670;&#160;</a></span>getPos()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -390,23 +831,44 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">size_t hku::KData::getPos </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>按日期查询对应的索引位置 </p>
+<p>Get the index position of the given date. </p>
+<p>Note: it is the position inside this <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a>, not the position of the original K-line record in the <a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="a874d3243911f90bf507afcea7cb983e7"></a>
+<a id="a269a5555b64059825e9add29ba0af187" name="a269a5555b64059825e9add29ba0af187"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a269a5555b64059825e9add29ba0af187">&#9670;&#160;</a></span>getPosInStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::KData::getPosInStock </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the position in the original K-line record by date </p>
+
+</div>
+</div>
+<a id="ad659b7b9859272c3386ebe908b4d402d" name="ad659b7b9859272c3386ebe908b4d402d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad659b7b9859272c3386ebe908b4d402d">&#9670;&#160;</a></span>getQuery()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -414,24 +876,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html">KQuery</a> hku::KData::getQuery </td>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp; hku::KData::getQuery </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取关联的KQuery </p>
+<p>Get the associated <a class="el" href="classhku_1_1_k_query.html" title="Query condition for K-line (candlestick) data by index">KQuery</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="a039c14ac446470a2ad17dff15ec5ece7"></a>
+<a id="a803e0eaf464472be4f467b65b8e0ac38" name="a803e0eaf464472be4f467b65b8e0ac38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a803e0eaf464472be4f467b65b8e0ac38">&#9670;&#160;</a></span>getStock()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -439,24 +903,76 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::KData::getStock </td>
+          <td class="memname">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp; hku::KData::getStock </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取关联的Stock，如果没有关联返回Null&lt;Stock&gt; </p>
+<p>Get the associated <a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a>; <a class="el" href="classhku_1_1_null.html" title="It provides the Null value of the given type">Null&lt;Stock&gt;</a> is returned if there is no association </p>
 
 </div>
 </div>
-<a class="anchor" id="a7e8da947b79bdf6f66ebe3cc52ad607a"></a>
+<a id="af38b8e3e6515875d5dd1112ec7c9777a" name="af38b8e3e6515875d5dd1112ec7c9777a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af38b8e3e6515875d5dd1112ec7c9777a">&#9670;&#160;</a></span>getSubKData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::KData::getSubKData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a></td>          <td class="paramname"><span class="paramname"><em>end</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="classhku_1_1_null.html">Null</a>&lt;&#160;<a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a>&#160;&gt;()</span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the subset [start, end) by index </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start</td><td>start index </td></tr>
+    <tr><td class="paramname">end</td><td>end index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> </dd></dl>
+
+</div>
+</div>
+<a id="a3508d83bfe0ea78bb8578f94d27ff69e" name="a3508d83bfe0ea78bb8578f94d27ff69e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3508d83bfe0ea78bb8578f94d27ff69e">&#9670;&#160;</a></span>high()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::KData::high </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>High price </p>
+
+</div>
+</div>
+<a id="a48e3449f99bb85a418c9ba319ec08cdf" name="a48e3449f99bb85a418c9ba319ec08cdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48e3449f99bb85a418c9ba319ec08cdf">&#9670;&#160;</a></span>lastPos()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -466,22 +982,87 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">size_t hku::KData::lastPos </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1 </p>
+<p>Get the position of the last record in the original K-line record; 0 if it is empty, otherwise endPos - 1 </p>
 
 </div>
 </div>
-<a class="anchor" id="a940df02cd58e7935846d9e548d2b4b53"></a>
+<a id="a630015a28514a13d2c77e6a3e3dfd576" name="a630015a28514a13d2c77e6a3e3dfd576"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a630015a28514a13d2c77e6a3e3dfd576">&#9670;&#160;</a></span>low()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::KData::low </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Low price </p>
+
+</div>
+</div>
+<a id="a161dca20b57cca647c48bbf2b593a3be" name="a161dca20b57cca647c48bbf2b593a3be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a161dca20b57cca647c48bbf2b593a3be">&#9670;&#160;</a></span>open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::KData::open </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Open price </p>
+
+</div>
+</div>
+<a id="a3788ed1debf31454d3fbbd49a564a6bb" name="a3788ed1debf31454d3fbbd49a564a6bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3788ed1debf31454d3fbbd49a564a6bb">&#9670;&#160;</a></span>operator!=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::KData::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa46ae4bba2fcf321f9d0e74c09746e75" name="aa46ae4bba2fcf321f9d0e74c09746e75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa46ae4bba2fcf321f9d0e74c09746e75">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -491,21 +1072,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp; hku::KData::operator= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>x</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a9769e00291287d9d3f26f270d0b60037"></a>
+<a id="a016a7da709e7c889685b66db9cb78e18" name="a016a7da709e7c889685b66db9cb78e18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a016a7da709e7c889685b66db9cb78e18">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -513,26 +1095,24 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_record.html">KRecord</a> hku::KData::operator[] </td>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp; hku::KData::operator= </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>x</em></span></td><td>)</td>
+          <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>同getKRecord </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_k_data.html#a9d357af244645be6568f164453f7e834" title="获取指定位置的KRecord，未作越界检查 ">getKRecord</a> </dd></dl>
+</div>
+</div>
+<a id="ad8aa37f13400691f6b2dc65e1899701e" name="ad8aa37f13400691f6b2dc65e1899701e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8aa37f13400691f6b2dc65e1899701e">&#9670;&#160;</a></span>operator==()</h2>
 
-</div>
-</div>
-<a class="anchor" id="af7d7b2f47c99860bb3b8fa0dca0ea773"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -540,26 +1120,90 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_record.html">KRecord</a> hku::KData::operator[] </td>
+          <td class="memname">bool hku::KData::operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>同getKRecordByDate </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_k_data.html#a2452ea46de96f500439a2a476ff8a2cd" title="按日期查询KRecord ">getKRecordByDate</a> </dd></dl>
+<p>Compare two <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> as a lightweight "is this the same sequence, and has its content changed
+at the tail" check, used mainly by the downstream cache guards to decide whether to recompute </p>
+<p>It is not a full element-wise comparison. The rules are, in order:</p><ul>
+<li>the same object, or backed by the same imp -&gt; equal;</li>
+<li>different stocks (or one side null) -&gt; handled by the stock checks;</li>
+<li>same stock + query + size -&gt; compare only the last <a class="el" href="classhku_1_1_k_record.html" title="K-line data record">KRecord</a> (<a class="el" href="#a028cc2841ee3e9a1e872cc4f8e27163b">back()</a>).</li>
+</ul>
+<p>Real-time scenario: with a right-open (exclusive end) <a class="el" href="classhku_1_1_k_query.html" title="Query condition for K-line (candlestick) data by index">KQuery</a>, a freshly built <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> over the same query picks up the latest revised or extended bar, so comparing a <em>different</em> <a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a> against the cached one differs in size or in the last record -&gt; not equal -&gt; recompute is triggered. Reusing the <em>same</em> KData/imp short-circuits to equal and can never observe an in-place buffer revision, since both sides read the same memory.</p>
+<dl class="section note"><dt>注解</dt><dd>Only the last record is compared, so a revision to any intermediate bar is not detected; this is an O(1) heuristic, not content equality. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a17f0993e0ab0dc440015eecab6974897"></a>
+<a id="a913f5cb5f2f47d9f1674da66925c2839" name="a913f5cb5f2f47d9f1674da66925c2839"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a913f5cb5f2f47d9f1674da66925c2839">&#9670;&#160;</a></span>operator[]() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KData::operator[] </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Same as getKRecord </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a52ec07f9075f0f5eaa8ac2d6f2f8c340" title="Get the KRecord at the given position, the null record is returned when it is out of range">getKRecord</a> </dd></dl>
+
+</div>
+</div>
+<a id="a15869b0abfb3a3f8f24ee49db3653d1a" name="a15869b0abfb3a3f8f24ee49db3653d1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15869b0abfb3a3f8f24ee49db3653d1a">&#9670;&#160;</a></span>operator[]() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KData::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Same as getKRecord </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="#a52ec07f9075f0f5eaa8ac2d6f2f8c340" title="Get the KRecord at the given position, the null record is returned when it is out of range">getKRecord</a> </dd></dl>
+
+</div>
+</div>
+<a id="a3de9857898714a6b6fc343579cb98f3b" name="a3de9857898714a6b6fc343579cb98f3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3de9857898714a6b6fc343579cb98f3b">&#9670;&#160;</a></span>size()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -569,20 +1213,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">size_t hku::KData::size </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a93836d23aab9f55abc245388ceb57187"></a>
+<a id="aa4d7e9ee52ba4634a8988cb27f63cc61" name="aa4d7e9ee52ba4634a8988cb27f63cc61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4d7e9ee52ba4634a8988cb27f63cc61">&#9670;&#160;</a></span>startPos()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -592,47 +1238,50 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">size_t hku::KData::startPos </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取在原始K线记录中对应的起始位置，如果为空返回0 </p>
+<p>Get the start position in the original K-line record; 0 if it is empty </p>
 
 </div>
 </div>
-<a class="anchor" id="afffc00d1d9b506238cad0c609f270161"></a>
+<a id="afffc00d1d9b506238cad0c609f270161" name="afffc00d1d9b506238cad0c609f270161"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afffc00d1d9b506238cad0c609f270161">&#9670;&#160;</a></span>tocsv()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::KData::tocsv </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>filename</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>输出数据到指定的文件中 </p>
+<p>Write the data to the given file </p>
 
 </div>
 </div>
-<a class="anchor" id="a1f6f57cf95076fc37d7bb982725b8c16"></a>
+<a id="ac397c3b0b5b694dd55de904822c4b6b7" name="ac397c3b0b5b694dd55de904822c4b6b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac397c3b0b5b694dd55de904822c4b6b7">&#9670;&#160;</a></span>toString()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::KData::toString </td>
+          <td class="memname">string hku::KData::toString </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -640,17 +1289,47 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
+<a id="a1a0b3cdd4beb29491b0a18cee300c68d" name="a1a0b3cdd4beb29491b0a18cee300c68d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a0b3cdd4beb29491b0a18cee300c68d">&#9670;&#160;</a></span>vol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::KData::vol </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Trading volume </p>
+
+</div>
+</div>
 <hr/>该类的文档由以下文件生成:<ul>
-<li>hikyuu/<a class="el" href="_k_d_a_t_a_8h_source.html">KData.h</a></li>
-<li>hikyuu/<a class="el" href="_k_data_8cpp.html">KData.cpp</a></li>
+<li>hikyuu/<a class="el" href="_k_data_8h_source.html">KData.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_k_data.html">KData</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

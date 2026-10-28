@@ -1,0 +1,230 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/StrategyContext.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_strategy_context_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">StrategyContext.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright(C) 2021 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Create on: 2021-02-10</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *     Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;DataType.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;KQuery.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span></div>
+<div class="foldopen" id="foldopen00021" data-start="{" data-end="};">
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html">   21</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_strategy_context.html#ad86e4f119e661a7fba40ed0b01ca7c3c">StrategyContext</a> {</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#ad86e4f119e661a7fba40ed0b01ca7c3c">   23</a></span>    <a class="code hl_function" href="classhku_1_1_strategy_context.html#ad86e4f119e661a7fba40ed0b01ca7c3c">StrategyContext</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#afb70da5b7a9cdf44ce4fd9f2b864797d">   24</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#afb70da5b7a9cdf44ce4fd9f2b864797d">~StrategyContext</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#af7353f8964a9a762c9a3d0247819f321">   30</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#af7353f8964a9a762c9a3d0247819f321">StrategyContext</a>(<span class="keyword">const</span> vector&lt;string&gt;&amp; stockCodeList);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#ad510a00e9c437d5f03864906db419077">   43</a></span>    <a class="code hl_function" href="classhku_1_1_strategy_context.html#ad510a00e9c437d5f03864906db419077">StrategyContext</a>(<span class="keyword">const</span> vector&lt;string&gt;&amp; stockCodeList, <span class="keyword">const</span> vector&lt;KQuery::KType&gt;&amp; ktypeList,</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                    <span class="keyword">const</span> unordered_map&lt;string, int64_t&gt;&amp; preloadNum = {});</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="comment">// A user-defined move constructor and assignment cause python to fail to exit normally</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="comment">// StrategyContext(const StrategyContext&amp;) = default;</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="comment">// StrategyContext(StrategyContext&amp;&amp; rv) = delete;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="comment">// StrategyContext&amp; operator=(const StrategyContext&amp;) = default;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="comment">// StrategyContext&amp; operator=(StrategyContext&amp;&amp;) = delete;</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#ab4585a991dcfeb0aff49c3e9d75145e0">   58</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#ab4585a991dcfeb0aff49c3e9d75145e0">isAll</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="foldopen" id="foldopen00060" data-start="{" data-end="}">
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#a40ae5b9a808c25ad88dc690af599e995">   60</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#a40ae5b9a808c25ad88dc690af599e995">empty</a>() const noexcept {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keywordflow">return</span> m_stockCodeList.empty();</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    }</div>
+</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="foldopen" id="foldopen00064" data-start="{" data-end="}">
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#a2ad5a5cad590fa14b70f48c9b90012b2">   64</a></span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_function" href="classhku_1_1_strategy_context.html#a2ad5a5cad590fa14b70f48c9b90012b2">startDatetime</a>() const noexcept {</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keywordflow">return</span> m_startDatetime;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    }</div>
+</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="foldopen" id="foldopen00068" data-start="{" data-end="}">
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#a01e4d41a778461ead9de1ef11fb48675">   68</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#a01e4d41a778461ead9de1ef11fb48675">setStockCodeList</a>(<span class="keyword">const</span> vector&lt;string&gt;&amp; stockList) {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        _removeDuplicateCode(stockList);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    }</div>
+</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="foldopen" id="foldopen00072" data-start="{" data-end="}">
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#ab69c76ccce8c9b059e04bc49c1ad2e00">   72</a></span>    <span class="keyword">const</span> vector&lt;string&gt;&amp; <a class="code hl_function" href="classhku_1_1_strategy_context.html#ab69c76ccce8c9b059e04bc49c1ad2e00">getStockCodeList</a>() const noexcept {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="keywordflow">return</span> m_stockCodeList;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    }</div>
+</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="foldopen" id="foldopen00076" data-start="{" data-end="}">
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#acf090d24bca4d35029f17ac753648c5b">   76</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#acf090d24bca4d35029f17ac753648c5b">setKTypeList</a>(<span class="keyword">const</span> vector&lt;KQuery::KType&gt;&amp; ktypeList) {</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        _checkAndRemoveDuplicateKType(ktypeList);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    }</div>
+</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="foldopen" id="foldopen00080" data-start="{" data-end="}">
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#a150d214499e4abe6296f8e19239630d4">   80</a></span>    <span class="keyword">const</span> vector&lt;KQuery::KType&gt;&amp; <a class="code hl_function" href="classhku_1_1_strategy_context.html#a150d214499e4abe6296f8e19239630d4">getKTypeList</a>() const noexcept {</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">return</span> m_ktypeList;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#a0b92a53ab502819c3452c99a951be147">   84</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#a0b92a53ab502819c3452c99a951be147">setPreloadNum</a>(<span class="keyword">const</span> unordered_map&lt;string, int64_t&gt;&amp; preloadNum);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="foldopen" id="foldopen00086" data-start="{" data-end="}">
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#aa02d61f7a86833ba0247ebde0133e023">   86</a></span>    <span class="keyword">const</span> unordered_map&lt;string, int64_t&gt;&amp; <a class="code hl_function" href="classhku_1_1_strategy_context.html#aa02d61f7a86833ba0247ebde0133e023">getPreloadNum</a>() const noexcept {</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">return</span> m_preloadNum;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    }</div>
+</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span></div>
+<div class="foldopen" id="foldopen00096" data-start="{" data-end="}">
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#aa458eda0018d517af4ad5546d8d8668e">   96</a></span>    <span class="keyword">const</span> vector&lt;string&gt;&amp; <a class="code hl_function" href="classhku_1_1_strategy_context.html#aa458eda0018d517af4ad5546d8d8668e">getMustLoadStockCodeList</a>() const noexcept {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <span class="keywordflow">return</span> m_mustLoad;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    }</div>
+</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#a41cdc5f5d280860ca67b1a7d03c9e205">  105</a></span>    vector&lt;string&gt; <a class="code hl_function" href="classhku_1_1_strategy_context.html#a41cdc5f5d280860ca67b1a7d03c9e205">getAllNeedLoadStockCodeList</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="classhku_1_1_strategy_context.html#ab967e031577562a6b5ff41a86ba71dc1">  107</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_strategy_context.html#ab967e031577562a6b5ff41a86ba71dc1">str</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">void</span> _removeDuplicateCode(<span class="keyword">const</span> vector&lt;string&gt;&amp; stockCodeList);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordtype">void</span> _checkAndRemoveDuplicateKType(<span class="keyword">const</span> vector&lt;KQuery::KType&gt;&amp; ktypeList);</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> m_startDatetime{19901219};</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    vector&lt;string&gt; m_mustLoad{<span class="stringliteral">&quot;SH000001&quot;</span>, <span class="stringliteral">&quot;SH000300&quot;</span>};  <span class="comment">// The stock that must be loaded by default</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    vector&lt;string&gt; m_stockCodeList;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    vector&lt;KQuery::KType&gt; m_ktypeList;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    unordered_map&lt;string, int64_t&gt; m_preloadNum;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>};</div>
+</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="namespacehku.html#a90714ff1eef9089f545cc7376837137d">  121</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp; os, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_strategy_context.html">StrategyContext</a>&amp; context);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html"><div class="ttname"><a href="classhku_1_1_strategy_context.html">hku::StrategyContext</a></div><div class="ttdoc">Strategy context, it defines the security / K-line level information contained when the strategy is e...</div><div class="ttdef"><b>定义</b> StrategyContext.h:21</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_a01e4d41a778461ead9de1ef11fb48675"><div class="ttname"><a href="classhku_1_1_strategy_context.html#a01e4d41a778461ead9de1ef11fb48675">hku::StrategyContext::setStockCodeList</a></div><div class="ttdeci">void setStockCodeList(const vector&lt; string &gt; &amp;stockList)</div><div class="ttdef"><b>定义</b> StrategyContext.h:68</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_a0b92a53ab502819c3452c99a951be147"><div class="ttname"><a href="classhku_1_1_strategy_context.html#a0b92a53ab502819c3452c99a951be147">hku::StrategyContext::setPreloadNum</a></div><div class="ttdeci">void setPreloadNum(const unordered_map&lt; string, int64_t &gt; &amp;preloadNum)</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_a150d214499e4abe6296f8e19239630d4"><div class="ttname"><a href="classhku_1_1_strategy_context.html#a150d214499e4abe6296f8e19239630d4">hku::StrategyContext::getKTypeList</a></div><div class="ttdeci">const vector&lt; KQuery::KType &gt; &amp; getKTypeList() const noexcept</div><div class="ttdef"><b>定义</b> StrategyContext.h:80</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_a2ad5a5cad590fa14b70f48c9b90012b2"><div class="ttname"><a href="classhku_1_1_strategy_context.html#a2ad5a5cad590fa14b70f48c9b90012b2">hku::StrategyContext::startDatetime</a></div><div class="ttdeci">Datetime startDatetime() const noexcept</div><div class="ttdef"><b>定义</b> StrategyContext.h:64</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_a40ae5b9a808c25ad88dc690af599e995"><div class="ttname"><a href="classhku_1_1_strategy_context.html#a40ae5b9a808c25ad88dc690af599e995">hku::StrategyContext::empty</a></div><div class="ttdeci">bool empty() const noexcept</div><div class="ttdef"><b>定义</b> StrategyContext.h:60</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_a41cdc5f5d280860ca67b1a7d03c9e205"><div class="ttname"><a href="classhku_1_1_strategy_context.html#a41cdc5f5d280860ca67b1a7d03c9e205">hku::StrategyContext::getAllNeedLoadStockCodeList</a></div><div class="ttdeci">vector&lt; string &gt; getAllNeedLoadStockCodeList() const</div><div class="ttdoc">Return all the security code lists that need to be loaded (including the given security list and the ...</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_aa02d61f7a86833ba0247ebde0133e023"><div class="ttname"><a href="classhku_1_1_strategy_context.html#aa02d61f7a86833ba0247ebde0133e023">hku::StrategyContext::getPreloadNum</a></div><div class="ttdeci">const unordered_map&lt; string, int64_t &gt; &amp; getPreloadNum() const noexcept</div><div class="ttdef"><b>定义</b> StrategyContext.h:86</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_aa458eda0018d517af4ad5546d8d8668e"><div class="ttname"><a href="classhku_1_1_strategy_context.html#aa458eda0018d517af4ad5546d8d8668e">hku::StrategyContext::getMustLoadStockCodeList</a></div><div class="ttdeci">const vector&lt; string &gt; &amp; getMustLoadStockCodeList() const noexcept</div><div class="ttdoc">The implicit security list that must be loaded by default</div><div class="ttdef"><b>定义</b> StrategyContext.h:96</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_ab4585a991dcfeb0aff49c3e9d75145e0"><div class="ttname"><a href="classhku_1_1_strategy_context.html#ab4585a991dcfeb0aff49c3e9d75145e0">hku::StrategyContext::isAll</a></div><div class="ttdeci">bool isAll() const</div><div class="ttdoc">Whether all the securities are loaded; as long as stockCodeList contains &quot;ALL&quot;(case insensitive) it i...</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_ab69c76ccce8c9b059e04bc49c1ad2e00"><div class="ttname"><a href="classhku_1_1_strategy_context.html#ab69c76ccce8c9b059e04bc49c1ad2e00">hku::StrategyContext::getStockCodeList</a></div><div class="ttdeci">const vector&lt; string &gt; &amp; getStockCodeList() const noexcept</div><div class="ttdef"><b>定义</b> StrategyContext.h:72</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_ab967e031577562a6b5ff41a86ba71dc1"><div class="ttname"><a href="classhku_1_1_strategy_context.html#ab967e031577562a6b5ff41a86ba71dc1">hku::StrategyContext::str</a></div><div class="ttdeci">string str() const</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_acf090d24bca4d35029f17ac753648c5b"><div class="ttname"><a href="classhku_1_1_strategy_context.html#acf090d24bca4d35029f17ac753648c5b">hku::StrategyContext::setKTypeList</a></div><div class="ttdeci">void setKTypeList(const vector&lt; KQuery::KType &gt; &amp;ktypeList)</div><div class="ttdef"><b>定义</b> StrategyContext.h:76</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_ad510a00e9c437d5f03864906db419077"><div class="ttname"><a href="classhku_1_1_strategy_context.html#ad510a00e9c437d5f03864906db419077">hku::StrategyContext::StrategyContext</a></div><div class="ttdeci">StrategyContext(const vector&lt; string &gt; &amp;stockCodeList, const vector&lt; KQuery::KType &gt; &amp;ktypeList, const unordered_map&lt; string, int64_t &gt; &amp;preloadNum={})</div><div class="ttdoc">Constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_ad86e4f119e661a7fba40ed0b01ca7c3c"><div class="ttname"><a href="classhku_1_1_strategy_context.html#ad86e4f119e661a7fba40ed0b01ca7c3c">hku::StrategyContext::StrategyContext</a></div><div class="ttdeci">StrategyContext()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_af7353f8964a9a762c9a3d0247819f321"><div class="ttname"><a href="classhku_1_1_strategy_context.html#af7353f8964a9a762c9a3d0247819f321">hku::StrategyContext::StrategyContext</a></div><div class="ttdeci">StrategyContext(const vector&lt; string &gt; &amp;stockCodeList)</div><div class="ttdoc">Constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_strategy_context_html_afb70da5b7a9cdf44ce4fd9f2b864797d"><div class="ttname"><a href="classhku_1_1_strategy_context.html#afb70da5b7a9cdf44ce4fd9f2b864797d">hku::StrategyContext::~StrategyContext</a></div><div class="ttdeci">virtual ~StrategyContext()=default</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><b>StrategyContext.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

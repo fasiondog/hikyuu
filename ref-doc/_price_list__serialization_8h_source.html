@@ -1,0 +1,182 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/serialization/PriceList_serialization.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_price_list__serialization_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">PriceList_serialization.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * PriceList_serialization.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2019-5-26</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef PRICELIST_SERIALIZATION_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define PRICELIST_SERIALIZATION_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../config.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../DataType.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#if HKU_SUPPORT_XML_ARCHIVE</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceboost.html">boost</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceboost_1_1serialization.html">serialization</a> {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="foldopen" id="foldopen00021" data-start="{" data-end="}">
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="namespaceboost_1_1serialization.html#a052e00e73a625c1f6a15460585911533">   21</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceboost_1_1serialization.html#a385c86ab96592633f8b87adeb213c8a5">save</a>(Archive&amp; ar, <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a>&amp; values, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">size_t</span> count = values.size();</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> item_version = 0;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    ar&amp; BOOST_SERIALIZATION_NVP(count);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    ar&amp; BOOST_SERIALIZATION_NVP(item_version);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; count; i++) {</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        <span class="keywordflow">if</span> (std::isnan(values[i])) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>            ar&amp; boost::serialization::make_nvp(<span class="stringliteral">&quot;item&quot;</span>, <span class="stringliteral">&quot;nan&quot;</span>);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (std::isinf(values[i])) {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>            ar&amp; boost::serialization::make_nvp(<span class="stringliteral">&quot;item&quot;</span>, values[i] &gt; 0 ? <span class="stringliteral">&quot;+inf&quot;</span> : <span class="stringliteral">&quot;-inf&quot;</span>);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>            ar&amp; boost::serialization::make_nvp(<span class="stringliteral">&quot;item&quot;</span>, values[i]);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        }</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    }</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>}</div>
+</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="namespaceboost_1_1serialization.html#ae2fe347168db2e2157c6a8e29e6a6f8a">   38</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceboost_1_1serialization.html#adc1b0ff0ad31e38405d864d8b7aef32d">load</a>(Archive&amp; ar, <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a>&amp; values, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keywordtype">size_t</span> count = 0;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> item_version = 0;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    ar&amp; BOOST_SERIALIZATION_NVP(count);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    ar&amp; BOOST_SERIALIZATION_NVP(item_version);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    values.resize(count);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; count; i++) {</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        std::string vstr;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        ar &gt;&gt; boost::serialization::make_nvp(<span class="stringliteral">&quot;item&quot;</span>, vstr);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <span class="keywordflow">if</span> (vstr == <span class="stringliteral">&quot;nan&quot;</span>) {</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>            values[i] = std::numeric_limits&lt;double&gt;::quiet_NaN();</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (vstr == <span class="stringliteral">&quot;+inf&quot;</span>) {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>            values[i] = std::numeric_limits&lt;double&gt;::infinity();</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (vstr == <span class="stringliteral">&quot;-inf&quot;</span>) {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>            values[i] = 0.0 - std::numeric_limits&lt;double&gt;::infinity();</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            values[i] = std::atof(vstr.c_str());</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        }</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    }</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>}</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>}  <span class="comment">// namespace serialization</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>}  <span class="comment">// namespace boost</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>BOOST_SERIALIZATION_SPLIT_FREE(<a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a>)</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_XML_ARCHIVE */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#endif </span><span class="comment">/* PRICELIST_SERIALIZATION_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="anamespaceboost_1_1serialization_html"><div class="ttname"><a href="namespaceboost_1_1serialization.html">boost::serialization</a></div><div class="ttdef"><b>定义</b> Block_serialization.h:19</div></div>
+<div class="ttc" id="anamespaceboost_1_1serialization_html_a385c86ab96592633f8b87adeb213c8a5"><div class="ttname"><a href="namespaceboost_1_1serialization.html#a385c86ab96592633f8b87adeb213c8a5">boost::serialization::save</a></div><div class="ttdeci">void save(Archive &amp;ar, const hku::Block &amp;blk, unsigned int version)</div><div class="ttdef"><b>定义</b> Block_serialization.h:21</div></div>
+<div class="ttc" id="anamespaceboost_1_1serialization_html_adc1b0ff0ad31e38405d864d8b7aef32d"><div class="ttname"><a href="namespaceboost_1_1serialization.html#adc1b0ff0ad31e38405d864d8b7aef32d">boost::serialization::load</a></div><div class="ttdeci">void load(Archive &amp;ar, hku::Block &amp;blk, unsigned int version)</div><div class="ttdef"><b>定义</b> Block_serialization.h:35</div></div>
+<div class="ttc" id="anamespaceboost_html"><div class="ttname"><a href="namespaceboost.html">boost</a></div><div class="ttdef"><b>定义</b> Block_serialization.h:18</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_3e155c5f2da30aa26fa83ad0482e6b65.html">serialization</a></li><li class="navelem"><b>PriceList_serialization.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

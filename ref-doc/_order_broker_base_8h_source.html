@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hikyuu/trade_manage/OrderBrokerBase.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_order_broker_base_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,34 +74,201 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">OrderBrokerBase.h</div>  </div>
+  <div class="headertitle"><div class="title">OrderBrokerBase.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_order_broker_base_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * OrderBrokerBase.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2017年6月28日</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef TRADE_MANAGE_ORDERBROKERBASE_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define TRADE_MANAGE_ORDERBROKERBASE_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../DataType.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_order_broker_base.html">OrderBrokerBase</a> {</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="classhku_1_1_order_broker_base.html">OrderBrokerBase</a>();</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classhku_1_1_order_broker_base.html">OrderBrokerBase</a>();</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classhku_1_1_datetime.html">Datetime</a> buy(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">int</span> num);</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classhku_1_1_datetime.html">Datetime</a> sell(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">int</span> num);</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> _buy(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">int</span> num) = 0;</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> _sell(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">int</span> num) = 0;</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;};</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div><div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="group___trade_manager_class.html#ga230f0334622d7230339a0759632b8f13">   63</a></span>&#160;<span class="keyword">typedef</span> shared_ptr&lt;OrderBrokerBase&gt; <a class="code" href="group___trade_manager_class.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>;</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* TRADE_MANAGE_ORDERBROKERBASE_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">日期类型 </div><div class="ttdef"><b>Definition:</b> Datetime.h:33</div></div>
-<div class="ttc" id="_data_type_8h_html_af59fd09cf4bfe9c265f61882e5f07d7a"><div class="ttname"><a href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a></div><div class="ttdeci">#define HKU_API</div><div class="ttdef"><b>Definition:</b> DataType.h:12</div></div>
-<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
-<div class="ttc" id="group___trade_manager_class_html_ga230f0334622d7230339a0759632b8f13"><div class="ttname"><a href="group___trade_manager_class.html#ga230f0334622d7230339a0759632b8f13">hku::OrderBrokerPtr</a></div><div class="ttdeci">shared_ptr&lt; OrderBrokerBase &gt; OrderBrokerPtr</div><div class="ttdoc">客户程序应使用此类型进行实际操作 </div><div class="ttdef"><b>Definition:</b> OrderBrokerBase.h:63</div></div>
-<div class="ttc" id="classhku_1_1_order_broker_base_html"><div class="ttname"><a href="classhku_1_1_order_broker_base.html">hku::OrderBrokerBase</a></div><div class="ttdoc">订单代理基类，实现实际的订单操作及程序化的订单 </div><div class="ttdef"><b>Definition:</b> OrderBrokerBase.h:19</div></div>
-<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * OrderBrokerBase.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2017-6-28</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef TRADE_MANAGE_ORDERBROKERBASE_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define TRADE_MANAGE_ORDERBROKERBASE_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../DataType.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../utilities/Parameter.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../trade_sys/system/SystemPart.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html">   18</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#ac55c504bbf7d478eb0215dfb68ddaa09">   19</a></span>    <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a> <a class="code hl_variable" href="structhku_1_1_broker_position_record.html#ac55c504bbf7d478eb0215dfb68ddaa09">stock</a>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#af11d5eed4ed44930641f5e6166167c32">   20</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_broker_position_record.html#af11d5eed4ed44930641f5e6166167c32">number</a>{0.0};  <span class="comment">// Quantity</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a3a79140131107fe2a785ffb8aeadf34a">   21</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_broker_position_record.html#a3a79140131107fe2a785ffb8aeadf34a">money</a>{0.0};   <span class="comment">// Total funds spent on the buy</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">   23</a></span>    <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a8b92b25cf1ecf10a59dbdedcc8b62537">   24</a></span>    <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a8b92b25cf1ecf10a59dbdedcc8b62537">BrokerPositionRecord</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; <a class="code hl_variable" href="structhku_1_1_broker_position_record.html#ac55c504bbf7d478eb0215dfb68ddaa09">stock</a>, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_broker_position_record.html#af11d5eed4ed44930641f5e6166167c32">number</a>, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_broker_position_record.html#a3a79140131107fe2a785ffb8aeadf34a">money</a>);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a72ab4c40482caee9911e957c98cdaa27">   25</a></span>    <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a72ab4c40482caee9911e957c98cdaa27">BrokerPositionRecord</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a8b06df06588a036fd9849dbd94e17d9a">   26</a></span>    <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a8b06df06588a036fd9849dbd94e17d9a">BrokerPositionRecord</a>(<a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>&amp;&amp; rv);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a7c1359a8ff639fd7e186f4cf77545653">   28</a></span>    <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>&amp; <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a7c1359a8ff639fd7e186f4cf77545653">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#a8bd81d0ed1968f422b30766581952640">   29</a></span>    <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>&amp; <a class="code hl_function" href="structhku_1_1_broker_position_record.html#a8bd81d0ed1968f422b30766581952640">operator=</a>(<a class="code hl_function" href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">BrokerPositionRecord</a>&amp;&amp; rv);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_broker_position_record.html#ae0f0e46103bfc8b0ec873b322ef774ae">   31</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="structhku_1_1_broker_position_record.html#ae0f0e46103bfc8b0ec873b322ef774ae">str</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>};</div>
+</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="namespacehku.html#abed5f8c6fabc1c74c92168eb013c3eb3">   34</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp; os, <span class="keyword">const</span> <a class="code hl_struct" href="structhku_1_1_broker_position_record.html">BrokerPositionRecord</a>&amp;);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span></div>
+<div class="foldopen" id="foldopen00055" data-start="{" data-end="};">
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html">   55</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a472d7d4bcaa5136d66ebc17dcad2de01">OrderBrokerBase</a> {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    PARAMETER_SUPPORT</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a472d7d4bcaa5136d66ebc17dcad2de01">   59</a></span>    <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a472d7d4bcaa5136d66ebc17dcad2de01">OrderBrokerBase</a>();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#aa1c09ed121f96bdfbadaa4ccf0f7c580">   60</a></span>    <a class="code hl_function" href="classhku_1_1_order_broker_base.html#aa1c09ed121f96bdfbadaa4ccf0f7c580">OrderBrokerBase</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">name</a>);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#aae5e93a70d881ea896d442932ef0a1fe">   61</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#aae5e93a70d881ea896d442932ef0a1fe">~OrderBrokerBase</a>();</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">name</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">name</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">name</a>);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a28842f790d338ee5f7206084306f30f4">   81</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a28842f790d338ee5f7206084306f30f4">buy</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> datetime, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">double</span> num,</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>             <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice, <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; remark) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a484559724111f9cb878f5e4d31098cfa">   96</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a484559724111f9cb878f5e4d31098cfa">sell</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> datetime, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>              <span class="keywordtype">double</span> num, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice, <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from,</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>              <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; remark) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a9368aa30737853330bd768049a2a63ec">  125</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a9368aa30737853330bd768049a2a63ec">getAssetInfo</a>();</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a2965e17bdd9dabc17b1bc948d573b284">  133</a></span>    <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a2965e17bdd9dabc17b1bc948d573b284">getLastError</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span></div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a05c632255937ad0abefcda612ffd45e9">  147</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a05c632255937ad0abefcda612ffd45e9">_buy</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> datetime, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>                      <span class="keywordtype">double</span> num, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice, <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from,</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>                      <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; remark) = 0;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a59db1b081d8bf2f238b37f9932b7d93c">  163</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a59db1b081d8bf2f238b37f9932b7d93c">_sell</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> datetime, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price,</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>                       <span class="keywordtype">double</span> num, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss, <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice, <a class="code hl_enumeration" href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">SystemPart</a> from,</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>                       <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; remark) = 0;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="foldopen" id="foldopen00167" data-start="{" data-end="}">
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a5a90bfd9261677c39598b2080fea3ff7">  167</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">string</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a5a90bfd9261677c39598b2080fea3ff7">_getAssetInfo</a>() {</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        <span class="keywordflow">return</span> string();</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    }</div>
+</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a0cb50eedff35287ff0592baf996ae27a">  172</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="classhku_1_1_order_broker_base.html#a0cb50eedff35287ff0592baf996ae27a">m_name</a>;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a3f1be806315cd0e549983429aa302be7">  173</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="classhku_1_1_order_broker_base.html#a3f1be806315cd0e549983429aa302be7">m_last_error</a>;  <span class="comment">// the message of the last failed call, cleared on success</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="comment">//============================================</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment">//============================================</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">  180</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    <span class="keywordtype">void</span> save(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="classhku_1_1_order_broker_base.html#a0cb50eedff35287ff0592baf996ae27a">m_name</a>);</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_params);</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    }</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keywordtype">void</span> load(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_name);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_params);</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    }</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span> </div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    BOOST_SERIALIZATION_SPLIT_MEMBER()</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>};</div>
+</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>BOOST_SERIALIZATION_ASSUME_ABSTRACT(<a class="code hl_class" href="classhku_1_1_order_broker_base.html">OrderBrokerBase</a>)</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno"><a class="line" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">  205</a></span><span class="keyword">typedef</span> shared_ptr&lt;OrderBrokerBase&gt; <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>;</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno"><a class="line" href="group___order_broker.html#ga533b878d2837925754828a6f17c55a1d">  208</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp; os, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_order_broker_base.html">OrderBrokerBase</a>&amp;);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno"><a class="line" href="group___order_broker.html#ga2a5e0792546c2a89dbc49e7177f9b64b">  211</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp; os, <span class="keyword">const</span> <a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>&amp;);</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
+<div class="foldopen" id="foldopen00213" data-start="{" data-end="}">
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">  213</a></span><span class="keyword">inline</span> <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">OrderBrokerBase::name</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_order_broker_base.html#a0cb50eedff35287ff0592baf996ae27a">m_name</a>;</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>}</div>
+</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span> </div>
+<div class="foldopen" id="foldopen00217" data-start="{" data-end="}">
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno"><a class="line" href="classhku_1_1_order_broker_base.html#afc6ceeae1c0ff690fc8a7d8da73dd958">  217</a></span><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">OrderBrokerBase::name</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">name</a>) {</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    <a class="code hl_variable" href="classhku_1_1_order_broker_base.html#a0cb50eedff35287ff0592baf996ae27a">m_name</a> = <a class="code hl_function" href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">name</a>;</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>}</div>
+</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="preprocessor">#if FMT_VERSION &gt;= 90000</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::OrderBrokerBase&gt; : ostream_formatter {};</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::<a class="code hl_typedef" href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">OrderBrokerPtr</a>&gt; : ostream_formatter {};</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><span class="preprocessor">#endif </span><span class="comment">/* TRADE_MANAGE_ORDERBROKERBASE_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html"><div class="ttname"><a href="classhku_1_1_order_broker_base.html">hku::OrderBrokerBase</a></div><div class="ttdoc">Base class of the order broker, it implements the actual order operations and the programmatic orders...</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:55</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a05c632255937ad0abefcda612ffd45e9"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a05c632255937ad0abefcda612ffd45e9">hku::OrderBrokerBase::_buy</a></div><div class="ttdeci">virtual void _buy(Datetime datetime, const string &amp;market, const string &amp;code, price_t price, double num, price_t stoploss, price_t goalPrice, SystemPart from, const string &amp;remark)=0</div><div class="ttdoc">Interface implemented by the subclass, it executes the actual buy operation</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a0cb50eedff35287ff0592baf996ae27a"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a0cb50eedff35287ff0592baf996ae27a">hku::OrderBrokerBase::m_name</a></div><div class="ttdeci">string m_name</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:172</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a11e8074e32aa03cad6a68cef7409fc10"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a11e8074e32aa03cad6a68cef7409fc10">hku::OrderBrokerBase::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the name</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:213</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a28842f790d338ee5f7206084306f30f4"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a28842f790d338ee5f7206084306f30f4">hku::OrderBrokerBase::buy</a></div><div class="ttdeci">void buy(Datetime datetime, const string &amp;market, const string &amp;code, price_t price, double num, price_t stoploss, price_t goalPrice, SystemPart from, const string &amp;remark) noexcept</div><div class="ttdoc">Execute the buy operation</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a2965e17bdd9dabc17b1bc948d573b284"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a2965e17bdd9dabc17b1bc948d573b284">hku::OrderBrokerBase::getLastError</a></div><div class="ttdeci">string getLastError() const</div><div class="ttdoc">Get the error message of the last failed buy/sell call (the exceptions are swallowed by the noexcept ...</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a3f1be806315cd0e549983429aa302be7"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a3f1be806315cd0e549983429aa302be7">hku::OrderBrokerBase::m_last_error</a></div><div class="ttdeci">string m_last_error</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:173</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a472d7d4bcaa5136d66ebc17dcad2de01"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a472d7d4bcaa5136d66ebc17dcad2de01">hku::OrderBrokerBase::OrderBrokerBase</a></div><div class="ttdeci">OrderBrokerBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a484559724111f9cb878f5e4d31098cfa"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a484559724111f9cb878f5e4d31098cfa">hku::OrderBrokerBase::sell</a></div><div class="ttdeci">void sell(Datetime datetime, const string &amp;market, const string &amp;code, price_t price, double num, price_t stoploss, price_t goalPrice, SystemPart from, const string &amp;remark) noexcept</div><div class="ttdoc">Execute the sell operation</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a59db1b081d8bf2f238b37f9932b7d93c"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a59db1b081d8bf2f238b37f9932b7d93c">hku::OrderBrokerBase::_sell</a></div><div class="ttdeci">virtual void _sell(Datetime datetime, const string &amp;market, const string &amp;code, price_t price, double num, price_t stoploss, price_t goalPrice, SystemPart from, const string &amp;remark)=0</div><div class="ttdoc">Interface implemented by the subclass, it executes the actual sell operation</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a5a90bfd9261677c39598b2080fea3ff7"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a5a90bfd9261677c39598b2080fea3ff7">hku::OrderBrokerBase::_getAssetInfo</a></div><div class="ttdeci">virtual string _getAssetInfo()</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:167</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_a9368aa30737853330bd768049a2a63ec"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#a9368aa30737853330bd768049a2a63ec">hku::OrderBrokerBase::getAssetInfo</a></div><div class="ttdeci">string getAssetInfo()</div><div class="ttdoc">Get the current asset information</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_aa1c09ed121f96bdfbadaa4ccf0f7c580"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#aa1c09ed121f96bdfbadaa4ccf0f7c580">hku::OrderBrokerBase::OrderBrokerBase</a></div><div class="ttdeci">OrderBrokerBase(const string &amp;name)</div></div>
+<div class="ttc" id="aclasshku_1_1_order_broker_base_html_aae5e93a70d881ea896d442932ef0a1fe"><div class="ttname"><a href="classhku_1_1_order_broker_base.html#aae5e93a70d881ea896d442932ef0a1fe">hku::OrderBrokerBase::~OrderBrokerBase</a></div><div class="ttdeci">virtual ~OrderBrokerBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="agroup___order_broker_html_ga230f0334622d7230339a0759632b8f13"><div class="ttname"><a href="group___order_broker.html#ga230f0334622d7230339a0759632b8f13">hku::OrderBrokerPtr</a></div><div class="ttdeci">shared_ptr&lt; OrderBrokerBase &gt; OrderBrokerPtr</div><div class="ttdoc">The client program should use this type for the actual operations</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:205</div></div>
+<div class="ttc" id="agroup___system_html_ga578a43d6f138141648ea4c76bad2d706"><div class="ttname"><a href="group___system.html#ga578a43d6f138141648ea4c76bad2d706">hku::SystemPart</a></div><div class="ttdeci">SystemPart</div><div class="ttdoc">Enumeration definition of the system associated parts (the respective strategies),...</div><div class="ttdef"><b>定义</b> SystemPart.h:21</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html"><div class="ttname"><a href="structhku_1_1_broker_position_record.html">hku::BrokerPositionRecord</a></div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:18</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a3a79140131107fe2a785ffb8aeadf34a"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a3a79140131107fe2a785ffb8aeadf34a">hku::BrokerPositionRecord::money</a></div><div class="ttdeci">price_t money</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:21</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a4cbf31c158c99744a3cf4abd99bbf113"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a4cbf31c158c99744a3cf4abd99bbf113">hku::BrokerPositionRecord::BrokerPositionRecord</a></div><div class="ttdeci">BrokerPositionRecord()=default</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a72ab4c40482caee9911e957c98cdaa27"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a72ab4c40482caee9911e957c98cdaa27">hku::BrokerPositionRecord::BrokerPositionRecord</a></div><div class="ttdeci">BrokerPositionRecord(const BrokerPositionRecord &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a7c1359a8ff639fd7e186f4cf77545653"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a7c1359a8ff639fd7e186f4cf77545653">hku::BrokerPositionRecord::operator=</a></div><div class="ttdeci">BrokerPositionRecord &amp; operator=(const BrokerPositionRecord &amp;)=default</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a8b06df06588a036fd9849dbd94e17d9a"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a8b06df06588a036fd9849dbd94e17d9a">hku::BrokerPositionRecord::BrokerPositionRecord</a></div><div class="ttdeci">BrokerPositionRecord(BrokerPositionRecord &amp;&amp;rv)</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a8b92b25cf1ecf10a59dbdedcc8b62537"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a8b92b25cf1ecf10a59dbdedcc8b62537">hku::BrokerPositionRecord::BrokerPositionRecord</a></div><div class="ttdeci">BrokerPositionRecord(const Stock &amp;stock, price_t number, price_t money)</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_a8bd81d0ed1968f422b30766581952640"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#a8bd81d0ed1968f422b30766581952640">hku::BrokerPositionRecord::operator=</a></div><div class="ttdeci">BrokerPositionRecord &amp; operator=(BrokerPositionRecord &amp;&amp;rv)</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_ac55c504bbf7d478eb0215dfb68ddaa09"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#ac55c504bbf7d478eb0215dfb68ddaa09">hku::BrokerPositionRecord::stock</a></div><div class="ttdeci">Stock stock</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:19</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_ae0f0e46103bfc8b0ec873b322ef774ae"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#ae0f0e46103bfc8b0ec873b322ef774ae">hku::BrokerPositionRecord::str</a></div><div class="ttdeci">string str() const</div></div>
+<div class="ttc" id="astructhku_1_1_broker_position_record_html_af11d5eed4ed44930641f5e6166167c32"><div class="ttname"><a href="structhku_1_1_broker_position_record.html#af11d5eed4ed44930641f5e6166167c32">hku::BrokerPositionRecord::number</a></div><div class="ttdeci">price_t number</div><div class="ttdef"><b>定义</b> OrderBrokerBase.h:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></li><li class="navelem"><b>OrderBrokerBase.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

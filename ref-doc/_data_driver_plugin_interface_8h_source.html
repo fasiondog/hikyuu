@@ -1,0 +1,196 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/plugin/interface/DataDriverPluginInterface.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_data_driver_plugin_interface_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">DataDriverPluginInterface.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-07-01</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/data_driver/KDataDriver.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;hikyuu/data_driver/BlockInfoDriver.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/data_driver/BaseInfoDriver.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;hikyuu/utilities/plugin/PluginBase.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;hikyuu/factor/FactorSet.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html">   18</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a1bd62a5ae0d8e7a2b46e97525b017c26">DataDriverPluginInterface</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_plugin_base.html#a331c89f54cbd3706b0ed111224e60893">PluginBase</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a1bd62a5ae0d8e7a2b46e97525b017c26">   20</a></span>    <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a1bd62a5ae0d8e7a2b46e97525b017c26">DataDriverPluginInterface</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ad5f731db8a79a5114b1d95591f172002">   21</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ad5f731db8a79a5114b1d95591f172002">~DataDriverPluginInterface</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ad9d75e6d04a152a14b0731a529901ce7">   23</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">KDataDriverPtr</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ad9d75e6d04a152a14b0731a529901ce7">getKDataDriver</a>() = 0;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ac5783c313c269115b3b742492a9b905b">   24</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#a4c9a42e065a529cba6fb22223ceff80c">BlockInfoDriverPtr</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ac5783c313c269115b3b742492a9b905b">getBlockInfoDriver</a>() = 0;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ae95571656f3541118edb28ed24b392d2">   25</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#a0621dde24e7e2b071691a83872ae9bae">BaseInfoDriverPtr</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ae95571656f3541118edb28ed24b392d2">getBaseInfoDriver</a>() = 0;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a671f5774bf5395fe1494552afe120d9e">   27</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a671f5774bf5395fe1494552afe120d9e">isValidFactorName</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name) <span class="keyword">noexcept</span> = 0;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a59ca49c7c3eef468ad63a178aa9293eb">   28</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#ae731f4a3610442c7af4690f14b14d6c0">FactorList</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a59ca49c7c3eef468ad63a178aa9293eb">getAllFactors</a>() = 0;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#aa6336c35149096783805470170d93a4d">   29</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#aa635a934213dca67adc5626c4b6f1e4c">FactorSetList</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#aa6336c35149096783805470170d93a4d">getAllFactorSets</a>() = 0;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#aa3bc28c004c1bbbcf75032c8b6054150">   30</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#aa3bc28c004c1bbbcf75032c8b6054150">updateAllFactorsValues</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype) = 0;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a99805ca263d62117a83fc631568e318f">   32</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a99805ca263d62117a83fc631568e318f">hasFactor</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype) = 0;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a668e4205b7d61f2dec83424da4ed3b64">   33</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a668e4205b7d61f2dec83424da4ed3b64">getFactor</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype) = 0;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a24ecdf7435ff9898f5a58c7a1f45c9d7">   34</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a24ecdf7435ff9898f5a58c7a1f45c9d7">saveFactor</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a>&amp; factor, <span class="keywordtype">bool</span> update_before) = 0;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ae600c44bb698e8cbd9ae71a0d7d9fbf0">   35</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ae600c44bb698e8cbd9ae71a0d7d9fbf0">removeFactor</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype) = 0;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a32ac6e563ec7021e80a29a4ea398a749">   36</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a32ac6e563ec7021e80a29a4ea398a749">saveSpecialFactorValues</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a>&amp; factor, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock,</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                                         <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&amp; dates, <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&amp; values,</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                                         <span class="keywordtype">bool</span> replace) = 0;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a2e7d9b00a42ca96a65306ec5197948e2">   40</a></span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a2e7d9b00a42ca96a65306ec5197948e2">getFactorSet</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype) = 0;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ab5c1bf69f88e999a6fb287c7d22e1609">   41</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ab5c1bf69f88e999a6fb287c7d22e1609">saveFactorSet</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a>&amp; set) = 0;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#ae02521ab74009058fc2b4798c99b2e8c">   42</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#ae02521ab74009058fc2b4798c99b2e8c">removeFactorSet</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype) = 0;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#aa39183cb6846a1b2c6fa76789748fec1">   44</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#aa39183cb6846a1b2c6fa76789748fec1">getValues</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a>&amp; factor, <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stocks,</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                                    <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keywordtype">bool</span> align, <span class="keywordtype">bool</span> fill_null, <span class="keywordtype">bool</span> tovalue,</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                                    <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&amp; align_dates) = 0;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_plugin_interface.html#a64842504338fd529ffd2b3ceedd51b27">   47</a></span>    <span class="keyword">virtual</span> vector&lt;IndicatorList&gt; <a class="code hl_function" href="classhku_1_1_data_driver_plugin_interface.html#a64842504338fd529ffd2b3ceedd51b27">getValues</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a>&amp; factor_set, <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stocks,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                                            <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keywordtype">bool</span> align, <span class="keywordtype">bool</span> fill_null,</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                                            <span class="keywordtype">bool</span> tovalue, <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&amp; align_dates) = 0;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>};</div>
+</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a1bd62a5ae0d8e7a2b46e97525b017c26"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a1bd62a5ae0d8e7a2b46e97525b017c26">hku::DataDriverPluginInterface::DataDriverPluginInterface</a></div><div class="ttdeci">DataDriverPluginInterface()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a24ecdf7435ff9898f5a58c7a1f45c9d7"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a24ecdf7435ff9898f5a58c7a1f45c9d7">hku::DataDriverPluginInterface::saveFactor</a></div><div class="ttdeci">virtual void saveFactor(const Factor &amp;factor, bool update_before)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a2e7d9b00a42ca96a65306ec5197948e2"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a2e7d9b00a42ca96a65306ec5197948e2">hku::DataDriverPluginInterface::getFactorSet</a></div><div class="ttdeci">virtual FactorSet getFactorSet(const string &amp;name, const KQuery::KType &amp;ktype)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a32ac6e563ec7021e80a29a4ea398a749"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a32ac6e563ec7021e80a29a4ea398a749">hku::DataDriverPluginInterface::saveSpecialFactorValues</a></div><div class="ttdeci">virtual void saveSpecialFactorValues(const Factor &amp;factor, const Stock &amp;stock, const DatetimeList &amp;dates, const PriceList &amp;values, bool replace)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a59ca49c7c3eef468ad63a178aa9293eb"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a59ca49c7c3eef468ad63a178aa9293eb">hku::DataDriverPluginInterface::getAllFactors</a></div><div class="ttdeci">virtual FactorList getAllFactors()=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a64842504338fd529ffd2b3ceedd51b27"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a64842504338fd529ffd2b3ceedd51b27">hku::DataDriverPluginInterface::getValues</a></div><div class="ttdeci">virtual vector&lt; IndicatorList &gt; getValues(const FactorSet &amp;factor_set, const StockList &amp;stocks, const KQuery &amp;query, bool align, bool fill_null, bool tovalue, const DatetimeList &amp;align_dates)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a668e4205b7d61f2dec83424da4ed3b64"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a668e4205b7d61f2dec83424da4ed3b64">hku::DataDriverPluginInterface::getFactor</a></div><div class="ttdeci">virtual Factor getFactor(const string &amp;name, const KQuery::KType &amp;ktype)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a671f5774bf5395fe1494552afe120d9e"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a671f5774bf5395fe1494552afe120d9e">hku::DataDriverPluginInterface::isValidFactorName</a></div><div class="ttdeci">virtual bool isValidFactorName(const string &amp;name) noexcept=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_a99805ca263d62117a83fc631568e318f"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#a99805ca263d62117a83fc631568e318f">hku::DataDriverPluginInterface::hasFactor</a></div><div class="ttdeci">virtual bool hasFactor(const string &amp;name, const KQuery::KType &amp;ktype)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_aa39183cb6846a1b2c6fa76789748fec1"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#aa39183cb6846a1b2c6fa76789748fec1">hku::DataDriverPluginInterface::getValues</a></div><div class="ttdeci">virtual IndicatorList getValues(const Factor &amp;factor, const StockList &amp;stocks, const KQuery &amp;query, bool align, bool fill_null, bool tovalue, const DatetimeList &amp;align_dates)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_aa3bc28c004c1bbbcf75032c8b6054150"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#aa3bc28c004c1bbbcf75032c8b6054150">hku::DataDriverPluginInterface::updateAllFactorsValues</a></div><div class="ttdeci">virtual void updateAllFactorsValues(const KQuery::KType &amp;ktype)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_aa6336c35149096783805470170d93a4d"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#aa6336c35149096783805470170d93a4d">hku::DataDriverPluginInterface::getAllFactorSets</a></div><div class="ttdeci">virtual FactorSetList getAllFactorSets()=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ab5c1bf69f88e999a6fb287c7d22e1609"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ab5c1bf69f88e999a6fb287c7d22e1609">hku::DataDriverPluginInterface::saveFactorSet</a></div><div class="ttdeci">virtual void saveFactorSet(const FactorSet &amp;set)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ac5783c313c269115b3b742492a9b905b"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ac5783c313c269115b3b742492a9b905b">hku::DataDriverPluginInterface::getBlockInfoDriver</a></div><div class="ttdeci">virtual BlockInfoDriverPtr getBlockInfoDriver()=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ad5f731db8a79a5114b1d95591f172002"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ad5f731db8a79a5114b1d95591f172002">hku::DataDriverPluginInterface::~DataDriverPluginInterface</a></div><div class="ttdeci">virtual ~DataDriverPluginInterface()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ad9d75e6d04a152a14b0731a529901ce7"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ad9d75e6d04a152a14b0731a529901ce7">hku::DataDriverPluginInterface::getKDataDriver</a></div><div class="ttdeci">virtual KDataDriverPtr getKDataDriver()=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ae02521ab74009058fc2b4798c99b2e8c"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ae02521ab74009058fc2b4798c99b2e8c">hku::DataDriverPluginInterface::removeFactorSet</a></div><div class="ttdeci">virtual void removeFactorSet(const string &amp;name, const KQuery::KType &amp;ktype)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ae600c44bb698e8cbd9ae71a0d7d9fbf0"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ae600c44bb698e8cbd9ae71a0d7d9fbf0">hku::DataDriverPluginInterface::removeFactor</a></div><div class="ttdeci">virtual void removeFactor(const string &amp;name, const KQuery::KType &amp;ktype)=0</div></div>
+<div class="ttc" id="aclasshku_1_1_data_driver_plugin_interface_html_ae95571656f3541118edb28ed24b392d2"><div class="ttname"><a href="classhku_1_1_data_driver_plugin_interface.html#ae95571656f3541118edb28ed24b392d2">hku::DataDriverPluginInterface::getBaseInfoDriver</a></div><div class="ttdeci">virtual BaseInfoDriverPtr getBaseInfoDriver()=0</div></div>
+<div class="ttc" id="aclasshku_1_1_factor_html"><div class="ttname"><a href="classhku_1_1_factor.html">hku::Factor</a></div><div class="ttdef"><b>定义</b> Factor.h:15</div></div>
+<div class="ttc" id="aclasshku_1_1_factor_set_html"><div class="ttname"><a href="classhku_1_1_factor_set.html">hku::FactorSet</a></div><div class="ttdef"><b>定义</b> FactorSet.h:16</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_plugin_base_html_a331c89f54cbd3706b0ed111224e60893"><div class="ttname"><a href="classhku_1_1_plugin_base.html#a331c89f54cbd3706b0ed111224e60893">hku::PluginBase::PluginBase</a></div><div class="ttdeci">PluginBase()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="agroup___data_type_html_gaeb6c8c0a18561345f892e2c4be1f5ef2"><div class="ttname"><a href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">hku::DatetimeList</a></div><div class="ttdeci">std::vector&lt; Datetime &gt; DatetimeList</div><div class="ttdoc">Date list</div><div class="ttdef"><b>定义</b> Datetime.h:375</div></div>
+<div class="ttc" id="agroup___indicator_html_ga81836486a13fb215ce8fe8bc264d203d"><div class="ttname"><a href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">hku::IndicatorList</a></div><div class="ttdeci">vector&lt; Indicator &gt; IndicatorList</div><div class="ttdef"><b>定义</b> Indicator.h:296</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga4a4df6bef18cec4791cca9bd27a4e973"><div class="ttname"><a href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">hku::StockList</a></div><div class="ttdeci">vector&lt; Stock &gt; StockList</div><div class="ttdef"><b>定义</b> Stock.h:409</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a0621dde24e7e2b071691a83872ae9bae"><div class="ttname"><a href="namespacehku.html#a0621dde24e7e2b071691a83872ae9bae">hku::BaseInfoDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; BaseInfoDriver &gt; BaseInfoDriverPtr</div><div class="ttdef"><b>定义</b> BaseInfoDriver.h:238</div></div>
+<div class="ttc" id="anamespacehku_html_a4c9a42e065a529cba6fb22223ceff80c"><div class="ttname"><a href="namespacehku.html#a4c9a42e065a529cba6fb22223ceff80c">hku::BlockInfoDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; BlockInfoDriver &gt; BlockInfoDriverPtr</div><div class="ttdef"><b>定义</b> BlockInfoDriver.h:104</div></div>
+<div class="ttc" id="anamespacehku_html_aa635a934213dca67adc5626c4b6f1e4c"><div class="ttname"><a href="namespacehku.html#aa635a934213dca67adc5626c4b6f1e4c">hku::FactorSetList</a></div><div class="ttdeci">vector&lt; FactorSet &gt; FactorSetList</div><div class="ttdef"><b>定义</b> FactorSet.h:338</div></div>
+<div class="ttc" id="anamespacehku_html_ac92c5810c3d9582283d88a71f51dcbc5"><div class="ttname"><a href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">hku::KDataDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriver &gt; KDataDriverPtr</div><div class="ttdef"><b>定义</b> KDataDriver.h:181</div></div>
+<div class="ttc" id="anamespacehku_html_ae731f4a3610442c7af4690f14b14d6c0"><div class="ttname"><a href="namespacehku.html#ae731f4a3610442c7af4690f14b14d6c0">hku::FactorList</a></div><div class="ttdeci">vector&lt; Factor &gt; FactorList</div><div class="ttdef"><b>定义</b> Factor.h:367</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_991d4c37e893a0798e9e63870536be30.html">plugin</a></li><li class="navelem"><a href="dir_9eb1ec821bd97d9883dc6af6dc7ac32d.html">interface</a></li><li class="navelem"><b>DataDriverPluginInterface.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

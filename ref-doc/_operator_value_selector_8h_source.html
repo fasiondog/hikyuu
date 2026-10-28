@@ -1,0 +1,236 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/selector/imp/logic/OperatorValueSelector.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_operator_value_selector_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">OperatorValueSelector.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-05-27</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/selector/SelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span></div>
+<div class="foldopen" id="foldopen00024" data-start="{" data-end="};">
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html">   24</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#a66b592989477b513edc7e1669fed2b03">OperatorValueSelector</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_selector_base.html#a6c0d1dffcc557142786d967cebc1e991">SelectorBase</a> {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#a66b592989477b513edc7e1669fed2b03">   26</a></span>    <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#a66b592989477b513edc7e1669fed2b03">OperatorValueSelector</a>();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#a70617761b928cdcc8a6d2fde907f086c">   27</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#a70617761b928cdcc8a6d2fde907f086c">OperatorValueSelector</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_selector_base.html#a55a1672fa01c1e84dd2eb483debc4020">name</a>);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#aab9f2b1385af7f6e62a1e338ba49b5db">   28</a></span>    <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#aab9f2b1385af7f6e62a1e338ba49b5db">OperatorValueSelector</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_selector_base.html#a55a1672fa01c1e84dd2eb483debc4020">name</a>, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a>&amp; se, <span class="keywordtype">double</span> value);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#ac98f7f2fd2fc82a743d631c087c6412a">   29</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#ac98f7f2fd2fc82a743d631c087c6412a">~OperatorValueSelector</a>();</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#a248b2f40bd1bd19812e79033a16ae38c">   31</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#a248b2f40bd1bd19812e79033a16ae38c">_reset</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#ac03c6df5d259055e9904df8e4284270f">   32</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#ac03c6df5d259055e9904df8e4284270f">_clone</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#aa637c2676207e732980a6fdc788ec4a7">   34</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#aa637c2676207e732980a6fdc788ec4a7">_calculate</a>() <span class="keyword">override</span>;</div>
+<div class="foldopen" id="foldopen00035" data-start="{" data-end="}">
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#aaf86cdaec2275b716f1c3e07361df66d">   35</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#aaf86cdaec2275b716f1c3e07361df66d">_getSelected</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> date)<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a>();</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    }</div>
+</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="comment">// Forward to the wrapped selector, otherwise a nested logical selector (e.g. (a + b) + 2.0)</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="comment">// would never learn its prototypes and select nothing</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#a115d0d948828e7e0de63a9b0f897b86c">   41</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#a115d0d948828e7e0de63a9b0f897b86c">_addSystem</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; sys) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#ade7851a3425143b3c0115c294a23bf98">   42</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#ade7851a3425143b3c0115c294a23bf98">_removeAll</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#ad56433aa356015d346a22183273efca8">   43</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#ad56433aa356015d346a22183273efca8">_replaceProtoSystem</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; from, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; to) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#aa5700752f950ea0acc3c575de85d510a">   44</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_operator_value_selector.html#aa5700752f950ea0acc3c575de85d510a">bindRealToProto</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; real, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp; proto) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#af3f145f921c53cd89f8aceea458a558a">   47</a></span>    <a class="code hl_typedef" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> <a class="code hl_variable" href="classhku_1_1_operator_value_selector.html#af3f145f921c53cd89f8aceea458a558a">m_se</a>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_operator_value_selector.html#ac4fc1f43e893cee06e9f2ac10e7e5f66">   48</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="classhku_1_1_operator_value_selector.html#ac4fc1f43e893cee06e9f2ac10e7e5f66">m_value</a>{0.0};</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="comment">//============================================</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="comment">//============================================</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// template &lt;class Archive&gt;</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="comment">// void serialize(Archive&amp; ar, const unsigned int version) {</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="comment">//     ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="comment">//     ar&amp; BOOST_SERIALIZATION_NVP(m_se);</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="comment">//     ar&amp; BOOST_SERIALIZATION_NVP(m_value);</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="comment">// }</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keywordtype">void</span> save(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(<a class="code hl_class" href="classhku_1_1_selector_base.html">SelectorBase</a>);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_se);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_value);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    }</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">void</span> load(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_se);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_value);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keywordflow">if</span> (m_se) {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>            m_pro_sys_list = m_se-&gt;getProtoSystemList();</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        }</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    }</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    BOOST_SERIALIZATION_SPLIT_MEMBER()</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>};</div>
+</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="preprocessor">#define OPERATOR_VALUE_SELECTOR_IMP(classname, name)                                           \</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="preprocessor">public:                                                                                        \</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="preprocessor">    classname() : OperatorValueSelector(name) {}                                               \</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="preprocessor">    classname(const SelectorPtr&amp; se, double value) : OperatorValueSelector(name, se, value) {} \</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">    virtual ~classname() override {}                                                           \</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">                                                                                               \</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">    virtual SystemWeightList _getSelected(Datetime date) override;                             \</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">                                                                                               \</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">    virtual SelectorPtr _clone() override {                                                    \</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">        auto p = std::make_shared&lt;classname&gt;();                                                \</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">        if (m_se) {                                                                            \</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">            p-&gt;m_se = m_se-&gt;clone();                                                           \</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">            p-&gt;m_pro_sys_list = p-&gt;m_se-&gt;getProtoSystemList();                                 \</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="preprocessor">        }                                                                                      \</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="preprocessor">        p-&gt;m_value = m_value;                                                                  \</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="preprocessor">        return p;                                                                              \</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">    }</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="preprocessor">#define OPERATOR_VALUE_SELECTOR_SERIALIZATION                           \</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="preprocessor">private:                                                                \</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="preprocessor">    friend class boost::serialization::access;                          \</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">    template &lt;class Archive&gt;                                            \</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="preprocessor">    void serialize(Archive&amp; ar, const unsigned int version) {           \</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="preprocessor">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(OperatorValueSelector); \</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="preprocessor">    }</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="preprocessor">#define OPERATOR_VALUE_SELECTOR_SERIALIZATION</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_a115d0d948828e7e0de63a9b0f897b86c"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#a115d0d948828e7e0de63a9b0f897b86c">hku::OperatorValueSelector::_addSystem</a></div><div class="ttdeci">virtual void _addSystem(const SYSPtr &amp;sys) override</div><div class="ttdoc">Add a prototype system in the subclass used for the logical operations; it generally does not need to...</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_a248b2f40bd1bd19812e79033a16ae38c"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#a248b2f40bd1bd19812e79033a16ae38c">hku::OperatorValueSelector::_reset</a></div><div class="ttdeci">virtual void _reset() override</div><div class="ttdoc">Subclass reset interface</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_a66b592989477b513edc7e1669fed2b03"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#a66b592989477b513edc7e1669fed2b03">hku::OperatorValueSelector::OperatorValueSelector</a></div><div class="ttdeci">OperatorValueSelector()</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_a70617761b928cdcc8a6d2fde907f086c"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#a70617761b928cdcc8a6d2fde907f086c">hku::OperatorValueSelector::OperatorValueSelector</a></div><div class="ttdeci">OperatorValueSelector(const string &amp;name)</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_aa5700752f950ea0acc3c575de85d510a"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#aa5700752f950ea0acc3c575de85d510a">hku::OperatorValueSelector::bindRealToProto</a></div><div class="ttdeci">virtual void bindRealToProto(const SYSPtr &amp;real, const SYSPtr &amp;proto) override</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_aa637c2676207e732980a6fdc788ec4a7"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#aa637c2676207e732980a6fdc788ec4a7">hku::OperatorValueSelector::_calculate</a></div><div class="ttdeci">virtual void _calculate() override</div><div class="ttdoc">Subclass calculation interface</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_aab9f2b1385af7f6e62a1e338ba49b5db"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#aab9f2b1385af7f6e62a1e338ba49b5db">hku::OperatorValueSelector::OperatorValueSelector</a></div><div class="ttdeci">OperatorValueSelector(const string &amp;name, const SelectorPtr &amp;se, double value)</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_aaf86cdaec2275b716f1c3e07361df66d"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#aaf86cdaec2275b716f1c3e07361df66d">hku::OperatorValueSelector::_getSelected</a></div><div class="ttdeci">virtual SystemWeightList _getSelected(Datetime date) override</div><div class="ttdoc">Subclass interface to get the targets selected at the close of the given moment</div><div class="ttdef"><b>定义</b> OperatorValueSelector.h:35</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_ac03c6df5d259055e9904df8e4284270f"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#ac03c6df5d259055e9904df8e4284270f">hku::OperatorValueSelector::_clone</a></div><div class="ttdeci">virtual SelectorPtr _clone() override</div><div class="ttdoc">Subclass clone interface</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_ac4fc1f43e893cee06e9f2ac10e7e5f66"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#ac4fc1f43e893cee06e9f2ac10e7e5f66">hku::OperatorValueSelector::m_value</a></div><div class="ttdeci">double m_value</div><div class="ttdef"><b>定义</b> OperatorValueSelector.h:48</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_ac98f7f2fd2fc82a743d631c087c6412a"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#ac98f7f2fd2fc82a743d631c087c6412a">hku::OperatorValueSelector::~OperatorValueSelector</a></div><div class="ttdeci">virtual ~OperatorValueSelector()</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_ad56433aa356015d346a22183273efca8"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#ad56433aa356015d346a22183273efca8">hku::OperatorValueSelector::_replaceProtoSystem</a></div><div class="ttdeci">virtual void _replaceProtoSystem(const SYSPtr &amp;from, const SYSPtr &amp;to) override</div><div class="ttdoc">Subclass hook of replaceProtoSystem, it generally does not need to be implemented</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_ade7851a3425143b3c0115c294a23bf98"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#ade7851a3425143b3c0115c294a23bf98">hku::OperatorValueSelector::_removeAll</a></div><div class="ttdeci">virtual void _removeAll() override</div><div class="ttdoc">Add a prototype system in the subclass used for the logical operations; it generally does not need to...</div></div>
+<div class="ttc" id="aclasshku_1_1_operator_value_selector_html_af3f145f921c53cd89f8aceea458a558a"><div class="ttname"><a href="classhku_1_1_operator_value_selector.html#af3f145f921c53cd89f8aceea458a558a">hku::OperatorValueSelector::m_se</a></div><div class="ttdeci">SelectorPtr m_se</div><div class="ttdef"><b>定义</b> OperatorValueSelector.h:47</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html"><div class="ttname"><a href="classhku_1_1_selector_base.html">hku::SelectorBase</a></div><div class="ttdoc">Trading object selection module</div><div class="ttdef"><b>定义</b> SelectorBase.h:25</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a15225fb9a883876736e71ff6b5616239"><div class="ttname"><a href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase::SelectorPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SelectorPtr</div><div class="ttdef"><b>定义</b> SelectorBase.h:112</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a55a1672fa01c1e84dd2eb483debc4020"><div class="ttname"><a href="classhku_1_1_selector_base.html#a55a1672fa01c1e84dd2eb483debc4020">hku::SelectorBase::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the algorithm name</div><div class="ttdef"><b>定义</b> SelectorBase.h:288</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a6c0d1dffcc557142786d967cebc1e991"><div class="ttname"><a href="classhku_1_1_selector_base.html#a6c0d1dffcc557142786d967cebc1e991">hku::SelectorBase::SelectorBase</a></div><div class="ttdeci">SelectorBase()</div><div class="ttdoc">Default constructor</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a98d36b433e7ba4fe01cb70ec3a856dbc"><div class="ttname"><a href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">hku::SYSPtr</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; SYSPtr</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:58</div></div>
+<div class="ttc" id="anamespacehku_html_addc86b26683f2e20b24301fce90ef431"><div class="ttname"><a href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">hku::SystemWeightList</a></div><div class="ttdeci">vector&lt; SystemWeight &gt; SystemWeightList</div><div class="ttdef"><b>定义</b> SystemWeight.h:57</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_3da1167a5556da8ee80b5b80dc171a54.html">selector</a></li><li class="navelem"><a href="dir_b4f9f0a55d87869bef0586870d14f68d.html">imp</a></li><li class="navelem"><a href="dir_e8fc02eed470ce560b3149db809fd082.html">logic</a></li><li class="navelem"><b>OperatorValueSelector.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

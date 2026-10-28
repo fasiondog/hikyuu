@@ -1,0 +1,16 @@
+digraph "hikyuu/factor"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  subgraph clusterdir_2aa0d26c9c4f7857b1dfd76e85fc9b07 {
+    graph [ bgcolor="#edf0f7", pencolor="grey25", label="hikyuu", fontname=Helvetica,fontsize=10 style="filled,dashed", URL="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html",tooltip=""]
+  subgraph clusterdir_736920cbf9f2cf60f2a7288289930416 {
+    graph [ bgcolor="#edf0f7", pencolor="grey25", label="", fontname=Helvetica,fontsize=10 style="filled,bold", URL="dir_736920cbf9f2cf60f2a7288289930416.html",tooltip=""]
+    dir_736920cbf9f2cf60f2a7288289930416 [shape=plaintext, label="factor"];
+  dir_4595801c1516f569097dbeb6eac52ef2 [label="imp", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_4595801c1516f569097dbeb6eac52ef2.html",tooltip=""];
+  }
+  }
+}

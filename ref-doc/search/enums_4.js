@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['recovertype',['RecoverType',['../classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e',1,'hku::KQuery']]]
+  ['optype_0',['OPType',['../classhku_1_1_indicator_imp.html#a89dfbaddbea317d601ee2e13ecc0d10f',1,'hku::IndicatorImp']]],
+  ['orderby_1',['ORDERBY',['../classhku_1_1_d_b_condition.html#ab17528dc60fc7fc5b81fcd288da5cba1',1,'hku::DBCondition']]]
 ];

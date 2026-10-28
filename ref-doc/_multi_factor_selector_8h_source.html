@@ -1,0 +1,189 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/selector/imp/MultiFactorSelector.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_multi_factor_selector_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">MultiFactorSelector.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-03-30</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;../SelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="};">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html">   14</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#a7c73b65dd2d11e855aa84390bc631e17">MultiFactorSelector</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_selector_base.html#a6c0d1dffcc557142786d967cebc1e991">SelectorBase</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#a7c73b65dd2d11e855aa84390bc631e17">   16</a></span>    <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#a7c73b65dd2d11e855aa84390bc631e17">MultiFactorSelector</a>();</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#a1f41f7b8f9e4dd4388585751ffcb8dbe">   17</a></span>    <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#a1f41f7b8f9e4dd4388585751ffcb8dbe">MultiFactorSelector</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a>&amp; mf, <span class="keywordtype">int</span> topn);</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#a7bb81c807adeb0a5142648ef339c5c72">   18</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#a7bb81c807adeb0a5142648ef339c5c72">~MultiFactorSelector</a>();</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#a805a3698bd5ed15f77e8520fe4ec4641">   20</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#a805a3698bd5ed15f77e8520fe4ec4641">_checkParam</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_selector_base.html#a55a1672fa01c1e84dd2eb483debc4020">name</a>) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#ad8297cbd3987f6e38c37a32038a28f94">   21</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#ad8297cbd3987f6e38c37a32038a28f94">_reset</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#aadd367221f8ff3795d15d78afd4a4b26">   22</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#aadd367221f8ff3795d15d78afd4a4b26">_clone</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#ae5bd145a70feeed420b59e584dc4fde8">   23</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#ae5bd145a70feeed420b59e584dc4fde8">_getSelected</a>(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> date) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#a410a51b75b26457ccaf167db5d132f21">   25</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#a410a51b75b26457ccaf167db5d132f21">_calculate</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="}">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#ac311a85513a4de4c067c3492cccb7db8">   27</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_multi_factor_selector.html#ac311a85513a4de4c067c3492cccb7db8">setFactorSet</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a>&amp; factorset) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        HKU_ASSERT(!factorset.<a class="code hl_function" href="classhku_1_1_factor_set.html#ad8dabce283b546f974007763868fca19">empty</a>());</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        m_factorset = factorset;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <a class="code hl_variable" href="classhku_1_1_selector_base.html#a681a4acdb9975fa6696ae4ab8c03324f">m_calculated</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    }</div>
+</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <a class="code hl_typedef" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> filterOnlyShouldBuy(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> date, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&amp; scores, <span class="keywordtype">size_t</span> topn);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <a class="code hl_typedef" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> filterTopN(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> date, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&amp; raw_scores, <span class="keywordtype">size_t</span> topn,</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                               <span class="keywordtype">bool</span> only_should_buy);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <a class="code hl_typedef" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a> filterTopNReverse(<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> date, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">ScoreRecordList</a>&amp; raw_scores, <span class="keywordtype">size_t</span> topn,</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                                      <span class="keywordtype">bool</span> only_should_buy, <span class="keywordtype">bool</span> ignore_null);</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a> m_factorset;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    unordered_map&lt;Stock, SYSPtr&gt; m_stk_sys_dict;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">//============================================</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="comment">//============================================</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_multi_factor_selector.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   48</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_friend" href="classhku_1_1_multi_factor_selector.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(<a class="code hl_function" href="classhku_1_1_selector_base.html#a6c0d1dffcc557142786d967cebc1e991">SelectorBase</a>);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_factorset);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    }</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>};</div>
+</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_factor_set_html"><div class="ttname"><a href="classhku_1_1_factor_set.html">hku::FactorSet</a></div><div class="ttdef"><b>定义</b> FactorSet.h:16</div></div>
+<div class="ttc" id="aclasshku_1_1_factor_set_html_ad8dabce283b546f974007763868fca19"><div class="ttname"><a href="classhku_1_1_factor_set.html#ad8dabce283b546f974007763868fca19">hku::FactorSet::empty</a></div><div class="ttdeci">bool empty() const noexcept</div><div class="ttdef"><b>定义</b> FactorSet.h:292</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_a1f41f7b8f9e4dd4388585751ffcb8dbe"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#a1f41f7b8f9e4dd4388585751ffcb8dbe">hku::MultiFactorSelector::MultiFactorSelector</a></div><div class="ttdeci">MultiFactorSelector(const MFPtr &amp;mf, int topn)</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_a410a51b75b26457ccaf167db5d132f21"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#a410a51b75b26457ccaf167db5d132f21">hku::MultiFactorSelector::_calculate</a></div><div class="ttdeci">virtual void _calculate() override</div><div class="ttdoc">Subclass calculation interface</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_a7bb81c807adeb0a5142648ef339c5c72"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#a7bb81c807adeb0a5142648ef339c5c72">hku::MultiFactorSelector::~MultiFactorSelector</a></div><div class="ttdeci">virtual ~MultiFactorSelector()</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_a7c73b65dd2d11e855aa84390bc631e17"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#a7c73b65dd2d11e855aa84390bc631e17">hku::MultiFactorSelector::MultiFactorSelector</a></div><div class="ttdeci">MultiFactorSelector()</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_a805a3698bd5ed15f77e8520fe4ec4641"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#a805a3698bd5ed15f77e8520fe4ec4641">hku::MultiFactorSelector::_checkParam</a></div><div class="ttdeci">virtual void _checkParam(const string &amp;name) const override</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_aadd367221f8ff3795d15d78afd4a4b26"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#aadd367221f8ff3795d15d78afd4a4b26">hku::MultiFactorSelector::_clone</a></div><div class="ttdeci">virtual SelectorPtr _clone() override</div><div class="ttdoc">Subclass clone interface</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_ac311a85513a4de4c067c3492cccb7db8"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#ac311a85513a4de4c067c3492cccb7db8">hku::MultiFactorSelector::setFactorSet</a></div><div class="ttdeci">void setFactorSet(const FactorSet &amp;factorset)</div><div class="ttdef"><b>定义</b> MultiFactorSelector.h:27</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_ac98d07dd8f7b70e16ccb9a01abf56b9c"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">hku::MultiFactorSelector::access</a></div><div class="ttdeci">friend class boost::serialization::access</div><div class="ttdef"><b>定义</b> MultiFactorSelector.h:48</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_ad8297cbd3987f6e38c37a32038a28f94"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#ad8297cbd3987f6e38c37a32038a28f94">hku::MultiFactorSelector::_reset</a></div><div class="ttdeci">virtual void _reset() override</div><div class="ttdoc">Subclass reset interface</div></div>
+<div class="ttc" id="aclasshku_1_1_multi_factor_selector_html_ae5bd145a70feeed420b59e584dc4fde8"><div class="ttname"><a href="classhku_1_1_multi_factor_selector.html#ae5bd145a70feeed420b59e584dc4fde8">hku::MultiFactorSelector::_getSelected</a></div><div class="ttdeci">virtual SystemWeightList _getSelected(Datetime date) override</div><div class="ttdoc">Subclass interface to get the targets selected at the close of the given moment</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a15225fb9a883876736e71ff6b5616239"><div class="ttname"><a href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase::SelectorPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SelectorPtr</div><div class="ttdef"><b>定义</b> SelectorBase.h:112</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a55a1672fa01c1e84dd2eb483debc4020"><div class="ttname"><a href="classhku_1_1_selector_base.html#a55a1672fa01c1e84dd2eb483debc4020">hku::SelectorBase::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the algorithm name</div><div class="ttdef"><b>定义</b> SelectorBase.h:288</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a681a4acdb9975fa6696ae4ab8c03324f"><div class="ttname"><a href="classhku_1_1_selector_base.html#a681a4acdb9975fa6696ae4ab8c03324f">hku::SelectorBase::m_calculated</a></div><div class="ttdeci">bool m_calculated</div><div class="ttdef"><b>定义</b> SelectorBase.h:201</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a6c0d1dffcc557142786d967cebc1e991"><div class="ttname"><a href="classhku_1_1_selector_base.html#a6c0d1dffcc557142786d967cebc1e991">hku::SelectorBase::SelectorBase</a></div><div class="ttdeci">SelectorBase()</div><div class="ttdoc">Default constructor</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a13af9cba95f52badf6f9c0385c410e10"><div class="ttname"><a href="namespacehku.html#a13af9cba95f52badf6f9c0385c410e10">hku::ScoreRecordList</a></div><div class="ttdeci">vector&lt; ScoreRecord &gt; ScoreRecordList</div><div class="ttdef"><b>定义</b> ScoreRecord.h:31</div></div>
+<div class="ttc" id="anamespacehku_html_a98bd4be9b5b675b83fb004495141769a"><div class="ttname"><a href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">hku::MFPtr</a></div><div class="ttdeci">std::shared_ptr&lt; MultiFactorBase &gt; MFPtr</div><div class="ttdef"><b>定义</b> MultiFactorBase.h:393</div></div>
+<div class="ttc" id="anamespacehku_html_addc86b26683f2e20b24301fce90ef431"><div class="ttname"><a href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">hku::SystemWeightList</a></div><div class="ttdeci">vector&lt; SystemWeight &gt; SystemWeightList</div><div class="ttdef"><b>定义</b> SystemWeight.h:57</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_3da1167a5556da8ee80b5b80dc171a54.html">selector</a></li><li class="navelem"><a href="dir_b4f9f0a55d87869bef0586870d14f68d.html">imp</a></li><li class="navelem"><b>MultiFactorSelector.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

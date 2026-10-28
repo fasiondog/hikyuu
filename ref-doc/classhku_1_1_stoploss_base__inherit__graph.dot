@@ -1,0 +1,12 @@
+digraph "hku::StoplossBase"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  Node1 [id="Node000001",label="hku::StoplossBase",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Base class of the stop-loss / take-profit strategy"];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="hku::FixedPercentStoploss",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_fixed_percent_stoploss.html",tooltip="Fixed percentage stop-loss strategy, i.e."];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="hku::IndicatorStoploss",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_indicator_stoploss.html",tooltip=" "];
+}

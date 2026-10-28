@@ -1,0 +1,11 @@
+digraph "TradeManager trade management class"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir=LR;
+  Node2 [id="Node000002",label="TradeManager trade\l management",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___trade_manager.html",tooltip="Trade management, responsible for recording every trade record and the current positions"];
+  Node1 [id="Node000001",label="TradeManager trade\l management class",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Trade management can be understood as a simulated account for simulated trading."];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+}

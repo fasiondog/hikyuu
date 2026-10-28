@@ -1,0 +1,285 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/ResourceHybridPool.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_resource_hybrid_pool_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">ResourceHybridPool.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * ResourceHybridPool.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2025, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2025-05-12</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef HKU_UTILS_RESOURCE_HYBRID_POOL_H</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define HKU_UTILS_RESOURCE_HYBRID_POOL_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;ResourceTlsPool.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;ResourcePool.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ResourceType, <span class="keywordtype">size_t</span> MAX_TLS_POOL_SIZE_LIMIT = 2&gt;</div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="};">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html">   85</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a41a1c0f36ba5b85911d2e72bcb7493b1">   88</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_resource_hybrid_pool.html#a41a1c0f36ba5b85911d2e72bcb7493b1">TlsPoolType</a> = <a class="code hl_class" href="classhku_1_1_resource_tls_pool.html">ResourceTlsPool&lt;ResourceType, MAX_TLS_POOL_SIZE_LIMIT&gt;</a>;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a182102bbf319cf6e0e02a0f4aacc70f8">   92</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_resource_hybrid_pool.html#a182102bbf319cf6e0e02a0f4aacc70f8">GlobalPoolType</a> = <a class="code hl_class" href="classhku_1_1_resource_pool.html">ResourcePool&lt;ResourceType&gt;</a>;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span></div>
+<div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">  112</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_parameter.html">Parameter</a> &amp;param,</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                                <span class="keywordtype">size_t</span> max_tls_pool_size = MAX_TLS_POOL_SIZE_LIMIT,</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                                <span class="keywordtype">size_t</span> max_global_pool_size = 64)</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    : m_max_global_pool_size(max_global_pool_size), m_max_tls_pool_size(max_tls_pool_size) {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        <span class="comment">// Check and truncate the TLS pool size</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        <span class="keywordflow">if</span> (m_max_tls_pool_size &gt; MAX_TLS_POOL_SIZE_LIMIT) {</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>            HKU_WARN(<span class="stringliteral">&quot;max_tls_pool_size({}) exceeds physical limit ({}), truncated to {}&quot;</span>,</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>                     m_max_tls_pool_size, MAX_TLS_POOL_SIZE_LIMIT, MAX_TLS_POOL_SIZE_LIMIT);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>            m_max_tls_pool_size = MAX_TLS_POOL_SIZE_LIMIT;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        }</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="comment">// Initialize the default parameters of the TLS Pool</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#ad4db1a650a6b956842b76aba0c80a346">TlsPoolType::init</a>(param);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        <span class="comment">// Set the actually used size of the TLS Pool (maxCount is called after getInstance())</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#a40f433ba40cd81448c1aae3ebfee5d2b">TlsPoolType::getInstance</a>().<a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#ab508f9dae7ee3ed0e906b4009c5243d2">maxCount</a>(m_max_tls_pool_size);</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <span class="comment">// Create the global shared pool (with the size given at runtime, supporting the</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="comment">// multi-thread concurrency)</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        m_global_pool = std::make_unique&lt;GlobalPoolType&gt;(param, m_max_global_pool_size);</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    }</div>
+</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a5af3859565ee758bcb6bf82968edaa2c">  137</a></span>    <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a5af3859565ee758bcb6bf82968edaa2c">~ResourceHybridPool</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#ab72902e36d9722aa71349505febe4cbc">  140</a></span>    <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab72902e36d9722aa71349505febe4cbc">ResourceHybridPool</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#aadff026a1c7c350263324cbabfaba437">  141</a></span>    <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> &amp;<a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#aadff026a1c7c350263324cbabfaba437">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#aba8cbec5e584e98d01fe4f4a82820fb2">  144</a></span>    <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#aba8cbec5e584e98d01fe4f4a82820fb2">ResourceHybridPool</a>(<a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> &amp;&amp;) noexcept = default;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a0285702767428f1bde29ef32adc3d1ac">  145</a></span>    <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> &amp;operator=(<a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">ResourceHybridPool</a> &amp;&amp;) noexcept = default;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span></div>
+<div class="foldopen" id="foldopen00161" data-start="{" data-end="}">
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a3a79370a1d40e80cbf10795feb44be1c">  161</a></span>    <a class="code hl_namespace" href="namespacestd.html">std</a>::shared_ptr&lt;ResourceType&gt; <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a3a79370a1d40e80cbf10795feb44be1c">get</a>() {</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="comment">// If the TLS Pool is disabled, acquire it from the global pool directly</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        <span class="keywordflow">if</span> (m_max_tls_pool_size == 0) {</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>            <span class="keywordflow">return</span> m_global_pool-&gt;get();</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        }</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        <span class="comment">// Acquire it from the TLS Pool preferentially (the fast path)</span></div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        <span class="keyword">auto</span> tls_result = <a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#a40f433ba40cd81448c1aae3ebfee5d2b">TlsPoolType::getInstance</a>().<a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#ac6aed8bc1db0e0ed516c387463fdf8bd">get</a>();</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>        <span class="keywordflow">if</span> (tls_result) {</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>            <span class="keywordflow">return</span> tls_result.value();  <span class="comment">// The TLS Pool succeeded, extract the shared_ptr</span></div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        }</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>        <span class="comment">// The TLS Pool failed, try to acquire it from the global shared pool</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="keywordflow">return</span> m_global_pool-&gt;get();  <span class="comment">// It may return nullptr or throw CreateResourceException</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    }</div>
+</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span></div>
+<div class="foldopen" id="foldopen00192" data-start="{" data-end="}">
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#aa2e58d318d1ab302895bd325b09fa54c">  192</a></span>    std::shared_ptr&lt;ResourceType&gt; <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#aa2e58d318d1ab302895bd325b09fa54c">getWaitFor</a>(<a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> ms_timeout) {</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        <span class="comment">// If the TLS Pool is disabled (max_tls_pool_size == 0), wait and acquire it from the global</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <span class="comment">// pool directly</span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        <span class="keywordflow">if</span> (m_max_tls_pool_size == 0) {</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>            <span class="keywordflow">return</span> m_global_pool-&gt;getWaitFor(ms_timeout);  <span class="comment">// It may throw an exception</span></div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        }</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        <span class="comment">// Acquire it from the TLS Pool preferentially (the fast path)</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        <span class="keyword">auto</span> tls_result = <a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#a40f433ba40cd81448c1aae3ebfee5d2b">TlsPoolType::getInstance</a>().<a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#ac6aed8bc1db0e0ed516c387463fdf8bd">get</a>();</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        <span class="keywordflow">if</span> (tls_result) {</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>            <span class="keywordflow">return</span> tls_result.value();  <span class="comment">// The TLS Pool succeeded, extract the shared_ptr</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        }</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> </div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        <span class="comment">// The TLS Pool failed, try to wait and acquire it from the global shared pool (with a</span></div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        <span class="comment">// timeout)</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        <span class="keywordflow">return</span> m_global_pool-&gt;getWaitFor(ms_timeout);  <span class="comment">// It may throw GetResourceTimeoutException</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    }</div>
+</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span></div>
+<div class="foldopen" id="foldopen00232" data-start="{" data-end="}">
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a931a1ccba220093ea38d686d186ab531">  232</a></span>    std::shared_ptr&lt;ResourceType&gt; <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a931a1ccba220093ea38d686d186ab531">getAndWait</a>() {</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#aa2e58d318d1ab302895bd325b09fa54c">getWaitFor</a>(0);  <span class="comment">// getWaitFor(0) is called to implement the indefinite waiting</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    }</div>
+</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span></div>
+<div class="foldopen" id="foldopen00241" data-start="{" data-end="}">
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a2deb36e1d874d4b87878ed2b54e1c94c">  241</a></span>    std::shared_ptr&lt;ResourceType&gt; <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a2deb36e1d874d4b87878ed2b54e1c94c">getFromTlsPool</a>() {</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        <span class="keyword">auto</span> result = <a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#a40f433ba40cd81448c1aae3ebfee5d2b">TlsPoolType::getInstance</a>().<a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#ac6aed8bc1db0e0ed516c387463fdf8bd">get</a>();</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>        <span class="keywordflow">return</span> result ? result.value() : <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    }</div>
+</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span></div>
+<div class="foldopen" id="foldopen00253" data-start="{" data-end="}">
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#aa4bcd9896b342598f3e7e557a0a453b0">  253</a></span>    std::shared_ptr&lt;ResourceType&gt; <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#aa4bcd9896b342598f3e7e557a0a453b0">getFromGlobalPool</a>() {</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>        <span class="keywordflow">return</span> m_global_pool-&gt;get();  <span class="comment">// It may return nullptr or throw CreateResourceException</span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    }</div>
+</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span></div>
+<div class="foldopen" id="foldopen00258" data-start="{" data-end="}">
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a5e77da82941ed9f6ff3ce3672055bb33">  258</a></span>    <a class="code hl_typedef" href="classhku_1_1_resource_hybrid_pool.html#a41a1c0f36ba5b85911d2e72bcb7493b1">TlsPoolType</a> &amp;<a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a5e77da82941ed9f6ff3ce3672055bb33">tlsPool</a>() {</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_resource_tls_pool.html#a40f433ba40cd81448c1aae3ebfee5d2b">TlsPoolType::getInstance</a>();</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>    }</div>
+</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span></div>
+<div class="foldopen" id="foldopen00263" data-start="{" data-end="}">
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#aa3b49be5364d4ddcb0ea0100f526fab6">  263</a></span>    <a class="code hl_typedef" href="classhku_1_1_resource_hybrid_pool.html#a182102bbf319cf6e0e02a0f4aacc70f8">GlobalPoolType</a> &amp;<a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#aa3b49be5364d4ddcb0ea0100f526fab6">globalPool</a>() {</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordflow">return</span> *m_global_pool;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    }</div>
+</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span></div>
+<div class="foldopen" id="foldopen00268" data-start="{" data-end="}">
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a637a618856ef80f5d0589f425e46d740">  268</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a637a618856ef80f5d0589f425e46d740">maxTlsPoolSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>        <span class="keywordflow">return</span> m_max_tls_pool_size;</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    }</div>
+</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span></div>
+<div class="foldopen" id="foldopen00273" data-start="{" data-end="}">
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno"><a class="line" href="classhku_1_1_resource_hybrid_pool.html#a4230f9b5178802d5142c77b7720e0976">  273</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_resource_hybrid_pool.html#a4230f9b5178802d5142c77b7720e0976">maxGlobalPoolSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        <span class="keywordflow">return</span> m_max_global_pool_size;</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    }</div>
+</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <span class="keywordtype">size_t</span> m_max_global_pool_size{64};  <span class="comment">// The maximum number of the resources of the global shared</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>                                        <span class="comment">// pool</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    <span class="keywordtype">size_t</span> m_max_tls_pool_size{MAX_TLS_POOL_SIZE_LIMIT};  <span class="comment">// The maximum number of the resources</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>                                                          <span class="comment">// actually used by the TLS pool (it does</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>                                                          <span class="comment">// not exceed the template parameter)</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    std::unique_ptr&lt;GlobalPoolType&gt; m_global_pool;        <span class="comment">// The global shared pool instance</span></div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>};</div>
+</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="preprocessor">#endif </span><span class="comment">/* RESOURCE_HYBRID_POOL_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html"><div class="ttname"><a href="classhku_1_1_parameter.html">hku::Parameter</a></div><div class="ttdoc">Used by the classes that need the named parameter settings</div><div class="ttdef"><b>定义</b> Parameter.h:202</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a182102bbf319cf6e0e02a0f4aacc70f8"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a182102bbf319cf6e0e02a0f4aacc70f8">hku::ResourceHybridPool::GlobalPoolType</a></div><div class="ttdeci">ResourcePool&lt; ResourceType &gt; GlobalPoolType</div><div class="ttdoc">Global shared pool type alias (std::mutex is used to support the multi-thread concurrent access)</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:92</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a2deb36e1d874d4b87878ed2b54e1c94c"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a2deb36e1d874d4b87878ed2b54e1c94c">hku::ResourceHybridPool::getFromTlsPool</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getFromTlsPool()</div><div class="ttdoc">Acquire the resource from the TLS Pool only (synchronously)</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:241</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a3a79370a1d40e80cbf10795feb44be1c"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a3a79370a1d40e80cbf10795feb44be1c">hku::ResourceHybridPool::get</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; get()</div><div class="ttdoc">Get an available resource; a null pointer is returned when the maximum number of the resources allowe...</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:161</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a41a1c0f36ba5b85911d2e72bcb7493b1"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a41a1c0f36ba5b85911d2e72bcb7493b1">hku::ResourceHybridPool::TlsPoolType</a></div><div class="ttdeci">ResourceTlsPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt; TlsPoolType</div><div class="ttdoc">TLS Pool type alias</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:88</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a4230f9b5178802d5142c77b7720e0976"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a4230f9b5178802d5142c77b7720e0976">hku::ResourceHybridPool::maxGlobalPoolSize</a></div><div class="ttdeci">size_t maxGlobalPoolSize() const</div><div class="ttdoc">Get the maximum number of the resources of the global shared pool</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:273</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a5af3859565ee758bcb6bf82968edaa2c"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a5af3859565ee758bcb6bf82968edaa2c">hku::ResourceHybridPool::~ResourceHybridPool</a></div><div class="ttdeci">~ResourceHybridPool()=default</div><div class="ttdoc">Destructor</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a5e77da82941ed9f6ff3ce3672055bb33"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a5e77da82941ed9f6ff3ce3672055bb33">hku::ResourceHybridPool::tlsPool</a></div><div class="ttdeci">TlsPoolType &amp; tlsPool()</div><div class="ttdoc">Get the TLS Pool reference</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:258</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a637a618856ef80f5d0589f425e46d740"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a637a618856ef80f5d0589f425e46d740">hku::ResourceHybridPool::maxTlsPoolSize</a></div><div class="ttdeci">size_t maxTlsPoolSize() const</div><div class="ttdoc">Get the maximum number of the resources actually used by the TLS pool</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:268</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_a931a1ccba220093ea38d686d186ab531"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#a931a1ccba220093ea38d686d186ab531">hku::ResourceHybridPool::getAndWait</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getAndWait()</div><div class="ttdoc">Get an available resource; if the maximum number of the resources allowed is exceeded,...</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:232</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_aa2e58d318d1ab302895bd325b09fa54c"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#aa2e58d318d1ab302895bd325b09fa54c">hku::ResourceHybridPool::getWaitFor</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getWaitFor(uint64_t ms_timeout)</div><div class="ttdoc">Get an available resource within the given timeout</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:192</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_aa3b49be5364d4ddcb0ea0100f526fab6"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#aa3b49be5364d4ddcb0ea0100f526fab6">hku::ResourceHybridPool::globalPool</a></div><div class="ttdeci">GlobalPoolType &amp; globalPool()</div><div class="ttdoc">Get the global shared pool reference</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:263</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_aa4bcd9896b342598f3e7e557a0a453b0"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#aa4bcd9896b342598f3e7e557a0a453b0">hku::ResourceHybridPool::getFromGlobalPool</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; getFromGlobalPool()</div><div class="ttdoc">Acquire the resource from the global shared pool only (synchronously)</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:253</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_aadff026a1c7c350263324cbabfaba437"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#aadff026a1c7c350263324cbabfaba437">hku::ResourceHybridPool::operator=</a></div><div class="ttdeci">ResourceHybridPool &amp; operator=(const ResourceHybridPool &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_ab6b7f40aca7683245d5b562844a5c882"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#ab6b7f40aca7683245d5b562844a5c882">hku::ResourceHybridPool::ResourceHybridPool</a></div><div class="ttdeci">ResourceHybridPool(const Parameter &amp;param, size_t max_tls_pool_size=MAX_TLS_POOL_SIZE_LIMIT, size_t max_global_pool_size=64)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> ResourceHybridPool.h:112</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_ab72902e36d9722aa71349505febe4cbc"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#ab72902e36d9722aa71349505febe4cbc">hku::ResourceHybridPool::ResourceHybridPool</a></div><div class="ttdeci">ResourceHybridPool(const ResourceHybridPool &amp;)=delete</div><div class="ttdoc">The copy is forbidden</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_hybrid_pool_html_aba8cbec5e584e98d01fe4f4a82820fb2"><div class="ttname"><a href="classhku_1_1_resource_hybrid_pool.html#aba8cbec5e584e98d01fe4f4a82820fb2">hku::ResourceHybridPool::ResourceHybridPool</a></div><div class="ttdeci">ResourceHybridPool(ResourceHybridPool &amp;&amp;) noexcept=default</div><div class="ttdoc">The move is allowed</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_pool_html"><div class="ttname"><a href="classhku_1_1_resource_pool.html">hku::ResourcePool</a></div><div class="ttdoc">General shared resource pool</div><div class="ttdef"><b>定义</b> ResourcePool.h:69</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_pool_html"><div class="ttname"><a href="classhku_1_1_resource_tls_pool.html">hku::ResourceTlsPool</a></div><div class="ttdef"><b>定义</b> ResourceTlsPool.h:96</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_pool_html_a40f433ba40cd81448c1aae3ebfee5d2b"><div class="ttname"><a href="classhku_1_1_resource_tls_pool.html#a40f433ba40cd81448c1aae3ebfee5d2b">hku::ResourceTlsPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::getInstance</a></div><div class="ttdeci">static ResourceTlsPool &amp; getInstance()</div><div class="ttdef"><b>定义</b> ResourceTlsPool.h:145</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_pool_html_ab508f9dae7ee3ed0e906b4009c5243d2"><div class="ttname"><a href="classhku_1_1_resource_tls_pool.html#ab508f9dae7ee3ed0e906b4009c5243d2">hku::ResourceTlsPool::maxCount</a></div><div class="ttdeci">size_t maxCount() const</div><div class="ttdoc">Get the maximum number of the resources allowed (the logical upper limit)</div><div class="ttdef"><b>定义</b> ResourceTlsPool.h:295</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_pool_html_ac6aed8bc1db0e0ed516c387463fdf8bd"><div class="ttname"><a href="classhku_1_1_resource_tls_pool.html#ac6aed8bc1db0e0ed516c387463fdf8bd">hku::ResourceTlsPool::get</a></div><div class="ttdeci">stdx::expected&lt; ResourcePtr, std::string &gt; get()</div><div class="ttdoc">Get an available resource (a synchronous operation)</div><div class="ttdef"><b>定义</b> ResourceTlsPool.h:217</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_tls_pool_html_ad4db1a650a6b956842b76aba0c80a346"><div class="ttname"><a href="classhku_1_1_resource_tls_pool.html#ad4db1a650a6b956842b76aba0c80a346">hku::ResourceTlsPool&lt; ResourceType, MAX_TLS_POOL_SIZE_LIMIT &gt;::init</a></div><div class="ttdeci">static void init(const Parameter &amp;param)</div><div class="ttdef"><b>定义</b> ResourceTlsPool.h:122</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><b>ResourceHybridPool.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

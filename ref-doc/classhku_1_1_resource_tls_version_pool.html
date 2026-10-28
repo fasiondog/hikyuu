@@ -1,0 +1,567 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::ResourceTlsVersionPool&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_resource_tls_version_pool.html','','classhku_1_1_resource_tls_version_pool-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::ResourceTlsVersionPool&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt; 模板类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="_resource_tls_version_pool_8h_source.html">ResourceTlsVersionPool.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:ResourceDeleter" id="r_ResourceDeleter"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html">ResourceDeleter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The resource deleter, used by shared_ptr to return the resource automatically  <a href="structhku_1_1_resource_tls_version_pool_1_1_resource_deleter.html#details">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a13cd85da7db19a00087419e4b81cf0eb" id="r_a13cd85da7db19a00087419e4b81cf0eb"><td class="memItemLeft" align="right" valign="top">typedef std::shared_ptr&lt; ResourceType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a></td></tr>
+<tr class="memdesc:a13cd85da7db19a00087419e4b81cf0eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The resource instance pointer type (the lifetime is managed with shared_ptr)  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ae00bc82c9114d3517400d0c54a701cbb" id="r_ae00bc82c9114d3517400d0c54a701cbb"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae00bc82c9114d3517400d0c54a701cbb">~ResourceTlsVersionPool</a> ()</td></tr>
+<tr class="memdesc:ae00bc82c9114d3517400d0c54a701cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, it releases all the cached resources of the current thread  <br /></td></tr>
+<tr class="memitem:abf81c627b81e41c0324d63e93fb9f9d6" id="r_abf81c627b81e41c0324d63e93fb9f9d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf81c627b81e41c0324d63e93fb9f9d6">syncVersion</a> (int version, const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;param)</td></tr>
+<tr class="memdesc:abf81c627b81e41c0324d63e93fb9f9d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronously update the version and the parameters (called by HybridVersionPool)  <br /></td></tr>
+<tr class="memitem:ae5b3ca45eadf568c8ffd9be829a03cfa" id="r_ae5b3ca45eadf568c8ffd9be829a03cfa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae5b3ca45eadf568c8ffd9be829a03cfa">getVersion</a> () const</td></tr>
+<tr class="memdesc:ae5b3ca45eadf568c8ffd9be829a03cfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current version number  <br /></td></tr>
+<tr class="memitem:ae73379d118908fa440cc0e5eb3ae9c44" id="r_ae73379d118908fa440cc0e5eb3ae9c44"><td class="memItemLeft" align="right" valign="top">stdx::expected&lt; <a class="el" href="#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a>, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae73379d118908fa440cc0e5eb3ae9c44">get</a> ()</td></tr>
+<tr class="memdesc:ae73379d118908fa440cc0e5eb3ae9c44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an available resource  <br /></td></tr>
+<tr class="memitem:af3b49755cc7cccddf063ffcc8880b807" id="r_af3b49755cc7cccddf063ffcc8880b807"><td class="memItemLeft" align="right" valign="top">stdx::expected&lt; std::unique_ptr&lt; ResourceType &gt;, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3b49755cc7cccddf063ffcc8880b807">createStandalone</a> ()</td></tr>
+<tr class="memitem:abf14458dbed38dc517fdd6681647038c" id="r_abf14458dbed38dc517fdd6681647038c"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf14458dbed38dc517fdd6681647038c">count</a> () const</td></tr>
+<tr class="memdesc:abf14458dbed38dc517fdd6681647038c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of the currently active resources (including the idle and the used ones)  <br /></td></tr>
+<tr class="memitem:ac67187323a1cfb87292a8255042aa5b5" id="r_ac67187323a1cfb87292a8255042aa5b5"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac67187323a1cfb87292a8255042aa5b5">idleCount</a> () const</td></tr>
+<tr class="memdesc:ac67187323a1cfb87292a8255042aa5b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current number of the idle resources  <br /></td></tr>
+<tr class="memitem:aa4626dbdcee011748df020d88534cfb4" id="r_aa4626dbdcee011748df020d88534cfb4"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4626dbdcee011748df020d88534cfb4">maxCount</a> () const</td></tr>
+<tr class="memdesc:aa4626dbdcee011748df020d88534cfb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum number of the resources allowed (the logical upper limit)  <br /></td></tr>
+<tr class="memitem:a940bb868638a3dd46479faeb72f00d82" id="r_a940bb868638a3dd46479faeb72f00d82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a940bb868638a3dd46479faeb72f00d82">maxCount</a> (size_t num)</td></tr>
+<tr class="memdesc:a940bb868638a3dd46479faeb72f00d82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of the resources (the logical upper limit, it cannot exceed the physical capacity)  <br /></td></tr>
+<tr class="memitem:a2f669700a32ca76a6283fd76c4ae883f" id="r_a2f669700a32ca76a6283fd76c4ae883f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f669700a32ca76a6283fd76c4ae883f">releaseIdleResource</a> ()</td></tr>
+<tr class="memdesc:a2f669700a32ca76a6283fd76c4ae883f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release all the currently idle resources  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:afafed4e1d71f8ef3e961b66496f1cc7e" id="r_afafed4e1d71f8ef3e961b66496f1cc7e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afafed4e1d71f8ef3e961b66496f1cc7e">init</a> (const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;param)</td></tr>
+<tr class="memitem:adb0598a712d14cb651f44e7ff9511c90" id="r_adb0598a712d14cb651f44e7ff9511c90"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_resource_tls_version_pool.html">ResourceTlsVersionPool</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb0598a712d14cb651f44e7ff9511c90">getInstance</a> ()</td></tr>
+</table>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a13cd85da7db19a00087419e4b81cf0eb" name="a13cd85da7db19a00087419e4b81cf0eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13cd85da7db19a00087419e4b81cf0eb">&#9670;&#160;</a></span>ResourcePtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::shared_ptr&lt;ResourceType&gt; <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::ResourcePtr</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The resource instance pointer type (the lifetime is managed with shared_ptr) </p>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a10">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ae00bc82c9114d3517400d0c54a701cbb" name="ae00bc82c9114d3517400d0c54a701cbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae00bc82c9114d3517400d0c54a701cbb">&#9670;&#160;</a></span>~ResourceTlsVersionPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::~<a class="el" href="classhku_1_1_resource_tls_version_pool.html">ResourceTlsVersionPool</a> </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor, it releases all the cached resources of the current thread </p>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a4">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="abf14458dbed38dc517fdd6681647038c" name="abf14458dbed38dc517fdd6681647038c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf14458dbed38dc517fdd6681647038c">&#9670;&#160;</a></span>count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::count </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The number of the currently active resources (including the idle and the used ones) </p>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a15">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="af3b49755cc7cccddf063ffcc8880b807" name="af3b49755cc7cccddf063ffcc8880b807"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3b49755cc7cccddf063ffcc8880b807">&#9670;&#160;</a></span>createStandalone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">stdx::expected&lt; std::unique_ptr&lt; ResourceType &gt;, std::string &gt; <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::createStandalone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a14">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="ae73379d118908fa440cc0e5eb3ae9c44" name="ae73379d118908fa440cc0e5eb3ae9c44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae73379d118908fa440cc0e5eb3ae9c44">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">stdx::expected&lt; <a class="el" href="#a13cd85da7db19a00087419e4b81cf0eb">ResourcePtr</a>, std::string &gt; <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::get </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get an available resource </p>
+<dl class="section return"><dt>返回</dt><dd>the expected object of <a class="el" href="#a13cd85da7db19a00087419e4b81cf0eb" title="The resource instance pointer type (the lifetime is managed with shared_ptr)">ResourcePtr</a>, it contains the resource pointer on success and the error information on failure</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>It is a completely lock free operation with an extremely high performance </dd>
+<dd>
+The returned shared_ptr returns the resource to the pool automatically at its destruction (through the custom deleter) </dd>
+<dd>
+If the current number of the resources has reached the upper limit and there is no idle resource, the error information is returned </dd>
+<dd>
+The version is checked when it is acquired from the idle queue; when the version does not match, the old resource is destroyed and a new resource is created </dd></dl>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a13">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="adb0598a712d14cb651f44e7ff9511c90" name="adb0598a712d14cb651f44e7ff9511c90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb0598a712d14cb651f44e7ff9511c90">&#9670;&#160;</a></span>getInstance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_resource_tls_version_pool.html">ResourceTlsVersionPool</a> &amp; <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::getInstance </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a3">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="ae5b3ca45eadf568c8ffd9be829a03cfa" name="ae5b3ca45eadf568c8ffd9be829a03cfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5b3ca45eadf568c8ffd9be829a03cfa">&#9670;&#160;</a></span>getVersion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::getVersion </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current version number </p>
+<dl class="section return"><dt>返回</dt><dd>the version number of the current thread </dd></dl>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a12">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="ac67187323a1cfb87292a8255042aa5b5" name="ac67187323a1cfb87292a8255042aa5b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac67187323a1cfb87292a8255042aa5b5">&#9670;&#160;</a></span>idleCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::idleCount </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The current number of the idle resources </p>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a16">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="afafed4e1d71f8ef3e961b66496f1cc7e" name="afafed4e1d71f8ef3e961b66496f1cc7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afafed4e1d71f8ef3e961b66496f1cc7e">&#9670;&#160;</a></span>init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::init </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>param</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a0">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="aa4626dbdcee011748df020d88534cfb4" name="aa4626dbdcee011748df020d88534cfb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4626dbdcee011748df020d88534cfb4">&#9670;&#160;</a></span>maxCount() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::maxCount </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the maximum number of the resources allowed (the logical upper limit) </p>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_hybrid_version_pool_8h-example.html#a6">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceHybridVersionPool.h</a> , 以及 <a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a17">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="a940bb868638a3dd46479faeb72f00d82" name="a940bb868638a3dd46479faeb72f00d82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a940bb868638a3dd46479faeb72f00d82">&#9670;&#160;</a></span>maxCount() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::maxCount </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the maximum number of the resources (the logical upper limit, it cannot exceed the physical capacity) </p>
+
+</div>
+</div>
+<a id="a2f669700a32ca76a6283fd76c4ae883f" name="a2f669700a32ca76a6283fd76c4ae883f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f669700a32ca76a6283fd76c4ae883f">&#9670;&#160;</a></span>releaseIdleResource()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::releaseIdleResource </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Release all the currently idle resources </p>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a5">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<a id="abf81c627b81e41c0324d63e93fb9f9d6" name="abf81c627b81e41c0324d63e93fb9f9d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf81c627b81e41c0324d63e93fb9f9d6">&#9670;&#160;</a></span>syncVersion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_resource_tls_version_pool.html">hku::ResourceTlsVersionPool</a>&lt; ResourceType, MAX_POOL_SIZE_LIMIT &gt;::syncVersion </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>version</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>param</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synchronously update the version and the parameters (called by HybridVersionPool) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">version</td><td>the new version number </td></tr>
+    <tr><td class="paramname">param</td><td>the new parameters</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>This method releases all the idle old version resources </dd>
+<dd>
+It only affects the resource pool instance of the current thread </dd></dl>
+<dl class="section examples"><dt>示例</dt><dd><a class="el" href="_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_tls_version_pool_8h-example.html#a11">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceTlsVersionPool.h</a>.</dd>
+</dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_resource_tls_version_pool_8h_source.html">ResourceTlsVersionPool.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_resource_tls_version_pool.html">ResourceTlsVersionPool</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

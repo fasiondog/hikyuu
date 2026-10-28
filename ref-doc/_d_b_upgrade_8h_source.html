@@ -1,0 +1,138 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/DBUpgrade.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_d_b_upgrade_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">DBUpgrade.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright(C) 2021 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Create on: 2021-04-08</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *     Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;DBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;AsyncDBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="group___data_driver.html#ga0f5a8f20698b6bc2a8b40b72e046645e">   27</a></span><span class="keywordtype">void</span> HKU_UTILS_API <a class="code hl_function" href="group___data_driver.html#ga0f5a8f20698b6bc2a8b40b72e046645e">DBUpgrade</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a> &amp;driver, <span class="keyword">const</span> <span class="keywordtype">char</span> *module_name,</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>                             <span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;upgrade_scripts, <span class="keywordtype">int</span> start_version = 2,</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>                             <span class="keyword">const</span> <span class="keywordtype">char</span> *create_script = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="namespacehku.html#ac899072cfb6ab56571acd73af8fb941e">   31</a></span><a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> HKU_UTILS_API <a class="code hl_function" href="group___data_driver.html#ga0f5a8f20698b6bc2a8b40b72e046645e">DBUpgrade</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">AsyncDBConnectPtr</a> &amp;driver,</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>                                             <span class="keyword">const</span> <span class="keywordtype">char</span> *module_name,</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                                             <span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;upgrade_scripts,</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>                                             <span class="keywordtype">int</span> start_version = 2,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                                             <span class="keyword">const</span> <span class="keywordtype">char</span> *create_script = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="agroup___d_b_connect_html_ga99e3e0a30d3e799e021e4873e4bfc331"><div class="ttname"><a href="group___d_b_connect.html#ga99e3e0a30d3e799e021e4873e4bfc331">hku::AsyncDBConnectPtr</a></div><div class="ttdeci">std::shared_ptr&lt; AsyncDBConnectBase &gt; AsyncDBConnectPtr</div><div class="ttdef"><b>定义</b> AsyncDBConnectBase.h:327</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_gab085d7d9748cc3ecf5dacf8691ad7a2b"><div class="ttname"><a href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">hku::DBConnectPtr</a></div><div class="ttdeci">std::shared_ptr&lt; DBConnectBase &gt; DBConnectPtr</div><div class="ttdef"><b>定义</b> DBConnectBase.h:376</div></div>
+<div class="ttc" id="agroup___data_driver_html_ga0f5a8f20698b6bc2a8b40b72e046645e"><div class="ttname"><a href="group___data_driver.html#ga0f5a8f20698b6bc2a8b40b72e046645e">hku::DBUpgrade</a></div><div class="ttdeci">void HKU_UTILS_API DBUpgrade(const DBConnectPtr &amp;driver, const char *module_name, const std::vector&lt; std::string &gt; &amp;upgrade_scripts, int start_version=2, const char *create_script=nullptr)</div><div class="ttdoc">Upgrade and create the database</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><b>DBUpgrade.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

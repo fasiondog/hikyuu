@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::SelectorBase类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_selector_base.html','','classhku_1_1_selector_base-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,109 +74,165 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pro-attribs">Protected 属性</a> &#124;
-<a href="#friends">友元</a> &#124;
-<a href="classhku_1_1_selector_base-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::SelectorBase类 参考<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___portfolio.html">Portfolio 投资组合管理</a> &raquo; <a class="el" href="group___selector.html">Selector 交易对象选择算法</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::SelectorBase类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___portfolio.html">Portfolio portfolio management</a> &raquo; <a class="el" href="group___selector.html">Selector trading object selection algorithm</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>交易对象选择模块  
- <a href="classhku_1_1_selector_base.html#details">更多...</a></p>
+<p>Trading object selection module  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_selector_base_8h_source.html">SelectorBase.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::SelectorBase 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_selector_base__inherit__graph.png" border="0" usemap="#ahku_1_1_selector_base_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::SelectorBase 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_selector_base__coll__graph.png" border="0" usemap="#ahku_1_1_selector_base_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a15225fb9a883876736e71ff6b5616239"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a></td></tr>
-<tr class="separator:a15225fb9a883876736e71ff6b5616239"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15225fb9a883876736e71ff6b5616239" id="r_a15225fb9a883876736e71ff6b5616239"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a6c0d1dffcc557142786d967cebc1e991"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a6c0d1dffcc557142786d967cebc1e991">SelectorBase</a> ()</td></tr>
-<tr class="separator:a6c0d1dffcc557142786d967cebc1e991"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af511439579a4f4b083dbf6b126d69c26"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#af511439579a4f4b083dbf6b126d69c26">~SelectorBase</a> ()</td></tr>
-<tr class="separator:af511439579a4f4b083dbf6b126d69c26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04d4ee4e26e44655d273d8dde4ef3ea1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a04d4ee4e26e44655d273d8dde4ef3ea1">addStock</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
-<tr class="separator:a04d4ee4e26e44655d273d8dde4ef3ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59af2d32a4b27b61d93ceae5aa83b224"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a59af2d32a4b27b61d93ceae5aa83b224">addStockList</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;)</td></tr>
-<tr class="separator:a59af2d32a4b27b61d93ceae5aa83b224"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d566c261eb624f3ad0d61d5927a1af2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a6d566c261eb624f3ad0d61d5927a1af2">getRawStockList</a> () const </td></tr>
-<tr class="separator:a6d566c261eb624f3ad0d61d5927a1af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19021db25f3858cd9f0909b1d5487223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a19021db25f3858cd9f0909b1d5487223">reset</a> ()</td></tr>
-<tr class="separator:a19021db25f3858cd9f0909b1d5487223"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbcd95ee123977203c827f688cfdf044"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#afbcd95ee123977203c827f688cfdf044">clearStockList</a> ()</td></tr>
-<tr class="separator:afbcd95ee123977203c827f688cfdf044"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad78f5fa76d6cda35df14238c0ef61e17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#ad78f5fa76d6cda35df14238c0ef61e17">clone</a> ()</td></tr>
-<tr class="separator:ad78f5fa76d6cda35df14238c0ef61e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2724063202847a83af1297f21f85b5d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#ad2724063202847a83af1297f21f85b5d">name</a> () const </td></tr>
-<tr class="separator:ad2724063202847a83af1297f21f85b5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75c258b42c8e003a9f167d6e16ecab5b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a75c258b42c8e003a9f167d6e16ecab5b">getSelectedStock</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> date)</td></tr>
-<tr class="separator:a75c258b42c8e003a9f167d6e16ecab5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20e1fabbb329563a518d56309a22e5a3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a20e1fabbb329563a518d56309a22e5a3">_reset</a> ()</td></tr>
-<tr class="memdesc:a20e1fabbb329563a518d56309a22e5a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类复位接口  <a href="#a20e1fabbb329563a518d56309a22e5a3">更多...</a><br /></td></tr>
-<tr class="separator:a20e1fabbb329563a518d56309a22e5a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9db36e057de3309ac77bc4cd49bea37a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#a9db36e057de3309ac77bc4cd49bea37a">_clone</a> ()=0</td></tr>
-<tr class="memdesc:a9db36e057de3309ac77bc4cd49bea37a"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类克隆接口  <a href="#a9db36e057de3309ac77bc4cd49bea37a">更多...</a><br /></td></tr>
-<tr class="separator:a9db36e057de3309ac77bc4cd49bea37a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c0d1dffcc557142786d967cebc1e991" id="r_a6c0d1dffcc557142786d967cebc1e991"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c0d1dffcc557142786d967cebc1e991">SelectorBase</a> ()</td></tr>
+<tr class="memdesc:a6c0d1dffcc557142786d967cebc1e991"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor  <br /></td></tr>
+<tr class="memitem:a7acc067c9d0162284963ce98e7ca9a88" id="r_a7acc067c9d0162284963ce98e7ca9a88"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7acc067c9d0162284963ce98e7ca9a88">SelectorBase</a> (const <a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a> &amp;)=default</td></tr>
+<tr class="memitem:ab4416cac5c8ab7504d641adeb975dae9" id="r_ab4416cac5c8ab7504d641adeb975dae9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4416cac5c8ab7504d641adeb975dae9">SelectorBase</a> (const string &amp;<a class="el" href="#a55a1672fa01c1e84dd2eb483debc4020">name</a>)</td></tr>
+<tr class="memdesc:ab4416cac5c8ab7504d641adeb975dae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it also gives the algorithm name  <br /></td></tr>
+<tr class="memitem:aea5fa05f0df681c0f975a445bad35a41" id="r_aea5fa05f0df681c0f975a445bad35a41"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea5fa05f0df681c0f975a445bad35a41">~SelectorBase</a> ()</td></tr>
+<tr class="memdesc:aea5fa05f0df681c0f975a445bad35a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor  <br /></td></tr>
+<tr class="memitem:a55a1672fa01c1e84dd2eb483debc4020" id="r_a55a1672fa01c1e84dd2eb483debc4020"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55a1672fa01c1e84dd2eb483debc4020">name</a> () const</td></tr>
+<tr class="memdesc:a55a1672fa01c1e84dd2eb483debc4020"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the algorithm name  <br /></td></tr>
+<tr class="memitem:a578c57cbc7c965ea85e368798d5710cf" id="r_a578c57cbc7c965ea85e368798d5710cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a578c57cbc7c965ea85e368798d5710cf">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:a578c57cbc7c965ea85e368798d5710cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the algorithm name  <br /></td></tr>
+<tr class="memitem:a0854263d4e5ba6f6926bbed2a27bbe2e" id="r_a0854263d4e5ba6f6926bbed2a27bbe2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0854263d4e5ba6f6926bbed2a27bbe2e">addStock</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;protoSys)</td></tr>
+<tr class="memdesc:a0854263d4e5ba6f6926bbed2a27bbe2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a candidate stock and its trading strategy prototype  <br /></td></tr>
+<tr class="memitem:ae482d7253581766b3a013d1fc275f0bb" id="r_ae482d7253581766b3a013d1fc275f0bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae482d7253581766b3a013d1fc275f0bb">addStockList</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stkList, const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;protoSys)</td></tr>
+<tr class="memdesc:ae482d7253581766b3a013d1fc275f0bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a group of stocks with the same trading strategy  <br /></td></tr>
+<tr class="memitem:acd2c91a5e100cb78ad7894bbc48264bb" id="r_acd2c91a5e100cb78ad7894bbc48264bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd2c91a5e100cb78ad7894bbc48264bb">addSystem</a> (const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;sys)</td></tr>
+<tr class="memdesc:acd2c91a5e100cb78ad7894bbc48264bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an existing system strategy instance directly, the very instance is adopted (no clone)  <br /></td></tr>
+<tr class="memitem:a91d9aabdb8e42cda86f64a2bfb33841a" id="r_a91d9aabdb8e42cda86f64a2bfb33841a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91d9aabdb8e42cda86f64a2bfb33841a">addSystemList</a> (const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp;sys)</td></tr>
+<tr class="memdesc:a91d9aabdb8e42cda86f64a2bfb33841a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add existing system strategy instances directly (no clone, see addSystem)  <br /></td></tr>
+<tr class="memitem:add675fe1e58bdf4ee3f04a36aaffddfb" id="r_add675fe1e58bdf4ee3f04a36aaffddfb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add675fe1e58bdf4ee3f04a36aaffddfb">getProtoSystemList</a> () const</td></tr>
+<tr class="memdesc:add675fe1e58bdf4ee3f04a36aaffddfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the prototype system list  <br /></td></tr>
+<tr class="memitem:a6bca868931a0610063d0ed4975a3cbd1" id="r_a6bca868931a0610063d0ed4975a3cbd1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6bca868931a0610063d0ed4975a3cbd1">getRealSystemList</a> () const</td></tr>
+<tr class="memdesc:a6bca868931a0610063d0ed4975a3cbd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the system list actually run by PF  <br /></td></tr>
+<tr class="memitem:adae29aefdcfa087935765ccfcea7ed15" id="r_adae29aefdcfa087935765ccfcea7ed15"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adae29aefdcfa087935765ccfcea7ed15">getSelected</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> date)</td></tr>
+<tr class="memdesc:adae29aefdcfa087935765ccfcea7ed15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the targets selected at the close of the given moment  <br /></td></tr>
+<tr class="memitem:a19021db25f3858cd9f0909b1d5487223" id="r_a19021db25f3858cd9f0909b1d5487223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19021db25f3858cd9f0909b1d5487223">reset</a> ()</td></tr>
+<tr class="memdesc:a19021db25f3858cd9f0909b1d5487223"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset  <br /></td></tr>
+<tr class="memitem:adedcbf377405953765e5a2b929009e3a" id="r_adedcbf377405953765e5a2b929009e3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adedcbf377405953765e5a2b929009e3a">invalidateCache</a> ()</td></tr>
+<tr class="memdesc:adedcbf377405953765e5a2b929009e3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop the cached selection only, the prototypes and their bindings are kept  <br /></td></tr>
+<tr class="memitem:aeef0704becd486deb659ab1a79ecf01c" id="r_aeef0704becd486deb659ab1a79ecf01c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeef0704becd486deb659ab1a79ecf01c">removeAll</a> ()</td></tr>
+<tr class="memdesc:aeef0704becd486deb659ab1a79ecf01c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the existing system prototypes  <br /></td></tr>
+<tr class="memitem:ad78f5fa76d6cda35df14238c0ef61e17" id="r_ad78f5fa76d6cda35df14238c0ef61e17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad78f5fa76d6cda35df14238c0ef61e17">clone</a> ()</td></tr>
+<tr class="memdesc:ad78f5fa76d6cda35df14238c0ef61e17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone the selector.  <br /></td></tr>
+<tr class="memitem:a20e1fabbb329563a518d56309a22e5a3" id="r_a20e1fabbb329563a518d56309a22e5a3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20e1fabbb329563a518d56309a22e5a3">_reset</a> ()</td></tr>
+<tr class="memdesc:a20e1fabbb329563a518d56309a22e5a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass reset interface  <br /></td></tr>
+<tr class="memitem:a9db36e057de3309ac77bc4cd49bea37a" id="r_a9db36e057de3309ac77bc4cd49bea37a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9db36e057de3309ac77bc4cd49bea37a">_clone</a> ()=0</td></tr>
+<tr class="memdesc:a9db36e057de3309ac77bc4cd49bea37a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass clone interface  <br /></td></tr>
+<tr class="memitem:a6fb89f627723161f5aa007b06775e8e3" id="r_a6fb89f627723161f5aa007b06775e8e3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fb89f627723161f5aa007b06775e8e3">_calculate</a> ()=0</td></tr>
+<tr class="memdesc:a6fb89f627723161f5aa007b06775e8e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass calculation interface  <br /></td></tr>
+<tr class="memitem:a807513bb8526314912ca5c645b58f34d" id="r_a807513bb8526314912ca5c645b58f34d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a807513bb8526314912ca5c645b58f34d">_getSelected</a> (<a class="el" href="classhku_1_1_datetime.html">Datetime</a> date)=0</td></tr>
+<tr class="memdesc:a807513bb8526314912ca5c645b58f34d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass interface to get the targets selected at the close of the given moment  <br /></td></tr>
+<tr class="memitem:a95c47ed17311289737da85b2c4e0659e" id="r_a95c47ed17311289737da85b2c4e0659e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95c47ed17311289737da85b2c4e0659e">_addSystem</a> (const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;sys)</td></tr>
+<tr class="memdesc:a95c47ed17311289737da85b2c4e0659e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a prototype system in the subclass used for the logical operations; it generally does not need to be implemented by the subclass  <br /></td></tr>
+<tr class="memitem:a517add8c9de8bcefc7329b8fc6cfdfc6" id="r_a517add8c9de8bcefc7329b8fc6cfdfc6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a517add8c9de8bcefc7329b8fc6cfdfc6">_removeAll</a> ()</td></tr>
+<tr class="memdesc:a517add8c9de8bcefc7329b8fc6cfdfc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a prototype system in the subclass used for the logical operations; it generally does not need to be implemented by the subclass  <br /></td></tr>
+<tr class="memitem:a6de2d06984e9386858e3113cae027d2b" id="r_a6de2d06984e9386858e3113cae027d2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6de2d06984e9386858e3113cae027d2b">replaceProtoSystem</a> (const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;from, const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;to)</td></tr>
+<tr class="memdesc:a6de2d06984e9386858e3113cae027d2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace a prototype instance with another one, updating the subclass containers too  <br /></td></tr>
+<tr class="memitem:a7e8f91ac518cba72c3a9b75b5a998d14" id="r_a7e8f91ac518cba72c3a9b75b5a998d14"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e8f91ac518cba72c3a9b75b5a998d14">_replaceProtoSystem</a> (const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;from, const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;to)</td></tr>
+<tr class="memdesc:a7e8f91ac518cba72c3a9b75b5a998d14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass hook of replaceProtoSystem, it generally does not need to be implemented  <br /></td></tr>
+<tr class="memitem:a47eb1840233e67bcc3082bbeb9983ccf" id="r_a47eb1840233e67bcc3082bbeb9983ccf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a47eb1840233e67bcc3082bbeb9983ccf">calculate</a> (const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp;pf_realSysList, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memitem:aa42d4b9aa00c8e61d3ebbe26137498d3" id="r_aa42d4b9aa00c8e61d3ebbe26137498d3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa42d4b9aa00c8e61d3ebbe26137498d3">bindRealToProto</a> (const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;real, const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;proto)</td></tr>
+<tr class="memitem:a1e89820d3f5d1015743a465352ccd1b4" id="r_a1e89820d3f5d1015743a465352ccd1b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e89820d3f5d1015743a465352ccd1b4">calculate_proto</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memitem:a0b2cad8cad911e7ee8e56f3bca451ddb" id="r_a0b2cad8cad911e7ee8e56f3bca451ddb"><td class="memItemLeft" align="right" valign="top">virtual string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b2cad8cad911e7ee8e56f3bca451ddb">str</a> () const</td></tr>
+<tr class="memitem:a0ce8bccefffe684a9260f51eef8d95f9" id="r_a0ce8bccefffe684a9260f51eef8d95f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ce8bccefffe684a9260f51eef8d95f9">getMF</a> () const</td></tr>
+<tr class="memitem:a028b3467726f364b13e19ffb3a9d0b4d" id="r_a028b3467726f364b13e19ffb3a9d0b4d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a028b3467726f364b13e19ffb3a9d0b4d">setMF</a> (const <a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> &amp;mf)</td></tr>
+<tr class="memitem:a1353cad274aa3499d0a58da21d962916" id="r_a1353cad274aa3499d0a58da21d962916"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1353cad274aa3499d0a58da21d962916">getScoresFilter</a> () const</td></tr>
+<tr class="memitem:ad9de1d6fbc94e2e01fc9555486bfbdf7" id="r_ad9de1d6fbc94e2e01fc9555486bfbdf7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9de1d6fbc94e2e01fc9555486bfbdf7">setScoresFilter</a> (const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;filter)</td></tr>
+<tr class="memdesc:ad9de1d6fbc94e2e01fc9555486bfbdf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the cross-section score record filter, it is used for the MF related Selector only, to filter when the Score list is got from MF  <br /></td></tr>
+<tr class="memitem:afea4b61436b29533bc093499b4e78f07" id="r_afea4b61436b29533bc093499b4e78f07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afea4b61436b29533bc093499b4e78f07">addScoresFilter</a> (const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;filter)</td></tr>
+<tr class="memdesc:afea4b61436b29533bc093499b4e78f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a filter on the basis of the existing filters, it is used for the MF related Selector only, to filter when the Score list is got from MF  <br /></td></tr>
+<tr class="memitem:a4c111a85ea823a1d050a6a7de77b230e" id="r_a4c111a85ea823a1d050a6a7de77b230e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c111a85ea823a1d050a6a7de77b230e">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:aaf72c8a625b893c39f4034d50dfaa156" id="r_aaf72c8a625b893c39f4034d50dfaa156"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf72c8a625b893c39f4034d50dfaa156">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memdesc:aaf72c8a625b893c39f4034d50dfaa156"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this selector, its filter, a held system, or its multi-factor is Python-defined  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected 属性</h2></td></tr>
-<tr class="memitem:aad508ec50686317a9c7703a22b7f6533"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#aad508ec50686317a9c7703a22b7f6533">m_stock_list</a></td></tr>
-<tr class="separator:aad508ec50686317a9c7703a22b7f6533"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae110ed49876b58afe8538585c4e64a62" id="r_ae110ed49876b58afe8538585c4e64a62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae110ed49876b58afe8538585c4e64a62">m_sc_filter</a></td></tr>
+<tr class="memitem:afb001d0fc6fef72025d58728299c741e" id="r_afb001d0fc6fef72025d58728299c741e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb001d0fc6fef72025d58728299c741e">m_mf</a></td></tr>
+<tr class="memitem:a10ec59d4b96b020d3bc0bc638eda7d40" id="r_a10ec59d4b96b020d3bc0bc638eda7d40"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10ec59d4b96b020d3bc0bc638eda7d40">m_name</a></td></tr>
+<tr class="memitem:adf93f1553de5a35060d7e6719eb30ac2" id="r_adf93f1553de5a35060d7e6719eb30ac2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf93f1553de5a35060d7e6719eb30ac2">m_is_python_object</a> {false}</td></tr>
+<tr class="memitem:a681a4acdb9975fa6696ae4ab8c03324f" id="r_a681a4acdb9975fa6696ae4ab8c03324f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a681a4acdb9975fa6696ae4ab8c03324f">m_calculated</a> {false}</td></tr>
+<tr class="memitem:ae6389955801f40dc947d50d5d682dcdb" id="r_ae6389955801f40dc947d50d5d682dcdb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6389955801f40dc947d50d5d682dcdb">m_proto_calculated</a> {false}</td></tr>
+<tr class="memitem:a2e55d656b1055d1600dee498c3a401dd" id="r_a2e55d656b1055d1600dee498c3a401dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e55d656b1055d1600dee498c3a401dd">m_query</a></td></tr>
+<tr class="memitem:aa87d776b6201a8a1558768c3665c28a1" id="r_aa87d776b6201a8a1558768c3665c28a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa87d776b6201a8a1558768c3665c28a1">m_proto_query</a></td></tr>
+<tr class="memitem:a59ed3e78729db99adba9c9bf99408337" id="r_a59ed3e78729db99adba9c9bf99408337"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59ed3e78729db99adba9c9bf99408337">m_pro_sys_list</a></td></tr>
+<tr class="memitem:a956b9fde36a73f94291a23833601c1c1" id="r_a956b9fde36a73f94291a23833601c1c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a956b9fde36a73f94291a23833601c1c1">m_real_sys_list</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 友元</h2></td></tr>
-<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_selector_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
-<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c" id="r_ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>交易对象选择模块 </p>
-</div><h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="a15225fb9a883876736e71ff6b5616239"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Trading object selection module </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a15225fb9a883876736e71ff6b5616239" name="a15225fb9a883876736e71ff6b5616239"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15225fb9a883876736e71ff6b5616239">&#9670;&#160;</a></span>SelectorPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a>&gt; <a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase::SelectorPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a>&gt; <a class="el" href="#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase::SelectorPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a6c0d1dffcc557142786d967cebc1e991"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a6c0d1dffcc557142786d967cebc1e991" name="a6c0d1dffcc557142786d967cebc1e991"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c0d1dffcc557142786d967cebc1e991">&#9670;&#160;</a></span>SelectorBase() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::SelectorBase::SelectorBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Default constructor </p>
+
 </div>
 </div>
-<a class="anchor" id="af511439579a4f4b083dbf6b126d69c26"></a>
+<a id="a7acc067c9d0162284963ce98e7ca9a88" name="a7acc067c9d0162284963ce98e7ca9a88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7acc067c9d0162284963ce98e7ca9a88">&#9670;&#160;</a></span>SelectorBase() <span class="overload">[2/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -189,23 +240,24 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::SelectorBase::~SelectorBase </td>
+          <td class="memname">hku::SelectorBase::SelectorBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_selector_base.html">SelectorBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a9db36e057de3309ac77bc4cd49bea37a"></a>
+<a id="ab4416cac5c8ab7504d641adeb975dae9" name="ab4416cac5c8ab7504d641adeb975dae9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4416cac5c8ab7504d641adeb975dae9">&#9670;&#160;</a></span>SelectorBase() <span class="overload">[3/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -213,24 +265,238 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> hku::SelectorBase::_clone </td>
+          <td class="memname">hku::SelectorBase::SelectorBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类克隆接口 </p>
+<p>Constructor, it also gives the algorithm name </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>the given name </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="a20e1fabbb329563a518d56309a22e5a3"></a>
+<a id="aea5fa05f0df681c0f975a445bad35a41" name="aea5fa05f0df681c0f975a445bad35a41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea5fa05f0df681c0f975a445bad35a41">&#9670;&#160;</a></span>~SelectorBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::SelectorBase::~SelectorBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a95c47ed17311289737da85b2c4e0659e" name="a95c47ed17311289737da85b2c4e0659e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95c47ed17311289737da85b2c4e0659e">&#9670;&#160;</a></span>_addSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::SelectorBase::_addSystem </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>sys</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a prototype system in the subclass used for the logical operations; it generally does not need to be implemented by the subclass </p>
+
+<p>被 <a class="el" href="classhku_1_1_operator_selector.html#a107ca84985d54666a173e88826cdf5d6">hku::OperatorSelector</a> , 以及 <a class="el" href="classhku_1_1_operator_value_selector.html#a115d0d948828e7e0de63a9b0f897b86c">hku::OperatorValueSelector</a> 重载.</p>
+
+</div>
+</div>
+<a id="a6fb89f627723161f5aa007b06775e8e3" name="a6fb89f627723161f5aa007b06775e8e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fb89f627723161f5aa007b06775e8e3">&#9670;&#160;</a></span>_calculate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::SelectorBase::_calculate </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass calculation interface </p>
+
+<p>在 <a class="el" href="classhku_1_1_multi_factor_selector2.html#a449837fe79b4922ffefdd756f5e86b68">hku::MultiFactorSelector2</a>, <a class="el" href="classhku_1_1_multi_factor_selector.html#a410a51b75b26457ccaf167db5d132f21">hku::MultiFactorSelector</a>, <a class="el" href="classhku_1_1_operator_selector.html#aef9cab7dbbc5f2cefd694ee6eafae9b9">hku::OperatorSelector</a> , 以及 <a class="el" href="classhku_1_1_operator_value_selector.html#aa637c2676207e732980a6fdc788ec4a7">hku::OperatorValueSelector</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a9db36e057de3309ac77bc4cd49bea37a" name="a9db36e057de3309ac77bc4cd49bea37a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9db36e057de3309ac77bc4cd49bea37a">&#9670;&#160;</a></span>_clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> hku::SelectorBase::_clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass clone interface </p>
+
+<p>在 <a class="el" href="classhku_1_1_multi_factor_selector2.html#a268005bb67aac146db9bdfce8a588f81">hku::MultiFactorSelector2</a>, <a class="el" href="classhku_1_1_multi_factor_selector.html#aadd367221f8ff3795d15d78afd4a4b26">hku::MultiFactorSelector</a>, <a class="el" href="classhku_1_1_operator_selector.html#a2df9a333ac76919b799a76d606dd7aed">hku::OperatorSelector</a>, <a class="el" href="classhku_1_1_operator_value_selector.html#ac03c6df5d259055e9904df8e4284270f">hku::OperatorValueSelector</a>, <a class="el" href="classhku_1_1_optimal_evaluate_selector.html#aab2a74f1f5378347ecbe405040539329">hku::OptimalEvaluateSelector</a> , 以及 <a class="el" href="classhku_1_1_performance_optimal_selector.html#a765aff11585ae405795f6bf71373cd3e">hku::PerformanceOptimalSelector</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a807513bb8526314912ca5c645b58f34d" name="a807513bb8526314912ca5c645b58f34d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a807513bb8526314912ca5c645b58f34d">&#9670;&#160;</a></span>_getSelected()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a> hku::SelectorBase::_getSelected </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>date</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass interface to get the targets selected at the close of the given moment </p>
+
+<p>在 <a class="el" href="classhku_1_1_multi_factor_selector2.html#aa91641f48cf71b4bb8f3037c266aa9a5">hku::MultiFactorSelector2</a>, <a class="el" href="classhku_1_1_multi_factor_selector.html#ae5bd145a70feeed420b59e584dc4fde8">hku::MultiFactorSelector</a>, <a class="el" href="classhku_1_1_operator_selector.html#a5754e6c6a18d7fdf294ed310cafa62d9">hku::OperatorSelector</a> , 以及 <a class="el" href="classhku_1_1_operator_value_selector.html#aaf86cdaec2275b716f1c3e07361df66d">hku::OperatorValueSelector</a> 内被实现.</p>
+
+</div>
+</div>
+<a id="a517add8c9de8bcefc7329b8fc6cfdfc6" name="a517add8c9de8bcefc7329b8fc6cfdfc6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a517add8c9de8bcefc7329b8fc6cfdfc6">&#9670;&#160;</a></span>_removeAll()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::SelectorBase::_removeAll </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a prototype system in the subclass used for the logical operations; it generally does not need to be implemented by the subclass </p>
+
+<p>被 <a class="el" href="classhku_1_1_operator_selector.html#ad2f7c250df86b88aecddc615ab847fe7">hku::OperatorSelector</a>, <a class="el" href="classhku_1_1_operator_value_selector.html#ade7851a3425143b3c0115c294a23bf98">hku::OperatorValueSelector</a> , 以及 <a class="el" href="classhku_1_1_optimal_selector_base.html#a42ed97c1800a88271e2bc5cd86a3be77">hku::OptimalSelectorBase</a> 重载.</p>
+
+</div>
+</div>
+<a id="a7e8f91ac518cba72c3a9b75b5a998d14" name="a7e8f91ac518cba72c3a9b75b5a998d14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e8f91ac518cba72c3a9b75b5a998d14">&#9670;&#160;</a></span>_replaceProtoSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::SelectorBase::_replaceProtoSystem </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>from</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>to</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Subclass hook of replaceProtoSystem, it generally does not need to be implemented </p>
+
+<p>被 <a class="el" href="classhku_1_1_operator_selector.html#abec5ea8d9167e754d3a3d12e69e9fb4a">hku::OperatorSelector</a> , 以及 <a class="el" href="classhku_1_1_operator_value_selector.html#ad56433aa356015d346a22183273efca8">hku::OperatorValueSelector</a> 重载.</p>
+
+</div>
+</div>
+<a id="a20e1fabbb329563a518d56309a22e5a3" name="a20e1fabbb329563a518d56309a22e5a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20e1fabbb329563a518d56309a22e5a3">&#9670;&#160;</a></span>_reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -240,84 +506,167 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::SelectorBase::_reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类复位接口 </p>
+<p>Subclass reset interface </p>
+
+<p>被 <a class="el" href="classhku_1_1_multi_factor_selector2.html#afcb9f2e11ab53acffaabff6a9e728328">hku::MultiFactorSelector2</a>, <a class="el" href="classhku_1_1_multi_factor_selector.html#ad8297cbd3987f6e38c37a32038a28f94">hku::MultiFactorSelector</a>, <a class="el" href="classhku_1_1_operator_selector.html#a6ee609f7adfe142f30f33fed2ce8ec85">hku::OperatorSelector</a>, <a class="el" href="classhku_1_1_operator_value_selector.html#a248b2f40bd1bd19812e79033a16ae38c">hku::OperatorValueSelector</a>, <a class="el" href="classhku_1_1_optimal_selector_base.html#a38c034a08486adff86bf29804c303f94">hku::OptimalSelectorBase</a> , 以及 <a class="el" href="classhku_1_1_signal_selector.html#a2d5ef079f19b9b3e1337ab3c37dfd8e2">hku::SignalSelector</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="a04d4ee4e26e44655d273d8dde4ef3ea1"></a>
+<a id="afea4b61436b29533bc093499b4e78f07" name="afea4b61436b29533bc093499b4e78f07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afea4b61436b29533bc093499b4e78f07">&#9670;&#160;</a></span>addScoresFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::addScoresFilter </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Append a filter on the basis of the existing filters, it is used for the MF related Selector only, to filter when the Score list is got from MF </p>
+
+</div>
+</div>
+<a id="a0854263d4e5ba6f6926bbed2a27bbe2e" name="a0854263d4e5ba6f6926bbed2a27bbe2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0854263d4e5ba6f6926bbed2a27bbe2e">&#9670;&#160;</a></span>addStock()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SelectorBase::addStock </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>protoSys</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Add a candidate stock and its trading strategy prototype </p>
+<dl class="section note"><dt>注解</dt><dd>The prototype is cloned and the clone is adopted (bound to the stock), the caller's instance keeps its own state; use addSystem to adopt a ready-made instance as is </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock</td><td>candidate stock </td></tr>
+    <tr><td class="paramname">protoSys</td><td>trading system strategy prototype </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a class="anchor" id="a59af2d32a4b27b61d93ceae5aa83b224"></a>
+<a id="ae482d7253581766b3a013d1fc275f0bb" name="ae482d7253581766b3a013d1fc275f0bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae482d7253581766b3a013d1fc275f0bb">&#9670;&#160;</a></span>addStockList()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SelectorBase::addStockList </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;&#160;</td>
-          <td class="paramname"><em>stk_list</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stkList</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>protoSys</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Add a group of stocks with the same trading strategy </p>
+<dl class="section note"><dt>注解</dt><dd>An invalid stock is ignored automatically, false is not returned. Like addStock, the prototype is cloned for every stock </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stkList</td><td>candidate stock list </td></tr>
+    <tr><td class="paramname">protoSys</td><td>trading system strategy prototype </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a class="anchor" id="afbcd95ee123977203c827f688cfdf044"></a>
+<a id="acd2c91a5e100cb78ad7894bbc48264bb" name="acd2c91a5e100cb78ad7894bbc48264bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd2c91a5e100cb78ad7894bbc48264bb">&#9670;&#160;</a></span>addSystem()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void hku::SelectorBase::clearStockList </td>
+          <td class="memname">void hku::SelectorBase::addSystem </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>sys</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Add an existing system strategy instance directly, the very instance is adopted (no clone) </p>
+<dl class="section note"><dt>注解</dt><dd>The stock should already be bound. The instance identity is preserved on purpose: the operator-combined selectors (e.g. SE_Add) resolve their prototype intersection by it, and the adopted instances are reused by <a class="el" href="classhku_1_1_multi_system.html">MultiSystem</a>; use addStock to bind a prototype to new securities instead </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sys</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a class="anchor" id="ad78f5fa76d6cda35df14238c0ef61e17"></a>
+<a id="a91d9aabdb8e42cda86f64a2bfb33841a" name="a91d9aabdb8e42cda86f64a2bfb33841a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91d9aabdb8e42cda86f64a2bfb33841a">&#9670;&#160;</a></span>addSystemList()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> hku::SelectorBase::clone </td>
+          <td class="memname">void hku::SelectorBase::addSystemList </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>sys</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Add existing system strategy instances directly (no clone, see addSystem) </p>
+<dl class="section note"><dt>注解</dt><dd>The stock should already be bound </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sys</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a class="anchor" id="a6d566c261eb624f3ad0d61d5927a1af2"></a>
+<a id="aa42d4b9aa00c8e61d3ebbe26137498d3" name="aa42d4b9aa00c8e61d3ebbe26137498d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa42d4b9aa00c8e61d3ebbe26137498d3">&#9670;&#160;</a></span>bindRealToProto()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -325,22 +674,123 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> hku::SelectorBase::getRawStockList </td>
+          <td class="memname">virtual void hku::SelectorBase::bindRealToProto </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>real</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>proto</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>被 <a class="el" href="classhku_1_1_operator_selector.html#a0866c30e6140af437eac99d3e068f46e">hku::OperatorSelector</a>, <a class="el" href="classhku_1_1_operator_value_selector.html#aa5700752f950ea0acc3c575de85d510a">hku::OperatorValueSelector</a> , 以及 <a class="el" href="classhku_1_1_optimal_selector_base.html#a2beed8f87087e77622f4ce9ce7964a04">hku::OptimalSelectorBase</a> 重载.</p>
+
+</div>
+</div>
+<a id="a47eb1840233e67bcc3082bbeb9983ccf" name="a47eb1840233e67bcc3082bbeb9983ccf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47eb1840233e67bcc3082bbeb9983ccf">&#9670;&#160;</a></span>calculate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::SelectorBase::calculate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>pf_realSysList</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>被 <a class="el" href="classhku_1_1_optimal_selector_base.html#ab33deb41a9b099fd94250df129659cd3">hku::OptimalSelectorBase</a> 重载.</p>
+
+</div>
+</div>
+<a id="a1e89820d3f5d1015743a465352ccd1b4" name="a1e89820d3f5d1015743a465352ccd1b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e89820d3f5d1015743a465352ccd1b4">&#9670;&#160;</a></span>calculate_proto()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::calculate_proto </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad78f5fa76d6cda35df14238c0ef61e17" name="ad78f5fa76d6cda35df14238c0ef61e17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad78f5fa76d6cda35df14238c0ef61e17">&#9670;&#160;</a></span>clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> hku::SelectorBase::clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clone the selector. </p>
+<p>The runtime selection cache is not cloned: calculate again before getSelected </p>
+
+</div>
+</div>
+<a id="a0ce8bccefffe684a9260f51eef8d95f9" name="a0ce8bccefffe684a9260f51eef8d95f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ce8bccefffe684a9260f51eef8d95f9">&#9670;&#160;</a></span>getMF()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> hku::SelectorBase::getMF </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a75c258b42c8e003a9f167d6e16ecab5b"></a>
+<a id="add675fe1e58bdf4ee3f04a36aaffddfb" name="add675fe1e58bdf4ee3f04a36aaffddfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add675fe1e58bdf4ee3f04a36aaffddfb">&#9670;&#160;</a></span>getProtoSystemList()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -348,62 +798,366 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> hku::SelectorBase::getSelectedStock </td>
+          <td class="memname">const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp; hku::SelectorBase::getProtoSystemList </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td>
-          <td class="paramname"><em>date</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad2724063202847a83af1297f21f85b5d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::SelectorBase::name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the prototype system list </p>
+<dl class="section return"><dt>返回</dt><dd>const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; </dd></dl>
+
+</div>
+</div>
+<a id="a6bca868931a0610063d0ed4975a3cbd1" name="a6bca868931a0610063d0ed4975a3cbd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bca868931a0610063d0ed4975a3cbd1">&#9670;&#160;</a></span>getRealSystemList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> &amp; hku::SelectorBase::getRealSystemList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the system list actually run by PF </p>
+<dl class="section return"><dt>返回</dt><dd>const <a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a>&amp; </dd></dl>
+
+</div>
+</div>
+<a id="a1353cad274aa3499d0a58da21d962916" name="a1353cad274aa3499d0a58da21d962916"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1353cad274aa3499d0a58da21d962916">&#9670;&#160;</a></span>getScoresFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> hku::SelectorBase::getScoresFilter </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a19021db25f3858cd9f0909b1d5487223"></a>
+<a id="adae29aefdcfa087935765ccfcea7ed15" name="adae29aefdcfa087935765ccfcea7ed15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adae29aefdcfa087935765ccfcea7ed15">&#9670;&#160;</a></span>getSelected()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#addc86b26683f2e20b24301fce90ef431">SystemWeightList</a> hku::SelectorBase::getSelected </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_datetime.html">Datetime</a></td>          <td class="paramname"><span class="paramname"><em>date</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the targets selected at the close of the given moment </p>
+
+</div>
+</div>
+<a id="aaf72c8a625b893c39f4034d50dfaa156" name="aaf72c8a625b893c39f4034d50dfaa156"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf72c8a625b893c39f4034d50dfaa156">&#9670;&#160;</a></span>hasPythonPart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::SelectorBase::hasPythonPart </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether this selector, its filter, a held system, or its multi-factor is Python-defined </p>
+
+</div>
+</div>
+<a id="adedcbf377405953765e5a2b929009e3a" name="adedcbf377405953765e5a2b929009e3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adedcbf377405953765e5a2b929009e3a">&#9670;&#160;</a></span>invalidateCache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::invalidateCache </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Drop the cached selection only, the prototypes and their bindings are kept </p>
+
+</div>
+</div>
+<a id="a4c111a85ea823a1d050a6a7de77b230e" name="a4c111a85ea823a1d050a6a7de77b230e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c111a85ea823a1d050a6a7de77b230e">&#9670;&#160;</a></span>isPythonObject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SelectorBase::isPythonObject </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a55a1672fa01c1e84dd2eb483debc4020" name="a55a1672fa01c1e84dd2eb483debc4020"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55a1672fa01c1e84dd2eb483debc4020">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; hku::SelectorBase::name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the algorithm name </p>
+
+</div>
+</div>
+<a id="a578c57cbc7c965ea85e368798d5710cf" name="a578c57cbc7c965ea85e368798d5710cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a578c57cbc7c965ea85e368798d5710cf">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::name </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the algorithm name </p>
+
+</div>
+</div>
+<a id="aeef0704becd486deb659ab1a79ecf01c" name="aeef0704becd486deb659ab1a79ecf01c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeef0704becd486deb659ab1a79ecf01c">&#9670;&#160;</a></span>removeAll()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::removeAll </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clear the existing system prototypes </p>
+
+</div>
+</div>
+<a id="a6de2d06984e9386858e3113cae027d2b" name="a6de2d06984e9386858e3113cae027d2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6de2d06984e9386858e3113cae027d2b">&#9670;&#160;</a></span>replaceProtoSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::replaceProtoSystem </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>from</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>to</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Replace a prototype instance with another one, updating the subclass containers too </p>
+
+</div>
+</div>
+<a id="a19021db25f3858cd9f0909b1d5487223" name="a19021db25f3858cd9f0909b1d5487223"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19021db25f3858cd9f0909b1d5487223">&#9670;&#160;</a></span>reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SelectorBase::reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Reset </p>
+<dl class="section note"><dt>注解</dt><dd>The reset does not clear the existing prototype systems </dd></dl>
+
 </div>
 </div>
-<h2 class="groupheader">友元及相关函数文档</h2>
-<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<a id="a028b3467726f364b13e19ffb3a9d0b4d" name="a028b3467726f364b13e19ffb3a9d0b4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a028b3467726f364b13e19ffb3a9d0b4d">&#9670;&#160;</a></span>setMF()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::setMF </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mf</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad9de1d6fbc94e2e01fc9555486bfbdf7" name="ad9de1d6fbc94e2e01fc9555486bfbdf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9de1d6fbc94e2e01fc9555486bfbdf7">&#9670;&#160;</a></span>setScoresFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SelectorBase::setScoresFilter </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the cross-section score record filter, it is used for the MF related Selector only, to filter when the Score list is got from MF </p>
+
+</div>
+</div>
+<a id="a0b2cad8cad911e7ee8e56f3bca451ddb" name="a0b2cad8cad911e7ee8e56f3bca451ddb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b2cad8cad911e7ee8e56f3bca451ddb">&#9670;&#160;</a></span>str()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual string hku::SelectorBase::str </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>被 <a class="el" href="classhku_1_1_optimal_selector_base.html#a9295de40bddb269a8105b6faf3a364f1">hku::OptimalSelectorBase</a> 重载.</p>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="ac98d07dd8f7b70e16ccb9a01abf56b9c" name="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">&#9670;&#160;</a></span>boost::serialization::access</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -416,15 +1170,17 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="aad508ec50686317a9c7703a22b7f6533"></a>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a681a4acdb9975fa6696ae4ab8c03324f" name="a681a4acdb9975fa6696ae4ab8c03324f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a681a4acdb9975fa6696ae4ab8c03324f">&#9670;&#160;</a></span>m_calculated</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -432,12 +1188,210 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> hku::SelectorBase::m_stock_list</td>
+          <td class="memname">bool hku::SelectorBase::m_calculated {false}</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adf93f1553de5a35060d7e6719eb30ac2" name="adf93f1553de5a35060d7e6719eb30ac2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf93f1553de5a35060d7e6719eb30ac2">&#9670;&#160;</a></span>m_is_python_object</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SelectorBase::m_is_python_object {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb001d0fc6fef72025d58728299c741e" name="afb001d0fc6fef72025d58728299c741e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb001d0fc6fef72025d58728299c741e">&#9670;&#160;</a></span>m_mf</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a98bd4be9b5b675b83fb004495141769a">MFPtr</a> hku::SelectorBase::m_mf</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a10ec59d4b96b020d3bc0bc638eda7d40" name="a10ec59d4b96b020d3bc0bc638eda7d40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10ec59d4b96b020d3bc0bc638eda7d40">&#9670;&#160;</a></span>m_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::SelectorBase::m_name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a59ed3e78729db99adba9c9bf99408337" name="a59ed3e78729db99adba9c9bf99408337"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59ed3e78729db99adba9c9bf99408337">&#9670;&#160;</a></span>m_pro_sys_list</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> hku::SelectorBase::m_pro_sys_list</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae6389955801f40dc947d50d5d682dcdb" name="ae6389955801f40dc947d50d5d682dcdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6389955801f40dc947d50d5d682dcdb">&#9670;&#160;</a></span>m_proto_calculated</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SelectorBase::m_proto_calculated {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa87d776b6201a8a1558768c3665c28a1" name="aa87d776b6201a8a1558768c3665c28a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa87d776b6201a8a1558768c3665c28a1">&#9670;&#160;</a></span>m_proto_query</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_query.html">KQuery</a> hku::SelectorBase::m_proto_query</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2e55d656b1055d1600dee498c3a401dd" name="a2e55d656b1055d1600dee498c3a401dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e55d656b1055d1600dee498c3a401dd">&#9670;&#160;</a></span>m_query</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_query.html">KQuery</a> hku::SelectorBase::m_query</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a956b9fde36a73f94291a23833601c1c1" name="a956b9fde36a73f94291a23833601c1c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a956b9fde36a73f94291a23833601c1c1">&#9670;&#160;</a></span>m_real_sys_list</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#aa2be5196687d3fa79339e28984e927d2">SystemList</a> hku::SelectorBase::m_real_sys_list</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae110ed49876b58afe8538585c4e64a62" name="ae110ed49876b58afe8538585c4e64a62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae110ed49876b58afe8538585c4e64a62">&#9670;&#160;</a></span>m_sc_filter</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#a07c233fc8c9eb1846d4573884485903a">ScoresFilterPtr</a> hku::SelectorBase::m_sc_filter</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -446,15 +1400,26 @@ Protected 属性</h2></td></tr>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/trade_sys/selector/<a class="el" href="_selector_base_8h_source.html">SelectorBase.h</a></li>
-<li>hikyuu/trade_sys/selector/<a class="el" href="_selector_base_8cpp.html">SelectorBase.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_selector_base.html">SelectorBase</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

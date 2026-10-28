@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::SignalBase类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_signal_base.html','','classhku_1_1_signal_base-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,154 +74,160 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_signal_base.html">SignalBase</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pro-attribs">Protected 属性</a> &#124;
-<a href="#friends">友元</a> &#124;
-<a href="classhku_1_1_signal_base-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::SignalBase类 参考<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a> &raquo; <a class="el" href="group___signal.html">Signal 信号指示器</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::SignalBase类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a> &raquo; <a class="el" href="group___signal.html">Signal signal generator</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>信号指示器基类  
- <a href="classhku_1_1_signal_base.html#details">更多...</a></p>
+<p>Base class of the signal generator  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_signal_base_8h_source.html">SignalBase.h</a>&gt;</code></p>
 <div class="dynheader">
 类 hku::SignalBase 继承关系图:</div>
 <div class="dyncontent">
-<div class="center"><img src="classhku_1_1_signal_base__inherit__graph.png" border="0" usemap="#hku_1_1_signal_base_inherit__map" alt="Inheritance graph"/></div>
-<map name="hku_1_1_signal_base_inherit__map" id="hku_1_1_signal_base_inherit__map">
-<area shape="rect" id="node2" href="classhku_1_1_bool_signal.html" title="hku::BoolSignal" alt="" coords="221,5,361,35"/>
-<area shape="rect" id="node3" href="classhku_1_1_cross_gold_signal.html" title="hku::CrossGoldSignal" alt="" coords="197,59,384,88"/>
-<area shape="rect" id="node4" href="classhku_1_1_cross_signal.html" title="hku::CrossSignal" alt="" coords="215,112,367,141"/>
-<area shape="rect" id="node5" href="classhku_1_1_single_signal.html" title="hku::SingleSignal" alt="" coords="215,165,366,195"/>
-<area shape="rect" id="node6" href="classhku_1_1_single_signal2.html" title="hku::SingleSignal2" alt="" coords="210,219,371,248"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="center"><img src="classhku_1_1_signal_base__inherit__graph.png" border="0" usemap="#ahku_1_1_signal_base_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <div class="dynheader">
 hku::SignalBase 的协作图:</div>
 <div class="dyncontent">
-<div class="center"><img src="classhku_1_1_signal_base__coll__graph.png" border="0" usemap="#hku_1_1_signal_base_coll__map" alt="Collaboration graph"/></div>
-<map name="hku_1_1_signal_base_coll__map" id="hku_1_1_signal_base_coll__map">
-<area shape="rect" id="node2" href="classhku_1_1_k_data.html" title="K线数据 " alt="" coords="24,5,131,35"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="center"><img src="classhku_1_1_signal_base__coll__graph.png" border="0" usemap="#ahku_1_1_signal_base_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a3b2d924d6d614365df4652271d9c65b8"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_signal_base.html">SignalBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a></td></tr>
-<tr class="separator:a3b2d924d6d614365df4652271d9c65b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b2d924d6d614365df4652271d9c65b8" id="r_a3b2d924d6d614365df4652271d9c65b8"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_signal_base.html">SignalBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a66564876ce659aa5373e652b66ee2197"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a66564876ce659aa5373e652b66ee2197">SignalBase</a> ()</td></tr>
-<tr class="separator:a66564876ce659aa5373e652b66ee2197"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67eb279e3072e490446ce72697e819e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a67eb279e3072e490446ce72697e819e1">SignalBase</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_signal_base.html#a50551b4f708469eaa5b4c863c55a3444">name</a>)</td></tr>
-<tr class="separator:a67eb279e3072e490446ce72697e819e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2d3a69545f3750318c9376e8e7c28e7"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#af2d3a69545f3750318c9376e8e7c28e7">~SignalBase</a> ()</td></tr>
-<tr class="separator:af2d3a69545f3750318c9376e8e7c28e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa2bb4d32ee64a90308037288486e227"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#aaa2bb4d32ee64a90308037288486e227">shouldBuy</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const </td></tr>
-<tr class="memdesc:aaa2bb4d32ee64a90308037288486e227"><td class="mdescLeft">&#160;</td><td class="mdescRight">指定时刻是否可以买入  <a href="#aaa2bb4d32ee64a90308037288486e227">更多...</a><br /></td></tr>
-<tr class="separator:aaa2bb4d32ee64a90308037288486e227"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a768f43108eb168182ce816120e8b5e32"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a768f43108eb168182ce816120e8b5e32">shouldSell</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const </td></tr>
-<tr class="memdesc:a768f43108eb168182ce816120e8b5e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">指定时刻是否可以卖出  <a href="#a768f43108eb168182ce816120e8b5e32">更多...</a><br /></td></tr>
-<tr class="separator:a768f43108eb168182ce816120e8b5e32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaff58a254040ff93d0765bc2294d7f19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#aaff58a254040ff93d0765bc2294d7f19">getBuySignal</a> () const </td></tr>
-<tr class="memdesc:aaff58a254040ff93d0765bc2294d7f19"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有买入指示日期列表  <a href="#aaff58a254040ff93d0765bc2294d7f19">更多...</a><br /></td></tr>
-<tr class="separator:aaff58a254040ff93d0765bc2294d7f19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac792a898f812c297de292f37efdca0b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#ac792a898f812c297de292f37efdca0b2">getSellSignal</a> () const </td></tr>
-<tr class="memdesc:ac792a898f812c297de292f37efdca0b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有卖出指示日期列表  <a href="#ac792a898f812c297de292f37efdca0b2">更多...</a><br /></td></tr>
-<tr class="separator:ac792a898f812c297de292f37efdca0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea00f468b57e9e830143045315dfd15a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#aea00f468b57e9e830143045315dfd15a">_addBuySignal</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
-<tr class="memdesc:aea00f468b57e9e830143045315dfd15a"><td class="mdescLeft">&#160;</td><td class="mdescRight">加入买入信号，在_calculate中调用  <a href="#aea00f468b57e9e830143045315dfd15a">更多...</a><br /></td></tr>
-<tr class="separator:aea00f468b57e9e830143045315dfd15a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9968d56b66b484e8b369d7bb3d9b1f98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a9968d56b66b484e8b369d7bb3d9b1f98">_addSellSignal</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
-<tr class="memdesc:a9968d56b66b484e8b369d7bb3d9b1f98"><td class="mdescLeft">&#160;</td><td class="mdescRight">加入卖出信号，在_calculate中调用  <a href="#a9968d56b66b484e8b369d7bb3d9b1f98">更多...</a><br /></td></tr>
-<tr class="separator:a9968d56b66b484e8b369d7bb3d9b1f98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba7ab8d5214c0dd7b82d94aa3fc63aca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#aba7ab8d5214c0dd7b82d94aa3fc63aca">setTO</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;kdata)</td></tr>
-<tr class="memdesc:aba7ab8d5214c0dd7b82d94aa3fc63aca"><td class="mdescLeft">&#160;</td><td class="mdescRight">指定交易对象，指K线数据  <a href="#aba7ab8d5214c0dd7b82d94aa3fc63aca">更多...</a><br /></td></tr>
-<tr class="separator:aba7ab8d5214c0dd7b82d94aa3fc63aca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad10c5dc5889418b9ac6f464cd75d5a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#aad10c5dc5889418b9ac6f464cd75d5a8">getTO</a> () const </td></tr>
-<tr class="memdesc:aad10c5dc5889418b9ac6f464cd75d5a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取交易对象  <a href="#aad10c5dc5889418b9ac6f464cd75d5a8">更多...</a><br /></td></tr>
-<tr class="separator:aad10c5dc5889418b9ac6f464cd75d5a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97d9328040ea1474140955c88099de95"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a97d9328040ea1474140955c88099de95">reset</a> ()</td></tr>
-<tr class="memdesc:a97d9328040ea1474140955c88099de95"><td class="mdescLeft">&#160;</td><td class="mdescRight">复位操作  <a href="#a97d9328040ea1474140955c88099de95">更多...</a><br /></td></tr>
-<tr class="separator:a97d9328040ea1474140955c88099de95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24398e495e19e10ad98f22068ac1f734"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a24398e495e19e10ad98f22068ac1f734">clone</a> ()</td></tr>
-<tr class="memdesc:a24398e495e19e10ad98f22068ac1f734"><td class="mdescLeft">&#160;</td><td class="mdescRight">克隆操作  <a href="#a24398e495e19e10ad98f22068ac1f734">更多...</a><br /></td></tr>
-<tr class="separator:a24398e495e19e10ad98f22068ac1f734"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50551b4f708469eaa5b4c863c55a3444"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a50551b4f708469eaa5b4c863c55a3444">name</a> () const </td></tr>
-<tr class="memdesc:a50551b4f708469eaa5b4c863c55a3444"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取名称  <a href="#a50551b4f708469eaa5b4c863c55a3444">更多...</a><br /></td></tr>
-<tr class="separator:a50551b4f708469eaa5b4c863c55a3444"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2f1c86258d74fde0e8da4f24bca1949"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#ae2f1c86258d74fde0e8da4f24bca1949">name</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
-<tr class="memdesc:ae2f1c86258d74fde0e8da4f24bca1949"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置名称  <a href="#ae2f1c86258d74fde0e8da4f24bca1949">更多...</a><br /></td></tr>
-<tr class="separator:ae2f1c86258d74fde0e8da4f24bca1949"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36df7e2fcb895afdebaafcdd25afa4a6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a36df7e2fcb895afdebaafcdd25afa4a6">_reset</a> ()</td></tr>
-<tr class="memdesc:a36df7e2fcb895afdebaafcdd25afa4a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类复位接口  <a href="#a36df7e2fcb895afdebaafcdd25afa4a6">更多...</a><br /></td></tr>
-<tr class="separator:a36df7e2fcb895afdebaafcdd25afa4a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8db6483154e4292e11e3a7a3880e71a1"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a8db6483154e4292e11e3a7a3880e71a1">_clone</a> ()=0</td></tr>
-<tr class="memdesc:a8db6483154e4292e11e3a7a3880e71a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类克隆接口  <a href="#a8db6483154e4292e11e3a7a3880e71a1">更多...</a><br /></td></tr>
-<tr class="separator:a8db6483154e4292e11e3a7a3880e71a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34ef3e17fa4e059521aa09bff1e4735a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a34ef3e17fa4e059521aa09bff1e4735a">_calculate</a> ()=0</td></tr>
-<tr class="memdesc:a34ef3e17fa4e059521aa09bff1e4735a"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类计算接口，在setTO中调用  <a href="#a34ef3e17fa4e059521aa09bff1e4735a">更多...</a><br /></td></tr>
-<tr class="separator:a34ef3e17fa4e059521aa09bff1e4735a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66564876ce659aa5373e652b66ee2197" id="r_a66564876ce659aa5373e652b66ee2197"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a66564876ce659aa5373e652b66ee2197">SignalBase</a> ()</td></tr>
+<tr class="memitem:a67eb279e3072e490446ce72697e819e1" id="r_a67eb279e3072e490446ce72697e819e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67eb279e3072e490446ce72697e819e1">SignalBase</a> (const string &amp;<a class="el" href="#a9b501ab32addf8467d667d9f88f6153f">name</a>)</td></tr>
+<tr class="memitem:abc7263ea1e1e0a1f302f190c24ecae89" id="r_abc7263ea1e1e0a1f302f190c24ecae89"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc7263ea1e1e0a1f302f190c24ecae89">SignalBase</a> (const <a class="el" href="classhku_1_1_signal_base.html">SignalBase</a> &amp;)=default</td></tr>
+<tr class="memitem:ae21144fa157da6ec11af99a0f621a651" id="r_ae21144fa157da6ec11af99a0f621a651"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae21144fa157da6ec11af99a0f621a651">~SignalBase</a> ()</td></tr>
+<tr class="memitem:ab9b87b95632c6c65339f422072c10e9e" id="r_ab9b87b95632c6c65339f422072c10e9e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9b87b95632c6c65339f422072c10e9e">shouldBuy</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memdesc:ab9b87b95632c6c65339f422072c10e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a buy is possible at the given moment  <br /></td></tr>
+<tr class="memitem:ab52a4c73983313f5d982ed9d0306c77b" id="r_ab52a4c73983313f5d982ed9d0306c77b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab52a4c73983313f5d982ed9d0306c77b">shouldSell</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memdesc:ab52a4c73983313f5d982ed9d0306c77b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a sell is possible at the given moment  <br /></td></tr>
+<tr class="memitem:a65dd7596f08eca8aefaae3c072c36e9f" id="r_a65dd7596f08eca8aefaae3c072c36e9f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65dd7596f08eca8aefaae3c072c36e9f">getBuyValue</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memdesc:a65dd7596f08eca8aefaae3c072c36e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the buy signal value of the given moment; a value less than or equal to 0 means there is no buy signal  <br /></td></tr>
+<tr class="memitem:a9d5369fc23e921f11c136002d07825fd" id="r_a9d5369fc23e921f11c136002d07825fd"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d5369fc23e921f11c136002d07825fd">getSellValue</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memdesc:a9d5369fc23e921f11c136002d07825fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sell signal value of the given moment; a value greater than or equal to 0 means there is no sell signal  <br /></td></tr>
+<tr class="memitem:a59fadffd5998b7dc4d0fcb27c2e60dda" id="r_a59fadffd5998b7dc4d0fcb27c2e60dda"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59fadffd5998b7dc4d0fcb27c2e60dda">getValue</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memitem:af352736f4be24a7e5b9f0eda3f3cb702" id="r_af352736f4be24a7e5b9f0eda3f3cb702"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af352736f4be24a7e5b9f0eda3f3cb702">nextTimeShouldBuy</a> () const</td></tr>
+<tr class="memdesc:af352736f4be24a7e5b9f0eda3f3cb702"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a buy is possible at the next moment, equivalent to whether the last moment indicates a buy  <br /></td></tr>
+<tr class="memitem:a3b2c95c2ac9be197c63e535b56ba2665" id="r_a3b2c95c2ac9be197c63e535b56ba2665"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b2c95c2ac9be197c63e535b56ba2665">nextTimeShouldSell</a> () const</td></tr>
+<tr class="memdesc:a3b2c95c2ac9be197c63e535b56ba2665"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a sell is possible at the next moment, equivalent to whether the last moment indicates a sell  <br /></td></tr>
+<tr class="memitem:abada2156e582a324f7b7b3ac7c385271" id="r_abada2156e582a324f7b7b3ac7c385271"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abada2156e582a324f7b7b3ac7c385271">getBuySignal</a> () const</td></tr>
+<tr class="memdesc:abada2156e582a324f7b7b3ac7c385271"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the date list of all the buy indications  <br /></td></tr>
+<tr class="memitem:aec2dad402062c0d68526c5dfb050f4a0" id="r_aec2dad402062c0d68526c5dfb050f4a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec2dad402062c0d68526c5dfb050f4a0">getSellSignal</a> () const</td></tr>
+<tr class="memdesc:aec2dad402062c0d68526c5dfb050f4a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the date list of all the sell indications  <br /></td></tr>
+<tr class="memitem:ad42dc0355a1980d441550ac1026411cf" id="r_ad42dc0355a1980d441550ac1026411cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad42dc0355a1980d441550ac1026411cf">_addSignal</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, double value)</td></tr>
+<tr class="memdesc:ad42dc0355a1980d441550ac1026411cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a signal, it is called in _calculate.  <br /></td></tr>
+<tr class="memitem:a33b2d84ca546c02678ca3e3fbe2836d0" id="r_a33b2d84ca546c02678ca3e3fbe2836d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a33b2d84ca546c02678ca3e3fbe2836d0">_addBuySignal</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, double value=1.0)</td></tr>
+<tr class="memdesc:a33b2d84ca546c02678ca3e3fbe2836d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a buy signal, it is called in _calculate  <br /></td></tr>
+<tr class="memitem:a738e9a4ee3e3d7b03fba4dea27d21ff1" id="r_a738e9a4ee3e3d7b03fba4dea27d21ff1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a738e9a4ee3e3d7b03fba4dea27d21ff1">_addSellSignal</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, double value=-1.0)</td></tr>
+<tr class="memdesc:a738e9a4ee3e3d7b03fba4dea27d21ff1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a sell signal, it is called in _calculate  <br /></td></tr>
+<tr class="memitem:aba7ab8d5214c0dd7b82d94aa3fc63aca" id="r_aba7ab8d5214c0dd7b82d94aa3fc63aca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba7ab8d5214c0dd7b82d94aa3fc63aca">setTO</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;kdata)</td></tr>
+<tr class="memdesc:aba7ab8d5214c0dd7b82d94aa3fc63aca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the trading object, it refers to the K-line data  <br /></td></tr>
+<tr class="memitem:aebfb4ffc0169441b650df5f8dc1ae6ef" id="r_aebfb4ffc0169441b650df5f8dc1ae6ef"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebfb4ffc0169441b650df5f8dc1ae6ef">getTO</a> () const</td></tr>
+<tr class="memdesc:aebfb4ffc0169441b650df5f8dc1ae6ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trading object  <br /></td></tr>
+<tr class="memitem:a45d565dc5b3f077c06bc04a0bed25546" id="r_a45d565dc5b3f077c06bc04a0bed25546"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45d565dc5b3f077c06bc04a0bed25546">startCycle</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;start, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;end)</td></tr>
+<tr class="memdesc:a45d565dc5b3f077c06bc04a0bed25546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a rebalancing cycle window (compatibility interface): it only records the cycle boundaries and registers the start day into the cycle-date list, it no longer slices the trading object nor recalculates the signal within the window  <br /></td></tr>
+<tr class="memitem:a19fd98eeb5cb7818b19841a73b5f1377" id="r_a19fd98eeb5cb7818b19841a73b5f1377"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19fd98eeb5cb7818b19841a73b5f1377">getCycleStart</a> () const</td></tr>
+<tr class="memitem:ae0e3a0dd510f35102270099c85959a2b" id="r_ae0e3a0dd510f35102270099c85959a2b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0e3a0dd510f35102270099c85959a2b">getCycleEnd</a> () const</td></tr>
+<tr class="memitem:a38532b8c1626b8ee9d457f201e937da8" id="r_a38532b8c1626b8ee9d457f201e937da8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38532b8c1626b8ee9d457f201e937da8">setCycleDates</a> (const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;dates)</td></tr>
+<tr class="memdesc:a38532b8c1626b8ee9d457f201e937da8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare the rebalancing days (the run-level input of the cycle signals): the signal is always calculated over the whole trading object, these dates are only consumed by the cycle signals (SG_Cycle emits a buy signal on each of them)  <br /></td></tr>
+<tr class="memitem:a4db4168c88a693f3098d85ca0b0186be" id="r_a4db4168c88a693f3098d85ca0b0186be"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4db4168c88a693f3098d85ca0b0186be">getCycleDates</a> () const</td></tr>
+<tr class="memdesc:a4db4168c88a693f3098d85ca0b0186be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the declared rebalancing days  <br /></td></tr>
+<tr class="memitem:a97d9328040ea1474140955c88099de95" id="r_a97d9328040ea1474140955c88099de95"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a97d9328040ea1474140955c88099de95">reset</a> ()</td></tr>
+<tr class="memdesc:a97d9328040ea1474140955c88099de95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset operation  <br /></td></tr>
+<tr class="memitem:a24398e495e19e10ad98f22068ac1f734" id="r_a24398e495e19e10ad98f22068ac1f734"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24398e495e19e10ad98f22068ac1f734">clone</a> ()</td></tr>
+<tr class="memdesc:a24398e495e19e10ad98f22068ac1f734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone operation  <br /></td></tr>
+<tr class="memitem:a9b501ab32addf8467d667d9f88f6153f" id="r_a9b501ab32addf8467d667d9f88f6153f"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b501ab32addf8467d667d9f88f6153f">name</a> () const</td></tr>
+<tr class="memdesc:a9b501ab32addf8467d667d9f88f6153f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name  <br /></td></tr>
+<tr class="memitem:ae2f1c86258d74fde0e8da4f24bca1949" id="r_ae2f1c86258d74fde0e8da4f24bca1949"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2f1c86258d74fde0e8da4f24bca1949">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:ae2f1c86258d74fde0e8da4f24bca1949"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name  <br /></td></tr>
+<tr class="memitem:a36df7e2fcb895afdebaafcdd25afa4a6" id="r_a36df7e2fcb895afdebaafcdd25afa4a6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36df7e2fcb895afdebaafcdd25afa4a6">_reset</a> ()</td></tr>
+<tr class="memdesc:a36df7e2fcb895afdebaafcdd25afa4a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass reset interface  <br /></td></tr>
+<tr class="memitem:a8db6483154e4292e11e3a7a3880e71a1" id="r_a8db6483154e4292e11e3a7a3880e71a1"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8db6483154e4292e11e3a7a3880e71a1">_clone</a> ()=0</td></tr>
+<tr class="memdesc:a8db6483154e4292e11e3a7a3880e71a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass clone interface  <br /></td></tr>
+<tr class="memitem:ab10fa629300415d31117aaae617404fb" id="r_ab10fa629300415d31117aaae617404fb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab10fa629300415d31117aaae617404fb">_calculate</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;)=0</td></tr>
+<tr class="memdesc:ab10fa629300415d31117aaae617404fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass calculation interface, it is called in setTO  <br /></td></tr>
+<tr class="memitem:ab1cd353c7a03b7a3f80b86145623d837" id="r_ab1cd353c7a03b7a3f80b86145623d837"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1cd353c7a03b7a3f80b86145623d837">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:a96681e7f7e4240bae1ba5c8da826b2b6" id="r_a96681e7f7e4240bae1ba5c8da826b2b6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96681e7f7e4240bae1ba5c8da826b2b6">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memdesc:a96681e7f7e4240bae1ba5c8da826b2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this signal or any composed Python part may call back: it only decides whether the C++ log streams stay redirected, the GIL is released regardless  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:a04a1b33d23ef1d3a846003a16f70cb06" id="r_a04a1b33d23ef1d3a846003a16f70cb06"><td class="memItemLeft" align="right" valign="top">const std::map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04a1b33d23ef1d3a846003a16f70cb06">getBuySignalMap</a> () const</td></tr>
+<tr class="memdesc:a04a1b33d23ef1d3a846003a16f70cb06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the buy signal table, for the composed operator signals to iterate directly  <br /></td></tr>
+<tr class="memitem:a0421cca35f40e10c2c78b91dc1e8912c" id="r_a0421cca35f40e10c2c78b91dc1e8912c"><td class="memItemLeft" align="right" valign="top">const std::map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0421cca35f40e10c2c78b91dc1e8912c">getSellSignalMap</a> () const</td></tr>
+<tr class="memdesc:a0421cca35f40e10c2c78b91dc1e8912c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sell signal table, for the composed operator signals to iterate directly  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected 属性</h2></td></tr>
-<tr class="memitem:a43183365d7af9f8e35b3e4b7ad52a1c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a43183365d7af9f8e35b3e4b7ad52a1c3">m_name</a></td></tr>
-<tr class="separator:a43183365d7af9f8e35b3e4b7ad52a1c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1794f1700bd62ab00941a6df91f1d4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#ab1794f1700bd62ab00941a6df91f1d4a">m_kdata</a></td></tr>
-<tr class="separator:ab1794f1700bd62ab00941a6df91f1d4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57fe511611dbad75f08fc360b6966d7b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a57fe511611dbad75f08fc360b6966d7b">m_hold</a></td></tr>
-<tr class="separator:a57fe511611dbad75f08fc360b6966d7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a836f6103d3ff16a1f6e64215f31fc28a"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a836f6103d3ff16a1f6e64215f31fc28a">m_buySig</a></td></tr>
-<tr class="separator:a836f6103d3ff16a1f6e64215f31fc28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22c4190dbb43862c589ca9c556c5dafa"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#a22c4190dbb43862c589ca9c556c5dafa">m_sellSig</a></td></tr>
-<tr class="separator:a22c4190dbb43862c589ca9c556c5dafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43183365d7af9f8e35b3e4b7ad52a1c3" id="r_a43183365d7af9f8e35b3e4b7ad52a1c3"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43183365d7af9f8e35b3e4b7ad52a1c3">m_name</a></td></tr>
+<tr class="memitem:ab1794f1700bd62ab00941a6df91f1d4a" id="r_ab1794f1700bd62ab00941a6df91f1d4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1794f1700bd62ab00941a6df91f1d4a">m_kdata</a></td></tr>
+<tr class="memitem:af65bcaece64da400108e450d81007a0f" id="r_af65bcaece64da400108e450d81007a0f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af65bcaece64da400108e450d81007a0f">m_is_python_object</a> {false}</td></tr>
+<tr class="memitem:a31483d9395bce9c4c4397c1505563791" id="r_a31483d9395bce9c4c4397c1505563791"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31483d9395bce9c4c4397c1505563791">m_calculated</a> {false}</td></tr>
+<tr class="memitem:a89f40a4518eed24a9168868194a3dcb1" id="r_a89f40a4518eed24a9168868194a3dcb1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89f40a4518eed24a9168868194a3dcb1">m_keepSignals</a> {false}</td></tr>
+<tr class="memitem:ab4967f65ac31e945b4817032f1a5b59f" id="r_ab4967f65ac31e945b4817032f1a5b59f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4967f65ac31e945b4817032f1a5b59f">m_hold_long</a></td></tr>
+<tr class="memitem:abfd4bbf4454216f42bf13df65d01bea3" id="r_abfd4bbf4454216f42bf13df65d01bea3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abfd4bbf4454216f42bf13df65d01bea3">m_hold_short</a></td></tr>
+<tr class="memitem:a521c27448efa4893e38eff53ac47c195" id="r_a521c27448efa4893e38eff53ac47c195"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a521c27448efa4893e38eff53ac47c195">m_holdSnapshotDate</a></td></tr>
+<tr class="memitem:a1ade1f76593078550a435babf3aed6f7" id="r_a1ade1f76593078550a435babf3aed6f7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1ade1f76593078550a435babf3aed6f7">m_holdLongSnapshot</a> {false}</td></tr>
+<tr class="memitem:af2a4588fcc5168bb7d9ff4f69ef7e31a" id="r_af2a4588fcc5168bb7d9ff4f69ef7e31a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2a4588fcc5168bb7d9ff4f69ef7e31a">m_holdShortSnapshot</a> {false}</td></tr>
+<tr class="memitem:a65d8b72dca3f391f8a52da75f1d6e84f" id="r_a65d8b72dca3f391f8a52da75f1d6e84f"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65d8b72dca3f391f8a52da75f1d6e84f">m_buySig</a></td></tr>
+<tr class="memitem:af6f3861637df451fc28474a6fad386c4" id="r_af6f3861637df451fc28474a6fad386c4"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6f3861637df451fc28474a6fad386c4">m_sellSig</a></td></tr>
+<tr class="memitem:a5140e164fc9f3bc7c38af4338ad62004" id="r_a5140e164fc9f3bc7c38af4338ad62004"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5140e164fc9f3bc7c38af4338ad62004">m_cycle_start</a></td></tr>
+<tr class="memitem:a69ad6e149d03c9ff2735e83a172bb67a" id="r_a69ad6e149d03c9ff2735e83a172bb67a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69ad6e149d03c9ff2735e83a172bb67a">m_cycle_end</a></td></tr>
+<tr class="memitem:a86947b5e1999e7450d0ef35f4c37b2ab" id="r_a86947b5e1999e7450d0ef35f4c37b2ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86947b5e1999e7450d0ef35f4c37b2ab">m_cycle_dates</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 友元</h2></td></tr>
-<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
-<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f43251ed3c47d9a5546683913cb0a84" id="r_a2f43251ed3c47d9a5546683913cb0a84"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f43251ed3c47d9a5546683913cb0a84">OperatorSignal</a></td></tr>
+<tr class="memitem:aa90adf82606f61bd8ba245028bbdebec" id="r_aa90adf82606f61bd8ba245028bbdebec"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa90adf82606f61bd8ba245028bbdebec">OperatorValueSignal</a></td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c" id="r_ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>信号指示器基类 </p>
-</div><h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="a3b2d924d6d614365df4652271d9c65b8"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Base class of the signal generator </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a3b2d924d6d614365df4652271d9c65b8" name="a3b2d924d6d614365df4652271d9c65b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b2d924d6d614365df4652271d9c65b8">&#9670;&#160;</a></span>SignalPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_signal_base.html">SignalBase</a>&gt; <a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">hku::SignalBase::SignalPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_signal_base.html">SignalBase</a>&gt; <a class="el" href="#a3b2d924d6d614365df4652271d9c65b8">hku::SignalBase::SignalPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a66564876ce659aa5373e652b66ee2197"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a66564876ce659aa5373e652b66ee2197" name="a66564876ce659aa5373e652b66ee2197"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66564876ce659aa5373e652b66ee2197">&#9670;&#160;</a></span>SignalBase() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::SignalBase::SignalBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -234,23 +235,9 @@ Protected 属性</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a67eb279e3072e490446ce72697e819e1"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::SignalBase::SignalBase </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<a id="a67eb279e3072e490446ce72697e819e1" name="a67eb279e3072e490446ce72697e819e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67eb279e3072e490446ce72697e819e1">&#9670;&#160;</a></span>SignalBase() <span class="overload">[2/3]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="af2d3a69545f3750318c9376e8e7c28e7"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -258,71 +245,181 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::SignalBase::~SignalBase </td>
+          <td class="memname">hku::SignalBase::SignalBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="aea00f468b57e9e830143045315dfd15a"></a>
+<a id="abc7263ea1e1e0a1f302f190c24ecae89" name="abc7263ea1e1e0a1f302f190c24ecae89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc7263ea1e1e0a1f302f190c24ecae89">&#9670;&#160;</a></span>SignalBase() <span class="overload">[3/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::SignalBase::SignalBase </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_signal_base.html">SignalBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae21144fa157da6ec11af99a0f621a651" name="ae21144fa157da6ec11af99a0f621a651"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae21144fa157da6ec11af99a0f621a651">&#9670;&#160;</a></span>~SignalBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::SignalBase::~SignalBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a33b2d84ca546c02678ca3e3fbe2836d0" name="a33b2d84ca546c02678ca3e3fbe2836d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33b2d84ca546c02678ca3e3fbe2836d0">&#9670;&#160;</a></span>_addBuySignal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SignalBase::_addBuySignal </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>value</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1.0</span>&#160;)</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>加入买入信号，在_calculate中调用 </p>
+<p>Add a buy signal, it is called in _calculate </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>发生买入信号的日期 </td></tr>
+    <tr><td class="paramname">datetime</td><td>the date when the buy signal occurs </td></tr>
+    <tr><td class="paramname">value</td><td>signal value, 1.0 by default; it must be greater than 0, otherwise an exception is thrown; it is merged into the same-date net value (see _addSignal) </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="a9968d56b66b484e8b369d7bb3d9b1f98"></a>
+<a id="a738e9a4ee3e3d7b03fba4dea27d21ff1" name="a738e9a4ee3e3d7b03fba4dea27d21ff1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a738e9a4ee3e3d7b03fba4dea27d21ff1">&#9670;&#160;</a></span>_addSellSignal()</h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SignalBase::_addSellSignal </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>value</em></span><span class="paramdefsep"> = </span><span class="paramdefval">-1.0</span>&#160;)</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>加入卖出信号，在_calculate中调用 </p>
+<p>Add a sell signal, it is called in _calculate </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td></td></tr>
+    <tr><td class="paramname">datetime</td><td>the date when the sell signal occurs </td></tr>
+    <tr><td class="paramname">value</td><td>signal value, -1.0 by default; it must be less than 0, otherwise an exception is thrown; it is merged into the same-date net value (see _addSignal) </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="a34ef3e17fa4e059521aa09bff1e4735a"></a>
+<a id="ad42dc0355a1980d441550ac1026411cf" name="ad42dc0355a1980d441550ac1026411cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad42dc0355a1980d441550ac1026411cf">&#9670;&#160;</a></span>_addSignal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SignalBase::_addSignal </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add a signal, it is called in _calculate. </p>
+<p>The inputs of the same date are merged into one net value: a positive net keeps only the buy record, a negative net only the sell record, the opposite record of the same date is dropped, and a net of about zero drops both records. The date is not validated against the trading object: a non-bar date is a legal write </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>the date when the signal occurs </td></tr>
+    <tr><td class="paramname">value</td><td>the signal value, positive for a buy intent, negative for a sell intent </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab10fa629300415d31117aaae617404fb" name="ab10fa629300415d31117aaae617404fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab10fa629300415d31117aaae617404fb">&#9670;&#160;</a></span>_calculate()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -332,24 +429,26 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::SignalBase::_calculate </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类计算接口，在setTO中调用 </p>
+<p>Subclass calculation interface, it is called in setTO </p>
 
-<p>在 <a class="el" href="classhku_1_1_bool_signal.html#a51d92f4ed44d0d1746ab3f2cddbc5a89">hku::BoolSignal</a>, <a class="el" href="classhku_1_1_cross_gold_signal.html#a7ecbdd26d015439de03e41486f60cbb7">hku::CrossGoldSignal</a>, <a class="el" href="classhku_1_1_cross_signal.html#a3a1c6c2bca0e332daabbea8cf6546877">hku::CrossSignal</a>, <a class="el" href="classhku_1_1_single_signal.html#a9c975cc97d3646f9c570be711310bd1d">hku::SingleSignal</a> , 以及 <a class="el" href="classhku_1_1_single_signal2.html#afbebd3117ab58d7a3a89b3695a2298b1">hku::SingleSignal2</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_band_signal2.html#a9a63b46bd169852d78184e2f27e8f6c7">hku::BandSignal2</a>, <a class="el" href="classhku_1_1_band_signal.html#a69cfd010a2beddc1540537839572641e">hku::BandSignal</a>, <a class="el" href="classhku_1_1_bool_signal.html#aba90d00a22eaf33e6673098176cc3777">hku::BoolSignal</a>, <a class="el" href="classhku_1_1_cross_gold_signal.html#ac56d5af5b85ecde6b50de28e6a924ba1">hku::CrossGoldSignal</a>, <a class="el" href="classhku_1_1_cross_signal.html#a74c8dbba91458b320c0229121c4c0e43">hku::CrossSignal</a>, <a class="el" href="classhku_1_1_one_side_signal.html#ac19cef487c866ea9bac0b2d00c5dbbe5">hku::OneSideSignal</a>, <a class="el" href="classhku_1_1_operator_signal.html#a37b5ebf448278569338dfc7942ca48c4">hku::OperatorSignal</a>, <a class="el" href="classhku_1_1_operator_value_signal.html#a832ec64e648512d247b3ae2c895b213a">hku::OperatorValueSignal</a>, <a class="el" href="classhku_1_1_single_signal2.html#a600d3278c42a354fca285777325d1314">hku::SingleSignal2</a> , 以及 <a class="el" href="classhku_1_1_single_signal.html#a992469ce3ed5756c46fba291ce1a96ce">hku::SingleSignal</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8db6483154e4292e11e3a7a3880e71a1"></a>
+<a id="a8db6483154e4292e11e3a7a3880e71a1" name="a8db6483154e4292e11e3a7a3880e71a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8db6483154e4292e11e3a7a3880e71a1">&#9670;&#160;</a></span>_clone()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -357,26 +456,28 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a> hku::SignalBase::_clone </td>
+          <td class="memname">virtual <a class="el" href="#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a> hku::SignalBase::_clone </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类克隆接口 </p>
+<p>Subclass clone interface </p>
 
-<p>在 <a class="el" href="classhku_1_1_bool_signal.html#af52caccaf73d5a2e111b6faa02b3434c">hku::BoolSignal</a>, <a class="el" href="classhku_1_1_cross_gold_signal.html#abe5c0707c84a8cfafde9a95a4f982a05">hku::CrossGoldSignal</a>, <a class="el" href="classhku_1_1_cross_signal.html#afaeb5925dcb84fe9e94b929c30aec9fe">hku::CrossSignal</a>, <a class="el" href="classhku_1_1_single_signal.html#a1c1d272b8e1c8d237fadcbfd18185176">hku::SingleSignal</a> , 以及 <a class="el" href="classhku_1_1_single_signal2.html#a2e3654acb0af3aff42b3b2f75f776c4b">hku::SingleSignal2</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_band_signal2.html#aa04976933a9d06fb9e78b5c33f3d8331">hku::BandSignal2</a>, <a class="el" href="classhku_1_1_band_signal.html#aa0543836d8c284c77fa73c2397c86926">hku::BandSignal</a>, <a class="el" href="classhku_1_1_bool_signal.html#a5b9af05443a46d2867f5b10c180d107f">hku::BoolSignal</a>, <a class="el" href="classhku_1_1_cross_gold_signal.html#afc33ef18d0c8175bd04a79c9ddb3bec5">hku::CrossGoldSignal</a>, <a class="el" href="classhku_1_1_cross_signal.html#ab19f00f86e692ff905a4a47a6553b9bb">hku::CrossSignal</a>, <a class="el" href="classhku_1_1_one_side_signal.html#a5d450b050200b60c142b9196c638760f">hku::OneSideSignal</a>, <a class="el" href="classhku_1_1_operator_signal.html#ae4c5286034fda8be4d9b19b8973a6ea6">hku::OperatorSignal</a>, <a class="el" href="classhku_1_1_operator_value_signal.html#a58a69b7322a6141719c5e3fccd3405a0">hku::OperatorValueSignal</a>, <a class="el" href="classhku_1_1_single_signal2.html#a1cc75deb6e2bc4ffef1017479d8d0194">hku::SingleSignal2</a> , 以及 <a class="el" href="classhku_1_1_single_signal.html#a7a8e17d85d1163b76c9a550b15e4e48e">hku::SingleSignal</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a36df7e2fcb895afdebaafcdd25afa4a6"></a>
+<a id="a36df7e2fcb895afdebaafcdd25afa4a6" name="a36df7e2fcb895afdebaafcdd25afa4a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36df7e2fcb895afdebaafcdd25afa4a6">&#9670;&#160;</a></span>_reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -386,73 +487,213 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::SignalBase::_reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类复位接口 </p>
+<p>Subclass reset interface </p>
+
+<p>被 <a class="el" href="classhku_1_1_operator_signal.html#a670f046806dff257ec56539c04a18936">hku::OperatorSignal</a> , 以及 <a class="el" href="classhku_1_1_operator_value_signal.html#af068409852001a3ce347faa5685c8174">hku::OperatorValueSignal</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="a24398e495e19e10ad98f22068ac1f734"></a>
+<a id="a24398e495e19e10ad98f22068ac1f734" name="a24398e495e19e10ad98f22068ac1f734"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24398e495e19e10ad98f22068ac1f734">&#9670;&#160;</a></span>clone()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_signal_base.html#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a> hku::SignalBase::clone </td>
+          <td class="memname"><a class="el" href="#a3b2d924d6d614365df4652271d9c65b8">SignalPtr</a> hku::SignalBase::clone </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>克隆操作 </p>
+<p>Clone operation </p>
 
 </div>
 </div>
-<a class="anchor" id="aaff58a254040ff93d0765bc2294d7f19"></a>
+<a id="abada2156e582a324f7b7b3ac7c385271" name="abada2156e582a324f7b7b3ac7c385271"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abada2156e582a324f7b7b3ac7c385271">&#9670;&#160;</a></span>getBuySignal()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::SignalBase::getBuySignal </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>获取所有买入指示日期列表 </p>
+<p>Get the date list of all the buy indications </p>
 
 </div>
 </div>
-<a class="anchor" id="ac792a898f812c297de292f37efdca0b2"></a>
+<a id="a04a1b33d23ef1d3a846003a16f70cb06" name="a04a1b33d23ef1d3a846003a16f70cb06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04a1b33d23ef1d3a846003a16f70cb06">&#9670;&#160;</a></span>getBuySignalMap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt; &amp; hku::SignalBase::getBuySignalMap </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the buy signal table, for the composed operator signals to iterate directly </p>
+
+</div>
+</div>
+<a id="a65dd7596f08eca8aefaae3c072c36e9f" name="a65dd7596f08eca8aefaae3c072c36e9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65dd7596f08eca8aefaae3c072c36e9f">&#9670;&#160;</a></span>getBuyValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::SignalBase::getBuyValue </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the buy signal value of the given moment; a value less than or equal to 0 means there is no buy signal </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>double </dd></dl>
+
+</div>
+</div>
+<a id="a4db4168c88a693f3098d85ca0b0186be" name="a4db4168c88a693f3098d85ca0b0186be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4db4168c88a693f3098d85ca0b0186be">&#9670;&#160;</a></span>getCycleDates()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp; hku::SignalBase::getCycleDates </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the declared rebalancing days </p>
+
+</div>
+</div>
+<a id="ae0e3a0dd510f35102270099c85959a2b" name="ae0e3a0dd510f35102270099c85959a2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0e3a0dd510f35102270099c85959a2b">&#9670;&#160;</a></span>getCycleEnd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp; hku::SignalBase::getCycleEnd </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a19fd98eeb5cb7818b19841a73b5f1377" name="a19fd98eeb5cb7818b19841a73b5f1377"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19fd98eeb5cb7818b19841a73b5f1377">&#9670;&#160;</a></span>getCycleStart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp; hku::SignalBase::getCycleStart </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aec2dad402062c0d68526c5dfb050f4a0" name="aec2dad402062c0d68526c5dfb050f4a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec2dad402062c0d68526c5dfb050f4a0">&#9670;&#160;</a></span>getSellSignal()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::SignalBase::getSellSignal </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>获取所有卖出指示日期列表 </p>
+<p>Get the date list of all the sell indications </p>
 
 </div>
 </div>
-<a class="anchor" id="aad10c5dc5889418b9ac6f464cd75d5a8"></a>
+<a id="a0421cca35f40e10c2c78b91dc1e8912c" name="a0421cca35f40e10c2c78b91dc1e8912c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0421cca35f40e10c2c78b91dc1e8912c">&#9670;&#160;</a></span>getSellSignalMap()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -460,25 +701,52 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::SignalBase::getTO </td>
+          <td class="memname">const std::map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double &gt; &amp; hku::SignalBase::getSellSignalMap </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取交易对象 </p>
-<dl class="section return"><dt>返回</dt><dd>交易对象(KData) </dd></dl>
+<p>Get the sell signal table, for the composed operator signals to iterate directly </p>
 
 </div>
 </div>
-<a class="anchor" id="a50551b4f708469eaa5b4c863c55a3444"></a>
+<a id="a9d5369fc23e921f11c136002d07825fd" name="a9d5369fc23e921f11c136002d07825fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d5369fc23e921f11c136002d07825fd">&#9670;&#160;</a></span>getSellValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::SignalBase::getSellValue </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the sell signal value of the given moment; a value greater than or equal to 0 means there is no sell signal </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>double </dd></dl>
+
+</div>
+</div>
+<a id="aebfb4ffc0169441b650df5f8dc1ae6ef" name="aebfb4ffc0169441b650df5f8dc1ae6ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebfb4ffc0169441b650df5f8dc1ae6ef">&#9670;&#160;</a></span>getTO()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -486,24 +754,133 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::SignalBase::name </td>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp; hku::SignalBase::getTO </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取名称 </p>
+<p>Get the trading object </p>
+<dl class="section return"><dt>返回</dt><dd>the trading object (<a class="el" href="classhku_1_1_k_data.html" title="K-line (candlestick) data">KData</a>) </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ae2f1c86258d74fde0e8da4f24bca1949"></a>
+<a id="a59fadffd5998b7dc4d0fcb27c2e60dda" name="a59fadffd5998b7dc4d0fcb27c2e60dda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59fadffd5998b7dc4d0fcb27c2e60dda">&#9670;&#160;</a></span>getValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double hku::SignalBase::getValue </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a96681e7f7e4240bae1ba5c8da826b2b6" name="a96681e7f7e4240bae1ba5c8da826b2b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96681e7f7e4240bae1ba5c8da826b2b6">&#9670;&#160;</a></span>hasPythonPart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::SignalBase::hasPythonPart </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether this signal or any composed Python part may call back: it only decides whether the C++ log streams stay redirected, the GIL is released regardless </p>
+
+<p>被 <a class="el" href="classhku_1_1_band_signal2.html#ad0ade921077c21e000959257f61a9bda">hku::BandSignal2</a>, <a class="el" href="classhku_1_1_band_signal.html#a588d8ca6c28dc6a0e253310fc3bdd895">hku::BandSignal</a>, <a class="el" href="classhku_1_1_bool_signal.html#a777271fdcf74622419327d418478ef5e">hku::BoolSignal</a>, <a class="el" href="classhku_1_1_cross_gold_signal.html#a9b0315ef19e28c2fc733c0e29e22e2d6">hku::CrossGoldSignal</a>, <a class="el" href="classhku_1_1_cross_signal.html#a91bdd8e991f4038e2e75e5cb06e59e7c">hku::CrossSignal</a>, <a class="el" href="classhku_1_1_one_side_signal.html#a5fbdd1914ce8ff1b926b3ee459ac8d0a">hku::OneSideSignal</a>, <a class="el" href="classhku_1_1_operator_signal.html#a34608d13571a783774619931f1b0825a">hku::OperatorSignal</a>, <a class="el" href="classhku_1_1_operator_value_signal.html#a3441b109be8780247a7efd9a00c1a303">hku::OperatorValueSignal</a>, <a class="el" href="classhku_1_1_single_signal2.html#a216b28072931209d46ebd3e21eb7150b">hku::SingleSignal2</a> , 以及 <a class="el" href="classhku_1_1_single_signal.html#a3146e399d4b49efc8aa893b9bb083308">hku::SingleSignal</a> 重载.</p>
+
+</div>
+</div>
+<a id="ab1cd353c7a03b7a3f80b86145623d837" name="ab1cd353c7a03b7a3f80b86145623d837"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1cd353c7a03b7a3f80b86145623d837">&#9670;&#160;</a></span>isPythonObject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::isPythonObject </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9b501ab32addf8467d667d9f88f6153f" name="a9b501ab32addf8467d667d9f88f6153f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b501ab32addf8467d667d9f88f6153f">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; hku::SignalBase::name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name </p>
+
+</div>
+</div>
+<a id="ae2f1c86258d74fde0e8da4f24bca1949" name="ae2f1c86258d74fde0e8da4f24bca1949"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2f1c86258d74fde0e8da4f24bca1949">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -513,64 +890,141 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">void hku::SignalBase::name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>设置名称 </p>
+<p>Set the name </p>
 
 </div>
 </div>
-<a class="anchor" id="a97d9328040ea1474140955c88099de95"></a>
+<a id="af352736f4be24a7e5b9f0eda3f3cb702" name="af352736f4be24a7e5b9f0eda3f3cb702"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af352736f4be24a7e5b9f0eda3f3cb702">&#9670;&#160;</a></span>nextTimeShouldBuy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::nextTimeShouldBuy </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether a buy is possible at the next moment, equivalent to whether the last moment indicates a buy </p>
+
+</div>
+</div>
+<a id="a3b2c95c2ac9be197c63e535b56ba2665" name="a3b2c95c2ac9be197c63e535b56ba2665"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b2c95c2ac9be197c63e535b56ba2665">&#9670;&#160;</a></span>nextTimeShouldSell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::nextTimeShouldSell </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether a sell is possible at the next moment, equivalent to whether the last moment indicates a sell </p>
+
+</div>
+</div>
+<a id="a97d9328040ea1474140955c88099de95" name="a97d9328040ea1474140955c88099de95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97d9328040ea1474140955c88099de95">&#9670;&#160;</a></span>reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SignalBase::reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>复位操作 </p>
+<p>Reset operation </p>
 
 </div>
 </div>
-<a class="anchor" id="aba7ab8d5214c0dd7b82d94aa3fc63aca"></a>
+<a id="a38532b8c1626b8ee9d457f201e937da8" name="a38532b8c1626b8ee9d457f201e937da8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38532b8c1626b8ee9d457f201e937da8">&#9670;&#160;</a></span>setCycleDates()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::SignalBase::setCycleDates </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>dates</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Declare the rebalancing days (the run-level input of the cycle signals): the signal is always calculated over the whole trading object, these dates are only consumed by the cycle signals (SG_Cycle emits a buy signal on each of them) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dates</td><td>the rebalancing days </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>被 <a class="el" href="classhku_1_1_operator_signal.html#aca7b6e2de6da3313f2bebfa3f0076999">hku::OperatorSignal</a> , 以及 <a class="el" href="classhku_1_1_operator_value_signal.html#a712b0c6400adece2c6b8b8a9e400410f">hku::OperatorValueSignal</a> 重载.</p>
+
+</div>
+</div>
+<a id="aba7ab8d5214c0dd7b82d94aa3fc63aca" name="aba7ab8d5214c0dd7b82d94aa3fc63aca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba7ab8d5214c0dd7b82d94aa3fc63aca">&#9670;&#160;</a></span>setTO()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::SignalBase::setTO </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>kdata</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>指定交易对象，指K线数据 </p>
+<p>Set the trading object, it refers to the K-line data </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">kdata</td><td>指定的交易对象 </td></tr>
+    <tr><td class="paramname">kdata</td><td>the given trading object </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="aaa2bb4d32ee64a90308037288486e227"></a>
+<a id="ab9b87b95632c6c65339f422072c10e9e" name="ab9b87b95632c6c65339f422072c10e9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9b87b95632c6c65339f422072c10e9e">&#9670;&#160;</a></span>shouldBuy()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -580,30 +1034,31 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">bool hku::SignalBase::shouldBuy </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>指定时刻是否可以买入 </p>
+<p>Whether a buy is possible at the given moment </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>指定时刻 </td></tr>
+    <tr><td class="paramname">datetime</td><td>the given moment </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>true 可以买入 | false 不可买入 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>true a buy is possible | false a buy is not possible </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a768f43108eb168182ce816120e8b5e32"></a>
+<a id="ab52a4c73983313f5d982ed9d0306c77b" name="ab52a4c73983313f5d982ed9d0306c77b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab52a4c73983313f5d982ed9d0306c77b">&#9670;&#160;</a></span>shouldSell()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -613,31 +1068,62 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">bool hku::SignalBase::shouldSell </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>指定时刻是否可以卖出 </p>
+<p>Whether a sell is possible at the given moment </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>指定时刻 </td></tr>
+    <tr><td class="paramname">datetime</td><td>the given moment </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>true 可以卖出 | false 不可卖出 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>true a sell is possible | false a sell is not possible </dd></dl>
 
 </div>
 </div>
-<h2 class="groupheader">友元及相关函数文档</h2>
-<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<a id="a45d565dc5b3f077c06bc04a0bed25546" name="a45d565dc5b3f077c06bc04a0bed25546"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45d565dc5b3f077c06bc04a0bed25546">&#9670;&#160;</a></span>startCycle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::SignalBase::startCycle </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>end</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Declare a rebalancing cycle window (compatibility interface): it only records the cycle boundaries and registers the start day into the cycle-date list, it no longer slices the trading object nor recalculates the signal within the window </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start</td><td>the cycle start </td></tr>
+    <tr><td class="paramname">end</td><td>the cycle end (it is only kept for introspection) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="ac98d07dd8f7b70e16ccb9a01abf56b9c" name="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">&#9670;&#160;</a></span>boost::serialization::access</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -650,15 +1136,16 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="a836f6103d3ff16a1f6e64215f31fc28a"></a>
+<a id="a2f43251ed3c47d9a5546683913cb0a84" name="a2f43251ed3c47d9a5546683913cb0a84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f43251ed3c47d9a5546683913cb0a84">&#9670;&#160;</a></span>OperatorSignal</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -666,19 +1153,21 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::set&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>&gt; hku::SignalBase::m_buySig</td>
+          <td class="memname">friend class <a class="el" href="classhku_1_1_operator_signal.html">OperatorSignal</a></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a57fe511611dbad75f08fc360b6966d7b"></a>
+<a id="aa90adf82606f61bd8ba245028bbdebec" name="aa90adf82606f61bd8ba245028bbdebec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa90adf82606f61bd8ba245028bbdebec">&#9670;&#160;</a></span>OperatorValueSignal</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -686,19 +1175,264 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool hku::SignalBase::m_hold</td>
+          <td class="memname">friend class <a class="el" href="classhku_1_1_operator_value_signal.html">OperatorValueSignal</a></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ab1794f1700bd62ab00941a6df91f1d4a"></a>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a65d8b72dca3f391f8a52da75f1d6e84f" name="a65d8b72dca3f391f8a52da75f1d6e84f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65d8b72dca3f391f8a52da75f1d6e84f">&#9670;&#160;</a></span>m_buySig</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double&gt; hku::SignalBase::m_buySig</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a31483d9395bce9c4c4397c1505563791" name="a31483d9395bce9c4c4397c1505563791"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31483d9395bce9c4c4397c1505563791">&#9670;&#160;</a></span>m_calculated</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::m_calculated {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a86947b5e1999e7450d0ef35f4c37b2ab" name="a86947b5e1999e7450d0ef35f4c37b2ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86947b5e1999e7450d0ef35f4c37b2ab">&#9670;&#160;</a></span>m_cycle_dates</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::SignalBase::m_cycle_dates</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a69ad6e149d03c9ff2735e83a172bb67a" name="a69ad6e149d03c9ff2735e83a172bb67a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69ad6e149d03c9ff2735e83a172bb67a">&#9670;&#160;</a></span>m_cycle_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::SignalBase::m_cycle_end</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5140e164fc9f3bc7c38af4338ad62004" name="a5140e164fc9f3bc7c38af4338ad62004"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5140e164fc9f3bc7c38af4338ad62004">&#9670;&#160;</a></span>m_cycle_start</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::SignalBase::m_cycle_start</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab4967f65ac31e945b4817032f1a5b59f" name="ab4967f65ac31e945b4817032f1a5b59f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4967f65ac31e945b4817032f1a5b59f">&#9670;&#160;</a></span>m_hold_long</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::m_hold_long</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abfd4bbf4454216f42bf13df65d01bea3" name="abfd4bbf4454216f42bf13df65d01bea3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfd4bbf4454216f42bf13df65d01bea3">&#9670;&#160;</a></span>m_hold_short</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::m_hold_short</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1ade1f76593078550a435babf3aed6f7" name="a1ade1f76593078550a435babf3aed6f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ade1f76593078550a435babf3aed6f7">&#9670;&#160;</a></span>m_holdLongSnapshot</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::m_holdLongSnapshot {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af2a4588fcc5168bb7d9ff4f69ef7e31a" name="af2a4588fcc5168bb7d9ff4f69ef7e31a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2a4588fcc5168bb7d9ff4f69ef7e31a">&#9670;&#160;</a></span>m_holdShortSnapshot</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::m_holdShortSnapshot {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a521c27448efa4893e38eff53ac47c195" name="a521c27448efa4893e38eff53ac47c195"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a521c27448efa4893e38eff53ac47c195">&#9670;&#160;</a></span>m_holdSnapshotDate</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::SignalBase::m_holdSnapshotDate</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af65bcaece64da400108e450d81007a0f" name="af65bcaece64da400108e450d81007a0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af65bcaece64da400108e450d81007a0f">&#9670;&#160;</a></span>m_is_python_object</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::SignalBase::m_is_python_object {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab1794f1700bd62ab00941a6df91f1d4a" name="ab1794f1700bd62ab00941a6df91f1d4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1794f1700bd62ab00941a6df91f1d4a">&#9670;&#160;</a></span>m_kdata</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -711,14 +1445,16 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a43183365d7af9f8e35b3e4b7ad52a1c3"></a>
+<a id="a89f40a4518eed24a9168868194a3dcb1" name="a89f40a4518eed24a9168868194a3dcb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89f40a4518eed24a9168868194a3dcb1">&#9670;&#160;</a></span>m_keepSignals</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -726,19 +1462,21 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::SignalBase::m_name</td>
+          <td class="memname">bool hku::SignalBase::m_keepSignals {false}</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a22c4190dbb43862c589ca9c556c5dafa"></a>
+<a id="a43183365d7af9f8e35b3e4b7ad52a1c3" name="a43183365d7af9f8e35b3e4b7ad52a1c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43183365d7af9f8e35b3e4b7ad52a1c3">&#9670;&#160;</a></span>m_name</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -746,12 +1484,34 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::set&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>&gt; hku::SignalBase::m_sellSig</td>
+          <td class="memname">string hku::SignalBase::m_name</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af6f3861637df451fc28474a6fad386c4" name="af6f3861637df451fc28474a6fad386c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6f3861637df451fc28474a6fad386c4">&#9670;&#160;</a></span>m_sellSig</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>, double&gt; hku::SignalBase::m_sellSig</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -760,15 +1520,26 @@ Protected 属性</h2></td></tr>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/trade_sys/signal/<a class="el" href="_signal_base_8h_source.html">SignalBase.h</a></li>
-<li>hikyuu/trade_sys/signal/<a class="el" href="_signal_base_8cpp.html">SignalBase.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_signal_base.html">SignalBase</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,0 +1,1123 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: /Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceAsioPool.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2_resource_asio_pool_8h-example.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/ResourceAsioPool.h</div></div>
+</div><!--header-->
+<div class="contents">
+<p>Acquire an available resource synchronously (without waiting; it returns a failure directly when there is no idle resource)</p>
+<p>Acquire an available resource synchronously (without waiting; it returns a failure directly when there is no idle resource)</p><dl class="section return"><dt>返回</dt><dd>stdx::expected&lt;ResourcePtr, std::string&gt; it contains the resource pointer on success and the error information on failure</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The acquisition strategy:<ol type="1">
+<li>Acquire the resource from the idle queue preferentially and check its version</li>
+<li>If the resource version is too old, destroy the resource and try to create a new one</li>
+<li>If there is no idle resource but the upper limit has not been reached, create a new version resource</li>
+<li>If the upper limit has been reached and there is no idle resource, return a failure immediately (without waiting)</li>
+<li>Use asyncGet() if an asynchronous waiting is needed</li>
+</ol>
+</dd></dl>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> result = pool.get();</div>
+<div class="line"><span class="keywordflow">if</span> (result) {</div>
+<div class="line">    <span class="keyword">auto</span> resource = result.value();</div>
+<div class="line">    <span class="comment">// The resource is guaranteed to be of the current latest version</span></div>
+<div class="line">    resource-&gt;doWork();</div>
+<div class="line">} <span class="keywordflow">else</span> {</div>
+<div class="line">    HKU_ERROR(<span class="stringliteral">&quot;Failed to get resource: {}&quot;</span>, result.error());</div>
+<div class="line">}</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">/*</span></div>
+<div class="line"><span class="comment"> * ResourceAsioPool.h</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> *  Copyright (c) 2025, hikyuu.org</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> *  Created on: 2025-03-17</span></div>
+<div class="line"><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><span class="comment"> */</span></div>
+<div class="line"><span class="preprocessor">#pragma once</span></div>
+<div class="line"><span class="preprocessor">#ifndef HKU_UTILS_RESOURCE_ASIO_POOL_H</span></div>
+<div class="line"><span class="preprocessor">#define HKU_UTILS_RESOURCE_ASIO_POOL_H</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;atomic&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;mutex&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;deque&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;condition_variable&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;chrono&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/lockfree/queue.hpp&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &quot;ResourceVersionTraits.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;Parameter.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;Log.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;net.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;expected.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using </span><a id="a0" name="a0"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>;</div>
+<div class="line"><span class="keyword">using </span><a id="a1" name="a1"></a><a class="code hl_function" href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">net::co_spawn</a>;</div>
+<div class="line"><span class="keyword">using </span><a id="a2" name="a2"></a><a class="code hl_variable" href="namespacehku_1_1net.html#adf0624b8ea0f771b7b5726e3ef6722fe">net::detached</a>;</div>
+<div class="line"><span class="keyword">using </span><a id="a3" name="a3"></a><a class="code hl_variable" href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">net::use_awaitable</a>;</div>
+<div class="line"><span class="keyword">namespace </span>this_coro = net::this_coro;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span>rap {</div>
+<div class="line"><span class="keyword">class </span>NullLock {</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a4" name="a4"></a><a class="code hl_function" href="classhku_1_1rap_1_1_null_lock.html#a35d7c5b0a736e5a127d8eb5c34341c58">lock</a>() {}</div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a5" name="a5"></a><a class="code hl_function" href="classhku_1_1rap_1_1_null_lock.html#a1b10e87cacac373a3712030d7a567a82">unlock</a>() {}</div>
+<div class="line">    <span class="keywordtype">bool</span> <a id="a6" name="a6"></a><a class="code hl_function" href="classhku_1_1rap_1_1_null_lock.html#ad79c9ebbedb8f3bb4a7c9bb92d8e990f">try_lock</a>() {</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">    }</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace rap</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ResourceType, <span class="keyword">typename</span> MutexType = std::mutex&gt;</div>
+<div class="line"><span class="keyword">class </span>ResourceAsioPool {</div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keyword">struct </span>WaiterNode {</div>
+<div class="line">        std::shared_ptr&lt;net::steady_timer&gt; timer;</div>
+<div class="line">        std::atomic&lt;ResourceType *&gt; handed{<span class="keyword">nullptr</span>};</div>
+<div class="line"></div>
+<div class="line">        <span class="keyword">static</span> ResourceType *gaveUp() <span class="keyword">noexcept</span> {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">reinterpret_cast&lt;</span>ResourceType *<span class="keyword">&gt;</span>(std::uintptr_t(1));</div>
+<div class="line">        }</div>
+<div class="line">    };</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">struct </span>WaiterRegistry {</div>
+<div class="line">        std::mutex mutex;</div>
+<div class="line">        std::vector&lt;std::weak_ptr&lt;WaiterNode&gt;&gt; queue;</div>
+<div class="line">    };</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    <a id="a7" name="a7"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a>() = <span class="keyword">delete</span>;</div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a> &amp;<a id="a8" name="a8"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a0243b56b1438f4ab3db8ab6790666331">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a>(<span class="keyword">const</span> <a id="a9" name="a9"></a><a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param, <span class="keywordtype">size_t</span> max_count = 128,</div>
+<div class="line">                              <span class="keywordtype">size_t</span> max_waiters = 1000)</div>
+<div class="line">    : m_maxCount(max_count),</div>
+<div class="line">      m_param(param),</div>
+<div class="line">      m_resourceList(max_count == 0 ? 128 : max_count),</div>
+<div class="line">      m_maxWaiters(max_waiters &gt; 0 ? max_waiters : 1000),</div>
+<div class="line">      m_waiters(std::make_shared&lt;WaiterRegistry&gt;()) {</div>
+<div class="line">        <span class="comment">// The waiting queue is reserved up front, so joining it never allocates and never throws</span></div>
+<div class="line">        m_waiters-&gt;queue.reserve(m_maxWaiters);</div>
+<div class="line">        <span class="keywordflow">if</span> (max_waiters == 0) {</div>
+<div class="line">            HKU_WARN(<span class="stringliteral">&quot;ResourceAsioPool: max_waiters is 0, using default 1000&quot;</span>);</div>
+<div class="line">        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (m_maxWaiters &gt; 10000) {</div>
+<div class="line">            <span class="keywordtype">double</span> estimated_mb = m_maxWaiters * 150.0 / 1024 / 1024;</div>
+<div class="line">            HKU_WARN(</div>
+<div class="line">              <span class="stringliteral">&quot;ResourceAsioPool: large max_waiters={}, &quot;</span></div>
+<div class="line">              <span class="stringliteral">&quot;estimated memory usage at full capacity: ~{:.1f}MB&quot;</span>,</div>
+<div class="line">              m_maxWaiters, estimated_mb);</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">virtual</span> <a id="a10" name="a10"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#abe93e55265c7a198b2e6355d46f04db3">~ResourceAsioPool</a>() {</div>
+<div class="line">        <span class="comment">// Mark that it is being destructed, preventing new resource acquisitions and returns</span></div>
+<div class="line">        m_is_destroying.store(<span class="keyword">true</span>, std::memory_order_release);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Take all the waiters away at once. Every node is co-owned by the waiting queue and by the</span></div>
+<div class="line">        <span class="comment">// waiting coroutine, so whoever claims the reserved resource first owns it, while the node</span></div>
+<div class="line">        <span class="comment">// itself stays alive as long as the other side still holds a reference.</span></div>
+<div class="line">        std::vector&lt;std::weak_ptr&lt;WaiterNode&gt;&gt; waiters;</div>
+<div class="line">        {</div>
+<div class="line">            std::lock_guard&lt;std::mutex&gt; lock(m_waiters-&gt;mutex);</div>
+<div class="line">            waiters.swap(m_waiters-&gt;queue);</div>
+<div class="line">        }</div>
+<div class="line">        m_registeredWaiters.fetch_sub(waiters.size(), std::memory_order_relaxed);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;waiter_ref : waiters) {</div>
+<div class="line">            <span class="keyword">auto</span> waiter = waiter_ref.lock();</div>
+<div class="line">            <span class="keywordflow">if</span> (!waiter) {</div>
+<div class="line">                <span class="comment">// The waiting coroutine is gone, its node dies together with it</span></div>
+<div class="line">                <span class="keywordflow">continue</span>;</div>
+<div class="line">            }</div>
+<div class="line">            ResourceType *p =</div>
+<div class="line">              waiter-&gt;handed.exchange(WaiterNode::gaveUp(), std::memory_order_acq_rel);</div>
+<div class="line">            <span class="comment">// Only the resource nobody will ever claim may be released here. The waiting coroutines</span></div>
+<div class="line">            <span class="comment">// are not timed out explicitly: whenever one of them resumes it finds gaveUp() and</span></div>
+<div class="line">            <span class="comment">// takes the time out branch, which reads nothing from the pool any more.</span></div>
+<div class="line">            <span class="keywordflow">if</span> (p != <span class="keyword">nullptr</span> &amp;&amp; p != WaiterNode::gaveUp()) {</div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Wait for all the active resources to be returned</span></div>
+<div class="line">        <span class="comment">// When m_count == m_idleCount all the resources have been returned to the idle queue</span></div>
+<div class="line">        std::unique_lock&lt;MutexType&gt; lock(m_destroy_mutex);</div>
+<div class="line">        m_destroy_waiting.store(<span class="keyword">true</span>, std::memory_order_seq_cst);</div>
+<div class="line">        m_destroy_cv.wait(lock, [<span class="keyword">this</span>]() {</div>
+<div class="line">            <span class="keywordflow">return</span> m_count.load(std::memory_order_seq_cst) ==</div>
+<div class="line">                   m_idleCount.load(std::memory_order_seq_cst);</div>
+<div class="line">        });</div>
+<div class="line">        m_destroy_waiting.store(<span class="keyword">false</span>, std::memory_order_relaxed);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// At this time all the resources are in the idle queue, release them</span></div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">while</span> (m_resourceList.pop(p)) {</div>
+<div class="line">            <span class="keywordflow">if</span> (p) {</div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;ResourceType&gt; <a id="a11" name="a11"></a><a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>;</div>
+<div class="line"></div>
+<div class="line">    stdx::expected&lt;ResourcePtr, std::string&gt; <a id="a12" name="a12"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#ae8d5e34ed56cf6fd532c5b254a9c6a0f">get</a>() {</div>
+<div class="line">        <span class="comment">// 1. Try to acquire a resource from the idle queue</span></div>
+<div class="line">        ResourceType *p = takeIdleResource();</div>
+<div class="line">        <span class="keywordflow">if</span> (p) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(<a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 2. There is no idle resource but the upper limit has not been reached -&gt; create a new</span></div>
+<div class="line">        <span class="comment">//    resource. The slot is reserved with a CAS first, so the upper limit stays a hard one</span></div>
+<div class="line">        <span class="comment">//    even when several threads create resources at the same time</span></div>
+<div class="line">        <span class="keywordflow">if</span> (reserveResourceSlot()) {</div>
+<div class="line">            <span class="keywordflow">try</span> {</div>
+<div class="line">                p = <span class="keyword">new</span> ResourceType(m_param);</div>
+<div class="line">            } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keywordflow">return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(fmt::format(<span class="stringliteral">&quot;Failed create a new Resource! {}&quot;</span>, e.what())));</div>
+<div class="line">            } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keywordflow">return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(<span class="stringliteral">&quot;Failed create a new Resource! Unknown error!&quot;</span>));</div>
+<div class="line">            }</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(<a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 3. The upper limit has been reached and there is no idle resource -&gt; return a failure</span></div>
+<div class="line">        <span class="comment">//    directly</span></div>
+<div class="line">        <span class="keywordflow">return</span> stdx::unexpected(fmt::format(<span class="stringliteral">&quot;No available resource, max_count={}, current_count={}&quot;</span>,</div>
+<div class="line">                                            m_maxCount, m_count.load(std::memory_order_relaxed)));</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">awaitable&lt;stdx::expected&lt;ResourcePtr, std::string&gt;</a>&gt; <a id="a13" name="a13"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#ae471835fdda3c11d737a46e69aebf82b">asyncGet</a>(</div>
+<div class="line">      std::chrono::steady_clock::duration timeout = std::chrono::seconds(5)) {</div>
+<div class="line">        <span class="comment">// Try to acquire a resource from the idle queue</span></div>
+<div class="line">        ResourceType *p = takeIdleResource();</div>
+<div class="line">        <span class="keywordflow">if</span> (p) {</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// There is no idle resource but the upper limit has not been reached -&gt; create a new</span></div>
+<div class="line">        <span class="comment">// resource. The slot is reserved with a CAS first, so the upper limit stays a hard one even</span></div>
+<div class="line">        <span class="comment">// when several coroutines create resources at the same time</span></div>
+<div class="line">        <span class="keywordflow">if</span> (reserveResourceSlot()) {</div>
+<div class="line">            <span class="keywordflow">try</span> {</div>
+<div class="line">                p = <span class="keyword">new</span> ResourceType(m_param);</div>
+<div class="line">            } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keyword">co_return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(fmt::format(<span class="stringliteral">&quot;Failed create a new Resource! {}&quot;</span>, e.what())));</div>
+<div class="line">            } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keyword">co_return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(<span class="stringliteral">&quot;Failed create a new Resource! Unknown error!&quot;</span>));</div>
+<div class="line">            }</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// The upper limit has been reached -&gt; enter the waiting queue</span></div>
+<div class="line">        <span class="keyword">auto</span> executor = <span class="keyword">co_await</span> this_coro::executor;</div>
+<div class="line">        <span class="keyword">auto</span> waiter = std::make_shared&lt;WaiterNode&gt;();</div>
+<div class="line">        waiter-&gt;timer = std::make_shared&lt;net::steady_timer&gt;(executor);</div>
+<div class="line">        waiter-&gt;timer-&gt;expires_after(timeout);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Both messages are built before the wait is started: nothing may be read from the pool on</span></div>
+<div class="line">        <span class="comment">// the failure branches, because the pool can already be gone when this coroutine resumes,</span></div>
+<div class="line">        <span class="comment">// and nothing between the wait being started and its co_await may throw (an awaitable with</span></div>
+<div class="line">        <span class="comment">// a pending operation must never be destroyed without being awaited)</span></div>
+<div class="line">        <span class="keyword">auto</span> timeout_msg =</div>
+<div class="line">          fmt::format(<span class="stringliteral">&quot;ResourceAsioPool get timeout, max_count={}, current_count={}&quot;</span>, m_maxCount,</div>
+<div class="line">                      m_count.load(std::memory_order_relaxed));</div>
+<div class="line">        <span class="keyword">auto</span> queue_full_msg = fmt::format(<span class="stringliteral">&quot;Waiter queue is full (max={})&quot;</span>, m_maxWaiters);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Start the wait before joining the queue, so that every wake up done by a resource</span></div>
+<div class="line">        <span class="comment">// returning thread hits an outstanding operation</span></div>
+<div class="line">        <a id="a14" name="a14"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a81dbfd7a2e31d0a8b61e0fccb91c8582">net::error_code</a> ec;</div>
+<div class="line">        <span class="keyword">auto</span> wait_result = waiter-&gt;timer-&gt;async_wait(<a id="a15" name="a15"></a><a class="code hl_function" href="namespacehku_1_1net.html#a8b48f61111ca429662745f8551417f4b">net::redirect_error</a>(<a class="code hl_variable" href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">net::use_awaitable</a>, ec));</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Keep our own reference to the waiting queue, so that unregistering stays valid even when</span></div>
+<div class="line">        <span class="comment">// the pool is destroyed while we are suspended</span></div>
+<div class="line">        <span class="keyword">auto</span> waiters = m_waiters;</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (!pushWaiter(waiters, waiter)) {</div>
+<div class="line">            waiter-&gt;timer-&gt;expires_after(std::chrono::milliseconds(0));</div>
+<div class="line">            <span class="keyword">co_await</span> std::move(wait_result);</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::unexpected(queue_full_msg);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// A resource may have been handed over between the checks above and joining the queue, take</span></div>
+<div class="line">        <span class="comment">// it instead of sleeping for a whole timeout</span></div>
+<div class="line">        ResourceType *idle = takeIdleResource();</div>
+<div class="line">        <span class="keywordflow">if</span> (idle) {</div>
+<div class="line">            waiter-&gt;timer-&gt;expires_after(std::chrono::milliseconds(0));</div>
+<div class="line">            <span class="keyword">co_await</span> std::move(wait_result);</div>
+<div class="line">            ResourceType *reserved =</div>
+<div class="line">              waiter-&gt;handed.exchange(WaiterNode::gaveUp(), std::memory_order_acq_rel);</div>
+<div class="line">            removeWaiter(waiters, waiter);</div>
+<div class="line">            <span class="keywordflow">if</span> (reserved != <span class="keyword">nullptr</span> &amp;&amp; reserved != WaiterNode::gaveUp()) {</div>
+<div class="line">                <span class="comment">// Somebody handed a second resource over to us, give ours back</span></div>
+<div class="line">                returnResource(idle, <span class="keyword">nullptr</span>);</div>
+<div class="line">                idle = reserved;</div>
+<div class="line">            }</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>(idle, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Note the error code is not looked at: it only tells how we were woken up, the result is</span></div>
+<div class="line">        <span class="comment">// decided by who wins the atomic exchange below</span></div>
+<div class="line">        <span class="keyword">co_await</span> std::move(wait_result);</div>
+<div class="line"> </div>
+<div class="line">        ResourceType *reserved =</div>
+<div class="line">          waiter-&gt;handed.exchange(WaiterNode::gaveUp(), std::memory_order_acq_rel);</div>
+<div class="line">        removeWaiter(waiters, waiter);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (reserved != <span class="keyword">nullptr</span> &amp;&amp; reserved != WaiterNode::gaveUp()) {</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">ResourcePtr</a>(reserved, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="keyword">co_return</span> stdx::unexpected(timeout_msg);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a16" name="a16"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a855fc3e37a7793fbdf56dfba2812b561">count</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_count.load();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a17" name="a17"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#aabb49258f661a665a7079e2d002f166f">idleCount</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_idleCount.load();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a18" name="a18"></a><a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#abe0f90301100cc0452cfdc5abb2d8963">releaseIdleResource</a>() {</div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">while</span> (m_resourceList.pop(p)) {</div>
+<div class="line">            <span class="keywordflow">if</span> (p) {</div>
+<div class="line">                m_idleCount.fetch_sub(1);  <span class="comment">// Decrease the idle count</span></div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">                releaseResourceCount();  <span class="comment">// Decrease the count and notify the destructor</span></div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    ResourceType *takeIdleResource() {</div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">if</span> (m_resourceList.pop(p)) {</div>
+<div class="line">            m_idleCount.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">            <span class="keywordflow">return</span> p;</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> releaseResourceCount() {</div>
+<div class="line">        m_count.fetch_sub(1, std::memory_order_seq_cst);</div>
+<div class="line">        notifyCountChanged();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> notifyCountChanged() {</div>
+<div class="line">        <span class="keywordflow">if</span> (m_destroy_waiting.load(std::memory_order_seq_cst)) {</div>
+<div class="line">            std::unique_lock&lt;MutexType&gt; lock(m_destroy_mutex);</div>
+<div class="line">            m_destroy_cv.notify_one();</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> pushWaiter(<span class="keyword">const</span> std::shared_ptr&lt;WaiterRegistry&gt; &amp;waiters,</div>
+<div class="line">                    <span class="keyword">const</span> std::shared_ptr&lt;WaiterNode&gt; &amp;waiter) {</div>
+<div class="line">        std::lock_guard&lt;std::mutex&gt; lock(waiters-&gt;mutex);</div>
+<div class="line">        <span class="keywordflow">if</span> (waiters-&gt;queue.size() &gt;= m_maxWaiters) {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">        }</div>
+<div class="line">        waiters-&gt;queue.emplace_back(waiter);</div>
+<div class="line">        m_registeredWaiters.fetch_add(1, std::memory_order_relaxed);</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> removeWaiter(<span class="keyword">const</span> std::shared_ptr&lt;WaiterRegistry&gt; &amp;waiters,</div>
+<div class="line">                      <span class="keyword">const</span> std::shared_ptr&lt;WaiterNode&gt; &amp;waiter) {</div>
+<div class="line">        std::lock_guard&lt;std::mutex&gt; lock(waiters-&gt;mutex);</div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keyword">auto</span> iter = waiters-&gt;queue.begin(); iter != waiters-&gt;queue.end(); ++iter) {</div>
+<div class="line">            <span class="keywordflow">if</span> (iter-&gt;lock() == waiter) {</div>
+<div class="line">                waiters-&gt;queue.erase(iter);</div>
+<div class="line">                m_registeredWaiters.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">                <span class="keywordflow">return</span>;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> handToWaiter(ResourceType *p) {</div>
+<div class="line">        <span class="comment">// The fast path of the resource returning: without any registered waiter there is nothing</span></div>
+<div class="line">        <span class="comment">// to scan and no lock to take. A waiter registered just after this check finds the resource</span></div>
+<div class="line">        <span class="comment">// by itself through the idle queue re-check below</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_registeredWaiters.load(std::memory_order_acquire) == 0) {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div>
+<div class="line">            std::shared_ptr&lt;WaiterNode&gt; waiter;</div>
+<div class="line">            {</div>
+<div class="line">                std::lock_guard&lt;std::mutex&gt; lock(m_waiters-&gt;mutex);</div>
+<div class="line">                <span class="keywordflow">for</span> (<span class="keyword">auto</span> iter = m_waiters-&gt;queue.begin(); iter != m_waiters-&gt;queue.end();) {</div>
+<div class="line">                    <span class="keyword">auto</span> candidate = iter-&gt;lock();</div>
+<div class="line">                    <span class="keywordflow">if</span> (!candidate) {</div>
+<div class="line">                        <span class="comment">// The waiting coroutine is gone, clean its node up on the way</span></div>
+<div class="line">                        iter = m_waiters-&gt;queue.erase(iter);</div>
+<div class="line">                        m_registeredWaiters.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">                        <span class="keywordflow">continue</span>;</div>
+<div class="line">                    }</div>
+<div class="line">                    ResourceType *current = candidate-&gt;handed.load(std::memory_order_relaxed);</div>
+<div class="line">                    <span class="keywordflow">if</span> (current == WaiterNode::gaveUp()) {</div>
+<div class="line">                        <span class="comment">// It has given up, clean its node up on the way</span></div>
+<div class="line">                        iter = m_waiters-&gt;queue.erase(iter);</div>
+<div class="line">                        m_registeredWaiters.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">                        <span class="keywordflow">continue</span>;</div>
+<div class="line">                    }</div>
+<div class="line">                    <span class="keywordflow">if</span> (current == <span class="keyword">nullptr</span>) {</div>
+<div class="line">                        waiter = std::move(candidate);</div>
+<div class="line">                        <span class="keywordflow">break</span>;</div>
+<div class="line">                    }</div>
+<div class="line">                    <span class="comment">// A resource has been handed over to it but has not been taken yet</span></div>
+<div class="line">                    ++iter;</div>
+<div class="line">                }</div>
+<div class="line">                <span class="keywordflow">if</span> (!waiter) {</div>
+<div class="line">                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">                }</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            ResourceType *expected = <span class="keyword">nullptr</span>;</div>
+<div class="line">            <span class="keywordflow">if</span> (waiter-&gt;handed.compare_exchange_strong(expected, p, std::memory_order_acq_rel)) {</div>
+<div class="line">                <span class="comment">// Wake it up with cancel(): it never touches the expiry, which the waiting</span></div>
+<div class="line">                <span class="comment">// coroutine may rearm at the very same moment</span></div>
+<div class="line">                waiter-&gt;timer-&gt;cancel();</div>
+<div class="line">                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            <span class="comment">// It has just given up, look for the next one</span></div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> reserveResourceSlot() {</div>
+<div class="line">        <span class="keywordtype">size_t</span> current = m_count.load(std::memory_order_relaxed);</div>
+<div class="line">        <span class="keywordflow">while</span> (m_maxCount == 0 || current &lt; m_maxCount) {</div>
+<div class="line">            <span class="keywordflow">if</span> (m_count.compare_exchange_weak(current, current + 1, std::memory_order_acq_rel)) {</div>
+<div class="line">                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">class </span>ResourceCloser {</div>
+<div class="line">    <span class="keyword">public</span>:</div>
+<div class="line">        <span class="keyword">explicit</span> ResourceCloser(<a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a> *pool) : m_pool(pool) {}</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordtype">void</span> operator()(ResourceType *conn) {</div>
+<div class="line">            <span class="keywordflow">if</span> (conn) {</div>
+<div class="line">                <span class="comment">// If the pool is bound, the resource is returned; otherwise it is deleted</span></div>
+<div class="line">                <span class="keywordflow">if</span> (m_pool) {</div>
+<div class="line">                    m_pool-&gt;<a id="a19" name="a19"></a>returnResource(conn, <span class="keyword">this</span>);</div>
+<div class="line">                } <span class="keywordflow">else</span> {</div>
+<div class="line">                    <span class="keyword">delete</span> conn;</div>
+<div class="line">                }</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">private</span>:</div>
+<div class="line">        <a class="code hl_function" href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">ResourceAsioPool</a> *m_pool;</div>
+<div class="line">    };</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> returnResource(ResourceType *p, ResourceCloser *closer) {</div>
+<div class="line">        <span class="keywordflow">if</span> (!p) [[unlikely]] {</div>
+<div class="line">            HKU_WARN(<span class="stringliteral">&quot;ResourceAsioPool::returnResource: nullptr&quot;</span>);</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// If it is being destructed, delete the resource directly</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_is_destroying.load(std::memory_order_acquire)) {</div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            releaseResourceCount();</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Try to hand it over to a waiter that has not given up yet</span></div>
+<div class="line">        <span class="keywordflow">if</span> (handToWaiter(p)) {</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// There is no waiter to hand it over to, put it back into the idle queue</span></div>
+<div class="line">        <span class="keywordflow">if</span> (!m_resourceList.push(p)) {</div>
+<div class="line">            <span class="comment">// The queue is full, delete it directly</span></div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            releaseResourceCount();</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        m_idleCount.fetch_add(1, std::memory_order_seq_cst);</div>
+<div class="line">        notifyCountChanged();</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    std::atomic&lt;size_t&gt; m_count{0};      <span class="comment">// The number of the currently active resources</span></div>
+<div class="line">    std::atomic&lt;size_t&gt; m_idleCount{0};  <span class="comment">// The current number of the idle resources</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_maxCount;                   <span class="comment">// The maximum resource upper limit</span></div>
+<div class="line">    <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> m_param;</div>
+<div class="line">    boost::lockfree::queue&lt;ResourceType *&gt; m_resourceList;</div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordtype">size_t</span> m_maxWaiters;  <span class="comment">// The runtime logical upper limit: the maximum number of the waiters</span></div>
+<div class="line">    std::shared_ptr&lt;WaiterRegistry&gt; m_waiters;  <span class="comment">// The waiting queue, shared with the waiting</span></div>
+<div class="line">                                                <span class="comment">// coroutines</span></div>
+<div class="line">    MutexType m_destroy_mutex;                  <span class="comment">// The mutex protecting the destructor waiting</span></div>
+<div class="line">                                                <span class="comment">// condition variable</span></div>
+<div class="line">    std::condition_variable_any m_destroy_cv;   <span class="comment">// Used to notify the destructor that a</span></div>
+<div class="line">                                                <span class="comment">// resource has been returned</span></div>
+<div class="line">    std::atomic&lt;bool&gt; m_is_destroying{<span class="keyword">false</span>};   <span class="comment">// Marks whether it is being destructed</span></div>
+<div class="line">    std::atomic&lt;size_t&gt; m_registeredWaiters{</div>
+<div class="line">      0};  <span class="comment">// The number of the registered waiters, it may be a little too large</span></div>
+<div class="line">    std::atomic&lt;bool&gt; m_destroy_waiting{</div>
+<div class="line">      <span class="keyword">false</span>};  <span class="comment">// Marks whether the destructor is waiting on the condition variable</span></div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ResourceType, <span class="keyword">typename</span> MutexType = std::mutex&gt;</div>
+<div class="line"><span class="keyword">class </span>ResourceAsioVersionPool {</div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keyword">struct </span>WaiterNode {</div>
+<div class="line">        std::shared_ptr&lt;net::steady_timer&gt; timer;</div>
+<div class="line">        std::atomic&lt;ResourceType *&gt; handed{<span class="keyword">nullptr</span>};</div>
+<div class="line"></div>
+<div class="line">        <span class="keyword">static</span> ResourceType *gaveUp() <span class="keyword">noexcept</span> {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">reinterpret_cast&lt;</span>ResourceType *<span class="keyword">&gt;</span>(std::uintptr_t(1));</div>
+<div class="line">        }</div>
+<div class="line">    };</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">struct </span>WaiterRegistry {</div>
+<div class="line">        std::mutex mutex;</div>
+<div class="line">        std::vector&lt;std::weak_ptr&lt;WaiterNode&gt;&gt; queue;</div>
+<div class="line">    };</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    <span class="comment">// Compile-time check: ResourceType must support getVersion and setVersion</span></div>
+<div class="line">    <span class="keyword">static_assert</span>(hku::detail::has_resource_getVersion_v&lt;ResourceType&gt;,</div>
+<div class="line">                  <span class="stringliteral">&quot;ResourceType must implement getVersion() method.&quot;</span>);</div>
+<div class="line">    <span class="keyword">static_assert</span>(hku::detail::has_resource_setVersion_v&lt;ResourceType&gt;,</div>
+<div class="line">                  <span class="stringliteral">&quot;ResourceType must implement setVersion(int) method.&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line">    <a id="a20" name="a20"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a>() = <span class="keyword">delete</span>;</div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a> &amp;<a id="a21" name="a21"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#af80b1109eb28e72d703834408263bff4">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a>(<span class="keyword">const</span> <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param, <span class="keywordtype">size_t</span> max_count = 0,</div>
+<div class="line">                                     <span class="keywordtype">size_t</span> max_waiters = 1000)</div>
+<div class="line">    : m_maxCount(max_count),</div>
+<div class="line">      m_param(param),</div>
+<div class="line">      m_resourceList(128),</div>
+<div class="line">      m_maxWaiters(max_waiters &gt; 0 ? max_waiters : 1000),</div>
+<div class="line">      m_waiters(std::make_shared&lt;WaiterRegistry&gt;()) {</div>
+<div class="line">        <span class="comment">// The waiting queue is reserved up front, so joining it never allocates and never throws</span></div>
+<div class="line">        m_waiters-&gt;queue.reserve(m_maxWaiters);</div>
+<div class="line">        <span class="keywordflow">if</span> (max_waiters == 0) {</div>
+<div class="line">            HKU_WARN(<span class="stringliteral">&quot;ResourceAsioVersionPool: max_waiters is 0, using default 1000&quot;</span>);</div>
+<div class="line">        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (m_maxWaiters &gt; 10000) {</div>
+<div class="line">            <span class="keywordtype">double</span> estimated_mb = m_maxWaiters * 150.0 / 1024 / 1024;</div>
+<div class="line">            HKU_WARN(</div>
+<div class="line">              <span class="stringliteral">&quot;ResourceAsioVersionPool: large max_waiters={}, &quot;</span></div>
+<div class="line">              <span class="stringliteral">&quot;estimated memory usage at full capacity: ~{:.1f}MB&quot;</span>,</div>
+<div class="line">              m_maxWaiters, estimated_mb);</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">virtual</span> <a id="a22" name="a22"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a4eead1a2c936a0e642676d46025818fb">~ResourceAsioVersionPool</a>() {</div>
+<div class="line">        <span class="comment">// Mark that it is being destructed, preventing new resource acquisitions and returns</span></div>
+<div class="line">        m_is_destroying.store(<span class="keyword">true</span>, std::memory_order_release);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Take all the waiters away at once. Every node is co-owned by the waiting queue and by the</span></div>
+<div class="line">        <span class="comment">// waiting coroutine, so whoever claims the reserved resource first owns it, while the node</span></div>
+<div class="line">        <span class="comment">// itself stays alive as long as the other side still holds a reference.</span></div>
+<div class="line">        std::vector&lt;std::weak_ptr&lt;WaiterNode&gt;&gt; waiters;</div>
+<div class="line">        {</div>
+<div class="line">            std::lock_guard&lt;std::mutex&gt; lock(m_waiters-&gt;mutex);</div>
+<div class="line">            waiters.swap(m_waiters-&gt;queue);</div>
+<div class="line">        }</div>
+<div class="line">        m_registeredWaiters.fetch_sub(waiters.size(), std::memory_order_relaxed);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;waiter_ref : waiters) {</div>
+<div class="line">            <span class="keyword">auto</span> waiter = waiter_ref.lock();</div>
+<div class="line">            <span class="keywordflow">if</span> (!waiter) {</div>
+<div class="line">                <span class="comment">// The waiting coroutine is gone, its node dies together with it</span></div>
+<div class="line">                <span class="keywordflow">continue</span>;</div>
+<div class="line">            }</div>
+<div class="line">            ResourceType *p =</div>
+<div class="line">              waiter-&gt;handed.exchange(WaiterNode::gaveUp(), std::memory_order_acq_rel);</div>
+<div class="line">            <span class="comment">// Only the resource nobody will ever claim may be released here. The waiting coroutines</span></div>
+<div class="line">            <span class="comment">// are not timed out explicitly: whenever one of them resumes it finds gaveUp() and</span></div>
+<div class="line">            <span class="comment">// takes the time out branch, which reads nothing from the pool any more.</span></div>
+<div class="line">            <span class="keywordflow">if</span> (p != <span class="keyword">nullptr</span> &amp;&amp; p != WaiterNode::gaveUp()) {</div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Wait for all the active resources to be returned</span></div>
+<div class="line">        std::unique_lock&lt;MutexType&gt; lock(m_destroy_mutex);</div>
+<div class="line">        m_destroy_waiting.store(<span class="keyword">true</span>, std::memory_order_seq_cst);</div>
+<div class="line">        m_destroy_cv.wait(lock, [<span class="keyword">this</span>]() {</div>
+<div class="line">            <span class="keywordflow">return</span> m_count.load(std::memory_order_seq_cst) ==</div>
+<div class="line">                   m_idleCount.load(std::memory_order_seq_cst);</div>
+<div class="line">        });</div>
+<div class="line">        m_destroy_waiting.store(<span class="keyword">false</span>, std::memory_order_relaxed);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// At this time all the resources are in the idle queue, release them</span></div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">while</span> (m_resourceList.pop(p)) {</div>
+<div class="line">            <span class="keywordflow">if</span> (p) {</div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> <a id="a23" name="a23"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a32fe75c5db4cfdf0b7a433f69c3f2022">haveParam</a>(<span class="keyword">const</span> std::string &amp;name) {</div>
+<div class="line">        std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">        <span class="keywordflow">return</span> m_param.<a id="a24" name="a24"></a><a class="code hl_function" href="classhku_1_1_parameter.html#a1cca33b034a332fc7ed9a5cedfaf281a">have</a>(name);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ValueType&gt;</div>
+<div class="line">    ValueType <a id="a25" name="a25"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a91a373d7a2bc15a1c4e83bccf377b0f9">getParam</a>(<span class="keyword">const</span> std::string &amp;name) {</div>
+<div class="line">        std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">        <span class="keywordflow">return</span> m_param.<a id="a26" name="a26"></a><a class="code hl_function" href="classhku_1_1_parameter.html#a5a178504381754095e48ff4279e83520">get</a>&lt;ValueType&gt;(name);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ValueType&gt;</div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a27" name="a27"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a64f9eb478f6052e5efb60021939e78b1">setParam</a>(<span class="keyword">const</span> std::string &amp;name, <span class="keyword">const</span> ValueType &amp;value) {</div>
+<div class="line">        std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">        <span class="comment">// If the parameter has not actually changed, return directly</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_param.<a class="code hl_function" href="classhku_1_1_parameter.html#a1cca33b034a332fc7ed9a5cedfaf281a">have</a>(name) &amp;&amp; value == m_param.<a class="code hl_function" href="classhku_1_1_parameter.html#a5a178504381754095e48ff4279e83520">get</a>&lt;ValueType&gt;(name)) {</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line">        m_param.<a id="a28" name="a28"></a><a class="code hl_function" href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">set</a>&lt;ValueType&gt;(name, value);</div>
+<div class="line">        m_version.fetch_add(1);</div>
+<div class="line">        <a id="a29" name="a29"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#af9f0946bda0a91f91942cf50d6d8bac8">releaseIdleResource</a>();  <span class="comment">// Release the current idle resources so that the new parameter</span></div>
+<div class="line">                                <span class="comment">// values take effect</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a30" name="a30"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a97dd25811cd80eb6f2507ab331bd6862">setParameter</a>(<span class="keyword">const</span> <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;param) {</div>
+<div class="line">        std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">        m_param = param;</div>
+<div class="line">        m_version.fetch_add(1);</div>
+<div class="line">        <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#af9f0946bda0a91f91942cf50d6d8bac8">releaseIdleResource</a>();  <span class="comment">// Release the current idle resources so that the new parameter</span></div>
+<div class="line">                                <span class="comment">// values take effect</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a97dd25811cd80eb6f2507ab331bd6862">setParameter</a>(<a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> &amp;&amp;param) {</div>
+<div class="line">        std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">        m_param = std::move(param);</div>
+<div class="line">        m_version.fetch_add(1);</div>
+<div class="line">        <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#af9f0946bda0a91f91942cf50d6d8bac8">releaseIdleResource</a>();  <span class="comment">// Release the current idle resources so that the new parameter</span></div>
+<div class="line">                                <span class="comment">// values take effect</span></div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">int</span> <a id="a31" name="a31"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a2138f60a3c53acfde68a8c5ee8e99a70">getVersion</a>() {</div>
+<div class="line">        <span class="keywordflow">return</span> m_version.load();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a id="a32" name="a32"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#aa2a407343e1fa8e16afd742754a75841">incVersion</a>(<span class="keywordtype">int</span> version) {</div>
+<div class="line">        m_version.fetch_add(1);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;ResourceType&gt; <a id="a33" name="a33"></a><a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>;</div>
+<div class="line"></div>
+<div class="line">    stdx::expected&lt;ResourcePtr, std::string&gt; <a id="a34" name="a34"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a0cc6b6f98b144f5a1eb58d7a8f419f3a">get</a>() {</div>
+<div class="line">        <span class="comment">// 1. Try to acquire a resource from the idle queue; a resource whose version is too old is</span></div>
+<div class="line">        <span class="comment">//    destroyed by takeIdleResource() itself and nullptr is returned then</span></div>
+<div class="line">        ResourceType *p = takeIdleResource();</div>
+<div class="line">        <span class="keywordflow">if</span> (p) {</div>
+<div class="line">            <span class="keywordflow">return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(<a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 2. The upper limit has not been reached, create a new resource. The slot is reserved with</span></div>
+<div class="line">        <span class="comment">//    a CAS first, so the upper limit stays a hard one even when several threads create</span></div>
+<div class="line">        <span class="comment">//    resources at the same time</span></div>
+<div class="line">        <span class="keywordflow">if</span> (reserveResourceSlot()) {</div>
+<div class="line">            <span class="keywordflow">try</span> {</div>
+<div class="line">                <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> current_param;</div>
+<div class="line">                {</div>
+<div class="line">                    std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">                    current_param = m_param;</div>
+<div class="line">                }</div>
+<div class="line"> </div>
+<div class="line">                p = <span class="keyword">new</span> ResourceType(current_param);</div>
+<div class="line">                p-&gt;setVersion(m_version.load());</div>
+<div class="line">            } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keywordflow">return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(fmt::format(<span class="stringliteral">&quot;Failed create a new Resource! {}&quot;</span>, e.what())));</div>
+<div class="line">            } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keywordflow">return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(<span class="stringliteral">&quot;Failed create a new Resource! Unknown error!&quot;</span>));</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            <span class="keywordflow">return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(<a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// 3. The upper limit has been reached and there is no idle resource -&gt; return a failure</span></div>
+<div class="line">        <span class="comment">//    directly</span></div>
+<div class="line">        <span class="keywordflow">return</span> stdx::unexpected(fmt::format(<span class="stringliteral">&quot;No available resource, max_count={}, current_count={}&quot;</span>,</div>
+<div class="line">                                            m_maxCount, m_count.load(std::memory_order_relaxed)));</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">awaitable&lt;stdx::expected&lt;ResourcePtr, std::string&gt;</a>&gt; <a id="a35" name="a35"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#afc225c60a927db89cf9c41db33709674">asyncGet</a>(</div>
+<div class="line">      std::chrono::steady_clock::duration timeout = std::chrono::seconds(5)) {</div>
+<div class="line">        <span class="keyword">auto</span> executor = <span class="keyword">co_await</span> this_coro::executor;</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Try to acquire a resource from the idle queue; a resource whose version is too old is</span></div>
+<div class="line">        <span class="comment">// destroyed by takeIdleResource() itself and nullptr is returned then, a new resource is</span></div>
+<div class="line">        <span class="comment">// created below</span></div>
+<div class="line">        ResourceType *p = takeIdleResource();</div>
+<div class="line">        <span class="keywordflow">if</span> (p) {</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// The upper limit has not been reached, create a new resource. The slot is reserved with a</span></div>
+<div class="line">        <span class="comment">// CAS first, so the upper limit stays a hard one even when several coroutines create</span></div>
+<div class="line">        <span class="comment">// resources at the same time</span></div>
+<div class="line">        <span class="keywordflow">if</span> (reserveResourceSlot()) {</div>
+<div class="line">            <span class="keywordflow">try</span> {</div>
+<div class="line">                <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> current_param;</div>
+<div class="line">                <span class="keywordtype">int</span> current_version;</div>
+<div class="line">                {</div>
+<div class="line">                    std::lock_guard&lt;MutexType&gt; lock(m_mutex);</div>
+<div class="line">                    current_param = m_param;</div>
+<div class="line">                    current_version = m_version.load();</div>
+<div class="line">                }</div>
+<div class="line"> </div>
+<div class="line">                p = <span class="keyword">new</span> ResourceType(current_param);</div>
+<div class="line">                p-&gt;setVersion(current_version);</div>
+<div class="line">            } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keyword">co_return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(fmt::format(<span class="stringliteral">&quot;Failed create a new Resource! {}&quot;</span>, e.what())));</div>
+<div class="line">            } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keyword">co_return</span> stdx::unexpected(</div>
+<div class="line">                  std::string(<span class="stringliteral">&quot;Failed create a new Resource! Unknown error!&quot;</span>));</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>(p, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// The upper limit has been reached, enter the waiting queue</span></div>
+<div class="line">        <span class="keyword">auto</span> waiter = std::make_shared&lt;WaiterNode&gt;();</div>
+<div class="line">        waiter-&gt;timer = std::make_shared&lt;net::steady_timer&gt;(executor);</div>
+<div class="line">        waiter-&gt;timer-&gt;expires_after(timeout);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Both messages are built before the wait is started: nothing may be read from the pool on</span></div>
+<div class="line">        <span class="comment">// the failure branches, because the pool can already be gone when this coroutine resumes,</span></div>
+<div class="line">        <span class="comment">// and nothing between the wait being started and its co_await may throw (an awaitable with</span></div>
+<div class="line">        <span class="comment">// a pending operation must never be destroyed without being awaited)</span></div>
+<div class="line">        <span class="keyword">auto</span> timeout_msg =</div>
+<div class="line">          fmt::format(<span class="stringliteral">&quot;ResourceAsioVersionPool get timeout, max_count={}, current_count={}&quot;</span>,</div>
+<div class="line">                      m_maxCount, m_count.load(std::memory_order_relaxed));</div>
+<div class="line">        <span class="keyword">auto</span> queue_full_msg = fmt::format(<span class="stringliteral">&quot;Waiter queue is full (max={})&quot;</span>, m_maxWaiters);</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Start the wait before joining the queue, so that every wake up done by a resource</span></div>
+<div class="line">        <span class="comment">// returning thread hits an outstanding operation</span></div>
+<div class="line">        <a class="code hl_typedef" href="namespacehku_1_1net.html#a81dbfd7a2e31d0a8b61e0fccb91c8582">net::error_code</a> ec;</div>
+<div class="line">        <span class="keyword">auto</span> wait_result = waiter-&gt;timer-&gt;async_wait(<a class="code hl_function" href="namespacehku_1_1net.html#a8b48f61111ca429662745f8551417f4b">net::redirect_error</a>(<a class="code hl_variable" href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">net::use_awaitable</a>, ec));</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Keep our own reference to the waiting queue, so that unregistering stays valid even when</span></div>
+<div class="line">        <span class="comment">// the pool is destroyed while we are suspended</span></div>
+<div class="line">        <span class="keyword">auto</span> waiters = m_waiters;</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (!pushWaiter(waiters, waiter)) {</div>
+<div class="line">            waiter-&gt;timer-&gt;expires_after(std::chrono::milliseconds(0));</div>
+<div class="line">            <span class="keyword">co_await</span> std::move(wait_result);</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::unexpected(queue_full_msg);</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// A resource may have been handed over between the checks above and joining the queue, take</span></div>
+<div class="line">        <span class="comment">// it instead of sleeping for a whole timeout</span></div>
+<div class="line">        ResourceType *idle = takeIdleResource();</div>
+<div class="line">        <span class="keywordflow">if</span> (idle) {</div>
+<div class="line">            waiter-&gt;timer-&gt;expires_after(std::chrono::milliseconds(0));</div>
+<div class="line">            <span class="keyword">co_await</span> std::move(wait_result);</div>
+<div class="line">            ResourceType *reserved =</div>
+<div class="line">              waiter-&gt;handed.exchange(WaiterNode::gaveUp(), std::memory_order_acq_rel);</div>
+<div class="line">            removeWaiter(waiters, waiter);</div>
+<div class="line">            <span class="keywordflow">if</span> (reserved != <span class="keyword">nullptr</span> &amp;&amp; reserved != WaiterNode::gaveUp()) {</div>
+<div class="line">                <span class="comment">// Somebody handed a second resource over to us, give ours back</span></div>
+<div class="line">                returnResource(idle, <span class="keyword">nullptr</span>);</div>
+<div class="line">                idle = reserved;</div>
+<div class="line">            }</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>(idle, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Note the error code is not looked at: it only tells how we were woken up, the result is</span></div>
+<div class="line">        <span class="comment">// decided by who wins the atomic exchange below</span></div>
+<div class="line">        <span class="keyword">co_await</span> std::move(wait_result);</div>
+<div class="line"> </div>
+<div class="line">        ResourceType *reserved =</div>
+<div class="line">          waiter-&gt;handed.exchange(WaiterNode::gaveUp(), std::memory_order_acq_rel);</div>
+<div class="line">        removeWaiter(waiters, waiter);</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (reserved != <span class="keyword">nullptr</span> &amp;&amp; reserved != WaiterNode::gaveUp()) {</div>
+<div class="line">            <span class="keyword">co_return</span> stdx::expected&lt;ResourcePtr, std::string&gt;(</div>
+<div class="line">              <a class="code hl_typedef" href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">ResourcePtr</a>(reserved, ResourceCloser(<span class="keyword">this</span>)));</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="keyword">co_return</span> stdx::unexpected(timeout_msg);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a36" name="a36"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a27e84e54e340b73dc1405a321c90eb86">count</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_count.load();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> <a id="a37" name="a37"></a><a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a068aee890355b50d653aa3691336f740">idleCount</a>()<span class="keyword"> const </span>{</div>
+<div class="line">        <span class="keywordflow">return</span> m_idleCount.load();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#af9f0946bda0a91f91942cf50d6d8bac8">releaseIdleResource</a>() {</div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">while</span> (m_resourceList.pop(p)) {</div>
+<div class="line">            <span class="keywordflow">if</span> (p) {</div>
+<div class="line">                m_idleCount.fetch_sub(1);  <span class="comment">// Decrease the idle count</span></div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">                releaseResourceCount();  <span class="comment">// Decrease the count and notify the destructor</span></div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    ResourceType *takeIdleResource() {</div>
+<div class="line">        ResourceType *p = <span class="keyword">nullptr</span>;</div>
+<div class="line">        <span class="keywordflow">if</span> (m_resourceList.pop(p)) {</div>
+<div class="line">            m_idleCount.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">            <span class="keywordflow">if</span> (p-&gt;getVersion() != m_version.load(std::memory_order_acquire)) {</div>
+<div class="line">                <span class="keyword">delete</span> p;</div>
+<div class="line">                releaseResourceCount();</div>
+<div class="line">                <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line">            }</div>
+<div class="line">            <span class="keywordflow">return</span> p;</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> releaseResourceCount() {</div>
+<div class="line">        m_count.fetch_sub(1, std::memory_order_seq_cst);</div>
+<div class="line">        notifyCountChanged();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> notifyCountChanged() {</div>
+<div class="line">        <span class="keywordflow">if</span> (m_destroy_waiting.load(std::memory_order_seq_cst)) {</div>
+<div class="line">            std::unique_lock&lt;MutexType&gt; lock(m_destroy_mutex);</div>
+<div class="line">            m_destroy_cv.notify_one();</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> pushWaiter(<span class="keyword">const</span> std::shared_ptr&lt;WaiterRegistry&gt; &amp;waiters,</div>
+<div class="line">                    <span class="keyword">const</span> std::shared_ptr&lt;WaiterNode&gt; &amp;waiter) {</div>
+<div class="line">        std::lock_guard&lt;std::mutex&gt; lock(waiters-&gt;mutex);</div>
+<div class="line">        <span class="keywordflow">if</span> (waiters-&gt;queue.size() &gt;= m_maxWaiters) {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">        }</div>
+<div class="line">        waiters-&gt;queue.emplace_back(waiter);</div>
+<div class="line">        m_registeredWaiters.fetch_add(1, std::memory_order_relaxed);</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> removeWaiter(<span class="keyword">const</span> std::shared_ptr&lt;WaiterRegistry&gt; &amp;waiters,</div>
+<div class="line">                      <span class="keyword">const</span> std::shared_ptr&lt;WaiterNode&gt; &amp;waiter) {</div>
+<div class="line">        std::lock_guard&lt;std::mutex&gt; lock(waiters-&gt;mutex);</div>
+<div class="line">        <span class="keywordflow">for</span> (<span class="keyword">auto</span> iter = waiters-&gt;queue.begin(); iter != waiters-&gt;queue.end(); ++iter) {</div>
+<div class="line">            <span class="keywordflow">if</span> (iter-&gt;lock() == waiter) {</div>
+<div class="line">                waiters-&gt;queue.erase(iter);</div>
+<div class="line">                m_registeredWaiters.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">                <span class="keywordflow">return</span>;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> handToWaiter(ResourceType *p) {</div>
+<div class="line">        <span class="comment">// The fast path of the resource returning: without any registered waiter there is nothing</span></div>
+<div class="line">        <span class="comment">// to scan and no lock to take. A waiter registered just after this check finds the resource</span></div>
+<div class="line">        <span class="comment">// by itself through the idle queue re-check below</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_registeredWaiters.load(std::memory_order_acquire) == 0) {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div>
+<div class="line">            std::shared_ptr&lt;WaiterNode&gt; waiter;</div>
+<div class="line">            {</div>
+<div class="line">                std::lock_guard&lt;std::mutex&gt; lock(m_waiters-&gt;mutex);</div>
+<div class="line">                <span class="keywordflow">for</span> (<span class="keyword">auto</span> iter = m_waiters-&gt;queue.begin(); iter != m_waiters-&gt;queue.end();) {</div>
+<div class="line">                    <span class="keyword">auto</span> candidate = iter-&gt;lock();</div>
+<div class="line">                    <span class="keywordflow">if</span> (!candidate) {</div>
+<div class="line">                        <span class="comment">// The waiting coroutine is gone, clean its node up on the way</span></div>
+<div class="line">                        iter = m_waiters-&gt;queue.erase(iter);</div>
+<div class="line">                        m_registeredWaiters.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">                        <span class="keywordflow">continue</span>;</div>
+<div class="line">                    }</div>
+<div class="line">                    ResourceType *current = candidate-&gt;handed.load(std::memory_order_relaxed);</div>
+<div class="line">                    <span class="keywordflow">if</span> (current == WaiterNode::gaveUp()) {</div>
+<div class="line">                        <span class="comment">// It has given up, clean its node up on the way</span></div>
+<div class="line">                        iter = m_waiters-&gt;queue.erase(iter);</div>
+<div class="line">                        m_registeredWaiters.fetch_sub(1, std::memory_order_relaxed);</div>
+<div class="line">                        <span class="keywordflow">continue</span>;</div>
+<div class="line">                    }</div>
+<div class="line">                    <span class="keywordflow">if</span> (current == <span class="keyword">nullptr</span>) {</div>
+<div class="line">                        waiter = std::move(candidate);</div>
+<div class="line">                        <span class="keywordflow">break</span>;</div>
+<div class="line">                    }</div>
+<div class="line">                    <span class="comment">// A resource has been handed over to it but has not been taken yet</span></div>
+<div class="line">                    ++iter;</div>
+<div class="line">                }</div>
+<div class="line">                <span class="keywordflow">if</span> (!waiter) {</div>
+<div class="line">                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">                }</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            ResourceType *expected = <span class="keyword">nullptr</span>;</div>
+<div class="line">            <span class="keywordflow">if</span> (waiter-&gt;handed.compare_exchange_strong(expected, p, std::memory_order_acq_rel)) {</div>
+<div class="line">                <span class="comment">// Wake it up with cancel(): it never touches the expiry, which the waiting</span></div>
+<div class="line">                <span class="comment">// coroutine may rearm at the very same moment</span></div>
+<div class="line">                waiter-&gt;timer-&gt;cancel();</div>
+<div class="line">                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">            }</div>
+<div class="line"> </div>
+<div class="line">            <span class="comment">// It has just given up, look for the next one</span></div>
+<div class="line">        }</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> reserveResourceSlot() {</div>
+<div class="line">        <span class="keywordtype">size_t</span> current = m_count.load(std::memory_order_relaxed);</div>
+<div class="line">        <span class="keywordflow">while</span> (m_maxCount == 0 || current &lt; m_maxCount) {</div>
+<div class="line">            <span class="keywordflow">if</span> (m_count.compare_exchange_weak(current, current + 1, std::memory_order_acq_rel)) {</div>
+<div class="line">                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">class </span>ResourceCloser {</div>
+<div class="line">    <span class="keyword">public</span>:</div>
+<div class="line">        <span class="keyword">explicit</span> ResourceCloser(<a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a> *pool) : m_pool(pool) {}</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordtype">void</span> operator()(ResourceType *conn) {</div>
+<div class="line">            <span class="keywordflow">if</span> (conn) {</div>
+<div class="line">                <span class="comment">// If the pool is bound, the resource is returned; otherwise it is deleted</span></div>
+<div class="line">                <span class="keywordflow">if</span> (m_pool) {</div>
+<div class="line">                    m_pool-&gt;<a id="a38" name="a38"></a>returnResource(conn, <span class="keyword">this</span>);</div>
+<div class="line">                } <span class="keywordflow">else</span> {</div>
+<div class="line">                    <span class="keyword">delete</span> conn;</div>
+<div class="line">                }</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">private</span>:</div>
+<div class="line">        <a class="code hl_function" href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">ResourceAsioVersionPool</a> *m_pool;</div>
+<div class="line">    };</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> returnResource(ResourceType *p, ResourceCloser *closer) {</div>
+<div class="line">        <span class="keywordflow">if</span> (!p) [[unlikely]] {</div>
+<div class="line">            HKU_WARN(<span class="stringliteral">&quot;ResourceAsioVersionPool::returnResource: nullptr&quot;</span>);</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// If it is being destructed, delete the resource directly</span></div>
+<div class="line">        <span class="keywordflow">if</span> (m_is_destroying.load(std::memory_order_acquire)) {</div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            releaseResourceCount();</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// The returned resource is accepted only when its version equals the resource pool version</span></div>
+<div class="line">        <span class="keywordflow">if</span> (p-&gt;getVersion() != m_version.load(std::memory_order_acquire)) {</div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            releaseResourceCount();</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Try to hand it over to a waiter that has not given up yet</span></div>
+<div class="line">        <span class="keywordflow">if</span> (handToWaiter(p)) {</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// There is no waiter to hand it over to, put it back into the idle queue</span></div>
+<div class="line">        <span class="keywordflow">if</span> (!m_resourceList.push(p)) {</div>
+<div class="line">            <span class="comment">// The queue is full, delete it directly</span></div>
+<div class="line">            <span class="keyword">delete</span> p;</div>
+<div class="line">            releaseResourceCount();</div>
+<div class="line">            <span class="keywordflow">return</span>;</div>
+<div class="line">        }</div>
+<div class="line"> </div>
+<div class="line">        m_idleCount.fetch_add(1, std::memory_order_seq_cst);</div>
+<div class="line">        notifyCountChanged();</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    std::atomic&lt;size_t&gt; m_count{0};      <span class="comment">// The number of the currently active resources</span></div>
+<div class="line">    std::atomic&lt;size_t&gt; m_idleCount{0};  <span class="comment">// The current number of the idle resources</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_maxCount;                   <span class="comment">// The maximum resource upper limit</span></div>
+<div class="line">    <a class="code hl_variable" href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">Parameter</a> m_param;</div>
+<div class="line">    boost::lockfree::queue&lt;ResourceType *&gt; m_resourceList;</div>
+<div class="line">    std::atomic&lt;int&gt; m_version{0};  <span class="comment">// The current resource pool version</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">mutable</span> MutexType m_mutex;                  <span class="comment">// The mutex protecting the parameter access</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_maxWaiters;                        <span class="comment">// The maximum number of the waiters</span></div>
+<div class="line">    std::shared_ptr&lt;WaiterRegistry&gt; m_waiters;  <span class="comment">// The waiting queue, shared with the waiting</span></div>
+<div class="line">                                                <span class="comment">// coroutines</span></div>
+<div class="line">    MutexType m_destroy_mutex;                  <span class="comment">// The mutex protecting the destructor waiting</span></div>
+<div class="line">                                                <span class="comment">// condition variable</span></div>
+<div class="line">    std::condition_variable_any m_destroy_cv;   <span class="comment">// Used to notify the destructor that a</span></div>
+<div class="line">                                                <span class="comment">// resource has been returned</span></div>
+<div class="line">    std::atomic&lt;bool&gt; m_is_destroying{<span class="keyword">false</span>};   <span class="comment">// Marks whether it is being destructed</span></div>
+<div class="line">    std::atomic&lt;size_t&gt; m_registeredWaiters{</div>
+<div class="line">      0};  <span class="comment">// The number of the registered waiters, it may be a little too large</span></div>
+<div class="line">    std::atomic&lt;bool&gt; m_destroy_waiting{</div>
+<div class="line">      <span class="keyword">false</span>};  <span class="comment">// Marks whether the destructor is waiting on the condition variable</span></div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace hku</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#endif </span><span class="comment">/* HKU_UTILS_RESOURCE_ASIO_POOL_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a1cca33b034a332fc7ed9a5cedfaf281a"><div class="ttname"><a href="classhku_1_1_parameter.html#a1cca33b034a332fc7ed9a5cedfaf281a">hku::Parameter::have</a></div><div class="ttdeci">bool have(const string &amp;name) const noexcept</div><div class="ttdoc">Whether a parameter with the given name exists</div><div class="ttdef"><b>定义</b> Parameter.h:224</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a5a06d1c39381362db1bac88f55d9472e"><div class="ttname"><a href="classhku_1_1_parameter.html#a5a06d1c39381362db1bac88f55d9472e">hku::Parameter::set</a></div><div class="ttdeci">void set(const string &amp;name, const ValueType &amp;value)</div><div class="ttdoc">Set the given parameter value</div><div class="ttdef"><b>定义</b> Parameter.h:489</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html_a5a178504381754095e48ff4279e83520"><div class="ttname"><a href="classhku_1_1_parameter.html#a5a178504381754095e48ff4279e83520">hku::Parameter::get</a></div><div class="ttdeci">ValueType get(const string &amp;name) const</div><div class="ttdoc">Get the given parameter value; an exception is thrown when the parameter does not exist or the type d...</div><div class="ttdef"><b>定义</b> Parameter.h:466</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_a0243b56b1438f4ab3db8ab6790666331"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#a0243b56b1438f4ab3db8ab6790666331">hku::ResourceAsioPool::operator=</a></div><div class="ttdeci">ResourceAsioPool &amp; operator=(const ResourceAsioPool &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_a663286c0a79995104b0ba695ba71bf81"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#a663286c0a79995104b0ba695ba71bf81">hku::ResourceAsioPool::ResourceAsioPool</a></div><div class="ttdeci">ResourceAsioPool()=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_a855fc3e37a7793fbdf56dfba2812b561"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#a855fc3e37a7793fbdf56dfba2812b561">hku::ResourceAsioPool::count</a></div><div class="ttdeci">size_t count() const</div><div class="ttdoc">The number of the currently active resources, i.e.</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:336</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_aabb49258f661a665a7079e2d002f166f"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#aabb49258f661a665a7079e2d002f166f">hku::ResourceAsioPool::idleCount</a></div><div class="ttdeci">size_t idleCount() const</div><div class="ttdoc">The current number of the idle resources (the exact value) It is tracked with an atomic counter to av...</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:344</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_abe0f90301100cc0452cfdc5abb2d8963"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#abe0f90301100cc0452cfdc5abb2d8963">hku::ResourceAsioPool::releaseIdleResource</a></div><div class="ttdeci">void releaseIdleResource()</div><div class="ttdoc">Release all the currently idle resources</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:349</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_abe93e55265c7a198b2e6355d46f04db3"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#abe93e55265c7a198b2e6355d46f04db3">hku::ResourceAsioPool::~ResourceAsioPool</a></div><div class="ttdeci">virtual ~ResourceAsioPool()</div><div class="ttdoc">Destructor, it releases all the cached resources</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:123</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_ae11e434a57a50a66ac31d468793661ea"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#ae11e434a57a50a66ac31d468793661ea">hku::ResourceAsioPool::ResourcePtr</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; ResourcePtr</div><div class="ttdoc">Resource instance pointer type</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:174</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_ae471835fdda3c11d737a46e69aebf82b"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#ae471835fdda3c11d737a46e69aebf82b">hku::ResourceAsioPool::asyncGet</a></div><div class="ttdeci">awaitable&lt; stdx::expected&lt; ResourcePtr, std::string &gt; &gt; asyncGet(std::chrono::steady_clock::duration timeout=std::chrono::seconds(5))</div><div class="ttdoc">Acquire an available resource in a coroutine way (with a timeout)</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:242</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_pool_html_ae8d5e34ed56cf6fd532c5b254a9c6a0f"><div class="ttname"><a href="classhku_1_1_resource_asio_pool.html#ae8d5e34ed56cf6fd532c5b254a9c6a0f">hku::ResourceAsioPool::get</a></div><div class="ttdeci">stdx::expected&lt; ResourcePtr, std::string &gt; get()</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:204</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a068aee890355b50d653aa3691336f740"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a068aee890355b50d653aa3691336f740">hku::ResourceAsioVersionPool::idleCount</a></div><div class="ttdeci">size_t idleCount() const</div><div class="ttdoc">The current number of the idle resources (the exact value) It is tracked with an atomic counter to av...</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:933</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a0cc6b6f98b144f5a1eb58d7a8f419f3a"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a0cc6b6f98b144f5a1eb58d7a8f419f3a">hku::ResourceAsioVersionPool::get</a></div><div class="ttdeci">stdx::expected&lt; ResourcePtr, std::string &gt; get()</div><div class="ttdoc">Acquire an available resource synchronously (without waiting; it returns a failure directly when ther...</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:771</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a2138f60a3c53acfde68a8c5ee8e99a70"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a2138f60a3c53acfde68a8c5ee8e99a70">hku::ResourceAsioVersionPool::getVersion</a></div><div class="ttdeci">int getVersion()</div><div class="ttdoc">Get the current version of the resource pool</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:752</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a27e84e54e340b73dc1405a321c90eb86"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a27e84e54e340b73dc1405a321c90eb86">hku::ResourceAsioVersionPool::count</a></div><div class="ttdeci">size_t count() const</div><div class="ttdoc">The number of the currently active resources, i.e.</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:925</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a32fe75c5db4cfdf0b7a433f69c3f2022"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a32fe75c5db4cfdf0b7a433f69c3f2022">hku::ResourceAsioVersionPool::haveParam</a></div><div class="ttdeci">bool haveParam(const std::string &amp;name)</div><div class="ttdoc">Whether the given parameter exists</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:692</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a4eead1a2c936a0e642676d46025818fb"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a4eead1a2c936a0e642676d46025818fb">hku::ResourceAsioVersionPool::~ResourceAsioVersionPool</a></div><div class="ttdeci">virtual ~ResourceAsioVersionPool()</div><div class="ttdoc">Destructor, it releases all the cached resources</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:642</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a64f9eb478f6052e5efb60021939e78b1"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a64f9eb478f6052e5efb60021939e78b1">hku::ResourceAsioVersionPool::setParam</a></div><div class="ttdeci">void setParam(const std::string &amp;name, const ValueType &amp;value)</div><div class="ttdoc">Set the value of the given parameter; the parameter takes effect only when a new resource is created</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:715</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a839db1b3dfb935a63fcee01a864e4bde"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a839db1b3dfb935a63fcee01a864e4bde">hku::ResourceAsioVersionPool::ResourceAsioVersionPool</a></div><div class="ttdeci">ResourceAsioVersionPool()=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a91a373d7a2bc15a1c4e83bccf377b0f9"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a91a373d7a2bc15a1c4e83bccf377b0f9">hku::ResourceAsioVersionPool::getParam</a></div><div class="ttdeci">ValueType getParam(const std::string &amp;name)</div><div class="ttdoc">Get the value of the given parameter; an exception is thrown when the parameter does not exist or the...</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:700</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_a97dd25811cd80eb6f2507ab331bd6862"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#a97dd25811cd80eb6f2507ab331bd6862">hku::ResourceAsioVersionPool::setParameter</a></div><div class="ttdeci">void setParameter(const Parameter &amp;param)</div><div class="ttdoc">Set the resource parameters; they take effect only when a new resource is created</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:731</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_aa2a407343e1fa8e16afd742754a75841"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#aa2a407343e1fa8e16afd742754a75841">hku::ResourceAsioVersionPool::incVersion</a></div><div class="ttdeci">void incVersion(int version)</div><div class="ttdoc">Increase the current version of the resource pool, equivalent to notifying the resource pool that the...</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:758</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_ade77f763d91e9421dd29d53c97cc4f3e"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#ade77f763d91e9421dd29d53c97cc4f3e">hku::ResourceAsioVersionPool::ResourcePtr</a></div><div class="ttdeci">std::shared_ptr&lt; ResourceType &gt; ResourcePtr</div><div class="ttdoc">Resource instance pointer type</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:763</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_af80b1109eb28e72d703834408263bff4"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#af80b1109eb28e72d703834408263bff4">hku::ResourceAsioVersionPool::operator=</a></div><div class="ttdeci">ResourceAsioVersionPool &amp; operator=(const ResourceAsioVersionPool &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_af9f0946bda0a91f91942cf50d6d8bac8"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#af9f0946bda0a91f91942cf50d6d8bac8">hku::ResourceAsioVersionPool::releaseIdleResource</a></div><div class="ttdeci">void releaseIdleResource()</div><div class="ttdoc">Release all the currently idle resources</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:938</div></div>
+<div class="ttc" id="aclasshku_1_1_resource_asio_version_pool_html_afc225c60a927db89cf9c41db33709674"><div class="ttname"><a href="classhku_1_1_resource_asio_version_pool.html#afc225c60a927db89cf9c41db33709674">hku::ResourceAsioVersionPool::asyncGet</a></div><div class="ttdeci">awaitable&lt; stdx::expected&lt; ResourcePtr, std::string &gt; &gt; asyncGet(std::chrono::steady_clock::duration timeout=std::chrono::seconds(5))</div><div class="ttdoc">Acquire an available resource in a coroutine way (with a timeout)</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:818</div></div>
+<div class="ttc" id="aclasshku_1_1rap_1_1_null_lock_html_a1b10e87cacac373a3712030d7a567a82"><div class="ttname"><a href="classhku_1_1rap_1_1_null_lock.html#a1b10e87cacac373a3712030d7a567a82">hku::rap::NullLock::unlock</a></div><div class="ttdeci">void unlock()</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:40</div></div>
+<div class="ttc" id="aclasshku_1_1rap_1_1_null_lock_html_a35d7c5b0a736e5a127d8eb5c34341c58"><div class="ttname"><a href="classhku_1_1rap_1_1_null_lock.html#a35d7c5b0a736e5a127d8eb5c34341c58">hku::rap::NullLock::lock</a></div><div class="ttdeci">void lock()</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:39</div></div>
+<div class="ttc" id="aclasshku_1_1rap_1_1_null_lock_html_ad79c9ebbedb8f3bb4a7c9bb92d8e990f"><div class="ttname"><a href="classhku_1_1rap_1_1_null_lock.html#ad79c9ebbedb8f3bb4a7c9bb92d8e990f">hku::rap::NullLock::try_lock</a></div><div class="ttdeci">bool try_lock()</div><div class="ttdef"><b>定义</b> ResourceAsioPool.h:41</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a1c1f97d030153423fff50486937cd518"><div class="ttname"><a href="namespacehku_1_1net.html#a1c1f97d030153423fff50486937cd518">hku::net::use_awaitable</a></div><div class="ttdeci">auto use_awaitable</div><div class="ttdef"><b>定义</b> net.h:98</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a81dbfd7a2e31d0a8b61e0fccb91c8582"><div class="ttname"><a href="namespacehku_1_1net.html#a81dbfd7a2e31d0a8b61e0fccb91c8582">hku::net::error_code</a></div><div class="ttdeci">boost::system::error_code error_code</div><div class="ttdef"><b>定义</b> net.h:86</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a8b48f61111ca429662745f8551417f4b"><div class="ttname"><a href="namespacehku_1_1net.html#a8b48f61111ca429662745f8551417f4b">hku::net::redirect_error</a></div><div class="ttdeci">auto redirect_error(Args &amp;&amp;... args) -&gt; decltype(boost::asio::redirect_error(std::forward&lt; Args &gt;(args)...))</div><div class="ttdef"><b>定义</b> net.h:115</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a9f9e50631a0aeab6a0885113086d5dc9"><div class="ttname"><a href="namespacehku_1_1net.html#a9f9e50631a0aeab6a0885113086d5dc9">hku::net::co_spawn</a></div><div class="ttdeci">void co_spawn(const Executor &amp;ex, F &amp;&amp;f)</div><div class="ttdef"><b>定义</b> net.h:103</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_adf0624b8ea0f771b7b5726e3ef6722fe"><div class="ttname"><a href="namespacehku_1_1net.html#adf0624b8ea0f771b7b5726e3ef6722fe">hku::net::detached</a></div><div class="ttdeci">auto detached</div><div class="ttdef"><b>定义</b> net.h:99</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_ac354a2ce9a6e6b3de1e91127fa79f686"><div class="ttname"><a href="namespacehku.html#ac354a2ce9a6e6b3de1e91127fa79f686">hku::Parameter</a></div><div class="ttdeci">class HKU_API Parameter</div><div class="ttdef"><b>定义</b> Stock.h:30</div></div>
+</div><!-- fragment --> </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

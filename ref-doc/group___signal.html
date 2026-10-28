@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: Signal 信号指示器</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: Signal signal generator</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,36 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li class="current"><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('group___signal.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,75 +74,69 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#nested-classes">类</a> &#124;
-<a href="#define-members">宏定义</a> &#124;
-<a href="#typedef-members">类型定义</a> &#124;
-<a href="#func-members">函数</a>  </div>
-  <div class="headertitle">
-<div class="title">Signal 信号指示器<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
+  <div class="headertitle"><div class="title">Signal signal generator <div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Signal 信号指示器 的协作图:</div>
+Signal signal generator 的协作图:</div>
 <div class="dyncontent">
-<center><table><tr><td><img src="group___signal.png" border="0" alt="" usemap="#group______signal"/>
-<map name="group______signal" id="group______signal">
-<area shape="rect" id="node2" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="5,5,231,35"/>
-</map>
-</td></tr></table></center>
+<div class="center"><img src="group___signal.png" border="0" usemap="#agroup______signal" loading="lazy" alt=""/></div>
 </div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 类</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html">hku::SignalBase</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">信号指示器基类  <a href="classhku_1_1_signal_base.html#details">更多...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:hku_3A_3ASignalBase" id="r_hku_3A_3ASignalBase"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html">hku::SignalBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class of the signal generator  <a href="classhku_1_1_signal_base.html#details">更多...</a><br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 宏定义</h2></td></tr>
-<tr class="memitem:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#ga81f04b1cf418aac0a7e793e0f2502c4a">SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
-<tr class="memdesc:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="#ga81f04b1cf418aac0a7e793e0f2502c4a">更多...</a><br /></td></tr>
-<tr class="separator:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga81f04b1cf418aac0a7e793e0f2502c4a" id="r_ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga81f04b1cf418aac0a7e793e0f2502c4a">SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">For an inheriting subclass without private variables, this macro can be used directly for the serialization  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 类型定义</h2></td></tr>
-<tr class="memitem:gae20430025d05ba5de75549f287e4dcd9"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; SignalBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></td></tr>
-<tr class="memdesc:gae20430025d05ba5de75549f287e4dcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型，操作信号指示器  <a href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">更多...</a><br /></td></tr>
-<tr class="separator:gae20430025d05ba5de75549f287e4dcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae20430025d05ba5de75549f287e4dcd9" id="r_gae20430025d05ba5de75549f287e4dcd9"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_signal_base.html">SignalBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></td></tr>
+<tr class="memdesc:gae20430025d05ba5de75549f287e4dcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Client programs should all use this pointer type to operate the signal generator  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 函数</h2></td></tr>
-<tr class="memitem:gad2fd595c66ba1a3c67048f6696948a0b"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gad2fd595c66ba1a3c67048f6696948a0b">hku::SG_Bool</a> (const Operand &amp;buy, const Operand &amp;sell, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
-<tr class="memdesc:gad2fd595c66ba1a3c67048f6696948a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">布尔信号指示器  <a href="group___signal.html#gad2fd595c66ba1a3c67048f6696948a0b">更多...</a><br /></td></tr>
-<tr class="separator:gad2fd595c66ba1a3c67048f6696948a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa4f9c7cd592beb5bf82c3f7beca226e1"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gaa4f9c7cd592beb5bf82c3f7beca226e1">hku::SG_Cross</a> (const Operand &amp;fast, const Operand &amp;slow, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
-<tr class="memdesc:gaa4f9c7cd592beb5bf82c3f7beca226e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。  <a href="group___signal.html#gaa4f9c7cd592beb5bf82c3f7beca226e1">更多...</a><br /></td></tr>
-<tr class="separator:gaa4f9c7cd592beb5bf82c3f7beca226e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6f68f24bd209bae9bb753dde172a0ef8"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#ga6f68f24bd209bae9bb753dde172a0ef8">hku::SG_CrossGold</a> (const Operand &amp;fast, const Operand &amp;slow, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
-<tr class="memdesc:ga6f68f24bd209bae9bb753dde172a0ef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入； 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。  <a href="group___signal.html#ga6f68f24bd209bae9bb753dde172a0ef8">更多...</a><br /></td></tr>
-<tr class="separator:ga6f68f24bd209bae9bb753dde172a0ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8edc2d64855239124c81f8a26d9da743"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#ga8edc2d64855239124c81f8a26d9da743">hku::SG_Flex</a> (const Operand &amp;op, int slow_n, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
-<tr class="memdesc:ga8edc2d64855239124c81f8a26d9da743"><td class="mdescLeft">&#160;</td><td class="mdescRight">自交叉单线拐点指示器。 使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。  <a href="group___signal.html#ga8edc2d64855239124c81f8a26d9da743">更多...</a><br /></td></tr>
-<tr class="separator:ga8edc2d64855239124c81f8a26d9da743"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac5d05e751350c029be71ff59c20d0af8"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gac5d05e751350c029be71ff59c20d0af8">hku::SG_Single</a> (const Operand &amp;ind, int filter_n=20, double filter_p=0.1, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
-<tr class="memdesc:gac5d05e751350c029be71ff59c20d0af8"><td class="mdescLeft">&#160;</td><td class="mdescRight">单线拐点信号指示器  <a href="group___signal.html#gac5d05e751350c029be71ff59c20d0af8">更多...</a><br /></td></tr>
-<tr class="separator:gac5d05e751350c029be71ff59c20d0af8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabba00831b85d2b9f65bf4d71c50bdb32"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gabba00831b85d2b9f65bf4d71c50bdb32">hku::SG_Single2</a> (const Operand &amp;ind, int filter_n=20, double filter_p=0.1, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
-<tr class="memdesc:gabba00831b85d2b9f65bf4d71c50bdb32"><td class="mdescLeft">&#160;</td><td class="mdescRight">单线拐点信号指示器2  <a href="group___signal.html#gabba00831b85d2b9f65bf4d71c50bdb32">更多...</a><br /></td></tr>
-<tr class="separator:gabba00831b85d2b9f65bf4d71c50bdb32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4d713a86427929bdecdfe3d8cb2ea5e2" id="r_ga4d713a86427929bdecdfe3d8cb2ea5e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga4d713a86427929bdecdfe3d8cb2ea5e2">hku::SG_AllwaysBuy</a> ()</td></tr>
+<tr class="memdesc:ga4d713a86427929bdecdfe3d8cb2ea5e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A system that always issues a buy signal, it is mainly used for the MultiFactor stock selection matching in <a class="el" href="classhku_1_1_multi_system.html">MultiSystem</a>  <br /></td></tr>
+<tr class="memitem:ga0d3b71aa1e295f6dd51f9594ff909074" id="r_ga0d3b71aa1e295f6dd51f9594ff909074"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga0d3b71aa1e295f6dd51f9594ff909074">hku::SG_Bool</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;buy, const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;sell, bool alternate=true)</td></tr>
+<tr class="memdesc:ga0d3b71aa1e295f6dd51f9594ff909074"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean signal generator  <br /></td></tr>
+<tr class="memitem:ga292e9f84ccca1df8e5b63e6bce2174e8" id="r_ga292e9f84ccca1df8e5b63e6bce2174e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga292e9f84ccca1df8e5b63e6bce2174e8">hku::SG_Cross</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;fast, const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;slow)</td></tr>
+<tr class="memdesc:ga292e9f84ccca1df8e5b63e6bce2174e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Two line crossing indicator: it buys when the fast line crosses the slow line upward from below, and sells when the fast line crosses the slow line downward from above.  <br /></td></tr>
+<tr class="memitem:ga9b0a025ac2fc3e0324e7da81682d0c7b" id="r_ga9b0a025ac2fc3e0324e7da81682d0c7b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga9b0a025ac2fc3e0324e7da81682d0c7b">hku::SG_CrossGold</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;fast, const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;slow)</td></tr>
+<tr class="memdesc:ga9b0a025ac2fc3e0324e7da81682d0c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Golden cross indicator: it is a golden cross and a buy when the fast line crosses the slow line upward from below and both the fast line and the slow line are directed upward; it is a death cross and a sell when the fast line crosses the slow line downward from above and both the fast line and the slow line are directed downward.  <br /></td></tr>
+<tr class="memitem:ga61d1916379cea1a3f945a5c43002c83e" id="r_ga61d1916379cea1a3f945a5c43002c83e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga61d1916379cea1a3f945a5c43002c83e">hku::SG_Flex</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;op, int slow_n)</td></tr>
+<tr class="memdesc:ga61d1916379cea1a3f945a5c43002c83e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Self-crossing single line inflection point indicator.  <br /></td></tr>
+<tr class="memitem:gacaffcc0512e061f6c8519fd20f494e0e" id="r_gacaffcc0512e061f6c8519fd20f494e0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gacaffcc0512e061f6c8519fd20f494e0e">hku::SG_OneSide</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind, bool is_buy)</td></tr>
+<tr class="memdesc:gacaffcc0512e061f6c8519fd20f494e0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a one-sided signal (containing the buy or the sell signals only) from the input indicator; a signal is added if the indicator value is greater than 0  <br /></td></tr>
+<tr class="memitem:ga42a7b7cd89321f553c18697750c4fdbd" id="r_ga42a7b7cd89321f553c18697750c4fdbd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga42a7b7cd89321f553c18697750c4fdbd">hku::SG_Single</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind, int filter_n=20, double filter_p=0.1)</td></tr>
+<tr class="memdesc:ga42a7b7cd89321f553c18697750c4fdbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Single line inflection point signal  <br /></td></tr>
+<tr class="memitem:ga5e4bc4437f81ed248790a482d402cc37" id="r_ga5e4bc4437f81ed248790a482d402cc37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga5e4bc4437f81ed248790a482d402cc37">hku::SG_Single2</a> (const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;ind, int filter_n=20, double filter_p=0.1)</td></tr>
+<tr class="memdesc:ga5e4bc4437f81ed248790a482d402cc37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Single line inflection point signal 2  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<p>信号指示器模块，包括各种信号指示器构造函数。<br />
- 信号指示器负责产生买入、卖出信号。 </p>
-<h2 class="groupheader">宏定义说明</h2>
-<a class="anchor" id="ga81f04b1cf418aac0a7e793e0f2502c4a"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<p>The signal generator module, including the various signal generator constructors. <br  />
+ The signal generator is responsible for producing the buy and sell signals. </p>
+<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">宏定义说明</h2>
+<a id="ga81f04b1cf418aac0a7e793e0f2502c4a" name="ga81f04b1cf418aac0a7e793e0f2502c4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga81f04b1cf418aac0a7e793e0f2502c4a">&#9670;&#160;</a></span>SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -149,247 +145,283 @@ Signal 信号指示器 的协作图:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:\</div><div class="line">    friend <span class="keyword">class </span>boost::serialization::access; \</div><div class="line">    template&lt;class Archive&gt; \</div><div class="line">    void serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div><div class="line">        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase); \</div><div class="line">    }</div></div><!-- fragment -->
-<p>对于没有私有变量的继承子类，可直接使用该宏定义序列化 </p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;class Drived: public SignalBase {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;    SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;public:</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    Drived();</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;    ...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;};</div></div><!-- fragment --> 
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/SignalBase.h&gt;</code></p>
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                                      \</div>
+<div class="line">    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;                \</div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;                                  \</div>
+<div class="line">    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div>
+<div class="line">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase);  \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+<p>For an inheriting subclass without private variables, this macro can be used directly for the serialization </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>Drived: <span class="keyword">public</span> SignalBase {</div>
+<div class="line">    <a class="code hl_define" href="#ga81f04b1cf418aac0a7e793e0f2502c4a">SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    Drived();</div>
+<div class="line">    ...</div>
+<div class="line">};</div>
+<div class="ttc" id="agroup___signal_html_ga81f04b1cf418aac0a7e793e0f2502c4a"><div class="ttname"><a href="#ga81f04b1cf418aac0a7e793e0f2502c4a">SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="ttdeci">#define SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="ttdoc">For an inheriting subclass without private variables, this macro can be used directly for the seriali...</div><div class="ttdef"><b>定义</b> SignalBase.h:294</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
-<h2 class="groupheader">类型定义说明</h2>
-<a class="anchor" id="gae20430025d05ba5de75549f287e4dcd9"></a>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">类型定义说明</h2>
+<a id="gae20430025d05ba5de75549f287e4dcd9" name="gae20430025d05ba5de75549f287e4dcd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae20430025d05ba5de75549f287e4dcd9">&#9670;&#160;</a></span>SignalPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;SignalBase&gt; <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_signal_base.html">SignalBase</a>&gt; <a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>客户程序都应使用该指针类型，操作信号指示器 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/SignalBase.h&gt;</code></p>
+
+<p>Client programs should all use this pointer type to operate the signal generator </p>
 
 </div>
 </div>
-<h2 class="groupheader">函数说明</h2>
-<a class="anchor" id="gad2fd595c66ba1a3c67048f6696948a0b"></a>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="ga4d713a86427929bdecdfe3d8cb2ea5e2" name="ga4d713a86427929bdecdfe3d8cb2ea5e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4d713a86427929bdecdfe3d8cb2ea5e2">&#9670;&#160;</a></span>SG_AllwaysBuy()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Bool </td>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_AllwaysBuy </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>buy</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>sell</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>布尔信号指示器 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h&gt;</code></p>
+
+<p>A system that always issues a buy signal, it is mainly used for the MultiFactor stock selection matching in <a class="el" href="classhku_1_1_multi_system.html">MultiSystem</a> </p>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9" title="Client programs should all use this pointer type to operate the signal generator">SignalPtr</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga0d3b71aa1e295f6dd51f9594ff909074" name="ga0d3b71aa1e295f6dd51f9594ff909074"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0d3b71aa1e295f6dd51f9594ff909074">&#9670;&#160;</a></span>SG_Bool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_Bool </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>buy</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>sell</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>alternate</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_Bool.h&gt;</code></p>
+
+<p>Boolean signal generator </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">buy</td><td>买入指示（结果Indicator中相应位置&gt;0则代表买入） </td></tr>
-    <tr><td class="paramname">sell</td><td>卖出指示（结果Indicator中相应位置&gt;0则代表卖出） </td></tr>
-    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+    <tr><td class="paramname">buy</td><td>the buy indication (a value &gt; 0 at the corresponding position of the result <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> means a buy; a non-finite value means no buy) </td></tr>
+    <tr><td class="paramname">sell</td><td>the sell indication (a value &gt; 0 at the corresponding position of the result <a class="el" href="classhku_1_1_indicator.html" title="Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,...">Indicator</a> means a sell; a non-finite value means no sell) </td></tr>
+    <tr><td class="paramname">alternate</td><td>whether the buy and sell signals appear alternately, true by default </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>signal generator </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gaa4f9c7cd592beb5bf82c3f7beca226e1"></a>
+<a id="ga292e9f84ccca1df8e5b63e6bce2174e8" name="ga292e9f84ccca1df8e5b63e6bce2174e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga292e9f84ccca1df8e5b63e6bce2174e8">&#9670;&#160;</a></span>SG_Cross()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Cross </td>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_Cross </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>fast</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>fast</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>slow</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slow</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_Cross.h&gt;</code></p>
+
+<p>Two line crossing indicator: it buys when the fast line crosses the slow line upward from below, and sells when the fast line crosses the slow line downward from above. </p>
+<dl class="section note"><dt>注解</dt><dd>A non-finite fast/slow value fires no signal </dd></dl>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fast</td><td>快线 </td></tr>
-    <tr><td class="paramname">slow</td><td>慢线 </td></tr>
-    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+    <tr><td class="paramname">fast</td><td>fast line </td></tr>
+    <tr><td class="paramname">slow</td><td>slow line </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>signal generator </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga6f68f24bd209bae9bb753dde172a0ef8"></a>
+<a id="ga9b0a025ac2fc3e0324e7da81682d0c7b" name="ga9b0a025ac2fc3e0324e7da81682d0c7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9b0a025ac2fc3e0324e7da81682d0c7b">&#9670;&#160;</a></span>SG_CrossGold()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_CrossGold </td>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_CrossGold </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>fast</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>fast</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>slow</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>slow</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入； 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_CrossGold.h&gt;</code></p>
+
+<p>Golden cross indicator: it is a golden cross and a buy when the fast line crosses the slow line upward from below and both the fast line and the slow line are directed upward; it is a death cross and a sell when the fast line crosses the slow line downward from above and both the fast line and the slow line are directed downward. </p>
+<dl class="section note"><dt>注解</dt><dd>A non-finite fast/slow value fires no signal </dd></dl>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fast</td><td>快线 </td></tr>
-    <tr><td class="paramname">slow</td><td>慢线 </td></tr>
-    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+    <tr><td class="paramname">fast</td><td>fast line </td></tr>
+    <tr><td class="paramname">slow</td><td>slow line </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>signal generator </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga8edc2d64855239124c81f8a26d9da743"></a>
+<a id="ga61d1916379cea1a3f945a5c43002c83e" name="ga61d1916379cea1a3f945a5c43002c83e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga61d1916379cea1a3f945a5c43002c83e">&#9670;&#160;</a></span>SG_Flex()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Flex </td>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_Flex </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>op</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>op</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>slow_n</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>slow_n</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>自交叉单线拐点指示器。 使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。 </p>
-<dl class="params"><dt>参数</dt><dd>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_Flex.h&gt;</code></p>
+
+<p>Self-crossing single line inflection point indicator. </p>
+<p>It uses its own EMA(slow_n) as the slow line and itself as the fast line: it buys when the fast line crosses the slow line upward and sells when the fast line crosses the slow line downward. </p><dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">op</td><td></td></tr>
-    <tr><td class="paramname">slow_n</td><td>慢线EMA周期 </td></tr>
-    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+    <tr><td class="paramname">slow_n</td><td>the EMA period of the slow line </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>signal generator </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gac5d05e751350c029be71ff59c20d0af8"></a>
+<a id="gacaffcc0512e061f6c8519fd20f494e0e" name="gacaffcc0512e061f6c8519fd20f494e0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacaffcc0512e061f6c8519fd20f494e0e">&#9670;&#160;</a></span>SG_OneSide()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Single </td>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_OneSide </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>ind</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>filter_n</em> = <code>20</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>filter_p</em> = <code>0.1</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_buy</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>单线拐点信号指示器 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_OneSide.h&gt;</code></p>
+
+<p>Build a one-sided signal (containing the buy or the sell signals only) from the input indicator; a signal is added if the indicator value is greater than 0 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ind</td><td>the indicating indicator </td></tr>
+    <tr><td class="paramname">is_buy</td><td>whether the added signal is a buy or a sell signal </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>signal generator </dd></dl>
+
+</div>
+</div>
+<a id="ga42a7b7cd89321f553c18697750c4fdbd" name="ga42a7b7cd89321f553c18697750c4fdbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga42a7b7cd89321f553c18697750c4fdbd">&#9670;&#160;</a></span>SG_Single()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_Single </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>filter_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">20</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>filter_p</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.1</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_Single.h&gt;</code></p>
+
+<p>Single line inflection point signal </p>
 <pre>
-使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：</pre><pre>    filter = percentage * STDEV((AMA-AMA[1], N)
+The curve inflection point algorithm given in "Smarter Trading" is used to judge the curve trend,
+the formula is as follows:
+
+    filter = percentage * STDEV((AMA-AMA[1], N)
     Buy  When AMA - AMA[1] &gt; filter
     or Buy When AMA - AMA[2] &gt; filter
     or Buy When AMA - AMA[3] &gt; filter
-</pre> <dl class="params"><dt>参数</dt><dd>
+</pre> <dl class="section note"><dt>注解</dt><dd>A non-finite input value fires no signal </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">ind</td><td></td></tr>
-    <tr><td class="paramname">filter_n</td><td>N日周期 </td></tr>
-    <tr><td class="paramname">filter_p</td><td>过滤器百分比 </td></tr>
-    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+    <tr><td class="paramname">filter_n</td><td>N-day period </td></tr>
+    <tr><td class="paramname">filter_p</td><td>filter percentage </td></tr>
   </table>
   </dd>
 </dl>
@@ -397,53 +429,46 @@ Signal 信号指示器 的协作图:</div>
 
 </div>
 </div>
-<a class="anchor" id="gabba00831b85d2b9f65bf4d71c50bdb32"></a>
+<a id="ga5e4bc4437f81ed248790a482d402cc37" name="ga5e4bc4437f81ed248790a482d402cc37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5e4bc4437f81ed248790a482d402cc37">&#9670;&#160;</a></span>SG_Single2()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Single2 </td>
+          <td class="memname"><a class="el" href="#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> HKU_API hku::SG_Single2 </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
-          <td class="paramname"><em>ind</em>, </td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ind</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>filter_n</em> = <code>20</code>, </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>filter_n</em></span><span class="paramdefsep"> = </span><span class="paramdefval">20</span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>filter_p</em> = <code>0.1</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>filter_p</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.1</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>单线拐点信号指示器2 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/signal/crt/SG_Single.h&gt;</code></p>
+
+<p>Single line inflection point signal 2 </p>
 <pre>
-使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：</pre><pre>    filter = percentage * STDEV((AMA-AMA[1], N)
-    Buy  When AMA - (AMA,n) &gt; filter
-    Sell When (AMA, n) - AMA &gt; filter
-</pre> <dl class="params"><dt>参数</dt><dd>
+The curve inflection point algorithm given in "Smarter Trading" is used to judge the curve trend,
+the formula is as follows:
+
+    filter = percentage * STDEV((AMA-AMA[1], N)
+    Buy  When AMA - lowest(AMA,n) &gt; filter
+    Sell When highest(AMA, n) - AMA &gt; filter
+</pre> <dl class="section note"><dt>注解</dt><dd>A non-finite input value fires no signal </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">ind</td><td></td></tr>
-    <tr><td class="paramname">filter_n</td><td>N日周期 </td></tr>
-    <tr><td class="paramname">filter_p</td><td>过滤器百分比 </td></tr>
-    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+    <tr><td class="paramname">filter_n</td><td>N-day period </td></tr>
+    <tr><td class="paramname">filter_p</td><td>filter percentage </td></tr>
   </table>
   </dd>
 </dl>
@@ -452,12 +477,23 @@ Signal 信号指示器 的协作图:</div>
 </div>
 </div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

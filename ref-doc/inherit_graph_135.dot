@@ -1,0 +1,21 @@
+digraph "类继承关系图"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node0 [id="Node000000",label="hku::SlippageBase",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_slippage_base.html",tooltip="Base class of the slippage algorithm"];
+  Node0 -> Node1 [id="edge276_Node000000_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node1 [id="Node000001",label="hku::FixedPercentSlippage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_fixed_percent_slippage.html",tooltip=" "];
+  Node0 -> Node2 [id="edge277_Node000000_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="hku::FixedValueSlippage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_fixed_value_slippage.html",tooltip=" "];
+  Node0 -> Node3 [id="edge278_Node000000_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="hku::LogNormalSlippage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_log_normal_slippage.html",tooltip=" "];
+  Node0 -> Node4 [id="edge279_Node000000_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="hku::NormalSlippage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_normal_slippage.html",tooltip=" "];
+  Node0 -> Node5 [id="edge280_Node000000_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="hku::TruncNormalSlippage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_trunc_normal_slippage.html",tooltip=" "];
+  Node0 -> Node6 [id="edge281_Node000000_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="hku::UniformSlippage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_uniform_slippage.html",tooltip=" "];
+}

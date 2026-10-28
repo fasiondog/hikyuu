@@ -1,0 +1,168 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/system/SubSystemContext.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_sub_system_context_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SubSystemContext.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * SubSystemContext.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Recursive combination refactoring: the L1 context of AF (including the mode B quota)</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#ifndef SUBSYSTEMCONTEXT_H_</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define SUBSYSTEMCONTEXT_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../../DataType.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;../../trade_manage/FundsRecord.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> = nlohmann::json;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_system.html">System</a>;  <span class="comment">// Forward declaration, to avoid a circular include with System.h (System.h already includes MoneyManagerBase.h)</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="};">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html">   28</a></span><span class="keyword">struct </span>HKU_API <a class="code hl_struct" href="structhku_1_1_sub_system_context.html">SubSystemContext</a> {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#a006d38e27451d09177c38df0e6cd76dc">   29</a></span>    std::shared_ptr&lt;System&gt; <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#a006d38e27451d09177c38df0e6cd76dc">sys</a>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#afdc8a68ea2489449f3e1f82b50aff018">   30</a></span>    <a class="code hl_class" href="classhku_1_1_funds_record.html">FundsRecord</a> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#afdc8a68ea2489449f3e1f82b50aff018">funds</a>;          <span class="comment">// The current funds of the sub-system virtual account</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#a305c6118c23a0b4e212364148cd9cc71">   31</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#a305c6118c23a0b4e212364148cd9cc71">profit_curve</a>;     <span class="comment">// Reserved for future AF extensions; not filled by MultiSystem</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#af7c782b1de4dc3903be81cb8b9ba5f7a">   32</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#af7c782b1de4dc3903be81cb8b9ba5f7a">total_return</a>{0.0};   <span class="comment">// Mode A shadow-account cumulative return over m_sub_init_cash;</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                                <span class="comment">// 0 in mode B (the quota-injected model has no fixed init cash)</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#a09023deac553818d0cd1edc5108c6751">   34</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#a09023deac553818d0cd1edc5108c6751">current_weight</a>{0.0};  <span class="comment">// The scale of this sub-system&#39;s account over the parent&#39;s real</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                                 <span class="comment">// total assets</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#af3a1c53069380267b08a3c900111d89c">   36</a></span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#af3a1c53069380267b08a3c900111d89c">score</a>{0.0};           <span class="comment">// The SE score on the rebalancing day (0 on the non-rebalancing days / for the unselected), used by AF_MultiFactor etc. to take the scores as the weights</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#a574da60b441f0bd776ef456aafd05177">   37</a></span>    <a class="code hl_typedef" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#a574da60b441f0bd776ef456aafd05177">quota</a>{0.0};          <span class="comment">// [Mode B] the quota allocated to this sub-system (written into its virtual account)</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#a3b8e8c1672cc8fed385dccd53cc76d70">   38</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#a3b8e8c1672cc8fed385dccd53cc76d70">suggestion_count</a>{0};  <span class="comment">// Reserved for future AF extensions; not filled by MultiSystem</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structhku_1_1_sub_system_context.html#a459e95ce495bd6788e0112afda84d5ff">   39</a></span>    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> <a class="code hl_variable" href="structhku_1_1_sub_system_context.html#a459e95ce495bd6788e0112afda84d5ff">ext</a>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>};</div>
+</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">   42</a></span><span class="keyword">typedef</span> std::vector&lt;SubSystemContext&gt; <a class="code hl_typedef" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">SubSystemContextList</a>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#endif </span><span class="comment">/* SUBSYSTEMCONTEXT_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_funds_record_html"><div class="ttname"><a href="classhku_1_1_funds_record.html">hku::FundsRecord</a></div><div class="ttdoc">Record of the current asset situation, returned by TradeManager::getFunds</div><div class="ttdef"><b>定义</b> FundsRecord.h:21</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html"><div class="ttname"><a href="classhku_1_1_system.html">hku::System</a></div><div class="ttdoc">Base class of the trading system</div><div class="ttdef"><b>定义</b> System.h:38</div></div>
+<div class="ttc" id="agroup___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>定义</b> DataType.h:136</div></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_ae9a514f1ae8310455075ca506de17757"><div class="ttname"><a href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">hku::json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>定义</b> MomentResult.h:25</div></div>
+<div class="ttc" id="anamespacehku_html_af861f9a4b77b4d00511261b54177acc0"><div class="ttname"><a href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">hku::SubSystemContextList</a></div><div class="ttdeci">std::vector&lt; SubSystemContext &gt; SubSystemContextList</div><div class="ttdef"><b>定义</b> SubSystemContext.h:42</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html"><div class="ttname"><a href="structhku_1_1_sub_system_context.html">hku::SubSystemContext</a></div><div class="ttdoc">The L1 context of AF (including the mode B quota)</div><div class="ttdef"><b>定义</b> SubSystemContext.h:28</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_a006d38e27451d09177c38df0e6cd76dc"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#a006d38e27451d09177c38df0e6cd76dc">hku::SubSystemContext::sys</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; sys</div><div class="ttdef"><b>定义</b> SubSystemContext.h:29</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_a09023deac553818d0cd1edc5108c6751"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#a09023deac553818d0cd1edc5108c6751">hku::SubSystemContext::current_weight</a></div><div class="ttdeci">double current_weight</div><div class="ttdef"><b>定义</b> SubSystemContext.h:34</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_a305c6118c23a0b4e212364148cd9cc71"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#a305c6118c23a0b4e212364148cd9cc71">hku::SubSystemContext::profit_curve</a></div><div class="ttdeci">PriceList profit_curve</div><div class="ttdef"><b>定义</b> SubSystemContext.h:31</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_a3b8e8c1672cc8fed385dccd53cc76d70"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#a3b8e8c1672cc8fed385dccd53cc76d70">hku::SubSystemContext::suggestion_count</a></div><div class="ttdeci">size_t suggestion_count</div><div class="ttdef"><b>定义</b> SubSystemContext.h:38</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_a459e95ce495bd6788e0112afda84d5ff"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#a459e95ce495bd6788e0112afda84d5ff">hku::SubSystemContext::ext</a></div><div class="ttdeci">json ext</div><div class="ttdef"><b>定义</b> SubSystemContext.h:39</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_a574da60b441f0bd776ef456aafd05177"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#a574da60b441f0bd776ef456aafd05177">hku::SubSystemContext::quota</a></div><div class="ttdeci">price_t quota</div><div class="ttdef"><b>定义</b> SubSystemContext.h:37</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_af3a1c53069380267b08a3c900111d89c"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#af3a1c53069380267b08a3c900111d89c">hku::SubSystemContext::score</a></div><div class="ttdeci">double score</div><div class="ttdef"><b>定义</b> SubSystemContext.h:36</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_af7c782b1de4dc3903be81cb8b9ba5f7a"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#af7c782b1de4dc3903be81cb8b9ba5f7a">hku::SubSystemContext::total_return</a></div><div class="ttdeci">double total_return</div><div class="ttdef"><b>定义</b> SubSystemContext.h:32</div></div>
+<div class="ttc" id="astructhku_1_1_sub_system_context_html_afdc8a68ea2489449f3e1f82b50aff018"><div class="ttname"><a href="structhku_1_1_sub_system_context.html#afdc8a68ea2489449f3e1f82b50aff018">hku::SubSystemContext::funds</a></div><div class="ttdeci">FundsRecord funds</div><div class="ttdef"><b>定义</b> SubSystemContext.h:30</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_be1571b252e421c31ea0682d2947607c.html">system</a></li><li class="navelem"><b>SubSystemContext.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

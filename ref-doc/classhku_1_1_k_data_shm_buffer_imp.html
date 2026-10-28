@@ -1,0 +1,563 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::KDataShmBufferImp类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_k_data_shm_buffer_imp.html','','classhku_1_1_k_data_shm_buffer_imp-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::KDataShmBufferImp类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage security management</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Zero-copy K-line view of the client shared memory  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_k_data_shm_buffer_imp_8h_source.html">KDataShmBufferImp.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::KDataShmBufferImp 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_k_data_shm_buffer_imp__inherit__graph.png" border="0" usemap="#ahku_1_1_k_data_shm_buffer_imp_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::KDataShmBufferImp 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_k_data_shm_buffer_imp__coll__graph.png" border="0" usemap="#ahku_1_1_k_data_shm_buffer_imp_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:abbcd83866f5abcb9321a3e51ec8589de" id="r_abbcd83866f5abcb9321a3e51ec8589de"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbcd83866f5abcb9321a3e51ec8589de">~KDataShmBufferImp</a> () override</td></tr>
+<tr class="memitem:ab5d7d672b9f1558bbc24d49927ecd2de" id="r_ab5d7d672b9f1558bbc24d49927ecd2de"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5d7d672b9f1558bbc24d49927ecd2de">empty</a> () const noexcept override</td></tr>
+<tr class="memitem:a74dcf45ccab90b753148f94e64675d38" id="r_a74dcf45ccab90b753148f94e64675d38"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74dcf45ccab90b753148f94e64675d38">size</a> () const noexcept override</td></tr>
+<tr class="memitem:ae1230f2c01318e37df2c6d5cbbe9799b" id="r_ae1230f2c01318e37df2c6d5cbbe9799b"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1230f2c01318e37df2c6d5cbbe9799b">startPos</a> () const override</td></tr>
+<tr class="memitem:addd648804b36d161cd11e5444702f78a" id="r_addd648804b36d161cd11e5444702f78a"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#addd648804b36d161cd11e5444702f78a">endPos</a> () const override</td></tr>
+<tr class="memitem:a54508d0dadbbaa2e47fdc41682649d4c" id="r_a54508d0dadbbaa2e47fdc41682649d4c"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a54508d0dadbbaa2e47fdc41682649d4c">lastPos</a> () const override</td></tr>
+<tr class="memitem:ab302e120cf33c7d76b0900e2db17e3ac" id="r_ab302e120cf33c7d76b0900e2db17e3ac"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab302e120cf33c7d76b0900e2db17e3ac">getPos</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const noexcept override</td></tr>
+<tr class="memitem:a37f339c3e27b41f686c4061f7038ce24" id="r_a37f339c3e27b41f686c4061f7038ce24"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37f339c3e27b41f686c4061f7038ce24">getKRecord</a> (size_t pos) const noexcept override</td></tr>
+<tr class="memitem:a9c92172812e756680e32f67e50cf02e6" id="r_a9c92172812e756680e32f67e50cf02e6"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c92172812e756680e32f67e50cf02e6">front</a> () const override</td></tr>
+<tr class="memitem:a49dfa990f8f9d885371d8623140ca28a" id="r_a49dfa990f8f9d885371d8623140ca28a"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a49dfa990f8f9d885371d8623140ca28a">back</a> () const override</td></tr>
+<tr class="memitem:ad3c79cec5d7efd23cf8e144007bc63cd" id="r_ad3c79cec5d7efd23cf8e144007bc63cd"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3c79cec5d7efd23cf8e144007bc63cd">data</a> () const noexcept override</td></tr>
+<tr class="memitem:a75b4268a0b6d54e7464a1172df36f158" id="r_a75b4268a0b6d54e7464a1172df36f158"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75b4268a0b6d54e7464a1172df36f158">getDatetimeList</a> () const override</td></tr>
+<tr class="memitem:a262009c329cba541cbe066543c30ab79" id="r_a262009c329cba541cbe066543c30ab79"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a262009c329cba541cbe066543c30ab79">getOtherFromSelf</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query) const override</td></tr>
+<tr class="inherit_header pub_methods_classhku_1_1_k_data_imp"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classhku_1_1_k_data_imp')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classhku_1_1_k_data_imp.html">hku::KDataImp</a></td></tr>
+<tr class="memitem:a4e4e061dcec23f4563cd310abb47c031 inherit pub_methods_classhku_1_1_k_data_imp" id="r_a4e4e061dcec23f4563cd310abb47c031"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a4e4e061dcec23f4563cd310abb47c031">KDataImp</a> ()=default</td></tr>
+<tr class="memitem:a97867981103b6af78f0ed84b83361dd6 inherit pub_methods_classhku_1_1_k_data_imp" id="r_a97867981103b6af78f0ed84b83361dd6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a97867981103b6af78f0ed84b83361dd6">KDataImp</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memitem:a1fde4fd3ad2da45b28d48f9677581b2d inherit pub_methods_classhku_1_1_k_data_imp" id="r_a1fde4fd3ad2da45b28d48f9677581b2d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a1fde4fd3ad2da45b28d48f9677581b2d">~KDataImp</a> ()</td></tr>
+<tr class="memitem:adfea607c44c010065cfaf0342f0f9e91 inherit pub_methods_classhku_1_1_k_data_imp" id="r_adfea607c44c010065cfaf0342f0f9e91"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#adfea607c44c010065cfaf0342f0f9e91">getQuery</a> () const</td></tr>
+<tr class="memitem:afbe528904ea36c10408d1eaa5e294c64 inherit pub_methods_classhku_1_1_k_data_imp" id="r_afbe528904ea36c10408d1eaa5e294c64"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#afbe528904ea36c10408d1eaa5e294c64">getStock</a> () const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:afa3110e86271debe0181cdb238e0fe5a" id="r_afa3110e86271debe0181cdb238e0fe5a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa3110e86271debe0181cdb238e0fe5a">create</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memdesc:afa3110e86271debe0181cdb238e0fe5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Factory: try to construct the shared memory zero-copy view in client mode  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-inherited" class="groupheader"><a id="inherited" name="inherited"></a>
+额外继承的成员函数</h2></td></tr>
+<tr class="inherit_header pub_types_classhku_1_1_k_data_imp"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_types_classhku_1_1_k_data_imp')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 类型 继承自 <a class="el" href="classhku_1_1_k_data_imp.html">hku::KDataImp</a></td></tr>
+<tr class="memitem:a7ba600fafc0438264b0869ec876f3a8c inherit pub_types_classhku_1_1_k_data_imp" id="r_a7ba600fafc0438264b0869ec876f3a8c"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_k_data_imp.html">KDataImp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a></td></tr>
+<tr class="inherit_header pro_static_methods_classhku_1_1_k_data_imp"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_static_methods_classhku_1_1_k_data_imp')"><span class="dynarrow"><span class="arrowhead closed"></span></span>静态 Protected 成员函数 继承自 <a class="el" href="classhku_1_1_k_data_imp.html">hku::KDataImp</a></td></tr>
+<tr class="memitem:a88ccc16188d6de7901495f53aca8a101 inherit pro_static_methods_classhku_1_1_k_data_imp" id="r_a88ccc16188d6de7901495f53aca8a101"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a88ccc16188d6de7901495f53aca8a101">getKRecordPosByDatetime</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> *first, size_t count, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) noexcept</td></tr>
+<tr class="inherit_header pro_attribs_classhku_1_1_k_data_imp"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classhku_1_1_k_data_imp')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected 属性 继承自 <a class="el" href="classhku_1_1_k_data_imp.html">hku::KDataImp</a></td></tr>
+<tr class="memitem:a7255f6a159f5d6437d30720191c35c7f inherit pro_attribs_classhku_1_1_k_data_imp" id="r_a7255f6a159f5d6437d30720191c35c7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a7255f6a159f5d6437d30720191c35c7f">m_query</a></td></tr>
+<tr class="memitem:a96a045380ad3140fb2a16a800e114773 inherit pro_attribs_classhku_1_1_k_data_imp" id="r_a96a045380ad3140fb2a16a800e114773"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_imp.html#a96a045380ad3140fb2a16a800e114773">m_stock</a></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Zero-copy K-line view of the client shared memory </p>
+<p>In client mode a NO_RECOVER query directly reads the shared memory snapshot published by the main process through a raw pointer view, without copying the records (all the clients share the same physical page), which aligns with the zero-copy semantics of <a class="el" href="classhku_1_1_k_data_shared_buffer_imp.html" title="Zero-copy KData view over the buffer cached by the Stock (NO_RECOVER only).">KDataSharedBufferImp</a> in the main process. The view pointer is pinned by m_pin (which holds a type-erased KDataShmReader), so the old mapping stays alive after the epoch is replaced. It is constructed successfully through <a class="el" href="#afa3110e86271debe0181cdb238e0fe5a" title="Factory: try to construct the shared memory zero-copy view in client mode">create()</a> only when the driver supports the view (a client IPC proxy driver with the snapshot covered and no reverse scaling needed), otherwise a null pointer is returned and the upper layer falls back to the <a class="el" href="classhku_1_1_k_data_privated_buffer_imp.html">KDataPrivatedBufferImp</a> copy path. </p><dl class="section note"><dt>注解</dt><dd>Read-only mapping: only the const <a class="el" href="#ad3c79cec5d7efd23cf8e144007bc63cd">data()</a> overload is provided, so no writable view of the shared snapshot is ever exposed. </dd></dl>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="abbcd83866f5abcb9321a3e51ec8589de" name="abbcd83866f5abcb9321a3e51ec8589de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbcd83866f5abcb9321a3e51ec8589de">&#9670;&#160;</a></span>~KDataShmBufferImp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::KDataShmBufferImp::~KDataShmBufferImp </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a49dfa990f8f9d885371d8623140ca28a" name="a49dfa990f8f9d885371d8623140ca28a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49dfa990f8f9d885371d8623140ca28a">&#9670;&#160;</a></span>back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KDataShmBufferImp::back </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#ad0b4fbbb5df7f717fe3dd4744d4f7e4a">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="afa3110e86271debe0181cdb238e0fe5a" name="afa3110e86271debe0181cdb238e0fe5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa3110e86271debe0181cdb238e0fe5a">&#9670;&#160;</a></span>create()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a> hku::KDataShmBufferImp::create </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Factory: try to construct the shared memory zero-copy view in client mode </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock</td><td>the target security </td></tr>
+    <tr><td class="paramname">query</td><td>the query condition (should be NO_RECOVER, guaranteed by the caller) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the view imp on success; nullptr when it does not apply (not a client / not covered / reverse scaling needed / invalid range) </dd></dl>
+
+</div>
+</div>
+<a id="ad3c79cec5d7efd23cf8e144007bc63cd" name="ad3c79cec5d7efd23cf8e144007bc63cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3c79cec5d7efd23cf8e144007bc63cd">&#9670;&#160;</a></span>data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> * hku::KDataShmBufferImp::data </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a4846c1f384941f0125e8cdedf5a84101">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="ab5d7d672b9f1558bbc24d49927ecd2de" name="ab5d7d672b9f1558bbc24d49927ecd2de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5d7d672b9f1558bbc24d49927ecd2de">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::KDataShmBufferImp::empty </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#aa0569e7d6b65837c57efab030b657082">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="addd648804b36d161cd11e5444702f78a" name="addd648804b36d161cd11e5444702f78a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addd648804b36d161cd11e5444702f78a">&#9670;&#160;</a></span>endPos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::KDataShmBufferImp::endPos </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a6249c8d36d9740ac4c04a52391e3a0d0">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="a9c92172812e756680e32f67e50cf02e6" name="a9c92172812e756680e32f67e50cf02e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c92172812e756680e32f67e50cf02e6">&#9670;&#160;</a></span>front()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KDataShmBufferImp::front </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a7aba749103edde5349bb4c9d6001896e">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="a75b4268a0b6d54e7464a1172df36f158" name="a75b4268a0b6d54e7464a1172df36f158"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75b4268a0b6d54e7464a1172df36f158">&#9670;&#160;</a></span>getDatetimeList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::KDataShmBufferImp::getDatetimeList </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a9b66a8fdd78b2a08e53a52264d3ea251">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="a37f339c3e27b41f686c4061f7038ce24" name="a37f339c3e27b41f686c4061f7038ce24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37f339c3e27b41f686c4061f7038ce24">&#9670;&#160;</a></span>getKRecord()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp; hku::KDataShmBufferImp::getKRecord </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a05aae16bb469b000a813199fb3e7d8be">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="a262009c329cba541cbe066543c30ab79" name="a262009c329cba541cbe066543c30ab79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a262009c329cba541cbe066543c30ab79">&#9670;&#160;</a></span>getOtherFromSelf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a> hku::KDataShmBufferImp::getOtherFromSelf </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a336b9d1db24eb274fc47bde83ee22a12">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="ab302e120cf33c7d76b0900e2db17e3ac" name="ab302e120cf33c7d76b0900e2db17e3ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab302e120cf33c7d76b0900e2db17e3ac">&#9670;&#160;</a></span>getPos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::KDataShmBufferImp::getPos </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a929e53db8f5de911764370edd68ce66c">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="a54508d0dadbbaa2e47fdc41682649d4c" name="a54508d0dadbbaa2e47fdc41682649d4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54508d0dadbbaa2e47fdc41682649d4c">&#9670;&#160;</a></span>lastPos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::KDataShmBufferImp::lastPos </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#a87d960b11143a7345ed9b9d6f715a00f">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="a74dcf45ccab90b753148f94e64675d38" name="a74dcf45ccab90b753148f94e64675d38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74dcf45ccab90b753148f94e64675d38">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::KDataShmBufferImp::size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#ab17190285b0952181cfee4ad45d4296a">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<a id="ae1230f2c01318e37df2c6d5cbbe9799b" name="ae1230f2c01318e37df2c6d5cbbe9799b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1230f2c01318e37df2c6d5cbbe9799b">&#9670;&#160;</a></span>startPos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual size_t hku::KDataShmBufferImp::startPos </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_k_data_imp.html#aa5857b0255809eaf1e90cdcb17842270">hku::KDataImp</a> .</p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/<a class="el" href="_k_data_shm_buffer_imp_8h_source.html">KDataShmBufferImp.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_k_data_shm_buffer_imp.html">KDataShmBufferImp</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

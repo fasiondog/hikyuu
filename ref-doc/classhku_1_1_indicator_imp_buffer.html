@@ -1,0 +1,1968 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::IndicatorImpBuffer类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_indicator_imp_buffer.html','','classhku_1_1_indicator_imp_buffer-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::IndicatorImpBuffer类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><a class="el" href="classhku_1_1_indicator_imp_buffer.html" title="IndicatorImpBuffer class, it fully customizes the memory management and is compatible with malloc and...">IndicatorImpBuffer</a> class, it fully customizes the memory management and is compatible with malloc and mi_malloc; it provides a std::vector-like interface to the outside  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_indicator_imp_buffer_8h_source.html">IndicatorImpBuffer.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a705bae14852e89a7e891c099f5d7a35f" id="r_a705bae14852e89a7e891c099f5d7a35f"><td class="memItemLeft" align="right" valign="top">typedef double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a></td></tr>
+<tr class="memitem:a877946356dd55c49e004012e0e832d0c" id="r_a877946356dd55c49e004012e0e832d0c"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a></td></tr>
+<tr class="memitem:a7fa911d9f8d706499d1e4f1b1d4cfd3a" id="r_a7fa911d9f8d706499d1e4f1b1d4cfd3a"><td class="memItemLeft" align="right" valign="top">typedef const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a></td></tr>
+<tr class="memitem:a85c4ec3204ede8c25ac6688df1bb44ec" id="r_a85c4ec3204ede8c25ac6688df1bb44ec"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85c4ec3204ede8c25ac6688df1bb44ec">pointer</a></td></tr>
+<tr class="memitem:a180411bd562abcc52536408ec1a18635" id="r_a180411bd562abcc52536408ec1a18635"><td class="memItemLeft" align="right" valign="top">typedef const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a180411bd562abcc52536408ec1a18635">const_pointer</a></td></tr>
+<tr class="memitem:ade0f860a563f0296a38adf215ddd3e8b" id="r_ade0f860a563f0296a38adf215ddd3e8b"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a></td></tr>
+<tr class="memitem:ab2875f4e094e835ef0f5487f67bf25c3" id="r_ab2875f4e094e835ef0f5487f67bf25c3"><td class="memItemLeft" align="right" valign="top">typedef const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td></tr>
+<tr class="memitem:ae3b2168aa9b4008d285d8af2d39a31f2" id="r_ae3b2168aa9b4008d285d8af2d39a31f2"><td class="memItemLeft" align="right" valign="top">typedef std::reverse_iterator&lt; <a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3b2168aa9b4008d285d8af2d39a31f2">reverse_iterator</a></td></tr>
+<tr class="memitem:a61c7c334bcdf29648fe5ef2d3ddff85b" id="r_a61c7c334bcdf29648fe5ef2d3ddff85b"><td class="memItemLeft" align="right" valign="top">typedef std::reverse_iterator&lt; <a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a></td></tr>
+<tr class="memitem:a131f1da7e090e43051ea75e9da36e055" id="r_a131f1da7e090e43051ea75e9da36e055"><td class="memItemLeft" align="right" valign="top">typedef size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td></tr>
+<tr class="memitem:a2bb2851cf08ab66d20e65f8e480e88e9" id="r_a2bb2851cf08ab66d20e65f8e480e88e9"><td class="memItemLeft" align="right" valign="top">typedef ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bb2851cf08ab66d20e65f8e480e88e9">difference_type</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a747568ab951c32a057d33c0ca2994af3" id="r_a747568ab951c32a057d33c0ca2994af3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a747568ab951c32a057d33c0ca2994af3">IndicatorImpBuffer</a> ()=default</td></tr>
+<tr class="memdesc:a747568ab951c32a057d33c0ca2994af3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor  <br /></td></tr>
+<tr class="memitem:a6a8b23c9274d26465dd0748e76d5f83e" id="r_a6a8b23c9274d26465dd0748e76d5f83e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a8b23c9274d26465dd0748e76d5f83e">IndicatorImpBuffer</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> count)</td></tr>
+<tr class="memdesc:a6a8b23c9274d26465dd0748e76d5f83e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with the given capacity  <br /></td></tr>
+<tr class="memitem:a94369754a4e570442025450e09ef123c" id="r_a94369754a4e570442025450e09ef123c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94369754a4e570442025450e09ef123c">IndicatorImpBuffer</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> count, const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;value)</td></tr>
+<tr class="memdesc:a94369754a4e570442025450e09ef123c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with an initial value  <br /></td></tr>
+<tr class="memitem:a74d37c213de38bb2d58735d0ae1cd740" id="r_a74d37c213de38bb2d58735d0ae1cd740"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74d37c213de38bb2d58735d0ae1cd740">IndicatorImpBuffer</a> (const <a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;other)</td></tr>
+<tr class="memdesc:a74d37c213de38bb2d58735d0ae1cd740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor  <br /></td></tr>
+<tr class="memitem:a12f0335e61cc8f19c36be139d8f8212c" id="r_a12f0335e61cc8f19c36be139d8f8212c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12f0335e61cc8f19c36be139d8f8212c">IndicatorImpBuffer</a> (<a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memdesc:a12f0335e61cc8f19c36be139d8f8212c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor  <br /></td></tr>
+<tr class="memitem:affc5f1c430f85878e9ee1eb2fddd3faf" id="r_affc5f1c430f85878e9ee1eb2fddd3faf"><td class="memTemplParams" colspan="2">template&lt;typename InputIterator&gt; </td></tr>
+<tr class="memitem:affc5f1c430f85878e9ee1eb2fddd3faf template"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affc5f1c430f85878e9ee1eb2fddd3faf">IndicatorImpBuffer</a> (InputIterator first, InputIterator last)</td></tr>
+<tr class="memdesc:affc5f1c430f85878e9ee1eb2fddd3faf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from an iterator range  <br /></td></tr>
+<tr class="memitem:aa32f1833a5606464d1a04147cbc05772" id="r_aa32f1833a5606464d1a04147cbc05772"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa32f1833a5606464d1a04147cbc05772">IndicatorImpBuffer</a> (std::initializer_list&lt; <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &gt; init_list)</td></tr>
+<tr class="memdesc:aa32f1833a5606464d1a04147cbc05772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializer list constructor  <br /></td></tr>
+<tr class="memitem:a5db0fb668b57636140af6118e5f74e2b" id="r_a5db0fb668b57636140af6118e5f74e2b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5db0fb668b57636140af6118e5f74e2b">operator=</a> (const <a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;other)</td></tr>
+<tr class="memdesc:a5db0fb668b57636140af6118e5f74e2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator  <br /></td></tr>
+<tr class="memitem:a2e3454db006314e36029b71778b6ef75" id="r_a2e3454db006314e36029b71778b6ef75"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e3454db006314e36029b71778b6ef75">operator=</a> (<a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memdesc:a2e3454db006314e36029b71778b6ef75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator  <br /></td></tr>
+<tr class="memitem:a4c46f03c2c2fb4b28896ffdfab727810" id="r_a4c46f03c2c2fb4b28896ffdfab727810"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c46f03c2c2fb4b28896ffdfab727810">~IndicatorImpBuffer</a> ()</td></tr>
+<tr class="memdesc:a4c46f03c2c2fb4b28896ffdfab727810"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor  <br /></td></tr>
+<tr class="memitem:a75a81afbadd6ca959d6eb3cea18778a2" id="r_a75a81afbadd6ca959d6eb3cea18778a2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75a81afbadd6ca959d6eb3cea18778a2">size</a> () const noexcept</td></tr>
+<tr class="memitem:ad39673e56ebc1d3093979d94be87940d" id="r_ad39673e56ebc1d3093979d94be87940d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad39673e56ebc1d3093979d94be87940d">capacity</a> () const noexcept</td></tr>
+<tr class="memitem:af72a1cc5d4632fae518c13776baef2ca" id="r_af72a1cc5d4632fae518c13776baef2ca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af72a1cc5d4632fae518c13776baef2ca">empty</a> () const noexcept</td></tr>
+<tr class="memitem:a6104a6e58e0845fa8f6616551f6ab14a" id="r_a6104a6e58e0845fa8f6616551f6ab14a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6104a6e58e0845fa8f6616551f6ab14a">max_size</a> () const noexcept</td></tr>
+<tr class="memitem:a37962771a041f67aeebb1ca01b7b39cd" id="r_a37962771a041f67aeebb1ca01b7b39cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37962771a041f67aeebb1ca01b7b39cd">resize</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> count)</td></tr>
+<tr class="memitem:a69dd9e50e7f3aff62fa50c0d50b7fcfa" id="r_a69dd9e50e7f3aff62fa50c0d50b7fcfa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69dd9e50e7f3aff62fa50c0d50b7fcfa">resize</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> count, const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;value)</td></tr>
+<tr class="memitem:ae71481b96aa7d61f9885af17322695c1" id="r_ae71481b96aa7d61f9885af17322695c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae71481b96aa7d61f9885af17322695c1">reserve</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> new_cap)</td></tr>
+<tr class="memitem:a42432dc5475be787b852de28eda2616d" id="r_a42432dc5475be787b852de28eda2616d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42432dc5475be787b852de28eda2616d">shrink_to_fit</a> ()</td></tr>
+<tr class="memitem:a6265483f6e829b5010d1223737f58480" id="r_a6265483f6e829b5010d1223737f58480"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6265483f6e829b5010d1223737f58480">clear</a> () noexcept</td></tr>
+<tr class="memitem:ae21d047a38f394533ef66d70f7a951b8" id="r_ae21d047a38f394533ef66d70f7a951b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae21d047a38f394533ef66d70f7a951b8">at</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> pos)</td></tr>
+<tr class="memitem:a22ec111106d8de968d991070d8080ad7" id="r_a22ec111106d8de968d991070d8080ad7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22ec111106d8de968d991070d8080ad7">at</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> pos) const</td></tr>
+<tr class="memitem:a642e871abd75893d9fc5a1fac97b64bd" id="r_a642e871abd75893d9fc5a1fac97b64bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a642e871abd75893d9fc5a1fac97b64bd">operator[]</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> pos)</td></tr>
+<tr class="memitem:a20fda431ed82e5ba2a253eb29015da9e" id="r_a20fda431ed82e5ba2a253eb29015da9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20fda431ed82e5ba2a253eb29015da9e">operator[]</a> (<a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> pos) const</td></tr>
+<tr class="memitem:a009cf5782662f7838559db8956e85dc1" id="r_a009cf5782662f7838559db8956e85dc1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a009cf5782662f7838559db8956e85dc1">front</a> ()</td></tr>
+<tr class="memitem:af95453b768e9b7ae42622fa718058098" id="r_af95453b768e9b7ae42622fa718058098"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af95453b768e9b7ae42622fa718058098">front</a> () const</td></tr>
+<tr class="memitem:aaaddacd34deb8073c4b4fa5b996b8519" id="r_aaaddacd34deb8073c4b4fa5b996b8519"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaaddacd34deb8073c4b4fa5b996b8519">back</a> ()</td></tr>
+<tr class="memitem:a6dafd6bb1f06d556485f4a1ff0804e4f" id="r_a6dafd6bb1f06d556485f4a1ff0804e4f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6dafd6bb1f06d556485f4a1ff0804e4f">back</a> () const</td></tr>
+<tr class="memitem:a591da54b3f9b4b4dccbbd233ac3359ff" id="r_a591da54b3f9b4b4dccbbd233ac3359ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a85c4ec3204ede8c25ac6688df1bb44ec">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a591da54b3f9b4b4dccbbd233ac3359ff">data</a> () noexcept</td></tr>
+<tr class="memitem:a1feaa4411f664e8d88ffb445b929f805" id="r_a1feaa4411f664e8d88ffb445b929f805"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a180411bd562abcc52536408ec1a18635">const_pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1feaa4411f664e8d88ffb445b929f805">data</a> () const noexcept</td></tr>
+<tr class="memitem:a0b3712ea14aa5193ae5505c2ef062170" id="r_a0b3712ea14aa5193ae5505c2ef062170"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b3712ea14aa5193ae5505c2ef062170">begin</a> () noexcept</td></tr>
+<tr class="memitem:a225a105449fdac676dc7b4a378255d2c" id="r_a225a105449fdac676dc7b4a378255d2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a225a105449fdac676dc7b4a378255d2c">begin</a> () const noexcept</td></tr>
+<tr class="memitem:a97f38d83e73ee2630c261350fee2b27f" id="r_a97f38d83e73ee2630c261350fee2b27f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a97f38d83e73ee2630c261350fee2b27f">cbegin</a> () const noexcept</td></tr>
+<tr class="memitem:af5e799e14719c5127a51f85408a60c19" id="r_af5e799e14719c5127a51f85408a60c19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5e799e14719c5127a51f85408a60c19">end</a> () noexcept</td></tr>
+<tr class="memitem:a4323de551ae368acd7b1a9b6f6a10485" id="r_a4323de551ae368acd7b1a9b6f6a10485"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4323de551ae368acd7b1a9b6f6a10485">end</a> () const noexcept</td></tr>
+<tr class="memitem:ad2b378e4636d9f3917a898967c37e390" id="r_ad2b378e4636d9f3917a898967c37e390"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2b378e4636d9f3917a898967c37e390">cend</a> () const noexcept</td></tr>
+<tr class="memitem:af3369ab34c187fae988ab2bd0e6c5a64" id="r_af3369ab34c187fae988ab2bd0e6c5a64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ae3b2168aa9b4008d285d8af2d39a31f2">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3369ab34c187fae988ab2bd0e6c5a64">rbegin</a> () noexcept</td></tr>
+<tr class="memitem:a7bdf81d5352630977a585f5e4f0f99cf" id="r_a7bdf81d5352630977a585f5e4f0f99cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7bdf81d5352630977a585f5e4f0f99cf">rbegin</a> () const noexcept</td></tr>
+<tr class="memitem:a84ca51aa98e1092d5e6e568ddf671bcf" id="r_a84ca51aa98e1092d5e6e568ddf671bcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84ca51aa98e1092d5e6e568ddf671bcf">crbegin</a> () const noexcept</td></tr>
+<tr class="memitem:a15b5a7827c1091514bef919445b0e346" id="r_a15b5a7827c1091514bef919445b0e346"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ae3b2168aa9b4008d285d8af2d39a31f2">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15b5a7827c1091514bef919445b0e346">rend</a> () noexcept</td></tr>
+<tr class="memitem:a7929fdf0dbfe6dd7b8518cac279b60ef" id="r_a7929fdf0dbfe6dd7b8518cac279b60ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7929fdf0dbfe6dd7b8518cac279b60ef">rend</a> () const noexcept</td></tr>
+<tr class="memitem:a6a4229aff00ede7c977244d70e02aeaa" id="r_a6a4229aff00ede7c977244d70e02aeaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a4229aff00ede7c977244d70e02aeaa">crend</a> () const noexcept</td></tr>
+<tr class="memitem:a0f2e666d507c45d494555fa0ab7a0441" id="r_a0f2e666d507c45d494555fa0ab7a0441"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f2e666d507c45d494555fa0ab7a0441">push_back</a> (const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;value)</td></tr>
+<tr class="memitem:a654074c685b8010b86328c4d9a798b58" id="r_a654074c685b8010b86328c4d9a798b58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a654074c685b8010b86328c4d9a798b58">push_back</a> (<a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;&amp;value)</td></tr>
+<tr class="memitem:aeb4337d08475421f0fc77bea5d1f641c" id="r_aeb4337d08475421f0fc77bea5d1f641c"><td class="memTemplParams" colspan="2">template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:aeb4337d08475421f0fc77bea5d1f641c template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeb4337d08475421f0fc77bea5d1f641c">emplace_back</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memitem:ab4e0b5643bd57a7a75b98cd2276edce2" id="r_ab4e0b5643bd57a7a75b98cd2276edce2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4e0b5643bd57a7a75b98cd2276edce2">pop_back</a> ()</td></tr>
+<tr class="memitem:aab47a8b043898d2ec264a9e934dd1527" id="r_aab47a8b043898d2ec264a9e934dd1527"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab47a8b043898d2ec264a9e934dd1527">insert</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> pos, const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;value)</td></tr>
+<tr class="memitem:acebdf74cf86161f39e1a747868da84a0" id="r_acebdf74cf86161f39e1a747868da84a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acebdf74cf86161f39e1a747868da84a0">insert</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> pos, <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;&amp;value)</td></tr>
+<tr class="memitem:a6af371b963409362639aee2f0d065191" id="r_a6af371b963409362639aee2f0d065191"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6af371b963409362639aee2f0d065191">insert</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> pos, <a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> count, const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;value)</td></tr>
+<tr class="memitem:af1283e6ed815c18e1efa8892c6a56c4e" id="r_af1283e6ed815c18e1efa8892c6a56c4e"><td class="memTemplParams" colspan="2">template&lt;class InputIt&gt; </td></tr>
+<tr class="memitem:af1283e6ed815c18e1efa8892c6a56c4e template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1283e6ed815c18e1efa8892c6a56c4e">insert</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> pos, InputIt first, InputIt last)</td></tr>
+<tr class="memitem:ae6defa4429927ec2e295af766f1e460c" id="r_ae6defa4429927ec2e295af766f1e460c"><td class="memTemplParams" colspan="2">template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:ae6defa4429927ec2e295af766f1e460c template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6defa4429927ec2e295af766f1e460c">emplace</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> pos, Args &amp;&amp;... args)</td></tr>
+<tr class="memitem:a6eafbb34bac62c15191be17f0b5e62f0" id="r_a6eafbb34bac62c15191be17f0b5e62f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6eafbb34bac62c15191be17f0b5e62f0">erase</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> pos)</td></tr>
+<tr class="memitem:ac7ebe1e391d79374bb0468779d88d4d2" id="r_ac7ebe1e391d79374bb0468779d88d4d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7ebe1e391d79374bb0468779d88d4d2">erase</a> (<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> first, <a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> last)</td></tr>
+<tr class="memitem:aa1b8381cf09a8868d2afd18f76acd1d3" id="r_aa1b8381cf09a8868d2afd18f76acd1d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa1b8381cf09a8868d2afd18f76acd1d3">swap</a> (<a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;other) noexcept</td></tr>
+<tr class="memitem:aa5340b51f7aba36fad707343918fbbf4" id="r_aa5340b51f7aba36fad707343918fbbf4"><td class="memTemplParams" colspan="2">template&lt;typename UnaryPredicate&gt; </td></tr>
+<tr class="memitem:aa5340b51f7aba36fad707343918fbbf4 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5340b51f7aba36fad707343918fbbf4">erase_if</a> (UnaryPredicate p)</td></tr>
+<tr class="memitem:af63b64703dcc82c1979963799481e94a" id="r_af63b64703dcc82c1979963799481e94a"><td class="memTemplParams" colspan="2">template&lt;typename Compare&gt; </td></tr>
+<tr class="memitem:af63b64703dcc82c1979963799481e94a template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af63b64703dcc82c1979963799481e94a">sort</a> (Compare comp)</td></tr>
+<tr class="memitem:a2897d6e124cc3625a301ae44ca2ba2ec" id="r_a2897d6e124cc3625a301ae44ca2ba2ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2897d6e124cc3625a301ae44ca2ba2ec">sort</a> ()</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a5fee2d85427ca2e3a04b6ced8fc5170e" id="r_a5fee2d85427ca2e3a04b6ced8fc5170e"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5fee2d85427ca2e3a04b6ced8fc5170e">operator new</a> (size_t <a class="el" href="#a75a81afbadd6ca959d6eb3cea18778a2">size</a>)</td></tr>
+<tr class="memdesc:a5fee2d85427ca2e3a04b6ced8fc5170e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded new operator  <br /></td></tr>
+<tr class="memitem:a63a6086bde1f35e8cd5f40c3e45274f2" id="r_a63a6086bde1f35e8cd5f40c3e45274f2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63a6086bde1f35e8cd5f40c3e45274f2">operator delete</a> (void *ptr) noexcept</td></tr>
+<tr class="memdesc:a63a6086bde1f35e8cd5f40c3e45274f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded delete operator  <br /></td></tr>
+<tr class="memitem:ae94b6e188aa96fdad70f454496f7c5be" id="r_ae94b6e188aa96fdad70f454496f7c5be"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae94b6e188aa96fdad70f454496f7c5be">operator new[]</a> (size_t <a class="el" href="#a75a81afbadd6ca959d6eb3cea18778a2">size</a>)</td></tr>
+<tr class="memdesc:ae94b6e188aa96fdad70f454496f7c5be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded new[] operator  <br /></td></tr>
+<tr class="memitem:a81202ea0922b942beb5906c19918a0ed" id="r_a81202ea0922b942beb5906c19918a0ed"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81202ea0922b942beb5906c19918a0ed">operator delete[]</a> (void *ptr) noexcept</td></tr>
+<tr class="memdesc:a81202ea0922b942beb5906c19918a0ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded delete[] operator  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p><a class="el" href="classhku_1_1_indicator_imp_buffer.html" title="IndicatorImpBuffer class, it fully customizes the memory management and is compatible with malloc and...">IndicatorImpBuffer</a> class, it fully customizes the memory management and is compatible with malloc and mi_malloc; it provides a std::vector-like interface to the outside </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="ab2875f4e094e835ef0f5487f67bf25c3" name="ab2875f4e094e835ef0f5487f67bf25c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2875f4e094e835ef0f5487f67bf25c3">&#9670;&#160;</a></span>const_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a>* <a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">hku::IndicatorImpBuffer::const_iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a180411bd562abcc52536408ec1a18635" name="a180411bd562abcc52536408ec1a18635"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a180411bd562abcc52536408ec1a18635">&#9670;&#160;</a></span>const_pointer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a>* <a class="el" href="#a180411bd562abcc52536408ec1a18635">hku::IndicatorImpBuffer::const_pointer</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7fa911d9f8d706499d1e4f1b1d4cfd3a" name="a7fa911d9f8d706499d1e4f1b1d4cfd3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">&#9670;&#160;</a></span>const_reference</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a>&amp; <a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">hku::IndicatorImpBuffer::const_reference</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a61c7c334bcdf29648fe5ef2d3ddff85b" name="a61c7c334bcdf29648fe5ef2d3ddff85b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61c7c334bcdf29648fe5ef2d3ddff85b">&#9670;&#160;</a></span>const_reverse_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::reverse_iterator&lt;<a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a>&gt; <a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">hku::IndicatorImpBuffer::const_reverse_iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2bb2851cf08ab66d20e65f8e480e88e9" name="a2bb2851cf08ab66d20e65f8e480e88e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bb2851cf08ab66d20e65f8e480e88e9">&#9670;&#160;</a></span>difference_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef ptrdiff_t <a class="el" href="#a2bb2851cf08ab66d20e65f8e480e88e9">hku::IndicatorImpBuffer::difference_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ade0f860a563f0296a38adf215ddd3e8b" name="ade0f860a563f0296a38adf215ddd3e8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade0f860a563f0296a38adf215ddd3e8b">&#9670;&#160;</a></span>iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a>* <a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">hku::IndicatorImpBuffer::iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a85c4ec3204ede8c25ac6688df1bb44ec" name="a85c4ec3204ede8c25ac6688df1bb44ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85c4ec3204ede8c25ac6688df1bb44ec">&#9670;&#160;</a></span>pointer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a>* <a class="el" href="#a85c4ec3204ede8c25ac6688df1bb44ec">hku::IndicatorImpBuffer::pointer</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a877946356dd55c49e004012e0e832d0c" name="a877946356dd55c49e004012e0e832d0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a877946356dd55c49e004012e0e832d0c">&#9670;&#160;</a></span>reference</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a>&amp; <a class="el" href="#a877946356dd55c49e004012e0e832d0c">hku::IndicatorImpBuffer::reference</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3b2168aa9b4008d285d8af2d39a31f2" name="ae3b2168aa9b4008d285d8af2d39a31f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3b2168aa9b4008d285d8af2d39a31f2">&#9670;&#160;</a></span>reverse_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::reverse_iterator&lt;<a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a>&gt; <a class="el" href="#ae3b2168aa9b4008d285d8af2d39a31f2">hku::IndicatorImpBuffer::reverse_iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a131f1da7e090e43051ea75e9da36e055" name="a131f1da7e090e43051ea75e9da36e055"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a131f1da7e090e43051ea75e9da36e055">&#9670;&#160;</a></span>size_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef size_t <a class="el" href="#a131f1da7e090e43051ea75e9da36e055">hku::IndicatorImpBuffer::size_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a705bae14852e89a7e891c099f5d7a35f" name="a705bae14852e89a7e891c099f5d7a35f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a705bae14852e89a7e891c099f5d7a35f">&#9670;&#160;</a></span>value_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef double <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">hku::IndicatorImpBuffer::value_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a747568ab951c32a057d33c0ca2994af3" name="a747568ab951c32a057d33c0ca2994af3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a747568ab951c32a057d33c0ca2994af3">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default constructor </p>
+
+</div>
+</div>
+<a id="a6a8b23c9274d26465dd0748e76d5f83e" name="a6a8b23c9274d26465dd0748e76d5f83e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a8b23c9274d26465dd0748e76d5f83e">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor with the given capacity </p>
+
+</div>
+</div>
+<a id="a94369754a4e570442025450e09ef123c" name="a94369754a4e570442025450e09ef123c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94369754a4e570442025450e09ef123c">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor with an initial value </p>
+
+</div>
+</div>
+<a id="a74d37c213de38bb2d58735d0ae1cd740" name="a74d37c213de38bb2d58735d0ae1cd740"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74d37c213de38bb2d58735d0ae1cd740">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy constructor </p>
+
+</div>
+</div>
+<a id="a12f0335e61cc8f19c36be139d8f8212c" name="a12f0335e61cc8f19c36be139d8f8212c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12f0335e61cc8f19c36be139d8f8212c">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Move constructor </p>
+
+</div>
+</div>
+<a id="affc5f1c430f85878e9ee1eb2fddd3faf" name="affc5f1c430f85878e9ee1eb2fddd3faf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affc5f1c430f85878e9ee1eb2fddd3faf">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename InputIterator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramtype">InputIterator</td>          <td class="paramname"><span class="paramname"><em>first</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">InputIterator</td>          <td class="paramname"><span class="paramname"><em>last</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct from an iterator range </p>
+
+</div>
+</div>
+<a id="aa32f1833a5606464d1a04147cbc05772" name="aa32f1833a5606464d1a04147cbc05772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa32f1833a5606464d1a04147cbc05772">&#9670;&#160;</a></span>IndicatorImpBuffer() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &gt;</td>          <td class="paramname"><span class="paramname"><em>init_list</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initializer list constructor </p>
+
+</div>
+</div>
+<a id="a4c46f03c2c2fb4b28896ffdfab727810" name="a4c46f03c2c2fb4b28896ffdfab727810"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c46f03c2c2fb4b28896ffdfab727810">&#9670;&#160;</a></span>~IndicatorImpBuffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::IndicatorImpBuffer::~IndicatorImpBuffer </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ae21d047a38f394533ef66d70f7a951b8" name="ae21d047a38f394533ef66d70f7a951b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae21d047a38f394533ef66d70f7a951b8">&#9670;&#160;</a></span>at() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a> hku::IndicatorImpBuffer::at </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a22ec111106d8de968d991070d8080ad7" name="a22ec111106d8de968d991070d8080ad7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22ec111106d8de968d991070d8080ad7">&#9670;&#160;</a></span>at() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a> hku::IndicatorImpBuffer::at </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaaddacd34deb8073c4b4fa5b996b8519" name="aaaddacd34deb8073c4b4fa5b996b8519"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaddacd34deb8073c4b4fa5b996b8519">&#9670;&#160;</a></span>back() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a> hku::IndicatorImpBuffer::back </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6dafd6bb1f06d556485f4a1ff0804e4f" name="a6dafd6bb1f06d556485f4a1ff0804e4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dafd6bb1f06d556485f4a1ff0804e4f">&#9670;&#160;</a></span>back() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a> hku::IndicatorImpBuffer::back </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a225a105449fdac676dc7b4a378255d2c" name="a225a105449fdac676dc7b4a378255d2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a225a105449fdac676dc7b4a378255d2c">&#9670;&#160;</a></span>begin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> hku::IndicatorImpBuffer::begin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0b3712ea14aa5193ae5505c2ef062170" name="a0b3712ea14aa5193ae5505c2ef062170"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b3712ea14aa5193ae5505c2ef062170">&#9670;&#160;</a></span>begin() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::begin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad39673e56ebc1d3093979d94be87940d" name="ad39673e56ebc1d3093979d94be87940d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad39673e56ebc1d3093979d94be87940d">&#9670;&#160;</a></span>capacity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> hku::IndicatorImpBuffer::capacity </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a97f38d83e73ee2630c261350fee2b27f" name="a97f38d83e73ee2630c261350fee2b27f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97f38d83e73ee2630c261350fee2b27f">&#9670;&#160;</a></span>cbegin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> hku::IndicatorImpBuffer::cbegin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad2b378e4636d9f3917a898967c37e390" name="ad2b378e4636d9f3917a898967c37e390"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2b378e4636d9f3917a898967c37e390">&#9670;&#160;</a></span>cend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> hku::IndicatorImpBuffer::cend </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6265483f6e829b5010d1223737f58480" name="a6265483f6e829b5010d1223737f58480"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6265483f6e829b5010d1223737f58480">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a84ca51aa98e1092d5e6e568ddf671bcf" name="a84ca51aa98e1092d5e6e568ddf671bcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84ca51aa98e1092d5e6e568ddf671bcf">&#9670;&#160;</a></span>crbegin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a> hku::IndicatorImpBuffer::crbegin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6a4229aff00ede7c977244d70e02aeaa" name="a6a4229aff00ede7c977244d70e02aeaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a4229aff00ede7c977244d70e02aeaa">&#9670;&#160;</a></span>crend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a> hku::IndicatorImpBuffer::crend </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1feaa4411f664e8d88ffb445b929f805" name="a1feaa4411f664e8d88ffb445b929f805"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1feaa4411f664e8d88ffb445b929f805">&#9670;&#160;</a></span>data() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a180411bd562abcc52536408ec1a18635">const_pointer</a> hku::IndicatorImpBuffer::data </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a591da54b3f9b4b4dccbbd233ac3359ff" name="a591da54b3f9b4b4dccbbd233ac3359ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a591da54b3f9b4b4dccbbd233ac3359ff">&#9670;&#160;</a></span>data() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a85c4ec3204ede8c25ac6688df1bb44ec">pointer</a> hku::IndicatorImpBuffer::data </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae6defa4429927ec2e295af766f1e460c" name="ae6defa4429927ec2e295af766f1e460c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6defa4429927ec2e295af766f1e460c">&#9670;&#160;</a></span>emplace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::emplace </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Args &amp;&amp;...</td>          <td class="paramname"><span class="paramname"><em>args</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aeb4337d08475421f0fc77bea5d1f641c" name="aeb4337d08475421f0fc77bea5d1f641c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb4337d08475421f0fc77bea5d1f641c">&#9670;&#160;</a></span>emplace_back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a> hku::IndicatorImpBuffer::emplace_back </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...</td>          <td class="paramname"><span class="paramname"><em>args</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af72a1cc5d4632fae518c13776baef2ca" name="af72a1cc5d4632fae518c13776baef2ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af72a1cc5d4632fae518c13776baef2ca">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::IndicatorImpBuffer::empty </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4323de551ae368acd7b1a9b6f6a10485" name="a4323de551ae368acd7b1a9b6f6a10485"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4323de551ae368acd7b1a9b6f6a10485">&#9670;&#160;</a></span>end() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a> hku::IndicatorImpBuffer::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af5e799e14719c5127a51f85408a60c19" name="af5e799e14719c5127a51f85408a60c19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5e799e14719c5127a51f85408a60c19">&#9670;&#160;</a></span>end() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac7ebe1e391d79374bb0468779d88d4d2" name="ac7ebe1e391d79374bb0468779d88d4d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7ebe1e391d79374bb0468779d88d4d2">&#9670;&#160;</a></span>erase() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::erase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>first</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>last</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6eafbb34bac62c15191be17f0b5e62f0" name="a6eafbb34bac62c15191be17f0b5e62f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6eafbb34bac62c15191be17f0b5e62f0">&#9670;&#160;</a></span>erase() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::erase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa5340b51f7aba36fad707343918fbbf4" name="aa5340b51f7aba36fad707343918fbbf4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5340b51f7aba36fad707343918fbbf4">&#9670;&#160;</a></span>erase_if()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename UnaryPredicate&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::erase_if </td>
+          <td>(</td>
+          <td class="paramtype">UnaryPredicate</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a009cf5782662f7838559db8956e85dc1" name="a009cf5782662f7838559db8956e85dc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a009cf5782662f7838559db8956e85dc1">&#9670;&#160;</a></span>front() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a> hku::IndicatorImpBuffer::front </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af95453b768e9b7ae42622fa718058098" name="af95453b768e9b7ae42622fa718058098"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af95453b768e9b7ae42622fa718058098">&#9670;&#160;</a></span>front() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a> hku::IndicatorImpBuffer::front </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aab47a8b043898d2ec264a9e934dd1527" name="aab47a8b043898d2ec264a9e934dd1527"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab47a8b043898d2ec264a9e934dd1527">&#9670;&#160;</a></span>insert() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::insert </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af1283e6ed815c18e1efa8892c6a56c4e" name="af1283e6ed815c18e1efa8892c6a56c4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1283e6ed815c18e1efa8892c6a56c4e">&#9670;&#160;</a></span>insert() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class InputIt&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::insert </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">InputIt</td>          <td class="paramname"><span class="paramname"><em>first</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">InputIt</td>          <td class="paramname"><span class="paramname"><em>last</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6af371b963409362639aee2f0d065191" name="a6af371b963409362639aee2f0d065191"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6af371b963409362639aee2f0d065191">&#9670;&#160;</a></span>insert() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::insert </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acebdf74cf86161f39e1a747868da84a0" name="acebdf74cf86161f39e1a747868da84a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acebdf74cf86161f39e1a747868da84a0">&#9670;&#160;</a></span>insert() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ade0f860a563f0296a38adf215ddd3e8b">iterator</a> hku::IndicatorImpBuffer::insert </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ab2875f4e094e835ef0f5487f67bf25c3">const_iterator</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6104a6e58e0845fa8f6616551f6ab14a" name="a6104a6e58e0845fa8f6616551f6ab14a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6104a6e58e0845fa8f6616551f6ab14a">&#9670;&#160;</a></span>max_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> hku::IndicatorImpBuffer::max_size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a63a6086bde1f35e8cd5f40c3e45274f2" name="a63a6086bde1f35e8cd5f40c3e45274f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63a6086bde1f35e8cd5f40c3e45274f2">&#9670;&#160;</a></span>operator delete()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::operator delete </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>ptr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded delete operator </p>
+
+</div>
+</div>
+<a id="a81202ea0922b942beb5906c19918a0ed" name="a81202ea0922b942beb5906c19918a0ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81202ea0922b942beb5906c19918a0ed">&#9670;&#160;</a></span>operator delete[]()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::operator delete[] </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>ptr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded delete[] operator </p>
+
+</div>
+</div>
+<a id="a5fee2d85427ca2e3a04b6ced8fc5170e" name="a5fee2d85427ca2e3a04b6ced8fc5170e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fee2d85427ca2e3a04b6ced8fc5170e">&#9670;&#160;</a></span>operator new()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * hku::IndicatorImpBuffer::operator new </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>size</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded new operator </p>
+
+</div>
+</div>
+<a id="ae94b6e188aa96fdad70f454496f7c5be" name="ae94b6e188aa96fdad70f454496f7c5be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae94b6e188aa96fdad70f454496f7c5be">&#9670;&#160;</a></span>operator new[]()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * hku::IndicatorImpBuffer::operator new[] </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>size</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded new[] operator </p>
+
+</div>
+</div>
+<a id="a5db0fb668b57636140af6118e5f74e2b" name="a5db0fb668b57636140af6118e5f74e2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5db0fb668b57636140af6118e5f74e2b">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp; hku::IndicatorImpBuffer::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assignment operator </p>
+
+</div>
+</div>
+<a id="a2e3454db006314e36029b71778b6ef75" name="a2e3454db006314e36029b71778b6ef75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e3454db006314e36029b71778b6ef75">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp; hku::IndicatorImpBuffer::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Move assignment operator </p>
+
+</div>
+</div>
+<a id="a642e871abd75893d9fc5a1fac97b64bd" name="a642e871abd75893d9fc5a1fac97b64bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a642e871abd75893d9fc5a1fac97b64bd">&#9670;&#160;</a></span>operator[]() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a877946356dd55c49e004012e0e832d0c">reference</a> hku::IndicatorImpBuffer::operator[] </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20fda431ed82e5ba2a253eb29015da9e" name="a20fda431ed82e5ba2a253eb29015da9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20fda431ed82e5ba2a253eb29015da9e">&#9670;&#160;</a></span>operator[]() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a7fa911d9f8d706499d1e4f1b1d4cfd3a">const_reference</a> hku::IndicatorImpBuffer::operator[] </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>pos</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab4e0b5643bd57a7a75b98cd2276edce2" name="ab4e0b5643bd57a7a75b98cd2276edce2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4e0b5643bd57a7a75b98cd2276edce2">&#9670;&#160;</a></span>pop_back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::pop_back </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0f2e666d507c45d494555fa0ab7a0441" name="a0f2e666d507c45d494555fa0ab7a0441"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f2e666d507c45d494555fa0ab7a0441">&#9670;&#160;</a></span>push_back() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::push_back </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a654074c685b8010b86328c4d9a798b58" name="a654074c685b8010b86328c4d9a798b58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a654074c685b8010b86328c4d9a798b58">&#9670;&#160;</a></span>push_back() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::push_back </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7bdf81d5352630977a585f5e4f0f99cf" name="a7bdf81d5352630977a585f5e4f0f99cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bdf81d5352630977a585f5e4f0f99cf">&#9670;&#160;</a></span>rbegin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a> hku::IndicatorImpBuffer::rbegin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af3369ab34c187fae988ab2bd0e6c5a64" name="af3369ab34c187fae988ab2bd0e6c5a64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3369ab34c187fae988ab2bd0e6c5a64">&#9670;&#160;</a></span>rbegin() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ae3b2168aa9b4008d285d8af2d39a31f2">reverse_iterator</a> hku::IndicatorImpBuffer::rbegin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7929fdf0dbfe6dd7b8518cac279b60ef" name="a7929fdf0dbfe6dd7b8518cac279b60ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7929fdf0dbfe6dd7b8518cac279b60ef">&#9670;&#160;</a></span>rend() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a61c7c334bcdf29648fe5ef2d3ddff85b">const_reverse_iterator</a> hku::IndicatorImpBuffer::rend </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a15b5a7827c1091514bef919445b0e346" name="a15b5a7827c1091514bef919445b0e346"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15b5a7827c1091514bef919445b0e346">&#9670;&#160;</a></span>rend() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ae3b2168aa9b4008d285d8af2d39a31f2">reverse_iterator</a> hku::IndicatorImpBuffer::rend </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae71481b96aa7d61f9885af17322695c1" name="ae71481b96aa7d61f9885af17322695c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae71481b96aa7d61f9885af17322695c1">&#9670;&#160;</a></span>reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>new_cap</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a37962771a041f67aeebb1ca01b7b39cd" name="a37962771a041f67aeebb1ca01b7b39cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37962771a041f67aeebb1ca01b7b39cd">&#9670;&#160;</a></span>resize() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::resize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a69dd9e50e7f3aff62fa50c0d50b7fcfa" name="a69dd9e50e7f3aff62fa50c0d50b7fcfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69dd9e50e7f3aff62fa50c0d50b7fcfa">&#9670;&#160;</a></span>resize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::resize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a705bae14852e89a7e891c099f5d7a35f">value_type</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a42432dc5475be787b852de28eda2616d" name="a42432dc5475be787b852de28eda2616d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42432dc5475be787b852de28eda2616d">&#9670;&#160;</a></span>shrink_to_fit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::shrink_to_fit </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a75a81afbadd6ca959d6eb3cea18778a2" name="a75a81afbadd6ca959d6eb3cea18778a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75a81afbadd6ca959d6eb3cea18778a2">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a131f1da7e090e43051ea75e9da36e055">size_type</a> hku::IndicatorImpBuffer::size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2897d6e124cc3625a301ae44ca2ba2ec" name="a2897d6e124cc3625a301ae44ca2ba2ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2897d6e124cc3625a301ae44ca2ba2ec">&#9670;&#160;</a></span>sort() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::sort </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af63b64703dcc82c1979963799481e94a" name="af63b64703dcc82c1979963799481e94a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af63b64703dcc82c1979963799481e94a">&#9670;&#160;</a></span>sort() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Compare&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::sort </td>
+          <td>(</td>
+          <td class="paramtype">Compare</td>          <td class="paramname"><span class="paramname"><em>comp</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa1b8381cf09a8868d2afd18f76acd1d3" name="aa1b8381cf09a8868d2afd18f76acd1d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1b8381cf09a8868d2afd18f76acd1d3">&#9670;&#160;</a></span>swap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::IndicatorImpBuffer::swap </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/indicator/<a class="el" href="_indicator_imp_buffer_8h_source.html">IndicatorImpBuffer.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_indicator_imp_buffer.html">IndicatorImpBuffer</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

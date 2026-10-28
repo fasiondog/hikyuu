@@ -1,0 +1,606 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: /Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_2_users_2fasiondog_2workspace_2hikyuu_2hikyuu_cpp_2hikyuu_2utilities_2http_client_2_asio_http_client_8h-example.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/utilities/http_client/AsioHttpClient.h</div></div>
+</div><!--header-->
+<div class="contents">
+<p>Get the executor of the io_context</p>
+<p>Get the executor of the io_contextIt is used to start a custom coroutine or an asynchronous operation on the io_context managed by AsioHttpClient. It follows the executor exposure convention and does not expose the internal implementation details.</p>
+<dl class="section return"><dt>返回</dt><dd>net::any_io_executor the executor of the io_context</dd></dl>
+<div class="fragment"><div class="line"><span class="comment">// Execute a custom task in the event loop of the client</span></div>
+<div class="line">co_spawn(client.get_executor(), []() -&gt; net::awaitable&lt;void&gt; {</div>
+<div class="line">    co_await some_async_operation();</div>
+<div class="line">}, net::detached);</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">/*</span></div>
+<div class="line"><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><span class="comment"> *</span></div>
+<div class="line"><span class="comment"> *  Created on: 2026-03-15</span></div>
+<div class="line"><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><span class="comment"> */</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#pragma once</span></div>
+<div class="line"><span class="preprocessor">#ifndef HKU_UTILS_ASIO_HTTP_CLIENT_H</span></div>
+<div class="line"><span class="preprocessor">#define HKU_UTILS_ASIO_HTTP_CLIENT_H</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/config.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#if !HKU_ENABLE_HTTP_CLIENT</span></div>
+<div class="line"><span class="preprocessor">#error &quot;Don&#39;t enable http client, please config with --http_client=y&quot;</span></div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;boost/beast.hpp&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/net.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/Log.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/Parameter.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;HttpException.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;hikyuu/utilities/ResourceAsioPool.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#ifndef HKU_UTILS_API</span></div>
+<div class="line"><span class="preprocessor">#define HKU_UTILS_API</span></div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using </span><a id="a0" name="a0"></a><a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">json</a> = nlohmann::json;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">namespace </span>beast = boost::beast;</div>
+<div class="line"><span class="keyword">namespace </span>http = beast::http;</div>
+<div class="line"><span class="keyword">using </span><a id="a1" name="a1"></a><a class="code hl_typedef" href="namespacehku.html#a9164905661426a2bd3b768687ee2d6df">tcp</a> = <a id="a2" name="a2"></a><a class="code hl_typedef" href="namespacehku_1_1net.html#a90d66dfcb2657674a379c11b30089e12">net::tcp</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using </span><a id="a3" name="a3"></a><a class="code hl_typedef" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a> = std::map&lt;std::string, std::string&gt;;</div>
+<div class="line"><span class="keyword">using </span><a id="a4" name="a4"></a><a class="code hl_typedef" href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">HttpParams</a> = std::map&lt;std::string, std::string&gt;;</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a id="a5" name="a5"></a><a class="code hl_function" href="namespacehku.html#a18d355c38670d1fe73336569e5a065af">validateHttpHeader</a>(<span class="keyword">const</span> std::string&amp; name, <span class="keyword">const</span> std::string&amp; value) {</div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> std::string token_special = <span class="stringliteral">&quot;!#$%&amp;&#39;*+-.^_`|~&quot;</span>;</div>
+<div class="line">    HKU_CHECK(!name.empty(), <span class="stringliteral">&quot;Empty http header name&quot;</span>);</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> c : name) {</div>
+<div class="line">        <span class="keywordtype">bool</span> is_token = (c &gt;= <span class="charliteral">&#39;a&#39;</span> &amp;&amp; c &lt;= <span class="charliteral">&#39;z&#39;</span>) || (c &gt;= <span class="charliteral">&#39;A&#39;</span> &amp;&amp; c &lt;= <span class="charliteral">&#39;Z&#39;</span>) ||</div>
+<div class="line">                        (c &gt;= <span class="charliteral">&#39;0&#39;</span> &amp;&amp; c &lt;= <span class="charliteral">&#39;9&#39;</span>) || token_special.find(c) != std::string::npos;</div>
+<div class="line">        HKU_CHECK(is_token, <span class="stringliteral">&quot;Invalid http header name: {}&quot;</span>, name);</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> c : value) {</div>
+<div class="line">        <span class="comment">// HTAB is the only allowed control character; CR/LF would inject headers</span></div>
+<div class="line">        HKU_CHECK(c == <span class="charliteral">&#39;\t&#39;</span> || c &gt;= <span class="charliteral">&#39; &#39;</span>, <span class="stringliteral">&quot;Control character in http header &#39;{}&#39;&quot;</span>, name);</div>
+<div class="line">        HKU_CHECK(c != 0x7f, <span class="stringliteral">&quot;Control character in http header &#39;{}&#39;&quot;</span>, name);</div>
+<div class="line">    }</div>
+<div class="line">}</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a id="a6" name="a6"></a><a class="code hl_function" href="namespacehku.html#ae1ecdf93f78ff3f7363a8d7b1f8391c3">validateHttpHeaders</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">HttpHeaders</a>&amp; headers) {</div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [name, value] : headers) {</div>
+<div class="line">        <a class="code hl_function" href="namespacehku.html#a18d355c38670d1fe73336569e5a065af">validateHttpHeader</a>(name, value);</div>
+<div class="line">    }</div>
+<div class="line">}</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">using </span><a id="a7" name="a7"></a><a class="code hl_typedef" href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">HttpChunkCallback</a> = std::function&lt;void(<span class="keyword">const</span> <span class="keywordtype">char</span>* data, <span class="keywordtype">size_t</span> size)&gt;;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">class </span>HKU_UTILS_API <a id="a8" name="a8"></a><a class="code hl_variable" href="namespacehku.html#a2799c9da95458b22fb9878c4b3a83dc5">AsioHttpClient</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Forward declaration of HttpConnection</span></div>
+<div class="line"><span class="keyword">struct </span>HttpConnection;</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">class </span>HKU_UTILS_API AsioHttpResponse final {</div>
+<div class="line">    <span class="keyword">friend</span> <span class="keyword">class </span>HKU_UTILS_API AsioHttpClient;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    AsioHttpResponse() = <span class="keywordflow">default</span>;</div>
+<div class="line">    ~AsioHttpResponse() = <span class="keywordflow">default</span>;</div>
+<div class="line"> </div>
+<div class="line">    AsioHttpResponse(<span class="keyword">const</span> AsioHttpResponse&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line">    AsioHttpResponse&amp; operator=(<span class="keyword">const</span> AsioHttpResponse&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"> </div>
+<div class="line">    AsioHttpResponse(AsioHttpResponse&amp;&amp; rhs);</div>
+<div class="line">    AsioHttpResponse&amp; operator=(AsioHttpResponse&amp;&amp; rhs) <span class="keyword">noexcept</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">const</span> std::string&amp; body() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_body;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <a class="code hl_typedef" href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">hku::json</a> json() <span class="keyword">const</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">int</span> status() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_status;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">const</span> std::string&amp; reason() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_reason;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::string getHeader(<span class="keyword">const</span> std::string&amp; key) <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keyword">auto</span> it = m_headers.find(key);</div>
+<div class="line">        <span class="keywordflow">return</span> it != m_headers.end() ? it-&gt;second : std::string();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> getContentLength() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keyword">auto</span> it = m_headers.find(<span class="stringliteral">&quot;Content-Length&quot;</span>);</div>
+<div class="line">        <span class="keywordflow">if</span> (it != m_headers.end() &amp;&amp; !it-&gt;second.empty()) {</div>
+<div class="line">            <span class="keywordflow">try</span> {</div>
+<div class="line">                <span class="keywordflow">return</span> std::stoull(it-&gt;second);</div>
+<div class="line">            } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                <span class="keywordflow">return</span> 0;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> 0;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keywordtype">int</span> m_status{0};</div>
+<div class="line">    std::string m_reason;</div>
+<div class="line">    std::string m_body;</div>
+<div class="line">    std::map&lt;std::string, std::string&gt; m_headers;</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">class </span>HKU_UTILS_API AsioHttpStreamResponse final {</div>
+<div class="line">    <span class="keyword">friend</span> <span class="keyword">class </span>HKU_UTILS_API AsioHttpClient;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    AsioHttpStreamResponse() = <span class="keywordflow">default</span>;</div>
+<div class="line">    ~AsioHttpStreamResponse() = <span class="keywordflow">default</span>;</div>
+<div class="line"> </div>
+<div class="line">    AsioHttpStreamResponse(<span class="keyword">const</span> AsioHttpStreamResponse&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line">    AsioHttpStreamResponse&amp; operator=(<span class="keyword">const</span> AsioHttpStreamResponse&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"> </div>
+<div class="line">    AsioHttpStreamResponse(AsioHttpStreamResponse&amp;&amp; rhs);</div>
+<div class="line">    AsioHttpStreamResponse&amp; operator=(AsioHttpStreamResponse&amp;&amp; rhs) <span class="keyword">noexcept</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">int</span> status() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_status;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">const</span> std::string&amp; reason() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_reason;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    std::string getHeader(<span class="keyword">const</span> std::string&amp; key) <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keyword">auto</span> it = m_headers.find(key);</div>
+<div class="line">        <span class="keywordflow">return</span> it != m_headers.end() ? it-&gt;second : std::string();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> getContentLength() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keyword">auto</span> it = m_headers.find(<span class="stringliteral">&quot;Content-Length&quot;</span>);</div>
+<div class="line">        <span class="keywordflow">if</span> (it != m_headers.end() &amp;&amp; !it-&gt;second.empty()) {</div>
+<div class="line">            <span class="keywordflow">try</span> {</div>
+<div class="line">                <span class="keywordflow">return</span> std::stoull(it-&gt;second);</div>
+<div class="line">            } <span class="keywordflow">catch</span> (...) {</div>
+<div class="line">                <span class="keywordflow">return</span> 0;</div>
+<div class="line">            }</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">return</span> 0;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> isChunked() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keyword">auto</span> it = m_headers.find(<span class="stringliteral">&quot;Transfer-Encoding&quot;</span>);</div>
+<div class="line">        <span class="keywordflow">return</span> it != m_headers.end() &amp;&amp; it-&gt;second == <span class="stringliteral">&quot;chunked&quot;</span>;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    uint64_t totalBytesRead() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_total_bytes_read;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keywordtype">int</span> m_status{0};</div>
+<div class="line">    std::string m_reason;</div>
+<div class="line">    std::map&lt;std::string, std::string&gt; m_headers;</div>
+<div class="line">    uint64_t m_total_bytes_read{0};</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_variable" href="namespacehku.html#a2799c9da95458b22fb9878c4b3a83dc5">AsioHttpClient</a> {</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    <span class="keyword">using </span>executor_type = boost::asio::any_io_executor;</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">constexpr</span> int32_t DEFAULT_TIMEOUT_MS = 30000;  <span class="comment">// 30 seconds</span></div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">constexpr</span> int32_t MAX_TIMEOUT_MS = 60000;  <span class="comment">// 60 seconds</span></div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> DEFAULT_MAX_RESPONSE_SIZE = 8 * 1024 * 1024;  <span class="comment">// 8 MB</span></div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> DEFAULT_MAX_HEADER_SIZE = 8 * 1024;  <span class="comment">// 8 KB</span></div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> AsioHttpClient(int32_t thread_count = 1, <span class="keywordtype">size_t</span> max_concurrency = 0);</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> AsioHttpClient(<span class="keyword">const</span> std::string&amp; url, int32_t timeout = DEFAULT_TIMEOUT_MS,</div>
+<div class="line">                            int32_t thread_count = 1, <span class="keywordtype">size_t</span> max_concurrency = 0);</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">explicit</span> AsioHttpClient(net::io_context&amp; ctx, <span class="keyword">const</span> std::string&amp; url,</div>
+<div class="line">                            int32_t timeout = DEFAULT_TIMEOUT_MS, <span class="keywordtype">size_t</span> max_concurrency = 0);</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">virtual</span> ~AsioHttpClient();</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// The copy operations are disabled</span></div>
+<div class="line">    AsioHttpClient(<span class="keyword">const</span> AsioHttpClient&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    AsioHttpClient&amp; operator=(<span class="keyword">const</span> AsioHttpClient&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// The move operations are disabled, because managing the lifetimes of the background threads</span></div>
+<div class="line">    <span class="comment">// and the io_context is unsafe</span></div>
+<div class="line">    AsioHttpClient(AsioHttpClient&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    AsioHttpClient&amp; operator=(AsioHttpClient&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">bool</span> valid() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> !m_url.empty();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keyword">const</span> std::string&amp; url() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_url;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setUrl(<span class="keyword">const</span> std::string&amp; url);</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setTimeout(int32_t ms);</div>
+<div class="line"></div>
+<div class="line">    int32_t getTimeout() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>int32_t<span class="keyword">&gt;</span>(m_timeout.count());</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setMaxResponseSize(<span class="keywordtype">size_t</span> bytes);</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> getMaxResponseSize() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_max_response_size;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setMaxHeaderSize(<span class="keywordtype">size_t</span> bytes);</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">size_t</span> getMaxHeaderSize() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_max_header_size;</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    executor_type get_executor() <span class="keyword">const</span> <span class="keyword">noexcept</span> {</div>
+<div class="line">        <span class="keywordflow">return</span> m_ctx-&gt;get_executor();</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setDefaultHeaders(std::map&lt;std::string, std::string&gt;&amp;&amp; headers) {</div>
+<div class="line">        validateHttpHeaders(headers);</div>
+<div class="line">        m_default_headers = std::move(headers);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setCaFile(<span class="keyword">const</span> std::string&amp; filename);</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">void</span> setDefaultHeaders(<span class="keyword">const</span> HttpHeaders&amp; headers) {</div>
+<div class="line">        validateHttpHeaders(headers);</div>
+<div class="line">        m_default_headers = headers;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// ==================== Asynchronous request methods ====================</span></div>
+<div class="line">    <span class="comment">// They return net::awaitable and need to be called with co_await in a coroutine</span></div>
+<div class="line">    <span class="comment">// The client must stay alive until the awaited request has finished, see the lifetime contract</span></div>
+<div class="line">    <span class="comment">// of the class documentation</span></div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_request(<span class="keyword">const</span> std::string&amp; method,</div>
+<div class="line">                                                   <span class="keyword">const</span> std::string&amp; path,</div>
+<div class="line">                                                   <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                                   <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body,</div>
+<div class="line">                                                   <span class="keywordtype">size_t</span> body_len,</div>
+<div class="line">                                                   <span class="keyword">const</span> std::string&amp; content_type);</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_get(<span class="keyword">const</span> std::string&amp; path,</div>
+<div class="line">                                               <span class="keyword">const</span> HttpHeaders&amp; headers = {}) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_request(<span class="stringliteral">&quot;GET&quot;</span>, path, {}, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_get(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                               <span class="keyword">const</span> HttpHeaders&amp; headers) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_request(<span class="stringliteral">&quot;GET&quot;</span>, path, params, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                                <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body,</div>
+<div class="line">                                                <span class="keywordtype">size_t</span> len, <span class="keyword">const</span> std::string&amp; content_type) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_request(<span class="stringliteral">&quot;POST&quot;</span>, path, params, headers, body, len, content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                                <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> len,</div>
+<div class="line">                                                <span class="keyword">const</span> std::string&amp; content_type) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_request(<span class="stringliteral">&quot;POST&quot;</span>, path, {}, headers, body, len, content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                                <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                                <span class="keyword">const</span> std::string&amp; content,</div>
+<div class="line">                                                <span class="keyword">const</span> std::string&amp; content_type = <span class="stringliteral">&quot;text/plain&quot;</span>) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_post(path, params, headers, content.data(), content.size(),</div>
+<div class="line">                                      content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                                <span class="keyword">const</span> std::string&amp; content,</div>
+<div class="line">                                                <span class="keyword">const</span> std::string&amp; content_type = <span class="stringliteral">&quot;text/plain&quot;</span>) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_post(path, {}, headers, content, content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                                <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> json&amp; body) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_post(path, params, headers, body.dump(), <span class="stringliteral">&quot;application/json&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                                <span class="keyword">const</span> json&amp; body) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_post(path, {}, headers, body);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpResponse&gt; async_post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> json&amp; body) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_post(path, {}, body);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpStreamResponse&gt; async_requestStream(</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; method, <span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">      <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> body_len,</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; content_type, <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback);</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpStreamResponse&gt; async_getStream(</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">      <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_requestStream(<span class="stringliteral">&quot;GET&quot;</span>, path, params, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>,</div>
+<div class="line">                                               chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpStreamResponse&gt; async_getStream(</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">      <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_requestStream(<span class="stringliteral">&quot;GET&quot;</span>, path, {}, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>,</div>
+<div class="line">                                               chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpStreamResponse&gt; async_postStream(</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">      <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> body_len, <span class="keyword">const</span> std::string&amp; content_type,</div>
+<div class="line">      <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_requestStream(<span class="stringliteral">&quot;POST&quot;</span>, path, params, headers, body, body_len,</div>
+<div class="line">                                               content_type, chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;AsioHttpStreamResponse&gt; async_postStream(</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> body_len,</div>
+<div class="line">      <span class="keyword">const</span> std::string&amp; content_type, <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keyword">co_return</span> <span class="keyword">co_await</span> async_requestStream(<span class="stringliteral">&quot;POST&quot;</span>, path, {}, headers, body, body_len,</div>
+<div class="line">                                               content_type, chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// ==================== Synchronous request methods ====================</span></div>
+<div class="line">    <span class="comment">// They block until the request is finished and use the asynchronous implementation internally</span></div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse request(<span class="keyword">const</span> std::string&amp; method, <span class="keyword">const</span> std::string&amp; path,</div>
+<div class="line">                             <span class="keyword">const</span> HttpParams&amp; params, <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body,</div>
+<div class="line">                             <span class="keywordtype">size_t</span> body_len, <span class="keyword">const</span> std::string&amp; content_type);</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse get(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers = {}) {</div>
+<div class="line">        <span class="keywordflow">return</span> request(<span class="stringliteral">&quot;GET&quot;</span>, path, {}, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse get(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                         <span class="keyword">const</span> HttpHeaders&amp; headers) {</div>
+<div class="line">        <span class="keywordflow">return</span> request(<span class="stringliteral">&quot;GET&quot;</span>, path, params, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                          <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> len,</div>
+<div class="line">                          <span class="keyword">const</span> std::string&amp; content_type) {</div>
+<div class="line">        <span class="keywordflow">return</span> request(<span class="stringliteral">&quot;POST&quot;</span>, path, params, headers, body, len, content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body,</div>
+<div class="line">                          <span class="keywordtype">size_t</span> len, <span class="keyword">const</span> std::string&amp; content_type) {</div>
+<div class="line">        <span class="keywordflow">return</span> request(<span class="stringliteral">&quot;POST&quot;</span>, path, {}, headers, body, len, content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                          <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> std::string&amp; content,</div>
+<div class="line">                          <span class="keyword">const</span> std::string&amp; content_type = <span class="stringliteral">&quot;text/plain&quot;</span>) {</div>
+<div class="line">        <span class="keywordflow">return</span> post(path, params, headers, content.data(), content.size(), content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                          <span class="keyword">const</span> std::string&amp; content,</div>
+<div class="line">                          <span class="keyword">const</span> std::string&amp; content_type = <span class="stringliteral">&quot;text/plain&quot;</span>) {</div>
+<div class="line">        <span class="keywordflow">return</span> post(path, {}, headers, content, content_type);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                          <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> json&amp; body) {</div>
+<div class="line">        <span class="keywordflow">return</span> post(path, params, headers, body.dump(), <span class="stringliteral">&quot;application/json&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> json&amp; body) {</div>
+<div class="line">        <span class="keywordflow">return</span> post(path, {}, headers, body);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpResponse post(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> json&amp; body) {</div>
+<div class="line">        <span class="keywordflow">return</span> post(path, {}, body);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpStreamResponse requestStream(<span class="keyword">const</span> std::string&amp; method, <span class="keyword">const</span> std::string&amp; path,</div>
+<div class="line">                                         <span class="keyword">const</span> HttpParams&amp; params, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                         <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> body_len,</div>
+<div class="line">                                         <span class="keyword">const</span> std::string&amp; content_type,</div>
+<div class="line">                                         <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback);</div>
+<div class="line"></div>
+<div class="line">    AsioHttpStreamResponse getStream(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                     <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                     <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keywordflow">return</span> requestStream(<span class="stringliteral">&quot;GET&quot;</span>, path, params, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>, chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpStreamResponse getStream(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                     <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keywordflow">return</span> requestStream(<span class="stringliteral">&quot;GET&quot;</span>, path, {}, headers, <span class="keyword">nullptr</span>, 0, <span class="stringliteral">&quot;&quot;</span>, chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpStreamResponse postStream(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params,</div>
+<div class="line">                                      <span class="keyword">const</span> HttpHeaders&amp; headers, <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> body_len,</div>
+<div class="line">                                      <span class="keyword">const</span> std::string&amp; content_type,</div>
+<div class="line">                                      <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keywordflow">return</span> requestStream(<span class="stringliteral">&quot;POST&quot;</span>, path, params, headers, body, body_len, content_type,</div>
+<div class="line">                             chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"></div>
+<div class="line">    AsioHttpStreamResponse postStream(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpHeaders&amp; headers,</div>
+<div class="line">                                      <span class="keyword">const</span> <span class="keywordtype">char</span>* body, <span class="keywordtype">size_t</span> body_len,</div>
+<div class="line">                                      <span class="keyword">const</span> std::string&amp; content_type,</div>
+<div class="line">                                      <span class="keyword">const</span> HttpChunkCallback&amp; chunk_callback) {</div>
+<div class="line">        <span class="keywordflow">return</span> requestStream(<span class="stringliteral">&quot;POST&quot;</span>, path, {}, headers, body, body_len, content_type,</div>
+<div class="line">                             chunk_callback);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keywordtype">void</span> _parseUrl() <span class="keyword">noexcept</span>;</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;std::vector&lt;tcp::endpoint&gt;&gt; _resolveDNS();</div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">struct </span>SocketVariant;</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;void&gt; _connect(SocketVariant&amp; socket_variant,</div>
+<div class="line">                                  <span class="keyword">const</span> std::vector&lt;tcp::endpoint&gt;&amp; dns_endpoints);</div>
+<div class="line"></div>
+<div class="line">    net::awaitable&lt;std::pair&lt;std::shared_ptr&lt;HttpConnection&gt;, <span class="keywordtype">bool</span>&gt;&gt; _getConnection();</div>
+<div class="line"></div>
+<div class="line">    std::string _buildURI(<span class="keyword">const</span> std::string&amp; path, <span class="keyword">const</span> HttpParams&amp; params);</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line"><span class="preprocessor">#if HKU_ENABLE_HTTP_CLIENT_SSL</span></div>
+<div class="line">    <span class="keyword">struct </span>SslContext;</div>
+<div class="line">    std::unique_ptr&lt;SslContext&gt; m_ssl_ctx;  <span class="comment">// SSL context (used when SSL is enabled only)</span></div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordtype">bool</span> m_is_valid_url{<span class="keyword">false</span>};  <span class="comment">// Whether the URL is valid</span></div>
+<div class="line">    <span class="keywordtype">bool</span> m_is_https{<span class="keyword">false</span>};      <span class="comment">// Whether the HTTPS protocol is used</span></div>
+<div class="line">    std::string m_url;           <span class="comment">// The complete URL</span></div>
+<div class="line">    std::string m_base_path;     <span class="comment">// The base path part of the URL</span></div>
+<div class="line">    std::string m_host;          <span class="comment">// Host name</span></div>
+<div class="line">    std::string m_host_header;   <span class="comment">// Host name in the form of the Host header</span></div>
+<div class="line">                                 <span class="comment">// (an IPv6 literal keeps its brackets and a non default port is</span></div>
+<div class="line">                                 <span class="comment">// appended)</span></div>
+<div class="line">    <span class="keywordtype">bool</span> m_host_is_ip{<span class="keyword">false</span>};    <span class="comment">// Whether the host is an IPv4 or IPv6 literal</span></div>
+<div class="line">    std::string m_port;          <span class="comment">// Port number</span></div>
+<div class="line">    std::chrono::milliseconds m_timeout{DEFAULT_TIMEOUT_MS};  <span class="comment">// Timeout</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_max_response_size{DEFAULT_MAX_RESPONSE_SIZE};    <span class="comment">// Maximum response body size</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> m_max_header_size{DEFAULT_MAX_HEADER_SIZE};        <span class="comment">// Maximum response header size</span></div>
+<div class="line">    std::map&lt;std::string, std::string&gt; m_default_headers;     <span class="comment">// Default request headers</span></div>
+<div class="line">    std::string m_ca_file;                                    <span class="comment">// Custom CA certificate file path</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Connection pool related members</span></div>
+<div class="line">    std::unique_ptr&lt;ResourceAsioVersionPool&lt;HttpConnection, std::mutex&gt;&gt; m_connection_pool;</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// io_context management</span></div>
+<div class="line">    std::shared_ptr&lt;net::io_context&gt; m_own_ctx;  <span class="comment">// Internal io_context</span></div>
+<div class="line">    net::io_context* m_ctx{<span class="keyword">nullptr</span>};             <span class="comment">// The io_context currently used</span></div>
+<div class="line">    std::vector&lt;std::thread&gt; m_worker_threads;   <span class="comment">// The thread pool running the io_context in the</span></div>
+<div class="line">                                                 <span class="comment">// background</span></div>
+<div class="line">    std::unique_ptr&lt;net::executor_work_guard&lt;net::io_context::executor_type&gt;&gt;</div>
+<div class="line">      m_work_guard;  <span class="comment">// Prevents the io_context from exiting when there is no task</span></div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line">}  <span class="comment">// namespace hku</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="anamespacehku_1_1net_html_a90d66dfcb2657674a379c11b30089e12"><div class="ttname"><a href="namespacehku_1_1net.html#a90d66dfcb2657674a379c11b30089e12">hku::net::tcp</a></div><div class="ttdeci">boost::asio::ip::tcp tcp</div><div class="ttdef"><b>定义</b> net.h:74</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a18d355c38670d1fe73336569e5a065af"><div class="ttname"><a href="namespacehku.html#a18d355c38670d1fe73336569e5a065af">hku::validateHttpHeader</a></div><div class="ttdeci">void validateHttpHeader(const std::string &amp;name, const std::string &amp;value)</div><div class="ttdoc">Check one request header: the name must be a token and the value must not carry CR/LF</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:45</div></div>
+<div class="ttc" id="anamespacehku_html_a2799c9da95458b22fb9878c4b3a83dc5"><div class="ttname"><a href="namespacehku.html#a2799c9da95458b22fb9878c4b3a83dc5">hku::AsioHttpClient</a></div><div class="ttdeci">class HKU_UTILS_API AsioHttpClient</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:83</div></div>
+<div class="ttc" id="anamespacehku_html_a384406f8f86e023533afe3d8502ecb79"><div class="ttname"><a href="namespacehku.html#a384406f8f86e023533afe3d8502ecb79">hku::HttpParams</a></div><div class="ttdeci">std::map&lt; std::string, std::string &gt; HttpParams</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:42</div></div>
+<div class="ttc" id="anamespacehku_html_a43e3cf04a4877236cc3c7b4567a457c1"><div class="ttname"><a href="namespacehku.html#a43e3cf04a4877236cc3c7b4567a457c1">hku::HttpHeaders</a></div><div class="ttdeci">std::map&lt; std::string, std::string &gt; HttpHeaders</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:41</div></div>
+<div class="ttc" id="anamespacehku_html_a9164905661426a2bd3b768687ee2d6df"><div class="ttname"><a href="namespacehku.html#a9164905661426a2bd3b768687ee2d6df">hku::tcp</a></div><div class="ttdeci">net::tcp tcp</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:39</div></div>
+<div class="ttc" id="anamespacehku_html_add33de391a0cdfa0f88190014659e92c"><div class="ttname"><a href="namespacehku.html#add33de391a0cdfa0f88190014659e92c">hku::HttpChunkCallback</a></div><div class="ttdeci">std::function&lt; void(const char *data, size_t size)&gt; HttpChunkCallback</div><div class="ttdoc">HTTP data chunk callback function type</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:81</div></div>
+<div class="ttc" id="anamespacehku_html_ae1ecdf93f78ff3f7363a8d7b1f8391c3"><div class="ttname"><a href="namespacehku.html#ae1ecdf93f78ff3f7363a8d7b1f8391c3">hku::validateHttpHeaders</a></div><div class="ttdeci">void validateHttpHeaders(const HttpHeaders &amp;headers)</div><div class="ttdoc">Validate every header before it is serialized into a request</div><div class="ttdef"><b>定义</b> AsioHttpClient.h:61</div></div>
+<div class="ttc" id="anamespacehku_html_ae9a514f1ae8310455075ca506de17757"><div class="ttname"><a href="namespacehku.html#ae9a514f1ae8310455075ca506de17757">hku::json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>定义</b> MomentResult.h:25</div></div>
+</div><!-- fragment --> </div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::AsyncSQLiteConnect类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_async_s_q_lite_connect.html','','classhku_1_1_async_s_q_lite_connect-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::AsyncSQLiteConnect类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___d_b_connect.html">DB Connect database connection</a> &raquo; <a class="el" href="group___s_q_lite.html">SQLite3 driver, the SQLITE3 data driver</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Asynchronous SQLite connection  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_async_s_q_lite_connect_8h_source.html">AsyncSQLiteConnect.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::AsyncSQLiteConnect 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_async_s_q_lite_connect__inherit__graph.png" border="0" usemap="#ahku_1_1_async_s_q_lite_connect_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::AsyncSQLiteConnect 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_async_s_q_lite_connect__coll__graph.png" border="0" usemap="#ahku_1_1_async_s_q_lite_connect_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a95155f196fb28dd264349a5fd9604a5d" id="r_a95155f196fb28dd264349a5fd9604a5d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95155f196fb28dd264349a5fd9604a5d">AsyncSQLiteConnect</a> (const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;param)</td></tr>
+<tr class="memitem:a7c11a5728883be76a09ab6863a37a02c" id="r_a7c11a5728883be76a09ab6863a37a02c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c11a5728883be76a09ab6863a37a02c">~AsyncSQLiteConnect</a> () override</td></tr>
+<tr class="memitem:afe405df7407d48aa8b02087572e5864e" id="r_afe405df7407d48aa8b02087572e5864e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe405df7407d48aa8b02087572e5864e">AsyncSQLiteConnect</a> (const <a class="el" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> &amp;)=delete</td></tr>
+<tr class="memitem:a4721fe7564888611d833ed1b11ce0e5a" id="r_a4721fe7564888611d833ed1b11ce0e5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4721fe7564888611d833ed1b11ce0e5a">operator=</a> (const <a class="el" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> &amp;)=delete</td></tr>
+<tr class="memitem:abd2cd9e1525d411d7a5a3dbd63896ee7" id="r_abd2cd9e1525d411d7a5a3dbd63896ee7"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd2cd9e1525d411d7a5a3dbd63896ee7">ping</a> () override</td></tr>
+<tr class="memdesc:abd2cd9e1525d411d7a5a3dbd63896ee7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ping operation, used to judge whether it is connected  <br /></td></tr>
+<tr class="memitem:a8ecf2d2986306d4401aaf3c2a7403bac" id="r_a8ecf2d2986306d4401aaf3c2a7403bac"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ecf2d2986306d4401aaf3c2a7403bac">exec</a> (const std::string &amp;sql_string) override</td></tr>
+<tr class="memdesc:a8ecf2d2986306d4401aaf3c2a7403bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the SQL without a result  <br /></td></tr>
+<tr class="memitem:aa6038affd5c8bb89957a22122b620c02" id="r_aa6038affd5c8bb89957a22122b620c02"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="group___d_b_connect.html#gab590184ccae3de49334642d167a28b78">AsyncSQLStatementPtr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa6038affd5c8bb89957a22122b620c02">getStatement</a> (const std::string &amp;sql_statement) override</td></tr>
+<tr class="memdesc:aa6038affd5c8bb89957a22122b620c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the AsyncSQLStatement  <br /></td></tr>
+<tr class="memitem:a93b5e92a4f9e17cd3d92ac2bec68f374" id="r_a93b5e92a4f9e17cd3d92ac2bec68f374"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93b5e92a4f9e17cd3d92ac2bec68f374">tableExist</a> (const std::string &amp;tablename) override</td></tr>
+<tr class="memdesc:a93b5e92a4f9e17cd3d92ac2bec68f374"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether the table exists  <br /></td></tr>
+<tr class="memitem:afcc75759fc6274a89c8ac2911800d684" id="r_afcc75759fc6274a89c8ac2911800d684"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afcc75759fc6274a89c8ac2911800d684">resetAutoIncrement</a> (const std::string &amp;tablename) override</td></tr>
+<tr class="memdesc:afcc75759fc6274a89c8ac2911800d684"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the id in the table with an auto-increment id to start from 1  <br /></td></tr>
+<tr class="memitem:a8eb617729f9b727189860c0815f06f07" id="r_a8eb617729f9b727189860c0815f06f07"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8eb617729f9b727189860c0815f06f07">transaction</a> () override</td></tr>
+<tr class="memdesc:a8eb617729f9b727189860c0815f06f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a transaction; an exception is thrown on failure  <br /></td></tr>
+<tr class="memitem:abcd3f4c020a57429637b6991541a6f35" id="r_abcd3f4c020a57429637b6991541a6f35"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abcd3f4c020a57429637b6991541a6f35">commit</a> () override</td></tr>
+<tr class="memdesc:abcd3f4c020a57429637b6991541a6f35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Commit the transaction; an exception is thrown on failure  <br /></td></tr>
+<tr class="memitem:afbe742bdd104c6bf0bbebeb0e263b058" id="r_afbe742bdd104c6bf0bbebeb0e263b058"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afbe742bdd104c6bf0bbebeb0e263b058">rollback</a> () noexcept override</td></tr>
+<tr class="memdesc:afbe742bdd104c6bf0bbebeb0e263b058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Roll back the transaction  <br /></td></tr>
+<tr class="memitem:aad15880802ce8909368006acfff3f2dd" id="r_aad15880802ce8909368006acfff3f2dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad15880802ce8909368006acfff3f2dd">check</a> (bool quick=false)</td></tr>
+<tr class="memdesc:aad15880802ce8909368006acfff3f2dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the database (the asynchronous version)  <br /></td></tr>
+<tr class="memitem:af1a149b154d2011149a817063b8e7b1e" id="r_af1a149b154d2011149a817063b8e7b1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1a149b154d2011149a817063b8e7b1e">backup</a> (const char *zFilename, int n_page=-1, int step_sleep=250)</td></tr>
+<tr class="memdesc:af1a149b154d2011149a817063b8e7b1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Back up the database online, without affecting the operations of the other database connections (the asynchronous version)  <br /></td></tr>
+<tr class="inherit_header pub_methods_classhku_1_1_async_d_b_connect_base"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classhku_1_1_async_d_b_connect_base')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classhku_1_1_async_d_b_connect_base.html">hku::AsyncDBConnectBase</a></td></tr>
+<tr class="memitem:a13aea238be55fd8640d047fb39ae44f0 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a13aea238be55fd8640d047fb39ae44f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a13aea238be55fd8640d047fb39ae44f0">AsyncDBConnectBase</a> (const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;param)</td></tr>
+<tr class="memdesc:a13aea238be55fd8640d047fb39ae44f0 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:aa1edf0634248dbdb97afa62d5b00dab2 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_aa1edf0634248dbdb97afa62d5b00dab2"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#aa1edf0634248dbdb97afa62d5b00dab2">~AsyncDBConnectBase</a> ()=default</td></tr>
+<tr class="memitem:a02ed5b5b20142ad91a8970fb44eb02df inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a02ed5b5b20142ad91a8970fb44eb02df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="group___d_b_connect.html#gab590184ccae3de49334642d167a28b78">AsyncSQLStatementPtr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a02ed5b5b20142ad91a8970fb44eb02df">getStatementWithParams</a> (const std::string &amp;sql_statement, const <a class="el" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> &amp;params)</td></tr>
+<tr class="memdesc:a02ed5b5b20142ad91a8970fb44eb02df inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a prepared statement with the values of a condition already bound  <br /></td></tr>
+<tr class="memitem:acdc0c013e6a01f7fc5c6a20bc52c7b66 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_acdc0c013e6a01f7fc5c6a20bc52c7b66"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:acdc0c013e6a01f7fc5c6a20bc52c7b66 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#acdc0c013e6a01f7fc5c6a20bc52c7b66">save</a> (T &amp;item, bool autotrans=true)</td></tr>
+<tr class="memdesc:acdc0c013e6a01f7fc5c6a20bc52c7b66 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save or update the table structure bound through TABLE_BIND  <br /></td></tr>
+<tr class="memitem:a3a1f79d27cf2bb97e00eb93bc85198f5 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a3a1f79d27cf2bb97e00eb93bc85198f5"><td class="memTemplParams" colspan="2">template&lt;class Container&gt; </td></tr>
+<tr class="memitem:a3a1f79d27cf2bb97e00eb93bc85198f5 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a3a1f79d27cf2bb97e00eb93bc85198f5">batchSave</a> (Container &amp;container, bool autotrans=true)</td></tr>
+<tr class="memdesc:a3a1f79d27cf2bb97e00eb93bc85198f5 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch saving  <br /></td></tr>
+<tr class="memitem:a3de9d4ba28a3255e3bd7bf73a95d088d inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a3de9d4ba28a3255e3bd7bf73a95d088d"><td class="memTemplParams" colspan="2">template&lt;class InputIterator&gt; </td></tr>
+<tr class="memitem:a3de9d4ba28a3255e3bd7bf73a95d088d inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a3de9d4ba28a3255e3bd7bf73a95d088d">batchSave</a> (InputIterator first, InputIterator last, bool autotrans=true)</td></tr>
+<tr class="memdesc:a3de9d4ba28a3255e3bd7bf73a95d088d inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch saving; the data in the iterators must be the table model bound through TABLE_BIND  <br /></td></tr>
+<tr class="memitem:a4f60efd6565a04980707e08a57edd3cc inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a4f60efd6565a04980707e08a57edd3cc"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a4f60efd6565a04980707e08a57edd3cc inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a4f60efd6565a04980707e08a57edd3cc">load</a> (T &amp;item, const std::string &amp;where=&quot;&quot;)</td></tr>
+<tr class="memdesc:a4f60efd6565a04980707e08a57edd3cc inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the model data into the given model instance  <br /></td></tr>
+<tr class="memitem:a8f69051553f875f54992bb53ed82a502 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a8f69051553f875f54992bb53ed82a502"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a8f69051553f875f54992bb53ed82a502 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a8f69051553f875f54992bb53ed82a502">load</a> (T &amp;item, const <a class="el" href="classhku_1_1_d_b_condition.html">DBCondition</a> &amp;cond)</td></tr>
+<tr class="memdesc:a8f69051553f875f54992bb53ed82a502 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the model data into the given model instance  <br /></td></tr>
+<tr class="memitem:a0548ebfa7656d993945e3fdb4ddbc5b4 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a0548ebfa7656d993945e3fdb4ddbc5b4"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a0548ebfa7656d993945e3fdb4ddbc5b4 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a0548ebfa7656d993945e3fdb4ddbc5b4">loadView</a> (T &amp;item, const std::string &amp;sql)</td></tr>
+<tr class="memdesc:a0548ebfa7656d993945e3fdb4ddbc5b4 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the model data into the given model instance, for the query only  <br /></td></tr>
+<tr class="memitem:a0153362c2ce504702f364e2187f2f8f3 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a0153362c2ce504702f364e2187f2f8f3"><td class="memTemplParams" colspan="2">template&lt;typename Container&gt; </td></tr>
+<tr class="memitem:a0153362c2ce504702f364e2187f2f8f3 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a0153362c2ce504702f364e2187f2f8f3">batchLoad</a> (Container &amp;container, const std::string &amp;where=&quot;&quot;)</td></tr>
+<tr class="memdesc:a0153362c2ce504702f364e2187f2f8f3 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch load the model data into a container  <br /></td></tr>
+<tr class="memitem:a58bf373b9eb4441f5bb8ba4d88a63117 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a58bf373b9eb4441f5bb8ba4d88a63117"><td class="memTemplParams" colspan="2">template&lt;typename Container&gt; </td></tr>
+<tr class="memitem:a58bf373b9eb4441f5bb8ba4d88a63117 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a58bf373b9eb4441f5bb8ba4d88a63117">batchLoad</a> (Container &amp;container, const <a class="el" href="classhku_1_1_d_b_condition.html">DBCondition</a> &amp;cond)</td></tr>
+<tr class="memdesc:a58bf373b9eb4441f5bb8ba4d88a63117 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch load the model data into a container  <br /></td></tr>
+<tr class="memitem:a0b0da2eb4dd67175dda6d483309c123d inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a0b0da2eb4dd67175dda6d483309c123d"><td class="memTemplParams" colspan="2">template&lt;typename Container&gt; </td></tr>
+<tr class="memitem:a0b0da2eb4dd67175dda6d483309c123d inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a0b0da2eb4dd67175dda6d483309c123d">batchLoadView</a> (Container &amp;container, const std::string &amp;sql)</td></tr>
+<tr class="memdesc:a0b0da2eb4dd67175dda6d483309c123d inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch load the model data into a container  <br /></td></tr>
+<tr class="memitem:a1df265f71a59419afd0857988d354d64 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a1df265f71a59419afd0857988d354d64"><td class="memTemplParams" colspan="2">template&lt;class Container&gt; </td></tr>
+<tr class="memitem:a1df265f71a59419afd0857988d354d64 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a1df265f71a59419afd0857988d354d64">batchUpdate</a> (Container &amp;container, bool autotrans=true)</td></tr>
+<tr class="memdesc:a1df265f71a59419afd0857988d354d64 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch updating  <br /></td></tr>
+<tr class="memitem:ad5f058347416679a6fb8714f93931b4e inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_ad5f058347416679a6fb8714f93931b4e"><td class="memTemplParams" colspan="2">template&lt;class InputIterator&gt; </td></tr>
+<tr class="memitem:ad5f058347416679a6fb8714f93931b4e inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#ad5f058347416679a6fb8714f93931b4e">batchUpdate</a> (InputIterator first, InputIterator last, bool autotrans=true)</td></tr>
+<tr class="memdesc:ad5f058347416679a6fb8714f93931b4e inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch updating  <br /></td></tr>
+<tr class="memitem:af916311ce5e1a3a65434b7ab85528be4 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_af916311ce5e1a3a65434b7ab85528be4"><td class="memTemplParams" colspan="2">template&lt;class Container&gt; </td></tr>
+<tr class="memitem:af916311ce5e1a3a65434b7ab85528be4 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#af916311ce5e1a3a65434b7ab85528be4">batchSaveOrUpdate</a> (Container &amp;container, bool autotrans=true)</td></tr>
+<tr class="memdesc:af916311ce5e1a3a65434b7ab85528be4 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch saving or updating  <br /></td></tr>
+<tr class="memitem:ad70626dfdeb9f9662adcf2d8aa0a09bf inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_ad70626dfdeb9f9662adcf2d8aa0a09bf"><td class="memTemplParams" colspan="2">template&lt;class InputIterator&gt; </td></tr>
+<tr class="memitem:ad70626dfdeb9f9662adcf2d8aa0a09bf inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#ad70626dfdeb9f9662adcf2d8aa0a09bf">batchSaveOrUpdate</a> (InputIterator first, InputIterator last, bool autotrans=true)</td></tr>
+<tr class="memdesc:ad70626dfdeb9f9662adcf2d8aa0a09bf inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch saving or updating  <br /></td></tr>
+<tr class="memitem:a954a1fa7eb888c44be7d1c5c2df66dfd inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a954a1fa7eb888c44be7d1c5c2df66dfd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a954a1fa7eb888c44be7d1c5c2df66dfd">remove</a> (const std::string &amp;tablename, const std::string &amp;where, bool autotrans=true)</td></tr>
+<tr class="memdesc:a954a1fa7eb888c44be7d1c5c2df66dfd inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the data satisfying the condition from the given table  <br /></td></tr>
+<tr class="memitem:adc307d8b5791252333da551022d8ce3f inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_adc307d8b5791252333da551022d8ce3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#adc307d8b5791252333da551022d8ce3f">remove</a> (const std::string &amp;tablename, const <a class="el" href="classhku_1_1_d_b_condition.html">DBCondition</a> &amp;cond, bool autotrans=true)</td></tr>
+<tr class="memdesc:adc307d8b5791252333da551022d8ce3f inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the data satisfying the condition from the given table  <br /></td></tr>
+<tr class="memitem:ae0f7d8e0158e15d30486079c5ba45a24 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_ae0f7d8e0158e15d30486079c5ba45a24"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:ae0f7d8e0158e15d30486079c5ba45a24 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#ae0f7d8e0158e15d30486079c5ba45a24">remove</a> (T &amp;item, bool autotrans=true)</td></tr>
+<tr class="memdesc:ae0f7d8e0158e15d30486079c5ba45a24 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete  <br /></td></tr>
+<tr class="memitem:a114fca233b25dd2828f87d7ce833a0c4 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a114fca233b25dd2828f87d7ce833a0c4"><td class="memTemplParams" colspan="2">template&lt;class Container&gt; </td></tr>
+<tr class="memitem:a114fca233b25dd2828f87d7ce833a0c4 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a114fca233b25dd2828f87d7ce833a0c4">batchRemove</a> (Container &amp;container, bool autotrans=true)</td></tr>
+<tr class="memdesc:a114fca233b25dd2828f87d7ce833a0c4 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch deleting  <br /></td></tr>
+<tr class="memitem:af6b6756ed8a3e8406eb79e08ae20cd8c inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_af6b6756ed8a3e8406eb79e08ae20cd8c"><td class="memTemplParams" colspan="2">template&lt;class InputIterator&gt; </td></tr>
+<tr class="memitem:af6b6756ed8a3e8406eb79e08ae20cd8c inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#af6b6756ed8a3e8406eb79e08ae20cd8c">batchRemove</a> (InputIterator first, InputIterator last, bool autotrans=true)</td></tr>
+<tr class="memdesc:af6b6756ed8a3e8406eb79e08ae20cd8c inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Batch deleting; the data in the iterators must be the table model bound through TABLE_BIND  <br /></td></tr>
+<tr class="memitem:a4db3637e24463149c8483a0c0748bc55 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a4db3637e24463149c8483a0c0748bc55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a4db3637e24463149c8483a0c0748bc55">queryInt</a> (const std::string &amp;<a class="el" href="classhku_1_1_async_d_b_connect_base.html#aab4b9cdbb0f14dc51bd3ad5812300ef4">query</a>, int default_val)</td></tr>
+<tr class="memdesc:a4db3637e24463149c8483a0c0748bc55 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a single integer, e.g.  <br /></td></tr>
+<tr class="memitem:afabaab2aacb35ba857348f8692524dcc inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_afabaab2aacb35ba857348f8692524dcc"><td class="memTemplParams" colspan="2">template&lt;typename NumberType&gt; </td></tr>
+<tr class="memitem:afabaab2aacb35ba857348f8692524dcc inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; NumberType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#afabaab2aacb35ba857348f8692524dcc">queryNumber</a> (const std::string &amp;<a class="el" href="classhku_1_1_async_d_b_connect_base.html#aab4b9cdbb0f14dc51bd3ad5812300ef4">query</a>, NumberType default_val=<a class="el" href="classhku_1_1_null.html">Null</a>&lt; NumberType &gt;())</td></tr>
+<tr class="memdesc:afabaab2aacb35ba857348f8692524dcc inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query the statistical data, e.g.  <br /></td></tr>
+<tr class="memitem:a5fedfeba824fade6d7736f8372bd1a53 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a5fedfeba824fade6d7736f8372bd1a53"><td class="memTemplParams" colspan="2">template&lt;typename NumberType&gt; </td></tr>
+<tr class="memitem:a5fedfeba824fade6d7736f8372bd1a53 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; NumberType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a5fedfeba824fade6d7736f8372bd1a53">queryNumber</a> (const std::string &amp;<a class="el" href="classhku_1_1_async_d_b_connect_base.html#aab4b9cdbb0f14dc51bd3ad5812300ef4">query</a>, NumberType default_val, const <a class="el" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> &amp;params)</td></tr>
+<tr class="memdesc:a5fedfeba824fade6d7736f8372bd1a53 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query the statistical data with the values of numbered placeholders bound to the statement  <br /></td></tr>
+<tr class="memitem:aab4b9cdbb0f14dc51bd3ad5812300ef4 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_aab4b9cdbb0f14dc51bd3ad5812300ef4"><td class="memTemplParams" colspan="2">template&lt;typename TableT, size_t page_size = 50&gt; </td></tr>
+<tr class="memitem:aab4b9cdbb0f14dc51bd3ad5812300ef4 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_async_s_q_l_result_set.html">AsyncSQLResultSet</a>&lt; TableT, page_size &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#aab4b9cdbb0f14dc51bd3ad5812300ef4">query</a> ()</td></tr>
+<tr class="memdesc:aab4b9cdbb0f14dc51bd3ad5812300ef4 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Paged query  <br /></td></tr>
+<tr class="memitem:ab58b4592a7c6c0c85f294deb41511ab2 inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_ab58b4592a7c6c0c85f294deb41511ab2"><td class="memTemplParams" colspan="2">template&lt;typename TableT, size_t page_size = 50&gt; </td></tr>
+<tr class="memitem:ab58b4592a7c6c0c85f294deb41511ab2 inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_async_s_q_l_result_set.html">AsyncSQLResultSet</a>&lt; TableT, page_size &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#ab58b4592a7c6c0c85f294deb41511ab2">query</a> (const std::string &amp;query)</td></tr>
+<tr class="memdesc:ab58b4592a7c6c0c85f294deb41511ab2 inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Paged query  <br /></td></tr>
+<tr class="memitem:a7b2ce3dc796c6fcfaefef73fc5786e5e inherit pub_methods_classhku_1_1_async_d_b_connect_base" id="r_a7b2ce3dc796c6fcfaefef73fc5786e5e"><td class="memTemplParams" colspan="2">template&lt;typename TableT, size_t page_size = 50&gt; </td></tr>
+<tr class="memitem:a7b2ce3dc796c6fcfaefef73fc5786e5e inherit pub_methods_classhku_1_1_async_d_b_connect_base template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_async_s_q_l_result_set.html">AsyncSQLResultSet</a>&lt; TableT, page_size &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_async_d_b_connect_base.html#a7b2ce3dc796c6fcfaefef73fc5786e5e">query</a> (const <a class="el" href="classhku_1_1_d_b_condition.html">DBCondition</a> &amp;cond)</td></tr>
+<tr class="memdesc:a7b2ce3dc796c6fcfaefef73fc5786e5e inherit pub_methods_classhku_1_1_async_d_b_connect_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Paged query  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:a2008de9894ab9b7d5dcf920421bfd876" id="r_a2008de9894ab9b7d5dcf920421bfd876"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2008de9894ab9b7d5dcf920421bfd876">AsyncSQLiteStatement</a></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Asynchronous SQLite connection </p>
+<p>The asynchronous database connection implementation based on SQLite3. Every connection holds an independent ThreadPool(1) single thread pool internally, and the synchronous operations are converted into the asynchronous interfaces through co_run. </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a95155f196fb28dd264349a5fd9604a5d" name="a95155f196fb28dd264349a5fd9604a5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95155f196fb28dd264349a5fd9604a5d">&#9670;&#160;</a></span>AsyncSQLiteConnect() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsyncSQLiteConnect::AsyncSQLiteConnect </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_parameter.html">Parameter</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>param</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7c11a5728883be76a09ab6863a37a02c" name="a7c11a5728883be76a09ab6863a37a02c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c11a5728883be76a09ab6863a37a02c">&#9670;&#160;</a></span>~AsyncSQLiteConnect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::AsyncSQLiteConnect::~AsyncSQLiteConnect </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afe405df7407d48aa8b02087572e5864e" name="afe405df7407d48aa8b02087572e5864e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe405df7407d48aa8b02087572e5864e">&#9670;&#160;</a></span>AsyncSQLiteConnect() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::AsyncSQLiteConnect::AsyncSQLiteConnect </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="af1a149b154d2011149a817063b8e7b1e" name="af1a149b154d2011149a817063b8e7b1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1a149b154d2011149a817063b8e7b1e">&#9670;&#160;</a></span>backup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt; hku::AsyncSQLiteConnect::backup </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>zFilename</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>n_page</em></span><span class="paramdefsep"> = </span><span class="paramdefval">-1</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>step_sleep</em></span><span class="paramdefsep"> = </span><span class="paramdefval">250</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Back up the database online, without affecting the operations of the other database connections (the asynchronous version) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">zFilename</td><td>the backup database name </td></tr>
+    <tr><td class="paramname">n_page</td><td>the number of the pages backed up in every loop of the batch backup; when it is less than or equal to 0 the backup is done in one go without batching </td></tr>
+    <tr><td class="paramname">step_sleep</td><td>the sleep interval in milliseconds after every loop of the batch backup, so as to yield the CPU </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true success </dd>
+<dd>
+false failure </dd></dl>
+
+</div>
+</div>
+<a id="aad15880802ce8909368006acfff3f2dd" name="aad15880802ce8909368006acfff3f2dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad15880802ce8909368006acfff3f2dd">&#9670;&#160;</a></span>check()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt; hku::AsyncSQLiteConnect::check </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>quick</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check the database (the asynchronous version) </p>
+<dl class="section note"><dt>注解</dt><dd>This function cannot distinguish whether the file is not a sqlite file or the sqlite itself is corrupted If the file itself needs to be judged as a valid sqlite file, please use the isValidSqliteFile method </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">quick</td><td>true quick check | false integrity check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true the check succeeded </dd>
+<dd>
+false the check failed </dd></dl>
+
+</div>
+</div>
+<a id="abcd3f4c020a57429637b6991541a6f35" name="abcd3f4c020a57429637b6991541a6f35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcd3f4c020a57429637b6991541a6f35">&#9670;&#160;</a></span>commit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt; hku::AsyncSQLiteConnect::commit </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Commit the transaction; an exception is thrown on failure </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#ab2e3769a8f3b6676d60796a57b356bec">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="a8ecf2d2986306d4401aaf3c2a7403bac" name="a8ecf2d2986306d4401aaf3c2a7403bac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ecf2d2986306d4401aaf3c2a7403bac">&#9670;&#160;</a></span>exec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &gt; hku::AsyncSQLiteConnect::exec </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>sql_string</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Execute the SQL without a result </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#a8162a1359bf7d1d52d3ee19e7d0425b0">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="aa6038affd5c8bb89957a22122b620c02" name="aa6038affd5c8bb89957a22122b620c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6038affd5c8bb89957a22122b620c02">&#9670;&#160;</a></span>getStatement()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; <a class="el" href="group___d_b_connect.html#gab590184ccae3de49334642d167a28b78">AsyncSQLStatementPtr</a> &gt; hku::AsyncSQLiteConnect::getStatement </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>sql_statement</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the AsyncSQLStatement </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#ae91dc507be8afdcf233713057b7456c3">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="a4721fe7564888611d833ed1b11ce0e5a" name="a4721fe7564888611d833ed1b11ce0e5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4721fe7564888611d833ed1b11ce0e5a">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> &amp; hku::AsyncSQLiteConnect::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abd2cd9e1525d411d7a5a3dbd63896ee7" name="abd2cd9e1525d411d7a5a3dbd63896ee7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd2cd9e1525d411d7a5a3dbd63896ee7">&#9670;&#160;</a></span>ping()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt; hku::AsyncSQLiteConnect::ping </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The ping operation, used to judge whether it is connected </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#a2c1c0be69f127d059279bbc32bf361e3">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="afcc75759fc6274a89c8ac2911800d684" name="afcc75759fc6274a89c8ac2911800d684"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcc75759fc6274a89c8ac2911800d684">&#9670;&#160;</a></span>resetAutoIncrement()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt; hku::AsyncSQLiteConnect::resetAutoIncrement </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tablename</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reset the id in the table with an auto-increment id to start from 1 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tablename</td><td>the table name whose id is to be reset </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">An</td><td>exception is thrown when the table still contains data </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#a5ff5e272c1876b8930c1a24b98bc98d2">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="afbe742bdd104c6bf0bbebeb0e263b058" name="afbe742bdd104c6bf0bbebeb0e263b058"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbe742bdd104c6bf0bbebeb0e263b058">&#9670;&#160;</a></span>rollback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt; hku::AsyncSQLiteConnect::rollback </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Roll back the transaction </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#a0f162b5877c7137014cabbf4300c829f">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="a93b5e92a4f9e17cd3d92ac2bec68f374" name="a93b5e92a4f9e17cd3d92ac2bec68f374"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93b5e92a4f9e17cd3d92ac2bec68f374">&#9670;&#160;</a></span>tableExist()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; bool &gt; hku::AsyncSQLiteConnect::tableExist </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tablename</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Judge whether the table exists </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#acd14385d41e927fcfaefe734e2a7d719">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a id="a8eb617729f9b727189860c0815f06f07" name="a8eb617729f9b727189860c0815f06f07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8eb617729f9b727189860c0815f06f07">&#9670;&#160;</a></span>transaction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable</a>&lt; void &gt; hku::AsyncSQLiteConnect::transaction </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Start a transaction; an exception is thrown on failure </p>
+
+<p>实现了 <a class="el" href="classhku_1_1_async_d_b_connect_base.html#a8c86ab644ee81052d2a5dee6b1baf860">hku::AsyncDBConnectBase</a>.</p>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="a2008de9894ab9b7d5dcf920421bfd876" name="a2008de9894ab9b7d5dcf920421bfd876"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2008de9894ab9b7d5dcf920421bfd876">&#9670;&#160;</a></span>AsyncSQLiteStatement</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classhku_1_1_async_s_q_lite_statement.html">AsyncSQLiteStatement</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/db_connect/sqlite/<a class="el" href="_async_s_q_lite_connect_8h_source.html">AsyncSQLiteConnect.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_async_s_q_lite_connect.html">AsyncSQLiteConnect</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

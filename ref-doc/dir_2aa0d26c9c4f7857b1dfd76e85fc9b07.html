@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hikyuu 目录参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li class="current"><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,145 +74,88 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">hikyuu 目录参考</div>  </div>
+  <div class="headertitle"><div class="title">hikyuu 目录参考</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-hikyuu 的目录依赖关系图</div>
-<div class="dyncontent">
-<div class="center"><img src="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07_dep.png" border="0" usemap="#dir__2aa0d26c9c4f7857b1dfd76e85fc9b07__dep" alt="hikyuu"/></div>
-<map name="dir__2aa0d26c9c4f7857b1dfd76e85fc9b07__dep" id="dir__2aa0d26c9c4f7857b1dfd76e85fc9b07__dep">
-<area shape="rect" id="node3" href="dir_fff272255cc4ac108b83fef2dd1e2700.html" title="datetime" alt="" coords="81,507,170,555"/>
-<area shape="rect" id="edge14-headlabel" href="dir_000000_000011.html" title="2" alt="" coords="125,479,136,496"/>
-<area shape="rect" id="node2" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html" title="data_driver" alt="" coords="248,507,357,555"/>
-<area shape="rect" id="node9" href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html" title="utilities" alt="" coords="123,603,197,651"/>
-<area shape="rect" id="edge7-headlabel" href="dir_000001_000048.html" title="4" alt="" coords="209,591,220,608"/>
-<area shape="rect" id="node10" href="dir_699ca82e967419bb3b9d6415a2e15ac3.html" title="hikyuu_utils" alt="" coords="379,603,491,651"/>
-<area shape="rect" id="edge8-headlabel" href="dir_000001_000012.html" title="3" alt="" coords="387,576,398,594"/>
-<area shape="rect" id="edge13-headlabel" href="dir_000011_000048.html" title="1" alt="" coords="148,574,158,591"/>
-<area shape="rect" id="node4" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html" title="indicator" alt="" coords="121,123,210,171"/>
-<area shape="rect" id="node8" href="dir_194593d72069437dd60c2304994b6f20.html" title="trade_sys" alt="" coords="93,219,192,267"/>
-<area shape="rect" id="edge9-headlabel" href="dir_000013_000015.html" title="1" alt="" coords="146,193,157,211"/>
-<area shape="rect" id="edge10-headlabel" href="dir_000013_000048.html" title="2" alt="" coords="186,583,197,600"/>
-<area shape="rect" id="node5" href="dir_3e155c5f2da30aa26fa83ad0482e6b65.html" title="serialization" alt="" coords="179,411,291,459"/>
-<area shape="rect" id="edge2-headlabel" href="dir_000028_000011.html" title="1" alt="" coords="166,493,177,510"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000028_000048.html" title="3" alt="" coords="178,580,189,597"/>
-<area shape="rect" id="node6" href="dir_c50e64642bb925fb085f5f79b79fe61a.html" title="trade_instance" alt="" coords="51,27,187,75"/>
-<area shape="rect" id="edge12-headlabel" href="dir_000029_000013.html" title="2" alt="" coords="148,94,159,111"/>
-<area shape="rect" id="edge11-headlabel" href="dir_000029_000015.html" title="1" alt="" coords="121,190,132,207"/>
-<area shape="rect" id="node7" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html" title="trade_manage" alt="" coords="76,315,209,363"/>
-<area shape="rect" id="edge15-headlabel" href="dir_000014_000028.html" title="5" alt="" coords="200,383,211,400"/>
-<area shape="rect" id="edge16-headlabel" href="dir_000014_000015.html" title="2" alt="" coords="138,277,149,294"/>
-<area shape="rect" id="edge17-headlabel" href="dir_000014_000048.html" title="7" alt="" coords="106,582,117,599"/>
-<area shape="rect" id="edge5-headlabel" href="dir_000015_000013.html" title="33" alt="" coords="146,179,167,196"/>
-<area shape="rect" id="edge3-headlabel" href="dir_000015_000028.html" title="6" alt="" coords="240,384,251,401"/>
-<area shape="rect" id="edge6-headlabel" href="dir_000015_000014.html" title="10" alt="" coords="131,287,153,305"/>
-<area shape="rect" id="edge4-headlabel" href="dir_000015_000048.html" title="11" alt="" coords="98,590,120,607"/>
-<area shape="rect" id="clust1" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html" alt="" coords="16,16,368,661"/>
-</map>
-</div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="subdirs"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-subdirs" class="groupheader"><a id="subdirs" name="subdirs"></a>
 目录</h2></td></tr>
-<tr class="memitem:dir_5ea9e4f15e457a8fb5a25f4d835cdecd"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_fff272255cc4ac108b83fef2dd1e2700"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_fff272255cc4ac108b83fef2dd1e2700.html">datetime</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_5d61c8df36118f58eb2ea847be75f1ac"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html">indicator</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_3e155c5f2da30aa26fa83ad0482e6b65"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_3e155c5f2da30aa26fa83ad0482e6b65.html">serialization</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_c50e64642bb925fb085f5f79b79fe61a"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_c50e64642bb925fb085f5f79b79fe61a.html">trade_instance</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_09d5cfaff4d2ae41cc48588927813e3d"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_194593d72069437dd60c2304994b6f20"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dir_8625b7d2da5c64ddcfb0723fda8075b2"><td class="memItemLeft" align="right" valign="top">目录 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:analysis" id="r_analysis"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_fd4ff774d23bec136cca53be21004967.html">analysis</a></td></tr>
+<tr class="memitem:data_5Fdriver" id="r_data_5Fdriver"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></td></tr>
+<tr class="memitem:factor" id="r_factor"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_736920cbf9f2cf60f2a7288289930416.html">factor</a></td></tr>
+<tr class="memitem:global" id="r_global"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_91fb09ec7b72bcc04f519cb3bd4f30a4.html">global</a></td></tr>
+<tr class="memitem:indicator" id="r_indicator"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html">indicator</a></td></tr>
+<tr class="memitem:indicator_5Ftalib" id="r_indicator_5Ftalib"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_e43f677b6fbe35f314c56dcab541e461.html">indicator_talib</a></td></tr>
+<tr class="memitem:plugin" id="r_plugin"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_991d4c37e893a0798e9e63870536be30.html">plugin</a></td></tr>
+<tr class="memitem:serialization" id="r_serialization"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_3e155c5f2da30aa26fa83ad0482e6b65.html">serialization</a></td></tr>
+<tr class="memitem:strategy" id="r_strategy"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_60c2bae2a9cd9d92ca9ac8bb5ff61036.html">strategy</a></td></tr>
+<tr class="memitem:trade_5Fmanage" id="r_trade_5Fmanage"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></td></tr>
+<tr class="memitem:trade_5Fsys" id="r_trade_5Fsys"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></td></tr>
+<tr class="memitem:utilities" id="r_utilities"><td class="memItemLeft" align="right" valign="top"><span class="iconfolder"><div class="folder-icon"></div></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="files"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-files" class="groupheader"><a id="files" name="files"></a>
 文件</h2></td></tr>
-<tr class="memitem:_block_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_block_8cpp.html">Block.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_block_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_block_8h.html">Block.h</a> <a href="_block_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:config_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="config_8h.html">config.h</a> <a href="config_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_data_type_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_data_type_8h.html">DataType.h</a> <a href="_data_type_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:doc_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doc_8h.html">doc.h</a> <a href="doc_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:hikyuu_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hikyuu_8cpp.html">hikyuu.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:hikyuu_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hikyuu_8h.html">hikyuu.h</a> <a href="hikyuu_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_data_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_data_8cpp.html">KData.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_d_a_t_a_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_d_a_t_a_8h.html">KData.h</a> <a href="_k_d_a_t_a_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_data_buffer_imp_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_data_buffer_imp_8cpp.html">KDataBufferImp.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_data_buffer_imp_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_data_buffer_imp_8h.html">KDataBufferImp.h</a> <a href="_k_data_buffer_imp_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_data_imp_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_data_imp_8cpp.html">KDataImp.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_data_imp_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_data_imp_8h.html">KDataImp.h</a> <a href="_k_data_imp_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_query_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_query_8cpp.html">KQuery.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_query_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_query_8h.html">KQuery.h</a> <a href="_k_query_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_record_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_record_8cpp.html">KRecord.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_k_record_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_k_record_8h.html">KRecord.h</a> <a href="_k_record_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_log_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_log_8cpp.html">Log.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_log_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_log_8h.html">Log.h</a> <a href="_log_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_market_info_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_market_info_8cpp.html">MarketInfo.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_market_info_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_market_info_8h.html">MarketInfo.h</a> <a href="_market_info_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_8cpp.html">Stock.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_8h.html">Stock.h</a> <a href="_stock_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_manager_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_manager_8cpp.html">StockManager.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_manager_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_manager_8h.html">StockManager.h</a> <a href="_stock_manager_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_map_iterator_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_map_iterator_8h.html">StockMapIterator.h</a> <a href="_stock_map_iterator_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_type_info_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_type_info_8cpp.html">StockTypeInfo.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_type_info_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_type_info_8h.html">StockTypeInfo.h</a> <a href="_stock_type_info_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_weight_8cpp"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_weight_8cpp.html">StockWeight.cpp</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:_stock_weight_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_stock_weight_8h.html">StockWeight.h</a> <a href="_stock_weight_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:Block_2Eh" id="r_Block_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_block_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>Block.h</b></td></tr>
+<tr class="memitem:config_2Eh" id="r_config_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="config_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>config.h</b></td></tr>
+<tr class="memitem:DataType_2Eh" id="r_DataType_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_data_type_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>DataType.h</b></td></tr>
+<tr class="memitem:debug_2Eh" id="r_debug_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="debug_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>debug.h</b></td></tr>
+<tr class="memitem:doc_2Eh" id="r_doc_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="doc_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>doc.h</b></td></tr>
+<tr class="memitem:GlobalInitializer_2Eh" id="r_GlobalInitializer_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_global_initializer_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>GlobalInitializer.h</b></td></tr>
+<tr class="memitem:hikyuu_2Eh" id="r_hikyuu_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="hikyuu_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>hikyuu.h</b></td></tr>
+<tr class="memitem:HistoryFinanceInfo_2Eh" id="r_HistoryFinanceInfo_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_history_finance_info_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>HistoryFinanceInfo.h</b></td></tr>
+<tr class="memitem:KData_2Eh" id="r_KData_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_data_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KData.h</b></td></tr>
+<tr class="memitem:KDataImp_2Eh" id="r_KDataImp_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_data_imp_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KDataImp.h</b></td></tr>
+<tr class="memitem:KDataPrivatedBufferImp_2Eh" id="r_KDataPrivatedBufferImp_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_data_privated_buffer_imp_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KDataPrivatedBufferImp.h</b></td></tr>
+<tr class="memitem:KDataSharedBufferImp_2Eh" id="r_KDataSharedBufferImp_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_data_shared_buffer_imp_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KDataSharedBufferImp.h</b></td></tr>
+<tr class="memitem:KDataShmBufferImp_2Eh" id="r_KDataShmBufferImp_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_data_shm_buffer_imp_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KDataShmBufferImp.h</b></td></tr>
+<tr class="memitem:KQuery_2Eh" id="r_KQuery_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_query_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KQuery.h</b></td></tr>
+<tr class="memitem:KRecord_2Eh" id="r_KRecord_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_k_record_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>KRecord.h</b></td></tr>
+<tr class="memitem:lang_2Eh" id="r_lang_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="lang_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>lang.h</b></td></tr>
+<tr class="memitem:MarketInfo_2Eh" id="r_MarketInfo_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_market_info_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>MarketInfo.h</b></td></tr>
+<tr class="memitem:misc_2Eh" id="r_misc_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="misc_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>misc.h</b></td></tr>
+<tr class="memitem:Stock_2Eh" id="r_Stock_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_stock_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>Stock.h</b></td></tr>
+<tr class="memitem:StockManager_2Eh" id="r_StockManager_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_stock_manager_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>StockManager.h</b></td></tr>
+<tr class="memitem:StockMapIterator_2Eh" id="r_StockMapIterator_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_stock_map_iterator_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>StockMapIterator.h</b></td></tr>
+<tr class="memitem:StockTypeInfo_2Eh" id="r_StockTypeInfo_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_stock_type_info_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>StockTypeInfo.h</b></td></tr>
+<tr class="memitem:StockWeight_2Eh" id="r_StockWeight_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_stock_weight_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>StockWeight.h</b></td></tr>
+<tr class="memitem:StrategyContext_2Eh" id="r_StrategyContext_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_strategy_context_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>StrategyContext.h</b></td></tr>
+<tr class="memitem:TimeLineRecord_2Eh" id="r_TimeLineRecord_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_time_line_record_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>TimeLineRecord.h</b></td></tr>
+<tr class="memitem:TransRecord_2Eh" id="r_TransRecord_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_trans_record_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>TransRecord.h</b></td></tr>
+<tr class="memitem:version_2Eh" id="r_version_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="version_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>version.h</b></td></tr>
+<tr class="memitem:ZhBond10_2Eh" id="r_ZhBond10_2Eh"><td class="memItemLeft" align="right" valign="top"><a href="_zh_bond10_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>ZhBond10.h</b></td></tr>
 </table>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

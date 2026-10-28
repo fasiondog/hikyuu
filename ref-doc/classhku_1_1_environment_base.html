@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::EnvironmentBase类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_environment_base.html','','classhku_1_1_environment_base-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,135 +74,129 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pro-attribs">Protected 属性</a> &#124;
-<a href="#friends">友元</a> &#124;
-<a href="classhku_1_1_environment_base-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::EnvironmentBase类 参考<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a> &raquo; <a class="el" href="group___environment.html">Environment 外部环境判断</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::EnvironmentBase类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a> &raquo; <a class="el" href="group___environment.html">Environment market environment</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>环境判定策略基类  
- <a href="classhku_1_1_environment_base.html#details">更多...</a></p>
+<p>Base class of the market environment strategy  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_environment_base_8h_source.html">EnvironmentBase.h</a>&gt;</code></p>
 <div class="dynheader">
 类 hku::EnvironmentBase 继承关系图:</div>
 <div class="dyncontent">
-<div class="center"><img src="classhku_1_1_environment_base__inherit__graph.png" border="0" usemap="#hku_1_1_environment_base_inherit__map" alt="Inheritance graph"/></div>
-<map name="hku_1_1_environment_base_inherit__map" id="hku_1_1_environment_base_inherit__map">
-<area shape="rect" id="node2" href="classhku_1_1_two_line_environment.html" title="hku::TwoLineEnvironment" alt="" coords="5,83,228,112"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="center"><img src="classhku_1_1_environment_base__inherit__graph.png" border="0" usemap="#ahku_1_1_environment_base_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <div class="dynheader">
 hku::EnvironmentBase 的协作图:</div>
 <div class="dyncontent">
-<div class="center"><img src="classhku_1_1_environment_base__coll__graph.png" border="0" usemap="#hku_1_1_environment_base_coll__map" alt="Collaboration graph"/></div>
-<map name="hku_1_1_environment_base_coll__map" id="hku_1_1_environment_base_coll__map">
-<area shape="rect" id="node2" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件 " alt="" coords="45,5,164,35"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="center"><img src="classhku_1_1_environment_base__coll__graph.png" border="0" usemap="#ahku_1_1_environment_base_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a493b3eae7d743d4cf4875e7144eb013c"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a></td></tr>
-<tr class="separator:a493b3eae7d743d4cf4875e7144eb013c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a493b3eae7d743d4cf4875e7144eb013c" id="r_a493b3eae7d743d4cf4875e7144eb013c"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:ae953b48e005863c435f390e735155ffa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#ae953b48e005863c435f390e735155ffa">EnvironmentBase</a> ()</td></tr>
-<tr class="separator:ae953b48e005863c435f390e735155ffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a375cd198cecf7490eb17aab7d514e777"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a375cd198cecf7490eb17aab7d514e777">EnvironmentBase</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_environment_base.html#aa2f73912a26335f750ed5aac8defd28a">name</a>)</td></tr>
-<tr class="separator:a375cd198cecf7490eb17aab7d514e777"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a573a633324c0f8f400533f4af27701cd"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a573a633324c0f8f400533f4af27701cd">~EnvironmentBase</a> ()</td></tr>
-<tr class="separator:a573a633324c0f8f400533f4af27701cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2f73912a26335f750ed5aac8defd28a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#aa2f73912a26335f750ed5aac8defd28a">name</a> () const </td></tr>
-<tr class="memdesc:aa2f73912a26335f750ed5aac8defd28a"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取名称  <a href="#aa2f73912a26335f750ed5aac8defd28a">更多...</a><br /></td></tr>
-<tr class="separator:aa2f73912a26335f750ed5aac8defd28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08f4d88911f8e1192947ae839f9905bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a08f4d88911f8e1192947ae839f9905bf">name</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
-<tr class="memdesc:a08f4d88911f8e1192947ae839f9905bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置名称  <a href="#a08f4d88911f8e1192947ae839f9905bf">更多...</a><br /></td></tr>
-<tr class="separator:a08f4d88911f8e1192947ae839f9905bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a773d2f0416df87ddb04087eae9331899"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a773d2f0416df87ddb04087eae9331899">reset</a> ()</td></tr>
-<tr class="memdesc:a773d2f0416df87ddb04087eae9331899"><td class="mdescLeft">&#160;</td><td class="mdescRight">复位  <a href="#a773d2f0416df87ddb04087eae9331899">更多...</a><br /></td></tr>
-<tr class="separator:a773d2f0416df87ddb04087eae9331899"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f5029281f8c9da41453d0ed93a3f94b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a7f5029281f8c9da41453d0ed93a3f94b">setQuery</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
-<tr class="memdesc:a7f5029281f8c9da41453d0ed93a3f94b"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置查询条件  <a href="#a7f5029281f8c9da41453d0ed93a3f94b">更多...</a><br /></td></tr>
-<tr class="separator:a7f5029281f8c9da41453d0ed93a3f94b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0edffff752efe26247bfd83707bf780"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#ac0edffff752efe26247bfd83707bf780">getQuery</a> () const </td></tr>
-<tr class="memdesc:ac0edffff752efe26247bfd83707bf780"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取查询条件  <a href="#ac0edffff752efe26247bfd83707bf780">更多...</a><br /></td></tr>
-<tr class="separator:ac0edffff752efe26247bfd83707bf780"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70b8738a7e2edc19dc7ab8d051bbdf82"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a70b8738a7e2edc19dc7ab8d051bbdf82">clone</a> ()</td></tr>
-<tr class="memdesc:a70b8738a7e2edc19dc7ab8d051bbdf82"><td class="mdescLeft">&#160;</td><td class="mdescRight">克隆操作  <a href="#a70b8738a7e2edc19dc7ab8d051bbdf82">更多...</a><br /></td></tr>
-<tr class="separator:a70b8738a7e2edc19dc7ab8d051bbdf82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36e78cf532750f22ad644d796149f29c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a36e78cf532750f22ad644d796149f29c">_addValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
-<tr class="memdesc:a36e78cf532750f22ad644d796149f29c"><td class="mdescLeft">&#160;</td><td class="mdescRight">加入有效时间，在_calculate中调用  <a href="#a36e78cf532750f22ad644d796149f29c">更多...</a><br /></td></tr>
-<tr class="separator:a36e78cf532750f22ad644d796149f29c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8d7bacf5255e53af20829cb772714cb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#ad8d7bacf5255e53af20829cb772714cb">isValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
-<tr class="memdesc:ad8d7bacf5255e53af20829cb772714cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断指定日期的外部环境是否有效  <a href="#ad8d7bacf5255e53af20829cb772714cb">更多...</a><br /></td></tr>
-<tr class="separator:ad8d7bacf5255e53af20829cb772714cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45d38eb5fa2374d5ebc6e5cf879a0820"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a45d38eb5fa2374d5ebc6e5cf879a0820">_calculate</a> ()=0</td></tr>
-<tr class="memdesc:a45d38eb5fa2374d5ebc6e5cf879a0820"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类计算接口  <a href="#a45d38eb5fa2374d5ebc6e5cf879a0820">更多...</a><br /></td></tr>
-<tr class="separator:a45d38eb5fa2374d5ebc6e5cf879a0820"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fa038eaca9fe31c5dbab365fd9eac6d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a0fa038eaca9fe31c5dbab365fd9eac6d">_reset</a> ()</td></tr>
-<tr class="memdesc:a0fa038eaca9fe31c5dbab365fd9eac6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类复位接口  <a href="#a0fa038eaca9fe31c5dbab365fd9eac6d">更多...</a><br /></td></tr>
-<tr class="separator:a0fa038eaca9fe31c5dbab365fd9eac6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a4b5a0115f834401d27b5c50d79f829"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a3a4b5a0115f834401d27b5c50d79f829">_clone</a> ()=0</td></tr>
-<tr class="memdesc:a3a4b5a0115f834401d27b5c50d79f829"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类克隆接口  <a href="#a3a4b5a0115f834401d27b5c50d79f829">更多...</a><br /></td></tr>
-<tr class="separator:a3a4b5a0115f834401d27b5c50d79f829"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae953b48e005863c435f390e735155ffa" id="r_ae953b48e005863c435f390e735155ffa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae953b48e005863c435f390e735155ffa">EnvironmentBase</a> ()</td></tr>
+<tr class="memitem:a375cd198cecf7490eb17aab7d514e777" id="r_a375cd198cecf7490eb17aab7d514e777"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a375cd198cecf7490eb17aab7d514e777">EnvironmentBase</a> (const string &amp;<a class="el" href="#ab274d82dcd72aeb634bc88a5395da332">name</a>)</td></tr>
+<tr class="memitem:ac713069d0e2a255063dfc9575e03bda9" id="r_ac713069d0e2a255063dfc9575e03bda9"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac713069d0e2a255063dfc9575e03bda9">~EnvironmentBase</a> ()</td></tr>
+<tr class="memitem:ac3bb3088f9090795b29c4d3a945688e4" id="r_ac3bb3088f9090795b29c4d3a945688e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3bb3088f9090795b29c4d3a945688e4">EnvironmentBase</a> (const <a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a> &amp;)</td></tr>
+<tr class="memitem:ab274d82dcd72aeb634bc88a5395da332" id="r_ab274d82dcd72aeb634bc88a5395da332"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab274d82dcd72aeb634bc88a5395da332">name</a> () const</td></tr>
+<tr class="memdesc:ab274d82dcd72aeb634bc88a5395da332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name  <br /></td></tr>
+<tr class="memitem:a08f4d88911f8e1192947ae839f9905bf" id="r_a08f4d88911f8e1192947ae839f9905bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a08f4d88911f8e1192947ae839f9905bf">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:a08f4d88911f8e1192947ae839f9905bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name  <br /></td></tr>
+<tr class="memitem:a773d2f0416df87ddb04087eae9331899" id="r_a773d2f0416df87ddb04087eae9331899"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a773d2f0416df87ddb04087eae9331899">reset</a> ()</td></tr>
+<tr class="memdesc:a773d2f0416df87ddb04087eae9331899"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset  <br /></td></tr>
+<tr class="memitem:a7f5029281f8c9da41453d0ed93a3f94b" id="r_a7f5029281f8c9da41453d0ed93a3f94b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f5029281f8c9da41453d0ed93a3f94b">setQuery</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query)</td></tr>
+<tr class="memdesc:a7f5029281f8c9da41453d0ed93a3f94b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the query condition; the calculation is re-run only when the query differs from the current one  <br /></td></tr>
+<tr class="memitem:a4660cd924a3d771e16f9a9adf4184a7e" id="r_a4660cd924a3d771e16f9a9adf4184a7e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4660cd924a3d771e16f9a9adf4184a7e">getQuery</a> () const</td></tr>
+<tr class="memdesc:a4660cd924a3d771e16f9a9adf4184a7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the query condition  <br /></td></tr>
+<tr class="memitem:a70b8738a7e2edc19dc7ab8d051bbdf82" id="r_a70b8738a7e2edc19dc7ab8d051bbdf82"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a70b8738a7e2edc19dc7ab8d051bbdf82">clone</a> ()</td></tr>
+<tr class="memdesc:a70b8738a7e2edc19dc7ab8d051bbdf82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone operation  <br /></td></tr>
+<tr class="memitem:ac54ca0acbec3407a073bf1d9ff4e720d" id="r_ac54ca0acbec3407a073bf1d9ff4e720d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac54ca0acbec3407a073bf1d9ff4e720d">_addValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> value=1.0)</td></tr>
+<tr class="memdesc:ac54ca0acbec3407a073bf1d9ff4e720d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a valid time, it is called in _calculate  <br /></td></tr>
+<tr class="memitem:a59362ba732d820dc71655ed3c49445fd" id="r_a59362ba732d820dc71655ed3c49445fd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59362ba732d820dc71655ed3c49445fd">isValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memdesc:a59362ba732d820dc71655ed3c49445fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Judge whether the external environment of the given date is valid  <br /></td></tr>
+<tr class="memitem:a77c667ad3684386e037cc4f530859701" id="r_a77c667ad3684386e037cc4f530859701"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77c667ad3684386e037cc4f530859701">getValue</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime) const</td></tr>
+<tr class="memdesc:a77c667ad3684386e037cc4f530859701"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the stored value of the given date  <br /></td></tr>
+<tr class="memitem:a710665bf1705415db3cf98f945e9cba4" id="r_a710665bf1705415db3cf98f945e9cba4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_indicator.html">Indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a710665bf1705415db3cf98f945e9cba4">getValues</a> () const</td></tr>
+<tr class="memdesc:a710665bf1705415db3cf98f945e9cba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the values as a time-series indicator: one record per date registered through _addValid, ordered by date; only a finite value &gt; 0 means valid, anything else is invalid  <br /></td></tr>
+<tr class="memitem:a01837a193d760c8a6276dcdb9a70bd57" id="r_a01837a193d760c8a6276dcdb9a70bd57"><td class="memItemLeft" align="right" valign="top">const vector&lt; <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a01837a193d760c8a6276dcdb9a70bd57">valuesRef</a> () const</td></tr>
+<tr class="memdesc:a01837a193d760c8a6276dcdb9a70bd57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the raw value storage; for each date d in <a class="el" href="#acd6d3ec596919f5055a2d2756db865ae" title="Get the date-&gt;index ordered map; iterating it yields dates in ascending order.">dateIndexRef()</a>, the element <a class="el" href="#a01837a193d760c8a6276dcdb9a70bd57" title="Get the raw value storage; for each date d in dateIndexRef(), the element valuesRef()[dateIndexRef()[...">valuesRef()</a>[<a class="el" href="#acd6d3ec596919f5055a2d2756db865ae" title="Get the date-&gt;index ordered map; iterating it yields dates in ascending order.">dateIndexRef()</a>[d]] is the value of d.  <br /></td></tr>
+<tr class="memitem:acd6d3ec596919f5055a2d2756db865ae" id="r_acd6d3ec596919f5055a2d2756db865ae"><td class="memItemLeft" align="right" valign="top">const map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, size_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd6d3ec596919f5055a2d2756db865ae">dateIndexRef</a> () const</td></tr>
+<tr class="memdesc:acd6d3ec596919f5055a2d2756db865ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the date-&gt;index ordered map; iterating it yields dates in ascending order.  <br /></td></tr>
+<tr class="memitem:ad3232f8049188034235f97a5ef2b67d0" id="r_ad3232f8049188034235f97a5ef2b67d0"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3232f8049188034235f97a5ef2b67d0">_isValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> value) const</td></tr>
+<tr class="memdesc:ad3232f8049188034235f97a5ef2b67d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combination operators intentionally use different strategies over these refs, driven by their result semantics:  <br /></td></tr>
+<tr class="memitem:a45d38eb5fa2374d5ebc6e5cf879a0820" id="r_a45d38eb5fa2374d5ebc6e5cf879a0820"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45d38eb5fa2374d5ebc6e5cf879a0820">_calculate</a> ()=0</td></tr>
+<tr class="memdesc:a45d38eb5fa2374d5ebc6e5cf879a0820"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass calculation interface  <br /></td></tr>
+<tr class="memitem:a0fa038eaca9fe31c5dbab365fd9eac6d" id="r_a0fa038eaca9fe31c5dbab365fd9eac6d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0fa038eaca9fe31c5dbab365fd9eac6d">_reset</a> ()</td></tr>
+<tr class="memdesc:a0fa038eaca9fe31c5dbab365fd9eac6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass reset interface  <br /></td></tr>
+<tr class="memitem:a3a4b5a0115f834401d27b5c50d79f829" id="r_a3a4b5a0115f834401d27b5c50d79f829"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a4b5a0115f834401d27b5c50d79f829">_clone</a> ()=0</td></tr>
+<tr class="memdesc:a3a4b5a0115f834401d27b5c50d79f829"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass clone interface  <br /></td></tr>
+<tr class="memitem:a1fd266ed76b5a8daa5e80a335837ed90" id="r_a1fd266ed76b5a8daa5e80a335837ed90"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fd266ed76b5a8daa5e80a335837ed90">isPythonObject</a> () const noexcept</td></tr>
+<tr class="memitem:adc6f994c86fb1b77724656dc19637653" id="r_adc6f994c86fb1b77724656dc19637653"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc6f994c86fb1b77724656dc19637653">hasPythonPart</a> () const noexcept</td></tr>
+<tr class="memdesc:adc6f994c86fb1b77724656dc19637653"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this component itself is defined in Python; subclasses with Python parts recurse  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected 属性</h2></td></tr>
-<tr class="memitem:aa0bc210985e45615f69d54b6e06ffafc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#aa0bc210985e45615f69d54b6e06ffafc">m_name</a></td></tr>
-<tr class="separator:aa0bc210985e45615f69d54b6e06ffafc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32a4eb263ca4c84558f05107617032e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#a32a4eb263ca4c84558f05107617032e3">m_query</a></td></tr>
-<tr class="separator:a32a4eb263ca4c84558f05107617032e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5e4da625923be6a73a95bcc73895fed"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#ae5e4da625923be6a73a95bcc73895fed">m_valid</a></td></tr>
-<tr class="separator:ae5e4da625923be6a73a95bcc73895fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0bc210985e45615f69d54b6e06ffafc" id="r_aa0bc210985e45615f69d54b6e06ffafc"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0bc210985e45615f69d54b6e06ffafc">m_name</a></td></tr>
+<tr class="memitem:a32a4eb263ca4c84558f05107617032e3" id="r_a32a4eb263ca4c84558f05107617032e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_query.html">KQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a32a4eb263ca4c84558f05107617032e3">m_query</a></td></tr>
+<tr class="memitem:acb6f89eee02d4c38945495806f8d700c" id="r_acb6f89eee02d4c38945495806f8d700c"><td class="memItemLeft" align="right" valign="top">map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb6f89eee02d4c38945495806f8d700c">m_date_index</a></td></tr>
+<tr class="memitem:a60c3c75c1c320be14d4aac5f3e94866d" id="r_a60c3c75c1c320be14d4aac5f3e94866d"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a60c3c75c1c320be14d4aac5f3e94866d">m_values</a></td></tr>
+<tr class="memitem:ac6451da3eec17c24d358a5e143113ad6" id="r_ac6451da3eec17c24d358a5e143113ad6"><td class="memItemLeft" align="right" valign="top">std::shared_mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac6451da3eec17c24d358a5e143113ad6">m_mutex</a></td></tr>
+<tr class="memitem:a1fdf08a855a58564f7499eba24143a59" id="r_a1fdf08a855a58564f7499eba24143a59"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fdf08a855a58564f7499eba24143a59">m_is_python_object</a> {false}</td></tr>
+<tr class="memitem:a8201a4474660ebcd05492bdbe8d89aca" id="r_a8201a4474660ebcd05492bdbe8d89aca"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8201a4474660ebcd05492bdbe8d89aca">m_calculated</a> {false}</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 友元</h2></td></tr>
-<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
-<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c" id="r_ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>环境判定策略基类 </p>
-<dl class="section note"><dt>注解</dt><dd>外部环境应该和具体的交易对象没有关系 </dd></dl>
-</div><h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="a493b3eae7d743d4cf4875e7144eb013c"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Base class of the market environment strategy </p>
+<dl class="section note"><dt>注解</dt><dd>The external environment should have nothing to do with the concrete trading object </dd>
+<dd>
+The environment is designed to be shared across systems (<a class="el" href="classhku_1_1_system.html" title="Base class of the trading system">System</a> shared_ev defaults to true): isValid takes a shared lock on every call while setQuery/reset take the exclusive lock, so all systems sharing one environment must use the same query, otherwise every differing setQuery reruns the full calculation under the exclusive lock </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a493b3eae7d743d4cf4875e7144eb013c" name="a493b3eae7d743d4cf4875e7144eb013c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a493b3eae7d743d4cf4875e7144eb013c">&#9670;&#160;</a></span>EnvironmentPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a>&gt; <a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">hku::EnvironmentBase::EnvironmentPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a>&gt; <a class="el" href="#a493b3eae7d743d4cf4875e7144eb013c">hku::EnvironmentBase::EnvironmentPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="ae953b48e005863c435f390e735155ffa"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ae953b48e005863c435f390e735155ffa" name="ae953b48e005863c435f390e735155ffa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae953b48e005863c435f390e735155ffa">&#9670;&#160;</a></span>EnvironmentBase() <span class="overload">[1/3]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::EnvironmentBase::EnvironmentBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -215,23 +204,9 @@ Protected 属性</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a375cd198cecf7490eb17aab7d514e777"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::EnvironmentBase::EnvironmentBase </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<a id="a375cd198cecf7490eb17aab7d514e777" name="a375cd198cecf7490eb17aab7d514e777"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a375cd198cecf7490eb17aab7d514e777">&#9670;&#160;</a></span>EnvironmentBase() <span class="overload">[2/3]</span></h2>
 
-</div>
-</div>
-<a class="anchor" id="a573a633324c0f8f400533f4af27701cd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -239,47 +214,100 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::EnvironmentBase::~EnvironmentBase </td>
+          <td class="memname">hku::EnvironmentBase::EnvironmentBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a36e78cf532750f22ad644d796149f29c"></a>
+<a id="ac713069d0e2a255063dfc9575e03bda9" name="ac713069d0e2a255063dfc9575e03bda9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac713069d0e2a255063dfc9575e03bda9">&#9670;&#160;</a></span>~EnvironmentBase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::EnvironmentBase::~EnvironmentBase </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac3bb3088f9090795b29c4d3a945688e4" name="ac3bb3088f9090795b29c4d3a945688e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3bb3088f9090795b29c4d3a945688e4">&#9670;&#160;</a></span>EnvironmentBase() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::EnvironmentBase::EnvironmentBase </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ac54ca0acbec3407a073bf1d9ff4e720d" name="ac54ca0acbec3407a073bf1d9ff4e720d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac54ca0acbec3407a073bf1d9ff4e720d">&#9670;&#160;</a></span>_addValid()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::EnvironmentBase::_addValid </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>value</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1.0</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>加入有效时间，在_calculate中调用 </p>
+<p>Add a valid time, it is called in _calculate </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>系统有效日期 </td></tr>
+    <tr><td class="paramname">datetime</td><td>the valid date of the system </td></tr>
+    <tr><td class="paramname">value</td><td>1.0 by default; greater than 0 means valid and less than or equal to 0 means invalid </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>注解</dt><dd>A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the value instead of replacing it </dd>
+<dd>
+It takes no lock itself, so it must only be called from _calculate (or another hook invoked by setQuery / reset while the mutex is held); a call from anywhere else would race with the readers </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a45d38eb5fa2374d5ebc6e5cf879a0820"></a>
+<a id="a45d38eb5fa2374d5ebc6e5cf879a0820" name="a45d38eb5fa2374d5ebc6e5cf879a0820"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45d38eb5fa2374d5ebc6e5cf879a0820">&#9670;&#160;</a></span>_calculate()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -289,24 +317,26 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::EnvironmentBase::_calculate </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类计算接口 </p>
+<p>Subclass calculation interface </p>
 
-<p>在 <a class="el" href="classhku_1_1_two_line_environment.html#a5e782f270a8e7f4305d83260534c91f2">hku::TwoLineEnvironment</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_add_environment.html#a094d9ae223dd8eb9c8a1f7b5415400bc">hku::AddEnvironment</a>, <a class="el" href="classhku_1_1_and_environment.html#aba811ab737b7913f7c2f47d1bf9a4ade">hku::AndEnvironment</a>, <a class="el" href="classhku_1_1_bool_environment.html#ad4c6df04a00157f76dc3a8f3cd4bb3e3">hku::BoolEnvironment</a>, <a class="el" href="classhku_1_1_div_environment.html#a30d53dfafde61101cffbb181472a2f43">hku::DivEnvironment</a>, <a class="el" href="classhku_1_1_multi_environment.html#ac9235cf195ec6b166b69a93d1550a1de">hku::MultiEnvironment</a>, <a class="el" href="classhku_1_1_or_environment.html#ab34050e96be5f9199b687d9a530be7ec">hku::OrEnvironment</a>, <a class="el" href="classhku_1_1_sub_environment.html#a541bd9dd583312a6b0baee716ec54aca">hku::SubEnvironment</a> , 以及 <a class="el" href="classhku_1_1_two_line_environment.html#a33169cb5c934e6849f6e23ae694c4554">hku::TwoLineEnvironment</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3a4b5a0115f834401d27b5c50d79f829"></a>
+<a id="a3a4b5a0115f834401d27b5c50d79f829" name="a3a4b5a0115f834401d27b5c50d79f829"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a4b5a0115f834401d27b5c50d79f829">&#9670;&#160;</a></span>_clone()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -314,26 +344,75 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a> hku::EnvironmentBase::_clone </td>
+          <td class="memname">virtual <a class="el" href="#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a> hku::EnvironmentBase::_clone </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类克隆接口 </p>
+<p>Subclass clone interface </p>
 
-<p>在 <a class="el" href="classhku_1_1_two_line_environment.html#aa21810ab1ea40e89395256eb9d841bd0">hku::TwoLineEnvironment</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_add_environment.html#ada9bc16fa23804855ed8f87ca5d260f1">hku::AddEnvironment</a>, <a class="el" href="classhku_1_1_and_environment.html#a1977142a3437d499690e0c495e7cecba">hku::AndEnvironment</a>, <a class="el" href="classhku_1_1_bool_environment.html#a51059230464912cada1d4b9ddfa81080">hku::BoolEnvironment</a>, <a class="el" href="classhku_1_1_div_environment.html#afbc731a4f05d347c2e3d4184a573bae4">hku::DivEnvironment</a>, <a class="el" href="classhku_1_1_multi_environment.html#a8742470fe29d38e3bf3685be375a7301">hku::MultiEnvironment</a>, <a class="el" href="classhku_1_1_or_environment.html#a68d244a7c3a8bf967e922b360401f047">hku::OrEnvironment</a>, <a class="el" href="classhku_1_1_sub_environment.html#a3dd0769969c2ae80586e7cb8710046b4">hku::SubEnvironment</a> , 以及 <a class="el" href="classhku_1_1_two_line_environment.html#af43958a5c2ba395c998a83cb1617840f">hku::TwoLineEnvironment</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a0fa038eaca9fe31c5dbab365fd9eac6d"></a>
+<a id="ad3232f8049188034235f97a5ef2b67d0" name="ad3232f8049188034235f97a5ef2b67d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3232f8049188034235f97a5ef2b67d0">&#9670;&#160;</a></span>_isValid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::EnvironmentBase::_isValid </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a></td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Combination operators intentionally use different strategies over these refs, driven by their result semantics: </p>
+<ul>
+<li>And / Multi / Div (intersection): two-pointer merge over the two ordered date_index maps, so there is no base side to pre-fill. And keeps only the dates valid (&gt; 0) on both sides, with the value fixed to 1.0. Multi / Div keep only the dates where both sides agree: both valid (&gt; 0) gives the product / ratio, both invalid (&lt; 0) gives its negation (kept negative so that the day stays invalid) - a disagreement (mixed sign) or a zero side carries no combined strength and is left out.</li>
+<li>Add / Sub (ev1 base + ev2 align): every date (valid or not) of ev1 and ev2 belongs to the result, so ev1 is laid down as the base and ev2 is aligned against it; ev1-only dates need no work and ev2-only dates go through _addValid. The value is the sum (Add) / the difference (Sub), an ev2-only date contributing -ev2 to Sub.</li>
+<li>Or (union of valid): a date is kept iff it is valid on at least one side, with the value fixed to 1.0, so both maps are walked and the date is pushed only when a side is valid. Do NOT "unify" these: a laydown for Or would add ev1's invalid dates as 0.0 to the output date set; an intersection for Add/Sub would drop ev1-only/ev2-only dates; a laydown for And/Multi/Div would wrongly keep ev1-only dates. Each file's _calculate spells out its own branch. The subclass validity-rule hook, called by isValid for every date registered through _addValid <dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>the queried date </td></tr>
+    <tr><td class="paramname">value</td><td>the stored value of the date </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true valid | false invalid; the default rule is "the value is finite and &gt; 0" </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>The <a class="el" href="classhku_1_1_system.html" title="Base class of the trading system">System</a> judges the market validity solely through isValid (one call per bar), so overriding this hook directly changes the trading behavior </dd>
+<dd>
+Override it to apply a custom rule based on the concrete ev value; the combination operators keep using the built-in "&gt; 0" rule on their sides </dd></dl>
+</li>
+</ul>
+
+</div>
+</div>
+<a id="a0fa038eaca9fe31c5dbab365fd9eac6d" name="a0fa038eaca9fe31c5dbab365fd9eac6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fa038eaca9fe31c5dbab365fd9eac6d">&#9670;&#160;</a></span>_reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -343,39 +422,48 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual void hku::EnvironmentBase::_reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>子类复位接口 </p>
+<p>Subclass reset interface </p>
+
+<p>被 <a class="el" href="classhku_1_1_add_environment.html#ae001cc98c980df19fe9253e5427ec529">hku::AddEnvironment</a>, <a class="el" href="classhku_1_1_and_environment.html#a30a363c84afe69331a0cf29c26d6b55d">hku::AndEnvironment</a>, <a class="el" href="classhku_1_1_div_environment.html#a46597958e36ca751fd2ab2b207bdfdd7">hku::DivEnvironment</a>, <a class="el" href="classhku_1_1_multi_environment.html#a196af949b8f0c01c7d19286fc8a25431">hku::MultiEnvironment</a>, <a class="el" href="classhku_1_1_or_environment.html#a857cd834fa3af9ed485e103f9d8fb3d0">hku::OrEnvironment</a> , 以及 <a class="el" href="classhku_1_1_sub_environment.html#adc0e9afa68c9ccc390176c39cf3c0c4b">hku::SubEnvironment</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="a70b8738a7e2edc19dc7ab8d051bbdf82"></a>
+<a id="a70b8738a7e2edc19dc7ab8d051bbdf82" name="a70b8738a7e2edc19dc7ab8d051bbdf82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70b8738a7e2edc19dc7ab8d051bbdf82">&#9670;&#160;</a></span>clone()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_environment_base.html#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a> hku::EnvironmentBase::clone </td>
+          <td class="memname"><a class="el" href="#a493b3eae7d743d4cf4875e7144eb013c">EnvironmentPtr</a> hku::EnvironmentBase::clone </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>克隆操作 </p>
+<p>Clone operation </p>
+<dl class="section note"><dt>注解</dt><dd>Unlike the other trading-system parts, the Environment is not bound to a specific instrument and can be shared, so essentially the clone operation is not needed here; it exists only for the consistency and the possibly existing special scenarios. </dd>
+<dd>
+The subclass _clone callback is invoked without holding the mutex, so that it may reach the GIL (or re-enter this object) without risking a lock-order deadlock. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ac0edffff752efe26247bfd83707bf780"></a>
+<a id="acd6d3ec596919f5055a2d2756db865ae" name="acd6d3ec596919f5055a2d2756db865ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd6d3ec596919f5055a2d2756db865ae">&#9670;&#160;</a></span>dateIndexRef()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -383,49 +471,184 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_k_query.html">KQuery</a> hku::EnvironmentBase::getQuery </td>
+          <td class="memname">const map&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a>, size_t &gt; &amp; hku::EnvironmentBase::dateIndexRef </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取查询条件 </p>
+<p>Get the date-&gt;index ordered map; iterating it yields dates in ascending order. </p>
+<dl class="section note"><dt>注解</dt><dd>Read-only reference, for internal combination without copying. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ad8d7bacf5255e53af20829cb772714cb"></a>
+<a id="a4660cd924a3d771e16f9a9adf4184a7e" name="a4660cd924a3d771e16f9a9adf4184a7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4660cd924a3d771e16f9a9adf4184a7e">&#9670;&#160;</a></span>getQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp; hku::EnvironmentBase::getQuery </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the query condition </p>
+
+</div>
+</div>
+<a id="a77c667ad3684386e037cc4f530859701" name="a77c667ad3684386e037cc4f530859701"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77c667ad3684386e037cc4f530859701">&#9670;&#160;</a></span>getValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::EnvironmentBase::getValue </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the stored value of the given date </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>the given date </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the stored value, or 0.0 for a date that was never added </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>0.0 is returned both for an invalid date and for an absent one; use isValid to tell the validity </dd></dl>
+
+</div>
+</div>
+<a id="a710665bf1705415db3cf98f945e9cba4" name="a710665bf1705415db3cf98f945e9cba4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a710665bf1705415db3cf98f945e9cba4">&#9670;&#160;</a></span>getValues()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_indicator.html">Indicator</a> hku::EnvironmentBase::getValues </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the values as a time-series indicator: one record per date registered through _addValid, ordered by date; only a finite value &gt; 0 means valid, anything else is invalid </p>
+<dl class="section note"><dt>注解</dt><dd>The date set and the meaning of the value depend on the operator that produced this object, see the operator notes above </dd></dl>
+
+</div>
+</div>
+<a id="adc6f994c86fb1b77724656dc19637653" name="adc6f994c86fb1b77724656dc19637653"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc6f994c86fb1b77724656dc19637653">&#9670;&#160;</a></span>hasPythonPart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::EnvironmentBase::hasPythonPart </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether this component itself is defined in Python; subclasses with Python parts recurse </p>
+
+<p>被 <a class="el" href="classhku_1_1_bool_environment.html#aefb0955441c3df2877693dd2aca4404a">hku::BoolEnvironment</a> , 以及 <a class="el" href="classhku_1_1_two_line_environment.html#af525791f709927713ea107af3a286128">hku::TwoLineEnvironment</a> 重载.</p>
+
+</div>
+</div>
+<a id="a1fd266ed76b5a8daa5e80a335837ed90" name="a1fd266ed76b5a8daa5e80a335837ed90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fd266ed76b5a8daa5e80a335837ed90">&#9670;&#160;</a></span>isPythonObject()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::EnvironmentBase::isPythonObject </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a59362ba732d820dc71655ed3c49445fd" name="a59362ba732d820dc71655ed3c49445fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59362ba732d820dc71655ed3c49445fd">&#9670;&#160;</a></span>isValid()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool hku::EnvironmentBase::isValid </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
-          <td class="paramname"><em>datetime</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>datetime</em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>判断指定日期的外部环境是否有效 </p>
+<p>Judge whether the external environment of the given date is valid </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">datetime</td><td>指定日期 </td></tr>
+    <tr><td class="paramname">datetime</td><td>the given date </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>true 有效 | false 无效 </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>true valid | false invalid </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>A date that was never added is invalid; for a registered date the rule is delegated to the _isValid hook, whose default is "the stored value is finite and &gt; 0" </dd>
+<dd>
+For a Python subclass that overrides _is_valid, the callback acquires the GIL while the shared lock is held, so isValid must not run concurrently with setQuery/reset on the same object </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="aa2f73912a26335f750ed5aac8defd28a"></a>
+<a id="ab274d82dcd72aeb634bc88a5395da332" name="ab274d82dcd72aeb634bc88a5395da332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab274d82dcd72aeb634bc88a5395da332">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -433,24 +656,26 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::EnvironmentBase::name </td>
+          <td class="memname">const string &amp; hku::EnvironmentBase::name </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取名称 </p>
+<p>Get the name </p>
 
 </div>
 </div>
-<a class="anchor" id="a08f4d88911f8e1192947ae839f9905bf"></a>
+<a id="a08f4d88911f8e1192947ae839f9905bf" name="a08f4d88911f8e1192947ae839f9905bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08f4d88911f8e1192947ae839f9905bf">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -460,59 +685,95 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">void hku::EnvironmentBase::name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>设置名称 </p>
+<p>Set the name </p>
 
 </div>
 </div>
-<a class="anchor" id="a773d2f0416df87ddb04087eae9331899"></a>
+<a id="a773d2f0416df87ddb04087eae9331899" name="a773d2f0416df87ddb04087eae9331899"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a773d2f0416df87ddb04087eae9331899">&#9670;&#160;</a></span>reset()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::EnvironmentBase::reset </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>复位 </p>
+<p>Reset </p>
+<dl class="section note"><dt>注解</dt><dd>For a Python subclass the _reset callback acquires the GIL while the mutex is held, so reset must not be invoked concurrently with the other calls on the same object </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a7f5029281f8c9da41453d0ed93a3f94b"></a>
+<a id="a7f5029281f8c9da41453d0ed93a3f94b" name="a7f5029281f8c9da41453d0ed93a3f94b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f5029281f8c9da41453d0ed93a3f94b">&#9670;&#160;</a></span>setQuery()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::EnvironmentBase::setQuery </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td>
-          <td class="paramname"><em>query</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>设置查询条件 </p>
+<p>Set the query condition; the calculation is re-run only when the query differs from the current one </p>
+<dl class="section note"><dt>注解</dt><dd>A right-open query (no end time or end index given) is not recalculated when new data arrives: call <a class="el" href="#a773d2f0416df87ddb04087eae9331899" title="Reset">reset()</a> or pass a query with an explicit end to refresh </dd>
+<dd>
+For a Python subclass the _calculate callback acquires the GIL while the mutex is held, so setQuery must not be invoked concurrently with the other calls on the same object </dd></dl>
 
 </div>
 </div>
-<h2 class="groupheader">友元及相关函数文档</h2>
-<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<a id="a01837a193d760c8a6276dcdb9a70bd57" name="a01837a193d760c8a6276dcdb9a70bd57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01837a193d760c8a6276dcdb9a70bd57">&#9670;&#160;</a></span>valuesRef()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const vector&lt; <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> &gt; &amp; hku::EnvironmentBase::valuesRef </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the raw value storage; for each date d in <a class="el" href="#acd6d3ec596919f5055a2d2756db865ae" title="Get the date-&gt;index ordered map; iterating it yields dates in ascending order.">dateIndexRef()</a>, the element <a class="el" href="#a01837a193d760c8a6276dcdb9a70bd57" title="Get the raw value storage; for each date d in dateIndexRef(), the element valuesRef()[dateIndexRef()[...">valuesRef()</a>[<a class="el" href="#acd6d3ec596919f5055a2d2756db865ae" title="Get the date-&gt;index ordered map; iterating it yields dates in ascending order.">dateIndexRef()</a>[d]] is the value of d. </p>
+<p>The vector itself is NOT guaranteed to be stored in date-ascending order (only <a class="el" href="#acd6d3ec596919f5055a2d2756db865ae" title="Get the date-&gt;index ordered map; iterating it yields dates in ascending order.">dateIndexRef()</a> iterates ascending). </p><dl class="section note"><dt>注解</dt><dd>Read-only reference. Use this inside combination operators to avoid the Indicator/PRICELIST copy produced by <a class="el" href="#a710665bf1705415db3cf98f945e9cba4" title="Get the values as a time-series indicator: one record per date registered through _addValid,...">getValues()</a>. Valid only while the query is stable (no concurrent setQuery on this object). </dd></dl>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="ac98d07dd8f7b70e16ccb9a01abf56b9c" name="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac98d07dd8f7b70e16ccb9a01abf56b9c">&#9670;&#160;</a></span>boost::serialization::access</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -525,15 +786,17 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="aa0bc210985e45615f69d54b6e06ffafc"></a>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a8201a4474660ebcd05492bdbe8d89aca" name="a8201a4474660ebcd05492bdbe8d89aca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8201a4474660ebcd05492bdbe8d89aca">&#9670;&#160;</a></span>m_calculated</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -541,19 +804,109 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::EnvironmentBase::m_name</td>
+          <td class="memname">std::atomic&lt;bool&gt; hku::EnvironmentBase::m_calculated {false}</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a32a4eb263ca4c84558f05107617032e3"></a>
+<a id="acb6f89eee02d4c38945495806f8d700c" name="acb6f89eee02d4c38945495806f8d700c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb6f89eee02d4c38945495806f8d700c">&#9670;&#160;</a></span>m_date_index</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">map&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>, size_t&gt; hku::EnvironmentBase::m_date_index</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1fdf08a855a58564f7499eba24143a59" name="a1fdf08a855a58564f7499eba24143a59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fdf08a855a58564f7499eba24143a59">&#9670;&#160;</a></span>m_is_python_object</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::EnvironmentBase::m_is_python_object {false}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac6451da3eec17c24d358a5e143113ad6" name="ac6451da3eec17c24d358a5e143113ad6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6451da3eec17c24d358a5e143113ad6">&#9670;&#160;</a></span>m_mutex</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_mutex hku::EnvironmentBase::m_mutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel mutable">mutable</span><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa0bc210985e45615f69d54b6e06ffafc" name="aa0bc210985e45615f69d54b6e06ffafc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0bc210985e45615f69d54b6e06ffafc">&#9670;&#160;</a></span>m_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::EnvironmentBase::m_name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a32a4eb263ca4c84558f05107617032e3" name="a32a4eb263ca4c84558f05107617032e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32a4eb263ca4c84558f05107617032e3">&#9670;&#160;</a></span>m_query</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -566,14 +919,16 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ae5e4da625923be6a73a95bcc73895fed"></a>
+<a id="a60c3c75c1c320be14d4aac5f3e94866d" name="a60c3c75c1c320be14d4aac5f3e94866d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60c3c75c1c320be14d4aac5f3e94866d">&#9670;&#160;</a></span>m_values</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -581,12 +936,12 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::set&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>&gt; hku::EnvironmentBase::m_valid</td>
+          <td class="memname">vector&lt;<a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&gt; hku::EnvironmentBase::m_values</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -595,15 +950,26 @@ Protected 属性</h2></td></tr>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/trade_sys/environment/<a class="el" href="_environment_base_8h_source.html">EnvironmentBase.h</a></li>
-<li>hikyuu/trade_sys/environment/<a class="el" href="_environment_base_8cpp.html">EnvironmentBase.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_environment_base.html">EnvironmentBase</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

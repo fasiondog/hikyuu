@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hikyuu/data_driver/KDataDriver.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,41 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_k_data_driver_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -77,43 +74,303 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">KDataDriver.h</div>  </div>
+  <div class="headertitle"><div class="title">KDataDriver.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_k_data_driver_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * KDataDriver.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2012-9-8</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef KDATADRIVER_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define KDATADRIVER_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_k_data_driver_imp_8h.html">KDataDriverImp.h</a>&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_k_data_driver.html">KDataDriver</a> {</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">   20</a></span>&#160;    <a class="code" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">KDataDriver</a>() {}</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">KDataDriver</a>(<span class="keyword">const</span> shared_ptr&lt;IniParser&gt;&amp; config);</div><div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">   22</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">~KDataDriver</a>() { }</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classhku_1_1_k_data_driver.html#a49f912e93333682623ab5294d9807953">loadKData</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;            <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType, <span class="keywordtype">size_t</span> start_ix, <span class="keywordtype">size_t</span> end_ix,</div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            <a class="code" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a>* out_buffer) ;</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code" href="classhku_1_1_k_data_driver.html#a39191fbf368e474e7cec931269e534c2">getCount</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType);</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classhku_1_1_k_data_driver.html#a147fb87c198d8d12e3916b21c89ce980">getIndexRangeByDate</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keywordtype">size_t</span>&amp; out_start, <span class="keywordtype">size_t</span>&amp; out_end);</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_record.html">KRecord</a> <a class="code" href="classhku_1_1_k_data_driver.html#ae3efb2bf1b96064a5b6318610ee163e5">getKRecord</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;              <span class="keywordtype">size_t</span> pos, <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType);</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="namespacehku.html#ad3c5d31e88224ffc26773733e5f33e75">KDataDriverImpPtr</a> _getImpPtr(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a>);</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    map&lt;KQuery::KType, string&gt; m_suffix;</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    map&lt;string, KDataDriverImpPtr&gt; m_imp; <span class="comment">/* key: market + _day */</span></div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;};</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div><div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b">   78</a></span>&#160;<span class="keyword">typedef</span> shared_ptr&lt;KDataDriver&gt; <a class="code" href="namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b">KDataDriverPtr</a>;</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;} <span class="comment">/* namespace */</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* KDATADRIVER_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_k_data_driver_html_a147fb87c198d8d12e3916b21c89ce980"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a147fb87c198d8d12e3916b21c89ce980">hku::KDataDriver::getIndexRangeByDate</a></div><div class="ttdeci">virtual bool getIndexRangeByDate(const string &amp;market, const string &amp;code, const KQuery &amp;query, size_t &amp;out_start, size_t &amp;out_end)</div><div class="ttdoc">获取指定日期范围对应的K线记录索引 </div><div class="ttdef"><b>Definition:</b> KDataDriver.cpp:143</div></div>
-<div class="ttc" id="classhku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K线数据记录 </div><div class="ttdef"><b>Definition:</b> KRecord.h:19</div></div>
-<div class="ttc" id="namespacehku_html_a9b7b63046972bf3d488fc94a11ac198b"><div class="ttname"><a href="namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b">hku::KDataDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriver &gt; KDataDriverPtr</div><div class="ttdef"><b>Definition:</b> KDataDriver.h:78</div></div>
-<div class="ttc" id="classhku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">按索引方式查询K线数据条件 </div><div class="ttdef"><b>Definition:</b> KQuery.h:19</div></div>
-<div class="ttc" id="classhku_1_1_k_data_driver_html_a39191fbf368e474e7cec931269e534c2"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a39191fbf368e474e7cec931269e534c2">hku::KDataDriver::getCount</a></div><div class="ttdeci">virtual size_t getCount(const string &amp;market, const string &amp;code, KQuery::KType kType)</div><div class="ttdoc">获取指定类型的K线数据量 </div><div class="ttdef"><b>Definition:</b> KDataDriver.cpp:135</div></div>
-<div class="ttc" id="classhku_1_1_k_data_driver_html"><div class="ttname"><a href="classhku_1_1_k_data_driver.html">hku::KDataDriver</a></div><div class="ttdoc">K线数据驱动基类 </div><div class="ttdef"><b>Definition:</b> KDataDriver.h:18</div></div>
-<div class="ttc" id="classhku_1_1_k_data_driver_html_ae3efb2bf1b96064a5b6318610ee163e5"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#ae3efb2bf1b96064a5b6318610ee163e5">hku::KDataDriver::getKRecord</a></div><div class="ttdeci">virtual KRecord getKRecord(const string &amp;market, const string &amp;code, size_t pos, KQuery::KType kType)</div><div class="ttdoc">获取指定的K线记录 </div><div class="ttdef"><b>Definition:</b> KDataDriver.cpp:153</div></div>
-<div class="ttc" id="group___stock_manage_html_ga7a898ea401d73f139c33ccb771cb62f0"><div class="ttname"><a href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">hku::KRecordList</a></div><div class="ttdeci">vector&lt; KRecord &gt; KRecordList</div><div class="ttdef"><b>Definition:</b> KRecord.h:53</div></div>
-<div class="ttc" id="namespacehku_html_ad3c5d31e88224ffc26773733e5f33e75"><div class="ttname"><a href="namespacehku.html#ad3c5d31e88224ffc26773733e5f33e75">hku::KDataDriverImpPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriverImp &gt; KDataDriverImpPtr</div><div class="ttdef"><b>Definition:</b> KDataDriverImp.h:82</div></div>
-<div class="ttc" id="classhku_1_1_k_data_driver_html_aa9194f53dfef4655ce836f1a78ca65f4"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">hku::KDataDriver::~KDataDriver</a></div><div class="ttdeci">virtual ~KDataDriver()</div><div class="ttdef"><b>Definition:</b> KDataDriver.h:22</div></div>
-<div class="ttc" id="classhku_1_1_k_data_driver_html_a72b29caede394bbc0c2d4df3aadcfe5b"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">hku::KDataDriver::KDataDriver</a></div><div class="ttdeci">KDataDriver()</div><div class="ttdef"><b>Definition:</b> KDataDriver.h:20</div></div>
-<div class="ttc" id="classhku_1_1_k_query_html_a8d0f696de1803fbeb83db0b0a42d4ac5"><div class="ttname"><a href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">hku::KQuery::KType</a></div><div class="ttdeci">KType</div><div class="ttdoc">查询K线类型：日线/周线等 </div><div class="ttdef"><b>Definition:</b> KQuery.h:29</div></div>
-<div class="ttc" id="classhku_1_1_k_data_driver_html_a49f912e93333682623ab5294d9807953"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a49f912e93333682623ab5294d9807953">hku::KDataDriver::loadKData</a></div><div class="ttdeci">virtual void loadKData(const string &amp;market, const string &amp;code, KQuery::KType kType, size_t start_ix, size_t end_ix, KRecordList *out_buffer)</div><div class="ttdoc">将指定类型的K线数据加载至缓存 </div><div class="ttdef"><b>Definition:</b> KDataDriver.cpp:127</div></div>
-<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
-<div class="ttc" id="_k_data_driver_imp_8h_html"><div class="ttname"><a href="_k_data_driver_imp_8h.html">KDataDriverImp.h</a></div></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * KDataDriver.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2012-9-8</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef KDATADRIVER_H_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define KDATADRIVER_H_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/utilities/Parameter.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;hikyuu/KQuery.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;hikyuu/TimeLineRecord.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;hikyuu/TransRecord.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span></div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="};">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="structhku_1_1_k_record_view.html">   27</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structhku_1_1_k_record_view.html">KRecordView</a> {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structhku_1_1_k_record_view.html#a210d06ba3fa8fb1385a31682f737b8fa">   28</a></span>    <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>* <a class="code hl_variable" href="structhku_1_1_k_record_view.html#a210d06ba3fa8fb1385a31682f737b8fa">data</a>{<span class="keyword">nullptr</span>};  </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="structhku_1_1_k_record_view.html#a9611534a0c43080ccff780898d7a895e">   30</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_variable" href="structhku_1_1_k_record_view.html#a9611534a0c43080ccff780898d7a895e">count</a>{0};               </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="structhku_1_1_k_record_view.html#ace99304a2d627fb2fa2b49d57b806de8">   31</a></span>    shared_ptr&lt;void&gt; <a class="code hl_variable" href="structhku_1_1_k_record_view.html#ace99304a2d627fb2fa2b49d57b806de8">pin</a>;          </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>};</div>
+</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span></div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="};">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html">   38</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">KDataDriver</a> {</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    PARAMETER_SUPPORT</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">   42</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">KDataDriver</a>();</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a05319be2261ad6a2a3529bfb42daa82e">   44</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a05319be2261ad6a2a3529bfb42daa82e">KDataDriver</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_parameter.html">Parameter</a>&amp; params);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#adc933345962dc15972f9af993ff6c481">   50</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver.html#adc933345962dc15972f9af993ff6c481">KDataDriver</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_k_data_driver.html#af4d21c229710aad17b84634a88fd0ed2">name</a>);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">   51</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">~KDataDriver</a>() {}</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a72de6e7d8da9c79e25a611d4e0038a43">   57</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a72de6e7d8da9c79e25a611d4e0038a43">init</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_parameter.html">Parameter</a>&amp;);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">   59</a></span>    <span class="keyword">typedef</span> shared_ptr&lt;KDataDriver&gt; <a class="code hl_typedef" href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">KDataDriverPtr</a>;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a234fbb40f3e5266e043cb077e394f36d">   63</a></span>    <a class="code hl_typedef" href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">KDataDriverPtr</a> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a234fbb40f3e5266e043cb077e394f36d">clone</a>();</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a316461d1277fb46ccb6460da9c156ed5">   68</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">KDataDriverPtr</a> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a316461d1277fb46ccb6460da9c156ed5">_clone</a>() = 0;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span></div>
+<div class="foldopen" id="foldopen00074" data-start="{" data-end="}">
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#ab791df2bd08ea3456ab6d190584bab0e">   74</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#ab791df2bd08ea3456ab6d190584bab0e">_init</a>() {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
+</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a8406f0d73879d0b12563cd415293f301">   82</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a8406f0d73879d0b12563cd415293f301">isIndexFirst</a>() = 0;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a5315008412cb91275e6389b318b52d65">   87</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a5315008412cb91275e6389b318b52d65">canParallelLoad</a>() = 0;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a789dcfafa177bd20723a4c11269c9b7a">   96</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a789dcfafa177bd20723a4c11269c9b7a">getCount</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; kType);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#adaacff90c2d61cce357ca47a2917c291">  107</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#adaacff90c2d61cce357ca47a2917c291">getIndexRangeByDate</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>                                     <span class="keywordtype">size_t</span>&amp; out_start, <span class="keywordtype">size_t</span>&amp; out_end);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a9c309daf9d1dc3b1aaf4194795aaeb60">  116</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a9c309daf9d1dc3b1aaf4194795aaeb60">getKRecordList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>                                       <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#afdb1eec0dc67c0b22395085979c904ad">  133</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#afdb1eec0dc67c0b22395085979c904ad">tryGetKRecordView</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>                                   <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; kType, <span class="keywordtype">size_t</span> start_ix, <span class="keywordtype">size_t</span> end_ix,</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>                                   <a class="code hl_struct" href="structhku_1_1_k_record_view.html">KRecordView</a>&amp; out);</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#ab5b121706c988023f0639fe26bde3b0c">  144</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___stock_manage.html#gaebd46ac2ec5d96c77771eb3f60a60997">TimeLineList</a> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#ab5b121706c988023f0639fe26bde3b0c">getTimeLineList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>                                         <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a5f199d7118bf35dcb9fcc26ff0e53275">  154</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4aaf569912532a38a80a77160fdd5c6b">TransList</a> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a5f199d7118bf35dcb9fcc26ff0e53275">getTransList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="comment">//---------------------------------------------------</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="comment">// The following is the column-oriented database interface</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="comment">//---------------------------------------------------</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span></div>
+<div class="foldopen" id="foldopen00161" data-start="{" data-end="}">
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#aa6b9ae029fc91fb56d8a073b9906c350">  161</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#aa6b9ae029fc91fb56d8a073b9906c350">isColumnFirst</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    }</div>
+</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a9c93b3a04701c82e6ba0e31ec0ed49cd">  165</a></span>    <span class="keyword">virtual</span> std::unordered_map&lt;std::string, KRecordList&gt; <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a9c93b3a04701c82e6ba0e31ec0ed49cd">getAllKRecordList</a>(</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>      <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; start_date, <span class="keyword">const</span> std::atomic_bool&amp; cancel_flag);</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="keyword">protected</span>:</div>
+<div class="foldopen" id="foldopen00169" data-start="{" data-end="}">
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a127b4ae56a2f3b6cded6304803c27695">  169</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a127b4ae56a2f3b6cded6304803c27695">isPythonObject</a>() const noexcept {</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_k_data_driver.html#a129848d040f0e5be01cd144ee41d3f1d">m_is_python_object</a>;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    }</div>
+</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    <span class="keywordtype">bool</span> checkType();</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a3f877ceeb1674b84bd24818b203ef918">  177</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="classhku_1_1_k_data_driver.html#a3f877ceeb1674b84bd24818b203ef918">m_name</a>;</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#a129848d040f0e5be01cd144ee41d3f1d">  178</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="classhku_1_1_k_data_driver.html#a129848d040f0e5be01cd144ee41d3f1d">m_is_python_object</a>{<span class="keyword">false</span>};</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>};</div>
+</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span> </div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno"><a class="line" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">  181</a></span><span class="keyword">typedef</span> shared_ptr&lt;KDataDriver&gt; <a class="code hl_typedef" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">KDataDriverPtr</a>;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno"><a class="line" href="namespacehku.html#ac0909bc03116dc91b2740b21ce4eb29c">  183</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_data_driver.html">KDataDriver</a>&amp;);</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno"><a class="line" href="namespacehku.html#adc45af068c52f46062e1b27edadcad24">  184</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp;, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">KDataDriverPtr</a>&amp;);</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="foldopen" id="foldopen00186" data-start="{" data-end="}">
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver.html#af4d21c229710aad17b84634a88fd0ed2">  186</a></span><span class="keyword">inline</span> <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_k_data_driver.html#af4d21c229710aad17b84634a88fd0ed2">KDataDriver::name</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_k_data_driver.html#a3f877ceeb1674b84bd24818b203ef918">m_name</a>;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>}</div>
+</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
+<div class="foldopen" id="foldopen00190" data-start="{" data-end="};">
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html">  190</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a> {</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a90f4a9d3cb6a78f9b1e25a895873b232">  192</a></span>    <span class="keyword">typedef</span> <a class="code hl_class" href="classhku_1_1_k_data_driver.html">KDataDriver</a> <a class="code hl_typedef" href="classhku_1_1_k_data_driver_connect.html#a90f4a9d3cb6a78f9b1e25a895873b232">DriverType</a>;</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a6f56e6ba377c15dc46e857260bf1a9d1">  193</a></span>    <span class="keyword">typedef</span> <a class="code hl_typedef" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">KDataDriverPtr</a> <a class="code hl_typedef" href="classhku_1_1_k_data_driver_connect.html#a6f56e6ba377c15dc46e857260bf1a9d1">DriverTypePtr</a>;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">  195</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">KDataDriverPtr</a>&amp; driver) : m_driver(driver) {}</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a9d6e5bde74c1724fe4330154aa981719">  196</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a9d6e5bde74c1724fe4330154aa981719">~KDataDriverConnect</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a70f44e1ceafe9f0f47d6297017e02982">  198</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a70f44e1ceafe9f0f47d6297017e02982">KDataDriverConnect</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a727a8b3460e5deaadbcd47798e5f9eee">  199</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a727a8b3460e5deaadbcd47798e5f9eee">KDataDriverConnect</a>(<a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#ad3c1894f6b594e8392b1c10871a31228">  200</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>&amp; <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ad3c1894f6b594e8392b1c10871a31228">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#aef7e7be581b50a9cff8bf13c2ec51dd5">  201</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>&amp; <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#aef7e7be581b50a9cff8bf13c2ec51dd5">operator=</a>(<a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">KDataDriverConnect</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
+<div class="foldopen" id="foldopen00203" data-start="{" data-end="}">
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#ab6136b7f186b7bc9e5530939be5f8367">  203</a></span>    <span class="keyword">explicit</span> <span class="keyword">operator</span> bool() const noexcept {</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        <span class="keywordflow">return</span> m_driver.get() != <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    }</div>
+</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
+<div class="foldopen" id="foldopen00207" data-start="{" data-end="}">
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a2ff0ae7b49722d5a4b83c373b1038be8">  207</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a2ff0ae7b49722d5a4b83c373b1038be8">name</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        <span class="keywordflow">return</span> m_driver-&gt;name();</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    }</div>
+</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span> </div>
+<div class="foldopen" id="foldopen00211" data-start="{" data-end="}">
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a1696f9743f0fc50bdfd93f4ff7f3b1d1">  211</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a1696f9743f0fc50bdfd93f4ff7f3b1d1">isIndexFirst</a>() {</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        <span class="keywordflow">return</span> m_driver-&gt;isIndexFirst();</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    }</div>
+</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
+<div class="foldopen" id="foldopen00215" data-start="{" data-end="}">
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#adf0567f1a73175d26cd808bc1dbe731b">  215</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#adf0567f1a73175d26cd808bc1dbe731b">canParallelLoad</a>() {</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        <span class="keywordflow">return</span> m_driver-&gt;canParallelLoad();</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    }</div>
+</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="foldopen" id="foldopen00219" data-start="{" data-end="}">
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a9b5f691c1bde38b0e2e5a3b3a3f5b67f">  219</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a9b5f691c1bde38b0e2e5a3b3a3f5b67f">getCount</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; kType) {</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        <span class="keywordflow">return</span> m_driver-&gt;getCount(market, code, kType);</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    }</div>
+</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
+<div class="foldopen" id="foldopen00223" data-start="{" data-end="}">
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a0a55c64a7ec7f9f1e7c56822ec1c294a">  223</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a0a55c64a7ec7f9f1e7c56822ec1c294a">getIndexRangeByDate</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>                             <span class="keywordtype">size_t</span>&amp; out_start, <span class="keywordtype">size_t</span>&amp; out_end) {</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        <span class="keywordflow">return</span> m_driver-&gt;getIndexRangeByDate(market, code, query, out_start, out_end);</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    }</div>
+</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span> </div>
+<div class="foldopen" id="foldopen00228" data-start="{" data-end="}">
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a4eba99866e36443be7bf7d8f5d72fac4">  228</a></span>    <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a4eba99866e36443be7bf7d8f5d72fac4">getKRecordList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) {</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordflow">return</span> m_driver-&gt;getKRecordList(market, code, query);</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    }</div>
+</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span> </div>
+<div class="foldopen" id="foldopen00232" data-start="{" data-end="}">
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a56d184a61dfa23983aa6860b10659d72">  232</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a56d184a61dfa23983aa6860b10659d72">tryGetKRecordView</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; kType,</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>                           <span class="keywordtype">size_t</span> start_ix, <span class="keywordtype">size_t</span> end_ix, <a class="code hl_struct" href="structhku_1_1_k_record_view.html">KRecordView</a>&amp; out) {</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        <span class="keywordflow">return</span> m_driver-&gt;tryGetKRecordView(market, code, kType, start_ix, end_ix, out);</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>    }</div>
+</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span> </div>
+<div class="foldopen" id="foldopen00237" data-start="{" data-end="}">
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a8eac5cb3714526ce76da6e09eccb9967">  237</a></span>    <a class="code hl_typedef" href="group___stock_manage.html#gaebd46ac2ec5d96c77771eb3f60a60997">TimeLineList</a> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a8eac5cb3714526ce76da6e09eccb9967">getTimeLineList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) {</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>        <span class="keywordflow">return</span> m_driver-&gt;getTimeLineList(market, code, query);</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    }</div>
+</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span> </div>
+<div class="foldopen" id="foldopen00241" data-start="{" data-end="}">
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#a763e51321ac1e0ce1c3154c52fd0f325">  241</a></span>    <a class="code hl_typedef" href="group___stock_manage.html#ga4aaf569912532a38a80a77160fdd5c6b">TransList</a> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#a763e51321ac1e0ce1c3154c52fd0f325">getTransList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) {</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        <span class="keywordflow">return</span> m_driver-&gt;getTransList(market, code, query);</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    }</div>
+</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span> </div>
+<div class="foldopen" id="foldopen00245" data-start="{" data-end="}">
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#ade884d9f4395b835e8f0e9841c4d2b15">  245</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ade884d9f4395b835e8f0e9841c4d2b15">isColumnFirst</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>        <span class="keywordflow">return</span> m_driver-&gt;isColumnFirst();</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    }</div>
+</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
+<div class="foldopen" id="foldopen00249" data-start="{" data-end="}">
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_driver_connect.html#ad9d54411a5a9fda842bae9a3070b9194">  249</a></span>    std::unordered_map&lt;std::string, KRecordList&gt; <a class="code hl_function" href="classhku_1_1_k_data_driver_connect.html#ad9d54411a5a9fda842bae9a3070b9194">getAllKRecordList</a>(</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>      <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; start_date, <span class="keyword">const</span> std::atomic_bool&amp; cancel_flag) {</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>        <span class="keywordflow">return</span> m_driver-&gt;getAllKRecordList(ktype, start_date, cancel_flag);</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    }</div>
+</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span> </div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <a class="code hl_typedef" href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">KDataDriverPtr</a> m_driver;</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>};</div>
+</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span> </div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="preprocessor">#endif </span><span class="comment">/* KDATADRIVER_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a0a55c64a7ec7f9f1e7c56822ec1c294a"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a0a55c64a7ec7f9f1e7c56822ec1c294a">hku::KDataDriverConnect::getIndexRangeByDate</a></div><div class="ttdeci">bool getIndexRangeByDate(const string &amp;market, const string &amp;code, const KQuery &amp;query, size_t &amp;out_start, size_t &amp;out_end)</div><div class="ttdef"><b>定义</b> KDataDriver.h:223</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a1696f9743f0fc50bdfd93f4ff7f3b1d1"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a1696f9743f0fc50bdfd93f4ff7f3b1d1">hku::KDataDriverConnect::isIndexFirst</a></div><div class="ttdeci">bool isIndexFirst()</div><div class="ttdef"><b>定义</b> KDataDriver.h:211</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a2ff0ae7b49722d5a4b83c373b1038be8"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a2ff0ae7b49722d5a4b83c373b1038be8">hku::KDataDriverConnect::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdef"><b>定义</b> KDataDriver.h:207</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a4eba99866e36443be7bf7d8f5d72fac4"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a4eba99866e36443be7bf7d8f5d72fac4">hku::KDataDriverConnect::getKRecordList</a></div><div class="ttdeci">KRecordList getKRecordList(const string &amp;market, const string &amp;code, const KQuery &amp;query)</div><div class="ttdef"><b>定义</b> KDataDriver.h:228</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a56d184a61dfa23983aa6860b10659d72"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a56d184a61dfa23983aa6860b10659d72">hku::KDataDriverConnect::tryGetKRecordView</a></div><div class="ttdeci">bool tryGetKRecordView(const string &amp;market, const string &amp;code, const KQuery::KType &amp;kType, size_t start_ix, size_t end_ix, KRecordView &amp;out)</div><div class="ttdef"><b>定义</b> KDataDriver.h:232</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a6f56e6ba377c15dc46e857260bf1a9d1"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a6f56e6ba377c15dc46e857260bf1a9d1">hku::KDataDriverConnect::DriverTypePtr</a></div><div class="ttdeci">KDataDriverPtr DriverTypePtr</div><div class="ttdef"><b>定义</b> KDataDriver.h:193</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a70f44e1ceafe9f0f47d6297017e02982"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a70f44e1ceafe9f0f47d6297017e02982">hku::KDataDriverConnect::KDataDriverConnect</a></div><div class="ttdeci">KDataDriverConnect(const KDataDriverConnect &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a727a8b3460e5deaadbcd47798e5f9eee"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a727a8b3460e5deaadbcd47798e5f9eee">hku::KDataDriverConnect::KDataDriverConnect</a></div><div class="ttdeci">KDataDriverConnect(KDataDriverConnect &amp;&amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a763e51321ac1e0ce1c3154c52fd0f325"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a763e51321ac1e0ce1c3154c52fd0f325">hku::KDataDriverConnect::getTransList</a></div><div class="ttdeci">TransList getTransList(const string &amp;market, const string &amp;code, const KQuery &amp;query)</div><div class="ttdef"><b>定义</b> KDataDriver.h:241</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a8eac5cb3714526ce76da6e09eccb9967"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a8eac5cb3714526ce76da6e09eccb9967">hku::KDataDriverConnect::getTimeLineList</a></div><div class="ttdeci">TimeLineList getTimeLineList(const string &amp;market, const string &amp;code, const KQuery &amp;query)</div><div class="ttdef"><b>定义</b> KDataDriver.h:237</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a90f4a9d3cb6a78f9b1e25a895873b232"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a90f4a9d3cb6a78f9b1e25a895873b232">hku::KDataDriverConnect::DriverType</a></div><div class="ttdeci">KDataDriver DriverType</div><div class="ttdef"><b>定义</b> KDataDriver.h:192</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a9b5f691c1bde38b0e2e5a3b3a3f5b67f"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a9b5f691c1bde38b0e2e5a3b3a3f5b67f">hku::KDataDriverConnect::getCount</a></div><div class="ttdeci">size_t getCount(const string &amp;market, const string &amp;code, const KQuery::KType &amp;kType)</div><div class="ttdef"><b>定义</b> KDataDriver.h:219</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_a9d6e5bde74c1724fe4330154aa981719"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#a9d6e5bde74c1724fe4330154aa981719">hku::KDataDriverConnect::~KDataDriverConnect</a></div><div class="ttdeci">~KDataDriverConnect()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_ad3c1894f6b594e8392b1c10871a31228"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#ad3c1894f6b594e8392b1c10871a31228">hku::KDataDriverConnect::operator=</a></div><div class="ttdeci">KDataDriverConnect &amp; operator=(const KDataDriverConnect &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_ad9d54411a5a9fda842bae9a3070b9194"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#ad9d54411a5a9fda842bae9a3070b9194">hku::KDataDriverConnect::getAllKRecordList</a></div><div class="ttdeci">std::unordered_map&lt; std::string, KRecordList &gt; getAllKRecordList(const KQuery::KType &amp;ktype, const Datetime &amp;start_date, const std::atomic_bool &amp;cancel_flag)</div><div class="ttdef"><b>定义</b> KDataDriver.h:249</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_ade884d9f4395b835e8f0e9841c4d2b15"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#ade884d9f4395b835e8f0e9841c4d2b15">hku::KDataDriverConnect::isColumnFirst</a></div><div class="ttdeci">bool isColumnFirst() const</div><div class="ttdef"><b>定义</b> KDataDriver.h:245</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_adf0567f1a73175d26cd808bc1dbe731b"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#adf0567f1a73175d26cd808bc1dbe731b">hku::KDataDriverConnect::canParallelLoad</a></div><div class="ttdeci">bool canParallelLoad()</div><div class="ttdef"><b>定义</b> KDataDriver.h:215</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_ae087cd0fedd0a463db06c0265dc61530"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#ae087cd0fedd0a463db06c0265dc61530">hku::KDataDriverConnect::KDataDriverConnect</a></div><div class="ttdeci">KDataDriverConnect(const KDataDriverPtr &amp;driver)</div><div class="ttdef"><b>定义</b> KDataDriver.h:195</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_connect_html_aef7e7be581b50a9cff8bf13c2ec51dd5"><div class="ttname"><a href="classhku_1_1_k_data_driver_connect.html#aef7e7be581b50a9cff8bf13c2ec51dd5">hku::KDataDriverConnect::operator=</a></div><div class="ttdeci">KDataDriverConnect &amp; operator=(KDataDriverConnect &amp;&amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html"><div class="ttname"><a href="classhku_1_1_k_data_driver.html">hku::KDataDriver</a></div><div class="ttdoc">Base class of the K-line data driver</div><div class="ttdef"><b>定义</b> KDataDriver.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a05319be2261ad6a2a3529bfb42daa82e"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a05319be2261ad6a2a3529bfb42daa82e">hku::KDataDriver::KDataDriver</a></div><div class="ttdeci">KDataDriver(const Parameter &amp;params)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a127b4ae56a2f3b6cded6304803c27695"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a127b4ae56a2f3b6cded6304803c27695">hku::KDataDriver::isPythonObject</a></div><div class="ttdeci">bool isPythonObject() const noexcept</div><div class="ttdef"><b>定义</b> KDataDriver.h:169</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a129848d040f0e5be01cd144ee41d3f1d"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a129848d040f0e5be01cd144ee41d3f1d">hku::KDataDriver::m_is_python_object</a></div><div class="ttdeci">bool m_is_python_object</div><div class="ttdef"><b>定义</b> KDataDriver.h:178</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a1c635843a21ead2794d614493077a950"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">hku::KDataDriver::KDataDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriver &gt; KDataDriverPtr</div><div class="ttdef"><b>定义</b> KDataDriver.h:59</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a234fbb40f3e5266e043cb077e394f36d"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a234fbb40f3e5266e043cb077e394f36d">hku::KDataDriver::clone</a></div><div class="ttdeci">KDataDriverPtr clone()</div><div class="ttdoc">Clone implementation</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a316461d1277fb46ccb6460da9c156ed5"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a316461d1277fb46ccb6460da9c156ed5">hku::KDataDriver::_clone</a></div><div class="ttdeci">virtual KDataDriverPtr _clone()=0</div><div class="ttdoc">Subclass clone function implementation</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a3f877ceeb1674b84bd24818b203ef918"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a3f877ceeb1674b84bd24818b203ef918">hku::KDataDriver::m_name</a></div><div class="ttdeci">string m_name</div><div class="ttdef"><b>定义</b> KDataDriver.h:177</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a5315008412cb91275e6389b318b52d65"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a5315008412cb91275e6389b318b52d65">hku::KDataDriver::canParallelLoad</a></div><div class="ttdeci">virtual bool canParallelLoad()=0</div><div class="ttdoc">Whether parallel data loading is supported</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a5f199d7118bf35dcb9fcc26ff0e53275"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a5f199d7118bf35dcb9fcc26ff0e53275">hku::KDataDriver::getTransList</a></div><div class="ttdeci">virtual TransList getTransList(const string &amp;market, const string &amp;code, const KQuery &amp;query)</div><div class="ttdoc">Get the historical tick data</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a72b29caede394bbc0c2d4df3aadcfe5b"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">hku::KDataDriver::KDataDriver</a></div><div class="ttdeci">KDataDriver()</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a72de6e7d8da9c79e25a611d4e0038a43"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a72de6e7d8da9c79e25a611d4e0038a43">hku::KDataDriver::init</a></div><div class="ttdeci">bool init(const Parameter &amp;)</div><div class="ttdoc">Driver initialization</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a789dcfafa177bd20723a4c11269c9b7a"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a789dcfafa177bd20723a4c11269c9b7a">hku::KDataDriver::getCount</a></div><div class="ttdeci">virtual size_t getCount(const string &amp;market, const string &amp;code, const KQuery::KType &amp;kType)</div><div class="ttdoc">Get the amount of the K-line data of the given type</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a8406f0d73879d0b12563cd415293f301"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a8406f0d73879d0b12563cd415293f301">hku::KDataDriver::isIndexFirst</a></div><div class="ttdeci">virtual bool isIndexFirst()=0</div><div class="ttdoc">Judge whether the query by position index is faster for this engine, or the query by date is faster</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a9c309daf9d1dc3b1aaf4194795aaeb60"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a9c309daf9d1dc3b1aaf4194795aaeb60">hku::KDataDriver::getKRecordList</a></div><div class="ttdeci">virtual KRecordList getKRecordList(const string &amp;market, const string &amp;code, const KQuery &amp;query)</div><div class="ttdoc">Get the K-line data</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a9c93b3a04701c82e6ba0e31ec0ed49cd"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a9c93b3a04701c82e6ba0e31ec0ed49cd">hku::KDataDriver::getAllKRecordList</a></div><div class="ttdeci">virtual std::unordered_map&lt; std::string, KRecordList &gt; getAllKRecordList(const KQuery::KType &amp;ktype, const Datetime &amp;start_date, const std::atomic_bool &amp;cancel_flag)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_aa6b9ae029fc91fb56d8a073b9906c350"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#aa6b9ae029fc91fb56d8a073b9906c350">hku::KDataDriver::isColumnFirst</a></div><div class="ttdeci">virtual bool isColumnFirst() const</div><div class="ttdoc">Whether it is column-first (the K-line data is stored in a column database)</div><div class="ttdef"><b>定义</b> KDataDriver.h:161</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_aa9194f53dfef4655ce836f1a78ca65f4"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">hku::KDataDriver::~KDataDriver</a></div><div class="ttdeci">virtual ~KDataDriver()</div><div class="ttdef"><b>定义</b> KDataDriver.h:51</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_ab5b121706c988023f0639fe26bde3b0c"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#ab5b121706c988023f0639fe26bde3b0c">hku::KDataDriver::getTimeLineList</a></div><div class="ttdeci">virtual TimeLineList getTimeLineList(const string &amp;market, const string &amp;code, const KQuery &amp;query)</div><div class="ttdoc">Get the time-sharing (intraday) line</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_ab791df2bd08ea3456ab6d190584bab0e"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#ab791df2bd08ea3456ab6d190584bab0e">hku::KDataDriver::_init</a></div><div class="ttdeci">virtual bool _init()</div><div class="ttdoc">Interface for the subclass to initialize its private variables</div><div class="ttdef"><b>定义</b> KDataDriver.h:74</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_adaacff90c2d61cce357ca47a2917c291"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#adaacff90c2d61cce357ca47a2917c291">hku::KDataDriver::getIndexRangeByDate</a></div><div class="ttdeci">virtual bool getIndexRangeByDate(const string &amp;market, const string &amp;code, const KQuery &amp;query, size_t &amp;out_start, size_t &amp;out_end)</div><div class="ttdoc">Get the K-line record index corresponding to the given date range</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_adc933345962dc15972f9af993ff6c481"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#adc933345962dc15972f9af993ff6c481">hku::KDataDriver::KDataDriver</a></div><div class="ttdeci">KDataDriver(const string &amp;name)</div><div class="ttdoc">Constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_af4d21c229710aad17b84634a88fd0ed2"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#af4d21c229710aad17b84634a88fd0ed2">hku::KDataDriver::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the driver name</div><div class="ttdef"><b>定义</b> KDataDriver.h:186</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_afdb1eec0dc67c0b22395085979c904ad"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#afdb1eec0dc67c0b22395085979c904ad">hku::KDataDriver::tryGetKRecordView</a></div><div class="ttdeci">virtual bool tryGetKRecordView(const string &amp;market, const string &amp;code, const KQuery::KType &amp;kType, size_t start_ix, size_t end_ix, KRecordView &amp;out)</div><div class="ttdoc">Get the raw pointer view of the K-line records of the given range (zero copy, optional implementation...</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K-line data record</div><div class="ttdef"><b>定义</b> KRecord.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_parameter_html"><div class="ttname"><a href="classhku_1_1_parameter.html">hku::Parameter</a></div><div class="ttdoc">Used by the classes that need the named parameter settings</div><div class="ttdef"><b>定义</b> Parameter.h:202</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga4aaf569912532a38a80a77160fdd5c6b"><div class="ttname"><a href="group___stock_manage.html#ga4aaf569912532a38a80a77160fdd5c6b">hku::TransList</a></div><div class="ttdeci">vector&lt; TransRecord &gt; TransList</div><div class="ttdoc">Time-sharing (tick) line</div><div class="ttdef"><b>定义</b> TransRecord.h:37</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga7a898ea401d73f139c33ccb771cb62f0"><div class="ttname"><a href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">hku::KRecordList</a></div><div class="ttdeci">vector&lt; KRecord &gt; KRecordList</div><div class="ttdef"><b>定义</b> KRecord.h:67</div></div>
+<div class="ttc" id="agroup___stock_manage_html_gaebd46ac2ec5d96c77771eb3f60a60997"><div class="ttname"><a href="group___stock_manage.html#gaebd46ac2ec5d96c77771eb3f60a60997">hku::TimeLineList</a></div><div class="ttdeci">vector&lt; TimeLineRecord &gt; TimeLineList</div><div class="ttdoc">Time-sharing (intraday) line</div><div class="ttdef"><b>定义</b> TimeLineRecord.h:36</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_ac92c5810c3d9582283d88a71f51dcbc5"><div class="ttname"><a href="namespacehku.html#ac92c5810c3d9582283d88a71f51dcbc5">hku::KDataDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriver &gt; KDataDriverPtr</div><div class="ttdef"><b>定义</b> KDataDriver.h:181</div></div>
+<div class="ttc" id="astructhku_1_1_k_record_view_html"><div class="ttname"><a href="structhku_1_1_k_record_view.html">hku::KRecordView</a></div><div class="ttdoc">Raw pointer view of the K-line records (zero copy)</div><div class="ttdef"><b>定义</b> KDataDriver.h:27</div></div>
+<div class="ttc" id="astructhku_1_1_k_record_view_html_a210d06ba3fa8fb1385a31682f737b8fa"><div class="ttname"><a href="structhku_1_1_k_record_view.html#a210d06ba3fa8fb1385a31682f737b8fa">hku::KRecordView::data</a></div><div class="ttdeci">const KRecord * data</div><div class="ttdoc">Pointer of the first record of the range (count consecutive records)</div><div class="ttdef"><b>定义</b> KDataDriver.h:28</div></div>
+<div class="ttc" id="astructhku_1_1_k_record_view_html_a9611534a0c43080ccff780898d7a895e"><div class="ttname"><a href="structhku_1_1_k_record_view.html#a9611534a0c43080ccff780898d7a895e">hku::KRecordView::count</a></div><div class="ttdeci">size_t count</div><div class="ttdoc">Number of the records in the range</div><div class="ttdef"><b>定义</b> KDataDriver.h:30</div></div>
+<div class="ttc" id="astructhku_1_1_k_record_view_html_ace99304a2d627fb2fa2b49d57b806de8"><div class="ttname"><a href="structhku_1_1_k_record_view.html#ace99304a2d627fb2fa2b49d57b806de8">hku::KRecordView::pin</a></div><div class="ttdeci">shared_ptr&lt; void &gt; pin</div><div class="ttdoc">Holds the mapping alive (type-erased)</div><div class="ttdef"><b>定义</b> KDataDriver.h:31</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><b>KDataDriver.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

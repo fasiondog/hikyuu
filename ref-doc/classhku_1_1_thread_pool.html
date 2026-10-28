@@ -1,0 +1,465 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::ThreadPool类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_thread_pool.html','','classhku_1_1_thread_pool-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::ThreadPool类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___thread_pool.html">Thread Pool thread pool</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>An ordinary centralized task queue thread pool; the tasks are independent of each other and cannot wait for each other  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_thread_pool_8h_source.html">ThreadPool.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:ExecutorWrapper" id="r_ExecutorWrapper"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhku_1_1_thread_pool_1_1_executor_wrapper.html">ExecutorWrapper</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a6030d1236d87caa352a0b00447ab87c4" id="r_a6030d1236d87caa352a0b00447ab87c4"><td class="memTemplParams" colspan="2">template&lt;typename ResultType&gt; </td></tr>
+<tr class="memitem:a6030d1236d87caa352a0b00447ab87c4 template"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6030d1236d87caa352a0b00447ab87c4">task_handle</a> = std::future&lt;ResultType&gt;</td></tr>
+<tr class="memdesc:a6030d1236d87caa352a0b00447ab87c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the corresponding future returned after submitting a task to the thread pool  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ac9cf16cf4504f206f6408863d0879cf5" id="r_ac9cf16cf4504f206f6408863d0879cf5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9cf16cf4504f206f6408863d0879cf5">ThreadPool</a> ()</td></tr>
+<tr class="memdesc:ac9cf16cf4504f206f6408863d0879cf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, it creates the number of the threads equal to the number of the CPUs of the current system  <br /></td></tr>
+<tr class="memitem:ad67e5e85df330df8d4e4b50fc15b1b2d" id="r_ad67e5e85df330df8d4e4b50fc15b1b2d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad67e5e85df330df8d4e4b50fc15b1b2d">ThreadPool</a> (size_t n, bool until_empty=true)</td></tr>
+<tr class="memdesc:ad67e5e85df330df8d4e4b50fc15b1b2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it creates the given number of the threads  <br /></td></tr>
+<tr class="memitem:a6ecbcac71936a465fa47c8d28ef5f7ab" id="r_a6ecbcac71936a465fa47c8d28ef5f7ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ecbcac71936a465fa47c8d28ef5f7ab">~ThreadPool</a> ()</td></tr>
+<tr class="memdesc:a6ecbcac71936a465fa47c8d28ef5f7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, it waits and blocks until all the tasks in the thread pool are finished  <br /></td></tr>
+<tr class="memitem:afc36e5de44d8ff488cc5f87b6ab1c8d4" id="r_afc36e5de44d8ff488cc5f87b6ab1c8d4"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc36e5de44d8ff488cc5f87b6ab1c8d4">worker_num</a> () const</td></tr>
+<tr class="memdesc:afc36e5de44d8ff488cc5f87b6ab1c8d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of the worker threads  <br /></td></tr>
+<tr class="memitem:a39288047c6c96c746b2854803959d755" id="r_a39288047c6c96c746b2854803959d755"><td class="memTemplParams" colspan="2">template&lt;typename FunctionType&gt; </td></tr>
+<tr class="memitem:a39288047c6c96c746b2854803959d755 template"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39288047c6c96c746b2854803959d755">submit</a> (FunctionType &amp;&amp;f)</td></tr>
+<tr class="memdesc:a39288047c6c96c746b2854803959d755"><td class="mdescLeft">&#160;</td><td class="mdescRight">Submit a task to the thread pool  <br /></td></tr>
+<tr class="memitem:a2a2a95662e1e86dd362d23ac76565c3e" id="r_a2a2a95662e1e86dd362d23ac76565c3e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2a2a95662e1e86dd362d23ac76565c3e">done</a> () const</td></tr>
+<tr class="memdesc:a2a2a95662e1e86dd362d23ac76565c3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end state of the thread pool  <br /></td></tr>
+<tr class="memitem:aa795b9441715bac36d6c9a62b5744111" id="r_aa795b9441715bac36d6c9a62b5744111"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa795b9441715bac36d6c9a62b5744111">remain_task_count</a> () const</td></tr>
+<tr class="memdesc:aa795b9441715bac36d6c9a62b5744111"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of the remaining tasks  <br /></td></tr>
+<tr class="memitem:a180b89f56d096c50e0f8e22bbf375530" id="r_a180b89f56d096c50e0f8e22bbf375530"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a180b89f56d096c50e0f8e22bbf375530">stop</a> ()</td></tr>
+<tr class="memdesc:a180b89f56d096c50e0f8e22bbf375530"><td class="mdescLeft">&#160;</td><td class="mdescRight">It waits for every thread to finish the currently executed task and then exits immediately  <br /></td></tr>
+<tr class="memitem:a43d1739e5493219c66a30f8f12b263cc" id="r_a43d1739e5493219c66a30f8f12b263cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43d1739e5493219c66a30f8f12b263cc">join</a> ()</td></tr>
+<tr class="memdesc:a43d1739e5493219c66a30f8f12b263cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">It waits and blocks until all the tasks in the thread pool are finished  <br /></td></tr>
+<tr class="memitem:a379277cab10f4fbd0a33eaef38fabcf3" id="r_a379277cab10f4fbd0a33eaef38fabcf3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhku_1_1_thread_pool_1_1_executor_wrapper.html">ExecutorWrapper</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a379277cab10f4fbd0a33eaef38fabcf3">executor</a> ()</td></tr>
+<tr class="memdesc:a379277cab10f4fbd0a33eaef38fabcf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coroutine executor  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>An ordinary centralized task queue thread pool; the tasks are independent of each other and cannot wait for each other </p>
+<dl class="section note"><dt>注解</dt><dd>If the tasks have a sequential order, please use <a class="el" href="classhku_1_1_steal_thread_pool.html" title="Distributed stealing thread pool">StealThreadPool</a>. </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a6030d1236d87caa352a0b00447ab87c4" name="a6030d1236d87caa352a0b00447ab87c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6030d1236d87caa352a0b00447ab87c4">&#9670;&#160;</a></span>task_handle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResultType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a6030d1236d87caa352a0b00447ab87c4">hku::ThreadPool::task_handle</a> = std::future&lt;ResultType&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The type of the corresponding future returned after submitting a task to the thread pool </p>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ac9cf16cf4504f206f6408863d0879cf5" name="ac9cf16cf4504f206f6408863d0879cf5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9cf16cf4504f206f6408863d0879cf5">&#9670;&#160;</a></span>ThreadPool() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::ThreadPool::ThreadPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default constructor, it creates the number of the threads equal to the number of the CPUs of the current system </p>
+
+</div>
+</div>
+<a id="ad67e5e85df330df8d4e4b50fc15b1b2d" name="ad67e5e85df330df8d4e4b50fc15b1b2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad67e5e85df330df8d4e4b50fc15b1b2d">&#9670;&#160;</a></span>ThreadPool() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::ThreadPool::ThreadPool </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>until_empty</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor, it creates the given number of the threads </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>the given number of the threads </td></tr>
+    <tr><td class="paramname">until_empty</td><td>when joining, it waits for the task queue to be empty and then stops running </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6ecbcac71936a465fa47c8d28ef5f7ab" name="a6ecbcac71936a465fa47c8d28ef5f7ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ecbcac71936a465fa47c8d28ef5f7ab">&#9670;&#160;</a></span>~ThreadPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::ThreadPool::~ThreadPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor, it waits and blocks until all the tasks in the thread pool are finished </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a2a2a95662e1e86dd362d23ac76565c3e" name="a2a2a95662e1e86dd362d23ac76565c3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a2a95662e1e86dd362d23ac76565c3e">&#9670;&#160;</a></span>done()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::ThreadPool::done </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the end state of the thread pool </p>
+
+</div>
+</div>
+<a id="a379277cab10f4fbd0a33eaef38fabcf3" name="a379277cab10f4fbd0a33eaef38fabcf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a379277cab10f4fbd0a33eaef38fabcf3">&#9670;&#160;</a></span>executor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structhku_1_1_thread_pool_1_1_executor_wrapper.html">ExecutorWrapper</a> hku::ThreadPool::executor </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Coroutine executor </p>
+
+</div>
+</div>
+<a id="a43d1739e5493219c66a30f8f12b263cc" name="a43d1739e5493219c66a30f8f12b263cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43d1739e5493219c66a30f8f12b263cc">&#9670;&#160;</a></span>join()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ThreadPool::join </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It waits and blocks until all the tasks in the thread pool are finished </p>
+<dl class="section note"><dt>注解</dt><dd>From then on the thread pool cannot be used after the worker threads are ended </dd></dl>
+
+</div>
+</div>
+<a id="aa795b9441715bac36d6c9a62b5744111" name="aa795b9441715bac36d6c9a62b5744111"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa795b9441715bac36d6c9a62b5744111">&#9670;&#160;</a></span>remain_task_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::ThreadPool::remain_task_count </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of the remaining tasks </p>
+
+</div>
+</div>
+<a id="a180b89f56d096c50e0f8e22bbf375530" name="a180b89f56d096c50e0f8e22bbf375530"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a180b89f56d096c50e0f8e22bbf375530">&#9670;&#160;</a></span>stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ThreadPool::stop </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It waits for every thread to finish the currently executed task and then exits immediately </p>
+
+</div>
+</div>
+<a id="a39288047c6c96c746b2854803959d755" name="a39288047c6c96c746b2854803959d755"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39288047c6c96c746b2854803959d755">&#9670;&#160;</a></span>submit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename FunctionType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto hku::ThreadPool::submit </td>
+          <td>(</td>
+          <td class="paramtype">FunctionType &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Submit a task to the thread pool </p>
+
+</div>
+</div>
+<a id="afc36e5de44d8ff488cc5f87b6ab1c8d4" name="afc36e5de44d8ff488cc5f87b6ab1c8d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc36e5de44d8ff488cc5f87b6ab1c8d4">&#9670;&#160;</a></span>worker_num()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::ThreadPool::worker_num </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the number of the worker threads </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/thread/<a class="el" href="_thread_pool_8h_source.html">ThreadPool.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_thread_pool.html">ThreadPool</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

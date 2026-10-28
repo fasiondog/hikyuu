@@ -1,0 +1,180 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/plugin/factor.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('plugin_2_f_a_c_t_o_r_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">factor.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2026 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2026-02-21</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/factor/FactorSet.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="namespacehku.html#a872d1f2c42eafc1bec7b24e028f68220">   15</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a872d1f2c42eafc1bec7b24e028f68220">saveFactor</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a>&amp; factor, <span class="keywordtype">bool</span> update_before = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="namespacehku.html#a5c6e62c6698b7225ba3c4cea12f973dd">   18</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a5c6e62c6698b7225ba3c4cea12f973dd">saveSpecialFactorValues</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a>&amp; factor, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock,</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>                                     <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&amp; dates, <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a>&amp; values,</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>                                     <span class="keywordtype">bool</span> replace);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="namespacehku.html#ad2d6f4dfc61e91bd95ab17b7432113a5">   22</a></span><span class="keywordtype">bool</span> HKU_API <a class="code hl_function" href="namespacehku.html#ad2d6f4dfc61e91bd95ab17b7432113a5">hasFactor</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="namespacehku.html#a5f7bc8c1bf3f1e3fb9059a43f865e318">   25</a></span><a class="code hl_class" href="classhku_1_1_factor.html">Factor</a> HKU_API <a class="code hl_function" href="namespacehku.html#a5f7bc8c1bf3f1e3fb9059a43f865e318">getFactor</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="namespacehku.html#aa754057799bbb7858557186aa76b4917">   28</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#aa754057799bbb7858557186aa76b4917">removeFactor</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="namespacehku.html#af7dda6265e53585275a9de68840ec4ce">   31</a></span><a class="code hl_typedef" href="namespacehku.html#ae731f4a3610442c7af4690f14b14d6c0">FactorList</a> HKU_API <a class="code hl_function" href="namespacehku.html#af7dda6265e53585275a9de68840ec4ce">getAllFactors</a>();</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="namespacehku.html#a4c54f3f746e00555c03f6e8be061a1c0">   34</a></span><a class="code hl_typedef" href="namespacehku.html#aa635a934213dca67adc5626c4b6f1e4c">FactorSetList</a> HKU_API <a class="code hl_function" href="namespacehku.html#a4c54f3f746e00555c03f6e8be061a1c0">getAllFactorSets</a>();</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="namespacehku.html#a8f69a66383f5740800dc71064e47e461">   37</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a8f69a66383f5740800dc71064e47e461">updateAllFactorsValues</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="namespacehku.html#a46a20e1155c6679593087d382e6340af">   40</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a46a20e1155c6679593087d382e6340af">saveFactorSet</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a>&amp; set);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="namespacehku.html#a4b8eff60abbdfe5c333050a789b171ac">   43</a></span><span class="keywordtype">void</span> HKU_API <a class="code hl_function" href="namespacehku.html#a4b8eff60abbdfe5c333050a789b171ac">removeFactorSet</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="namespacehku.html#a05bee4e38a518fb977e3a4d43b514a76">   46</a></span><a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a> HKU_API <a class="code hl_function" href="namespacehku.html#a05bee4e38a518fb977e3a4d43b514a76">getFactorSet</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype = <a class="code hl_variable" href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">KQuery::DAY</a>);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="namespacehku.html#a0b681d56064af95001c70e8ba8e4031a">   48</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku.html#a0b681d56064af95001c70e8ba8e4031a">isValidFactorName</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="namespacehku.html#a98d16b88af864166b204a31eb1127b3b">   50</a></span><a class="code hl_typedef" href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">IndicatorList</a> <a class="code hl_function" href="namespacehku.html#a98d16b88af864166b204a31eb1127b3b">getValues</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor.html">Factor</a>&amp; factor, <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stocks, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                        <span class="keywordtype">bool</span> align, <span class="keywordtype">bool</span> fill_null, <span class="keywordtype">bool</span> tovalue, <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&amp; align_dates);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="namespacehku.html#a6105ca91523b058550116cae3a69205d">   53</a></span>vector&lt;IndicatorList&gt; <a class="code hl_function" href="namespacehku.html#a98d16b88af864166b204a31eb1127b3b">getValues</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_factor_set.html">FactorSet</a>&amp; factor_set, <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&amp; stocks,</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                                <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keywordtype">bool</span> align, <span class="keywordtype">bool</span> fill_null, <span class="keywordtype">bool</span> tovalue,</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>                                <span class="keyword">const</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&amp; align_dates);</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_factor_html"><div class="ttname"><a href="classhku_1_1_factor.html">hku::Factor</a></div><div class="ttdef"><b>定义</b> Factor.h:15</div></div>
+<div class="ttc" id="aclasshku_1_1_factor_set_html"><div class="ttname"><a href="classhku_1_1_factor_set.html">hku::FactorSet</a></div><div class="ttdef"><b>定义</b> FactorSet.h:16</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a305b6d1aff976a8b9d2460e6964308fe"><div class="ttname"><a href="classhku_1_1_k_query.html#a305b6d1aff976a8b9d2460e6964308fe">hku::KQuery::DAY</a></div><div class="ttdeci">static const string DAY</div><div class="ttdef"><b>定义</b> KQuery.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gae6bd4dd3668ad317763b0ca333e250bb"><div class="ttname"><a href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></div><div class="ttdeci">vector&lt; price_t &gt; PriceList</div><div class="ttdef"><b>定义</b> DataType.h:151</div></div>
+<div class="ttc" id="agroup___data_type_html_gaeb6c8c0a18561345f892e2c4be1f5ef2"><div class="ttname"><a href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">hku::DatetimeList</a></div><div class="ttdeci">std::vector&lt; Datetime &gt; DatetimeList</div><div class="ttdoc">Date list</div><div class="ttdef"><b>定义</b> Datetime.h:375</div></div>
+<div class="ttc" id="agroup___indicator_html_ga81836486a13fb215ce8fe8bc264d203d"><div class="ttname"><a href="group___indicator.html#ga81836486a13fb215ce8fe8bc264d203d">hku::IndicatorList</a></div><div class="ttdeci">vector&lt; Indicator &gt; IndicatorList</div><div class="ttdef"><b>定义</b> Indicator.h:296</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga4a4df6bef18cec4791cca9bd27a4e973"><div class="ttname"><a href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">hku::StockList</a></div><div class="ttdeci">vector&lt; Stock &gt; StockList</div><div class="ttdef"><b>定义</b> Stock.h:409</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a05bee4e38a518fb977e3a4d43b514a76"><div class="ttname"><a href="namespacehku.html#a05bee4e38a518fb977e3a4d43b514a76">hku::getFactorSet</a></div><div class="ttdeci">FactorSet HKU_API getFactorSet(const string &amp;name, const KQuery::KType &amp;ktype=KQuery::DAY)</div><div class="ttdoc">Get the factor set</div></div>
+<div class="ttc" id="anamespacehku_html_a0b681d56064af95001c70e8ba8e4031a"><div class="ttname"><a href="namespacehku.html#a0b681d56064af95001c70e8ba8e4031a">hku::isValidFactorName</a></div><div class="ttdeci">bool isValidFactorName(const string &amp;name)</div></div>
+<div class="ttc" id="anamespacehku_html_a46a20e1155c6679593087d382e6340af"><div class="ttname"><a href="namespacehku.html#a46a20e1155c6679593087d382e6340af">hku::saveFactorSet</a></div><div class="ttdeci">void HKU_API saveFactorSet(const FactorSet &amp;set)</div><div class="ttdoc">Save the factor set</div></div>
+<div class="ttc" id="anamespacehku_html_a4b8eff60abbdfe5c333050a789b171ac"><div class="ttname"><a href="namespacehku.html#a4b8eff60abbdfe5c333050a789b171ac">hku::removeFactorSet</a></div><div class="ttdeci">void HKU_API removeFactorSet(const string &amp;name, const KQuery::KType &amp;ktype)</div><div class="ttdoc">Delete the factor set</div></div>
+<div class="ttc" id="anamespacehku_html_a4c54f3f746e00555c03f6e8be061a1c0"><div class="ttname"><a href="namespacehku.html#a4c54f3f746e00555c03f6e8be061a1c0">hku::getAllFactorSets</a></div><div class="ttdeci">FactorSetList HKU_API getAllFactorSets()</div><div class="ttdoc">Get all the factor sets</div></div>
+<div class="ttc" id="anamespacehku_html_a5c6e62c6698b7225ba3c4cea12f973dd"><div class="ttname"><a href="namespacehku.html#a5c6e62c6698b7225ba3c4cea12f973dd">hku::saveSpecialFactorValues</a></div><div class="ttdeci">void HKU_API saveSpecialFactorValues(const Factor &amp;factor, const Stock &amp;stock, const DatetimeList &amp;dates, const PriceList &amp;values, bool replace)</div><div class="ttdoc">Save the special factor values</div></div>
+<div class="ttc" id="anamespacehku_html_a5f7bc8c1bf3f1e3fb9059a43f865e318"><div class="ttname"><a href="namespacehku.html#a5f7bc8c1bf3f1e3fb9059a43f865e318">hku::getFactor</a></div><div class="ttdeci">Factor HKU_API getFactor(const string &amp;name, const KQuery::KType &amp;ktype=KQuery::DAY)</div><div class="ttdoc">Get the factor</div></div>
+<div class="ttc" id="anamespacehku_html_a872d1f2c42eafc1bec7b24e028f68220"><div class="ttname"><a href="namespacehku.html#a872d1f2c42eafc1bec7b24e028f68220">hku::saveFactor</a></div><div class="ttdeci">void HKU_API saveFactor(const Factor &amp;factor, bool update_before=true)</div><div class="ttdoc">Save the factor</div></div>
+<div class="ttc" id="anamespacehku_html_a8f69a66383f5740800dc71064e47e461"><div class="ttname"><a href="namespacehku.html#a8f69a66383f5740800dc71064e47e461">hku::updateAllFactorsValues</a></div><div class="ttdeci">void HKU_API updateAllFactorsValues(const KQuery::KType &amp;ktype=KQuery::DAY)</div><div class="ttdoc">Update all the saved factor data to the current</div></div>
+<div class="ttc" id="anamespacehku_html_a98d16b88af864166b204a31eb1127b3b"><div class="ttname"><a href="namespacehku.html#a98d16b88af864166b204a31eb1127b3b">hku::getValues</a></div><div class="ttdeci">IndicatorList getValues(const Factor &amp;factor, const StockList &amp;stocks, const KQuery &amp;query, bool align, bool fill_null, bool tovalue, const DatetimeList &amp;align_dates)</div></div>
+<div class="ttc" id="anamespacehku_html_aa635a934213dca67adc5626c4b6f1e4c"><div class="ttname"><a href="namespacehku.html#aa635a934213dca67adc5626c4b6f1e4c">hku::FactorSetList</a></div><div class="ttdeci">vector&lt; FactorSet &gt; FactorSetList</div><div class="ttdef"><b>定义</b> FactorSet.h:338</div></div>
+<div class="ttc" id="anamespacehku_html_aa754057799bbb7858557186aa76b4917"><div class="ttname"><a href="namespacehku.html#aa754057799bbb7858557186aa76b4917">hku::removeFactor</a></div><div class="ttdeci">void HKU_API removeFactor(const string &amp;name, const KQuery::KType &amp;ktype=KQuery::DAY)</div><div class="ttdoc">Delete the factor</div></div>
+<div class="ttc" id="anamespacehku_html_ad2d6f4dfc61e91bd95ab17b7432113a5"><div class="ttname"><a href="namespacehku.html#ad2d6f4dfc61e91bd95ab17b7432113a5">hku::hasFactor</a></div><div class="ttdeci">bool HKU_API hasFactor(const string &amp;name, const KQuery::KType &amp;ktype=KQuery::DAY)</div></div>
+<div class="ttc" id="anamespacehku_html_ae731f4a3610442c7af4690f14b14d6c0"><div class="ttname"><a href="namespacehku.html#ae731f4a3610442c7af4690f14b14d6c0">hku::FactorList</a></div><div class="ttdeci">vector&lt; Factor &gt; FactorList</div><div class="ttdef"><b>定义</b> Factor.h:367</div></div>
+<div class="ttc" id="anamespacehku_html_af7dda6265e53585275a9de68840ec4ce"><div class="ttname"><a href="namespacehku.html#af7dda6265e53585275a9de68840ec4ce">hku::getAllFactors</a></div><div class="ttdeci">FactorList HKU_API getAllFactors()</div><div class="ttdoc">Get all the factors</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_991d4c37e893a0798e9e63870536be30.html">plugin</a></li><li class="navelem"><b>factor.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

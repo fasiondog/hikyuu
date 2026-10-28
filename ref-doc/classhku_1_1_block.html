@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: hku::Block类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_block.html','','classhku_1_1_block-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,176 +74,187 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_block.html">Block</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-types">Public 类型</a> &#124;
-<a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="classhku_1_1_block-members.html">所有成员列表</a>  </div>
-  <div class="headertitle">
-<div class="title">hku::Block类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+  <div class="headertitle"><div class="title">hku::Block类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___base.html">Base infrastructure</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage security management</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>板块类，可视为证券的容器  
- <a href="classhku_1_1_block.html#details">更多...</a></p>
+<p>Sector (<a class="el" href="classhku_1_1_block.html" title="Sector (Block) class, which can be regarded as a container of securities">Block</a>) class, which can be regarded as a container of securities  
+ <a href="#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_block_8h_source.html">Block.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:ad50db5a20eb28f6b57c127911489185a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">const_iterator</a></td></tr>
-<tr class="separator:ad50db5a20eb28f6b57c127911489185a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad50db5a20eb28f6b57c127911489185a" id="r_ad50db5a20eb28f6b57c127911489185a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad50db5a20eb28f6b57c127911489185a">const_iterator</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a825c938e9377cb3dbe3d3b7c1575e88f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a825c938e9377cb3dbe3d3b7c1575e88f">Block</a> ()</td></tr>
-<tr class="separator:a825c938e9377cb3dbe3d3b7c1575e88f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae205fe4f4207792d7b8ff8f802bef99b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ae205fe4f4207792d7b8ff8f802bef99b">Block</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_block.html#ac53b5a4a2f346d55cd4db26589ede4fc">category</a>, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_block.html#af1d4eb20f43842c5263b11088bd72616">name</a>)</td></tr>
-<tr class="separator:ae205fe4f4207792d7b8ff8f802bef99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f2aefa3606e0e8f2ad17a121e755773"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a4f2aefa3606e0e8f2ad17a121e755773">Block</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;)</td></tr>
-<tr class="separator:a4f2aefa3606e0e8f2ad17a121e755773"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38125b4b615566b67178b88e9ccb359f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a38125b4b615566b67178b88e9ccb359f">operator=</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;)</td></tr>
-<tr class="separator:a38125b4b615566b67178b88e9ccb359f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cc0c97cf34edac6d994c586ce7424a9"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a0cc0c97cf34edac6d994c586ce7424a9">~Block</a> ()</td></tr>
-<tr class="separator:a0cc0c97cf34edac6d994c586ce7424a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae105055e8af7da3a08251b04ee1c5919"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ae105055e8af7da3a08251b04ee1c5919">begin</a> () const </td></tr>
-<tr class="separator:ae105055e8af7da3a08251b04ee1c5919"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad344dd1c279d5d0922db32e3b3950b04"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ad344dd1c279d5d0922db32e3b3950b04">end</a> () const </td></tr>
-<tr class="separator:ad344dd1c279d5d0922db32e3b3950b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a557e339f0d5dff1474dafb6bdff284c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a557e339f0d5dff1474dafb6bdff284c6">operator==</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;blk)</td></tr>
-<tr class="separator:a557e339f0d5dff1474dafb6bdff284c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdef11daed4db04d79cd78d63b99cdfb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#afdef11daed4db04d79cd78d63b99cdfb">operator!=</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;blk)</td></tr>
-<tr class="separator:afdef11daed4db04d79cd78d63b99cdfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac53b5a4a2f346d55cd4db26589ede4fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ac53b5a4a2f346d55cd4db26589ede4fc">category</a> () const </td></tr>
-<tr class="memdesc:ac53b5a4a2f346d55cd4db26589ede4fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取板块类别  <a href="#ac53b5a4a2f346d55cd4db26589ede4fc">更多...</a><br /></td></tr>
-<tr class="separator:ac53b5a4a2f346d55cd4db26589ede4fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1d4eb20f43842c5263b11088bd72616"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#af1d4eb20f43842c5263b11088bd72616">name</a> () const </td></tr>
-<tr class="memdesc:af1d4eb20f43842c5263b11088bd72616"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取板块名称  <a href="#af1d4eb20f43842c5263b11088bd72616">更多...</a><br /></td></tr>
-<tr class="separator:af1d4eb20f43842c5263b11088bd72616"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdf62da8344c28663a074b107eee3a01"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#afdf62da8344c28663a074b107eee3a01">category</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;category)</td></tr>
-<tr class="memdesc:afdf62da8344c28663a074b107eee3a01"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置板块类别  <a href="#afdf62da8344c28663a074b107eee3a01">更多...</a><br /></td></tr>
-<tr class="separator:afdf62da8344c28663a074b107eee3a01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03b06dd3e88e7aae5f00d0683cc56fe1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a03b06dd3e88e7aae5f00d0683cc56fe1">name</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
-<tr class="memdesc:a03b06dd3e88e7aae5f00d0683cc56fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置名称  <a href="#a03b06dd3e88e7aae5f00d0683cc56fe1">更多...</a><br /></td></tr>
-<tr class="separator:a03b06dd3e88e7aae5f00d0683cc56fe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37775bee3ec5b6ff98d37b8796cb9314"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a37775bee3ec5b6ff98d37b8796cb9314">have</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market_code) const </td></tr>
-<tr class="memdesc:a37775bee3ec5b6ff98d37b8796cb9314"><td class="mdescLeft">&#160;</td><td class="mdescRight">是否包含指定的证券  <a href="#a37775bee3ec5b6ff98d37b8796cb9314">更多...</a><br /></td></tr>
-<tr class="separator:a37775bee3ec5b6ff98d37b8796cb9314"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92f545aa5142d56ecf8e464042d7c3e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a92f545aa5142d56ecf8e464042d7c3e5">have</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) const </td></tr>
-<tr class="memdesc:a92f545aa5142d56ecf8e464042d7c3e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">是否包含指定的证券  <a href="#a92f545aa5142d56ecf8e464042d7c3e5">更多...</a><br /></td></tr>
-<tr class="separator:a92f545aa5142d56ecf8e464042d7c3e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cacc96d3bf4206116413194e536c794"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a4cacc96d3bf4206116413194e536c794">get</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market_code) const </td></tr>
-<tr class="memdesc:a4cacc96d3bf4206116413194e536c794"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的证券  <a href="#a4cacc96d3bf4206116413194e536c794">更多...</a><br /></td></tr>
-<tr class="separator:a4cacc96d3bf4206116413194e536c794"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa092977e257f2a7530afce56aa01104"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#afa092977e257f2a7530afce56aa01104">operator[]</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market_code) const </td></tr>
-<tr class="memdesc:afa092977e257f2a7530afce56aa01104"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的证券  <a href="#afa092977e257f2a7530afce56aa01104">更多...</a><br /></td></tr>
-<tr class="separator:afa092977e257f2a7530afce56aa01104"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eeb9a5da805aae9da3bac126a5fad77"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a1eeb9a5da805aae9da3bac126a5fad77">add</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
-<tr class="memdesc:a1eeb9a5da805aae9da3bac126a5fad77"><td class="mdescLeft">&#160;</td><td class="mdescRight">加入指定证券  <a href="#a1eeb9a5da805aae9da3bac126a5fad77">更多...</a><br /></td></tr>
-<tr class="separator:a1eeb9a5da805aae9da3bac126a5fad77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6b961638159f1c9fb036862c039defe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ad6b961638159f1c9fb036862c039defe">add</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market_code)</td></tr>
-<tr class="memdesc:ad6b961638159f1c9fb036862c039defe"><td class="mdescLeft">&#160;</td><td class="mdescRight">加入指定证券  <a href="#ad6b961638159f1c9fb036862c039defe">更多...</a><br /></td></tr>
-<tr class="separator:ad6b961638159f1c9fb036862c039defe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac84dc807d3fa71d484141cff40ca308e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ac84dc807d3fa71d484141cff40ca308e">remove</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market_code)</td></tr>
-<tr class="memdesc:ac84dc807d3fa71d484141cff40ca308e"><td class="mdescLeft">&#160;</td><td class="mdescRight">移除指定证券  <a href="#ac84dc807d3fa71d484141cff40ca308e">更多...</a><br /></td></tr>
-<tr class="separator:ac84dc807d3fa71d484141cff40ca308e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29899179f6879f7e05ecd3cf17109cd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a29899179f6879f7e05ecd3cf17109cd0">remove</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
-<tr class="memdesc:a29899179f6879f7e05ecd3cf17109cd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">移除指定证券  <a href="#a29899179f6879f7e05ecd3cf17109cd0">更多...</a><br /></td></tr>
-<tr class="separator:a29899179f6879f7e05ecd3cf17109cd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac16f4c775559862edcd3db692b7faada"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#ac16f4c775559862edcd3db692b7faada">size</a> () const </td></tr>
-<tr class="memdesc:ac16f4c775559862edcd3db692b7faada"><td class="mdescLeft">&#160;</td><td class="mdescRight">包含的证券数量  <a href="#ac16f4c775559862edcd3db692b7faada">更多...</a><br /></td></tr>
-<tr class="separator:ac16f4c775559862edcd3db692b7faada"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a9bb97de621e143a23ad3f96980c33e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a3a9bb97de621e143a23ad3f96980c33e">empty</a> () const </td></tr>
-<tr class="memdesc:a3a9bb97de621e143a23ad3f96980c33e"><td class="mdescLeft">&#160;</td><td class="mdescRight">是否为空  <a href="#a3a9bb97de621e143a23ad3f96980c33e">更多...</a><br /></td></tr>
-<tr class="separator:a3a9bb97de621e143a23ad3f96980c33e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a758639891cbbd0e75e6f32de84fac6d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_block.html#a758639891cbbd0e75e6f32de84fac6d5">clear</a> ()</td></tr>
-<tr class="memdesc:a758639891cbbd0e75e6f32de84fac6d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除包含的所有证券  <a href="#a758639891cbbd0e75e6f32de84fac6d5">更多...</a><br /></td></tr>
-<tr class="separator:a758639891cbbd0e75e6f32de84fac6d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab242c0e562290bb19ffa33f0c0e208ac" id="r_ab242c0e562290bb19ffa33f0c0e208ac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab242c0e562290bb19ffa33f0c0e208ac">Block</a> () noexcept</td></tr>
+<tr class="memitem:ae205fe4f4207792d7b8ff8f802bef99b" id="r_ae205fe4f4207792d7b8ff8f802bef99b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae205fe4f4207792d7b8ff8f802bef99b">Block</a> (const string &amp;<a class="el" href="#a5c741008e342ef82b91ff2ce0f02b9eb">category</a>, const string &amp;<a class="el" href="#aba59e60b981741b3abeda9b2eeab0688">name</a>)</td></tr>
+<tr class="memitem:a89d00c2cb089ef49c2e974755b8f25f1" id="r_a89d00c2cb089ef49c2e974755b8f25f1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89d00c2cb089ef49c2e974755b8f25f1">Block</a> (const string &amp;<a class="el" href="#a5c741008e342ef82b91ff2ce0f02b9eb">category</a>, const string &amp;<a class="el" href="#aba59e60b981741b3abeda9b2eeab0688">name</a>, const string &amp;indexCode)</td></tr>
+<tr class="memitem:a86e02e1f20b3171a99f49a5dd9a6ac04" id="r_a86e02e1f20b3171a99f49a5dd9a6ac04"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86e02e1f20b3171a99f49a5dd9a6ac04">Block</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;) noexcept</td></tr>
+<tr class="memitem:a3973470640aaca10c6d9571a1b404af3" id="r_a3973470640aaca10c6d9571a1b404af3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3973470640aaca10c6d9571a1b404af3">Block</a> (<a class="el" href="classhku_1_1_block.html">Block</a> &amp;&amp;) noexcept</td></tr>
+<tr class="memitem:a222d02612bc0d0e903e681a5774ac2e9" id="r_a222d02612bc0d0e903e681a5774ac2e9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a222d02612bc0d0e903e681a5774ac2e9">operator=</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;) noexcept</td></tr>
+<tr class="memitem:a7513f98cdc95e6f96bd76a1ac6ed355a" id="r_a7513f98cdc95e6f96bd76a1ac6ed355a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7513f98cdc95e6f96bd76a1ac6ed355a">operator=</a> (<a class="el" href="classhku_1_1_block.html">Block</a> &amp;&amp;) noexcept</td></tr>
+<tr class="memitem:a57380bfaf338262f2b911a6582219dfa" id="r_a57380bfaf338262f2b911a6582219dfa"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57380bfaf338262f2b911a6582219dfa">~Block</a> ()</td></tr>
+<tr class="memitem:ae132b16e7f3cbbf699bba09f76546a00" id="r_ae132b16e7f3cbbf699bba09f76546a00"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae132b16e7f3cbbf699bba09f76546a00">Block</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stocks)</td></tr>
+<tr class="memdesc:ae132b16e7f3cbbf699bba09f76546a00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a sector from a security list; the category and name are empty, usually used for a temporary sector  <br /></td></tr>
+<tr class="memitem:acca2a8329c155fec631f94fdadf7d0ff" id="r_acca2a8329c155fec631f94fdadf7d0ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acca2a8329c155fec631f94fdadf7d0ff">Block</a> (const <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">StringList</a> &amp;market_codes)</td></tr>
+<tr class="memdesc:acca2a8329c155fec631f94fdadf7d0ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a sector from a security code list; the category and name are empty, usually used for a temporary sector  <br /></td></tr>
+<tr class="memitem:a9ba084c1c9d6b962715a081a33f17187" id="r_a9ba084c1c9d6b962715a081a33f17187"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ad50db5a20eb28f6b57c127911489185a">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ba084c1c9d6b962715a081a33f17187">begin</a> () const</td></tr>
+<tr class="memitem:a6a4a1b7eafb4ff964cfd1404b01fd7a9" id="r_a6a4a1b7eafb4ff964cfd1404b01fd7a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ad50db5a20eb28f6b57c127911489185a">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a4a1b7eafb4ff964cfd1404b01fd7a9">end</a> () const</td></tr>
+<tr class="memitem:a8669f88456cd478528a729ab9fd544f7" id="r_a8669f88456cd478528a729ab9fd544f7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8669f88456cd478528a729ab9fd544f7">isNull</a> () const noexcept</td></tr>
+<tr class="memitem:a233cfe710f49d6708e125752fde6479e" id="r_a233cfe710f49d6708e125752fde6479e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a233cfe710f49d6708e125752fde6479e">id</a> () const noexcept</td></tr>
+<tr class="memitem:ac77e17a33356c3df46b903be051150cc" id="r_ac77e17a33356c3df46b903be051150cc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac77e17a33356c3df46b903be051150cc">operator==</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;blk) const noexcept</td></tr>
+<tr class="memitem:ae9557620268c133e9d0d854a4847d2ec" id="r_ae9557620268c133e9d0d854a4847d2ec"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9557620268c133e9d0d854a4847d2ec">operator!=</a> (const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;blk) const noexcept</td></tr>
+<tr class="memitem:a5c741008e342ef82b91ff2ce0f02b9eb" id="r_a5c741008e342ef82b91ff2ce0f02b9eb"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c741008e342ef82b91ff2ce0f02b9eb">category</a> () const noexcept</td></tr>
+<tr class="memdesc:a5c741008e342ef82b91ff2ce0f02b9eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sector category  <br /></td></tr>
+<tr class="memitem:aba59e60b981741b3abeda9b2eeab0688" id="r_aba59e60b981741b3abeda9b2eeab0688"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba59e60b981741b3abeda9b2eeab0688">name</a> () const noexcept</td></tr>
+<tr class="memdesc:aba59e60b981741b3abeda9b2eeab0688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sector name  <br /></td></tr>
+<tr class="memitem:afdf62da8344c28663a074b107eee3a01" id="r_afdf62da8344c28663a074b107eee3a01"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afdf62da8344c28663a074b107eee3a01">category</a> (const string &amp;category)</td></tr>
+<tr class="memdesc:afdf62da8344c28663a074b107eee3a01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the sector category  <br /></td></tr>
+<tr class="memitem:a03b06dd3e88e7aae5f00d0683cc56fe1" id="r_a03b06dd3e88e7aae5f00d0683cc56fe1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03b06dd3e88e7aae5f00d0683cc56fe1">name</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:a03b06dd3e88e7aae5f00d0683cc56fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name  <br /></td></tr>
+<tr class="memitem:a8a6b4e67c9ef00898421884299cb0169" id="r_a8a6b4e67c9ef00898421884299cb0169"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8a6b4e67c9ef00898421884299cb0169">have</a> (const string &amp;market_code) const</td></tr>
+<tr class="memdesc:a8a6b4e67c9ef00898421884299cb0169"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the given security is contained  <br /></td></tr>
+<tr class="memitem:aaec7a6c4fa8852d17e5b99dd08b03601" id="r_aaec7a6c4fa8852d17e5b99dd08b03601"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaec7a6c4fa8852d17e5b99dd08b03601">have</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock) const</td></tr>
+<tr class="memdesc:aaec7a6c4fa8852d17e5b99dd08b03601"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the given security is contained  <br /></td></tr>
+<tr class="memitem:a71117928de5c225085b832be9f37d99e" id="r_a71117928de5c225085b832be9f37d99e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a71117928de5c225085b832be9f37d99e">get</a> (const string &amp;market_code) const</td></tr>
+<tr class="memdesc:a71117928de5c225085b832be9f37d99e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the given security  <br /></td></tr>
+<tr class="memitem:a9a100f06e314af331361ea7831eb7bca" id="r_a9a100f06e314af331361ea7831eb7bca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a100f06e314af331361ea7831eb7bca">operator[]</a> (const string &amp;market_code) const</td></tr>
+<tr class="memdesc:a9a100f06e314af331361ea7831eb7bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the given security  <br /></td></tr>
+<tr class="memitem:ab194c910b43afa6184dc4c10cfd1dc54" id="r_ab194c910b43afa6184dc4c10cfd1dc54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab194c910b43afa6184dc4c10cfd1dc54">getStockList</a> (std::function&lt; bool(const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;)&gt; &amp;&amp;filter=std::function&lt; bool(const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;)&gt;()) const</td></tr>
+<tr class="memdesc:ab194c910b43afa6184dc4c10cfd1dc54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all the securities in the sector  <br /></td></tr>
+<tr class="memitem:a1eeb9a5da805aae9da3bac126a5fad77" id="r_a1eeb9a5da805aae9da3bac126a5fad77"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1eeb9a5da805aae9da3bac126a5fad77">add</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
+<tr class="memdesc:a1eeb9a5da805aae9da3bac126a5fad77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the given security  <br /></td></tr>
+<tr class="memitem:ad6b961638159f1c9fb036862c039defe" id="r_ad6b961638159f1c9fb036862c039defe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad6b961638159f1c9fb036862c039defe">add</a> (const string &amp;market_code)</td></tr>
+<tr class="memdesc:ad6b961638159f1c9fb036862c039defe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the given security  <br /></td></tr>
+<tr class="memitem:ad56a77065d9874add1591e9aeb3d8b6f" id="r_ad56a77065d9874add1591e9aeb3d8b6f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad56a77065d9874add1591e9aeb3d8b6f">add</a> (const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;stocks)</td></tr>
+<tr class="memdesc:ad56a77065d9874add1591e9aeb3d8b6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the given security list  <br /></td></tr>
+<tr class="memitem:a1128439ef1b4d95b5473fce449e724a1" id="r_a1128439ef1b4d95b5473fce449e724a1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1128439ef1b4d95b5473fce449e724a1">add</a> (const <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">StringList</a> &amp;market_codes)</td></tr>
+<tr class="memdesc:a1128439ef1b4d95b5473fce449e724a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the given security list  <br /></td></tr>
+<tr class="memitem:ac84dc807d3fa71d484141cff40ca308e" id="r_ac84dc807d3fa71d484141cff40ca308e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac84dc807d3fa71d484141cff40ca308e">remove</a> (const string &amp;market_code)</td></tr>
+<tr class="memdesc:ac84dc807d3fa71d484141cff40ca308e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the given security  <br /></td></tr>
+<tr class="memitem:a29899179f6879f7e05ecd3cf17109cd0" id="r_a29899179f6879f7e05ecd3cf17109cd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29899179f6879f7e05ecd3cf17109cd0">remove</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
+<tr class="memdesc:a29899179f6879f7e05ecd3cf17109cd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the given security  <br /></td></tr>
+<tr class="memitem:a81f9d31b2760a0dabfe13d866f4252d7" id="r_a81f9d31b2760a0dabfe13d866f4252d7"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81f9d31b2760a0dabfe13d866f4252d7">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a81f9d31b2760a0dabfe13d866f4252d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of contained securities  <br /></td></tr>
+<tr class="memitem:aea126d3a672c281955bf048157ef6cd5" id="r_aea126d3a672c281955bf048157ef6cd5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea126d3a672c281955bf048157ef6cd5">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:aea126d3a672c281955bf048157ef6cd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether it is empty  <br /></td></tr>
+<tr class="memitem:a758639891cbbd0e75e6f32de84fac6d5" id="r_a758639891cbbd0e75e6f32de84fac6d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a758639891cbbd0e75e6f32de84fac6d5">clear</a> ()</td></tr>
+<tr class="memdesc:a758639891cbbd0e75e6f32de84fac6d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove all contained securities  <br /></td></tr>
+<tr class="memitem:afafa37f6ae0754794b1e04775145b8d6" id="r_afafa37f6ae0754794b1e04775145b8d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afafa37f6ae0754794b1e04775145b8d6">getIndexStock</a> () const noexcept</td></tr>
+<tr class="memdesc:afafa37f6ae0754794b1e04775145b8d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the corresponding index; it may be a null <a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a>  <br /></td></tr>
+<tr class="memitem:ac49b29e13972892a7185727e2cdf5205" id="r_ac49b29e13972892a7185727e2cdf5205"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac49b29e13972892a7185727e2cdf5205">setIndexStock</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stk)</td></tr>
+<tr class="memdesc:ac49b29e13972892a7185727e2cdf5205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the corresponding index  <br /></td></tr>
+<tr class="memitem:a5f80fc6de4b3b2bfd3d0e3c3bbc38a7c" id="r_a5f80fc6de4b3b2bfd3d0e3c3bbc38a7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f80fc6de4b3b2bfd3d0e3c3bbc38a7c">strongHash</a> () const</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>板块类，可视为证券的容器 </p>
-</div><h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="ad50db5a20eb28f6b57c127911489185a"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Sector (<a class="el" href="classhku_1_1_block.html" title="Sector (Block) class, which can be regarded as a container of securities">Block</a>) class, which can be regarded as a container of securities </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="ad50db5a20eb28f6b57c127911489185a" name="ad50db5a20eb28f6b57c127911489185a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad50db5a20eb28f6b57c127911489185a">&#9670;&#160;</a></span>const_iterator</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> <a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">hku::Block::const_iterator</a></td>
+          <td class="memname">typedef <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> <a class="el" href="#ad50db5a20eb28f6b57c127911489185a">hku::Block::const_iterator</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a825c938e9377cb3dbe3d3b7c1575e88f"></a>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ab242c0e562290bb19ffa33f0c0e208ac" name="ab242c0e562290bb19ffa33f0c0e208ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab242c0e562290bb19ffa33f0c0e208ac">&#9670;&#160;</a></span>Block() <span class="overload">[1/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">hku::Block::Block </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ae205fe4f4207792d7b8ff8f802bef99b"></a>
+<a id="ae205fe4f4207792d7b8ff8f802bef99b" name="ae205fe4f4207792d7b8ff8f802bef99b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae205fe4f4207792d7b8ff8f802bef99b">&#9670;&#160;</a></span>Block() <span class="overload">[2/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::Block::Block </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>category</em>, </td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>category</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a4f2aefa3606e0e8f2ad17a121e755773"></a>
+<a id="a89d00c2cb089ef49c2e974755b8f25f1" name="a89d00c2cb089ef49c2e974755b8f25f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89d00c2cb089ef49c2e974755b8f25f1">&#9670;&#160;</a></span>Block() <span class="overload">[3/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">hku::Block::Block </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td>
-          <td class="paramname"><em>block</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>category</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>indexCode</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a0cc0c97cf34edac6d994c586ce7424a9"></a>
+<a id="a86e02e1f20b3171a99f49a5dd9a6ac04" name="a86e02e1f20b3171a99f49a5dd9a6ac04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86e02e1f20b3171a99f49a5dd9a6ac04">&#9670;&#160;</a></span>Block() <span class="overload">[4/7]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -256,59 +262,223 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">hku::Block::~Block </td>
+          <td class="memname">hku::Block::Block </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a1eeb9a5da805aae9da3bac126a5fad77"></a>
+<a id="a3973470640aaca10c6d9571a1b404af3" name="a3973470640aaca10c6d9571a1b404af3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3973470640aaca10c6d9571a1b404af3">&#9670;&#160;</a></span>Block() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Block::Block </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_block.html">Block</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a57380bfaf338262f2b911a6582219dfa" name="a57380bfaf338262f2b911a6582219dfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57380bfaf338262f2b911a6582219dfa">&#9670;&#160;</a></span>~Block()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::Block::~Block </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae132b16e7f3cbbf699bba09f76546a00" name="ae132b16e7f3cbbf699bba09f76546a00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae132b16e7f3cbbf699bba09f76546a00">&#9670;&#160;</a></span>Block() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Block::Block </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stocks</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a sector from a security list; the category and name are empty, usually used for a temporary sector </p>
+
+</div>
+</div>
+<a id="acca2a8329c155fec631f94fdadf7d0ff" name="acca2a8329c155fec631f94fdadf7d0ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acca2a8329c155fec631f94fdadf7d0ff">&#9670;&#160;</a></span>Block() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::Block::Block </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">StringList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>market_codes</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a sector from a security code list; the category and name are empty, usually used for a temporary sector </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a1eeb9a5da805aae9da3bac126a5fad77" name="a1eeb9a5da805aae9da3bac126a5fad77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1eeb9a5da805aae9da3bac126a5fad77">&#9670;&#160;</a></span>add() <span class="overload">[1/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool hku::Block::add </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>加入指定证券 </p>
+<p>Add the given security </p>
 
 </div>
 </div>
-<a class="anchor" id="ad6b961638159f1c9fb036862c039defe"></a>
+<a id="ad56a77065d9874add1591e9aeb3d8b6f" name="ad56a77065d9874add1591e9aeb3d8b6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad56a77065d9874add1591e9aeb3d8b6f">&#9670;&#160;</a></span>add() <span class="overload">[2/4]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool hku::Block::add </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>market_code</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stocks</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>加入指定证券 </p>
+<p>Add the given security list </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stocks</td><td>security list </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true all succeeded </dd>
+<dd>
+false at least one failed </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ae105055e8af7da3a08251b04ee1c5919"></a>
+<a id="ad6b961638159f1c9fb036862c039defe" name="ad6b961638159f1c9fb036862c039defe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6b961638159f1c9fb036862c039defe">&#9670;&#160;</a></span>add() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Block::add </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add the given security </p>
+
+</div>
+</div>
+<a id="a1128439ef1b4d95b5473fce449e724a1" name="a1128439ef1b4d95b5473fce449e724a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1128439ef1b4d95b5473fce449e724a1">&#9670;&#160;</a></span>add() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Block::add </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">StringList</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>market_codes</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add the given security list </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">market_codes</td><td>security identifier list </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true all succeeded </dd>
+<dd>
+false at least one failed </dd></dl>
+
+</div>
+</div>
+<a id="a9ba084c1c9d6b962715a081a33f17187" name="a9ba084c1c9d6b962715a081a33f17187"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ba084c1c9d6b962715a081a33f17187">&#9670;&#160;</a></span>begin()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -316,22 +486,24 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">const_iterator</a> hku::Block::begin </td>
+          <td class="memname"><a class="el" href="#ad50db5a20eb28f6b57c127911489185a">const_iterator</a> hku::Block::begin </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ac53b5a4a2f346d55cd4db26589ede4fc"></a>
+<a id="a5c741008e342ef82b91ff2ce0f02b9eb" name="a5c741008e342ef82b91ff2ce0f02b9eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c741008e342ef82b91ff2ce0f02b9eb">&#9670;&#160;</a></span>category() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -339,24 +511,26 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::Block::category </td>
+          <td class="memname">string hku::Block::category </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取板块类别 </p>
+<p>Get the sector category </p>
 
 </div>
 </div>
-<a class="anchor" id="afdf62da8344c28663a074b107eee3a01"></a>
+<a id="afdf62da8344c28663a074b107eee3a01" name="afdf62da8344c28663a074b107eee3a01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdf62da8344c28663a074b107eee3a01">&#9670;&#160;</a></span>category() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -366,23 +540,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">void hku::Block::category </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>category</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>category</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>设置板块类别 </p>
+<p>Set the sector category </p>
 
 </div>
 </div>
-<a class="anchor" id="a758639891cbbd0e75e6f32de84fac6d5"></a>
+<a id="a758639891cbbd0e75e6f32de84fac6d5" name="a758639891cbbd0e75e6f32de84fac6d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a758639891cbbd0e75e6f32de84fac6d5">&#9670;&#160;</a></span>clear()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -392,22 +567,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">void hku::Block::clear </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>清除包含的所有证券 </p>
+<p>Remove all contained securities </p>
 
 </div>
 </div>
-<a class="anchor" id="a3a9bb97de621e143a23ad3f96980c33e"></a>
+<a id="aea126d3a672c281955bf048157ef6cd5" name="aea126d3a672c281955bf048157ef6cd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea126d3a672c281955bf048157ef6cd5">&#9670;&#160;</a></span>empty()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -417,22 +594,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bool hku::Block::empty </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>是否为空 </p>
+<p>Whether it is empty </p>
 
 </div>
 </div>
-<a class="anchor" id="ad344dd1c279d5d0922db32e3b3950b04"></a>
+<a id="a6a4a1b7eafb4ff964cfd1404b01fd7a9" name="a6a4a1b7eafb4ff964cfd1404b01fd7a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a4a1b7eafb4ff964cfd1404b01fd7a9">&#9670;&#160;</a></span>end()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -440,76 +619,43 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_block.html#ad50db5a20eb28f6b57c127911489185a">const_iterator</a> hku::Block::end </td>
+          <td class="memname"><a class="el" href="#ad50db5a20eb28f6b57c127911489185a">const_iterator</a> hku::Block::end </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a4cacc96d3bf4206116413194e536c794"></a>
+<a id="a71117928de5c225085b832be9f37d99e" name="a71117928de5c225085b832be9f37d99e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71117928de5c225085b832be9f37d99e">&#9670;&#160;</a></span>get()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::Block::get </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>market_code</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>获取指定的证券 </p>
+<p>Get the given security </p>
 
 </div>
 </div>
-<a class="anchor" id="a37775bee3ec5b6ff98d37b8796cb9314"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool hku::Block::have </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>market_code</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<a id="afafa37f6ae0754794b1e04775145b8d6" name="afafa37f6ae0754794b1e04775145b8d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afafa37f6ae0754794b1e04775145b8d6">&#9670;&#160;</a></span>getIndexStock()</h2>
 
-<p>是否包含指定的证券 </p>
-
-</div>
-</div>
-<a class="anchor" id="a92f545aa5142d56ecf8e464042d7c3e5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool hku::Block::have </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>是否包含指定的证券 </p>
-
-</div>
-</div>
-<a class="anchor" id="af1d4eb20f43842c5263b11088bd72616"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -517,24 +663,160 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::Block::name </td>
+          <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::Block::getIndexStock </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取板块名称 </p>
+<p>Get the corresponding index; it may be a null <a class="el" href="classhku_1_1_stock.html" title="Base class of a security (Stock).">Stock</a> </p>
 
 </div>
 </div>
-<a class="anchor" id="a03b06dd3e88e7aae5f00d0683cc56fe1"></a>
+<a id="ab194c910b43afa6184dc4c10cfd1dc54" name="ab194c910b43afa6184dc4c10cfd1dc54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab194c910b43afa6184dc4c10cfd1dc54">&#9670;&#160;</a></span>getStockList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> hku::Block::getStockList </td>
+          <td>(</td>
+          <td class="paramtype">std::function&lt; bool(const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;)&gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::function&lt;&#160;bool(const&#160;<a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;&amp;)&gt;()</span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get all the securities in the sector </p>
+
+</div>
+</div>
+<a id="aaec7a6c4fa8852d17e5b99dd08b03601" name="aaec7a6c4fa8852d17e5b99dd08b03601"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaec7a6c4fa8852d17e5b99dd08b03601">&#9670;&#160;</a></span>have() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Block::have </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether the given security is contained </p>
+
+</div>
+</div>
+<a id="a8a6b4e67c9ef00898421884299cb0169" name="a8a6b4e67c9ef00898421884299cb0169"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a6b4e67c9ef00898421884299cb0169">&#9670;&#160;</a></span>have() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Block::have </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether the given security is contained </p>
+
+</div>
+</div>
+<a id="a233cfe710f49d6708e125752fde6479e" name="a233cfe710f49d6708e125752fde6479e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a233cfe710f49d6708e125752fde6479e">&#9670;&#160;</a></span>id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Block::id </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8669f88456cd478528a729ab9fd544f7" name="a8669f88456cd478528a729ab9fd544f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8669f88456cd478528a729ab9fd544f7">&#9670;&#160;</a></span>isNull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::Block::isNull </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aba59e60b981741b3abeda9b2eeab0688" name="aba59e60b981741b3abeda9b2eeab0688"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba59e60b981741b3abeda9b2eeab0688">&#9670;&#160;</a></span>name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string hku::Block::name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the sector name </p>
+
+</div>
+</div>
+<a id="a03b06dd3e88e7aae5f00d0683cc56fe1" name="a03b06dd3e88e7aae5f00d0683cc56fe1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03b06dd3e88e7aae5f00d0683cc56fe1">&#9670;&#160;</a></span>name() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -544,23 +826,24 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">void hku::Block::name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>设置名称 </p>
+<p>Set the name </p>
 
 </div>
 </div>
-<a class="anchor" id="afdef11daed4db04d79cd78d63b99cdfb"></a>
+<a id="ae9557620268c133e9d0d854a4847d2ec" name="ae9557620268c133e9d0d854a4847d2ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9557620268c133e9d0d854a4847d2ec">&#9670;&#160;</a></span>operator!=()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -570,37 +853,72 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bool hku::Block::operator!= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td>
-          <td class="paramname"><em>blk</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>blk</em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a38125b4b615566b67178b88e9ccb359f"></a>
+<a id="a7513f98cdc95e6f96bd76a1ac6ed355a" name="a7513f98cdc95e6f96bd76a1ac6ed355a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7513f98cdc95e6f96bd76a1ac6ed355a">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_block.html">Block</a> &amp; hku::Block::operator= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td>
-          <td class="paramname"><em>block</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_block.html">Block</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a557e339f0d5dff1474dafb6bdff284c6"></a>
+<a id="a222d02612bc0d0e903e681a5774ac2e9" name="a222d02612bc0d0e903e681a5774ac2e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a222d02612bc0d0e903e681a5774ac2e9">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_block.html">Block</a> &amp; hku::Block::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac77e17a33356c3df46b903be051150cc" name="ac77e17a33356c3df46b903be051150cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac77e17a33356c3df46b903be051150cc">&#9670;&#160;</a></span>operator==()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -610,21 +928,22 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">bool hku::Block::operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;&#160;</td>
-          <td class="paramname"><em>blk</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_block.html">Block</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>blk</em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="afa092977e257f2a7530afce56aa01104"></a>
+<a id="a9a100f06e314af331361ea7831eb7bca" name="a9a100f06e314af331361ea7831eb7bca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a100f06e314af331361ea7831eb7bca">&#9670;&#160;</a></span>operator[]()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -634,59 +953,81 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::Block::operator[] </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>market_code</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>获取指定的证券 </p>
+<p>Get the given security </p>
 
 </div>
 </div>
-<a class="anchor" id="ac84dc807d3fa71d484141cff40ca308e"></a>
+<a id="a29899179f6879f7e05ecd3cf17109cd0" name="a29899179f6879f7e05ecd3cf17109cd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29899179f6879f7e05ecd3cf17109cd0">&#9670;&#160;</a></span>remove() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool hku::Block::remove </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>market_code</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stock</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>移除指定证券 </p>
+<p>Remove the given security </p>
 
 </div>
 </div>
-<a class="anchor" id="a29899179f6879f7e05ecd3cf17109cd0"></a>
+<a id="ac84dc807d3fa71d484141cff40ca308e" name="ac84dc807d3fa71d484141cff40ca308e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac84dc807d3fa71d484141cff40ca308e">&#9670;&#160;</a></span>remove() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool hku::Block::remove </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em></td><td>)</td>
+          <td class="paramtype">const string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>移除指定证券 </p>
+<p>Remove the given security </p>
 
 </div>
 </div>
-<a class="anchor" id="ac16f4c775559862edcd3db692b7faada"></a>
+<a id="ac49b29e13972892a7185727e2cdf5205" name="ac49b29e13972892a7185727e2cdf5205"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac49b29e13972892a7185727e2cdf5205">&#9670;&#160;</a></span>setIndexStock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::Block::setIndexStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>stk</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the corresponding index </p>
+
+</div>
+</div>
+<a id="a81f9d31b2760a0dabfe13d866f4252d7" name="a81f9d31b2760a0dabfe13d866f4252d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81f9d31b2760a0dabfe13d866f4252d7">&#9670;&#160;</a></span>size()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -696,32 +1037,60 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">size_t hku::Block::size </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>包含的证券数量 </p>
+<p>Number of contained securities </p>
+
+</div>
+</div>
+<a id="a5f80fc6de4b3b2bfd3d0e3c3bbc38a7c" name="a5f80fc6de4b3b2bfd3d0e3c3bbc38a7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f80fc6de4b3b2bfd3d0e3c3bbc38a7c">&#9670;&#160;</a></span>strongHash()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> hku::Block::strongHash </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/<a class="el" href="_block_8h_source.html">Block.h</a></li>
-<li>hikyuu/<a class="el" href="_block_8cpp.html">Block.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_block.html">Block</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,4 +1,20 @@
 var searchData=
 [
-  ['datetime',['datetime',['../structhku_1_1_h5_record.html#ab8662fe67ae2ce079771be7d4f8a173e',1,'hku::H5Record::datetime()'],['../structhku_1_1_h5_index_record.html#a202e3f0528b55001c7fcc3428a0cfe81',1,'hku::H5IndexRecord::datetime()'],['../classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760',1,'hku::KRecord::datetime()'],['../structhku_1_1_borrow_record_1_1_data.html#ac2851b7331d36346d723c6041ab2080d',1,'hku::BorrowRecord::Data::datetime()'],['../classhku_1_1_loan_record.html#a424a07596fd1d6bce05d96f38b6289e2',1,'hku::LoanRecord::datetime()'],['../classhku_1_1_trade_record.html#aa799a30dd3bd32c1c47e98136e5d3a29',1,'hku::TradeRecord::datetime()'],['../classhku_1_1_trade_request.html#adf5ead28aabff1a41b4eab508c1ac33a',1,'hku::TradeRequest::datetime()']]]
+  ['cash_0',['cash',['../classhku_1_1_funds_record.html#a2da7ed1468aba9bcb41ab085091b5f90',1,'hku::FundsRecord::cash'],['../classhku_1_1_trade_record.html#a015d13874da9c99df3586e9bf8676411',1,'hku::TradeRecord::cash']]],
+  ['cash_5fratio_1',['cash_ratio',['../structhku_1_1_trade_suggestion.html#acf6792f8f99bf2f8bdc33698fbe4e431',1,'hku::TradeSuggestion']]],
+  ['cleandatetime_2',['cleanDatetime',['../classhku_1_1_position_record.html#ab2b220125aa732e7e45872eebb15a407',1,'hku::PositionRecord']]],
+  ['close_3',['close',['../structhku_1_1_spot_record.html#af8bb8d2bd917f3f5c857e997a4f315fa',1,'hku::SpotRecord']]],
+  ['closeprice_4',['closePrice',['../structhku_1_1_h5_record.html#a5f249e740893d09b2de098ab5fff2479',1,'hku::H5Record::closePrice'],['../classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c',1,'hku::KRecord::closePrice']]],
+  ['code_5',['code',['../classhku_1_1_stock_table.html#a6f238d662945f50c8cc3b647027e4e51',1,'hku::StockTable::code'],['../structhku_1_1_stock_info.html#aae2fe00688fa36bbe0d72482dfb06239',1,'hku::StockInfo::code'],['../structhku_1_1_spot_record.html#afe39d2bc3a0eecdf6fa184726fa6e2a6',1,'hku::SpotRecord::code']]],
+  ['combinatename_6',['combinateName',['../structhku_1_1_combinate_analysis_output.html#abfa08c28bf0ad2e6408086f6d15dbac2',1,'hku::CombinateAnalysisOutput']]],
+  ['commission_7',['commission',['../classhku_1_1_cost_record.html#a42825e217b9f466ed524959fb3fd434f',1,'hku::CostRecord']]],
+  ['contextseparator_8',['ContextSeparator',['../classmo_file_reader.html#aeabb7f96a46aeab9de8927934ad33c30',1,'moFileReader']]],
+  ['cost_9',['cost',['../classhku_1_1_trade_record.html#ac13382c891a4a7f3ca436a8f2d934c21',1,'hku::TradeRecord']]],
+  ['count_10',['count',['../structhku_1_1_k_record_view.html#a9611534a0c43080ccff780898d7a895e',1,'hku::KRecordView::count'],['../classhku_1_1_trade_request.html#a0f70aea9f03382d0b0145d9b2cddc941',1,'hku::TradeRequest::count']]],
+  ['countasgift_11',['countAsGift',['../structhku_1_1_stock_weight_table_view.html#acc7643f95844549b8e328337bacd98cd',1,'hku::StockWeightTableView']]],
+  ['countforsell_12',['countForSell',['../structhku_1_1_stock_weight_table_view.html#a674246d29ece3cad54f68e55d9ad0da9',1,'hku::StockWeightTableView']]],
+  ['countofincreasement_13',['countOfIncreasement',['../structhku_1_1_stock_weight_table_view.html#a4002755243111cb5d39c3b0cbcf407b5',1,'hku::StockWeightTableView']]],
+  ['current_5fweight_14',['current_weight',['../structhku_1_1_sub_system_context.html#a09023deac553818d0cd1edc5108c6751',1,'hku::SubSystemContext']]],
+  ['currentcloseprice_15',['currentClosePrice',['../structhku_1_1_position_ext_info.html#af34a33d661f421999ba717efd31890c5',1,'hku::PositionExtInfo']]],
+  ['currentprofit_16',['currentProfit',['../structhku_1_1_position_ext_info.html#aae5799a5cc6348a5b12630c57df6e9a7',1,'hku::PositionExtInfo']]]
 ];

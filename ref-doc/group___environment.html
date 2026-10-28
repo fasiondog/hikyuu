@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
-<title>Hikyuu: Environment 外部环境判断</title>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: Environment market environment</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,36 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li class="current"><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('group___environment.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,59 +74,54 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#nested-classes">类</a> &#124;
-<a href="#define-members">宏定义</a> &#124;
-<a href="#typedef-members">类型定义</a> &#124;
-<a href="#func-members">函数</a>  </div>
-  <div class="headertitle">
-<div class="title">Environment 外部环境判断<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
+  <div class="headertitle"><div class="title">Environment market environment <div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem systematic trading framework</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Environment 外部环境判断 的协作图:</div>
+Environment market environment 的协作图:</div>
 <div class="dyncontent">
-<center><table><tr><td><img src="group___environment.png" border="0" alt="" usemap="#group______environment"/>
-<map name="group______environment" id="group______environment">
-<area shape="rect" id="node1" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="5,5,231,35"/>
-</map>
-</td></tr></table></center>
+<div class="center"><img src="group___environment.png" border="0" usemap="#agroup______environment" loading="lazy" alt=""/></div>
 </div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 类</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html">hku::EnvironmentBase</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">环境判定策略基类  <a href="classhku_1_1_environment_base.html#details">更多...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:hku_3A_3AEnvironmentBase" id="r_hku_3A_3AEnvironmentBase"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_environment_base.html">hku::EnvironmentBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class of the market environment strategy  <a href="classhku_1_1_environment_base.html#details">更多...</a><br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 宏定义</h2></td></tr>
-<tr class="memitem:gace1dfb0db70165374ce40964c1293f81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___environment.html#gace1dfb0db70165374ce40964c1293f81">ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
-<tr class="memdesc:gace1dfb0db70165374ce40964c1293f81"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="#gace1dfb0db70165374ce40964c1293f81">更多...</a><br /></td></tr>
-<tr class="separator:gace1dfb0db70165374ce40964c1293f81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gace1dfb0db70165374ce40964c1293f81" id="r_gace1dfb0db70165374ce40964c1293f81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gace1dfb0db70165374ce40964c1293f81">ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:gace1dfb0db70165374ce40964c1293f81"><td class="mdescLeft">&#160;</td><td class="mdescRight">For an inheriting subclass without private variables, this macro can be used directly for the serialization  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 类型定义</h2></td></tr>
-<tr class="memitem:gac1532edba0a5f3a254e0c2d12552ee7e"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; EnvironmentBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">hku::EnvironmentPtr</a></td></tr>
-<tr class="memdesc:gac1532edba0a5f3a254e0c2d12552ee7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型  <a href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">更多...</a><br /></td></tr>
-<tr class="separator:gac1532edba0a5f3a254e0c2d12552ee7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac1532edba0a5f3a254e0c2d12552ee7e" id="r_gac1532edba0a5f3a254e0c2d12552ee7e"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gac1532edba0a5f3a254e0c2d12552ee7e">hku::EnvironmentPtr</a></td></tr>
+<tr class="memdesc:gac1532edba0a5f3a254e0c2d12552ee7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Client programs should all use this pointer type  <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 函数</h2></td></tr>
-<tr class="memitem:ga83da7652b2f4ab4f5deb850a355ec27d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___environment.html#ga83da7652b2f4ab4f5deb850a355ec27d">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const EnvironmentPtr &amp;)</td></tr>
-<tr class="memdesc:ga83da7652b2f4ab4f5deb850a355ec27d"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出Environment信息，如：Environment(name, params[...])  <a href="group___environment.html#ga83da7652b2f4ab4f5deb850a355ec27d">更多...</a><br /></td></tr>
-<tr class="separator:ga83da7652b2f4ab4f5deb850a355ec27d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga83da7652b2f4ab4f5deb850a355ec27d" id="r_ga83da7652b2f4ab4f5deb850a355ec27d"><td class="memItemLeft" align="right" valign="top">HKU_API std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga83da7652b2f4ab4f5deb850a355ec27d">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;)</td></tr>
+<tr class="memdesc:ga83da7652b2f4ab4f5deb850a355ec27d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output the Environment information, e.g.  <br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<p>外部环境判断模块，用于判断当前的市场环境是否有效，只有在市场 处于有效状态中，才会发生买入操作。当市场进入失效状态下，系统 的一般策略是立即强行清仓。 </p>
-<h2 class="groupheader">宏定义说明</h2>
-<a class="anchor" id="gace1dfb0db70165374ce40964c1293f81"></a>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<p>The market environment module, used to judge whether the current market environment is valid; a buy operation happens only when the market is in a valid state. When the market enters an invalid state, the general strategy of the system is to immediately force a liquidation. </p>
+<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">宏定义说明</h2>
+<a id="gace1dfb0db70165374ce40964c1293f81" name="gace1dfb0db70165374ce40964c1293f81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gace1dfb0db70165374ce40964c1293f81">&#9670;&#160;</a></span>ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -133,62 +130,91 @@ Environment 外部环境判断 的协作图:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:\</div><div class="line">    friend <span class="keyword">class </span>boost::serialization::access; \</div><div class="line">    template&lt;class Archive&gt; \</div><div class="line">    void serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div><div class="line">        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(EnvironmentBase); \</div><div class="line">    }</div></div><!-- fragment -->
-<p>对于没有私有变量的继承子类，可直接使用该宏定义序列化 </p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;class Drived: public EnvironmentBase {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;    ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;public:</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    Drived();</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;    ...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;};</div></div><!-- fragment --> 
+
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/environment/EnvironmentBase.h&gt;</code></p>
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                                          \</div>
+<div class="line">    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;                    \</div>
+<div class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;                                      \</div>
+<div class="line">    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {     \</div>
+<div class="line">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(EnvironmentBase); \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+<p>For an inheriting subclass without private variables, this macro can be used directly for the serialization </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>Drived: <span class="keyword">public</span> EnvironmentBase {</div>
+<div class="line">    <a class="code hl_define" href="#gace1dfb0db70165374ce40964c1293f81">ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</a></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    Drived();</div>
+<div class="line">    ...</div>
+<div class="line">};</div>
+<div class="ttc" id="agroup___environment_html_gace1dfb0db70165374ce40964c1293f81"><div class="ttname"><a href="#gace1dfb0db70165374ce40964c1293f81">ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="ttdeci">#define ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="ttdoc">For an inheriting subclass without private variables, this macro can be used directly for the seriali...</div><div class="ttdef"><b>定义</b> EnvironmentBase.h:264</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
-<h2 class="groupheader">类型定义说明</h2>
-<a class="anchor" id="gac1532edba0a5f3a254e0c2d12552ee7e"></a>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">类型定义说明</h2>
+<a id="gac1532edba0a5f3a254e0c2d12552ee7e" name="gac1532edba0a5f3a254e0c2d12552ee7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac1532edba0a5f3a254e0c2d12552ee7e">&#9670;&#160;</a></span>EnvironmentPtr</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef shared_ptr&lt;EnvironmentBase&gt; <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">hku::EnvironmentPtr</a></td>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_environment_base.html">EnvironmentBase</a>&gt; <a class="el" href="#gac1532edba0a5f3a254e0c2d12552ee7e">hku::EnvironmentPtr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>客户程序都应使用该指针类型 </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/environment/EnvironmentBase.h&gt;</code></p>
+
+<p>Client programs should all use this pointer type </p>
 
 </div>
 </div>
-<h2 class="groupheader">函数说明</h2>
-<a class="anchor" id="ga83da7652b2f4ab4f5deb850a355ec27d"></a>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="ga83da7652b2f4ab4f5deb850a355ec27d" name="ga83da7652b2f4ab4f5deb850a355ec27d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga83da7652b2f4ab4f5deb850a355ec27d">&#9670;&#160;</a></span>operator&lt;&lt;()</h2>
+
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp; hku::operator&lt;&lt; </td>
+          <td class="memname">HKU_API std::ostream &amp; hku::operator&lt;&lt; </td>
           <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>os</em>, </td>
+          <td class="paramtype">std::ostream &amp;</td>          <td class="paramname"><span class="paramname"><em>os</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;&#160;</td>
-          <td class="paramname"><em>en</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">const <a class="el" href="#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>输出Environment信息，如：Environment(name, params[...]) </p>
+<p><code>#include &lt;/Users/fasiondog/workspace/hikyuu/hikyuu_cpp/hikyuu/trade_sys/environment/EnvironmentBase.h&gt;</code></p>
+
+<p>Output the Environment information, e.g. </p>
+<p>Environment(name, params[...]) </p>
 
 </div>
 </div>
 </div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

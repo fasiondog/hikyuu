@@ -4,17 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { init_search(); });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -25,7 +26,6 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
    </div>
   </td>
  </tr>
@@ -33,43 +33,38 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.14.0 -->
 <script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+var searchBox = new SearchBox("searchBox", "search/",'.html');
 </script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li class="current"><a href="annotated.html"><span>类</span></a></li>
-      <li><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>类列表</span></a></li>
-      <li><a href="classes.html"><span>类索引</span></a></li>
-      <li><a href="inherits.html"><span>类继承关系</span></a></li>
-      <li><a href="functions.html"><span>类成员</span></a></li>
-    </ul>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_position_record.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,46 +74,58 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_position_record.html">PositionRecord</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
-  <div class="headertitle">
-<div class="title">hku::PositionRecord 成员列表</div>  </div>
+  <div class="headertitle"><div class="title">hku::PositionRecord 成员列表</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>成员的完整列表，这些成员属于 <a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a>,包括所有继承而来的类成员</p>
 <table class="directory">
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a> class</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a904865374e0d688328bc511f640ba683">buyMoney</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#ab2b220125aa732e7e45872eebb15a407">cleanDatetime</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#adf442d298ea70ed3397817c104367463">goalPrice</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a383a2e2656683197020a4c8a37c9d1e8">number</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a107fe0d25b6babfe438e72deee81413e">PositionRecord</a>()</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a591c4f1af76c3b7641fa814c585ec1f2">PositionRecord</a>(const Stock &amp;stock, const Datetime &amp;takeDatetime, const Datetime &amp;cleanDatetime, size_t number, price_t stoploss, price_t goalPrice, size_t totalNumber, price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney)</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a01265fa6e18cd7b019b8cc4a63881c02">sellMoney</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#af37a6b9ea50031d198183e4aed093711">buyCount</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a904865374e0d688328bc511f640ba683">buyMoney</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#ab2b220125aa732e7e45872eebb15a407">cleanDatetime</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#adf442d298ea70ed3397817c104367463">goalPrice</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a948bfcb91a7f21395485afc1bea3535d">number</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a50d6fcb6b1a0a3b44942257d32a17e47">operator=</a>(const PositionRecord &amp;ths)=default</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#aabb0db004c8643b4e781218826edbef1">operator=</a>(PositionRecord &amp;&amp;rhs)</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a867cb8bb397f65cdd93dfb9623a8515c">PositionRecord</a>()=default</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a17cd5b9376419a3075c15887e93c3f18">PositionRecord</a>(const Stock &amp;stock, const Datetime &amp;takeDatetime, const Datetime &amp;cleanDatetime, double number, price_t stoploss, price_t goalPrice, double totalNumber, price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney)</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a799e0e5d3a2f3e73d25647f331ca7067">PositionRecord</a>(const PositionRecord &amp;ths)=default</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a02d78b2914fef0f8e010403f7fad508f">PositionRecord</a>(PositionRecord &amp;&amp;rhs)</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a4fbcbff896b055fd822420db156a1efd">sellCount</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a01265fa6e18cd7b019b8cc4a63881c02">sellMoney</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a2d58c15b73c7dcde4f95f84804937c67">stock</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a007be3fad5897e2a53e221d38840a860">stoploss</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#aadbf0667ea041eb5cec4b2dfd7d307dd">takeDatetime</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a853ae94b1ab39b96f391911a881c9961">toString</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a007be3fad5897e2a53e221d38840a860">stoploss</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#ab1331441d94d2182b0e7dbac9bc5a5ea">str</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#aadbf0667ea041eb5cec4b2dfd7d307dd">takeDatetime</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a0cd91defcf042824fe36d47e359eaea3">totalCost</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a486732fb505ffe19426ff71473e6c31b">totalNumber</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a3b58633ba9cd89165533d58899fc07db">totalRisk</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#aa9e0cc71648b393ebd5c5e452710e572">totalNumber</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#ac36300c19f56c9a8d53046c8d1f9008c">totalProfit</a>() const</td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="classhku_1_1_position_record.html#a3b58633ba9cd89165533d58899fc07db">totalRisk</a></td><td class="entry"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.11
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

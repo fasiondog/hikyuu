@@ -1,0 +1,204 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/mysql/AsyncMySQLStatement.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_async_my_s_q_l_statement_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">AsyncMySQLStatement.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AsyncMySQLStatement.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2019, hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Created on: 2026-05-09</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef HIYUU_DB_CONNECT_MYSQL_ASYNCMYSQLSTATEMENT_H</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define HIYUU_DB_CONNECT_MYSQL_ASYNCMYSQLSTATEMENT_H</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../AsyncSQLStatementBase.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// Forward declaration, to avoid the circular dependency</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_async_my_s_q_l_connect.html">AsyncMySQLConnect</a>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="foldopen" id="foldopen00023" data-start="{" data-end="};">
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html">   23</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">AsyncMySQLStatement</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_async_s_q_l_statement_base.html#a8b22b7fa76e2d51cea827c81f567919d">AsyncSQLStatementBase</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">   25</a></span>    <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">AsyncMySQLStatement</a>(<a class="code hl_class" href="classhku_1_1_async_my_s_q_l_connect.html">AsyncMySQLConnect</a> *connect, <span class="keyword">const</span> std::string &amp;sql);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a1113a2270c98fa8ec76dc20e2fa9559f">   26</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a1113a2270c98fa8ec76dc20e2fa9559f">~AsyncMySQLStatement</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a0bda2f443162a5e40951fb9149eec599">   28</a></span>    <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a0bda2f443162a5e40951fb9149eec599">AsyncMySQLStatement</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">AsyncMySQLStatement</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a14d5ad5e78037f2af5165cef3e6b9580">   29</a></span>    <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">AsyncMySQLStatement</a> &amp;<a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a14d5ad5e78037f2af5165cef3e6b9580">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">AsyncMySQLStatement</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a3018c8b6bff5c8a693972fc294871c73">   31</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;void&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a3018c8b6bff5c8a693972fc294871c73">sub_exec</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a7160b99f2312a275c17d53b54c03d105">   32</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">net::awaitable&lt;bool&gt;</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a7160b99f2312a275c17d53b54c03d105">sub_moveNext</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a2613b4d0d9542875961a2c0ce3007c20">   33</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a2613b4d0d9542875961a2c0ce3007c20">sub_getLastRowid</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a73af708fa20ea30c2ead9bb3faa9180e">   35</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a73af708fa20ea30c2ead9bb3faa9180e">sub_bindNull</a>(<span class="keywordtype">int</span> idx) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a31043ca8b44c21bd198a387c72e0e325">   36</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a31043ca8b44c21bd198a387c72e0e325">sub_bindInt</a>(<span class="keywordtype">int</span> idx, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> value) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#af32150be2d9ced5d305ffcb99ecce0d1">   37</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#af32150be2d9ced5d305ffcb99ecce0d1">sub_bindUInt64</a>(<span class="keywordtype">int</span> idx, <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> value) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a44a6a84e660823187335978c1d003b18">   38</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a44a6a84e660823187335978c1d003b18">sub_bindDouble</a>(<span class="keywordtype">int</span> idx, <span class="keywordtype">double</span> item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a0f9502b52e76f0181387a04b50a30237">   39</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a0f9502b52e76f0181387a04b50a30237">sub_bindDatetime</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a307c294dcc2f96dff279692bfb2e9a0a">   40</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a307c294dcc2f96dff279692bfb2e9a0a">sub_bindText</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#ad8700a83a6745b4c59dae465c49c2b79">   41</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#ad8700a83a6745b4c59dae465c49c2b79">sub_bindText</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> <span class="keywordtype">char</span> *item, <span class="keywordtype">size_t</span> len) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a8c5af7c112475ebeedcd710a0367d151">   42</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a8c5af7c112475ebeedcd710a0367d151">sub_bindBlob</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a9b78e1f73afeef2b6b02297ce1a2232a">   43</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a9b78e1f73afeef2b6b02297ce1a2232a">sub_bindBlob</a>(<span class="keywordtype">int</span> idx, <span class="keyword">const</span> std::vector&lt;char&gt; &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a15e6f96d58f2f3f61c140eab800f9ff3">   45</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a15e6f96d58f2f3f61c140eab800f9ff3">sub_getNumColumns</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#ab4a60b2e9ca9da6bf88dc4bc38788e87">   46</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#ab4a60b2e9ca9da6bf88dc4bc38788e87">sub_getColumnAsInt64</a>(<span class="keywordtype">int</span> idx, <a class="code hl_typedef" href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">int64_t</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a58df009caa155b4b5e1c609def29c6e1">   47</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a58df009caa155b4b5e1c609def29c6e1">sub_getColumnAsUInt64</a>(<span class="keywordtype">int</span> idx, <a class="code hl_typedef" href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">uint64_t</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a2a2899543a465e9ffe38fdb8896dc0aa">   48</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a2a2899543a465e9ffe38fdb8896dc0aa">sub_getColumnAsDouble</a>(<span class="keywordtype">int</span> idx, <span class="keywordtype">double</span> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a1394680314f77f8f748ff965c1e97f12">   49</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a1394680314f77f8f748ff965c1e97f12">sub_getColumnAsDatetime</a>(<span class="keywordtype">int</span> idx, <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#aad0719156a25f84cd4046710aeb78a29">   50</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#aad0719156a25f84cd4046710aeb78a29">sub_getColumnAsText</a>(<span class="keywordtype">int</span> idx, std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a8599975a5da6b993627c98da9c9d2a6c">   51</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a8599975a5da6b993627c98da9c9d2a6c">sub_getColumnAsBlob</a>(<span class="keywordtype">int</span> idx, std::string &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="classhku_1_1_async_my_s_q_l_statement.html#a9c05dc67cdd0873b069627a61efbed9f">   52</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_async_my_s_q_l_statement.html#a9c05dc67cdd0873b069627a61efbed9f">sub_getColumnAsBlob</a>(<span class="keywordtype">int</span> idx, std::vector&lt;char&gt; &amp;item) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">void</span> _reset();</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">struct </span>Impl;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    std::unique_ptr&lt;Impl&gt; m_impl;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>};</div>
+</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>}  <span class="comment">// namespace hku</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#endif </span><span class="comment">/* HIYUU_DB_CONNECT_MYSQL_ASYNCMYSQLSTATEMENT_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_connect_html"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_connect.html">hku::AsyncMySQLConnect</a></div><div class="ttdef"><b>定义</b> AsyncMySQLConnect.h:22</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a0bda2f443162a5e40951fb9149eec599"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a0bda2f443162a5e40951fb9149eec599">hku::AsyncMySQLStatement::AsyncMySQLStatement</a></div><div class="ttdeci">AsyncMySQLStatement(const AsyncMySQLStatement &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a0f9502b52e76f0181387a04b50a30237"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a0f9502b52e76f0181387a04b50a30237">hku::AsyncMySQLStatement::sub_bindDatetime</a></div><div class="ttdeci">virtual void sub_bindDatetime(int idx, const Datetime &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a1113a2270c98fa8ec76dc20e2fa9559f"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a1113a2270c98fa8ec76dc20e2fa9559f">hku::AsyncMySQLStatement::~AsyncMySQLStatement</a></div><div class="ttdeci">virtual ~AsyncMySQLStatement() override</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a1394680314f77f8f748ff965c1e97f12"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a1394680314f77f8f748ff965c1e97f12">hku::AsyncMySQLStatement::sub_getColumnAsDatetime</a></div><div class="ttdeci">virtual void sub_getColumnAsDatetime(int idx, Datetime &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a14d5ad5e78037f2af5165cef3e6b9580"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a14d5ad5e78037f2af5165cef3e6b9580">hku::AsyncMySQLStatement::operator=</a></div><div class="ttdeci">AsyncMySQLStatement &amp; operator=(const AsyncMySQLStatement &amp;)=delete</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a15e6f96d58f2f3f61c140eab800f9ff3"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a15e6f96d58f2f3f61c140eab800f9ff3">hku::AsyncMySQLStatement::sub_getNumColumns</a></div><div class="ttdeci">virtual int sub_getNumColumns() const override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a2613b4d0d9542875961a2c0ce3007c20"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a2613b4d0d9542875961a2c0ce3007c20">hku::AsyncMySQLStatement::sub_getLastRowid</a></div><div class="ttdeci">virtual uint64_t sub_getLastRowid() override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a2a2899543a465e9ffe38fdb8896dc0aa"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a2a2899543a465e9ffe38fdb8896dc0aa">hku::AsyncMySQLStatement::sub_getColumnAsDouble</a></div><div class="ttdeci">virtual void sub_getColumnAsDouble(int idx, double &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a3018c8b6bff5c8a693972fc294871c73"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a3018c8b6bff5c8a693972fc294871c73">hku::AsyncMySQLStatement::sub_exec</a></div><div class="ttdeci">virtual net::awaitable&lt; void &gt; sub_exec() override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a307c294dcc2f96dff279692bfb2e9a0a"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a307c294dcc2f96dff279692bfb2e9a0a">hku::AsyncMySQLStatement::sub_bindText</a></div><div class="ttdeci">virtual void sub_bindText(int idx, const std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a31043ca8b44c21bd198a387c72e0e325"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a31043ca8b44c21bd198a387c72e0e325">hku::AsyncMySQLStatement::sub_bindInt</a></div><div class="ttdeci">virtual void sub_bindInt(int idx, int64_t value) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a3b419eaa200308cbcd324acfd6a7b00b"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a3b419eaa200308cbcd324acfd6a7b00b">hku::AsyncMySQLStatement::AsyncMySQLStatement</a></div><div class="ttdeci">AsyncMySQLStatement(AsyncMySQLConnect *connect, const std::string &amp;sql)</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a44a6a84e660823187335978c1d003b18"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a44a6a84e660823187335978c1d003b18">hku::AsyncMySQLStatement::sub_bindDouble</a></div><div class="ttdeci">virtual void sub_bindDouble(int idx, double item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a58df009caa155b4b5e1c609def29c6e1"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a58df009caa155b4b5e1c609def29c6e1">hku::AsyncMySQLStatement::sub_getColumnAsUInt64</a></div><div class="ttdeci">virtual void sub_getColumnAsUInt64(int idx, uint64_t &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a7160b99f2312a275c17d53b54c03d105"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a7160b99f2312a275c17d53b54c03d105">hku::AsyncMySQLStatement::sub_moveNext</a></div><div class="ttdeci">virtual net::awaitable&lt; bool &gt; sub_moveNext() override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a73af708fa20ea30c2ead9bb3faa9180e"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a73af708fa20ea30c2ead9bb3faa9180e">hku::AsyncMySQLStatement::sub_bindNull</a></div><div class="ttdeci">virtual void sub_bindNull(int idx) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a8599975a5da6b993627c98da9c9d2a6c"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a8599975a5da6b993627c98da9c9d2a6c">hku::AsyncMySQLStatement::sub_getColumnAsBlob</a></div><div class="ttdeci">virtual void sub_getColumnAsBlob(int idx, std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a8c5af7c112475ebeedcd710a0367d151"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a8c5af7c112475ebeedcd710a0367d151">hku::AsyncMySQLStatement::sub_bindBlob</a></div><div class="ttdeci">virtual void sub_bindBlob(int idx, const std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a9b78e1f73afeef2b6b02297ce1a2232a"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a9b78e1f73afeef2b6b02297ce1a2232a">hku::AsyncMySQLStatement::sub_bindBlob</a></div><div class="ttdeci">virtual void sub_bindBlob(int idx, const std::vector&lt; char &gt; &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_a9c05dc67cdd0873b069627a61efbed9f"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#a9c05dc67cdd0873b069627a61efbed9f">hku::AsyncMySQLStatement::sub_getColumnAsBlob</a></div><div class="ttdeci">virtual void sub_getColumnAsBlob(int idx, std::vector&lt; char &gt; &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_aad0719156a25f84cd4046710aeb78a29"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#aad0719156a25f84cd4046710aeb78a29">hku::AsyncMySQLStatement::sub_getColumnAsText</a></div><div class="ttdeci">virtual void sub_getColumnAsText(int idx, std::string &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_ab4a60b2e9ca9da6bf88dc4bc38788e87"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#ab4a60b2e9ca9da6bf88dc4bc38788e87">hku::AsyncMySQLStatement::sub_getColumnAsInt64</a></div><div class="ttdeci">virtual void sub_getColumnAsInt64(int idx, int64_t &amp;item) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_ad8700a83a6745b4c59dae465c49c2b79"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#ad8700a83a6745b4c59dae465c49c2b79">hku::AsyncMySQLStatement::sub_bindText</a></div><div class="ttdeci">virtual void sub_bindText(int idx, const char *item, size_t len) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_my_s_q_l_statement_html_af32150be2d9ced5d305ffcb99ecce0d1"><div class="ttname"><a href="classhku_1_1_async_my_s_q_l_statement.html#af32150be2d9ced5d305ffcb99ecce0d1">hku::AsyncMySQLStatement::sub_bindUInt64</a></div><div class="ttdeci">virtual void sub_bindUInt64(int idx, uint64_t value) override</div><div class="ttdoc">Subclass interface</div></div>
+<div class="ttc" id="aclasshku_1_1_async_s_q_l_statement_base_html_a8b22b7fa76e2d51cea827c81f567919d"><div class="ttname"><a href="classhku_1_1_async_s_q_l_statement_base.html#a8b22b7fa76e2d51cea827c81f567919d">hku::AsyncSQLStatementBase::AsyncSQLStatementBase</a></div><div class="ttdeci">AsyncSQLStatementBase(AsyncDBConnectBase *driver, const std::string &amp;sql_statement)</div><div class="ttdoc">Constructor</div><div class="ttdef"><b>定义</b> AsyncSQLStatementBase.h:231</div></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="agroup___data_type_html_ga27007f768f298a8d7aa27f58b4005b46"><div class="ttname"><a href="group___data_type.html#ga27007f768f298a8d7aa27f58b4005b46">hku::uint64_t</a></div><div class="ttdeci">unsigned long long uint64_t</div><div class="ttdef"><b>定义</b> DataType.h:103</div></div>
+<div class="ttc" id="agroup___data_type_html_ga2b6c0eff2e4f65f353dc655a1baf7f04"><div class="ttname"><a href="group___data_type.html#ga2b6c0eff2e4f65f353dc655a1baf7f04">hku::int64_t</a></div><div class="ttdeci">long long int64_t</div><div class="ttdef"><b>定义</b> DataType.h:99</div></div>
+<div class="ttc" id="anamespacehku_1_1net_html_ac9c7453ceb79ee5ce968f7396744c670"><div class="ttname"><a href="namespacehku_1_1net.html#ac9c7453ceb79ee5ce968f7396744c670">hku::net::awaitable</a></div><div class="ttdeci">boost::asio::awaitable&lt; T &gt; awaitable</div><div class="ttdef"><b>定义</b> net.h:92</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><a href="dir_bd37ad3b95eab063e2ce02bebf1cde6d.html">mysql</a></li><li class="navelem"><b>AsyncMySQLStatement.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

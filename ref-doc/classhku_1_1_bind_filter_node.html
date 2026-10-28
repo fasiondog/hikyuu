@@ -1,0 +1,439 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::BindFilterNode类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_bind_filter_node.html','','classhku_1_1_bind_filter_node-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::BindFilterNode类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Bind a filter node; the custom filter and process handler functions are bound through std::function  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_filter_node_8h_source.html">FilterNode.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::BindFilterNode 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_bind_filter_node__inherit__graph.png" border="0" usemap="#ahku_1_1_bind_filter_node_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::BindFilterNode 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_bind_filter_node__coll__graph.png" border="0" usemap="#ahku_1_1_bind_filter_node_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a06e5189f968c099a3bee0f60a790cd6a" id="r_a06e5189f968c099a3bee0f60a790cd6a"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a06e5189f968c099a3bee0f60a790cd6a">filter_func</a> = std::function&lt;bool(<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a>*, const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a>&amp;)&gt;</td></tr>
+<tr class="memitem:a055706fc476eb6f98fe9571a55f6036e" id="r_a055706fc476eb6f98fe9571a55f6036e"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> = std::function&lt;void(<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a>*, const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a>&amp;)&gt;</td></tr>
+<tr class="inherit_header pub_types_classhku_1_1_filter_node"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_types_classhku_1_1_filter_node')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 类型 继承自 <a class="el" href="classhku_1_1_filter_node.html">hku::FilterNode</a></td></tr>
+<tr class="memitem:a005e9c55521dbfe2f37ceccdc9e4a05b inherit pub_types_classhku_1_1_filter_node" id="r_a005e9c55521dbfe2f37ceccdc9e4a05b"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a005e9c55521dbfe2f37ceccdc9e4a05b">ptr_t</a> = std::shared_ptr&lt;<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a>&gt;</td></tr>
+<tr class="memitem:a5e027798a7dbf8d306c0592e22d5f123 inherit pub_types_classhku_1_1_filter_node" id="r_a5e027798a7dbf8d306c0592e22d5f123"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a5e027798a7dbf8d306c0592e22d5f123">const_iterator</a> = std::forward_list&lt;<a class="el" href="classhku_1_1_filter_node.html#a005e9c55521dbfe2f37ceccdc9e4a05b">ptr_t</a>&gt;::const_iterator</td></tr>
+<tr class="memitem:a933ee1784a29fb30f262909311b07602 inherit pub_types_classhku_1_1_filter_node" id="r_a933ee1784a29fb30f262909311b07602"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a933ee1784a29fb30f262909311b07602">iterator</a> = std::forward_list&lt;<a class="el" href="classhku_1_1_filter_node.html#a005e9c55521dbfe2f37ceccdc9e4a05b">ptr_t</a>&gt;::iterator</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a2ffc33d529120aa1ca781c1baad5bfcb" id="r_a2ffc33d529120aa1ca781c1baad5bfcb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2ffc33d529120aa1ca781c1baad5bfcb">BindFilterNode</a> ()=default</td></tr>
+<tr class="memitem:a2b01e20264407c67912110d8c6e1f5a3" id="r_a2b01e20264407c67912110d8c6e1f5a3"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b01e20264407c67912110d8c6e1f5a3">~BindFilterNode</a> ()=default</td></tr>
+<tr class="memitem:a78ef0f69d6ffea942d9bf95c4d1104df" id="r_a78ef0f69d6ffea942d9bf95c4d1104df"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78ef0f69d6ffea942d9bf95c4d1104df">BindFilterNode</a> (const <a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;<a class="el" href="#aab0feee6ef28fc856598a33f836c5c54">process</a>)</td></tr>
+<tr class="memitem:a68974fa18a1759685a04163247b8e98a" id="r_a68974fa18a1759685a04163247b8e98a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68974fa18a1759685a04163247b8e98a">BindFilterNode</a> (<a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;&amp;<a class="el" href="#aab0feee6ef28fc856598a33f836c5c54">process</a>)</td></tr>
+<tr class="memitem:afdb4de6a59392978bd66ed804de5e446" id="r_afdb4de6a59392978bd66ed804de5e446"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afdb4de6a59392978bd66ed804de5e446">BindFilterNode</a> (const <a class="el" href="#a06e5189f968c099a3bee0f60a790cd6a">filter_func</a> &amp;<a class="el" href="#a03fbeebae00551fbe87f6489c9801961">filter</a>, const <a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;<a class="el" href="#aab0feee6ef28fc856598a33f836c5c54">process</a>, bool <a class="el" href="classhku_1_1_filter_node.html#a8aabc82836247ae0d8be42f2dbefec4c">exclusive</a>=false)</td></tr>
+<tr class="memitem:ad088efb909d95da60a335a1b994e377c" id="r_ad088efb909d95da60a335a1b994e377c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad088efb909d95da60a335a1b994e377c">BindFilterNode</a> (<a class="el" href="#a06e5189f968c099a3bee0f60a790cd6a">filter_func</a> &amp;&amp;<a class="el" href="#a03fbeebae00551fbe87f6489c9801961">filter</a>, <a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;&amp;<a class="el" href="#aab0feee6ef28fc856598a33f836c5c54">process</a>, bool <a class="el" href="classhku_1_1_filter_node.html#a8aabc82836247ae0d8be42f2dbefec4c">exclusive</a>=false)</td></tr>
+<tr class="memitem:a03fbeebae00551fbe87f6489c9801961" id="r_a03fbeebae00551fbe87f6489c9801961"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03fbeebae00551fbe87f6489c9801961">filter</a> (const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a> &amp;data)</td></tr>
+<tr class="memitem:aab0feee6ef28fc856598a33f836c5c54" id="r_aab0feee6ef28fc856598a33f836c5c54"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab0feee6ef28fc856598a33f836c5c54">process</a> (const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a> &amp;data)</td></tr>
+<tr class="inherit_header pub_methods_classhku_1_1_filter_node"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classhku_1_1_filter_node')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classhku_1_1_filter_node.html">hku::FilterNode</a></td></tr>
+<tr class="memitem:abbdb78d9e3ce0b9ec420c425d8bddb71 inherit pub_methods_classhku_1_1_filter_node" id="r_abbdb78d9e3ce0b9ec420c425d8bddb71"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#abbdb78d9e3ce0b9ec420c425d8bddb71">FilterNode</a> ()=default</td></tr>
+<tr class="memitem:ac26f55c3ab415d836091319d48210807 inherit pub_methods_classhku_1_1_filter_node" id="r_ac26f55c3ab415d836091319d48210807"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#ac26f55c3ab415d836091319d48210807">FilterNode</a> (const <a class="el" href="classhku_1_1_filter_node.html">FilterNode</a> &amp;)=default</td></tr>
+<tr class="memitem:ab0ad8656cd85c46dcb45118f753c543c inherit pub_methods_classhku_1_1_filter_node" id="r_ab0ad8656cd85c46dcb45118f753c543c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#ab0ad8656cd85c46dcb45118f753c543c">~FilterNode</a> ()=default</td></tr>
+<tr class="memitem:ae056379be1d13f25d2bf9e758fbc529d inherit pub_methods_classhku_1_1_filter_node" id="r_ae056379be1d13f25d2bf9e758fbc529d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#ae056379be1d13f25d2bf9e758fbc529d">FilterNode</a> (bool <a class="el" href="classhku_1_1_filter_node.html#a8aabc82836247ae0d8be42f2dbefec4c">exclusive</a>)</td></tr>
+<tr class="memdesc:ae056379be1d13f25d2bf9e758fbc529d inherit pub_methods_classhku_1_1_filter_node"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <br /></td></tr>
+<tr class="memitem:a77f702a046d86c7995bdf5004cea1c2f inherit pub_methods_classhku_1_1_filter_node" id="r_a77f702a046d86c7995bdf5004cea1c2f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a77f702a046d86c7995bdf5004cea1c2f">FilterNode</a> (<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a> &amp;&amp;rv)</td></tr>
+<tr class="memitem:aea2864680a15ca6bf824f4fd7f91ae00 inherit pub_methods_classhku_1_1_filter_node" id="r_aea2864680a15ca6bf824f4fd7f91ae00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html">FilterNode</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#aea2864680a15ca6bf824f4fd7f91ae00">operator=</a> (const <a class="el" href="classhku_1_1_filter_node.html">FilterNode</a> &amp;rv)</td></tr>
+<tr class="memitem:a1948bc8924f86ebe50f8d8db52751a4d inherit pub_methods_classhku_1_1_filter_node" id="r_a1948bc8924f86ebe50f8d8db52751a4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html">FilterNode</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a1948bc8924f86ebe50f8d8db52751a4d">operator=</a> (<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a> &amp;&amp;rv)</td></tr>
+<tr class="memitem:a10e17a496cbf76b33065150103ed3861 inherit pub_methods_classhku_1_1_filter_node" id="r_a10e17a496cbf76b33065150103ed3861"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html#a005e9c55521dbfe2f37ceccdc9e4a05b">ptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a10e17a496cbf76b33065150103ed3861">addChild</a> (const <a class="el" href="classhku_1_1_filter_node.html#a005e9c55521dbfe2f37ceccdc9e4a05b">ptr_t</a> &amp;child)</td></tr>
+<tr class="memitem:a8aabc82836247ae0d8be42f2dbefec4c inherit pub_methods_classhku_1_1_filter_node" id="r_a8aabc82836247ae0d8be42f2dbefec4c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a8aabc82836247ae0d8be42f2dbefec4c">exclusive</a> () const</td></tr>
+<tr class="memitem:ab70e5d69ab60e402e36d1f35f820db15 inherit pub_methods_classhku_1_1_filter_node" id="r_ab70e5d69ab60e402e36d1f35f820db15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#ab70e5d69ab60e402e36d1f35f820db15">exclusive</a> (bool exclusive)</td></tr>
+<tr class="memdesc:ab70e5d69ab60e402e36d1f35f820db15 inherit pub_methods_classhku_1_1_filter_node"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the exclusive mode  <br /></td></tr>
+<tr class="memitem:a4c6213a8bd54c960ec18cb502c3abbb8 inherit pub_methods_classhku_1_1_filter_node" id="r_a4c6213a8bd54c960ec18cb502c3abbb8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html#a5e027798a7dbf8d306c0592e22d5f123">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a4c6213a8bd54c960ec18cb502c3abbb8">cbegin</a> () const</td></tr>
+<tr class="memitem:acd28b8fdd1191d752b1e480b59d000d9 inherit pub_methods_classhku_1_1_filter_node" id="r_acd28b8fdd1191d752b1e480b59d000d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html#a5e027798a7dbf8d306c0592e22d5f123">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#acd28b8fdd1191d752b1e480b59d000d9">cend</a> () const</td></tr>
+<tr class="memitem:a230b54bdc773f7a8fbbce6c385f916de inherit pub_methods_classhku_1_1_filter_node" id="r_a230b54bdc773f7a8fbbce6c385f916de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html#a933ee1784a29fb30f262909311b07602">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a230b54bdc773f7a8fbbce6c385f916de">begin</a> ()</td></tr>
+<tr class="memitem:a5635584d9271eb5da592fb357d1f3353 inherit pub_methods_classhku_1_1_filter_node" id="r_a5635584d9271eb5da592fb357d1f3353"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_filter_node.html#a933ee1784a29fb30f262909311b07602">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a5635584d9271eb5da592fb357d1f3353">end</a> ()</td></tr>
+<tr class="memitem:a2cca410f37d6f0486f6e6676912f0948 inherit pub_methods_classhku_1_1_filter_node" id="r_a2cca410f37d6f0486f6e6676912f0948"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a2cca410f37d6f0486f6e6676912f0948">run</a> (const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a> &amp;data) noexcept</td></tr>
+<tr class="memitem:af15f27252854045f18be7d7c85e74d1f inherit pub_methods_classhku_1_1_filter_node" id="r_af15f27252854045f18be7d7c85e74d1f"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:af15f27252854045f18be7d7c85e74d1f inherit pub_methods_classhku_1_1_filter_node template"><td class="memItemLeft" align="right" valign="top">ValueT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#af15f27252854045f18be7d7c85e74d1f">value</a> () const</td></tr>
+<tr class="memitem:aae474c19de97387a88ac9ac18c558d35 inherit pub_methods_classhku_1_1_filter_node" id="r_aae474c19de97387a88ac9ac18c558d35"><td class="memTemplParams" colspan="2">template&lt;typename ValueT&gt; </td></tr>
+<tr class="memitem:aae474c19de97387a88ac9ac18c558d35 inherit pub_methods_classhku_1_1_filter_node template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#aae474c19de97387a88ac9ac18c558d35">value</a> (const ValueT &amp;value)</td></tr>
+<tr class="memitem:ac487aa8d90cb3a0bb9898a2902c2b781 inherit pub_methods_classhku_1_1_filter_node" id="r_ac487aa8d90cb3a0bb9898a2902c2b781"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#ac487aa8d90cb3a0bb9898a2902c2b781">has_value</a> () const</td></tr>
+<tr class="memitem:a06698777d26eccfd022f6b64e8d107db inherit pub_methods_classhku_1_1_filter_node" id="r_a06698777d26eccfd022f6b64e8d107db"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a06698777d26eccfd022f6b64e8d107db inherit pub_methods_classhku_1_1_filter_node template"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a06698777d26eccfd022f6b64e8d107db">value</a> () const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-inherited" class="groupheader"><a id="inherited" name="inherited"></a>
+额外继承的成员函数</h2></td></tr>
+<tr class="inherit_header pro_attribs_classhku_1_1_filter_node"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classhku_1_1_filter_node')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected 属性 继承自 <a class="el" href="classhku_1_1_filter_node.html">hku::FilterNode</a></td></tr>
+<tr class="memitem:a3651398ecb6f47b1f8f5281f6d564d3a inherit pro_attribs_classhku_1_1_filter_node" id="r_a3651398ecb6f47b1f8f5281f6d564d3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_filter_node.html#a3651398ecb6f47b1f8f5281f6d564d3a">m_value</a></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Bind a filter node; the custom filter and process handler functions are bound through std::function </p>
+<dl class="section note"><dt>注解</dt><dd>When it is created with the default constructor, m_filter and m_process are empty, <a class="el" href="#a03fbeebae00551fbe87f6489c9801961">filter()</a> returns true and <a class="el" href="#aab0feee6ef28fc856598a33f836c5c54">process()</a> does not perform any operation </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a06e5189f968c099a3bee0f60a790cd6a" name="a06e5189f968c099a3bee0f60a790cd6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06e5189f968c099a3bee0f60a790cd6a">&#9670;&#160;</a></span>filter_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a06e5189f968c099a3bee0f60a790cd6a">hku::BindFilterNode::filter_func</a> = std::function&lt;bool(<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a>*, const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a>&amp;)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a055706fc476eb6f98fe9571a55f6036e" name="a055706fc476eb6f98fe9571a55f6036e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a055706fc476eb6f98fe9571a55f6036e">&#9670;&#160;</a></span>process_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">hku::BindFilterNode::process_func</a> = std::function&lt;void(<a class="el" href="classhku_1_1_filter_node.html">FilterNode</a>*, const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a>&amp;)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a2ffc33d529120aa1ca781c1baad5bfcb" name="a2ffc33d529120aa1ca781c1baad5bfcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ffc33d529120aa1ca781c1baad5bfcb">&#9670;&#160;</a></span>BindFilterNode() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BindFilterNode::BindFilterNode </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2b01e20264407c67912110d8c6e1f5a3" name="a2b01e20264407c67912110d8c6e1f5a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b01e20264407c67912110d8c6e1f5a3">&#9670;&#160;</a></span>~BindFilterNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual hku::BindFilterNode::~BindFilterNode </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a78ef0f69d6ffea942d9bf95c4d1104df" name="a78ef0f69d6ffea942d9bf95c4d1104df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78ef0f69d6ffea942d9bf95c4d1104df">&#9670;&#160;</a></span>BindFilterNode() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BindFilterNode::BindFilterNode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>process</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a68974fa18a1759685a04163247b8e98a" name="a68974fa18a1759685a04163247b8e98a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68974fa18a1759685a04163247b8e98a">&#9670;&#160;</a></span>BindFilterNode() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BindFilterNode::BindFilterNode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>process</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afdb4de6a59392978bd66ed804de5e446" name="afdb4de6a59392978bd66ed804de5e446"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdb4de6a59392978bd66ed804de5e446">&#9670;&#160;</a></span>BindFilterNode() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BindFilterNode::BindFilterNode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#a06e5189f968c099a3bee0f60a790cd6a">filter_func</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>process</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>exclusive</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad088efb909d95da60a335a1b994e377c" name="ad088efb909d95da60a335a1b994e377c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad088efb909d95da60a335a1b994e377c">&#9670;&#160;</a></span>BindFilterNode() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::BindFilterNode::BindFilterNode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a06e5189f968c099a3bee0f60a790cd6a">filter_func</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>filter</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a055706fc476eb6f98fe9571a55f6036e">process_func</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>process</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>exclusive</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a03fbeebae00551fbe87f6489c9801961" name="a03fbeebae00551fbe87f6489c9801961"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03fbeebae00551fbe87f6489c9801961">&#9670;&#160;</a></span>filter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool hku::BindFilterNode::filter </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>data</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_filter_node.html#a22c05ffc2a40f383629f686758f7163b">hku::FilterNode</a> .</p>
+
+</div>
+</div>
+<a id="aab0feee6ef28fc856598a33f836c5c54" name="aab0feee6ef28fc856598a33f836c5c54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab0feee6ef28fc856598a33f836c5c54">&#9670;&#160;</a></span>process()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::BindFilterNode::process </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#a849774c3c9e13298987cfe88d81f3efb">any_t</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>data</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重载 <a class="el" href="classhku_1_1_filter_node.html#af1d0dd93ef78e1f7a13b38a93702c66d">hku::FilterNode</a> .</p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_filter_node_8h_source.html">FilterNode.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_bind_filter_node.html">BindFilterNode</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

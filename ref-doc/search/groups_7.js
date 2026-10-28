@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['moneymanager_20资金管理策略',['MoneyManager 资金管理策略',['../group___money_manager.html',1,'']]]
+  ['handling_0',['Exception handling',['../group___exception.html',1,'']]],
+  ['hikyuu_20core_20engine_20library_1',['Hikyuu core engine library',['../group___hikyuu.html',1,'']]]
 ];

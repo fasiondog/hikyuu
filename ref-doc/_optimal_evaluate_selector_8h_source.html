@@ -1,0 +1,151 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/selector/imp/optimal/OptimalEvaluateSelector.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_optimal_evaluate_selector_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">OptimalEvaluateSelector.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2024 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2024-09-22</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;OptimalSelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="foldopen" id="foldopen00014" data-start="{" data-end="};">
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classhku_1_1_optimal_evaluate_selector.html">   14</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#ada80e684147bd1bf1bc6349ab1e3c857">OptimalEvaluateSelector</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_optimal_selector_base.html#ae10b0580a1ddb9e6d5d4ee6861026afb">OptimalSelectorBase</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_optimal_evaluate_selector.html#ada80e684147bd1bf1bc6349ab1e3c857">   18</a></span>    <a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#ada80e684147bd1bf1bc6349ab1e3c857">OptimalEvaluateSelector</a>();</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classhku_1_1_optimal_evaluate_selector.html#ad540fc88f7932eef30fc620327e842a1">   19</a></span>    <a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#ad540fc88f7932eef30fc620327e842a1">OptimalEvaluateSelector</a>(std::function&lt;<span class="keywordtype">double</span>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a>&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp;)&gt; <a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#a6e6ab3399f63bed5ebc6814dca359808">evaluate</a>);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_optimal_evaluate_selector.html#a97d70caf74f5c4788f57c3d0b7946259">   21</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#a97d70caf74f5c4788f57c3d0b7946259">~OptimalEvaluateSelector</a>();</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_optimal_evaluate_selector.html#aab2a74f1f5378347ecbe405040539329">   23</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">SelectorPtr</a> <a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#aab2a74f1f5378347ecbe405040539329">_clone</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_optimal_evaluate_selector.html#a6e6ab3399f63bed5ebc6814dca359808">   25</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">double</span> <a class="code hl_function" href="classhku_1_1_optimal_evaluate_selector.html#a6e6ab3399f63bed5ebc6814dca359808">evaluate</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a>&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; endDate) <span class="keyword">noexcept</span> <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    std::function&lt;double(<span class="keyword">const</span> <a class="code hl_typedef" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a>&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp;)&gt; m_evaluate;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>};</div>
+</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_optimal_evaluate_selector_html_a6e6ab3399f63bed5ebc6814dca359808"><div class="ttname"><a href="classhku_1_1_optimal_evaluate_selector.html#a6e6ab3399f63bed5ebc6814dca359808">hku::OptimalEvaluateSelector::evaluate</a></div><div class="ttdeci">virtual double evaluate(const SYSPtr &amp;, const Datetime &amp;endDate) noexcept override</div></div>
+<div class="ttc" id="aclasshku_1_1_optimal_evaluate_selector_html_a97d70caf74f5c4788f57c3d0b7946259"><div class="ttname"><a href="classhku_1_1_optimal_evaluate_selector.html#a97d70caf74f5c4788f57c3d0b7946259">hku::OptimalEvaluateSelector::~OptimalEvaluateSelector</a></div><div class="ttdeci">virtual ~OptimalEvaluateSelector()</div></div>
+<div class="ttc" id="aclasshku_1_1_optimal_evaluate_selector_html_aab2a74f1f5378347ecbe405040539329"><div class="ttname"><a href="classhku_1_1_optimal_evaluate_selector.html#aab2a74f1f5378347ecbe405040539329">hku::OptimalEvaluateSelector::_clone</a></div><div class="ttdeci">virtual SelectorPtr _clone() override</div><div class="ttdoc">Subclass clone interface</div></div>
+<div class="ttc" id="aclasshku_1_1_optimal_evaluate_selector_html_ad540fc88f7932eef30fc620327e842a1"><div class="ttname"><a href="classhku_1_1_optimal_evaluate_selector.html#ad540fc88f7932eef30fc620327e842a1">hku::OptimalEvaluateSelector::OptimalEvaluateSelector</a></div><div class="ttdeci">OptimalEvaluateSelector(std::function&lt; double(const SystemPtr &amp;, const Datetime &amp;)&gt; evaluate)</div></div>
+<div class="ttc" id="aclasshku_1_1_optimal_evaluate_selector_html_ada80e684147bd1bf1bc6349ab1e3c857"><div class="ttname"><a href="classhku_1_1_optimal_evaluate_selector.html#ada80e684147bd1bf1bc6349ab1e3c857">hku::OptimalEvaluateSelector::OptimalEvaluateSelector</a></div><div class="ttdeci">OptimalEvaluateSelector()</div></div>
+<div class="ttc" id="aclasshku_1_1_optimal_selector_base_html_ae10b0580a1ddb9e6d5d4ee6861026afb"><div class="ttname"><a href="classhku_1_1_optimal_selector_base.html#ae10b0580a1ddb9e6d5d4ee6861026afb">hku::OptimalSelectorBase::OptimalSelectorBase</a></div><div class="ttdeci">OptimalSelectorBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_selector_base_html_a15225fb9a883876736e71ff6b5616239"><div class="ttname"><a href="classhku_1_1_selector_base.html#a15225fb9a883876736e71ff6b5616239">hku::SelectorBase::SelectorPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SelectorPtr</div><div class="ttdef"><b>定义</b> SelectorBase.h:112</div></div>
+<div class="ttc" id="agroup___system_html_gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><div class="ttname"><a href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku::SystemPtr</a></div><div class="ttdeci">shared_ptr&lt; System &gt; SystemPtr</div><div class="ttdoc">Client programs should operate through this pointer</div><div class="ttdef"><b>定义</b> System.h:545</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a98d36b433e7ba4fe01cb70ec3a856dbc"><div class="ttname"><a href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">hku::SYSPtr</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; SYSPtr</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:58</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_3da1167a5556da8ee80b5b80dc171a54.html">selector</a></li><li class="navelem"><a href="dir_b4f9f0a55d87869bef0586870d14f68d.html">imp</a></li><li class="navelem"><a href="dir_e754f9f1a09c79c9d38521547ab98c53.html">optimal</a></li><li class="navelem"><b>OptimalEvaluateSelector.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

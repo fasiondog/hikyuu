@@ -1,0 +1,138 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/environment/crt/EV_Logic.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_e_v___logic_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">EV_Logic.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2025-03-06</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;hikyuu/trade_sys/environment/EnvironmentBase.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="namespacehku.html#a6eedf029f1fb90788641a08ff9170874">   20</a></span>HKU_API <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> <a class="code hl_function" href="namespacehku.html#a00a2d82f8a7797b86699205d2b90f82e">operator&amp;</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev1, <span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev2);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="namespacehku.html#ada96511f436432fa13e3bdc6829eece4">   28</a></span>HKU_API <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> <a class="code hl_function" href="namespacehku.html#aec021721c94c1fa60513e0e81896f12f">operator|</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev1, <span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev2);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="namespacehku.html#ad04d71f2acdeb96e3cf33bb58b136edb">   30</a></span>HKU_API <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> <a class="code hl_function" href="namespacehku.html#a197d09c650708d79c1a6464727f515e2">operator+</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev1, <span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev2);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="namespacehku.html#aece5aed11e0e444872a34961914503ff">   31</a></span>HKU_API <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> <a class="code hl_function" href="namespacehku.html#af40b4dac3e9bd98b9ac49632d4d4b1f1">operator-</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev1, <span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev2);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="namespacehku.html#a81a4ccfaa76ccca0c98a6c3292670141">   32</a></span>HKU_API <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> <a class="code hl_function" href="namespacehku.html#af90cae0e2c922fd483e568026d37ff24">operator*</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev1, <span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev2);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="namespacehku.html#acd56b3ac4d48e5a924fe515927c577c4">   33</a></span>HKU_API <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> <a class="code hl_function" href="namespacehku.html#a3f0ea36cf3fdb980c212c08ba152a89c">operator/</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev1, <span class="keyword">const</span> <a class="code hl_typedef" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev2);</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="agroup___environment_html_gac1532edba0a5f3a254e0c2d12552ee7e"><div class="ttname"><a href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">hku::EnvironmentPtr</a></div><div class="ttdeci">shared_ptr&lt; EnvironmentBase &gt; EnvironmentPtr</div><div class="ttdoc">Client programs should all use this pointer type</div><div class="ttdef"><b>定义</b> EnvironmentBase.h:279</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a00a2d82f8a7797b86699205d2b90f82e"><div class="ttname"><a href="namespacehku.html#a00a2d82f8a7797b86699205d2b90f82e">hku::operator&amp;</a></div><div class="ttdeci">HKU_API Indicator operator&amp;(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a197d09c650708d79c1a6464727f515e2"><div class="ttname"><a href="namespacehku.html#a197d09c650708d79c1a6464727f515e2">hku::operator+</a></div><div class="ttdeci">HKU_API Indicator operator+(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_a3f0ea36cf3fdb980c212c08ba152a89c"><div class="ttname"><a href="namespacehku.html#a3f0ea36cf3fdb980c212c08ba152a89c">hku::operator/</a></div><div class="ttdeci">HKU_API Indicator operator/(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_aec021721c94c1fa60513e0e81896f12f"><div class="ttname"><a href="namespacehku.html#aec021721c94c1fa60513e0e81896f12f">hku::operator|</a></div><div class="ttdeci">HKU_API Indicator operator|(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_af40b4dac3e9bd98b9ac49632d4d4b1f1"><div class="ttname"><a href="namespacehku.html#af40b4dac3e9bd98b9ac49632d4d4b1f1">hku::operator-</a></div><div class="ttdeci">HKU_API Indicator operator-(const Indicator &amp;, const Indicator &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_af90cae0e2c922fd483e568026d37ff24"><div class="ttname"><a href="namespacehku.html#af90cae0e2c922fd483e568026d37ff24">hku::operator*</a></div><div class="ttdeci">HKU_API Indicator operator*(const Indicator &amp;, const Indicator &amp;)</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_9270ebd214e2e1cdb9f75c4fbfb50253.html">environment</a></li><li class="navelem"><a href="dir_753dc38fdf42e936c65682c4adbd9616.html">crt</a></li><li class="navelem"><b>EV_Logic.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

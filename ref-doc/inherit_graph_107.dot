@@ -1,0 +1,9 @@
+digraph "类继承关系图"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node0 [id="Node000000",label="hku::OrderBrokerBase",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classhku_1_1_order_broker_base.html",tooltip="Base class of the order broker, it implements the actual order operations and the programmatic orders..."];
+}

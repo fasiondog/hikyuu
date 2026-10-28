@@ -1,0 +1,149 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/portfolio/crt/PF_Simple.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_p_f___simple_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">PF_Simple.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * PF_Simple.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2018-1-13</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *  PF is a preset configuration of MultiSystem, so this factory directly returns MultiSystemPtr,</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *  no shell class is introduced. The returned aggregate system runs in</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *  **mode B &quot;Fund Allocation&quot;**: every selected sub-system is calibrated to the quota allocated by</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *  the AF on the rebalancing day and trades with the exact quota, the parent mirrors its real</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> *  instructions on the parent account (see the MultiSystem class comment for the full semantics).</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#ifndef TRADE_SYS_PORTFOLIO_CRT_PF_SIMPLE_H_</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#define TRADE_SYS_PORTFOLIO_CRT_PF_SIMPLE_H_</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &quot;../../system/imp/MultiSystem.h&quot;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;../../selector/SelectorBase.h&quot;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &quot;../../allocatefunds/crt/AF_EqualWeight.h&quot;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &quot;../../selector/crt/SE_Fixed.h&quot;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="group___portfolio.html#ga3f4d9be5f2f143688f763f2844d27f2a">   64</a></span><a class="code hl_typedef" href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">MultiSystemPtr</a> HKU_API <a class="code hl_function" href="group___portfolio.html#ga3f4d9be5f2f143688f763f2844d27f2a">PF_Simple</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">TMPtr</a>&amp; tm = <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>(), <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">SEPtr</a>&amp; se = <a class="code hl_function" href="group___selector.html#gaec8091e220f70e082003d9387802237c">SE_Fixed</a>(),</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>                                 <span class="keyword">const</span> <a class="code hl_typedef" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">AFPtr</a>&amp; af = <a class="code hl_function" href="group___allocate_funds.html#gaa11ab7e810d297ed48c3493aaa6b1226">AF_EqualWeight</a>(), <span class="keywordtype">int</span> adjust_cycle = 1,</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                                 <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; adjust_mode = <span class="stringliteral">&quot;query&quot;</span>,</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>                                 <span class="keywordtype">bool</span> delay_to_trading_day = <span class="keyword">true</span>, <span class="keywordtype">bool</span> trade_on_close = <span class="keyword">true</span>,</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>                                 <span class="keywordtype">bool</span> sell_at_not_selected = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#endif </span><span class="comment">/* TRADE_SYS_PORTFOLIO_CRT_PF_SIMPLE_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup___allocate_funds_html_ga5558df617c5efbb03ad9fa57da4bff68"><div class="ttname"><a href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">hku::AFPtr</a></div><div class="ttdeci">AllocateFundsPtr AFPtr</div><div class="ttdoc">The pointer type that the client programs should use</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:67</div></div>
+<div class="ttc" id="agroup___allocate_funds_html_gaa11ab7e810d297ed48c3493aaa6b1226"><div class="ttname"><a href="group___allocate_funds.html#gaa11ab7e810d297ed48c3493aaa6b1226">hku::AF_EqualWeight</a></div><div class="ttdeci">AFPtr HKU_API AF_EqualWeight()</div><div class="ttdoc">Equal weight asset allocation, it allocates the selected assets in equal proportions</div></div>
+<div class="ttc" id="agroup___portfolio_html_ga3f4d9be5f2f143688f763f2844d27f2a"><div class="ttname"><a href="group___portfolio.html#ga3f4d9be5f2f143688f763f2844d27f2a">hku::PF_Simple</a></div><div class="ttdeci">MultiSystemPtr HKU_API PF_Simple(const TMPtr &amp;tm=TradeManagerPtr(), const SEPtr &amp;se=SE_Fixed(), const AFPtr &amp;af=AF_EqualWeight(), int adjust_cycle=1, const string &amp;adjust_mode=&quot;query&quot;, bool delay_to_trading_day=true, bool trade_on_close=true, bool sell_at_not_selected=true)</div><div class="ttdoc">Create a portfolio</div></div>
+<div class="ttc" id="agroup___selector_html_gaec8091e220f70e082003d9387802237c"><div class="ttname"><a href="group___selector.html#gaec8091e220f70e082003d9387802237c">hku::SE_Fixed</a></div><div class="ttdeci">SelectorPtr HKU_API SE_Fixed(double weight=1.0)</div><div class="ttdoc">Fixed selector, it selects the given trading system every day</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga9d7ab0c25be37c167f61358a5fa526f0"><div class="ttname"><a href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TradeManagerPtr</div><div class="ttdoc">Client programs should use this type for the actual operations</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:904</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a09fb32c38270e0b3fffde2c9387e52a3"><div class="ttname"><a href="namespacehku.html#a09fb32c38270e0b3fffde2c9387e52a3">hku::TMPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TMPtr</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:905</div></div>
+<div class="ttc" id="anamespacehku_html_ab815b3a2995c9b5f09d53950ecca5590"><div class="ttname"><a href="namespacehku.html#ab815b3a2995c9b5f09d53950ecca5590">hku::SEPtr</a></div><div class="ttdeci">shared_ptr&lt; SelectorBase &gt; SEPtr</div><div class="ttdef"><b>定义</b> SelectorBase.h:283</div></div>
+<div class="ttc" id="anamespacehku_html_ab85b5da3d08bc3431ea34eeb11ae8afc"><div class="ttname"><a href="namespacehku.html#ab85b5da3d08bc3431ea34eeb11ae8afc">hku::MultiSystemPtr</a></div><div class="ttdeci">shared_ptr&lt; MultiSystem &gt; MultiSystemPtr</div><div class="ttdef"><b>定义</b> MultiSystem.h:963</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_a60c48821b72d3eea87d425308f18364.html">portfolio</a></li><li class="navelem"><a href="dir_9ce5e03763e1e5af391e76205d9e518b.html">crt</a></li><li class="navelem"><b>PF_Simple.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

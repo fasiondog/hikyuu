@@ -1,0 +1,27 @@
+digraph "hku::ConditionBase"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="hku::ConditionBase",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Base class of the system valid condition"];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="hku::AddCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_add_condition.html",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="hku::AndCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_and_condition.html",tooltip=" "];
+  Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="hku::BoolCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_bool_condition.html",tooltip=" "];
+  Node1 -> Node5 [id="edge4_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="hku::DivCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_div_condition.html",tooltip=" "];
+  Node1 -> Node6 [id="edge5_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="hku::ManualCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_manual_condition.html",tooltip=" "];
+  Node1 -> Node7 [id="edge6_Node000001_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="hku::MultiCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_multi_condition.html",tooltip=" "];
+  Node1 -> Node8 [id="edge7_Node000001_Node000008",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="hku::OPLineCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_o_p_line_condition.html",tooltip=" "];
+  Node1 -> Node9 [id="edge8_Node000001_Node000009",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node9 [id="Node000009",label="hku::OrCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_or_condition.html",tooltip=" "];
+  Node1 -> Node10 [id="edge9_Node000001_Node000010",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node10 [id="Node000010",label="hku::SubCondition",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$classhku_1_1_sub_condition.html",tooltip=" "];
+}

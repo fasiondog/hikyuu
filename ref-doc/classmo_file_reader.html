@@ -1,0 +1,672 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: moFileReader类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classmo_file_reader.html','','classmo_file_reader-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">moFileReader类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>This class is a gettext-replacement.  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="mo_file_reader_8h_source.html">moFileReader.h</a>&gt;</code></p>
+<div class="dynheader">
+类 moFileReader 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmo_file_reader__inherit__graph.png" border="0" usemap="#amo_file_reader_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:ab3b927e46986be2d0fb6da2af3550844" id="r_ab3b927e46986be2d0fb6da2af3550844"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">eErrorCode</a> { <br />
+&#160;&#160;<a class="el" href="#ab3b927e46986be2d0fb6da2af3550844ad23aa5572ebe813ff02ac7dfe5debddf">EC_SUCCESS</a> = 0
+, <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844a05f8a8612e80acf657f19420927f537d">EC_ERROR</a>
+, <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844a340dfeba68a68dc93b22170550904527">EC_FILENOTFOUND</a>
+, <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844a9716abf0936d8285e8f56ee871191a30">EC_FILEINVALID</a>
+, <br />
+&#160;&#160;<a class="el" href="#ab3b927e46986be2d0fb6da2af3550844a5df0131956c6fb1751619b18efeaec30">EC_TABLEEMPTY</a>
+, <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844a5db9a79e4f2ee107153bf7b272446432">EC_MAGICNUMBER_NOMATCH</a>
+, <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844a66abfe538a12fdb91763d458d4d0cdab">EC_MAGICNUMBER_REVERSED</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:ab3b927e46986be2d0fb6da2af3550844"><td class="mdescLeft">&#160;</td><td class="mdescRight">The possible errorcodes for methods of this class  <a href="#ab3b927e46986be2d0fb6da2af3550844">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:aac075dc8d5951ac0c627ee7229de84f3" id="r_aac075dc8d5951ac0c627ee7229de84f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">moFileReader::eErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac075dc8d5951ac0c627ee7229de84f3">ParseData</a> (const std::string &amp;data)</td></tr>
+<tr class="memdesc:aac075dc8d5951ac0c627ee7229de84f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a .mo-file  <br /></td></tr>
+<tr class="memitem:a14cf21695eb753aa8900a7d2fff58e23" id="r_a14cf21695eb753aa8900a7d2fff58e23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">eErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a14cf21695eb753aa8900a7d2fff58e23">ReadFile</a> (const char *filename)</td></tr>
+<tr class="memdesc:a14cf21695eb753aa8900a7d2fff58e23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a .mo-file  <br /></td></tr>
+<tr class="memitem:ac5d106a4c238200f78501afa11e51d57" id="r_ac5d106a4c238200f78501afa11e51d57"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:ac5d106a4c238200f78501afa11e51d57 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">eErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5d106a4c238200f78501afa11e51d57">ReadStream</a> (T &amp;stream)</td></tr>
+<tr class="memdesc:ac5d106a4c238200f78501afa11e51d57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads data from a stream  <br /></td></tr>
+<tr class="memitem:a118b075d99572e5a7163e3a2226f9084" id="r_a118b075d99572e5a7163e3a2226f9084"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a118b075d99572e5a7163e3a2226f9084">Lookup</a> (const char *id) const</td></tr>
+<tr class="memdesc:a118b075d99572e5a7163e3a2226f9084"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the searched translation or returns the input.  <br /></td></tr>
+<tr class="memitem:ab9cfcdd509de5692b7e2102d5a82b586" id="r_ab9cfcdd509de5692b7e2102d5a82b586"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9cfcdd509de5692b7e2102d5a82b586">LookupWithContext</a> (const char *context, const char *id) const</td></tr>
+<tr class="memdesc:ab9cfcdd509de5692b7e2102d5a82b586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the searched translation or returns the input, restricted to the context given by context.  <br /></td></tr>
+<tr class="memitem:aed25725e1282ad27825accd791e79303" id="r_aed25725e1282ad27825accd791e79303"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed25725e1282ad27825accd791e79303">GetErrorDescription</a> () const</td></tr>
+<tr class="memdesc:aed25725e1282ad27825accd791e79303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Error Description.  <br /></td></tr>
+<tr class="memitem:af8c37ff369476dcc72a9c018b6bbfad3" id="r_af8c37ff369476dcc72a9c018b6bbfad3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8c37ff369476dcc72a9c018b6bbfad3">ClearTable</a> ()</td></tr>
+<tr class="memdesc:af8c37ff369476dcc72a9c018b6bbfad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empties the Lookup-Table.  <br /></td></tr>
+<tr class="memitem:abf8dcfa13b65c51f51251ac5a08b409c" id="r_abf8dcfa13b65c51f51251ac5a08b409c"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf8dcfa13b65c51f51251ac5a08b409c">GetNumStrings</a> () const</td></tr>
+<tr class="memdesc:abf8dcfa13b65c51f51251ac5a08b409c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Number of Entries in our Lookup-Table.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+静态 Public 属性</h2></td></tr>
+<tr class="memitem:a073fe0f7dbd9dadf997f97494055fd1b" id="r_a073fe0f7dbd9dadf997f97494055fd1b"><td class="memItemLeft" align="right" valign="top">static const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a073fe0f7dbd9dadf997f97494055fd1b">MagicNumber</a> = 0x950412DE</td></tr>
+<tr class="memdesc:a073fe0f7dbd9dadf997f97494055fd1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Magic Number describes the endianess of bytes on the system.  <br /></td></tr>
+<tr class="memitem:a931e584ca16773bb1911c1587bb0daa3" id="r_a931e584ca16773bb1911c1587bb0daa3"><td class="memItemLeft" align="right" valign="top">static const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a931e584ca16773bb1911c1587bb0daa3">MagicReversed</a> = 0xDE120495</td></tr>
+<tr class="memdesc:a931e584ca16773bb1911c1587bb0daa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the Magic Number is Reversed, we need to swap the bytes.  <br /></td></tr>
+<tr class="memitem:aeabb7f96a46aeab9de8927934ad33c30" id="r_aeabb7f96a46aeab9de8927934ad33c30"><td class="memItemLeft" align="right" valign="top">static const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeabb7f96a46aeab9de8927934ad33c30">ContextSeparator</a> = '\x04'</td></tr>
+<tr class="memdesc:aeabb7f96a46aeab9de8927934ad33c30"><td class="mdescLeft">&#160;</td><td class="mdescRight">The character that is used to separate context strings  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-types" class="groupheader"><a id="pro-types" name="pro-types"></a>
+Protected 类型</h2></td></tr>
+<tr class="memitem:ab5382f6394b7f6ed812f6bd6973707cc" id="r_ab5382f6394b7f6ed812f6bd6973707cc"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; std::string, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5382f6394b7f6ed812f6bd6973707cc">moLookupList</a></td></tr>
+<tr class="memdesc:ab5382f6394b7f6ed812f6bd6973707cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type for the map which holds the translation-pairs later.  <br /></td></tr>
+<tr class="memitem:abb1ab174607bf8e1db986d71caaad72e" id="r_abb1ab174607bf8e1db986d71caaad72e"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; std::string, <a class="el" href="#ab5382f6394b7f6ed812f6bd6973707cc">moLookupList</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb1ab174607bf8e1db986d71caaad72e">moContextLookupList</a></td></tr>
+<tr class="memdesc:abb1ab174607bf8e1db986d71caaad72e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type for the 2D map which holds the translation-pairs later.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:a06068ac596b529a22461b141963a4f1b" id="r_a06068ac596b529a22461b141963a4f1b"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a06068ac596b529a22461b141963a4f1b">SwapBytes</a> (unsigned long in)</td></tr>
+<tr class="memdesc:a06068ac596b529a22461b141963a4f1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap the endianness of a 4 byte WORD.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected 属性</h2></td></tr>
+<tr class="memitem:ae8fb2a5f7a3e3ff76db8d5086a4c8d53" id="r_ae8fb2a5f7a3e3ff76db8d5086a4c8d53"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8fb2a5f7a3e3ff76db8d5086a4c8d53">m_error</a></td></tr>
+<tr class="memdesc:ae8fb2a5f7a3e3ff76db8d5086a4c8d53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keeps the last error as String.  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>This class is a gettext-replacement. </p>
+<p>The usage is quite simple:<br  />
+Tell the class which .mo-file it shall load via <a class="el" href="#a14cf21695eb753aa8900a7d2fff58e23" title="Reads a .mo-file">moFileReader::ReadFile()</a>. The method will attempt to load the file, all translations will be stored in memory. Afterwards you can lookup the strings with <a class="el" href="#a118b075d99572e5a7163e3a2226f9084" title="Returns the searched translation or returns the input.">moFileReader::Lookup()</a> just like you would do with gettext. Additionally, you can call <a class="el" href="#a14cf21695eb753aa8900a7d2fff58e23" title="Reads a .mo-file">moFileReader::ReadFile()</a> for as much files as you like. But please be aware, that if there are duplicated keys (original strings), that they will replace each other in the lookup-table. There is no check done, if a key already exists.</p>
+<dl class="section note"><dt>注解</dt><dd>If you add "Lookup" to the keywords of the gettext-parser (like poEdit), it will recognize the Strings loaded with an instance of this class. </dd>
+<dd>
+I strongly recommend poEdit from Vaclav Slavik for editing .po-Files, get it at <a href="http://poedit.net">http://poedit.net</a> for various systems :). </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="abb1ab174607bf8e1db986d71caaad72e" name="abb1ab174607bf8e1db986d71caaad72e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb1ab174607bf8e1db986d71caaad72e">&#9670;&#160;</a></span>moContextLookupList</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::map&lt;std::string, <a class="el" href="#ab5382f6394b7f6ed812f6bd6973707cc">moLookupList</a>&gt; <a class="el" href="#abb1ab174607bf8e1db986d71caaad72e">moFileReader::moContextLookupList</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Type for the 2D map which holds the translation-pairs later. </p>
+
+</div>
+</div>
+<a id="ab5382f6394b7f6ed812f6bd6973707cc" name="ab5382f6394b7f6ed812f6bd6973707cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5382f6394b7f6ed812f6bd6973707cc">&#9670;&#160;</a></span>moLookupList</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::map&lt;std::string, std::string&gt; <a class="el" href="#ab5382f6394b7f6ed812f6bd6973707cc">moFileReader::moLookupList</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Type for the map which holds the translation-pairs later. </p>
+
+</div>
+</div>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">成员枚举类型说明</h2>
+<a id="ab3b927e46986be2d0fb6da2af3550844" name="ab3b927e46986be2d0fb6da2af3550844"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3b927e46986be2d0fb6da2af3550844">&#9670;&#160;</a></span>eErrorCode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">moFileReader::eErrorCode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The possible errorcodes for methods of this class </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844ad23aa5572ebe813ff02ac7dfe5debddf" name="ab3b927e46986be2d0fb6da2af3550844ad23aa5572ebe813ff02ac7dfe5debddf"></a>EC_SUCCESS&#160;</td><td class="fielddoc"><p>Indicated success </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844a05f8a8612e80acf657f19420927f537d" name="ab3b927e46986be2d0fb6da2af3550844a05f8a8612e80acf657f19420927f537d"></a>EC_ERROR&#160;</td><td class="fielddoc"><p>Indicates an error </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844a340dfeba68a68dc93b22170550904527" name="ab3b927e46986be2d0fb6da2af3550844a340dfeba68a68dc93b22170550904527"></a>EC_FILENOTFOUND&#160;</td><td class="fielddoc"><p>The given File was not found. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844a9716abf0936d8285e8f56ee871191a30" name="ab3b927e46986be2d0fb6da2af3550844a9716abf0936d8285e8f56ee871191a30"></a>EC_FILEINVALID&#160;</td><td class="fielddoc"><p>The file is invalid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844a5df0131956c6fb1751619b18efeaec30" name="ab3b927e46986be2d0fb6da2af3550844a5df0131956c6fb1751619b18efeaec30"></a>EC_TABLEEMPTY&#160;</td><td class="fielddoc"><p>The empty lookup-table (kept for the error-code numbering stability; the ExportAsHTML interface using it was removed because it emitted unescaped HTML) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844a5db9a79e4f2ee107153bf7b272446432" name="ab3b927e46986be2d0fb6da2af3550844a5db9a79e4f2ee107153bf7b272446432"></a>EC_MAGICNUMBER_NOMATCH&#160;</td><td class="fielddoc"><p>The magic number did not match </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab3b927e46986be2d0fb6da2af3550844a66abfe538a12fdb91763d458d4d0cdab" name="ab3b927e46986be2d0fb6da2af3550844a66abfe538a12fdb91763d458d4d0cdab"></a>EC_MAGICNUMBER_REVERSED&#160;</td><td class="fielddoc"><p>The magic number is reversed. </p>
+<dl class="section note"><dt>注解</dt><dd>This is an error until the class supports it. </dd></dl>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="af8c37ff369476dcc72a9c018b6bbfad3" name="af8c37ff369476dcc72a9c018b6bbfad3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8c37ff369476dcc72a9c018b6bbfad3">&#9670;&#160;</a></span>ClearTable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void moFileReader::ClearTable </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Empties the Lookup-Table. </p>
+
+</div>
+</div>
+<a id="aed25725e1282ad27825accd791e79303" name="aed25725e1282ad27825accd791e79303"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed25725e1282ad27825accd791e79303">&#9670;&#160;</a></span>GetErrorDescription()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string &amp; moFileReader::GetErrorDescription </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the Error Description. </p>
+
+</div>
+</div>
+<a id="abf8dcfa13b65c51f51251ac5a08b409c" name="abf8dcfa13b65c51f51251ac5a08b409c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf8dcfa13b65c51f51251ac5a08b409c">&#9670;&#160;</a></span>GetNumStrings()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int moFileReader::GetNumStrings </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the Number of Entries in our Lookup-Table. </p>
+<dl class="section note"><dt>注解</dt><dd>The mo-File-table always contains an empty msgid, which contains informations about the tranlsation-project. So the real number of strings is always minus 1. </dd></dl>
+
+</div>
+</div>
+<a id="a118b075d99572e5a7163e3a2226f9084" name="a118b075d99572e5a7163e3a2226f9084"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a118b075d99572e5a7163e3a2226f9084">&#9670;&#160;</a></span>Lookup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string moFileReader::Lookup </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>id</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the searched translation or returns the input. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The id of the translation to search for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The value you passed in via _id or the translated string. </dd></dl>
+
+</div>
+</div>
+<a id="ab9cfcdd509de5692b7e2102d5a82b586" name="ab9cfcdd509de5692b7e2102d5a82b586"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9cfcdd509de5692b7e2102d5a82b586">&#9670;&#160;</a></span>LookupWithContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string moFileReader::LookupWithContext </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>context</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>id</em></span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the searched translation or returns the input, restricted to the context given by context. </p>
+<p>See <a href="https://www.gnu.org/software/gettext/manual/html_node/Contexts.html">https://www.gnu.org/software/gettext/manual/html_node/Contexts.html</a> for more info.</p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>Restrict to the context given.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The id of the translation to search for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The value you passed in via _id or the translated string. </dd></dl>
+
+</div>
+</div>
+<a id="aac075dc8d5951ac0c627ee7229de84f3" name="aac075dc8d5951ac0c627ee7229de84f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac075dc8d5951ac0c627ee7229de84f3">&#9670;&#160;</a></span>ParseData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">moFileReader::eErrorCode</a> moFileReader::ParseData </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>data</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reads a .mo-file </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The path to the file to load. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>SUCCESS on success or one of the other error-codes in <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844" title="The possible errorcodes for methods of this class">eErrorCode</a> on error.</dd></dl>
+<p>This is the core-feature. This method loads the .mo-file and stores all translation-pairs in a map. You can access this map via the method <a class="el" href="#a118b075d99572e5a7163e3a2226f9084" title="Returns the searched translation or returns the input.">moFileReader::Lookup()</a>. </p>
+
+</div>
+</div>
+<a id="a14cf21695eb753aa8900a7d2fff58e23" name="a14cf21695eb753aa8900a7d2fff58e23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14cf21695eb753aa8900a7d2fff58e23">&#9670;&#160;</a></span>ReadFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">eErrorCode</a> moFileReader::ReadFile </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>filename</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reads a .mo-file </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">filename</td><td>The path to the file to load. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>SUCCESS on success or one of the other error-codes in <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844" title="The possible errorcodes for methods of this class">eErrorCode</a> on error.</dd></dl>
+<p>This is the core-feature. This method loads the .mo-file and stores all translation-pairs in a map. You can access this map via the method <a class="el" href="#a118b075d99572e5a7163e3a2226f9084" title="Returns the searched translation or returns the input.">moFileReader::Lookup()</a>. </p>
+
+</div>
+</div>
+<a id="ac5d106a4c238200f78501afa11e51d57" name="ac5d106a4c238200f78501afa11e51d57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5d106a4c238200f78501afa11e51d57">&#9670;&#160;</a></span>ReadStream()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab3b927e46986be2d0fb6da2af3550844">eErrorCode</a> moFileReader::ReadStream </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;</td>          <td class="paramname"><span class="paramname"><em>stream</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reads data from a stream </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">stream</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>SUCCESS on success or one of the other error-codes in <a class="el" href="#ab3b927e46986be2d0fb6da2af3550844" title="The possible errorcodes for methods of this class">eErrorCode</a> on error. </dd></dl>
+
+</div>
+</div>
+<a id="a06068ac596b529a22461b141963a4f1b" name="a06068ac596b529a22461b141963a4f1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06068ac596b529a22461b141963a4f1b">&#9670;&#160;</a></span>SwapBytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long moFileReader::SwapBytes </td>
+          <td>(</td>
+          <td class="paramtype">unsigned long</td>          <td class="paramname"><span class="paramname"><em>in</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Swap the endianness of a 4 byte WORD. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">in</td><td>The value to swap. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The swapped value. </dd></dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="aeabb7f96a46aeab9de8927934ad33c30" name="aeabb7f96a46aeab9de8927934ad33c30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeabb7f96a46aeab9de8927934ad33c30">&#9670;&#160;</a></span>ContextSeparator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char moFileReader::ContextSeparator = '\x04'</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The character that is used to separate context strings </p>
+
+</div>
+</div>
+<a id="ae8fb2a5f7a3e3ff76db8d5086a4c8d53" name="ae8fb2a5f7a3e3ff76db8d5086a4c8d53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8fb2a5f7a3e3ff76db8d5086a4c8d53">&#9670;&#160;</a></span>m_error</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string moFileReader::m_error</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Keeps the last error as String. </p>
+
+</div>
+</div>
+<a id="a073fe0f7dbd9dadf997f97494055fd1b" name="a073fe0f7dbd9dadf997f97494055fd1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a073fe0f7dbd9dadf997f97494055fd1b">&#9670;&#160;</a></span>MagicNumber</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int moFileReader::MagicNumber = 0x950412DE</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The Magic Number describes the endianess of bytes on the system. </p>
+
+</div>
+</div>
+<a id="a931e584ca16773bb1911c1587bb0daa3" name="a931e584ca16773bb1911c1587bb0daa3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a931e584ca16773bb1911c1587bb0daa3">&#9670;&#160;</a></span>MagicReversed</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int moFileReader::MagicReversed = 0xDE120495</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>If the Magic Number is Reversed, we need to swap the bytes. </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="mo_file_reader_8h_source.html">moFileReader.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="classmo_file_reader.html">moFileReader</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

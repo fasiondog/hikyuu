@@ -1,0 +1,187 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/data_driver/ipc/ShmClientHook.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_shm_client_hook_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">ShmClientHook.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2026 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2026-09-07</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;hikyuu/KQuery.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;hikyuu/KRecord.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="}">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html">   17</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku_1_1ipc.html">ipc</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span></div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="};">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="structhku_1_1ipc_1_1_shm_client_forwarders.html">   28</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structhku_1_1ipc_1_1_shm_client_forwarders.html">ShmClientForwarders</a> {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    std::function&lt;bool(<span class="keyword">const</span> std::string&amp; market_code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype,</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                       <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>&amp; record)&gt;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a8ccc088385b3c6a6b9c13d3b3d0f1b38">   32</a></span>      <a class="code hl_variable" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a8ccc088385b3c6a6b9c13d3b3d0f1b38">realtimeUpdate</a>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    std::function&lt;<a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>(<span class="keyword">const</span> std::string&amp; market_code, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype)&gt;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a13d26886c50046ac3bbcaba8cb5af687">   37</a></span>      <a class="code hl_variable" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a13d26886c50046ac3bbcaba8cb5af687">getLastUpdateTime</a>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    std::function&lt;bool(<span class="keyword">const</span> std::string&amp; addr, <span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; codes,</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>                       <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype)&gt;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a5450d6d2acf2c05919d4886dc87e67d0">   43</a></span>      <a class="code hl_variable" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a5450d6d2acf2c05919d4886dc87e67d0">pullFromBufferServer</a>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span></div>
+<div class="foldopen" id="foldopen00047" data-start="{" data-end="}">
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#ab6806c90fe23c79ac9ecf054e7b6544b">   47</a></span>    <span class="keyword">inline</span> <span class="keyword">explicit</span> <span class="keyword">operator</span> bool() const noexcept {</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">bool</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a8ccc088385b3c6a6b9c13d3b3d0f1b38">realtimeUpdate</a>) || <span class="keyword">static_cast&lt;</span><span class="keywordtype">bool</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a13d26886c50046ac3bbcaba8cb5af687">getLastUpdateTime</a>) ||</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>               <span class="keyword">static_cast&lt;</span><span class="keywordtype">bool</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a5450d6d2acf2c05919d4886dc87e67d0">pullFromBufferServer</a>);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    }</div>
+</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>};</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#ab60a9aeba1b3e71a19e6cac256f5d420">   62</a></span>HKU_API <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku_1_1ipc.html#ab60a9aeba1b3e71a19e6cac256f5d420">registerShmClient</a>(<a class="code hl_struct" href="structhku_1_1ipc_1_1_shm_client_forwarders.html">ShmClientForwarders</a> fwd) <span class="keyword">noexcept</span>;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#a94750e1ab8eed3439ed6c959df4ab4b1">   66</a></span>HKU_API <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku_1_1ipc.html#a94750e1ab8eed3439ed6c959df4ab4b1">shmClient</a>() noexcept;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#ad64af84be12c568977e6b8dfd86b37f7">   73</a></span>HKU_API <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku_1_1ipc.html#ad64af84be12c568977e6b8dfd86b37f7">forwardRealtimeUpdate</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span>&amp; market_code, const <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>::KType&amp; ktype,</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>                                   const <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>&amp; record);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#a114516fe227c40b219fa5e612daf7789">   82</a></span>HKU_API <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> <a class="code hl_function" href="namespacehku_1_1ipc.html#a114516fe227c40b219fa5e612daf7789">forwardGetLastUpdateTime</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span>&amp; market_code,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                                          const <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>::KType&amp; ktype);</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#a1310a3e4c759c9c47ecbad991f533270">   91</a></span>HKU_API <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku_1_1ipc.html#a1310a3e4c759c9c47ecbad991f533270">forwardPullFromBufferServer</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span>&amp; addr,</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                                         const <a class="code hl_namespace" href="namespacestd.html">std</a>::vector&lt;<a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span>&gt;&amp; codes,</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                                         const <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>::KType&amp; ktype);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#ad2a381e74c44cfac6c03a7bfc636aa8a">  104</a></span>HKU_API <span class="keywordtype">void</span> <a class="code hl_function" href="namespacehku_1_1ipc.html#ad2a381e74c44cfac6c03a7bfc636aa8a">setInterruptChecker</a>(<a class="code hl_namespace" href="namespacestd.html">std</a>::function&lt;<span class="keywordtype">bool</span>()&gt; checker);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="namespacehku_1_1ipc.html#a91c5270ee65ae57b41fe26d330c6fd46">  107</a></span>HKU_API <span class="keywordtype">bool</span> <a class="code hl_function" href="namespacehku_1_1ipc.html#a91c5270ee65ae57b41fe26d330c6fd46">checkInterrupted</a>();</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>}  <span class="comment">// namespace ipc</span></div>
+</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K-line data record</div><div class="ttdef"><b>定义</b> KRecord.h:20</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html"><div class="ttname"><a href="namespacehku_1_1ipc.html">hku::ipc</a></div><div class="ttdef"><b>定义</b> ShmClientHook.h:17</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_a114516fe227c40b219fa5e612daf7789"><div class="ttname"><a href="namespacehku_1_1ipc.html#a114516fe227c40b219fa5e612daf7789">hku::ipc::forwardGetLastUpdateTime</a></div><div class="ttdeci">HKU_API Datetime forwardGetLastUpdateTime(const std::string &amp;market_code, const KQuery::KType &amp;ktype)</div><div class="ttdoc">The client queries the service process for the last update moment of the buffer of the given security...</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_a1310a3e4c759c9c47ecbad991f533270"><div class="ttname"><a href="namespacehku_1_1ipc.html#a1310a3e4c759c9c47ecbad991f533270">hku::ipc::forwardPullFromBufferServer</a></div><div class="ttdeci">HKU_API bool forwardPullFromBufferServer(const std::string &amp;addr, const std::vector&lt; std::string &gt; &amp;codes, const KQuery::KType &amp;ktype)</div><div class="ttdoc">The client asks the service process to pull the latest K-line from the market data cache service (buf...</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_a91c5270ee65ae57b41fe26d330c6fd46"><div class="ttname"><a href="namespacehku_1_1ipc.html#a91c5270ee65ae57b41fe26d330c6fd46">hku::ipc::checkInterrupted</a></div><div class="ttdeci">HKU_API bool checkInterrupted()</div><div class="ttdoc">Call the registered interruption checker; false is returned when none is registered</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_a94750e1ab8eed3439ed6c959df4ab4b1"><div class="ttname"><a href="namespacehku_1_1ipc.html#a94750e1ab8eed3439ed6c959df4ab4b1">hku::ipc::shmClient</a></div><div class="ttdeci">HKU_API bool shmClient() noexcept</div><div class="ttdoc">Whether the client forwarding is currently registered; false is returned when it is not registered (s...</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_ab60a9aeba1b3e71a19e6cac256f5d420"><div class="ttname"><a href="namespacehku_1_1ipc.html#ab60a9aeba1b3e71a19e6cac256f5d420">hku::ipc::registerShmClient</a></div><div class="ttdeci">HKU_API void registerShmClient(ShmClientForwarders fwd) noexcept</div><div class="ttdoc">Register / unregister the shm client forwarding callbacks (called when the plugin connects successful...</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_ad2a381e74c44cfac6c03a7bfc636aa8a"><div class="ttname"><a href="namespacehku_1_1ipc.html#ad2a381e74c44cfac6c03a7bfc636aa8a">hku::ipc::setInterruptChecker</a></div><div class="ttdeci">HKU_API void setInterruptChecker(std::function&lt; bool()&gt; checker)</div><div class="ttdoc">Set the interruption checker during a long blocking wait (such as waiting for the data service to be ...</div></div>
+<div class="ttc" id="anamespacehku_1_1ipc_html_ad64af84be12c568977e6b8dfd86b37f7"><div class="ttname"><a href="namespacehku_1_1ipc.html#ad64af84be12c568977e6b8dfd86b37f7">hku::ipc::forwardRealtimeUpdate</a></div><div class="ttdeci">HKU_API bool forwardRealtimeUpdate(const std::string &amp;market_code, const KQuery::KType &amp;ktype, const KRecord &amp;record)</div><div class="ttdoc">Client realtime update forwarding (called by Stock::realtimeUpdate)</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+<div class="ttc" id="astructhku_1_1ipc_1_1_shm_client_forwarders_html"><div class="ttname"><a href="structhku_1_1ipc_1_1_shm_client_forwarders.html">hku::ipc::ShmClientForwarders</a></div><div class="ttdoc">The three realtime forwarding callbacks (they are registered after the shmserver plugin connects succ...</div><div class="ttdef"><b>定义</b> ShmClientHook.h:28</div></div>
+<div class="ttc" id="astructhku_1_1ipc_1_1_shm_client_forwarders_html_a13d26886c50046ac3bbcaba8cb5af687"><div class="ttname"><a href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a13d26886c50046ac3bbcaba8cb5af687">hku::ipc::ShmClientForwarders::getLastUpdateTime</a></div><div class="ttdeci">std::function&lt; Datetime(const std::string &amp;market_code, const KQuery::KType &amp;ktype)&gt; getLastUpdateTime</div><div class="ttdoc">Stock::getLastUpdateTime forwarding: it returns the last update moment of the server buffer,...</div><div class="ttdef"><b>定义</b> ShmClientHook.h:37</div></div>
+<div class="ttc" id="astructhku_1_1ipc_1_1_shm_client_forwarders_html_a5450d6d2acf2c05919d4886dc87e67d0"><div class="ttname"><a href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a5450d6d2acf2c05919d4886dc87e67d0">hku::ipc::ShmClientForwarders::pullFromBufferServer</a></div><div class="ttdeci">std::function&lt; bool(const std::string &amp;addr, const std::vector&lt; std::string &gt; &amp;codes, const KQuery::KType &amp;ktype)&gt; pullFromBufferServer</div><div class="ttdoc">The client asks the service process to pull the K-lines from the market data cache service (buffer se...</div><div class="ttdef"><b>定义</b> ShmClientHook.h:43</div></div>
+<div class="ttc" id="astructhku_1_1ipc_1_1_shm_client_forwarders_html_a8ccc088385b3c6a6b9c13d3b3d0f1b38"><div class="ttname"><a href="structhku_1_1ipc_1_1_shm_client_forwarders.html#a8ccc088385b3c6a6b9c13d3b3d0f1b38">hku::ipc::ShmClientForwarders::realtimeUpdate</a></div><div class="ttdeci">std::function&lt; bool(const std::string &amp;market_code, const KQuery::KType &amp;ktype, const KRecord &amp;record)&gt; realtimeUpdate</div><div class="ttdoc">Stock::realtimeUpdate forwarding: true is returned when the server has applied it</div><div class="ttdef"><b>定义</b> ShmClientHook.h:32</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><a href="dir_00ded26d57904b1b2959be02f7cd2043.html">ipc</a></li><li class="navelem"><b>ShmClientHook.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/data_driver/kdata/sqlite/SQLiteKDataDriver.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_s_q_lite_k_data_driver_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SQLiteKDataDriver.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * SQLiteKDataDriver.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *   Created on: 2023-09-14</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *       Author: yangrq1018</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#ifndef SQLITE_KDATA_DRIVER_H</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define SQLITE_KDATA_DRIVER_H</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;../../../utilities/db_connect/DBConnect.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../../../utilities/db_connect/sqlite/SQLiteConnect.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../../KDataDriver.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html">   17</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#a741f80593da70b9f3160df50e048ae6f">SQLiteKDataDriver</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">KDataDriver</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#a741f80593da70b9f3160df50e048ae6f">   19</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#a741f80593da70b9f3160df50e048ae6f">SQLiteKDataDriver</a>();</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#a284d79ed1e62718bba235dcafc2031ce">   20</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#a284d79ed1e62718bba235dcafc2031ce">~SQLiteKDataDriver</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="foldopen" id="foldopen00022" data-start="{" data-end="}">
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#a01dd17ed00d174e938b3c77b57167bba">   22</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">KDataDriverPtr</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#a01dd17ed00d174e938b3c77b57167bba">_clone</a>()<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="keywordflow">return</span> std::make_shared&lt;SQLiteKDataDriver&gt;();</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    }</div>
+</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#a9ada75d7b57b53483158fe1d802d049c">   26</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#a9ada75d7b57b53483158fe1d802d049c">_init</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#af2fd6386feaea73bd2b1e66f2f546311">   28</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#af2fd6386feaea73bd2b1e66f2f546311">isIndexFirst</a>()<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    }</div>
+</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="foldopen" id="foldopen00032" data-start="{" data-end="}">
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#afef8fcf4a858065e8dc71f73e28b855d">   32</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#afef8fcf4a858065e8dc71f73e28b855d">canParallelLoad</a>()<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    }</div>
+</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#ab185a851242f7c32b3333de9036e0fcd">   36</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#ab185a851242f7c32b3333de9036e0fcd">getCount</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                            <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; kType) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#a3b3d94cfac488aea04793d0def06c153">   39</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#a3b3d94cfac488aea04793d0def06c153">getIndexRangeByDate</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                                     <span class="keywordtype">size_t</span>&amp; out_start, <span class="keywordtype">size_t</span>&amp; out_end) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_k_data_driver.html#ab2eb81d51a1218eb4649d6139124295b">   42</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_k_data_driver.html#ab2eb81d51a1218eb4649d6139124295b">getKRecordList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                                       <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keyword">static</span> <span class="keywordtype">string</span> _getTableName(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code, <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> ktype);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> _getKRecordList(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                                <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; kType, <span class="keywordtype">size_t</span> start_ix, <span class="keywordtype">size_t</span> end_ix);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> _getKRecordList(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                                <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; ktype, <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> start_date, <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a> end_date);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keyword">static</span> <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> convertToNewInterval(<span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a>&amp; candles,</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                                            <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; from_type,</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>                                            <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a>&amp; to_ktype);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    unordered_map&lt;string, SQLiteConnectPtr&gt; m_sqlite_connection_map;  <span class="comment">// key: exchange+code</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordtype">bool</span> m_ifConvert = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>};</div>
+</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#endif </span><span class="comment">/* SQLITE_KDATA_DRIVER_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a1c635843a21ead2794d614493077a950"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a1c635843a21ead2794d614493077a950">hku::KDataDriver::KDataDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriver &gt; KDataDriverPtr</div><div class="ttdef"><b>定义</b> KDataDriver.h:59</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_driver_html_a72b29caede394bbc0c2d4df3aadcfe5b"><div class="ttname"><a href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">hku::KDataDriver::KDataDriver</a></div><div class="ttdeci">KDataDriver()</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html_a4d5db3c7c8b21c8ffe8a4cf233eaedf8"><div class="ttname"><a href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">hku::KQuery::KType</a></div><div class="ttdeci">string KType</div><div class="ttdef"><b>定义</b> KQuery.h:29</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_a01dd17ed00d174e938b3c77b57167bba"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#a01dd17ed00d174e938b3c77b57167bba">hku::SQLiteKDataDriver::_clone</a></div><div class="ttdeci">virtual KDataDriverPtr _clone() override</div><div class="ttdoc">Subclass clone function implementation</div><div class="ttdef"><b>定义</b> SQLiteKDataDriver.h:22</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_a284d79ed1e62718bba235dcafc2031ce"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#a284d79ed1e62718bba235dcafc2031ce">hku::SQLiteKDataDriver::~SQLiteKDataDriver</a></div><div class="ttdeci">virtual ~SQLiteKDataDriver() override</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_a3b3d94cfac488aea04793d0def06c153"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#a3b3d94cfac488aea04793d0def06c153">hku::SQLiteKDataDriver::getIndexRangeByDate</a></div><div class="ttdeci">virtual bool getIndexRangeByDate(const string &amp;market, const string &amp;code, const KQuery &amp;query, size_t &amp;out_start, size_t &amp;out_end) override</div><div class="ttdoc">Get the K-line record index corresponding to the given date range</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_a741f80593da70b9f3160df50e048ae6f"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#a741f80593da70b9f3160df50e048ae6f">hku::SQLiteKDataDriver::SQLiteKDataDriver</a></div><div class="ttdeci">SQLiteKDataDriver()</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_a9ada75d7b57b53483158fe1d802d049c"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#a9ada75d7b57b53483158fe1d802d049c">hku::SQLiteKDataDriver::_init</a></div><div class="ttdeci">virtual bool _init() override</div><div class="ttdoc">Interface for the subclass to initialize its private variables</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_ab185a851242f7c32b3333de9036e0fcd"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#ab185a851242f7c32b3333de9036e0fcd">hku::SQLiteKDataDriver::getCount</a></div><div class="ttdeci">virtual size_t getCount(const string &amp;market, const string &amp;code, const KQuery::KType &amp;kType) override</div><div class="ttdoc">Get the amount of the K-line data of the given type</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_ab2eb81d51a1218eb4649d6139124295b"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#ab2eb81d51a1218eb4649d6139124295b">hku::SQLiteKDataDriver::getKRecordList</a></div><div class="ttdeci">virtual KRecordList getKRecordList(const string &amp;market, const string &amp;code, const KQuery &amp;query) override</div><div class="ttdoc">Get the K-line data</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_af2fd6386feaea73bd2b1e66f2f546311"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#af2fd6386feaea73bd2b1e66f2f546311">hku::SQLiteKDataDriver::isIndexFirst</a></div><div class="ttdeci">virtual bool isIndexFirst() override</div><div class="ttdoc">Judge whether the query by position index is faster for this engine, or the query by date is faster</div><div class="ttdef"><b>定义</b> SQLiteKDataDriver.h:28</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_k_data_driver_html_afef8fcf4a858065e8dc71f73e28b855d"><div class="ttname"><a href="classhku_1_1_s_q_lite_k_data_driver.html#afef8fcf4a858065e8dc71f73e28b855d">hku::SQLiteKDataDriver::canParallelLoad</a></div><div class="ttdeci">virtual bool canParallelLoad() override</div><div class="ttdoc">Whether parallel data loading is supported</div><div class="ttdef"><b>定义</b> SQLiteKDataDriver.h:32</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga7a898ea401d73f139c33ccb771cb62f0"><div class="ttname"><a href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">hku::KRecordList</a></div><div class="ttdeci">vector&lt; KRecord &gt; KRecordList</div><div class="ttdef"><b>定义</b> KRecord.h:67</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><a href="dir_706bb32c583fde91b67e81aa3618785e.html">kdata</a></li><li class="navelem"><a href="dir_c6a97a5c97cb56be9e8f781be0d58ef0.html">sqlite</a></li><li class="navelem"><b>SQLiteKDataDriver.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

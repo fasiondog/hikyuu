@@ -1,0 +1,377 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::ipc 命名空间参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('namespacehku_1_1ipc.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::ipc 命名空间参考</div></div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:ShmClientForwarders" id="r_ShmClientForwarders"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhku_1_1ipc_1_1_shm_client_forwarders.html">ShmClientForwarders</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The three realtime forwarding callbacks (they are registered after the shmserver plugin connects successfully, and an empty set is registered to unregister them on disconnection)  <a href="structhku_1_1ipc_1_1_shm_client_forwarders.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:ShmMirrorSink" id="r_ShmMirrorSink"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1ipc_1_1_shm_mirror_sink.html">ShmMirrorSink</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The plugin side implementation interface of the realtime mirror writing (implemented and registered by the shmserver plugin)  <a href="classhku_1_1ipc_1_1_shm_mirror_sink.html#details">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:ab60a9aeba1b3e71a19e6cac256f5d420" id="r_ab60a9aeba1b3e71a19e6cac256f5d420"><td class="memItemLeft" align="right" valign="top">HKU_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab60a9aeba1b3e71a19e6cac256f5d420">registerShmClient</a> (<a class="el" href="structhku_1_1ipc_1_1_shm_client_forwarders.html">ShmClientForwarders</a> fwd) noexcept</td></tr>
+<tr class="memdesc:ab60a9aeba1b3e71a19e6cac256f5d420"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register / unregister the shm client forwarding callbacks (called when the plugin connects successfully / disconnects; passing an empty set means unregistering)  <br /></td></tr>
+<tr class="memitem:a94750e1ab8eed3439ed6c959df4ab4b1" id="r_a94750e1ab8eed3439ed6c959df4ab4b1"><td class="memItemLeft" align="right" valign="top">HKU_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94750e1ab8eed3439ed6c959df4ab4b1">shmClient</a> () noexcept</td></tr>
+<tr class="memdesc:a94750e1ab8eed3439ed6c959df4ab4b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the client forwarding is currently registered; false is returned when it is not registered (standalone mode / the plugin is not installed)  <br /></td></tr>
+<tr class="memitem:ad64af84be12c568977e6b8dfd86b37f7" id="r_ad64af84be12c568977e6b8dfd86b37f7"><td class="memItemLeft" align="right" valign="top">HKU_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad64af84be12c568977e6b8dfd86b37f7">forwardRealtimeUpdate</a> (const std::string &amp;market_code, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype, const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;record)</td></tr>
+<tr class="memdesc:ad64af84be12c568977e6b8dfd86b37f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Client realtime update forwarding (called by <a class="el" href="classhku_1_1_stock.html#a834be2ddf0324f49efd4edbec5a7f53c" title="(Temporary function) only used to update the K-line data in the cache">Stock::realtimeUpdate</a>)  <br /></td></tr>
+<tr class="memitem:a114516fe227c40b219fa5e612daf7789" id="r_a114516fe227c40b219fa5e612daf7789"><td class="memItemLeft" align="right" valign="top">HKU_API <a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a114516fe227c40b219fa5e612daf7789">forwardGetLastUpdateTime</a> (const std::string &amp;market_code, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype)</td></tr>
+<tr class="memdesc:a114516fe227c40b219fa5e612daf7789"><td class="mdescLeft">&#160;</td><td class="mdescRight">The client queries the service process for the last update moment of the buffer of the given security x type (called by <a class="el" href="classhku_1_1_stock.html#a9d9cfcd07fbb4bd7da76a6e8e661d718" title="Get the last update time of the given K-line data type">Stock::getLastUpdateTime</a>)  <br /></td></tr>
+<tr class="memitem:a1310a3e4c759c9c47ecbad991f533270" id="r_a1310a3e4c759c9c47ecbad991f533270"><td class="memItemLeft" align="right" valign="top">HKU_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1310a3e4c759c9c47ecbad991f533270">forwardPullFromBufferServer</a> (const std::string &amp;addr, const std::vector&lt; std::string &gt; &amp;codes, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype)</td></tr>
+<tr class="memdesc:a1310a3e4c759c9c47ecbad991f533270"><td class="mdescLeft">&#160;</td><td class="mdescRight">The client asks the service process to pull the latest K-line from the market data cache service (buffer server) and update it  <br /></td></tr>
+<tr class="memitem:ad2a381e74c44cfac6c03a7bfc636aa8a" id="r_ad2a381e74c44cfac6c03a7bfc636aa8a"><td class="memItemLeft" align="right" valign="top">HKU_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2a381e74c44cfac6c03a7bfc636aa8a">setInterruptChecker</a> (std::function&lt; bool()&gt; checker)</td></tr>
+<tr class="memdesc:ad2a381e74c44cfac6c03a7bfc636aa8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the interruption checker during a long blocking wait (such as waiting for the data service to be ready); true means the wait should be interrupted  <br /></td></tr>
+<tr class="memitem:a91c5270ee65ae57b41fe26d330c6fd46" id="r_a91c5270ee65ae57b41fe26d330c6fd46"><td class="memItemLeft" align="right" valign="top">HKU_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91c5270ee65ae57b41fe26d330c6fd46">checkInterrupted</a> ()</td></tr>
+<tr class="memdesc:a91c5270ee65ae57b41fe26d330c6fd46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call the registered interruption checker; false is returned when none is registered  <br /></td></tr>
+<tr class="memitem:af8e87e9d5aad1c822ae0f8a4ce16b6c8" id="r_af8e87e9d5aad1c822ae0f8a4ce16b6c8"><td class="memItemLeft" align="right" valign="top">HKU_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8e87e9d5aad1c822ae0f8a4ce16b6c8">registerShmMirrorSink</a> (<a class="el" href="classhku_1_1ipc_1_1_shm_mirror_sink.html">ShmMirrorSink</a> *sink) noexcept</td></tr>
+<tr class="memdesc:af8e87e9d5aad1c822ae0f8a4ce16b6c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register / unregister the mirror implementation (pass nullptr to unregister); it is called by the plugin at the single point of start / stop  <br /></td></tr>
+<tr class="memitem:ac512d5faf91c9bc2316aa50089fd5845" id="r_ac512d5faf91c9bc2316aa50089fd5845"><td class="memItemLeft" align="right" valign="top">HKU_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac512d5faf91c9bc2316aa50089fd5845">shmMirrorRealtimeUpdate</a> (const std::string &amp;market_code, const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;ktype, const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;record)</td></tr>
+<tr class="memdesc:ac512d5faf91c9bc2316aa50089fd5845"><td class="mdescLeft">&#160;</td><td class="mdescRight">The existing call entry of <a class="el" href="classhku_1_1_stock.html#a834be2ddf0324f49efd4edbec5a7f53c" title="(Temporary function) only used to update the K-line data in the cache">Stock::realtimeUpdate</a>; when nothing is registered it returns after a single atomic read only  <br /></td></tr>
+</table>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="a91c5270ee65ae57b41fe26d330c6fd46" name="a91c5270ee65ae57b41fe26d330c6fd46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91c5270ee65ae57b41fe26d330c6fd46">&#9670;&#160;</a></span>checkInterrupted()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API bool hku::ipc::checkInterrupted </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Call the registered interruption checker; false is returned when none is registered </p>
+
+</div>
+</div>
+<a id="a114516fe227c40b219fa5e612daf7789" name="a114516fe227c40b219fa5e612daf7789"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a114516fe227c40b219fa5e612daf7789">&#9670;&#160;</a></span>forwardGetLastUpdateTime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API <a class="el" href="classhku_1_1_datetime.html">Datetime</a> hku::ipc::forwardGetLastUpdateTime </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The client queries the service process for the last update moment of the buffer of the given security x type (called by <a class="el" href="classhku_1_1_stock.html#a9d9cfcd07fbb4bd7da76a6e8e661d718" title="Get the last update time of the given K-line data type">Stock::getLastUpdateTime</a>) </p>
+<dl class="section return"><dt>返回</dt><dd>the last update moment of the server buffer; <a class="el" href="classhku_1_1_datetime.html#a7bcda9336692499ddbe71bdb66c7acad" title="Return the minimum expressible date: 1400-Jan-01 00:00:00">Datetime::min()</a> is returned when the client is not registered, the communication failed or the security does not exist </dd></dl>
+
+</div>
+</div>
+<a id="a1310a3e4c759c9c47ecbad991f533270" name="a1310a3e4c759c9c47ecbad991f533270"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1310a3e4c759c9c47ecbad991f533270">&#9670;&#160;</a></span>forwardPullFromBufferServer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API bool hku::ipc::forwardPullFromBufferServer </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>addr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>codes</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The client asks the service process to pull the latest K-line from the market data cache service (buffer server) and update it </p>
+<dl class="section return"><dt>返回</dt><dd>true the server has accepted it | false the client is not registered or the communication failed (the caller only logs it, without interrupting) </dd></dl>
+
+</div>
+</div>
+<a id="ad64af84be12c568977e6b8dfd86b37f7" name="ad64af84be12c568977e6b8dfd86b37f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad64af84be12c568977e6b8dfd86b37f7">&#9670;&#160;</a></span>forwardRealtimeUpdate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API bool hku::ipc::forwardRealtimeUpdate </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Client realtime update forwarding (called by <a class="el" href="classhku_1_1_stock.html#a834be2ddf0324f49efd4edbec5a7f53c" title="(Temporary function) only used to update the K-line data in the cache">Stock::realtimeUpdate</a>) </p>
+<dl class="section return"><dt>返回</dt><dd>true the server has applied it | false the client is not registered, the communication failed or the server did not apply it </dd></dl>
+
+</div>
+</div>
+<a id="ab60a9aeba1b3e71a19e6cac256f5d420" name="ab60a9aeba1b3e71a19e6cac256f5d420"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab60a9aeba1b3e71a19e6cac256f5d420">&#9670;&#160;</a></span>registerShmClient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API void hku::ipc::registerShmClient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structhku_1_1ipc_1_1_shm_client_forwarders.html">ShmClientForwarders</a></td>          <td class="paramname"><span class="paramname"><em>fwd</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Register / unregister the shm client forwarding callbacks (called when the plugin connects successfully / disconnects; passing an empty set means unregistering) </p>
+<dl class="section note"><dt>注解</dt><dd>The registration happens only in the <a class="el" href="classhku_1_1_stock_manager.html" title="Unified management class for security information">StockManager</a> initialization negotiation period, and the forwarding calls happen in the market data thread; the implementation adopts lock-free publish-subscribe (publish-acquire), and the forwarding side only reads the stable object created in the registration period. The lifetime of the callback object follows the plugin instance, and it must be unregistered before the plugin is destroyed </dd></dl>
+
+</div>
+</div>
+<a id="af8e87e9d5aad1c822ae0f8a4ce16b6c8" name="af8e87e9d5aad1c822ae0f8a4ce16b6c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8e87e9d5aad1c822ae0f8a4ce16b6c8">&#9670;&#160;</a></span>registerShmMirrorSink()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API void hku::ipc::registerShmMirrorSink </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1ipc_1_1_shm_mirror_sink.html">ShmMirrorSink</a> *</td>          <td class="paramname"><span class="paramname"><em>sink</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Register / unregister the mirror implementation (pass nullptr to unregister); it is called by the plugin at the single point of start / stop </p>
+<dl class="section note"><dt>注解</dt><dd>The pid of the publishing process is recorded on registration, used to exclude the writing of the forked child process (maintaining the single-writer premise) </dd></dl>
+
+</div>
+</div>
+<a id="ad2a381e74c44cfac6c03a7bfc636aa8a" name="ad2a381e74c44cfac6c03a7bfc636aa8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2a381e74c44cfac6c03a7bfc636aa8a">&#9670;&#160;</a></span>setInterruptChecker()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API void hku::ipc::setInterruptChecker </td>
+          <td>(</td>
+          <td class="paramtype">std::function&lt; bool()&gt;</td>          <td class="paramname"><span class="paramname"><em>checker</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the interruption checker during a long blocking wait (such as waiting for the data service to be ready); true means the wait should be interrupted </p>
+<p>In the python environment it is registered by the binding layer (the pending signal is checked after the GIL is re-acquired), so that the wait can be interrupted by Ctrl+C. It is a general facility of the core library: the waiting logic is entirely inside the plugin, and the plugin calls back the implementation registered here through <a class="el" href="#a91c5270ee65ae57b41fe26d330c6fd46" title="Call the registered interruption checker; false is returned when none is registered">ipc::checkInterrupted()</a>. </p>
+
+</div>
+</div>
+<a id="a94750e1ab8eed3439ed6c959df4ab4b1" name="a94750e1ab8eed3439ed6c959df4ab4b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94750e1ab8eed3439ed6c959df4ab4b1">&#9670;&#160;</a></span>shmClient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API bool hku::ipc::shmClient </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the client forwarding is currently registered; false is returned when it is not registered (standalone mode / the plugin is not installed) </p>
+
+</div>
+</div>
+<a id="ac512d5faf91c9bc2316aa50089fd5845" name="ac512d5faf91c9bc2316aa50089fd5845"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac512d5faf91c9bc2316aa50089fd5845">&#9670;&#160;</a></span>shmMirrorRealtimeUpdate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HKU_API void hku::ipc::shmMirrorRealtimeUpdate </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>market_code</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html#a4d5db3c7c8b21c8ffe8a4cf233eaedf8">KQuery::KType</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>ktype</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>record</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The existing call entry of <a class="el" href="classhku_1_1_stock.html#a834be2ddf0324f49efd4edbec5a7f53c" title="(Temporary function) only used to update the K-line data in the cache">Stock::realtimeUpdate</a>; when nothing is registered it returns after a single atomic read only </p>
+<p>The core library implementation only does the atomic fast path judgment + the pid gating of the forked child process + the virtual call forwarding </p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="namespacehku_1_1ipc.html">ipc</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

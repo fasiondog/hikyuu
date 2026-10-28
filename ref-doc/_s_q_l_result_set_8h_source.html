@@ -1,0 +1,453 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/SQLResultSet.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_s_q_l_result_set_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SQLResultSet.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a2f11b1a62645d4ef57069e34ecbe2e5e">    1</a></span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2023 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2023-01-10</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;iterator&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;hikyuu/utilities/arithmetic.h&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;hikyuu/utilities/Log.h&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;hikyuu/utilities/osdef.h&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;DBConnectBase.h&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> TableT, <span class="keywordtype">size_t</span> page_size&gt;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_s_q_l_result_set_iterator.html">SQLResultSetIterator</a>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> TableT, <span class="keywordtype">size_t</span> page_size = 100&gt;</div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="};">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html">   41</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#afa1322418a66bdeaf15dec5a2f0a3dfe">SQLResultSet</a> {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_s_q_l_result_set_iterator.html">SQLResultSetIterator</a>&lt;TableT, page_size&gt;;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#if CPP_STANDARD &gt;= CPP_STANDARD_17</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="classhku_1_1_s_q_l_result_set.html#a4677109d16be518c1dd6058f51150128">PSIZE</a> = page_size;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a4677109d16be518c1dd6058f51150128">   48</a></span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="classhku_1_1_s_q_l_result_set.html#a4677109d16be518c1dd6058f51150128">PSIZE</a> = page_size;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#afa1322418a66bdeaf15dec5a2f0a3dfe">   51</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#afa1322418a66bdeaf15dec5a2f0a3dfe">SQLResultSet</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
+<div class="foldopen" id="foldopen00058" data-start="{" data-end="}">
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a287abde03918cfa7353c9bceb911129a">   58</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a287abde03918cfa7353c9bceb911129a">SQLResultSet</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a>&amp; connect, <span class="keyword">const</span> std::string&amp; sql)</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    : m_connect(connect),</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>      m_sql_template(<span class="stringliteral">&quot;id IN (SELECT id FROM {} WHERE {} {} LIMIT {} OFFSET {}) {}&quot;</span>) {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="comment">// the plain path: the clauses can only be located in the text the caller wrote</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <a class="code hl_struct" href="structhku_1_1_where_parts.html">WhereParts</a> parts = <a class="code hl_function" href="namespacehku.html#aaaa80f58b25cf24355601f9d9e108243">splitWhereParts</a>(sql);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        _setup(parts.<a class="code hl_variable" href="structhku_1_1_where_parts.html#a704995ac5c20e254b0358e4c8f8d7dee">where</a>, parts.<a class="code hl_variable" href="structhku_1_1_where_parts.html#a415709fff3f1a1547880a2499ae8317d">orderBy</a>, parts.<a class="code hl_variable" href="structhku_1_1_where_parts.html#a6c8e1b7865907d046f47362c876711de">limit</a>, <a class="code hl_typedef" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a>{});</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    }</div>
+</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span></div>
+<div class="foldopen" id="foldopen00071" data-start="{" data-end="}">
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#ad4a9a0bd08ea30917c37176f43c12f1c">   71</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#ad4a9a0bd08ea30917c37176f43c12f1c">SQLResultSet</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a>&amp; connect, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_d_b_condition.html">DBCondition</a>&amp; cond)</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    : m_connect(connect),</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      m_sql_template(<span class="stringliteral">&quot;id IN (SELECT id FROM {} WHERE {} {} LIMIT {} OFFSET {}) {}&quot;</span>) {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="comment">// a condition already carries its parts, nothing has to be parsed out of the text</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        _setup(cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#a095a1761cab1b7235a2461f03d773366">sql</a>(), cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#ae65fa1322305ab12c5fb6e15a6bf9792">getOrderBy</a>(), cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#ac7a1c149d5bbfdd704e46df3b38c17eb">getLimit</a>(), cond.<a class="code hl_function" href="classhku_1_1_d_b_condition.html#a28eae81a2b6d59f97b4bfadaec2e188e">params</a>());</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
+</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span></div>
+<div class="foldopen" id="foldopen00079" data-start="{" data-end="}">
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a9255f1615bc133550293eedc06bcfbb3">   79</a></span>    <span class="keyword">const</span> <a class="code hl_typedef" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a>&amp; <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a9255f1615bc133550293eedc06bcfbb3">getConnect</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="keywordflow">return</span> m_connect;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    }</div>
+</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">   83</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">const_iterator</a> = <a class="code hl_class" href="classhku_1_1_s_q_l_result_set_iterator.html">SQLResultSetIterator&lt;TableT, page_size&gt;</a>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">   84</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">iterator</a> = <a class="code hl_class" href="classhku_1_1_s_q_l_result_set_iterator.html">SQLResultSetIterator&lt;TableT, page_size&gt;</a>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="foldopen" id="foldopen00086" data-start="{" data-end="}">
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a3822216870c22a199686dab30818bd77">   86</a></span>    <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">const_iterator</a> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a3822216870c22a199686dab30818bd77">cbegin</a>() {</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">const_iterator</a>(<span class="keyword">this</span>, 0);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    }</div>
+</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="foldopen" id="foldopen00090" data-start="{" data-end="}">
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a5ff42d6b11fae4ca9e39cc7873dcece3">   90</a></span>    <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">const_iterator</a> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a5ff42d6b11fae4ca9e39cc7873dcece3">cend</a>() {</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">const_iterator</a>(<span class="keyword">this</span>, <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>());</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    }</div>
+</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="foldopen" id="foldopen00094" data-start="{" data-end="}">
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#af8d0bbf96ab7a9c4c87953980ae13c46">   94</a></span>    <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">iterator</a> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#af8d0bbf96ab7a9c4c87953980ae13c46">begin</a>() {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">iterator</a>(<span class="keyword">this</span>, 0);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    }</div>
+</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="foldopen" id="foldopen00098" data-start="{" data-end="}">
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a494fdbe26888c5c42cd4919ce1392dbf">   98</a></span>    <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">iterator</a> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a494fdbe26888c5c42cd4919ce1392dbf">end</a>() {</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">iterator</a>(<span class="keyword">this</span>, <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>());</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    }</div>
+</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span></div>
+<div class="foldopen" id="foldopen00107" data-start="{" data-end="}">
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#ad37900d873b5d8470b41f8558481e8b4">  107</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#ad37900d873b5d8470b41f8558481e8b4">size</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        HKU_IF_RETURN(!m_connect, 0);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        std::string sql =</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>          fmt::format(<span class="stringliteral">&quot;select count(1) from {} where {}&quot;</span>, TableT::getTableName(), m_where);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        <span class="keywordtype">size_t</span> total = m_connect-&gt;queryNumber&lt;<span class="keywordtype">size_t</span>&gt;(sql, 0, m_params);</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        <span class="comment">// the row limit of the condition caps the reported size, the pages are cut the same way</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keywordflow">return</span> m_limit &gt;= 0 ? std::min(total, <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(m_limit)) : total;</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    }</div>
+</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span></div>
+<div class="foldopen" id="foldopen00121" data-start="{" data-end="}">
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a3e1f6cd701776c1d43f9c6146e1569b7">  121</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a3e1f6cd701776c1d43f9c6146e1569b7">empty</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#ad37900d873b5d8470b41f8558481e8b4">size</a>() == 0;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    }</div>
+</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span></div>
+<div class="foldopen" id="foldopen00131" data-start="{" data-end="}">
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a1d30f5992242d38d23543e06632351ac">  131</a></span>    <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a1d30f5992242d38d23543e06632351ac">getPageCount</a>() {</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="keywordtype">size_t</span> total = <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#ad37900d873b5d8470b41f8558481e8b4">size</a>();</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        <span class="keywordtype">size_t</span> n = total / page_size;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        <span class="comment">// the last page counts only when it holds rows: an exact multiple needs no extra page</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        <span class="keywordflow">return</span> n * page_size &gt;= total ? n : n + 1;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    }</div>
+</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span></div>
+<div class="foldopen" id="foldopen00143" data-start="{" data-end="}">
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a4410e86d9d6b38e9e0d26890eef73f0a">  143</a></span>    std::vector&lt;TableT&gt; <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a4410e86d9d6b38e9e0d26890eef73f0a">getPage</a>(<span class="keywordtype">size_t</span> page) {</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>        std::vector&lt;TableT&gt; result;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        HKU_IF_RETURN(!m_connect || _pageLimit(page) &lt;= 0, result);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        m_connect-&gt;batchLoadView(result, _selectSQL(page), m_params);</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    }</div>
+</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
+<div class="foldopen" id="foldopen00150" data-start="{" data-end="}">
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#adda78b939f9d2d5fffa75d7a16cb8e3d">  150</a></span>    TableT <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#adda78b939f9d2d5fffa75d7a16cb8e3d">operator[]</a>(<span class="keywordtype">size_t</span> index) {</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        <span class="keywordflow">return</span> get(index);</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    }</div>
+</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="foldopen" id="foldopen00154" data-start="{" data-end="}">
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set.html#a8581fd9946e3f7d94b5baff1f25bb2b4">  154</a></span>    TableT <a class="code hl_function" href="classhku_1_1_s_q_l_result_set.html#a8581fd9946e3f7d94b5baff1f25bb2b4">at</a>(<span class="keywordtype">size_t</span> index) {</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        TableT result = get(index);</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        HKU_CHECK_THROW(result.valid(), std::out_of_range, <span class="stringliteral">&quot;Index is over&quot;</span>);</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    }</div>
+</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <span class="keywordtype">void</span> _setup(<span class="keyword">const</span> std::string&amp; where, <span class="keyword">const</span> std::string&amp; orderBy, <span class="keywordtype">int</span> limit,</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>                <a class="code hl_typedef" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> params) {</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        m_params = std::move(params);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        m_limit = limit;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        std::string text = where;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        <a class="code hl_function" href="group___utilities.html#gacb72fa0e392c25a69a7990a4a4b8c7b3">trim</a>(text);</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>        m_where = text.empty() ? <span class="stringliteral">&quot;1=1&quot;</span> : text;</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        <span class="keywordflow">if</span> (orderBy.empty()) {</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>            m_orderby_inner = <span class="stringliteral">&quot;ORDER BY id&quot;</span>;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>            m_orderby_inner = fmt::format(<span class="stringliteral">&quot;{}, id ASC&quot;</span>, orderBy);</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        }</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <span class="comment">// the page rows are picked by id in the inner subquery, but the outer select reads them</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        <span class="comment">// back with `id IN (...)`, whose result order is undefined without an ORDER BY of its own;</span></div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="comment">// without it the row sequence within a page (and hence the index-to-row mapping) is not</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <span class="comment">// guaranteed on every driver, so the outer query must re-apply the same order as the inner</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        m_orderby_outer = m_orderby_inner;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    }</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keywordtype">size_t</span> _pageLimit(<span class="keywordtype">size_t</span> page)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordflow">if</span> (m_limit &lt; 0) {</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>            <span class="keywordflow">return</span> page_size;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        }</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span> </div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        <span class="keyword">const</span> <span class="keywordtype">size_t</span> offset = page * page_size;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <span class="keyword">const</span> <span class="keywordtype">size_t</span> left = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(m_limit);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        <span class="keywordflow">return</span> offset &gt;= left ? 0 : std::min(page_size, left - offset);</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    }</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    std::string _selectSQL(<span class="keywordtype">size_t</span> page)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        <span class="keywordflow">return</span> fmt::format(</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>          <span class="stringliteral">&quot;{} where {}&quot;</span>, TableT::getSelectSQL(),</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>          fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>                      m_orderby_inner, _pageLimit(page), page * page_size, m_orderby_outer));</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    }</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span> </div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    TableT get(<span class="keywordtype">size_t</span> index) {</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        TableT result{Null&lt;TableT&gt;()};</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        HKU_IF_RETURN(index == Null&lt;size_t&gt;(), result);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        <span class="keywordtype">size_t</span> page = index / page_size;</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>        <span class="keywordflow">if</span> (m_connect &amp;&amp; page != m_current_page) {</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>            m_buffer.clear();</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>            <span class="keywordflow">if</span> (_pageLimit(page) &gt; 0) {</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>                m_connect-&gt;batchLoadView(m_buffer, _selectSQL(page), m_params);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>            }</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>            m_current_page = page;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>        }</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>        HKU_IF_RETURN(m_buffer.empty(), result);</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        <span class="keywordtype">size_t</span> pos = index - page * page_size;</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>        HKU_IF_RETURN(pos &gt;= m_buffer.size(), result);</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        result = m_buffer[index - page * page_size];</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    }</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span> </div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>    <a class="code hl_typedef" href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">DBConnectPtr</a> m_connect;</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    std::vector&lt;TableT&gt; m_buffer;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    std::string m_where;</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    std::string m_sql_template;</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    std::string m_orderby_inner;</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    std::string m_orderby_outer;</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>    <a class="code hl_typedef" href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">BoundValues</a> m_params;</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    <span class="keywordtype">int</span> m_limit = -1;</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>    <span class="keywordtype">size_t</span> m_current_page = Null&lt;size_t&gt;();</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>};</div>
+</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span> </div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> TableT, <span class="keywordtype">size_t</span> page_size&gt;</div>
+<div class="foldopen" id="foldopen00241" data-start="{" data-end="};">
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html">  241</a></span><span class="keyword">class </span><a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a> {</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a28da7c93df192587db4cc792d233b105">  243</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set_iterator.html#a28da7c93df192587db4cc792d233b105">ResultSet</a> = <a class="code hl_class" href="classhku_1_1_s_q_l_result_set.html">SQLResultSet&lt;TableT, page_size&gt;</a>;</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span> </div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">  245</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a77825320a83b0d5e47dc5dfa9b41f93f">  246</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a77825320a83b0d5e47dc5dfa9b41f93f">~SQLResultSetIterator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
+<div class="foldopen" id="foldopen00248" data-start="{" data-end="}">
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a582dc57e23bc6ba9ae896b4a54226b57">  248</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a582dc57e23bc6ba9ae896b4a54226b57">SQLResultSetIterator</a>(<a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set_iterator.html#a28da7c93df192587db4cc792d233b105">ResultSet</a>* result_set, <span class="keywordtype">size_t</span> index)</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    : m_set(result_set), m_index(index) {</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>        <span class="keywordflow">if</span> (m_index != <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>()) {</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>            m_value = std::move(m_set-&gt;get(index));</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            <span class="keywordflow">if</span> (!m_value.valid()) {</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>                m_index = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>();</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>            }</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        }</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    }</div>
+</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="foldopen" id="foldopen00258" data-start="{" data-end="}">
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a5321559e2da777c5bb487ea26309cc99">  258</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a5321559e2da777c5bb487ea26309cc99">SQLResultSetIterator</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a>&amp; other)</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    : m_set(other.m_set), m_index(other.m_index), m_value(other.m_value) {}</div>
+</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
+<div class="foldopen" id="foldopen00261" data-start="{" data-end="}">
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a8281a086b33933c0b248c8d86fc83e70">  261</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a>&amp; <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a8281a086b33933c0b248c8d86fc83e70">operator=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a>&amp; other) {</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>        <span class="keywordflow">if</span> (<span class="keyword">this</span> == &amp;other)</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        m_index = other.m_index;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>        m_set = other.m_set;</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>        m_value = other.m_value;</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    }</div>
+</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="foldopen" id="foldopen00270" data-start="{" data-end="}">
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a31881f60022046b4a3d77486083dfd53">  270</a></span>    <span class="keyword">const</span> TableT&amp; <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a31881f60022046b4a3d77486083dfd53">operator*</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>        <span class="keywordflow">return</span> m_value;</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    }</div>
+</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
+<div class="foldopen" id="foldopen00274" data-start="{" data-end="}">
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#adf657222bcfb6a2660d05c111f9450a8">  274</a></span>    TableT&amp; <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#adf657222bcfb6a2660d05c111f9450a8">operator*</a>() {</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        <span class="keywordflow">return</span> m_value;</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    }</div>
+</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
+<div class="foldopen" id="foldopen00278" data-start="{" data-end="}">
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#af3c4a4c5b2bdde57f793c36e0672ba85">  278</a></span>    <span class="keyword">const</span> TableT* <span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#af3c4a4c5b2bdde57f793c36e0672ba85">operator-&gt;</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        <span class="keywordflow">return</span> &amp;m_value;</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    }</div>
+</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span> </div>
+<div class="foldopen" id="foldopen00282" data-start="{" data-end="}">
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a9752601cc8d14a0248ed688761e19e71">  282</a></span>    TableT* <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a9752601cc8d14a0248ed688761e19e71">operator-&gt;</a>() {</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        <span class="keywordflow">return</span> &amp;m_value;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>    }</div>
+</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <span class="comment">// Prefix increment operator</span></div>
+<div class="foldopen" id="foldopen00287" data-start="{" data-end="}">
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a3444295d7bb1b2e7003bc2d5c77c56c2">  287</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a>&amp; <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a3444295d7bb1b2e7003bc2d5c77c56c2">operator++</a>() {</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>        HKU_CHECK_THROW(m_index != <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>(), std::logic_error,</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>                        <span class="stringliteral">&quot;Cannot increment an end iterator.&quot;</span>);</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        m_index++;</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>        m_value = std::move(m_set-&gt;get(m_index));</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>        <span class="keywordflow">if</span> (!m_value.valid()) {</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>            m_index = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>();</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>        }</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    }</div>
+</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span> </div>
+<div class="foldopen" id="foldopen00298" data-start="{" data-end="}">
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_l_result_set_iterator.html#a5879ddafa56f44a6236e3d36b6327016">  298</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a5879ddafa56f44a6236e3d36b6327016">operator!=</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">SQLResultSetIterator</a>&amp; iter)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>        <span class="keywordflow">return</span> m_index != iter.m_index;</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    }</div>
+</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span> </div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    <a class="code hl_typedef" href="classhku_1_1_s_q_l_result_set_iterator.html#a28da7c93df192587db4cc792d233b105">ResultSet</a>* m_set = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    <span class="keywordtype">size_t</span> m_index = <a class="code hl_class" href="classhku_1_1_null.html">Null&lt;size_t&gt;</a>();</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    TableT m_value;</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>};</div>
+</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html"><div class="ttname"><a href="classhku_1_1_d_b_condition.html">hku::DBCondition</a></div><div class="ttdoc">Query condition of a table model query.</div><div class="ttdef"><b>定义</b> DBCondition.h:212</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_a095a1761cab1b7235a2461f03d773366"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#a095a1761cab1b7235a2461f03d773366">hku::DBCondition::sql</a></div><div class="ttdeci">const std::string &amp; sql() const</div><div class="ttdoc">The filter part with numbered ?</div><div class="ttdef"><b>定义</b> DBCondition.h:252</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_a28eae81a2b6d59f97b4bfadaec2e188e"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#a28eae81a2b6d59f97b4bfadaec2e188e">hku::DBCondition::params</a></div><div class="ttdeci">const BoundValues &amp; params() const</div><div class="ttdoc">The values of the placeholders of sql(), in placeholder order</div><div class="ttdef"><b>定义</b> DBCondition.h:257</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_ac7a1c149d5bbfdd704e46df3b38c17eb"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#ac7a1c149d5bbfdd704e46df3b38c17eb">hku::DBCondition::getLimit</a></div><div class="ttdeci">int getLimit() const</div><div class="ttdoc">The row limit set by LIMIT, -1 when there is none</div><div class="ttdef"><b>定义</b> DBCondition.h:272</div></div>
+<div class="ttc" id="aclasshku_1_1_d_b_condition_html_ae65fa1322305ab12c5fb6e15a6bf9792"><div class="ttname"><a href="classhku_1_1_d_b_condition.html#ae65fa1322305ab12c5fb6e15a6bf9792">hku::DBCondition::getOrderBy</a></div><div class="ttdeci">const std::string &amp; getOrderBy() const</div><div class="ttdoc">The trailing order-by clause, including its leading space, empty when there is none</div><div class="ttdef"><b>定义</b> DBCondition.h:267</div></div>
+<div class="ttc" id="aclasshku_1_1_null_html"><div class="ttname"><a href="classhku_1_1_null.html">hku::Null</a></div><div class="ttdoc">It provides the Null value of the given type</div><div class="ttdef"><b>定义</b> Null.h:38</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html">hku::SQLResultSet</a></div><div class="ttdoc">SQL query result set</div><div class="ttdef"><b>定义</b> SQLResultSet.h:41</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a1d30f5992242d38d23543e06632351ac"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a1d30f5992242d38d23543e06632351ac">hku::SQLResultSet::getPageCount</a></div><div class="ttdeci">size_t getPageCount()</div><div class="ttdoc">Get the number of the pages of the current data set</div><div class="ttdef"><b>定义</b> SQLResultSet.h:131</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a287abde03918cfa7353c9bceb911129a"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a287abde03918cfa7353c9bceb911129a">hku::SQLResultSet::SQLResultSet</a></div><div class="ttdeci">SQLResultSet(const DBConnectPtr &amp;connect, const std::string &amp;sql)</div><div class="ttdoc">Build a new paged query result instance</div><div class="ttdef"><b>定义</b> SQLResultSet.h:58</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a3822216870c22a199686dab30818bd77"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a3822216870c22a199686dab30818bd77">hku::SQLResultSet::cbegin</a></div><div class="ttdeci">const_iterator cbegin()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:86</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a3e1f6cd701776c1d43f9c6146e1569b7"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a3e1f6cd701776c1d43f9c6146e1569b7">hku::SQLResultSet::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Whether the current data set is empty</div><div class="ttdef"><b>定义</b> SQLResultSet.h:121</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a4410e86d9d6b38e9e0d26890eef73f0a"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a4410e86d9d6b38e9e0d26890eef73f0a">hku::SQLResultSet::getPage</a></div><div class="ttdeci">std::vector&lt; TableT &gt; getPage(size_t page)</div><div class="ttdoc">Get all the data in the given page</div><div class="ttdef"><b>定义</b> SQLResultSet.h:143</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a4677109d16be518c1dd6058f51150128"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a4677109d16be518c1dd6058f51150128">hku::SQLResultSet::PSIZE</a></div><div class="ttdeci">static const int PSIZE</div><div class="ttdef"><b>定义</b> SQLResultSet.h:48</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a494fdbe26888c5c42cd4919ce1392dbf"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a494fdbe26888c5c42cd4919ce1392dbf">hku::SQLResultSet::end</a></div><div class="ttdeci">iterator end()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:98</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a5ff42d6b11fae4ca9e39cc7873dcece3"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a5ff42d6b11fae4ca9e39cc7873dcece3">hku::SQLResultSet::cend</a></div><div class="ttdeci">const_iterator cend()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:90</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a69c9173584b96f17c32b384d61200d01"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a69c9173584b96f17c32b384d61200d01">hku::SQLResultSet::iterator</a></div><div class="ttdeci">SQLResultSetIterator&lt; TableT, page_size &gt; iterator</div><div class="ttdef"><b>定义</b> SQLResultSet.h:84</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a8581fd9946e3f7d94b5baff1f25bb2b4"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a8581fd9946e3f7d94b5baff1f25bb2b4">hku::SQLResultSet::at</a></div><div class="ttdeci">TableT at(size_t index)</div><div class="ttdef"><b>定义</b> SQLResultSet.h:154</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_a9255f1615bc133550293eedc06bcfbb3"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#a9255f1615bc133550293eedc06bcfbb3">hku::SQLResultSet::getConnect</a></div><div class="ttdeci">const DBConnectPtr &amp; getConnect() const</div><div class="ttdoc">Get its database connection</div><div class="ttdef"><b>定义</b> SQLResultSet.h:79</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_ab6668d96eb17ff87808d2be45076e2a9"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#ab6668d96eb17ff87808d2be45076e2a9">hku::SQLResultSet::const_iterator</a></div><div class="ttdeci">SQLResultSetIterator&lt; TableT, page_size &gt; const_iterator</div><div class="ttdef"><b>定义</b> SQLResultSet.h:83</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_ad37900d873b5d8470b41f8558481e8b4"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#ad37900d873b5d8470b41f8558481e8b4">hku::SQLResultSet::size</a></div><div class="ttdeci">size_t size() const</div><div class="ttdoc">Get the data set size at the current moment</div><div class="ttdef"><b>定义</b> SQLResultSet.h:107</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_ad4a9a0bd08ea30917c37176f43c12f1c"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#ad4a9a0bd08ea30917c37176f43c12f1c">hku::SQLResultSet::SQLResultSet</a></div><div class="ttdeci">SQLResultSet(const DBConnectPtr &amp;connect, const DBCondition &amp;cond)</div><div class="ttdoc">Build a new paged query result instance from a condition</div><div class="ttdef"><b>定义</b> SQLResultSet.h:71</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_adda78b939f9d2d5fffa75d7a16cb8e3d"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#adda78b939f9d2d5fffa75d7a16cb8e3d">hku::SQLResultSet::operator[]</a></div><div class="ttdeci">TableT operator[](size_t index)</div><div class="ttdef"><b>定义</b> SQLResultSet.h:150</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_af8d0bbf96ab7a9c4c87953980ae13c46"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#af8d0bbf96ab7a9c4c87953980ae13c46">hku::SQLResultSet::begin</a></div><div class="ttdeci">iterator begin()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:94</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_html_afa1322418a66bdeaf15dec5a2f0a3dfe"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set.html#afa1322418a66bdeaf15dec5a2f0a3dfe">hku::SQLResultSet::SQLResultSet</a></div><div class="ttdeci">SQLResultSet()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html">hku::SQLResultSetIterator</a></div><div class="ttdef"><b>定义</b> SQLResultSet.h:241</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a28da7c93df192587db4cc792d233b105"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a28da7c93df192587db4cc792d233b105">hku::SQLResultSetIterator::ResultSet</a></div><div class="ttdeci">SQLResultSet&lt; TableT, page_size &gt; ResultSet</div><div class="ttdef"><b>定义</b> SQLResultSet.h:243</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a29d2670370e85279dcd1ed69b82023ed"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a29d2670370e85279dcd1ed69b82023ed">hku::SQLResultSetIterator::SQLResultSetIterator</a></div><div class="ttdeci">SQLResultSetIterator()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a31881f60022046b4a3d77486083dfd53"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a31881f60022046b4a3d77486083dfd53">hku::SQLResultSetIterator::operator*</a></div><div class="ttdeci">const TableT &amp; operator*() const</div><div class="ttdef"><b>定义</b> SQLResultSet.h:270</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a3444295d7bb1b2e7003bc2d5c77c56c2"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a3444295d7bb1b2e7003bc2d5c77c56c2">hku::SQLResultSetIterator::operator++</a></div><div class="ttdeci">SQLResultSetIterator &amp; operator++()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:287</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a5321559e2da777c5bb487ea26309cc99"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a5321559e2da777c5bb487ea26309cc99">hku::SQLResultSetIterator::SQLResultSetIterator</a></div><div class="ttdeci">SQLResultSetIterator(const SQLResultSetIterator &amp;other)</div><div class="ttdef"><b>定义</b> SQLResultSet.h:258</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a582dc57e23bc6ba9ae896b4a54226b57"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a582dc57e23bc6ba9ae896b4a54226b57">hku::SQLResultSetIterator::SQLResultSetIterator</a></div><div class="ttdeci">SQLResultSetIterator(ResultSet *result_set, size_t index)</div><div class="ttdef"><b>定义</b> SQLResultSet.h:248</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a5879ddafa56f44a6236e3d36b6327016"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a5879ddafa56f44a6236e3d36b6327016">hku::SQLResultSetIterator::operator!=</a></div><div class="ttdeci">bool operator!=(const SQLResultSetIterator &amp;iter) const</div><div class="ttdef"><b>定义</b> SQLResultSet.h:298</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a77825320a83b0d5e47dc5dfa9b41f93f"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a77825320a83b0d5e47dc5dfa9b41f93f">hku::SQLResultSetIterator::~SQLResultSetIterator</a></div><div class="ttdeci">~SQLResultSetIterator()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a8281a086b33933c0b248c8d86fc83e70"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a8281a086b33933c0b248c8d86fc83e70">hku::SQLResultSetIterator::operator=</a></div><div class="ttdeci">SQLResultSetIterator &amp; operator=(const SQLResultSetIterator &amp;other)</div><div class="ttdef"><b>定义</b> SQLResultSet.h:261</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_a9752601cc8d14a0248ed688761e19e71"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#a9752601cc8d14a0248ed688761e19e71">hku::SQLResultSetIterator::operator-&gt;</a></div><div class="ttdeci">TableT * operator-&gt;()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:282</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_adf657222bcfb6a2660d05c111f9450a8"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#adf657222bcfb6a2660d05c111f9450a8">hku::SQLResultSetIterator::operator*</a></div><div class="ttdeci">TableT &amp; operator*()</div><div class="ttdef"><b>定义</b> SQLResultSet.h:274</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_l_result_set_iterator_html_af3c4a4c5b2bdde57f793c36e0672ba85"><div class="ttname"><a href="classhku_1_1_s_q_l_result_set_iterator.html#af3c4a4c5b2bdde57f793c36e0672ba85">hku::SQLResultSetIterator::operator-&gt;</a></div><div class="ttdeci">const TableT *const operator-&gt;() const</div><div class="ttdef"><b>定义</b> SQLResultSet.h:278</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_ga74b9c3d6f48f40f6208924675acfb321"><div class="ttname"><a href="group___d_b_connect.html#ga74b9c3d6f48f40f6208924675acfb321">hku::BoundValues</a></div><div class="ttdeci">std::vector&lt; BoundValue &gt; BoundValues</div><div class="ttdef"><b>定义</b> DBCondition.h:135</div></div>
+<div class="ttc" id="agroup___d_b_connect_html_gab085d7d9748cc3ecf5dacf8691ad7a2b"><div class="ttname"><a href="group___d_b_connect.html#gab085d7d9748cc3ecf5dacf8691ad7a2b">hku::DBConnectPtr</a></div><div class="ttdeci">std::shared_ptr&lt; DBConnectBase &gt; DBConnectPtr</div><div class="ttdef"><b>定义</b> DBConnectBase.h:376</div></div>
+<div class="ttc" id="agroup___utilities_html_gacb72fa0e392c25a69a7990a4a4b8c7b3"><div class="ttname"><a href="group___utilities.html#gacb72fa0e392c25a69a7990a4a4b8c7b3">hku::trim</a></div><div class="ttdeci">void trim(std::string &amp;s)</div><div class="ttdoc">Remove the blanks (spaces, tabs and CRLF) at both ends of a string</div><div class="ttdef"><b>定义</b> arithmetic.h:302</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_aaaa80f58b25cf24355601f9d9e108243"><div class="ttname"><a href="namespacehku.html#aaaa80f58b25cf24355601f9d9e108243">hku::splitWhereParts</a></div><div class="ttdeci">HKU_UTILS_API WhereParts splitWhereParts(const std::string &amp;where)</div><div class="ttdoc">Split a plain (hand-written) where clause into its parts.</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html"><div class="ttname"><a href="structhku_1_1_where_parts.html">hku::WhereParts</a></div><div class="ttdoc">The parts of a plain where clause: the filter, the trailing order-by and the row limit</div><div class="ttdef"><b>定义</b> DBCondition.h:148</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html_a415709fff3f1a1547880a2499ae8317d"><div class="ttname"><a href="structhku_1_1_where_parts.html#a415709fff3f1a1547880a2499ae8317d">hku::WhereParts::orderBy</a></div><div class="ttdeci">std::string orderBy</div><div class="ttdef"><b>定义</b> DBCondition.h:150</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html_a6c8e1b7865907d046f47362c876711de"><div class="ttname"><a href="structhku_1_1_where_parts.html#a6c8e1b7865907d046f47362c876711de">hku::WhereParts::limit</a></div><div class="ttdeci">int limit</div><div class="ttdef"><b>定义</b> DBCondition.h:151</div></div>
+<div class="ttc" id="astructhku_1_1_where_parts_html_a704995ac5c20e254b0358e4c8f8d7dee"><div class="ttname"><a href="structhku_1_1_where_parts.html#a704995ac5c20e254b0358e4c8f8d7dee">hku::WhereParts::where</a></div><div class="ttdeci">std::string where</div><div class="ttdef"><b>定义</b> DBCondition.h:149</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><b>SQLResultSet.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

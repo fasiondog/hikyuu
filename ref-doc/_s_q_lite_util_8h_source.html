@@ -1,0 +1,179 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/utilities/db_connect/sqlite/SQLiteUtil.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_s_q_lite_util_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SQLiteUtil.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> *  Copyright (c) 2019~2023 hikyuu.org</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2023/01/04</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;SQLiteConnect.h&quot;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span></div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html">   18</a></span><span class="keyword">class </span>HKU_UTILS_API <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a53306af5cc7c87f2d005eb2054abc421">SQLiteUtil</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a53306af5cc7c87f2d005eb2054abc421">   20</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a53306af5cc7c87f2d005eb2054abc421">SQLiteUtil</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a2607248256eb495ecf5e404df2dc9d59">   21</a></span>    <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a2607248256eb495ecf5e404df2dc9d59">~SQLiteUtil</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="foldopen" id="foldopen00023" data-start="{" data-end="};">
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924a">   23</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924a">BackupResult</a> {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6">   24</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6">BACKUP_SUCCESS</a> = 0,             </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb">   25</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb">BACKUP_FAILED_INVALID_SRC</a> = 1,  </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341">   26</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341">BACKUP_FAILED_EXECUTE</a> = 2,      </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8">   27</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8">BACKUP_FAILED_OTHER</a> = 3,        </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    };</div>
+</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="foldopen" id="foldopen00030" data-start="{" data-end="};">
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ad">   30</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ad">RecoverResult</a> {</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951">   31</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951">RECOVER_SUCCESS</a> = 0,              </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276">   32</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276">RECOVER_FAILED_BACKUP_NOT_EXIST</a>,  </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16">   33</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16">RECOVER_FAILED_BACKUP_INVALID</a>,    </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13">   34</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13">RECOVER_FAILED_INVALID_DST</a>,  </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b">   36</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b">RECOVER_FAILED_EXECUTE</a>,      </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9">   37</a></span>        <a class="code hl_enumvalue" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9">RECOVER_FAILED_OTHER</a>,        </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    };</div>
+</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a6f52534a252059bab928e9bfda430f33">   50</a></span>    <span class="keyword">static</span> <a class="code hl_enumeration" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924a">BackupResult</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a6f52534a252059bab928e9bfda430f33">onlineBackup</a>(<span class="keyword">const</span> std::shared_ptr&lt;SQLiteConnect&gt; &amp;conn,</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                                     <span class="keyword">const</span> std::string &amp;dst, <span class="keywordtype">int</span> n_page = -1,</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                                     <span class="keywordtype">int</span> step_sleep = 250) noexcept;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a4c8fbe10806df65fc2cb9761c975cbca">   63</a></span>    static <a class="code hl_enumeration" href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924a">BackupResult</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a6f52534a252059bab928e9bfda430f33">onlineBackup</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;src, const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;dst,</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>                                     <span class="keywordtype">int</span> n_page = -1, <span class="keywordtype">int</span> step_sleep = 250) noexcept;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a970f12d67457c8c5cd0bd30e1b264881">   77</a></span>    static <a class="code hl_enumeration" href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ad">RecoverResult</a> <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a970f12d67457c8c5cd0bd30e1b264881">recoverFromBackup</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;backup, const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;dst,</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>                                           <span class="keywordtype">bool</span> save_bad = false) noexcept;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classhku_1_1_s_q_lite_util.html#a1f0bc3fcd6ec02607976363442fb0f44">   88</a></span>    static <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_s_q_lite_util.html#a1f0bc3fcd6ec02607976363442fb0f44">removeDBFile</a>(const <a class="code hl_namespace" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> &amp;dbfilename);</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>};</div>
+</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>}  <span class="comment">// namespace hku</span></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a1f0bc3fcd6ec02607976363442fb0f44"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a1f0bc3fcd6ec02607976363442fb0f44">hku::SQLiteUtil::removeDBFile</a></div><div class="ttdeci">static bool removeDBFile(const std::string &amp;dbfilename)</div><div class="ttdoc">Try to delete the database related files (the main file and the journal file)</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a2607248256eb495ecf5e404df2dc9d59"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a2607248256eb495ecf5e404df2dc9d59">hku::SQLiteUtil::~SQLiteUtil</a></div><div class="ttdeci">~SQLiteUtil()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a53306af5cc7c87f2d005eb2054abc421"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a53306af5cc7c87f2d005eb2054abc421">hku::SQLiteUtil::SQLiteUtil</a></div><div class="ttdeci">SQLiteUtil()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a6f52534a252059bab928e9bfda430f33"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a6f52534a252059bab928e9bfda430f33">hku::SQLiteUtil::onlineBackup</a></div><div class="ttdeci">static BackupResult onlineBackup(const std::shared_ptr&lt; SQLiteConnect &gt; &amp;conn, const std::string &amp;dst, int n_page=-1, int step_sleep=250) noexcept</div><div class="ttdoc">Back up the database online, without affecting the operations of the other database connections</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a8ecb7243b78128304a03eccb429d924a"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924a">hku::SQLiteUtil::BackupResult</a></div><div class="ttdeci">BackupResult</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:23</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aa21bc1fde05396b3de9206d877d7e5cf6">hku::SQLiteUtil::BACKUP_SUCCESS</a></div><div class="ttdeci">@ BACKUP_SUCCESS</div><div class="ttdoc">Backup succeeded</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:24</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aa3d8dfe522fd28e7ed9bc37265eb2cbcb">hku::SQLiteUtil::BACKUP_FAILED_INVALID_SRC</a></div><div class="ttdeci">@ BACKUP_FAILED_INVALID_SRC</div><div class="ttdoc">The given source data to be backed up is invalid</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:25</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aac84460d495e239c8d7f9bf9b68649341">hku::SQLiteUtil::BACKUP_FAILED_EXECUTE</a></div><div class="ttdeci">@ BACKUP_FAILED_EXECUTE</div><div class="ttdoc">An error occurred in the backup execution</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:26</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a8ecb7243b78128304a03eccb429d924aacf80469052449a8671b5dbdb18c9bab8">hku::SQLiteUtil::BACKUP_FAILED_OTHER</a></div><div class="ttdeci">@ BACKUP_FAILED_OTHER</div><div class="ttdoc">The backup failed for other reasons</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:27</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_a970f12d67457c8c5cd0bd30e1b264881"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#a970f12d67457c8c5cd0bd30e1b264881">hku::SQLiteUtil::recoverFromBackup</a></div><div class="ttdeci">static RecoverResult recoverFromBackup(const std::string &amp;backup, const std::string &amp;dst, bool save_bad=false) noexcept</div><div class="ttdoc">Recover the database from the given backup file</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44ad"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ad">hku::SQLiteUtil::RecoverResult</a></div><div class="ttdeci">RecoverResult</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:30</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ada14929eee52821e378e4770e2d3a30b13">hku::SQLiteUtil::RECOVER_FAILED_INVALID_DST</a></div><div class="ttdeci">@ RECOVER_FAILED_INVALID_DST</div><div class="ttdoc">The given recovery target file name is invalid or the file is occupied and cannot be deleted</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:34</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44ada92b5086c55bcd7934806bc1e8d3ecde9">hku::SQLiteUtil::RECOVER_FAILED_OTHER</a></div><div class="ttdeci">@ RECOVER_FAILED_OTHER</div><div class="ttdoc">The recovery failed for other reasons</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:37</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adabb1bcca113403f266858f72ac64d7f2b">hku::SQLiteUtil::RECOVER_FAILED_EXECUTE</a></div><div class="ttdeci">@ RECOVER_FAILED_EXECUTE</div><div class="ttdoc">The recovery execution failed</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:36</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adad74180192b2a522e728d2b3cc7b1e951">hku::SQLiteUtil::RECOVER_SUCCESS</a></div><div class="ttdeci">@ RECOVER_SUCCESS</div><div class="ttdoc">Recovery succeeded</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:31</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adaf8d5754bdf462ce0e0e85d05106ee276">hku::SQLiteUtil::RECOVER_FAILED_BACKUP_NOT_EXIST</a></div><div class="ttdeci">@ RECOVER_FAILED_BACKUP_NOT_EXIST</div><div class="ttdoc">The given backup file does not exist</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:32</div></div>
+<div class="ttc" id="aclasshku_1_1_s_q_lite_util_html_acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16"><div class="ttname"><a href="classhku_1_1_s_q_lite_util.html#acf1c30b903641b8633dcf7c3f07d44adafbf7ab085bbd343ef53516f22cbc9f16">hku::SQLiteUtil::RECOVER_FAILED_BACKUP_INVALID</a></div><div class="ttdeci">@ RECOVER_FAILED_BACKUP_INVALID</div><div class="ttdoc">The given backup file is not a valid database file</div><div class="ttdef"><b>定义</b> SQLiteUtil.h:33</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>定义</b> Block.h:189</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html">utilities</a></li><li class="navelem"><a href="dir_6af6b5d9d9160aa717632db74d9cb4b7.html">db_connect</a></li><li class="navelem"><a href="dir_22517f5458a7819cb7338454b9c24008.html">sqlite</a></li><li class="navelem"><b>SQLiteUtil.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

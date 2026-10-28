@@ -1,0 +1,380 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_allocate_funds_base_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">AllocateFundsBase.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AllocateFundsBase.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Copyright (c) 2025 hikyuu.org</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *  Base class of the portfolio-level fund allocation (AF), it is held by the aggregate form</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> *  (MultiSystem) only.</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *  AF is composed of three replaceable algorithm parts, each of them corresponds to one virtual</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *  function (L1/L2/L3):</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> *  - **L1 system-level allocation** `_allocate`: decide &quot;how much each sub-system may manage&quot;.</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> *    Input is the sub-system context list, output is the weight table; in mode B (Fund</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *    Allocation) it also writes the real cash quota into `contexts[i].quota` (weight x the parent</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> *    net assets, or the fixed amount). Examples: AF_EqualWeight (1/N), AF_FixedWeight,</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> *    AF_MultiFactor (weighted by the SE score).</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> *  - **L2 behavior-level conversion** `_toTargets`: convert the sub-system suggestions into the</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *    executable quantity of the parent account (the folding point from the sub-system space to</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> *    the individual instrument space). In mode A (Signal Aggregation) the target position market</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> *    value = weight x net exposure ratio x the parent net assets, aggregated per instrument and</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> *    rebalanced by the delta to the current position; in mode B the real instruction of the</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> *    sub-system passes through unchanged.</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> *  - **L3 portfolio risk control** `_checkRisk`: clip the suggestions at the portfolio</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> *    dimension (e.g. the single instrument concentration cap `max_single_position`); mode B</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> *    respects the sub-manager autonomy and skips the clipping.</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> *  The overall entry is `allocate()` = L1 -&gt; L2 -&gt; L3. When the quota is needed before driving</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> *  the sub-systems (the mode B calibration), use `allocateQuota()` (L1 only) and</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> *  `allocateTargets()` (L2 -&gt; L3) separately.</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *  The running mode (&quot;A&quot; Signal Aggregation / &quot;B&quot; Fund Allocation / &quot;C&quot; Shared Account</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> *  Compatibility) is **owned by MultiSystem** and is passed explicitly into every L1/L2/L3 hook</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *  as the trailing `mode` argument; AF itself does not hold it. See the MultiSystem class comment</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> *  for the three modes.</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> *  The single-security form uses MoneyManagerBase (MM); the two no longer share the class</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> *  hierarchy, the parameter family or the allocation mode.</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment"> *  Created on: 2018-1-30</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#ifndef ALLOCATEFUNDSBASE_H_</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#define ALLOCATEFUNDSBASE_H_</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &quot;../../utilities/Parameter.h&quot;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &quot;../system/SystemPart.h&quot;</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &quot;../system/TradeSuggestion.h&quot;</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &quot;../system/SubSystemContext.h&quot;</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &quot;../../trade_manage/TradeManager.h&quot;</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_system.html">System</a>;  <span class="comment">// Forward declaration, to avoid a circular include with System.h</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">   58</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">SYSPtr</a> = std::shared_ptr&lt;System&gt;;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="keyword">class </span><a class="code hl_class" href="classhku_1_1_allocate_funds_base.html">AllocateFundsBase</a>;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">   61</a></span><span class="keyword">typedef</span> shared_ptr&lt;AllocateFundsBase&gt; <a class="code hl_typedef" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">AllocateFundsPtr</a>;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">   67</a></span><span class="keyword">using </span><a class="code hl_typedef" href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">AFPtr</a> = <a class="code hl_typedef" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">AllocateFundsPtr</a>;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span></div>
+<div class="foldopen" id="foldopen00078" data-start="{" data-end="};">
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html">   78</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a90a88a1ed018786bbd4d35a149e23ea0">AllocateFundsBase</a> {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    PARAMETER_SUPPORT_WITH_CHECK</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a90a88a1ed018786bbd4d35a149e23ea0">   83</a></span>    <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a90a88a1ed018786bbd4d35a149e23ea0">AllocateFundsBase</a>();</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a84df097057677287c5cf1552faae32e8">   84</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a84df097057677287c5cf1552faae32e8">AllocateFundsBase</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a3bda4bd5b6fe631b847af24ad170ba04">name</a>);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a6273f7c73fe42f32c493da81eea6e565">   85</a></span>    <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a6273f7c73fe42f32c493da81eea6e565">AllocateFundsBase</a>(<span class="keyword">const</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a90a88a1ed018786bbd4d35a149e23ea0">AllocateFundsBase</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a4bb93d7098a9cae6436af42899286039">   86</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a4bb93d7098a9cae6436af42899286039">~AllocateFundsBase</a>();</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span></div>
+<div class="foldopen" id="foldopen00089" data-start="{" data-end="}">
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a3bda4bd5b6fe631b847af24ad170ba04">   89</a></span>    <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a3bda4bd5b6fe631b847af24ad170ba04">name</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#acc52ff1584385b891f9991dedc4049a8">m_name</a>;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    }</div>
+</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span></div>
+<div class="foldopen" id="foldopen00094" data-start="{" data-end="}">
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a56455dc6c9f2e58f301d537abf6b1edd">   94</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a56455dc6c9f2e58f301d537abf6b1edd">name</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a3bda4bd5b6fe631b847af24ad170ba04">name</a>) {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#acc52ff1584385b891f9991dedc4049a8">m_name</a> = <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a3bda4bd5b6fe631b847af24ad170ba04">name</a>;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    }</div>
+</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#ac63526c0dd76c1b970e202c9a87bd025">   99</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#ac63526c0dd76c1b970e202c9a87bd025">reset</a>();</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a8246f4ef56a619487dfff18b656ed47c">  102</a></span>    <a class="code hl_typedef" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">AllocateFundsPtr</a> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a8246f4ef56a619487dfff18b656ed47c">clone</a>();</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span></div>
+<div class="foldopen" id="foldopen00105" data-start="{" data-end="}">
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a858167f6c01cec0d18151b3bce47a086">  105</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a858167f6c01cec0d18151b3bce47a086">setTM</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm) {</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">m_tm</a> = tm;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    }</div>
+</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span></div>
+<div class="foldopen" id="foldopen00110" data-start="{" data-end="}">
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a97578e5bda283973901b4bffb680b958">  110</a></span>    <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a97578e5bda283973901b4bffb680b958">getTM</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">m_tm</a>;</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    }</div>
+</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span></div>
+<div class="foldopen" id="foldopen00115" data-start="{" data-end="}">
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#adc83fd0502bef21d6657108295e07e4a">  115</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#adc83fd0502bef21d6657108295e07e4a">setQuery</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#ac9a3552ad69e967c60b1dff406873312">m_query</a> = query;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    }</div>
+</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span></div>
+<div class="foldopen" id="foldopen00120" data-start="{" data-end="}">
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#ae11a05503816aeb718f9884d83e55866">  120</a></span>    <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#ae11a05503816aeb718f9884d83e55866">getQuery</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#ac9a3552ad69e967c60b1dff406873312">m_query</a>;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    }</div>
+</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="comment">// @note The running mode is no longer held here: it is owned by MultiSystem and passed into</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    <span class="comment">//       every L1/L2/L3 hook through the trailing `mode` argument. In mode C the aggregate</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <span class="comment">//       system drives the sub-systems directly on its own real account and never calls</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <span class="comment">//       allocate(); the mode checks inside the hooks are only a defensive pass-through for an</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    <span class="comment">//       AF invoked in mode C.</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">  134</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">Weights</a> = std::unordered_map&lt;SYSPtr, double&gt;;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#aba802a1aa46fb95e9cf36bbd58006d1a">  150</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#aba802a1aa46fb95e9cf36bbd58006d1a">allocate</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm, <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a>&amp; suggestions,</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>                  <a class="code hl_typedef" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">SubSystemContextList</a>&amp; contexts, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode);</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a8185d3cf207acff5c2ec250908c90cc3">  159</a></span>    <a class="code hl_typedef" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">Weights</a> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a8185d3cf207acff5c2ec250908c90cc3">allocateQuota</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>                          <a class="code hl_typedef" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">SubSystemContextList</a>&amp; contexts, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span></div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#abec5dd6216f35bd4213ec0ac03275e2f">  167</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#abec5dd6216f35bd4213ec0ac03275e2f">allocateTargets</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>                         <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a>&amp; suggestions, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">Weights</a>&amp; sys_weight,</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>                         <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode);</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#ab915c686642986848253128b2d502e21">  175</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">Weights</a> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#ab915c686642986848253128b2d502e21">_allocate</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>                              <a class="code hl_typedef" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">SubSystemContextList</a>&amp; contexts, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>                              <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode);</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a2b6941736bc8c472c62321503a18f412">  189</a></span>    <a class="code hl_typedef" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">Weights</a> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a2b6941736bc8c472c62321503a18f412">_applyWeights</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>                          <a class="code hl_typedef" href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">SubSystemContextList</a>&amp; contexts, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>                          <span class="keyword">const</span> std::vector&lt;double&gt;&amp; weights, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span></div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a8a3f24168e649db6fcd6e6cce8568523">  206</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a8a3f24168e649db6fcd6e6cce8568523">_toTargets</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>                            <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a>&amp; suggestions, <span class="keyword">const</span> <a class="code hl_typedef" href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">Weights</a>&amp; sys_weight,</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>                            <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a82f4fe9cf8c7948115e7a1e62fe5a756">  219</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a82f4fe9cf8c7948115e7a1e62fe5a756">_checkRisk</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; date, <span class="keyword">const</span> <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a>&amp; tm,</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>                            <a class="code hl_typedef" href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">TradeSuggestionList</a>&amp; suggestions, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query,</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>                            <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; mode);</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a3e61f6b9056777ac9edc1a61db0b07b5">  224</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a3e61f6b9056777ac9edc1a61db0b07b5">_reset</a>() {}</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span></div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a7dd36af35774102cf1344e715ee5f37e">  227</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">AllocateFundsPtr</a> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a7dd36af35774102cf1344e715ee5f37e">_clone</a>() = 0;</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span> </div>
+<div class="foldopen" id="foldopen00229" data-start="{" data-end="}">
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a79a898c8fbcde135e02af45bbf37db73">  229</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a79a898c8fbcde135e02af45bbf37db73">isPythonObject</a>() const noexcept {</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a9336d1a8507d5cc799459b0b81b904a7">m_is_python_object</a>;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    }</div>
+</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span></div>
+<div class="foldopen" id="foldopen00234" data-start="{" data-end="}">
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a3e3912d32580654acb548b2459870250">  234</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_allocate_funds_base.html#a3e3912d32580654acb548b2459870250">hasPythonPart</a>() const noexcept {</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a9336d1a8507d5cc799459b0b81b904a7">m_is_python_object</a> || (<a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">m_tm</a> &amp;&amp; <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">m_tm</a>-&gt;hasPythonPart());</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    }</div>
+</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span> </div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#acc52ff1584385b891f9991dedc4049a8">  239</a></span>    <span class="keywordtype">string</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#acc52ff1584385b891f9991dedc4049a8">m_name</a>;</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#ac9a3552ad69e967c60b1dff406873312">  240</a></span>    <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#ac9a3552ad69e967c60b1dff406873312">m_query</a>;</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">  241</a></span>    <a class="code hl_typedef" href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">TradeManagerPtr</a> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">m_tm</a>;</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a9336d1a8507d5cc799459b0b81b904a7">  242</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a9336d1a8507d5cc799459b0b81b904a7">m_is_python_object</a>{<span class="keyword">false</span>};</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    <span class="comment">// The one-shot notices are per instance, not per process: a shared flag would hide the</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="comment">// diagnostics of every other portfolio / backtest once the first instance printed them</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#a15d35a2d79594a05ef2f9b0b60a9497a">  246</a></span>    <span class="keyword">mutable</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a15d35a2d79594a05ef2f9b0b60a9497a">m_fixed_amount_notified</a>{<span class="keyword">false</span>};</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#adb20403929f691052c7b9177b6b1c26b">  247</a></span>    <span class="keyword">mutable</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#adb20403929f691052c7b9177b6b1c26b">m_warned_short_unsupported</a>{<span class="keyword">false</span>};</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="comment">//============================================</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="comment">// Serialization support</span></div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="comment">//============================================</span></div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno"><a class="line" href="classhku_1_1_allocate_funds_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">  254</a></span>    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <span class="comment">// The current schema only; no compatibility with the older archives. m_query and m_tm are set</span></div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <span class="comment">// temporarily when the system runs, they do not need to be serialized</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    <span class="keywordtype">void</span> serialize(Archive&amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>) {</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#acc52ff1584385b891f9991dedc4049a8">m_name</a>);</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>        ar&amp; BOOST_SERIALIZATION_NVP(m_params);</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        ar&amp; BOOST_SERIALIZATION_NVP(<a class="code hl_variable" href="classhku_1_1_allocate_funds_base.html#a9336d1a8507d5cc799459b0b81b904a7">m_is_python_object</a>);</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    }</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>};</div>
+</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>BOOST_SERIALIZATION_ASSUME_ABSTRACT(AllocateFundsBase)</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span><span class="preprocessor"></span></div>
+<div class="foldopen" id="foldopen00285" data-start="" data-end="">
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno"><a class="line" href="group___allocate_funds.html#ga879f5886130251d38ad710bafbb8a37a">  285</a></span><span class="preprocessor">#define ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION              \</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="preprocessor">private:                                                            \</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="preprocessor">    friend class boost::serialization::access;                      \</span></div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="preprocessor">    template &lt;class Archive&gt;                                        \</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="preprocessor">    void serialize(Archive&amp; ar, const unsigned int version) {       \</span></div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="preprocessor">        ar&amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(AllocateFundsBase); \</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="preprocessor">    }</span></div>
+</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="preprocessor">#define ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span> </div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="preprocessor">#define ALLOCATE_FUNDS_IMP(classname)            \</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="preprocessor">public:                                          \</span></div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="preprocessor">    virtual AllocateFundsPtr _clone() override { \</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="preprocessor">        return std::make_shared&lt;classname&gt;();    \</span></div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="preprocessor">    }</span></div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span> </div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno"><a class="line" href="namespacehku.html#a7efd14b0e8acf753e571f160df30dec7">  302</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp;, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_allocate_funds_base.html">AllocateFundsBase</a>&amp;);</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno"><a class="line" href="namespacehku.html#a4456f9954343e2b67434b0f98abd41de">  303</a></span>HKU_API std::ostream&amp; <a class="code hl_function" href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">operator&lt;&lt;</a>(std::ostream&amp;, <span class="keyword">const</span> <a class="code hl_typedef" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">AllocateFundsPtr</a>&amp;);</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span> </div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="preprocessor">#if FMT_VERSION &gt;= 90000</span></div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::AllocateFundsBase&gt; : ostream_formatter {};</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="keyword">struct </span>fmt::formatter&lt;<a class="code hl_namespace" href="namespacehku.html">hku</a>::<a class="code hl_typedef" href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">AllocateFundsPtr</a>&gt; : ostream_formatter {};</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span> </div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="preprocessor">#endif </span><span class="comment">/* ALLOCATEFUNDSBASE_H_ */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html">hku::AllocateFundsBase</a></div><div class="ttdoc">Base class of the portfolio-level fund allocation (AF).</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:78</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a15d35a2d79594a05ef2f9b0b60a9497a"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a15d35a2d79594a05ef2f9b0b60a9497a">hku::AllocateFundsBase::m_fixed_amount_notified</a></div><div class="ttdeci">bool m_fixed_amount_notified</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:246</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a2b6941736bc8c472c62321503a18f412"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a2b6941736bc8c472c62321503a18f412">hku::AllocateFundsBase::_applyWeights</a></div><div class="ttdeci">Weights _applyWeights(const Datetime &amp;date, const TradeManagerPtr &amp;tm, SubSystemContextList &amp;contexts, const KQuery &amp;query, const std::vector&lt; double &gt; &amp;weights, const string &amp;mode) const</div><div class="ttdoc">L1 skeleton: fill the L1 result by &quot;sub-system index -&gt; weight&quot;, and in mode B write contexts[i]....</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a3bda4bd5b6fe631b847af24ad170ba04"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a3bda4bd5b6fe631b847af24ad170ba04">hku::AllocateFundsBase::name</a></div><div class="ttdeci">const string &amp; name() const</div><div class="ttdoc">Get the name</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:89</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a3e3912d32580654acb548b2459870250"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a3e3912d32580654acb548b2459870250">hku::AllocateFundsBase::hasPythonPart</a></div><div class="ttdeci">virtual bool hasPythonPart() const noexcept</div><div class="ttdoc">Whether this component or its trade manager is defined in Python; overrides may recurse</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:234</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a3e61f6b9056777ac9edc1a61db0b07b5"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a3e61f6b9056777ac9edc1a61db0b07b5">hku::AllocateFundsBase::_reset</a></div><div class="ttdeci">virtual void _reset()</div><div class="ttdoc">Subclass reset interface</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:224</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a4bb93d7098a9cae6436af42899286039"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a4bb93d7098a9cae6436af42899286039">hku::AllocateFundsBase::~AllocateFundsBase</a></div><div class="ttdeci">virtual ~AllocateFundsBase()</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a56455dc6c9f2e58f301d537abf6b1edd"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a56455dc6c9f2e58f301d537abf6b1edd">hku::AllocateFundsBase::name</a></div><div class="ttdeci">void name(const string &amp;name)</div><div class="ttdoc">Set the name</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:94</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a6273f7c73fe42f32c493da81eea6e565"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a6273f7c73fe42f32c493da81eea6e565">hku::AllocateFundsBase::AllocateFundsBase</a></div><div class="ttdeci">AllocateFundsBase(const AllocateFundsBase &amp;)=default</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a79a898c8fbcde135e02af45bbf37db73"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a79a898c8fbcde135e02af45bbf37db73">hku::AllocateFundsBase::isPythonObject</a></div><div class="ttdeci">bool isPythonObject() const noexcept</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:229</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a7d93c94a82c1f0e328189f2ef6138800"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a7d93c94a82c1f0e328189f2ef6138800">hku::AllocateFundsBase::Weights</a></div><div class="ttdeci">std::unordered_map&lt; SYSPtr, double &gt; Weights</div><div class="ttdoc">Weight table: sub-system instance -&gt; weight (the L1 output and the L2 input)</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:134</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a7dd36af35774102cf1344e715ee5f37e"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a7dd36af35774102cf1344e715ee5f37e">hku::AllocateFundsBase::_clone</a></div><div class="ttdeci">virtual AllocateFundsPtr _clone()=0</div><div class="ttdoc">Interface for the subclass to clone its private variables</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a7e95975cd32c8311cacf98d747fed9b1"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a7e95975cd32c8311cacf98d747fed9b1">hku::AllocateFundsBase::m_tm</a></div><div class="ttdeci">TradeManagerPtr m_tm</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:241</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a8185d3cf207acff5c2ec250908c90cc3"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a8185d3cf207acff5c2ec250908c90cc3">hku::AllocateFundsBase::allocateQuota</a></div><div class="ttdeci">Weights allocateQuota(const Datetime &amp;date, const TradeManagerPtr &amp;tm, SubSystemContextList &amp;contexts, const KQuery &amp;query, const string &amp;mode)</div><div class="ttdoc">L1 only: calculate the weights and (in mode B) write the real quota into contexts[i]....</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a8246f4ef56a619487dfff18b656ed47c"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a8246f4ef56a619487dfff18b656ed47c">hku::AllocateFundsBase::clone</a></div><div class="ttdeci">AllocateFundsPtr clone()</div><div class="ttdoc">Clone operation</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a82f4fe9cf8c7948115e7a1e62fe5a756"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a82f4fe9cf8c7948115e7a1e62fe5a756">hku::AllocateFundsBase::_checkRisk</a></div><div class="ttdeci">virtual void _checkRisk(const Datetime &amp;date, const TradeManagerPtr &amp;tm, TradeSuggestionList &amp;suggestions, const KQuery &amp;query, const string &amp;mode)</div><div class="ttdoc">L3 portfolio risk control clipping: mode A performs the portfolio dimension risk control (concentrati...</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a84df097057677287c5cf1552faae32e8"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a84df097057677287c5cf1552faae32e8">hku::AllocateFundsBase::AllocateFundsBase</a></div><div class="ttdeci">AllocateFundsBase(const string &amp;name)</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a858167f6c01cec0d18151b3bce47a086"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a858167f6c01cec0d18151b3bce47a086">hku::AllocateFundsBase::setTM</a></div><div class="ttdeci">void setTM(const TradeManagerPtr &amp;tm)</div><div class="ttdoc">Set the trade account (the real account of the parent/aggregate system)</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:105</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a8a3f24168e649db6fcd6e6cce8568523"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a8a3f24168e649db6fcd6e6cce8568523">hku::AllocateFundsBase::_toTargets</a></div><div class="ttdeci">virtual void _toTargets(const Datetime &amp;date, const TradeManagerPtr &amp;tm, TradeSuggestionList &amp;suggestions, const Weights &amp;sys_weight, const KQuery &amp;query, const string &amp;mode)</div><div class="ttdoc">L2 behavior-level conversion: in mode A it converts the parent account quantity by the budget (weight...</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a90a88a1ed018786bbd4d35a149e23ea0"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a90a88a1ed018786bbd4d35a149e23ea0">hku::AllocateFundsBase::AllocateFundsBase</a></div><div class="ttdeci">AllocateFundsBase()</div><div class="ttdoc">Default constructor</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a9336d1a8507d5cc799459b0b81b904a7"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a9336d1a8507d5cc799459b0b81b904a7">hku::AllocateFundsBase::m_is_python_object</a></div><div class="ttdeci">bool m_is_python_object</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:242</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_a97578e5bda283973901b4bffb680b958"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#a97578e5bda283973901b4bffb680b958">hku::AllocateFundsBase::getTM</a></div><div class="ttdeci">TradeManagerPtr getTM() const</div><div class="ttdoc">Get the trade account</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:110</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_ab915c686642986848253128b2d502e21"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#ab915c686642986848253128b2d502e21">hku::AllocateFundsBase::_allocate</a></div><div class="ttdeci">virtual Weights _allocate(const Datetime &amp;date, const TradeManagerPtr &amp;tm, SubSystemContextList &amp;contexts, const KQuery &amp;query, const string &amp;mode)</div><div class="ttdoc">L1 system-level allocation: mode A returns the nominal weight (suggested weight), mode B returns the ...</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_aba802a1aa46fb95e9cf36bbd58006d1a"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#aba802a1aa46fb95e9cf36bbd58006d1a">hku::AllocateFundsBase::allocate</a></div><div class="ttdeci">void allocate(const Datetime &amp;date, const TradeManagerPtr &amp;tm, TradeSuggestionList &amp;suggestions, SubSystemContextList &amp;contexts, const KQuery &amp;query, const string &amp;mode)</div><div class="ttdoc">The unified entry of L1/L2/L3, it is called by the aggregate System (MultiSystem).</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_abec5dd6216f35bd4213ec0ac03275e2f"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#abec5dd6216f35bd4213ec0ac03275e2f">hku::AllocateFundsBase::allocateTargets</a></div><div class="ttdeci">void allocateTargets(const Datetime &amp;date, const TradeManagerPtr &amp;tm, TradeSuggestionList &amp;suggestions, const Weights &amp;sys_weight, const KQuery &amp;query, const string &amp;mode)</div><div class="ttdoc">L2 + L3 only: convert the suggestions into the executable quantity of the parent account and perform ...</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_ac63526c0dd76c1b970e202c9a87bd025"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#ac63526c0dd76c1b970e202c9a87bd025">hku::AllocateFundsBase::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Reset</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_ac9a3552ad69e967c60b1dff406873312"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#ac9a3552ad69e967c60b1dff406873312">hku::AllocateFundsBase::m_query</a></div><div class="ttdeci">KQuery m_query</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:240</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_acc52ff1584385b891f9991dedc4049a8"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#acc52ff1584385b891f9991dedc4049a8">hku::AllocateFundsBase::m_name</a></div><div class="ttdeci">string m_name</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:239</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_adb20403929f691052c7b9177b6b1c26b"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#adb20403929f691052c7b9177b6b1c26b">hku::AllocateFundsBase::m_warned_short_unsupported</a></div><div class="ttdeci">bool m_warned_short_unsupported</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:247</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_adc83fd0502bef21d6657108295e07e4a"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#adc83fd0502bef21d6657108295e07e4a">hku::AllocateFundsBase::setQuery</a></div><div class="ttdeci">void setQuery(const KQuery &amp;query)</div><div class="ttdoc">Set the query condition</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:115</div></div>
+<div class="ttc" id="aclasshku_1_1_allocate_funds_base_html_ae11a05503816aeb718f9884d83e55866"><div class="ttname"><a href="classhku_1_1_allocate_funds_base.html#ae11a05503816aeb718f9884d83e55866">hku::AllocateFundsBase::getQuery</a></div><div class="ttdeci">const KQuery &amp; getQuery() const</div><div class="ttdoc">Get the query condition</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:120</div></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_system_html"><div class="ttname"><a href="classhku_1_1_system.html">hku::System</a></div><div class="ttdoc">Base class of the trading system</div><div class="ttdef"><b>定义</b> System.h:38</div></div>
+<div class="ttc" id="agroup___allocate_funds_html_ga5558df617c5efbb03ad9fa57da4bff68"><div class="ttname"><a href="group___allocate_funds.html#ga5558df617c5efbb03ad9fa57da4bff68">hku::AFPtr</a></div><div class="ttdeci">AllocateFundsPtr AFPtr</div><div class="ttdoc">The pointer type that the client programs should use</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:67</div></div>
+<div class="ttc" id="agroup___trade_manager_class_html_ga9d7ab0c25be37c167f61358a5fa526f0"><div class="ttname"><a href="group___trade_manager_class.html#ga9d7ab0c25be37c167f61358a5fa526f0">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManagerBase &gt; TradeManagerPtr</div><div class="ttdoc">Client programs should use this type for the actual operations</div><div class="ttdef"><b>定义</b> TradeManagerBase.h:904</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+<div class="ttc" id="anamespacehku_html_a98d36b433e7ba4fe01cb70ec3a856dbc"><div class="ttname"><a href="namespacehku.html#a98d36b433e7ba4fe01cb70ec3a856dbc">hku::SYSPtr</a></div><div class="ttdeci">std::shared_ptr&lt; System &gt; SYSPtr</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:58</div></div>
+<div class="ttc" id="anamespacehku_html_aa6f29d7575fee2c97e62e16db18b182e"><div class="ttname"><a href="namespacehku.html#aa6f29d7575fee2c97e62e16db18b182e">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;)</div></div>
+<div class="ttc" id="anamespacehku_html_ac89c5611bbd8872a208fe9c18a369899"><div class="ttname"><a href="namespacehku.html#ac89c5611bbd8872a208fe9c18a369899">hku::TradeSuggestionList</a></div><div class="ttdeci">vector&lt; TradeSuggestion &gt; TradeSuggestionList</div><div class="ttdef"><b>定义</b> TradeSuggestion.h:62</div></div>
+<div class="ttc" id="anamespacehku_html_af1655b1270acf894ef9ff1fd5f51572b"><div class="ttname"><a href="namespacehku.html#af1655b1270acf894ef9ff1fd5f51572b">hku::AllocateFundsPtr</a></div><div class="ttdeci">shared_ptr&lt; AllocateFundsBase &gt; AllocateFundsPtr</div><div class="ttdef"><b>定义</b> AllocateFundsBase.h:61</div></div>
+<div class="ttc" id="anamespacehku_html_af861f9a4b77b4d00511261b54177acc0"><div class="ttname"><a href="namespacehku.html#af861f9a4b77b4d00511261b54177acc0">hku::SubSystemContextList</a></div><div class="ttdeci">std::vector&lt; SubSystemContext &gt; SubSystemContextList</div><div class="ttdef"><b>定义</b> SubSystemContext.h:42</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a href="dir_e7fa64a077837fcd2f2677689fe4f679.html">allocatefunds</a></li><li class="navelem"><b>AllocateFundsBase.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

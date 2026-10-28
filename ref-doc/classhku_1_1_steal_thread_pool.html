@@ -1,0 +1,465 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hku::StealThreadPool类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('classhku_1_1_steal_thread_pool.html','','classhku_1_1_steal_thread_pool-members'); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">hku::StealThreadPool类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu core engine library</a> &raquo; <a class="el" href="group___utilities.html">Utilities program utility collection</a> &raquo; <a class="el" href="group___thread_pool.html">Thread Pool thread pool</a></div></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Distributed stealing thread pool  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_steal_thread_pool_8h_source.html">StealThreadPool.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:ExecutorWrapper" id="r_ExecutorWrapper"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhku_1_1_steal_thread_pool_1_1_executor_wrapper.html">ExecutorWrapper</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a75171f5cf3cd305b8f5992cff96ae809" id="r_a75171f5cf3cd305b8f5992cff96ae809"><td class="memTemplParams" colspan="2">template&lt;typename ResultType&gt; </td></tr>
+<tr class="memitem:a75171f5cf3cd305b8f5992cff96ae809 template"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75171f5cf3cd305b8f5992cff96ae809">task_handle</a> = std::future&lt;ResultType&gt;</td></tr>
+<tr class="memdesc:a75171f5cf3cd305b8f5992cff96ae809"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the corresponding future returned after submitting a task to the thread pool  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a8baf9ee53b12695727721898dfe1efec" id="r_a8baf9ee53b12695727721898dfe1efec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8baf9ee53b12695727721898dfe1efec">StealThreadPool</a> ()</td></tr>
+<tr class="memdesc:a8baf9ee53b12695727721898dfe1efec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, it creates the number of the threads equal to the number of the CPUs of the current system  <br /></td></tr>
+<tr class="memitem:a358e1c9fb360cb09992fc05997845031" id="r_a358e1c9fb360cb09992fc05997845031"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a358e1c9fb360cb09992fc05997845031">StealThreadPool</a> (size_t n, bool until_empty=true)</td></tr>
+<tr class="memdesc:a358e1c9fb360cb09992fc05997845031"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, it creates the given number of the threads  <br /></td></tr>
+<tr class="memitem:a6b26d5cf84d11779088b83cc6b62d795" id="r_a6b26d5cf84d11779088b83cc6b62d795"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b26d5cf84d11779088b83cc6b62d795">~StealThreadPool</a> ()</td></tr>
+<tr class="memdesc:a6b26d5cf84d11779088b83cc6b62d795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, it waits and blocks until all the tasks in the thread pool are finished  <br /></td></tr>
+<tr class="memitem:a759fca3419631404f3fb54e85442a381" id="r_a759fca3419631404f3fb54e85442a381"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a759fca3419631404f3fb54e85442a381">worker_num</a> () const</td></tr>
+<tr class="memdesc:a759fca3419631404f3fb54e85442a381"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of the worker threads  <br /></td></tr>
+<tr class="memitem:abcffa675adad05766cbefd3e878d0137" id="r_abcffa675adad05766cbefd3e878d0137"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abcffa675adad05766cbefd3e878d0137">remain_task_count</a> () const</td></tr>
+<tr class="memdesc:abcffa675adad05766cbefd3e878d0137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of the remaining tasks  <br /></td></tr>
+<tr class="memitem:ab3a6c423d692a496ecbc0f64464d4ce9" id="r_ab3a6c423d692a496ecbc0f64464d4ce9"><td class="memTemplParams" colspan="2">template&lt;typename FunctionType&gt; </td></tr>
+<tr class="memitem:ab3a6c423d692a496ecbc0f64464d4ce9 template"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3a6c423d692a496ecbc0f64464d4ce9">submit</a> (FunctionType &amp;&amp;f)</td></tr>
+<tr class="memdesc:ab3a6c423d692a496ecbc0f64464d4ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Submit a task to the thread pool  <br /></td></tr>
+<tr class="memitem:a819a1a4c9211bdce42bbb3f183899108" id="r_a819a1a4c9211bdce42bbb3f183899108"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a819a1a4c9211bdce42bbb3f183899108">done</a> () const</td></tr>
+<tr class="memdesc:a819a1a4c9211bdce42bbb3f183899108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end state of the thread pool  <br /></td></tr>
+<tr class="memitem:a5b9818d0caf8e48abc4a0a5cf28b42c3" id="r_a5b9818d0caf8e48abc4a0a5cf28b42c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5b9818d0caf8e48abc4a0a5cf28b42c3">stop</a> ()</td></tr>
+<tr class="memdesc:a5b9818d0caf8e48abc4a0a5cf28b42c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It waits for every thread to finish the currently executed task and then exits immediately  <br /></td></tr>
+<tr class="memitem:ae9e11df68e8ef6d41d482cf7cc987e0a" id="r_ae9e11df68e8ef6d41d482cf7cc987e0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9e11df68e8ef6d41d482cf7cc987e0a">join</a> ()</td></tr>
+<tr class="memdesc:ae9e11df68e8ef6d41d482cf7cc987e0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It waits and blocks until all the tasks in the thread pool are finished  <br /></td></tr>
+<tr class="memitem:ada24b0ba9a6b990d29c1669422c01e30" id="r_ada24b0ba9a6b990d29c1669422c01e30"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhku_1_1_steal_thread_pool_1_1_executor_wrapper.html">ExecutorWrapper</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada24b0ba9a6b990d29c1669422c01e30">executor</a> ()</td></tr>
+<tr class="memdesc:ada24b0ba9a6b990d29c1669422c01e30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coroutine executor  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>Distributed stealing thread pool </p>
+<dl class="section note"><dt>注解</dt><dd>It is mainly used in the recursive case where a task creates further tasks and adds them to the thread pool; otherwise an ordinary thread pool is recommended </dd></dl>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="a75171f5cf3cd305b8f5992cff96ae809" name="a75171f5cf3cd305b8f5992cff96ae809"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75171f5cf3cd305b8f5992cff96ae809">&#9670;&#160;</a></span>task_handle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ResultType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a75171f5cf3cd305b8f5992cff96ae809">hku::StealThreadPool::task_handle</a> = std::future&lt;ResultType&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The type of the corresponding future returned after submitting a task to the thread pool </p>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a8baf9ee53b12695727721898dfe1efec" name="a8baf9ee53b12695727721898dfe1efec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8baf9ee53b12695727721898dfe1efec">&#9670;&#160;</a></span>StealThreadPool() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::StealThreadPool::StealThreadPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default constructor, it creates the number of the threads equal to the number of the CPUs of the current system </p>
+
+</div>
+</div>
+<a id="a358e1c9fb360cb09992fc05997845031" name="a358e1c9fb360cb09992fc05997845031"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a358e1c9fb360cb09992fc05997845031">&#9670;&#160;</a></span>StealThreadPool() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::StealThreadPool::StealThreadPool </td>
+          <td>(</td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>until_empty</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor, it creates the given number of the threads </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>the given number of the threads </td></tr>
+    <tr><td class="paramname">until_empty</td><td>it stops running automatically when the task queue is empty </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6b26d5cf84d11779088b83cc6b62d795" name="a6b26d5cf84d11779088b83cc6b62d795"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b26d5cf84d11779088b83cc6b62d795">&#9670;&#160;</a></span>~StealThreadPool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::StealThreadPool::~StealThreadPool </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destructor, it waits and blocks until all the tasks in the thread pool are finished </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a819a1a4c9211bdce42bbb3f183899108" name="a819a1a4c9211bdce42bbb3f183899108"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a819a1a4c9211bdce42bbb3f183899108">&#9670;&#160;</a></span>done()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::StealThreadPool::done </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the end state of the thread pool </p>
+
+</div>
+</div>
+<a id="ada24b0ba9a6b990d29c1669422c01e30" name="ada24b0ba9a6b990d29c1669422c01e30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada24b0ba9a6b990d29c1669422c01e30">&#9670;&#160;</a></span>executor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structhku_1_1_steal_thread_pool_1_1_executor_wrapper.html">ExecutorWrapper</a> hku::StealThreadPool::executor </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Coroutine executor </p>
+
+</div>
+</div>
+<a id="ae9e11df68e8ef6d41d482cf7cc987e0a" name="ae9e11df68e8ef6d41d482cf7cc987e0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9e11df68e8ef6d41d482cf7cc987e0a">&#9670;&#160;</a></span>join()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::StealThreadPool::join </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It waits and blocks until all the tasks in the thread pool are finished </p>
+<dl class="section note"><dt>注解</dt><dd>From then on the thread pool cannot be used after the worker threads are ended </dd></dl>
+
+</div>
+</div>
+<a id="abcffa675adad05766cbefd3e878d0137" name="abcffa675adad05766cbefd3e878d0137"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcffa675adad05766cbefd3e878d0137">&#9670;&#160;</a></span>remain_task_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::StealThreadPool::remain_task_count </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of the remaining tasks </p>
+
+</div>
+</div>
+<a id="a5b9818d0caf8e48abc4a0a5cf28b42c3" name="a5b9818d0caf8e48abc4a0a5cf28b42c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b9818d0caf8e48abc4a0a5cf28b42c3">&#9670;&#160;</a></span>stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::StealThreadPool::stop </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It waits for every thread to finish the currently executed task and then exits immediately </p>
+
+</div>
+</div>
+<a id="ab3a6c423d692a496ecbc0f64464d4ce9" name="ab3a6c423d692a496ecbc0f64464d4ce9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3a6c423d692a496ecbc0f64464d4ce9">&#9670;&#160;</a></span>submit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename FunctionType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto hku::StealThreadPool::submit </td>
+          <td>(</td>
+          <td class="paramtype">FunctionType &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Submit a task to the thread pool </p>
+
+</div>
+</div>
+<a id="a759fca3419631404f3fb54e85442a381" name="a759fca3419631404f3fb54e85442a381"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a759fca3419631404f3fb54e85442a381">&#9670;&#160;</a></span>worker_num()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::StealThreadPool::worker_num </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the number of the worker threads </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/thread/<a class="el" href="_steal_thread_pool_8h_source.html">StealThreadPool.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="namespacehku.html">hku</a></li><li class="navelem"><a href="classhku_1_1_steal_thread_pool.html">StealThreadPool</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>

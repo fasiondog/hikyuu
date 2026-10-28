@@ -1,0 +1,231 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<title>Hikyuu: hikyuu/KDataPrivatedBufferImp.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',true);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('_k_data_privated_buffer_imp_8h_source.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">KDataPrivatedBufferImp.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * KDataPrivatedBufferImp.h</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *  Created on: 2013-2-4</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;KDataImp.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacehku.html">hku</a> {</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html">   15</a></span><span class="keyword">class </span>HKU_API <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#af9c9265803b85ee803f018a57646dcf3">KDataPrivatedBufferImp</a> : <span class="keyword">public</span> <a class="code hl_function" href="classhku_1_1_k_data_imp.html#a4e4e061dcec23f4563cd310abb47c031">KDataImp</a> {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#af9c9265803b85ee803f018a57646dcf3">   17</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#af9c9265803b85ee803f018a57646dcf3">KDataPrivatedBufferImp</a>();</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a1ad5409c2c60ffc3f0b7d27df7ee2cf4">   18</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a1ad5409c2c60ffc3f0b7d27df7ee2cf4">KDataPrivatedBufferImp</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="comment">// Used by the affiliated projects: the krecords are taken as-is, the recovery is NOT applied,</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="comment">// and startPos/endPos are recomputed from the query, so the caller must ensure krecords</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="comment">// correspond to the query range.</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a92c4ccb4278f2fecd571e034fd68b411">   23</a></span>    <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a92c4ccb4278f2fecd571e034fd68b411">KDataPrivatedBufferImp</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keyword">const</span> <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a>&amp; krecords);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a7ff1894bbc9d8998890032a162bd64ad">   25</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a7ff1894bbc9d8998890032a162bd64ad">~KDataPrivatedBufferImp</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="}">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a9f16a74dfa533811468e199281b13889">   27</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a9f16a74dfa533811468e199281b13889">empty</a>() const noexcept<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        <span class="keywordflow">return</span> m_buffer.empty();</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    }</div>
+</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="foldopen" id="foldopen00031" data-start="{" data-end="}">
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a011aada2cb3fb1e687978cdb91bad312">   31</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a011aada2cb3fb1e687978cdb91bad312">size</a>() const noexcept<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="keywordflow">return</span> m_buffer.size();</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    }</div>
+</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a71c5f67052f08be89a4372c0a1099bbd">   35</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a71c5f67052f08be89a4372c0a1099bbd">startPos</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a7562b8525e4e588c5bf951f87a18a7fa">   36</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a7562b8525e4e588c5bf951f87a18a7fa">endPos</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#ad3699dc73c80657a035e6f6b9c95a070">   37</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#ad3699dc73c80657a035e6f6b9c95a070">lastPos</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#aa5b443a206aa7ce8d7ad69a1d5ee6070">   39</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#aa5b443a206aa7ce8d7ad69a1d5ee6070">getPos</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime) <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="}">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#ae30db5aa88e485eaa376a31370bb97a1">   41</a></span>    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>&amp; <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#ae30db5aa88e485eaa376a31370bb97a1">getKRecord</a>(<span class="keywordtype">size_t</span> pos) <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="keyword">override</span> {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keywordflow">return</span> pos &lt; m_buffer.size() ? m_buffer[pos] : <a class="code hl_variable" href="classhku_1_1_k_record.html#af402788b29aff4da3993f0d45e41b068">KRecord::NullKRecord</a>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    }</div>
+</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="foldopen" id="foldopen00045" data-start="{" data-end="}">
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#ab46e17769745e3ab2a087fc4d3927327">   45</a></span>    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>&amp; <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#ab46e17769745e3ab2a087fc4d3927327">front</a>()<span class="keyword"> const override </span>{</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordflow">return</span> m_buffer.empty() ? <a class="code hl_variable" href="classhku_1_1_k_record.html#af402788b29aff4da3993f0d45e41b068">KRecord::NullKRecord</a> : m_buffer.front();</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    }</div>
+</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="foldopen" id="foldopen00049" data-start="{" data-end="}">
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#af04ce0973bc3304a94e8d2ac75c3a297">   49</a></span>    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>&amp; <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#af04ce0973bc3304a94e8d2ac75c3a297">back</a>()<span class="keyword"> const override </span>{</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keywordflow">return</span> m_buffer.empty() ? <a class="code hl_variable" href="classhku_1_1_k_record.html#af402788b29aff4da3993f0d45e41b068">KRecord::NullKRecord</a> : m_buffer.back();</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    }</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="foldopen" id="foldopen00053" data-start="{" data-end="}">
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a09462e390026ef00568a25da49070da1">   53</a></span>    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_record.html">KRecord</a>* <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a09462e390026ef00568a25da49070da1">data</a>() const noexcept<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keywordflow">return</span> m_buffer.data();</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    }</div>
+</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a16b600c8cf311b2dae1450dcca4157c9">   57</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a16b600c8cf311b2dae1450dcca4157c9">getDatetimeList</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_privated_buffer_imp.html#a2ca874f7e2ef41f926e645c4a2ee1be2">   59</a></span>    <span class="keyword">virtual</span> <a class="code hl_typedef" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a> <a class="code hl_function" href="classhku_1_1_k_data_privated_buffer_imp.html#a2ca874f7e2ef41f926e645c4a2ee1be2">getOtherFromSelf</a>(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordtype">void</span> _getPosInStock() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="comment">// All the types are anchored at a fixed baseline: backward at the stock&#39;s data start, forward</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="comment">// at its last data day. The equal-ratio multipliers come from the cached factor table of Stock.</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">void</span> _recover();</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keywordtype">void</span> _recoverForward();</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordtype">void</span> _recoverBackward();</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordtype">void</span> _recoverEqualForward();</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">void</span> _recoverEqualBackward();</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">void</span> _recoverForUpDay();</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <a class="code hl_typedef" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a> _getOtherFromSelfByIndex(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <a class="code hl_typedef" href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">KDataImpPtr</a> _getOtherFromSelfByDate(<span class="keyword">const</span> <a class="code hl_class" href="classhku_1_1_k_query.html">KQuery</a>&amp; query) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <a class="code hl_typedef" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> m_buffer;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keyword">mutable</span> <span class="keywordtype">size_t</span> m_start{0};</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keyword">mutable</span> <span class="keywordtype">size_t</span> m_end{0};</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keyword">mutable</span> std::once_flag m_pos_once;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>};</div>
+</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment">// typedef shared_ptr&lt;KDataPrivatedBufferImp&gt; KDataPrivatedBufferImpPtr;</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>} <span class="comment">/* namespace hku */</span></div>
+<div class="ttc" id="aclasshku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">Date type</div><div class="ttdef"><b>定义</b> Datetime.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_imp_html_a4e4e061dcec23f4563cd310abb47c031"><div class="ttname"><a href="classhku_1_1_k_data_imp.html#a4e4e061dcec23f4563cd310abb47c031">hku::KDataImp::KDataImp</a></div><div class="ttdeci">KDataImp()=default</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_imp_html_a7ba600fafc0438264b0869ec876f3a8c"><div class="ttname"><a href="classhku_1_1_k_data_imp.html#a7ba600fafc0438264b0869ec876f3a8c">hku::KDataImp::KDataImpPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataImp &gt; KDataImpPtr</div><div class="ttdef"><b>定义</b> KDataImp.h:73</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a011aada2cb3fb1e687978cdb91bad312"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a011aada2cb3fb1e687978cdb91bad312">hku::KDataPrivatedBufferImp::size</a></div><div class="ttdeci">virtual size_t size() const noexcept override</div><div class="ttdef"><b>定义</b> KDataPrivatedBufferImp.h:31</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a09462e390026ef00568a25da49070da1"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a09462e390026ef00568a25da49070da1">hku::KDataPrivatedBufferImp::data</a></div><div class="ttdeci">virtual const KRecord * data() const noexcept override</div><div class="ttdef"><b>定义</b> KDataPrivatedBufferImp.h:53</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a16b600c8cf311b2dae1450dcca4157c9"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a16b600c8cf311b2dae1450dcca4157c9">hku::KDataPrivatedBufferImp::getDatetimeList</a></div><div class="ttdeci">virtual DatetimeList getDatetimeList() const override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a1ad5409c2c60ffc3f0b7d27df7ee2cf4"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a1ad5409c2c60ffc3f0b7d27df7ee2cf4">hku::KDataPrivatedBufferImp::KDataPrivatedBufferImp</a></div><div class="ttdeci">KDataPrivatedBufferImp(const Stock &amp;stock, const KQuery &amp;query)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a2ca874f7e2ef41f926e645c4a2ee1be2"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a2ca874f7e2ef41f926e645c4a2ee1be2">hku::KDataPrivatedBufferImp::getOtherFromSelf</a></div><div class="ttdeci">virtual KDataImpPtr getOtherFromSelf(const KQuery &amp;query) const override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a71c5f67052f08be89a4372c0a1099bbd"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a71c5f67052f08be89a4372c0a1099bbd">hku::KDataPrivatedBufferImp::startPos</a></div><div class="ttdeci">virtual size_t startPos() const override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a7562b8525e4e588c5bf951f87a18a7fa"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a7562b8525e4e588c5bf951f87a18a7fa">hku::KDataPrivatedBufferImp::endPos</a></div><div class="ttdeci">virtual size_t endPos() const override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a7ff1894bbc9d8998890032a162bd64ad"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a7ff1894bbc9d8998890032a162bd64ad">hku::KDataPrivatedBufferImp::~KDataPrivatedBufferImp</a></div><div class="ttdeci">virtual ~KDataPrivatedBufferImp() override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a92c4ccb4278f2fecd571e034fd68b411"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a92c4ccb4278f2fecd571e034fd68b411">hku::KDataPrivatedBufferImp::KDataPrivatedBufferImp</a></div><div class="ttdeci">KDataPrivatedBufferImp(const Stock &amp;stock, const KQuery &amp;query, const KRecordList &amp;krecords)</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_a9f16a74dfa533811468e199281b13889"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#a9f16a74dfa533811468e199281b13889">hku::KDataPrivatedBufferImp::empty</a></div><div class="ttdeci">virtual bool empty() const noexcept override</div><div class="ttdef"><b>定义</b> KDataPrivatedBufferImp.h:27</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_aa5b443a206aa7ce8d7ad69a1d5ee6070"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#aa5b443a206aa7ce8d7ad69a1d5ee6070">hku::KDataPrivatedBufferImp::getPos</a></div><div class="ttdeci">virtual size_t getPos(const Datetime &amp;datetime) const noexcept override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_ab46e17769745e3ab2a087fc4d3927327"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#ab46e17769745e3ab2a087fc4d3927327">hku::KDataPrivatedBufferImp::front</a></div><div class="ttdeci">virtual const KRecord &amp; front() const override</div><div class="ttdef"><b>定义</b> KDataPrivatedBufferImp.h:45</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_ad3699dc73c80657a035e6f6b9c95a070"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#ad3699dc73c80657a035e6f6b9c95a070">hku::KDataPrivatedBufferImp::lastPos</a></div><div class="ttdeci">virtual size_t lastPos() const override</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_ae30db5aa88e485eaa376a31370bb97a1"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#ae30db5aa88e485eaa376a31370bb97a1">hku::KDataPrivatedBufferImp::getKRecord</a></div><div class="ttdeci">virtual const KRecord &amp; getKRecord(size_t pos) const noexcept override</div><div class="ttdef"><b>定义</b> KDataPrivatedBufferImp.h:41</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_af04ce0973bc3304a94e8d2ac75c3a297"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#af04ce0973bc3304a94e8d2ac75c3a297">hku::KDataPrivatedBufferImp::back</a></div><div class="ttdeci">virtual const KRecord &amp; back() const override</div><div class="ttdef"><b>定义</b> KDataPrivatedBufferImp.h:49</div></div>
+<div class="ttc" id="aclasshku_1_1_k_data_privated_buffer_imp_html_af9c9265803b85ee803f018a57646dcf3"><div class="ttname"><a href="classhku_1_1_k_data_privated_buffer_imp.html#af9c9265803b85ee803f018a57646dcf3">hku::KDataPrivatedBufferImp::KDataPrivatedBufferImp</a></div><div class="ttdeci">KDataPrivatedBufferImp()</div></div>
+<div class="ttc" id="aclasshku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">Query condition for K-line (candlestick) data by index</div><div class="ttdef"><b>定义</b> KQuery.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K-line data record</div><div class="ttdef"><b>定义</b> KRecord.h:20</div></div>
+<div class="ttc" id="aclasshku_1_1_k_record_html_af402788b29aff4da3993f0d45e41b068"><div class="ttname"><a href="classhku_1_1_k_record.html#af402788b29aff4da3993f0d45e41b068">hku::KRecord::NullKRecord</a></div><div class="ttdeci">static const KRecord NullKRecord</div><div class="ttdef"><b>定义</b> KRecord.h:63</div></div>
+<div class="ttc" id="aclasshku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Base class of a security (Stock).</div><div class="ttdef"><b>定义</b> Stock.h:46</div></div>
+<div class="ttc" id="agroup___data_type_html_gaeb6c8c0a18561345f892e2c4be1f5ef2"><div class="ttname"><a href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">hku::DatetimeList</a></div><div class="ttdeci">std::vector&lt; Datetime &gt; DatetimeList</div><div class="ttdoc">Date list</div><div class="ttdef"><b>定义</b> Datetime.h:375</div></div>
+<div class="ttc" id="agroup___stock_manage_html_ga7a898ea401d73f139c33ccb771cb62f0"><div class="ttname"><a href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">hku::KRecordList</a></div><div class="ttdeci">vector&lt; KRecord &gt; KRecordList</div><div class="ttdef"><b>定义</b> KRecord.h:67</div></div>
+<div class="ttc" id="anamespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">The Hikyuu core namespace, it contains the stock data management, the indicator implementation,...</div><div class="ttdef"><b>定义</b> analysis_sys.h:14</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+</div><!-- container -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><b>KDataPrivatedBufferImp.h</b></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
+</body>
+</html>
