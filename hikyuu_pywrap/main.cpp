@@ -175,7 +175,7 @@ PYBIND11_MODULE(core, m) {
     m.def("get_latest_version_info", []() {
         auto info = getLatestVersionInfo();
         py::dict ret;
-        ret["version"] = info.version;
+        ret["version"] = info.version_str();
         ret["remark"] = info.remark;
         ret["release_date"] = info.release_date;
         return ret;

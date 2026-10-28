@@ -127,7 +127,7 @@ void GlobalInitializer::clean() {
           "pip install hikyuu --upgrade\n"
           "{}\n"
           "====================================================================\n\n",
-          info.version, info.version, info.remark);
+          info.version_str(), info.version_str(), info.remark);
     }
 #endif
 

@@ -55,6 +55,14 @@ struct HKU_API LatestVersionInfo {
         remark = std::move(rhs.remark);
         return *this;
     }
+
+    /**
+     * Get the version as a dotted string, e.g. 1003001 -> "1.3.1"
+     */
+    std::string version_str() const {
+        return std::to_string(version / 1000000) + "." + std::to_string((version / 1000) % 1000) +
+               "." + std::to_string(version % 1000);
+    }
 };
 
 LatestVersionInfo HKU_API getLatestVersionInfo();
