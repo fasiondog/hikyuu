@@ -110,6 +110,7 @@ target("hikyuu")
     add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/**.cpp|indicator_talib/**.cpp")
    
     add_files("./*.cpp", "./serialization/*.cpp", "./factor/**.cpp", {unity_group="base"})
+    add_files("./part/**.cpp", {unity_group="part"})
     add_files("./indicator/**.cpp", {unity_group="indicator"})
 
     add_files("./analysis/**.cpp", {unity_group="analysis"})

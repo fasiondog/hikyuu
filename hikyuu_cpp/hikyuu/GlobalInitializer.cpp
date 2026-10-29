@@ -31,6 +31,8 @@
 #include "plugin/shmserver.h"
 #include "data_driver/ipc/ShmClientHook.h"
 #include "indicator/IndicatorImp.h"
+#include "part/PartRegistry.h"
+#include "part/BuiltinParts.h"
 #include "global/sysinfo.h"
 #include "plugin/interface/plugins.h"
 #include "debug.h"
@@ -113,6 +115,9 @@ void GlobalInitializer::init() {
     DataDriverFactory::init();
     StockManager::instance();
 
+    PartRegistry::instance();
+    registerBuiltinParts();
+
     getGlobalSpotAgent();
 }
 
@@ -186,6 +191,7 @@ void GlobalInitializer::clean() {
 #endif
 
     DataDriverFactory::release();
+    PartRegistry::release();
     IndicatorImp::releaseEngine();
 
 #if HKU_ENABLE_TA_LIB
