@@ -8,6 +8,7 @@
  */
 
 #include "IReverse.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IReverse)
@@ -40,6 +41,10 @@ void IReverse::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API REVERSE() {
     return Indicator(make_shared<IReverse>());
+}
+
+void registerPart_REVERSE() {
+    registerIndicatorPart("core.ind.reverse", [] { return REVERSE(); });
 }
 
 } /* namespace hku */

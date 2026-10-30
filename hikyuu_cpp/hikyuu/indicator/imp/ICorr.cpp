@@ -7,6 +7,8 @@
 
 #include <climits>
 #include "ICorr.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICorr)
@@ -256,6 +258,24 @@ Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n, bool
     auto p = make_shared<ICorr>(ind2, n, fill_null);
     Indicator result(p);
     return result(ind1);
+}
+
+void registerPart_CORR() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CORR";
+    meta.params.push_back(
+      ParamMeta{.name = "ind1", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ind2", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "10"});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.corr", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return CORR(std::get<Indicator>(pp.at("ind1").at(0)),
+                      std::get<Indicator>(pp.at("ind2").at(0)),
+                      static_cast<int>(sc.get<int64_t>("n")), sc.get<bool>("fill_null"));
+      });
 }
 
 }  // namespace hku

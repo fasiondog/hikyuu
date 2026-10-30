@@ -51,6 +51,8 @@ inline Indicator SUM(const Indicator& ind, const Indicator& n) {
     return SUM(IndParam(n))(ind);
 }
 
+void registerPart_SUM();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SUM_H_ */

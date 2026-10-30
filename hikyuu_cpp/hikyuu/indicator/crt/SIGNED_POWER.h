@@ -41,6 +41,8 @@ inline Indicator SIGNED_POWER(Indicator::value_t val, int n) {
     return SIGNED_POWER(CVAL(val), n);
 }
 
+void registerPart_SIGNED_POWER();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SIGNED_POWER_H_ */

@@ -55,6 +55,8 @@ inline Indicator BARSLASTS(Indicator::value_t val, const Indicator& n) {
     return BARSLASTS(CVAL(val), IndParam(n));
 }
 
+void registerPart_BARSLASTS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSLASTS_H_ */

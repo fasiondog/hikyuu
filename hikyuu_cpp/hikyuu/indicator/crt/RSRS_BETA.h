@@ -39,4 +39,6 @@ namespace hku {
 Indicator HKU_API RSRS_BETA(int n = 20);
 Indicator HKU_API RSRS_BETA(const KData& kdata, int n = 20);
 
+void registerPart_RSRS_BETA();
+
 }  // namespace hku

@@ -8,6 +8,7 @@
  */
 
 #include "IAlign.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAlign)
@@ -210,6 +211,10 @@ Indicator HKU_API ALIGN(DatetimeList&& ref, bool fill_null) {
     p->setParam<DatetimeList>("align_date_list", std::move(ref));
     p->setParam<bool>("fill_null", fill_null);
     return Indicator(p);
+}
+
+void registerPart_ALIGN() {
+    registerIndicatorPart("core.ind.align", [] { return ALIGN(); });
 }
 
 } /* namespace hku */

@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "BoolCondition.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -48,6 +49,20 @@ void BoolCondition::_calculate() {
 
 CNPtr HKU_API CN_Bool(const Indicator& ind) {
     return make_shared<BoolCondition>(ind);
+}
+
+void registerPart_CN_Bool() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.cn.bool"), void());
+    PartMeta meta;
+    meta.type = PartType::CN;
+    meta.name = "CN_Bool";
+    meta.full_name = "core.cn.bool";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return CN_Bool(std::get<Indicator>(pp.at("ind").at(0)));
+    });
 }
 
 }  // namespace hku

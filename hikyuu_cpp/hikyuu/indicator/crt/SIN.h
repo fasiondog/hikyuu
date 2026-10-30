@@ -29,6 +29,8 @@ inline Indicator SIN(Indicator::value_t val) {
     return SIN(CVAL(val));
 }
 
+void registerPart_SIN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SIN_H_ */

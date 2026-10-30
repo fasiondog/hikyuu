@@ -36,6 +36,8 @@ inline Indicator SKEW(const Indicator& data, const Indicator& n) {
     return SKEW(IndParam(n))(data);
 }
 
+void registerPart_SKEW();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SKEW_H_ */

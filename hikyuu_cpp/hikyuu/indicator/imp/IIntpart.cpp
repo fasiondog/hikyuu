@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include "IIntpart.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIntpart)
@@ -42,6 +43,10 @@ void IIntpart::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API INTPART() {
     return Indicator(make_shared<IIntpart>());
+}
+
+void registerPart_INTPART() {
+    registerIndicatorPart("core.ind.intpart", [] { return INTPART(); });
 }
 
 } /* namespace hku */

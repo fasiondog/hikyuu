@@ -37,6 +37,8 @@ inline Indicator ROCR(const Indicator& ind, const Indicator& n) {
     return ROCR(IndParam(n))(ind);
 }
 
+void registerPart_ROCR();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ROCR_H_ */

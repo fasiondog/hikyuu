@@ -40,6 +40,8 @@ inline Indicator AVEDEV(const Indicator& ind, const IndParam& n) {
     return result;
 }
 
+void registerPart_AVEDEV();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_AVEDEV_H_ */

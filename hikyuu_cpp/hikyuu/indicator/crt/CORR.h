@@ -28,4 +28,6 @@ Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n = 10,
                        bool fill_null = true);
 Indicator HKU_API CORR(const Indicator& ref_ind, int n = 10, bool fill_null = true);
 
+void registerPart_CORR();
+
 }  // namespace hku

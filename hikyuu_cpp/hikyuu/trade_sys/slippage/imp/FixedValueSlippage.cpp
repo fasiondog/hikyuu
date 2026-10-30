@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include <optional>
 #include "FixedValueSlippage.h"
 
@@ -29,11 +30,11 @@ void FixedValueSlippage::_checkParam(const string& name) const {
     }
 }
 
-price_t FixedValueSlippage ::_getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t FixedValueSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     return price + getParam<double>("value");
 }
 
-price_t FixedValueSlippage ::_getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t FixedValueSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     return price - getParam<double>("value");
 }
 
@@ -52,6 +53,19 @@ SlippagePtr HKU_API SP_FixedValue(double value, std::optional<double> short_valu
     ptr->setParam("value", value);
     ptr->setParam("short_value", short_value.value_or(value));
     return ptr;
+}
+
+void registerPart_SP_FixedValue() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sp.fixedvalue"), void());
+    PartMeta meta;
+    meta.type = PartType::SP;
+    meta.name = "SP_FixedValue";
+    meta.full_name = "core.sp.fixedvalue";
+    meta.params.push_back(ParamMeta{.name = "value", .type = "double", .default_value = "0.01"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SP_FixedValue(sc.get<double>("value"), std::nullopt);
+    });
 }
 
 } /* namespace hku */

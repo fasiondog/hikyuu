@@ -31,6 +31,8 @@ inline Indicator ROUNDUP(Indicator::value_t val, int n = 2) {
     return ROUNDUP(CVAL(val), n);
 }
 
+void registerPart_ROUNDUP();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUNDUP_H_ */

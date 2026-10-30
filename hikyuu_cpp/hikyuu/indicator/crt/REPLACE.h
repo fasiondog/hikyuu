@@ -28,4 +28,6 @@ inline Indicator REPLACE(const Indicator& ind, double old_val = Null<double>(),
     return REPLACE(old_val, new_val, ignore_discard)(ind);
 }
 
+void registerPart_REPLACE();
+
 }  // namespace hku

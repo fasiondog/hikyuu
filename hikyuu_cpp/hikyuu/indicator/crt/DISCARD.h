@@ -22,6 +22,8 @@ inline Indicator DISCARD(const Indicator& ind, int discard) {
     return DISCARD(discard)(ind);
 }
 
+void registerPart_DISCARD();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DISCARD_H_ */

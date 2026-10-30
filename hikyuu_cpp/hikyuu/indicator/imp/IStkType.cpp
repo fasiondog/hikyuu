@@ -7,6 +7,7 @@
 
 #include "hikyuu/StockTypeInfo.h"
 #include "IStkType.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IStkType)
@@ -52,6 +53,10 @@ Indicator HKU_API STKTYPE(const KData& k) {
     auto p = make_shared<IStkType>();
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_STKTYPE() {
+    registerIndicatorPart("core.ind.stktype", [] { return STKTYPE(); });
 }
 
 }  // namespace hku

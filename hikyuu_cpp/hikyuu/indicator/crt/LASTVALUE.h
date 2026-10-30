@@ -26,6 +26,8 @@ inline Indicator LASTVALUE(const Indicator& ind, bool ignore_discard = false) {
     return LASTVALUE(ignore_discard)(ind);
 }
 
+void registerPart_LASTVALUE();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_LASTVALUE_H_ */

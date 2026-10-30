@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "hikyuu/StockManager.h"
 #include "IZhBond10.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IZhBond10)
@@ -93,6 +94,10 @@ Indicator HKU_API ZHBOND10(const KData& k, double default_val) {
     p->setParam<double>("default", default_val);
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_ZHBOND10() {
+    registerIndicatorPart("core.ind.zhbond10", [] { return ZHBOND10(); });
 }
 
 }  // namespace hku

@@ -6,6 +6,8 @@
  */
 
 #include "IResult.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IResult)
@@ -52,6 +54,17 @@ void IResult::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
 Indicator HKU_API RESULT(int result_ix) {
     return Indicator(make_shared<IResult>(result_ix));
+}
+
+void registerPart_RESULT() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "RESULT";
+    meta.params.push_back(ParamMeta{.name = "result_ix", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.result", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return RESULT(static_cast<int>(sc.get<int64_t>("result_ix")));
+                          });
 }
 
 }  // namespace hku

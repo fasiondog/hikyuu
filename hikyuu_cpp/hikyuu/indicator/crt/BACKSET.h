@@ -41,6 +41,8 @@ inline Indicator BACKSET(const Indicator& ind, const Indicator& n) {
     return BACKSET(IndParam(n))(ind);
 }
 
+void registerPart_BACKSET();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_BACKSET_H_ */

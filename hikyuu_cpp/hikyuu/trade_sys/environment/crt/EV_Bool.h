@@ -21,4 +21,6 @@ namespace hku {
  */
 EVPtr HKU_API EV_Bool(const Indicator& ind, const string& market = "SH");
 
+void registerPart_EV_Bool();
+
 }  // namespace hku

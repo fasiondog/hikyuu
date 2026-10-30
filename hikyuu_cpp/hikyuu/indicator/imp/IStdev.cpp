@@ -8,6 +8,7 @@
 #include <climits>
 #include "IStdev.h"
 #include "../crt/MA.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IStdev)
@@ -263,6 +264,10 @@ Indicator HKU_API STDEV(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IStdev>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_STDEV() {
+    registerIndicatorPart("core.ind.stdev", [] { return STDEV(); });
 }
 
 } /* namespace hku */

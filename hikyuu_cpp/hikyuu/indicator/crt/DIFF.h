@@ -28,6 +28,8 @@ Indicator HKU_API DIFF(int n = 1);
  */
 Indicator HKU_API DIFF(const Indicator& data, int n = 1);
 
+void registerPart_DIFF();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DIFF_H_ */

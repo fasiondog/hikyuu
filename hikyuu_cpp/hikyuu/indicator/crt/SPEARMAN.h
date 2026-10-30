@@ -25,4 +25,6 @@ Indicator HKU_API SPEARMAN(const Indicator& ind, const Indicator& ref_ind, int n
                            bool fill_null = true);
 Indicator HKU_API SPEARMAN(const Indicator& ref_ind, int n = 0, bool fill_null = true);
 
+void registerPart_SPEARMAN();
+
 }  // namespace hku

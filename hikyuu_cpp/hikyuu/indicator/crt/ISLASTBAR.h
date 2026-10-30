@@ -24,6 +24,8 @@ inline Indicator ISLASTBAR(const Indicator& ind) {
     return ISLASTBAR()(ind);
 }
 
+void registerPart_ISLASTBAR();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ISLASTBAR_H_ */

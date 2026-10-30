@@ -36,6 +36,8 @@ inline Indicator KURT(const Indicator& data, const Indicator& n) {
     return KURT(IndParam(n))(data);
 }
 
+void registerPart_KURT();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_KURT_H_ */

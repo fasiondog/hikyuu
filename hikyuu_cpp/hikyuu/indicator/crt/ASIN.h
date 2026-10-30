@@ -30,6 +30,8 @@ inline Indicator ASIN(Indicator::value_t val) {
     return ASIN(CVAL(val));
 }
 
+void registerPart_ASIN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ASIN_H_ */

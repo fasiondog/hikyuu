@@ -18,4 +18,6 @@ namespace hku {
  */
 SignalPtr HKU_API SG_Manual();
 
+void registerPart_SG_Manual();
+
 }  // namespace hku

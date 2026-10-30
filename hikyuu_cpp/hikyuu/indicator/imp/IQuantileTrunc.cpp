@@ -7,6 +7,7 @@
 
 #include <climits>
 #include "IQuantileTrunc.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IQuantileTrunc)
@@ -106,6 +107,10 @@ Indicator HKU_API QUANTILE_TRUNC(int n, double quantile_min, double quantile_max
     p->setParam<double>("quantile_min", quantile_min);
     p->setParam<double>("quantile_max", quantile_max);
     return Indicator(p);
+}
+
+void registerPart_QUANTILE_TRUNC() {
+    registerIndicatorPart("core.ind.quantile_trunc", [] { return QUANTILE_TRUNC(); });
 }
 
 }  // namespace hku

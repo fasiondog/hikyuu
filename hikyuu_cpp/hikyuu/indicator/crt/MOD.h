@@ -41,6 +41,8 @@ inline Indicator MOD(Indicator::value_t ind1, Indicator::value_t ind2) {
     return CVAL(ind1) % CVAL(ind2);
 }
 
+void registerPart_MOD();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_MOD_H_ */

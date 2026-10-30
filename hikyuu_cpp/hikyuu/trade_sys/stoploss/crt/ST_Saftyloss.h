@@ -35,6 +35,8 @@ namespace hku {
  */
 StoplossPtr HKU_API ST_Saftyloss(int n1 = 10, int n2 = 3, double p = 2.0);
 
+void registerPart_ST_Saftyloss();
+
 }  // namespace hku
 
 #endif /* SAFTYLOSS_ST_H_ */

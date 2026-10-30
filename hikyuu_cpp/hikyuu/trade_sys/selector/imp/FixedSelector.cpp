@@ -6,6 +6,7 @@
  */
 
 #include "FixedSelector.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedSelector)
@@ -22,8 +23,6 @@ FixedSelector::FixedSelector(double weight) : SelectorBase("SE_Fixed") {
 }
 
 FixedSelector::~FixedSelector() {}
-
-
 
 SystemWeightList FixedSelector::_getSelected(Datetime date) {
     auto weight = getParam<double>("weight");
@@ -44,6 +43,19 @@ SelectorPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys, 
     SelectorPtr p = make_shared<FixedSelector>(weight);
     p->addStockList(stock_list, sys);
     return p;
+}
+
+void registerPart_SE_Fixed() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.se.fixed"), void());
+    PartMeta meta;
+    meta.type = PartType::SE;
+    meta.name = "SE_Fixed";
+    meta.full_name = "core.se.fixed";
+    meta.params.push_back(ParamMeta{.name = "weight", .type = "double", .default_value = "1.0"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SE_Fixed(sc.get<double>("weight"));
+    });
 }
 
 } /* namespace hku */

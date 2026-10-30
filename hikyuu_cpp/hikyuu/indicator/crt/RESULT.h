@@ -17,4 +17,6 @@ inline Indicator RESULT(const Indicator& ind, int result_ix) {
     return RESULT(result_ix)(ind);
 }
 
+void registerPart_RESULT();
+
 }  // namespace hku

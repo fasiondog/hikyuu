@@ -7,6 +7,8 @@
 
 #include "ICost.h"
 #include "StockWeightFill.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICost)
@@ -75,6 +77,18 @@ Indicator HKU_API COST(const KData& k, double x) {
     p->setParam<double>("percent", x);
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_COST() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "COST";
+    meta.params.push_back(ParamMeta{.name = "k", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "x", .type = "double", .default_value = "10.0"});
+    registerIndicatorPart("core.ind.cost", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return COST(sc.get<KData>("k"), sc.get<double>("x"));
+                          });
 }
 
 }  // namespace hku

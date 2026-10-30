@@ -6,6 +6,7 @@
  */
 
 #include "ZeroTradeCost.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ZeroTradeCost)
@@ -17,13 +18,13 @@ ZeroTradeCost::ZeroTradeCost() : TradeCostBase("TC_Zero") {}
 
 ZeroTradeCost::~ZeroTradeCost() {}
 
-CostRecord ZeroTradeCost ::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                      double num) const {
+CostRecord ZeroTradeCost::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                     double num) const {
     return CostRecord();
 }
 
-CostRecord ZeroTradeCost ::getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                       double num) const {
+CostRecord ZeroTradeCost::getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                      double num) const {
     return CostRecord();
 }
 
@@ -33,6 +34,17 @@ TradeCostPtr ZeroTradeCost::_clone() {
 
 TradeCostPtr HKU_API TC_Zero() {
     return make_shared<ZeroTradeCost>();
+}
+
+void registerPart_TC_Zero() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.tc.zero"), void());
+    PartMeta meta;
+    meta.type = PartType::TC;
+    meta.name = "TC_Zero";
+    meta.full_name = "core.tc.zero";
+    reg.registerPart(meta,
+                     [](const Parameter& sc, const PartParamMap& pp) -> Part { return TC_Zero(); });
 }
 
 } /* namespace hku */

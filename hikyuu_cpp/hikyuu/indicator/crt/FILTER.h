@@ -41,6 +41,8 @@ inline Indicator FILTER(const Indicator& ind, const Indicator& n) {
     return FILTER(IndParam(n))(ind);
 }
 
+void registerPart_FILTER();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_FILTER_H_ */

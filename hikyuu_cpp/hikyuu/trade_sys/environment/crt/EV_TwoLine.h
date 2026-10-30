@@ -24,6 +24,8 @@ namespace hku {
  */
 EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const string& market = "SH");
 
+void registerPart_EV_TwoLine();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_ENVIRONMENT_CRT_EV_TWOLINE_H_ */

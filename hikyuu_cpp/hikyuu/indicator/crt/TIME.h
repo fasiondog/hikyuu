@@ -103,4 +103,6 @@ Indicator HKU_API HOUR(const KData&);
 Indicator HKU_API MINUTE();
 Indicator HKU_API MINUTE(const KData&);
 
+void registerPart_DATE();
+
 }  // namespace hku

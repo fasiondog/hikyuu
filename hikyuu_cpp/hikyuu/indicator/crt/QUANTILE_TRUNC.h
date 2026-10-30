@@ -27,4 +27,6 @@ inline Indicator QUANTILE_TRUNC(const Indicator& data, int n = 60, double quanti
     return QUANTILE_TRUNC(n, quantile_min, quantile_max)(data);
 }
 
+void registerPart_QUANTILE_TRUNC();
+
 }  // namespace hku

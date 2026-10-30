@@ -94,6 +94,8 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm = TradeManagerPtr(),
                                     bool sys_use_self_tm = false, bool sell_at_not_selected = false,
                                     bool keep_watch_force_sell = false);
 
+void registerPart_PF_WithoutAF();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_PORTFOLIO_CRT_PF_WITHOUTAF_H_ */

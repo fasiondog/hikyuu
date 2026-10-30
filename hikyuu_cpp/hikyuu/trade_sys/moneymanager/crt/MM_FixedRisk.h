@@ -22,6 +22,8 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_FixedRisk(double risk = 1000.00);
 
+void registerPart_MM_FixedRisk();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDRISK_H_ */

@@ -38,6 +38,8 @@ inline Indicator NDAY(const Indicator& x, const Indicator& y, const IndParam& n)
     return result;
 }
 
+void registerPart_NDAY();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_NDAY_H_ */

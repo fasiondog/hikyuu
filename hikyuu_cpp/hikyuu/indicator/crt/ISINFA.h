@@ -23,6 +23,8 @@ inline Indicator ISINFA(const Indicator& ind) {
     return ISINFA()(ind);
 }
 
+void registerPart_ISINFA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ISINFA_H_ */

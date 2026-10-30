@@ -20,4 +20,6 @@ namespace hku {
  */
 CNPtr HKU_API CN_Bool(const Indicator& ind);
 
+void registerPart_CN_Bool();
+
 } /* namespace hku */

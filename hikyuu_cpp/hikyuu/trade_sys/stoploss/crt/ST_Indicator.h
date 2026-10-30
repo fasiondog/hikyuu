@@ -16,6 +16,8 @@ namespace hku {
 
 StoplossPtr HKU_API ST_Indicator(const Indicator& ind);
 
+void registerPart_ST_Indicator();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_STOPLOSS_CRT_ST_INDICATOR_H_ */

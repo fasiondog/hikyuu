@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 
 #include "../../../StockManager.h"
 #include "../../../indicator/crt/ALIGN.h"
@@ -88,6 +89,24 @@ EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const str
     EVPtr ptr = make_shared<TwoLineEnvironment>(fast, slow);
     ptr->setParam<string>("market", market);
     return ptr;
+}
+
+void registerPart_EV_TwoLine() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.ev.twoline"), void());
+    PartMeta meta;
+    meta.type = PartType::EV;
+    meta.name = "EV_TwoLine";
+    meta.full_name = "core.ev.twoline";
+    meta.params.push_back(
+      ParamMeta{.name = "fast", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "slow", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "market", .type = "string", .default_value = "SH"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return EV_TwoLine(std::get<Indicator>(pp.at("fast").at(0)),
+                          std::get<Indicator>(pp.at("slow").at(0)), sc.get<string>("market"));
+    });
 }
 
 } /* namespace hku */

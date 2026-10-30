@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/part/BuiltinParts.h>
+#include <hikyuu/part/PartRegistration.h>
 #include <hikyuu/part/PartRegistry.h>
 #include <hikyuu/trade_manage/crt/TC_FixedETF.h>
 
@@ -21,11 +21,11 @@ using namespace hku;
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_create_default") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg create with all params at their defaults equals the direct crt call */
-    Indicator a = tryGetAs<Indicator>(reg.create("core.ind.MA")).value();
+    Indicator a = tryGetAs<Indicator>(reg.create("core.ind.ma")).value();
     Indicator b = MA();
     CHECK_UNARY(a.alike(b));
 
@@ -35,23 +35,23 @@ TEST_CASE("test_PartRegistry_create_default") {
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_create_with_params") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg provided scalars override the defaults */
     Parameter sc;
     sc.set<int>("n", 10);
-    Indicator a = tryGetAs<Indicator>(reg.create("core.ind.MA", sc)).value();
+    Indicator a = tryGetAs<Indicator>(reg.create("core.ind.ma", sc)).value();
     CHECK_UNARY(a.alike(MA(10)));
 
     /** @arg an empty Parameter falls back to the defaults */
-    Indicator b = tryGetAs<Indicator>(reg.create("core.ind.MA", Parameter())).value();
+    Indicator b = tryGetAs<Indicator>(reg.create("core.ind.ma", Parameter())).value();
     CHECK_UNARY(b.alike(MA()));
 }
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_create_component") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg a part-typed param is passed via the PartParamMap and the scalars via Parameter */
@@ -60,7 +60,7 @@ TEST_CASE("test_PartRegistry_create_component") {
     sc.set<double>("upper", 20.0);
     PartRegistry::PartParamMap parts;
     parts["ind"] = {Part(MA(5))};
-    Part part = reg.create("core.sg.SG_Band", sc, parts);
+    Part part = reg.create("core.sg.band", sc, parts);
 
     auto sg = tryGetAs<SignalPtr>(part);
     CHECK_UNARY(sg.has_value());
@@ -68,42 +68,42 @@ TEST_CASE("test_PartRegistry_create_component") {
     CHECK(partName(part) == "SG_Band");
 
     /** @arg a missing required part param throws with the param name */
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band"), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band"), std::invalid_argument);
 
     /** @arg a missing required scalar param throws */
     Parameter bad_sc;
     bad_sc.set<double>("lower", 10.0);
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", bad_sc, parts), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", bad_sc, parts), std::invalid_argument);
 
     /** @arg a wrong part type in the param channel throws with the param name */
     PartRegistry::PartParamMap bad_parts;
     bad_parts["ind"] = {Part(TradeManagerPtr())};
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", sc, bad_parts), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", sc, bad_parts), std::invalid_argument);
 
     /** @arg a non-list part param takes exactly 1 element */
     PartRegistry::PartParamMap multi_parts;
     multi_parts["ind"] = {Part(MA(5)), Part(MA(6))};
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", sc, multi_parts), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", sc, multi_parts), std::invalid_argument);
 
     /** @arg an unknown scalar param key is rejected */
     Parameter unknown_sc;
     unknown_sc.set<int>("lowerr", 1);
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", unknown_sc, parts), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", unknown_sc, parts), std::invalid_argument);
 
     /** @arg an unknown part param key is rejected */
     PartRegistry::PartParamMap unknown_map;
     unknown_map["indd"] = {Part(MA(5))};
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", sc, unknown_map), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", sc, unknown_map), std::invalid_argument);
 
     /** @arg a part-typed param must not be passed through Parameter */
     Parameter wrong_channel;
     wrong_channel.set<int>("ind", 5);
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", wrong_channel, parts), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", wrong_channel, parts), std::invalid_argument);
 
     /** @arg a scalar param must not be passed through the PartParamMap */
     PartRegistry::PartParamMap wrong_map;
     wrong_map["lower"] = {Part(MA(5))};
-    CHECK_THROWS_AS(reg.create("core.sg.SG_Band", sc, wrong_map), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.sg.band", sc, wrong_map), std::invalid_argument);
 }
 
 /** @par Test points */
@@ -152,11 +152,11 @@ TEST_CASE("test_PartRegistry_create_list_param") {
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_create_tm") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg the TM part is created with its defaults */
-    Part part = reg.create("core.tm.crtTM");
+    Part part = reg.create("core.tm.crttm");
     auto tm = tryGetAs<TradeManagerPtr>(part);
     CHECK_UNARY(tm.has_value());
     CHECK_UNARY(*tm != nullptr);
@@ -165,24 +165,24 @@ TEST_CASE("test_PartRegistry_create_tm") {
     /** @arg the scalar overrides reach the creator */
     Parameter sc;
     sc.set<string>("name", "TEST_TM");
-    auto tm2 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.crtTM", sc)).value();
+    auto tm2 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.crttm", sc)).value();
     CHECK(tm2->name() == "TEST_TM");
 
     /** @arg the part-typed costfunc is passed via the PartParamMap */
     PartRegistry::PartParamMap parts;
     parts["costfunc"] = {Part(TC_FixedETF())};
-    auto tm3 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.crtTM", Parameter(), parts)).value();
+    auto tm3 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.crttm", Parameter(), parts)).value();
     CHECK_UNARY(tm3->costFunc() != nullptr);
     CHECK(tm3->costFunc()->name() == "TC_FixedETF");
 }
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_create_tc") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg the TC part is created with its defaults */
-    Part part = reg.create("core.tc.TC_FixedETF");
+    Part part = reg.create("core.tc.fixedetf");
     auto tc = tryGetAs<TradeCostPtr>(part);
     CHECK_UNARY(tc.has_value());
     CHECK_UNARY(*tc != nullptr);
@@ -195,18 +195,18 @@ TEST_CASE("test_PartRegistry_create_tc") {
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_create_type_mismatch") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg a scalar of the wrong type throws with the expected type */
     Parameter sc;
     sc.set<double>("n", 10.0);
-    CHECK_THROWS_AS(reg.create("core.ind.MA", sc), std::invalid_argument);
+    CHECK_THROWS_AS(reg.create("core.ind.ma", sc), std::invalid_argument);
 }
 
 /** @par Test points */
 TEST_CASE("test_PartRegistry_createFromString") {
-    registerBuiltinParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
     /** @arg a bare name equals the default construction */
@@ -220,7 +220,7 @@ TEST_CASE("test_PartRegistry_createFromString") {
 
     /** @arg the full name also works */
     CHECK_UNARY(
-      tryGetAs<Indicator>(reg.createFromString("core.ind.MA(n=10)")).value().alike(MA(10)));
+      tryGetAs<Indicator>(reg.createFromString("core.ind.ma(n=10)")).value().alike(MA(10)));
 
     /** @arg a short C++ name resolves via meta.name; SG_Band has required params, so the
      *  resolution succeeds but creation throws on the missing params */

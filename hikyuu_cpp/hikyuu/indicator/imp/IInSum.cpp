@@ -12,6 +12,8 @@
 #include "../Indicator.h"
 #include "../crt/ALIGN.h"
 #include "../../StockManager.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IInSum)
@@ -299,6 +301,24 @@ Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator
 
 Indicator HKU_API INSUM(const Block& block, const Indicator& ind, int mode, bool fill_null) {
     return INSUM(block, KQuery(0, 0), ind, mode, fill_null);
+}
+
+void registerPart_INSUM() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "INSUM";
+    meta.params.push_back(ParamMeta{.name = "block", .type = "Block", .required = true});
+    meta.params.push_back(ParamMeta{.name = "query", .type = "KQuery", .required = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "mode", .type = "int", .required = true});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.insum", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return INSUM(sc.get<Block>("block"), sc.get<KQuery>("query"),
+                       std::get<Indicator>(pp.at("ind").at(0)),
+                       static_cast<int>(sc.get<int64_t>("mode")), sc.get<bool>("fill_null"));
+      });
 }
 
 } /* namespace hku */

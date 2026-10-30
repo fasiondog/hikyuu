@@ -6,6 +6,7 @@
  */
 
 #include "IMddCurrent.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IMddCurrent)
@@ -54,6 +55,10 @@ void IMddCurrent::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
 Indicator HKU_API MDD_CURRENT() {
     return Indicator(make_shared<IMddCurrent>());
+}
+
+void registerPart_MDD_CURRENT() {
+    registerIndicatorPart("core.ind.mdd_current", [] { return MDD_CURRENT(); });
 }
 
 }  // namespace hku

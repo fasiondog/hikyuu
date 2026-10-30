@@ -8,6 +8,7 @@
 #include <climits>
 #include "IMacd.h"
 #include "../crt/CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IMacd)
@@ -196,6 +197,10 @@ Indicator HKU_API MACD(const IndParam& n1, const IndParam& n2, const IndParam& n
     p->setIndParam("n2", n2);
     p->setIndParam("n3", n3);
     return Indicator(p);
+}
+
+void registerPart_MACD() {
+    registerIndicatorPart("core.ind.macd", [] { return MACD(); });
 }
 
 } /* namespace hku */

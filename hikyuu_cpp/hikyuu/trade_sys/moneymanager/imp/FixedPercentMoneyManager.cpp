@@ -6,6 +6,7 @@
  */
 
 #include "FixedPercentMoneyManager.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedPercentMoneyManager)
@@ -44,6 +45,19 @@ MoneyManagerPtr HKU_API MM_FixedPercent(double p) {
     MoneyManagerPtr ptr = make_shared<FixedPercentMoneyManager>();
     ptr->setParam<double>("p", p);
     return ptr;
+}
+
+void registerPart_MM_FixedPercent() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.fixedpercent"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_FixedPercent";
+    meta.full_name = "core.mm.fixedpercent";
+    meta.params.push_back(ParamMeta{.name = "p", .type = "double", .required = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return MM_FixedPercent(sc.get<double>("p"));
+    });
 }
 
 } /* namespace hku */

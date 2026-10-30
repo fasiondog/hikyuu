@@ -9,6 +9,7 @@
 
 #include <climits>
 #include "IEvery.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IEvery)
@@ -129,6 +130,10 @@ Indicator HKU_API EVERY(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IEvery>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_EVERY() {
+    registerIndicatorPart("core.ind.every", [] { return EVERY(); });
 }
 
 } /* namespace hku */

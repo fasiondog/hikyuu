@@ -8,6 +8,7 @@
 #include <climits>
 #include "../crt/ATR.h"
 #include "IAtr.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAtr)
@@ -111,6 +112,10 @@ Indicator HKU_API ATR(const KData& kdata, int n) {
     Indicator ret = ATR(n);
     ret.setContext(kdata);
     return ret;
+}
+
+void registerPart_ATR() {
+    registerIndicatorPart("core.ind.atr", [] { return ATR(); });
 }
 
 } /* namespace hku */

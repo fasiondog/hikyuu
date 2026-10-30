@@ -30,6 +30,8 @@ inline Indicator LN(Indicator::value_t val) {
     return LN(CVAL(val));
 }
 
+void registerPart_LN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_LN_H_ */

@@ -29,6 +29,8 @@ inline Indicator REVERSE(Indicator::value_t val) {
     return REVERSE(CVAL(val));
 }
 
+void registerPart_REVERSE();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_REVERSE_H_ */

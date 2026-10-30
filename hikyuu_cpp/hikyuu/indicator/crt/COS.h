@@ -29,6 +29,8 @@ inline Indicator COS(Indicator::value_t val) {
     return COS(CVAL(val));
 }
 
+void registerPart_COS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_COS_H_ */

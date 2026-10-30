@@ -26,4 +26,6 @@ Indicator HKU_API CODELIKE(const string& pattern);
  */
 Indicator HKU_API CODELIKE(const KData& kdata, const string& pattern);
 
+void registerPart_CODELIKE();
+
 }  // namespace hku

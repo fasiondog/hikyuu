@@ -8,6 +8,7 @@
  */
 
 #include "IAcos.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAcos)
@@ -39,6 +40,10 @@ void IAcos::_increment_calculate(const Indicator &data, size_t start_pos) {
 
 Indicator HKU_API ACOS() {
     return Indicator(make_shared<IAcos>());
+}
+
+void registerPart_ACOS() {
+    registerIndicatorPart("core.ind.acos", [] { return ACOS(); });
 }
 
 } /* namespace hku */

@@ -35,6 +35,8 @@ Indicator HKU_API VIGOR(const KData& kdata, int n = 2);
 
 Indicator HKU_API VIGOR(int n = 2);
 
+void registerPart_VIGOR();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_VIGOR_H_ */

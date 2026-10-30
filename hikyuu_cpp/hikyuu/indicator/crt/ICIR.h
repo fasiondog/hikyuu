@@ -54,4 +54,6 @@ inline Indicator ICIR(const Indicator& ind, const Block& blk, int n = 1, int rol
     return x;
 }
 
+void registerPart_ICIR();
+
 }  // namespace hku

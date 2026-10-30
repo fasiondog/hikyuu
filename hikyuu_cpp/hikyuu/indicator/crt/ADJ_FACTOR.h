@@ -167,4 +167,6 @@ inline Indicator ADJ_VOL(const KData& kdata) {
     return ADJ_VOL()(kdata);
 }
 
+void registerPart_ADJ_FACTOR();
+
 }  // namespace hku

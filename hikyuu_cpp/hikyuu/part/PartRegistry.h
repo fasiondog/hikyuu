@@ -9,8 +9,10 @@
 #ifndef HKU_PART_REGISTRY_H_
 #define HKU_PART_REGISTRY_H_
 
+#include <atomic>
 #include <functional>
 #include <map>
+#include <mutex>
 #include "hikyuu/utilities/Parameter.h"
 #include "Part.h"
 #include "PartMeta.h"
@@ -59,6 +61,16 @@ public:
      * @param overwrite allow replacing an existing registration of the same full_name
      */
     void registerPart(const PartMeta& meta, Creator creator, bool overwrite = false);
+
+    /**
+     * Attach a lazily executed introspector that fills the meta on the first access.
+     *
+     * Building a prototype may touch the data layer (e.g. a market info lookup), which is not
+     * ready while the global initializers run, so the introspection is deferred until the first
+     * getMeta/create call. The introspector runs at most once; a throwing one leaves the meta as
+     * it was registered.
+     */
+    void setIntrospector(const string& full_name, std::function<void(PartMeta&)> introspector);
     bool unregister(const string& full_name);
     /** Unregister all parts of the given module (plugins must call this before unload) */
     void unregisterByModule(const string& module_hint);
@@ -106,17 +118,25 @@ private:
     struct Entry {
         PartMeta meta;
         Creator creator;
+        std::function<void(PartMeta&)> introspector;  // consumed on the first meta access
     };
 
     /** Validate the inputs against the meta, fill defaults, then invoke the creator */
     Part createWithMeta(const PartMeta& meta, const Creator& creator, const Parameter& scalars,
                         const PartParamMap& parts) const;
 
+    /** Run the pending introspector of the given part, if any */
+    void ensureMeta(const string& full_name) const;
+    /** Run the pending introspectors of all parts */
+    void ensureAllMeta() const;
+
 private:
     static PartRegistry* m_registry;
 
-    std::map<string, Entry> m_entries;         // key: full_name
-    std::map<PartType, StringList> m_by_type;  // full_name index by category, registration order
+    mutable std::map<string, Entry> m_entries;  // key: full_name
+    std::map<PartType, StringList> m_by_type;   // full_name index by category, registered order
+    mutable std::mutex m_introspect_mutex;      // serializes the lazy introspection
+    mutable std::atomic<size_t> m_pending_introspect{0};  // number of pending introspectors
 };
 
 }  // namespace hku

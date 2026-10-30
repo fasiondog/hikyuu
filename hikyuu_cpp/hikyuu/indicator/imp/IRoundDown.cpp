@@ -8,6 +8,7 @@
  */
 
 #include "IRoundDown.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRoundDown)
@@ -54,6 +55,10 @@ Indicator HKU_API ROUNDDOWN(int ndigits) {
     IndicatorImpPtr p = make_shared<IRoundDown>();
     p->setParam<int>("ndigits", ndigits);
     return Indicator(p);
+}
+
+void registerPart_ROUNDDOWN() {
+    registerIndicatorPart("core.ind.rounddown", [] { return ROUNDDOWN(); });
 }
 
 } /* namespace hku */

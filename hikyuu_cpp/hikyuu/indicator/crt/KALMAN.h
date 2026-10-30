@@ -28,6 +28,8 @@ inline Indicator KALMAN(const Indicator& ind, double q = 0.01, double r = 0.1) {
     return KALMAN(q, r)(ind);
 }
 
+void registerPart_KALMAN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_KALMAN_H_ */

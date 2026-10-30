@@ -10,6 +10,7 @@
 #include <climits>
 #include "IDevsq.h"
 #include "../crt/MA.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IDevsq)
@@ -101,6 +102,10 @@ Indicator HKU_API DEVSQ(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IDevsq>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_DEVSQ() {
+    registerIndicatorPart("core.ind.devsq", [] { return DEVSQ(); });
 }
 
 } /* namespace hku */

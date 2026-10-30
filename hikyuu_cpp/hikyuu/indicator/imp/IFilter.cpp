@@ -9,6 +9,7 @@
 
 #include <climits>
 #include "IFilter.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IFilter)
@@ -106,6 +107,10 @@ Indicator HKU_API FILTER(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IFilter>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_FILTER() {
+    registerIndicatorPart("core.ind.filter", [] { return FILTER(); });
 }
 
 } /* namespace hku */

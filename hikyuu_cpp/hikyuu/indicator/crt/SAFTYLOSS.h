@@ -83,6 +83,8 @@ inline Indicator SAFTYLOSS(const Indicator& data, const Indicator& n1, const Ind
     return SAFTYLOSS(IndParam(n1), IndParam(n2), IndParam(p))(data);
 }
 
+void registerPart_SAFTYLOSS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SAFTYLOSS_H_ */

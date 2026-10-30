@@ -7,6 +7,8 @@
 
 #include <climits>
 #include "IRef.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRef)
@@ -69,6 +71,17 @@ Indicator HKU_API REF(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IRef>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_REF() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "REF";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.ref", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return REF(static_cast<int>(sc.get<int64_t>("n")));
+                          });
 }
 
 } /* namespace hku */

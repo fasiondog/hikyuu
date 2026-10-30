@@ -22,7 +22,7 @@ namespace hku {
 
  * @ingroup Indicator
  */
-Indicator HKU_API CVAL(double value, size_t discard=0);
+Indicator HKU_API CVAL(double value, size_t discard = 0);
 
 /**
  * Create a constant indicator whose length is the same as the input ind and whose value is fixed to
@@ -38,6 +38,8 @@ Indicator HKU_API CVAL(double value, size_t discard=0);
  */
 Indicator HKU_API CVAL(const Indicator& ind, double value = 0.0, int discard = 0);
 
-} /* namespace */
+void registerPart_CVAL();
+
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_CVAL_H_ */

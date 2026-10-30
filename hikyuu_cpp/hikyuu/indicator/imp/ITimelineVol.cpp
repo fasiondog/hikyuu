@@ -7,6 +7,7 @@
 
 #include "../crt/TIMELINE.h"
 #include "../crt/TIMELINEVOL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -24,4 +25,8 @@ Indicator HKU_API TIMELINEVOL(const KData& k) {
     return ind;
 }
 
+void registerPart_TIMELINEVOL() {
+    registerIndicatorPart("core.ind.timelinevol", [] { return TIMELINEVOL(); });
 }
+
+}  // namespace hku

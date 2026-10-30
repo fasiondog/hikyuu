@@ -11,6 +11,7 @@
 #include <climits>
 #include "../crt/CVAL.h"
 #include "ISma.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISma)
@@ -150,6 +151,10 @@ Indicator HKU_API SMA(const IndParam& n, double m) {
     p->setIndParam("n", n);
     p->setParam<double>("m", m);
     return Indicator(p);
+}
+
+void registerPart_SMA() {
+    registerIndicatorPart("core.ind.sma", [] { return SMA(); });
 }
 
 } /* namespace hku */

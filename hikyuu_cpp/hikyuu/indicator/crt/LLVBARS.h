@@ -41,6 +41,8 @@ inline Indicator LLVBARS(const Indicator& ind, const Indicator& n) {
     return LLVBARS(IndParam(n))(ind);
 }
 
+void registerPart_LLVBARS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_LLVBARS_H_ */

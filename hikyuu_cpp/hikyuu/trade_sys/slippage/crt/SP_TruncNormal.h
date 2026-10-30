@@ -34,4 +34,6 @@ SlippagePtr HKU_API SP_TruncNormal(double mean = 0.0, double stddev = 0.05, doub
                                    std::optional<double> short_min_value = std::nullopt,
                                    std::optional<double> short_max_value = std::nullopt);
 
+void registerPart_SP_TruncNormal();
+
 } /* namespace hku */

@@ -64,4 +64,6 @@ inline Indicator IC(const Indicator& ind, const Block& blk, int n = 1, bool spea
 Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n = 1, bool use_spearman = true,
                      bool strict = false);
 
+void registerPart_IC();
+
 }  // namespace hku

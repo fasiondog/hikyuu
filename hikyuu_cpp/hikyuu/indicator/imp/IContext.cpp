@@ -9,6 +9,8 @@
 #include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
 #include "IContext.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IContext)
@@ -189,6 +191,24 @@ bool HKU_API is_standalone_context(const Indicator& ind) {
     auto imp = ind.getImp();
     IContext const* p = dynamic_cast<IContext const*>(imp.get());
     return p != nullptr;
+}
+
+void registerPart_CONTEXT() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CONTEXT";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "false"});
+    meta.params.push_back(
+      ParamMeta{.name = "use_self_ktype", .type = "bool", .default_value = "false"});
+    meta.params.push_back(
+      ParamMeta{.name = "use_self_recover_type", .type = "bool", .default_value = "false"});
+    registerIndicatorPart(
+      "core.ind.context", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return CONTEXT(std::get<Indicator>(pp.at("ind").at(0)), sc.get<bool>("fill_null"),
+                         sc.get<bool>("use_self_ktype"), sc.get<bool>("use_self_recover_type"));
+      });
 }
 
 }  // namespace hku

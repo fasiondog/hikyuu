@@ -11,6 +11,8 @@
 #include "../crt/PRICELIST.h"
 #include "../crt/KDATA.h"
 #include "../crt/REF.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IVigor)
@@ -71,6 +73,18 @@ Indicator HKU_API VIGOR(const KData& k, int n) {
     Indicator v = VIGOR(n);
     v.setContext(k);
     return v;
+}
+
+void registerPart_VIGOR() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "VIGOR";
+    meta.params.push_back(ParamMeta{.name = "kdata", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "2"});
+    registerIndicatorPart(
+      "core.ind.vigor", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return VIGOR(sc.get<KData>("kdata"), static_cast<int>(sc.get<int64_t>("n")));
+      });
 }
 
 } /* namespace hku */

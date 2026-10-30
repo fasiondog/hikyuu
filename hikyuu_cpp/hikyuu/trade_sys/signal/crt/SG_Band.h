@@ -36,6 +36,8 @@ SignalPtr HKU_API SG_Band(const Indicator& ind, price_t lower, price_t upper);
  */
 SignalPtr HKU_API SG_Band(const Indicator& ind, const Indicator& lower, const Indicator& upper);
 
+void registerPart_SG_Band();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SIGNAL_CRT_SG_BOOL_H_ */

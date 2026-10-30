@@ -9,6 +9,7 @@
 
 #include <climits>
 #include "ILowLine.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ILowLine)
@@ -158,6 +159,10 @@ Indicator HKU_API LLV(const IndParam& n) {
     IndicatorImpPtr p = make_shared<ILowLine>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_LLV() {
+    registerIndicatorPart("core.ind.llv", [] { return LLV(); });
 }
 
 } /* namespace hku */

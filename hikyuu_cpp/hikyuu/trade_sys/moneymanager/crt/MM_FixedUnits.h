@@ -21,6 +21,8 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_FixedUnits(int n = 33);
 
+void registerPart_MM_FixedUnits();
+
 }  // namespace hku
 
 #endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDUNITS_H_ */

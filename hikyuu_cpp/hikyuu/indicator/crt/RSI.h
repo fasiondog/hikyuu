@@ -22,6 +22,8 @@ namespace hku {
 Indicator HKU_API RSI(int n = 14);
 Indicator HKU_API RSI(const Indicator& data, int n = 14);
 
+void registerPart_RSI();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_RSI_H_ */

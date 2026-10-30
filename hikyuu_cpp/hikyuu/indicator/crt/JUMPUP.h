@@ -21,4 +21,6 @@ inline Indicator JUMPUP(const Indicator& ind) {
     return JUMPUP()(ind);
 }
 
+void registerPart_JUMPUP();
+
 }  // namespace hku

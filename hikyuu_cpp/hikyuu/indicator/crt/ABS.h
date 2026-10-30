@@ -27,6 +27,8 @@ inline Indicator ABS(Indicator::value_t val) {
     return ABS(CVAL(val));
 }
 
+void registerPart_ABS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ABS_H_ */

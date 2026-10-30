@@ -19,4 +19,6 @@ Indicator HKU_API TURNOVER(int n = 1);
 
 Indicator HKU_API TURNOVER(const KData& kdata, int n = 1);
 
+void registerPart_TURNOVER();
+
 }  // namespace hku

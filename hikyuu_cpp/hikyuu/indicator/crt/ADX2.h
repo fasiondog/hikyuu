@@ -36,4 +36,6 @@ Indicator HKU_API ADX2(const KData& kdata, int n = 14);
  */
 Indicator HKU_API ADX2(int n = 14);
 
+void registerPart_ADX2();
+
 }  // namespace hku

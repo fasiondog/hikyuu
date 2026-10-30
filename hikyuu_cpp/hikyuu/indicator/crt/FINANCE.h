@@ -17,4 +17,6 @@ Indicator HKU_API FINANCE(const KData& k, int field_ix);
 Indicator HKU_API FINANCE(const string& field_name);
 Indicator HKU_API FINANCE(const KData& k, const string& field_name);
 
+void registerPart_FINANCE();
+
 }  // namespace hku

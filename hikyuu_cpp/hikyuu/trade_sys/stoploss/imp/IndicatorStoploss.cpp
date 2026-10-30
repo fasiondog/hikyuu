@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "IndicatorStoploss.h"
@@ -62,6 +63,20 @@ void IndicatorStoploss::_calculate() {
 
 StoplossPtr HKU_API ST_Indicator(const Indicator& ind) {
     return make_shared<IndicatorStoploss>(ind);
+}
+
+void registerPart_ST_Indicator() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.st.indicator"), void());
+    PartMeta meta;
+    meta.type = PartType::ST;
+    meta.name = "ST_Indicator";
+    meta.full_name = "core.st.indicator";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return ST_Indicator(std::get<Indicator>(pp.at("ind").at(0)));
+    });
 }
 
 } /* namespace hku */

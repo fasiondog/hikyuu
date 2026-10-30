@@ -44,6 +44,8 @@ inline Indicator EMA(const Indicator& data, const Indicator& n) {
     return EMA(IndParam(n))(data);
 }
 
+void registerPart_EMA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_EMA_H_ */

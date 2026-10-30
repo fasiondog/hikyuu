@@ -26,4 +26,6 @@ Indicator HKU_API CYCLE(const KData& k, int adjust_cycle = 1, const string& adju
 Indicator HKU_API CYCLE(int adjust_cycle = 1, const string& adjust_mode = "query",
                         bool delay_to_trading_day = true);
 
+void registerPart_CYCLE();
+
 }  // namespace hku

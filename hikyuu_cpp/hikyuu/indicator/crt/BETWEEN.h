@@ -81,6 +81,8 @@ inline Indicator BETWEEN(Indicator::value_t a, Indicator::value_t b, Indicator::
     return result;
 }
 
+void registerPart_BETWEEN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_BETWEEN_H_ */

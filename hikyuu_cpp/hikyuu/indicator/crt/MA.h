@@ -22,6 +22,8 @@ namespace hku {
 Indicator HKU_API MA(int n = 22);
 Indicator HKU_API MA(const IndParam& n);
 
+void registerPart_MA();
+
 /**
  * Simple moving average
  * @param ind the data to be calculated

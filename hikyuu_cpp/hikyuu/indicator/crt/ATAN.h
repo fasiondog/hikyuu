@@ -29,6 +29,8 @@ inline Indicator ATAN(Indicator::value_t val) {
     return ATAN(CVAL(val));
 }
 
+void registerPart_ATAN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ATAN_H_ */

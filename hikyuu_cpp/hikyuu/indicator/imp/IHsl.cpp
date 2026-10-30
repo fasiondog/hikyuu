@@ -7,6 +7,8 @@
 
 #include "IHsl.h"
 #include "StockWeightFill.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IHsl)
@@ -53,6 +55,16 @@ Indicator HKU_API HSL(const KData& k) {
     auto p = make_shared<IHsl>();
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_HSL() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "HSL";
+    meta.params.push_back(ParamMeta{.name = "k", .type = "KData", .required = true});
+    registerIndicatorPart(
+      "core.ind.hsl", meta,
+      [](const Parameter& sc, const PartParamMap&) -> Part { return HSL(sc.get<KData>("k")); });
 }
 
 } /* namespace hku */

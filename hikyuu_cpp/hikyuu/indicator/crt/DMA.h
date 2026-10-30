@@ -41,6 +41,8 @@ namespace hku {
  */
 Indicator HKU_API DMA(const Indicator& x, const Indicator& a, bool fill_null = true);
 
+void registerPart_DMA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DMA_H_ */

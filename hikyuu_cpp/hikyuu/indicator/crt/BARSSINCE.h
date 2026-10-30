@@ -58,6 +58,8 @@ inline Indicator BARSSINCEN(const Indicator& ind, int n) {
     return BARSSINCEN(n)(ind);
 }
 
+void registerPart_BARSSINCE();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSSINCE_H_ */

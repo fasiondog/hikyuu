@@ -32,6 +32,8 @@ Indicator HKU_API DECLINE(const KQuery& query = KQueryByIndex(-100), const strin
                           int stk_type = STOCKTYPE_A, bool ignore_context = false,
                           bool fill_null = true);
 
+void registerPart_DECLINE();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DECLINE_H_ */

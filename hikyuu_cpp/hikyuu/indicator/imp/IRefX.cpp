@@ -6,6 +6,8 @@
  */
 
 #include "IRefX.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRefX)
@@ -69,6 +71,17 @@ Indicator HKU_API REFX(int n) {
     IndicatorImpPtr p = make_shared<IRefX>();
     p->setParam<int>("n", n);
     return Indicator(p);
+}
+
+void registerPart_REFX() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "REFX";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.refx", meta,
+                          [](const Parameter &sc, const PartParamMap &) -> Part {
+                              return REFX(static_cast<int>(sc.get<int64_t>("n")));
+                          });
 }
 
 } /* namespace hku */

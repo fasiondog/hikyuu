@@ -20,4 +20,6 @@ namespace hku {
  */
 CNPtr HKU_API CN_Manual();
 
+void registerPart_CN_Manual();
+
 }  // namespace hku

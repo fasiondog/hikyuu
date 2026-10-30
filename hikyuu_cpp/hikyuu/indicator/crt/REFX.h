@@ -24,4 +24,6 @@ inline Indicator REFX(const Indicator& ind, int n) {
     return REFX(n)(ind);
 }
 
+void registerPart_REFX();
+
 }  // namespace hku

@@ -28,6 +28,8 @@ inline Indicator BARSLASTCOUNT(const Indicator& ind) {
     return BARSLASTCOUNT()(ind);
 }
 
+void registerPart_BARSLASTCOUNT();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSLASTCOUNT_H_ */

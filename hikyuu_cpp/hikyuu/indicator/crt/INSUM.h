@@ -34,4 +34,6 @@ Indicator HKU_API INSUM(const Block& block, const Indicator& ind, int mode, bool
 
 Indicator HKU_API INSUM(const Block& block, int mode, bool fill_null);
 
+void registerPart_INSUM();
+
 }  // namespace hku

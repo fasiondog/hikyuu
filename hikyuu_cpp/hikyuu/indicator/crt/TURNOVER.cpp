@@ -6,6 +6,7 @@
  */
 
 #include "KDATA.h"
+#include "hikyuu/part/PartRegister.h"
 #include "SUM.h"
 #include "LIUTONGPAN.h"
 
@@ -21,6 +22,10 @@ Indicator HKU_API TURNOVER(const KData& kdata, int n) {
     HKU_ASSERT(n >= 1);
     return n == 1 ? (kdata.vol() / LIUTONGPAN(kdata))
                   : (SUM(kdata.vol(), n) / SUM(LIUTONGPAN(kdata), n));
+}
+
+void registerPart_TURNOVER() {
+    registerIndicatorPart("core.ind.turnover", [] { return TURNOVER(); });
 }
 
 }  // namespace hku

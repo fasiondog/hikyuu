@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "CrossSignal.h"
@@ -64,6 +65,23 @@ void CrossSignal::_calculate(const KData& kdata) {
 
 SignalPtr HKU_API SG_Cross(const Indicator& fast, const Indicator& slow) {
     return make_shared<CrossSignal>(fast, slow);
+}
+
+void registerPart_SG_Cross() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sg.cross"), void());
+    PartMeta meta;
+    meta.type = PartType::SG;
+    meta.name = "SG_Cross";
+    meta.full_name = "core.sg.cross";
+    meta.params.push_back(
+      ParamMeta{.name = "fast", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "slow", .type = "Indicator", .required = true, .is_part_param = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SG_Cross(std::get<Indicator>(pp.at("fast").at(0)),
+                        std::get<Indicator>(pp.at("slow").at(0)));
+    });
 }
 
 } /* namespace hku */

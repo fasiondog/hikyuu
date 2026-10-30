@@ -29,6 +29,8 @@ inline Indicator LOG(Indicator::value_t val) {
     return LOG(CVAL(val));
 }
 
+void registerPart_LOG();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_LOG_H_ */

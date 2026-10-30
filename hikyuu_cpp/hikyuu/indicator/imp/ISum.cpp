@@ -7,6 +7,7 @@
 
 #include <climits>
 #include "ISum.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISum)
@@ -110,6 +111,10 @@ Indicator HKU_API SUM(const IndParam& n) {
     IndicatorImpPtr p = make_shared<ISum>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_SUM() {
+    registerIndicatorPart("core.ind.sum", [] { return SUM(); });
 }
 
 } /* namespace hku */

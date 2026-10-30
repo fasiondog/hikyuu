@@ -115,6 +115,8 @@ inline Indicator AMA(const Indicator& ind, const Indicator& n, const Indicator& 
     return AMA(IndParam(n), IndParam(fast_n), IndParam(slow_n))(ind);
 }
 
+void registerPart_AMA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_AMA_H_ */

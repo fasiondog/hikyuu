@@ -31,6 +31,8 @@ inline Indicator ROUNDDOWN(Indicator::value_t val, int n = 2) {
     return ROUNDDOWN(CVAL(val), n);
 }
 
+void registerPart_ROUNDDOWN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUNDDOWN_H_ */

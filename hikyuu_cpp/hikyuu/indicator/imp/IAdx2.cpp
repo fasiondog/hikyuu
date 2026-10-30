@@ -7,6 +7,8 @@
 
 #include <climits>
 #include "IAdx2.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAdx2)
@@ -194,6 +196,18 @@ Indicator HKU_API ADX2(const KData& kdata, int n) {
     p->setParam<int>("n", n);
     p->setContext(kdata);
     return Indicator(p);
+}
+
+void registerPart_ADX2() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "ADX2";
+    meta.params.push_back(ParamMeta{.name = "kdata", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "14"});
+    registerIndicatorPart(
+      "core.ind.adx2", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return ADX2(sc.get<KData>("kdata"), static_cast<int>(sc.get<int64_t>("n")));
+      });
 }
 
 } /* namespace hku */

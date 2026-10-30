@@ -6,6 +6,7 @@
  */
 
 #include "FixedPercentProfitGoal.h"
+#include "hikyuu/part/PartRegister.h"
 
 #include <cmath>
 
@@ -72,6 +73,19 @@ ProfitGoalPtr HKU_API PG_FixedPercent(double p) {
     ProfitGoalPtr ptr = make_shared<FixedPercentProfitGoal>();
     ptr->setParam<double>("p", p);
     return ptr;
+}
+
+void registerPart_PG_FixedPercent() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.pg.fixedpercent"), void());
+    PartMeta meta;
+    meta.type = PartType::PG;
+    meta.name = "PG_FixedPercent";
+    meta.full_name = "core.pg.fixedpercent";
+    meta.params.push_back(ParamMeta{.name = "p", .type = "double", .default_value = "0.2"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return PG_FixedPercent(sc.get<double>("p"));
+    });
 }
 
 } /* namespace hku */

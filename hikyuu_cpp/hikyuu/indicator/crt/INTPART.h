@@ -31,6 +31,8 @@ inline Indicator INTPART(Indicator::value_t val) {
     return INTPART(CVAL(val));
 }
 
+void registerPart_INTPART();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_INTPART_H_ */

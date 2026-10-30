@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/utilities/Log.h"
+#include "hikyuu/part/PartRegister.h"
 #include "RSI.h"
 
 namespace hku {
@@ -33,6 +34,10 @@ Indicator HKU_API RSI(int n) {
 
 Indicator HKU_API RSI(const Indicator& data, int n) {
     return RSI(n)(data)(data.getContext());
+}
+
+void registerPart_RSI() {
+    registerIndicatorPart("core.ind.rsi", [] { return RSI(); });
 }
 
 }  // namespace hku

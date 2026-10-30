@@ -32,7 +32,7 @@
 #include "data_driver/ipc/ShmClientHook.h"
 #include "indicator/IndicatorImp.h"
 #include "part/PartRegistry.h"
-#include "part/BuiltinParts.h"
+#include "part/PartRegistration.h"
 #include "global/sysinfo.h"
 #include "plugin/interface/plugins.h"
 #include "debug.h"
@@ -116,7 +116,7 @@ void GlobalInitializer::init() {
     StockManager::instance();
 
     PartRegistry::instance();
-    registerBuiltinParts();
+    registerAllBuiltinParts();
 
     getGlobalSpotAgent();
 }

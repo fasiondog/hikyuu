@@ -30,6 +30,8 @@ inline Indicator ACOS(Indicator::value_t val) {
     return ACOS(CVAL(val));
 }
 
+void registerPart_ACOS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ACOS_H_ */

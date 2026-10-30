@@ -53,6 +53,8 @@ inline Indicator SLOPE(const Indicator& ind, const Indicator& n) {
     return SLOPE(IndParam(n))(ind);
 }
 
+void registerPart_SLOPE();
+
 }  // namespace hku
 
 #endif

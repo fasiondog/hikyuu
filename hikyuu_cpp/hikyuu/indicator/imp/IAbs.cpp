@@ -6,6 +6,7 @@
  */
 
 #include "IAbs.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAbs)
@@ -38,6 +39,10 @@ void IAbs::_increment_calculate(const Indicator &data, size_t start_pos) {
 
 Indicator HKU_API ABS() {
     return Indicator(make_shared<IAbs>());
+}
+
+void registerPart_ABS() {
+    registerIndicatorPart("core.ind.abs", [] { return ABS(); });
 }
 
 } /* namespace hku */

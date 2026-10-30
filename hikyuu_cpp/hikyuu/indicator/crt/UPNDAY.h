@@ -38,6 +38,8 @@ inline Indicator UPNDAY(const Indicator& ind, const Indicator& n) {
     return result;
 }
 
+void registerPart_UPNDAY();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_UPNDAY_H_ */

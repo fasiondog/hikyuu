@@ -38,4 +38,6 @@ inline Indicator MDD(const Indicator& ind, int n = 0) {
     return MDD(n)(ind);
 }
 
+void registerPart_MDD();
+
 }  // namespace hku

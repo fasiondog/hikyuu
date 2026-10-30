@@ -6,6 +6,8 @@
  */
 
 #include "IDiscard.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IDiscard)
@@ -53,6 +55,17 @@ Indicator HKU_API DISCARD(int discard) {
     auto p = make_shared<IDiscard>();
     p->setParam<int>("discard", discard);
     return Indicator(p);
+}
+
+void registerPart_DISCARD() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "DISCARD";
+    meta.params.push_back(ParamMeta{.name = "discard", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.discard", meta,
+                          [](const Parameter &sc, const PartParamMap &) -> Part {
+                              return DISCARD(static_cast<int>(sc.get<int64_t>("discard")));
+                          });
 }
 
 } /* namespace hku */

@@ -44,6 +44,8 @@ inline Indicator POW(Indicator::value_t val, int n) {
     return POW(CVAL(val), n);
 }
 
+void registerPart_POW();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_POW_H_ */

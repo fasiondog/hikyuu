@@ -38,6 +38,8 @@ inline Indicator DOWNNDAY(const Indicator& ind, const IndParam& n) {
     return result;
 }
 
+void registerPart_DOWNNDAY();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DOWNNDAY_H_ */

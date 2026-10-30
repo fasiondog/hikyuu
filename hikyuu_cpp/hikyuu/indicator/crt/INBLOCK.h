@@ -35,4 +35,6 @@ Indicator HKU_API INBLOCK(const string& category, const string& name);
  */
 Indicator HKU_API INBLOCK(const KData& kdata, const string& category, const string& name);
 
+void registerPart_INBLOCK();
+
 }  // namespace hku

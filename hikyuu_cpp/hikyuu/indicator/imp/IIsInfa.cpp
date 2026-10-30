@@ -6,6 +6,7 @@
  */
 
 #include "IIsInfa.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIsInfa)
@@ -39,6 +40,10 @@ void IIsInfa::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API ISINFA() {
     return Indicator(make_shared<IIsInfa>());
+}
+
+void registerPart_ISINFA() {
+    registerIndicatorPart("core.ind.isinfa", [] { return ISINFA(); });
 }
 
 } /* namespace hku */

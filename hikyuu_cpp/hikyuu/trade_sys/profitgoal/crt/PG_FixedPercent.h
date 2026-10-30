@@ -22,6 +22,8 @@ namespace hku {
  */
 ProfitGoalPtr HKU_API PG_FixedPercent(double p = 0.2);
 
+void registerPart_PG_FixedPercent();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDPERCENT_H_ */

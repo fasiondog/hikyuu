@@ -24,6 +24,8 @@ inline Indicator ISNA(const Indicator& ind, bool ignore_discard = false) {
     return ISNA(ignore_discard)(ind);
 }
 
+void registerPart_ISNA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ISNA_H_ */

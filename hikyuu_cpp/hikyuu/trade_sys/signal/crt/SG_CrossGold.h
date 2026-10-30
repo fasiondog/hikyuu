@@ -27,6 +27,8 @@ namespace hku {
  */
 SignalPtr HKU_API SG_CrossGold(const Indicator& fast, const Indicator& slow);
 
+void registerPart_SG_CrossGold();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SIGNAL_CRT_SG_CROSSGOLD_H_ */

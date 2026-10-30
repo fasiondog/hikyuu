@@ -211,8 +211,9 @@ TEST_CASE("test_PartRegistry_getNameList") {
     CHECK_UNARY(std::find(inds.begin(), inds.end(), ind_name) != inds.end());
     CHECK_UNARY(std::find(inds.begin(), inds.end(), sg_name) == inds.end());
 
-    /** @arg a category without registrations yields an empty list */
-    CHECK_UNARY(reg.getNameList(PartType::MF).empty());
+    /** @arg a part is listed only in its own category */
+    StringList mfs = reg.getNameList(PartType::MF);
+    CHECK_UNARY(std::find(mfs.begin(), mfs.end(), ind_name) == mfs.end());
 
     /** @arg getMetaList mirrors getNameList with metas */
     auto metas = reg.getMetaList(PartType::SG);

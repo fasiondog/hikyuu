@@ -6,6 +6,7 @@
  */
 
 #include "IIsLastBar.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIsLastBar)
@@ -53,6 +54,10 @@ Indicator HKU_API ISLASTBAR(const KData &kdata) {
     auto p = make_shared<IIsLastBar>();
     p->setContext(kdata);
     return Indicator(p);
+}
+
+void registerPart_ISLASTBAR() {
+    registerIndicatorPart("core.ind.islastbar", [] { return ISLASTBAR(); });
 }
 
 } /* namespace hku */

@@ -23,4 +23,6 @@ namespace hku {
 Indicator HKU_API ZONGGUBEN();
 Indicator HKU_API ZONGGUBEN(const KData&);
 
+void registerPart_ZONGGUBEN();
+
 }  // namespace hku

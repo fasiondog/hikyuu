@@ -32,6 +32,8 @@ inline Indicator BARSCOUNT(const Indicator& ind) {
     return BARSCOUNT()(ind);
 }
 
+void registerPart_BARSCOUNT();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSCOUNT_H_ */

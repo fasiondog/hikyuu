@@ -48,4 +48,6 @@ inline Indicator IR(const Indicator& p, const Indicator& b, int n = 100) {
     return ret;
 }
 
+void registerPart_IR();
+
 }  // namespace hku

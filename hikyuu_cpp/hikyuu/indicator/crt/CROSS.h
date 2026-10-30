@@ -38,6 +38,8 @@ inline Indicator CROSS(Indicator::value_t x, Indicator::value_t y) {
     return CROSS(CVAL(x), CVAL(y));
 }
 
+void registerPart_CROSS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_CROSS_H_ */

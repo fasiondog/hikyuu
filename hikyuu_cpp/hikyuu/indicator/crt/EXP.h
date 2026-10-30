@@ -28,6 +28,8 @@ inline Indicator EXP(Indicator::value_t val) {
     return EXP(CVAL(val));
 }
 
+void registerPart_EXP();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_EXP_H_ */

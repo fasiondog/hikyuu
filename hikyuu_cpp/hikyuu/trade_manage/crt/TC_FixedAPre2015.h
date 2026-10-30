@@ -33,6 +33,8 @@ TradeCostPtr HKU_API TC_FixedAPre2015(price_t commission = 0.0018, price_t lowes
                                       price_t stamptax = 0.001, price_t transferfee = 0.001,
                                       price_t lowestTransferfee = 1.0);
 
+void registerPart_TC_FixedAPre2015();
+
 }  // namespace hku
 
 #endif /* TRADE_MANAGE_CRT_TC_FIXEDAPRE2015_H_ */

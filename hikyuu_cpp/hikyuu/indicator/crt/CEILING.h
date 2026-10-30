@@ -31,6 +31,8 @@ inline Indicator CEILING(Indicator::value_t val) {
     return CEILING(CVAL(val));
 }
 
+void registerPart_CEILING();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_CEILING_H_ */

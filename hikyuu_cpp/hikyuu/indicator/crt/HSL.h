@@ -27,5 +27,7 @@ namespace hku {
 Indicator HKU_API HSL(const KData& k);
 Indicator HKU_API HSL();
 
+void registerPart_HSL();
+
 }  // namespace hku
 #endif /* INDICATOR_CRT_HSL_H_ */

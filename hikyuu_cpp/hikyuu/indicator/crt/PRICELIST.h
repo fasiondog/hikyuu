@@ -46,6 +46,8 @@ Indicator PRICELIST(ValueT* data, size_t total) {
     return PRICELIST(tmp);
 }
 
+void registerPart_PRICELIST();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_PRICELIST_H_ */

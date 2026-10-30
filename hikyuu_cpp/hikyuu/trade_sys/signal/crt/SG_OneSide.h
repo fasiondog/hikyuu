@@ -34,6 +34,8 @@ inline SignalPtr SG_Sell(const Indicator& ind) {
     return SG_OneSide(ind, false);
 }
 
+void registerPart_SG_OneSide();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SIGNAL_CRT_SG_ONESIDE_H_ */

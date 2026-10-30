@@ -8,6 +8,8 @@
 #include "hikyuu/Stock.h"
 #include "ICodeLike.h"
 #include "WildcardMatch.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICodeLike)
@@ -66,6 +68,17 @@ Indicator HKU_API CODELIKE(const KData& k, const string& pattern) {
     p->setParam<string>("pattern", pattern);
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_CODELIKE() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CODELIKE";
+    meta.params.push_back(ParamMeta{.name = "pattern", .type = "string", .required = true});
+    registerIndicatorPart("core.ind.codelike", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return CODELIKE(sc.get<string>("pattern"));
+                          });
 }
 
 } /* namespace hku */

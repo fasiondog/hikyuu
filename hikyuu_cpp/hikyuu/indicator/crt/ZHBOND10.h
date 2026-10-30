@@ -25,4 +25,6 @@ inline Indicator ZHBOND10(const Indicator& ind, double default_val = 4.0) {
     return ZHBOND10(default_val)(ind);
 }
 
+void registerPart_ZHBOND10();
+
 }  // namespace hku

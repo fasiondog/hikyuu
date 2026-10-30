@@ -30,6 +30,8 @@ inline Indicator DROPNA(const Indicator& ind, bool drop_inf = false) {
     return DROPNA(drop_inf)(ind);
 }
 
+void registerPart_DROPNA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DROPNA_H_ */

@@ -41,4 +41,6 @@ inline Indicator SLICE(const Indicator& ind, int64_t start, int64_t end, int res
     return SLICE(start, end, result_index)(ind);
 }
 
+void registerPart_SLICE();
+
 }  // namespace hku

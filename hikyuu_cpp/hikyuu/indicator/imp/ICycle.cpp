@@ -8,6 +8,8 @@
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "ICycle.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICycle)
@@ -208,6 +210,23 @@ Indicator HKU_API CYCLE(const KData& k, int adjust_cycle, const string& adjust_m
     p->setParam<bool>("delay_to_trading_day", delay_to_trading_day);
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_CYCLE() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CYCLE";
+    meta.params.push_back(ParamMeta{.name = "k", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "adjust_cycle", .type = "int", .default_value = "1"});
+    meta.params.push_back(
+      ParamMeta{.name = "adjust_mode", .type = "string", .default_value = "query"});
+    meta.params.push_back(
+      ParamMeta{.name = "delay_to_trading_day", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.cycle", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return CYCLE(sc.get<KData>("k"), static_cast<int>(sc.get<int64_t>("adjust_cycle")),
+                       sc.get<string>("adjust_mode"), sc.get<bool>("delay_to_trading_day"));
+      });
 }
 
 } /* namespace hku */

@@ -22,6 +22,8 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_FixedCapital(double capital = 10000.00);
 
+void registerPart_MM_FixedCapital();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDCAPITAL_H_ */

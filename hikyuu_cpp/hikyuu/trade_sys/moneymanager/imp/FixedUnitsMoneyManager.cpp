@@ -6,6 +6,7 @@
  */
 
 #include "FixedUnitsMoneyManager.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedUnitsMoneyManager)
@@ -52,6 +53,19 @@ MoneyManagerPtr HKU_API MM_FixedUnits(int n) {
     MoneyManagerPtr p = make_shared<FixedUnitsMoneyManager>();
     p->setParam<int>("n", n);
     return p;
+}
+
+void registerPart_MM_FixedUnits() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.fixedunits"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_FixedUnits";
+    meta.full_name = "core.mm.fixedunits";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "33"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return MM_FixedUnits(static_cast<int>(sc.get<int64_t>("n")));
+    });
 }
 
 } /* namespace hku */

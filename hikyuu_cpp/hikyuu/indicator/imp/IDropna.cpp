@@ -8,6 +8,7 @@
  */
 
 #include "IDropna.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IDropna)
@@ -82,6 +83,10 @@ Indicator HKU_API DROPNA(bool drop_inf) {
     IndicatorImpPtr p = make_shared<IDropna>();
     p->setParam<bool>("drop_inf", drop_inf);
     return Indicator(p);
+}
+
+void registerPart_DROPNA() {
+    registerIndicatorPart("core.ind.dropna", [] { return DROPNA(); });
 }
 
 } /* namespace hku */

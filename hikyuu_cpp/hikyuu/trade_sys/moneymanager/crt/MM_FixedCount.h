@@ -26,6 +26,8 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_FixedCount(double n = 100);
 
+void registerPart_MM_FixedCount();
+
 }  // namespace hku
 
 #endif /* FIXEDCOUNT_MM_H_ */

@@ -26,6 +26,8 @@ namespace hku {
 Indicator HKU_API AD(const KData& k);
 Indicator HKU_API AD();
 
+void registerPart_AD();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_AD_H_ */

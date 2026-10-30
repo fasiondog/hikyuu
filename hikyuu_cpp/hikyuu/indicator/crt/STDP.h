@@ -33,6 +33,8 @@ inline Indicator STDP(const Indicator& data, const Indicator& n) {
     return STDP(IndParam(n))(data);
 }
 
+void registerPart_STDP();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_STDP_H_ */

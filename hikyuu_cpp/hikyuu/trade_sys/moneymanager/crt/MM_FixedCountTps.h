@@ -29,6 +29,8 @@ namespace hku {
 MoneyManagerPtr HKU_API MM_FixedCountTps(const vector<double>& buy_counts,
                                          const vector<double>& sell_counts);
 
+void registerPart_MM_FixedCountTps();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDCOUNT_TPS_H_ */

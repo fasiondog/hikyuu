@@ -6,6 +6,7 @@
  */
 
 #include "FixedATradeCost.h"
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/arithmetic.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -44,6 +45,27 @@ TradeCostPtr FixedATradeCost::_clone() {
 TradeCostPtr HKU_API TC_FixedA(price_t commission, price_t lowestCommission, price_t stamptax,
                                price_t transferfee) {
     return make_shared<FixedATradeCost>(commission, lowestCommission, stamptax, transferfee);
+}
+
+void registerPart_TC_FixedA() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.tc.fixeda"), void());
+    PartMeta meta;
+    meta.type = PartType::TC;
+    meta.name = "TC_FixedA";
+    meta.full_name = "core.tc.fixeda";
+    meta.params.push_back(
+      ParamMeta{.name = "commission", .type = "double", .default_value = "0.0018"});
+    meta.params.push_back(
+      ParamMeta{.name = "lowestCommission", .type = "double", .default_value = "5.0"});
+    meta.params.push_back(
+      ParamMeta{.name = "stamptax", .type = "double", .default_value = "0.0005"});
+    meta.params.push_back(
+      ParamMeta{.name = "transferfee", .type = "double", .default_value = "0.00001"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return TC_FixedA(sc.get<double>("commission"), sc.get<double>("lowestCommission"),
+                         sc.get<double>("stamptax"), sc.get<double>("transferfee"));
+    });
 }
 
 } /* namespace hku */

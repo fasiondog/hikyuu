@@ -7,6 +7,7 @@
 
 #include <climits>
 #include "IWma.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IWma)
@@ -165,6 +166,10 @@ Indicator HKU_API WMA(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IWma>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_WMA() {
+    registerIndicatorPart("core.ind.wma", [] { return WMA(); });
 }
 
 } /* namespace hku */

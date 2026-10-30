@@ -32,6 +32,8 @@ inline Indicator ROUND(Indicator::value_t val, int n = 2) {
     return ROUND(CVAL(val), n);
 }
 
+void registerPart_ROUND();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUND_H_ */

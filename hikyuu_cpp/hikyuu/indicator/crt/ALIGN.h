@@ -43,6 +43,8 @@ inline Indicator ALIGN(const Indicator& ind, const KData& ref, bool fill_null = 
     return ALIGN(ref.getDatetimeList(), fill_null)(ind);
 }
 
+void registerPart_ALIGN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ALIGN_H_ */

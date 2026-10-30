@@ -254,6 +254,16 @@ These contracts were settled during the 2026-10 indicator audit; treat them as b
 - **Increment admission**: `min_increment_start()` declares only the algorithm's own prerequisite (never fold the input discard into it); input-side validity is judged by the framework guards, and the seed-state reconstruction lives inside `_increment_calculate`.
 - **Result snapshots**: `IndicatorImp::getResult()` returns a value snapshot carrying the source context - plus the `align_date_list` parameter when the source is date aligned, because its date answers come from that parameter and not from the context - and `setCalculateFlag(false)`; it must not be recomputed, and rebinding a snapshot to a new KData is not supported by design (use the original formula indicator).
 
+### Built-in Part Registration
+
+Every built-in factory (201 parts: 138 indicators + 63 components) is registered into the `PartRegistry` (`hikyuu_cpp/hikyuu/part/`). Adding a new built-in part requires **three places in sync**:
+
+1. declare `void registerPart_XXX();` in the part's `crt/XXX.h` (no `HKU_API`; only the module aggregation functions and `registerAllBuiltinParts()` are exported);
+2. define it **in the same file as the factory implementation** (usually `imp/*.cpp`, right after the factory; indicators use `registerIndicatorPart("core.ind.xxx", [] { return XXX(...); })` for lazy prototype introspection, components hand-write the `PartMeta` plus a dual-channel creator); the exception is a header-only combination indicator whose factory is an inline definition in its crt header (e.g. `MAX` / `LAST` / `CROSS`) - it has no implementation cpp, so its registration stays in `indicator/build_in.cpp`;
+3. add one call line in the aggregation function of the module `build_in.cpp` (`registerSignalParts()` / `registerTradeManageParts()` / ...).
+
+`GlobalInitializer::init()` calls `registerAllBuiltinParts()` (declared in `part/PartRegistration.h`) and `clean()` calls `PartRegistry::release()`. CI keeps the three places consistent via `python3 hikyuu_cpp/tools/check_part_registration.py`. Combination headers (`SG_Logic` / `CN_Logic` / `EV_Logic` / `SE_Logic` / `PF_Mode`) and the `TC_TestStub` test fixture are excluded by design.
+
 ## 7. Documentation
 
 - Sphinx + myst_parser, **dual-source and bilingual**: `docs/zh/` (Chinese) and `docs/en/` (English) are two **independent Sphinx trees**, each with its own `conf.py`, without using gettext.

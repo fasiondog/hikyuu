@@ -96,6 +96,8 @@ inline Indicator LAST(const Indicator& ind, const Indicator& m, const Indicator&
     return LAST(IndParam(m), IndParam(n))(ind);
 }
 
+void registerPart_LAST();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_LAST_H_ */

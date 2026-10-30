@@ -8,6 +8,8 @@
  */
 
 #include "ISumBars.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISumBars)
@@ -152,6 +154,17 @@ Indicator HKU_API SUMBARS(const IndParam& a) {
     IndicatorImpPtr p = make_shared<ISumBars>();
     p->setIndParam("a", a);
     return Indicator(p);
+}
+
+void registerPart_SUMBARS() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "SUMBARS";
+    meta.params.push_back(ParamMeta{.name = "a", .type = "double", .required = true});
+    registerIndicatorPart("core.ind.sumbars", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return SUMBARS(sc.get<double>("a"));
+                          });
 }
 
 } /* namespace hku */

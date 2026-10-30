@@ -8,6 +8,8 @@
 #include <climits>
 #include "ISpearman.h"
 #include "hikyuu/indicator/utils.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISpearman)
@@ -108,6 +110,24 @@ Indicator HKU_API SPEARMAN(const Indicator &ind, const Indicator &ref_ind, int n
     auto p = make_shared<ISpearman>(ref_ind, n, fill_null);
     Indicator result(p);
     return result(ind);
+}
+
+void registerPart_SPEARMAN() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "SPEARMAN";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ref_ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "0"});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.spearman", meta, [](const Parameter &sc, const PartParamMap &pp) -> Part {
+          return SPEARMAN(std::get<Indicator>(pp.at("ind").at(0)),
+                          std::get<Indicator>(pp.at("ref_ind").at(0)),
+                          static_cast<int>(sc.get<int64_t>("n")), sc.get<bool>("fill_null"));
+      });
 }
 
 }  // namespace hku

@@ -40,6 +40,8 @@ inline Indicator EVERY(const Indicator& ind, const Indicator& n) {
     return EVERY(IndParam(n))(ind);
 }
 
+void registerPart_EVERY();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_EVERY_H_ */

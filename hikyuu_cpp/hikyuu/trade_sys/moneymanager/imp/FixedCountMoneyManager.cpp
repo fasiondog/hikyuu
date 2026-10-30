@@ -6,6 +6,7 @@
  */
 
 #include "FixedCountMoneyManager.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedCountMoneyManager)
@@ -40,6 +41,19 @@ MoneyManagerPtr HKU_API MM_FixedCount(double n) {
     MoneyManagerPtr p = make_shared<FixedCountMoneyManager>();
     p->setParam<double>("n", n);
     return p;
+}
+
+void registerPart_MM_FixedCount() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.fixedcount"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_FixedCount";
+    meta.full_name = "core.mm.fixedcount";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "double", .default_value = "100"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return MM_FixedCount(sc.get<double>("n"));
+    });
 }
 
 } /* namespace hku */

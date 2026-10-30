@@ -6,6 +6,7 @@
  */
 
 #include "IJumpUp.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IJumpUp)
@@ -42,6 +43,10 @@ void IJumpUp::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
 Indicator HKU_API JUMPUP() {
     return Indicator(make_shared<IJumpUp>());
+}
+
+void registerPart_JUMPUP() {
+    registerIndicatorPart("core.ind.jumpup", [] { return JUMPUP(); });
 }
 
 } /* namespace hku */

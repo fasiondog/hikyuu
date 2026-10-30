@@ -9,6 +9,8 @@
 
 #include <climits>
 #include "IBarsLasts.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IBarsLasts)
@@ -154,6 +156,17 @@ Indicator HKU_API BARSLASTS(const IndParam& n) {
     auto p = make_shared<IBarsLasts>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_BARSLASTS() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "BARSLASTS";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.barslasts", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return BARSLASTS(static_cast<int>(sc.get<int64_t>("n")));
+                          });
 }
 
 } /* namespace hku */

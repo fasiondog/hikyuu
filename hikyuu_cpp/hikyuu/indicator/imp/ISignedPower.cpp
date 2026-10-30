@@ -6,6 +6,8 @@
  */
 
 #include "ISignedPower.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISignedPower)
@@ -57,6 +59,17 @@ Indicator HKU_API SIGNED_POWER(const IndParam& n) {
     IndicatorImpPtr p = make_shared<ISignedPower>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_SIGNED_POWER() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "SIGNED_POWER";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.signed_power", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return SIGNED_POWER(static_cast<int>(sc.get<int64_t>("n")));
+                          });
 }
 
 } /* namespace hku */

@@ -27,6 +27,8 @@ inline Indicator SGN(Indicator::value_t val) {
     return SGN(CVAL(val));
 }
 
+void registerPart_SGN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SGN_H_ */

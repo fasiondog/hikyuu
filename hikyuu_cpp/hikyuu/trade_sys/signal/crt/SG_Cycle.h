@@ -21,4 +21,6 @@ namespace hku {
  */
 SignalPtr HKU_API SG_Cycle();
 
+void registerPart_SG_Cycle();
+
 }  // namespace hku

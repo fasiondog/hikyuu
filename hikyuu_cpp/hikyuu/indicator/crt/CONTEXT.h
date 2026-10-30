@@ -55,4 +55,6 @@ KData HKU_API CONTEXT_K(const Indicator& ind);
  */
 bool HKU_API is_standalone_context(const Indicator& ind);
 
+void registerPart_CONTEXT();
+
 }  // namespace hku

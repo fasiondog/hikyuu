@@ -62,4 +62,6 @@ Indicator HKU_API ISLIMITUP();
  */
 Indicator HKU_API ISLIMITUP(const KData& k);
 
+void registerPart_ISLIMITUP();
+
 }  // namespace hku

@@ -26,4 +26,6 @@ Indicator HKU_API NAMELIKE(const string& pattern);
  */
 Indicator HKU_API NAMELIKE(const KData& kdata, const string& pattern);
 
+void registerPart_NAMELIKE();
+
 }  // namespace hku

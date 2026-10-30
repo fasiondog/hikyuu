@@ -28,6 +28,8 @@ inline Indicator NOT(const Indicator& ind) {
     return NOT()(ind);
 }
 
+void registerPart_NOT();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_NOT_H_ */

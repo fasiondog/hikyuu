@@ -36,6 +36,8 @@ inline Indicator DEVSQ(const Indicator& data, const Indicator& n) {
     return DEVSQ(IndParam(n))(data);
 }
 
+void registerPart_DEVSQ();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_DEVSQ_H_ */

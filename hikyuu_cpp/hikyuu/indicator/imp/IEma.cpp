@@ -7,6 +7,7 @@
 
 #include <climits>
 #include "IEma.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IEma)
@@ -101,6 +102,10 @@ Indicator HKU_API EMA(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IEma>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_EMA() {
+    registerIndicatorPart("core.ind.ema", [] { return EMA(); });
 }
 
 } /* namespace hku */

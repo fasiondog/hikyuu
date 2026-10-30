@@ -29,6 +29,8 @@ inline Indicator TAN(Indicator::value_t val) {
     return TAN(CVAL(val));
 }
 
+void registerPart_TAN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_TAN_H_ */

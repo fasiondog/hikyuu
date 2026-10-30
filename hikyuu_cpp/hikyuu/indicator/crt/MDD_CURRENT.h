@@ -30,4 +30,6 @@ inline Indicator MDD_CURRENT(const Indicator& ind) {
     return MDD_CURRENT()(ind);
 }
 
+void registerPart_MDD_CURRENT();
+
 }  // namespace hku

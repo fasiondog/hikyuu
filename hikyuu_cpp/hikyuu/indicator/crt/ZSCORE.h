@@ -31,4 +31,6 @@ inline Indicator ZSCORE(const Indicator& data, bool outExtreme = false, double n
     return ZSCORE(outExtreme, nsigma, recursive)(data);
 }
 
+void registerPart_ZSCORE();
+
 }  // namespace hku

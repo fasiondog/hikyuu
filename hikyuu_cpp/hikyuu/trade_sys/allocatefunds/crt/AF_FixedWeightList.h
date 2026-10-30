@@ -28,6 +28,8 @@ namespace hku {
  */
 AFPtr HKU_API AF_FixedWeightList(const vector<double>& weights);
 
+void registerPart_AF_FixedWeightList();
+
 }  // namespace hku
 
 #endif /* TRADE_SYS_ALLOCATEFUNDS_CRT_AF_FIXEDWEIGHTLIST_H_ */

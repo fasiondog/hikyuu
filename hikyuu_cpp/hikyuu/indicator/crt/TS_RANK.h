@@ -71,6 +71,8 @@ inline Indicator TS_RANK(const Indicator& ind, const Indicator& n) {
     return TS_RANK(IndParam(n))(ind);
 }
 
+void registerPart_TS_RANK();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_TS_RANK_H_ */

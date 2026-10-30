@@ -45,6 +45,8 @@ inline Indicator MAX(Indicator::value_t val, const Indicator& ind) {
     return result;
 }
 
+void registerPart_MAX();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_MAX_H_ */

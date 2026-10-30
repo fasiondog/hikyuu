@@ -14,6 +14,8 @@
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "../utils.h"
 #include "IIc.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIc)
@@ -172,9 +174,8 @@ price_t calc_day_ic(const IndicatorList& ref_inds, const IndicatorList& returns,
         buf_a[j] = ref_inds[j][i];
         buf_b[j] = returns[j][i];
     }
-    return use_spearman
-             ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
-             : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
+    return use_spearman ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
+                        : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
 }
 
 }  // namespace
@@ -242,6 +243,22 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
     }
 
     return PRICELIST(ret, discard);
+}
+
+void registerPart_IC() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "IC";
+    meta.params.push_back(ParamMeta{.name = "stks", .type = "StockList", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "1"});
+    meta.params.push_back(ParamMeta{.name = "spearman", .type = "bool", .default_value = "true"});
+    meta.params.push_back(ParamMeta{.name = "strict", .type = "bool", .default_value = "false"});
+    registerIndicatorPart(
+      "core.ind.ic", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          HKU_THROW_EXCEPTION(std::logic_error,
+                              "IC can not be created from the registry, it needs a StockList");
+          return Indicator();
+      });
 }
 
 }  // namespace hku

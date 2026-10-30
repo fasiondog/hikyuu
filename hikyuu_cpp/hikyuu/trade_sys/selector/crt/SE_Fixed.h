@@ -34,6 +34,8 @@ SelectorPtr HKU_API SE_Fixed(double weight = 1.0);
 SelectorPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys,
                              double weight = 1.0);
 
+void registerPart_SE_Fixed();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SELECTOR_CRT_SE_FIXED_H_ */

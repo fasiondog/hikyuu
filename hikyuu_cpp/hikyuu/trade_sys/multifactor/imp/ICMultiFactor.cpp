@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/utilities/thread/algorithm.h"
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/indicator/crt/IC.h"
 #include "hikyuu/indicator/crt/MA.h"
@@ -112,6 +113,17 @@ MultiFactorPtr HKU_API MF_ICWeight(const StockList& stks, const KQuery& query, c
                                    bool save_all_factors) {
     return std::make_shared<ICMultiFactor>(stks, query, ref_stk, ic_n, ic_rolling_n, spearman, mode,
                                            save_all_factors);
+}
+
+void registerPart_MF_ICWeight() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mf.icweight"), void());
+    PartMeta meta;
+    meta.type = PartType::MF;
+    meta.name = "MF_ICWeight";
+    meta.full_name = "core.mf.icweight";
+    reg.registerPart(
+      meta, [](const Parameter& sc, const PartParamMap& pp) -> Part { return MF_ICWeight(); });
 }
 
 }  // namespace hku

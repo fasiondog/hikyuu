@@ -5,6 +5,7 @@
  *       Author: yangrq1018
  */
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "BandSignal.h"
@@ -59,6 +60,23 @@ void BandSignal::_calculate(const KData& kdata) {
 
 SignalPtr HKU_API SG_Band(const Indicator& sig, price_t lower, price_t upper) {
     return make_shared<BandSignal>(sig, lower, upper);
+}
+
+void registerPart_SG_Band() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sg.band"), void());
+    PartMeta meta;
+    meta.type = PartType::SG;
+    meta.name = "SG_Band";
+    meta.full_name = "core.sg.band";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "lower", .type = "double", .required = true});
+    meta.params.push_back(ParamMeta{.name = "upper", .type = "double", .required = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SG_Band(std::get<Indicator>(pp.at("ind").at(0)), sc.get<double>("lower"),
+                       sc.get<double>("upper"));
+    });
 }
 
 }  // namespace hku

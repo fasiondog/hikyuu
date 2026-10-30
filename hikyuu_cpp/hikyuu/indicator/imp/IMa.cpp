@@ -8,6 +8,8 @@
 #include <climits>
 #include "IMa.h"
 
+#include "hikyuu/part/PartRegister.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IMa)
 #endif
@@ -188,6 +190,10 @@ Indicator HKU_API MA(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IMa>();
     p->setIndParam("n", n);
     return Indicator(p);
+}
+
+void registerPart_MA() {
+    registerIndicatorPart("core.ind.ma", [] { return MA(); });
 }
 
 } /* namespace hku */

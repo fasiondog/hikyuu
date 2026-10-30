@@ -54,6 +54,8 @@ inline Indicator SUMBARS(const Indicator& ind, const Indicator& a) {
     return SUMBARS(IndParam(a))(ind);
 }
 
+void registerPart_SUMBARS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SUMBARS_H_ */

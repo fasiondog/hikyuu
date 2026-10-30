@@ -6,6 +6,7 @@
  */
 
 #include "NotMoneyManager.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::NotMoneyManager)
@@ -45,6 +46,17 @@ double NotMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stoc
 
 MoneyManagerPtr HKU_API MM_Nothing() {
     return make_shared<NotMoneyManager>();
+}
+
+void registerPart_MM_Nothing() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.nothing"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_Nothing";
+    meta.full_name = "core.mm.nothing";
+    reg.registerPart(
+      meta, [](const Parameter& sc, const PartParamMap& pp) -> Part { return MM_Nothing(); });
 }
 
 } /* namespace hku */

@@ -70,4 +70,6 @@ Indicator HKU_API VOL(const KData&);
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& kpart);
 Indicator HKU_API KDATA_PART(const string& kpart);
 
+void registerPart_KDATA();
+
 }  // namespace hku

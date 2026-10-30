@@ -71,6 +71,8 @@ inline Indicator SMA(const Indicator& ind, const Indicator& n, const Indicator& 
     return SMA(IndParam(n), IndParam(m))(ind);
 }
 
+void registerPart_SMA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SMA_H_ */

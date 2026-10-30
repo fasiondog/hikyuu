@@ -23,6 +23,8 @@ inline Indicator ISINF(const Indicator& ind) {
     return ISINF()(ind);
 }
 
+void registerPart_ISINF();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ISINF_H_ */

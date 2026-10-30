@@ -20,4 +20,6 @@ namespace hku {
 Indicator HKU_API BLOCKSETNUM(const Block& blk, const KQuery& query);
 Indicator HKU_API BLOCKSETNUM(const Block& blk);
 
+void registerPart_BLOCKSETNUM();
+
 }  // namespace hku

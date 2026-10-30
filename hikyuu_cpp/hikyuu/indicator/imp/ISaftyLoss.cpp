@@ -8,6 +8,7 @@
 #include <climits>
 #include "../crt/CVAL.h"
 #include "ISaftyLoss.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISaftyLoss)
@@ -176,6 +177,10 @@ Indicator HKU_API SAFTYLOSS(const IndParam& n1, const IndParam& n2, const IndPar
     result->setIndParam("n2", n2);
     result->setIndParam("p", p);
     return Indicator(result);
+}
+
+void registerPart_SAFTYLOSS() {
+    registerIndicatorPart("core.ind.saftyloss", [] { return SAFTYLOSS(); });
 }
 
 } /* namespace hku */

@@ -6,6 +6,7 @@
  */
 
 #include "FixedHoldDays.h"
+#include "hikyuu/part/PartRegister.h"
 
 #include <algorithm>
 
@@ -80,6 +81,19 @@ ProfitGoalPtr HKU_API PG_FixedHoldDays(int days) {
     ProfitGoalPtr ptr = make_shared<FixedHoldDays>();
     ptr->setParam<int>("days", days);
     return ptr;
+}
+
+void registerPart_PG_FixedHoldDays() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.pg.fixedholddays"), void());
+    PartMeta meta;
+    meta.type = PartType::PG;
+    meta.name = "PG_FixedHoldDays";
+    meta.full_name = "core.pg.fixedholddays";
+    meta.params.push_back(ParamMeta{.name = "days", .type = "int", .default_value = "5"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return PG_FixedHoldDays(static_cast<int>(sc.get<int64_t>("days")));
+    });
 }
 
 } /* namespace hku */

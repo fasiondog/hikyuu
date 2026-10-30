@@ -6,6 +6,7 @@
  */
 
 #include "ILastValue.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ILastValue)
@@ -44,6 +45,10 @@ Indicator HKU_API LASTVALUE(bool ignore_discard) {
     auto p = make_shared<ILastValue>();
     p->setParam<bool>("ignore_discard", ignore_discard);
     return Indicator(p);
+}
+
+void registerPart_LASTVALUE() {
+    registerIndicatorPart("core.ind.lastvalue", [] { return LASTVALUE(); });
 }
 
 } /* namespace hku */

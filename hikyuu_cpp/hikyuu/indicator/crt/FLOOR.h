@@ -31,6 +31,8 @@ inline Indicator FLOOR(Indicator::value_t val) {
     return FLOOR(CVAL(val));
 }
 
+void registerPart_FLOOR();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_FLOOR_H_ */

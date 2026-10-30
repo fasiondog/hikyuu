@@ -6,6 +6,7 @@
  */
 
 #include "IKalman.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IKalman)
@@ -71,6 +72,10 @@ Indicator HKU_API KALMAN(double q, double r) {
     p->setParam<double>("q", q);
     p->setParam<double>("r", r);
     return Indicator(p);
+}
+
+void registerPart_KALMAN() {
+    registerIndicatorPart("core.ind.kalman", [] { return KALMAN(); });
 }
 
 } /* namespace hku */

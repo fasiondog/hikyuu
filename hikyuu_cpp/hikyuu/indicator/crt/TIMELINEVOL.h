@@ -16,6 +16,10 @@ namespace hku {
 Indicator HKU_API TIMELINEVOL();
 Indicator HKU_API TIMELINEVOL(const KData&);
 
+void registerPart_TIMELINEVOL();
+
+void registerPart_TIMELINEVOL();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_TIMELINEVOL_H_ */

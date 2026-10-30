@@ -48,6 +48,8 @@ inline Indicator WMA(const Indicator& ind, const Indicator& n) {
     return WMA(IndParam(n))(ind);
 }
 
+void registerPart_WMA();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_WMA_H_ */

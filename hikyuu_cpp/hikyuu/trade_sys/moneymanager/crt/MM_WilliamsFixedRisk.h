@@ -22,6 +22,8 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_WilliamsFixedRisk(double p = 0.1, price_t max_loss = 1000.0);
 
+void registerPart_MM_WilliamsFixedRisk();
+
 }  // namespace hku
 
 #endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_WILLIAMSFIXEDRISK_H_ */

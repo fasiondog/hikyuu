@@ -68,6 +68,14 @@ void injectDefault(Parameter& sc, const ParamMeta& p) {
             sc.set<bool>(p.name, v == "true" || v == "1");
         } else if (p.type == "string") {
             sc.set<string>(p.name, v);
+        } else {
+            // Datetime/Stock/Block/... have no textual default to inject: the creator must fall
+            // back to its own default (sc.have(...) ? ... : <default>), otherwise it reads a
+            // param that was never set
+            HKU_WARN(
+              "The default value of the param \"{}\" (type: {}) can not be injected, "
+              "handle it inside the creator",
+              p.name, p.type);
         }
     } catch (const boost::bad_lexical_cast& e) {
         HKU_THROW_EXCEPTION(std::invalid_argument,
@@ -184,40 +192,108 @@ void PartRegistry::release() {
 
 void PartRegistry::registerPart(const PartMeta& meta, Creator creator, bool overwrite) {
     HKU_CHECK_THROW(!meta.full_name.empty(), std::invalid_argument, "Empty part full_name!");
+
+    // The registry keys on lower-case full names: normalize here so that a mixed-case caller
+    // (e.g. a future dynamic registration) cannot create an entry the lookups never find
+    string full_name = toLower(meta.full_name);
     HKU_CHECK_THROW(creator != nullptr, std::invalid_argument, "Null creator for part \"{}\"!",
-                    meta.full_name);
+                    full_name);
 
     // Meta sanity: duplicate param names would make the validation ambiguous
     for (size_t i = 0; i < meta.params.size(); ++i) {
         for (size_t j = i + 1; j < meta.params.size(); ++j) {
             HKU_CHECK_THROW(meta.params[i].name != meta.params[j].name, std::invalid_argument,
                             "Duplicate param \"{}\" of part \"{}\"", meta.params[i].name,
-                            meta.full_name);
+                            full_name);
         }
     }
 
-    auto iter = m_entries.find(meta.full_name);
+    auto iter = m_entries.find(full_name);
     if (iter != m_entries.end()) {
         HKU_CHECK_THROW(overwrite, std::invalid_argument, "Part \"{}\" is already registered!",
-                        meta.full_name);
+                        full_name);
+        if (iter->second.introspector) {
+            // the pending introspector is dropped together with the replaced entry
+            m_pending_introspect.fetch_sub(1, std::memory_order_acq_rel);
+        }
         if (iter->second.meta.type != meta.type) {
             auto& names = m_by_type[iter->second.meta.type];
-            names.erase(std::remove(names.begin(), names.end(), meta.full_name), names.end());
-            m_by_type[meta.type].push_back(meta.full_name);
+            names.erase(std::remove(names.begin(), names.end(), full_name), names.end());
+            m_by_type[meta.type].push_back(full_name);
         }
     } else {
-        m_by_type[meta.type].push_back(meta.full_name);
+        m_by_type[meta.type].push_back(full_name);
     }
-    m_entries[meta.full_name] = Entry{meta, std::move(creator)};
+    PartMeta normalized(meta);
+    normalized.full_name = full_name;
+    m_entries[full_name] = Entry{std::move(normalized), std::move(creator), nullptr};
+}
+
+void PartRegistry::setIntrospector(const string& full_name,
+                                   std::function<void(PartMeta&)> introspector) {
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
+    HKU_CHECK_THROW(iter != m_entries.end(), std::out_of_range, "Part not registered: {}",
+                    full_name);
+    iter->second.introspector = std::move(introspector);
+    m_pending_introspect.fetch_add(1, std::memory_order_acq_rel);
+}
+
+void PartRegistry::ensureMeta(const string& full_name) const {
+    // Fast path: the atomic pending counter keeps the common case lock free without racing with
+    // the thread that consumes the introspector
+    if (m_pending_introspect.load(std::memory_order_acquire) == 0) {
+        return;
+    }
+
+    std::function<void(PartMeta&)> fn;
+    PartMeta* target = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(m_introspect_mutex);
+        auto iter = m_entries.find(full_name);
+        if (iter == m_entries.end() || !iter->second.introspector) {
+            return;
+        }
+        fn = std::move(iter->second.introspector);
+        iter->second.introspector = nullptr;
+        m_pending_introspect.fetch_sub(1, std::memory_order_acq_rel);
+        target = &iter->second.meta;
+    }
+
+    // A throwing introspector must not break the caller: the meta keeps what was registered
+    try {
+        fn(*target);
+    } catch (const std::exception& e) {
+        HKU_WARN("Failed to introspect the part {}: {}", full_name, e.what());
+    } catch (...) {
+        HKU_WARN("Failed to introspect the part {}", full_name);
+    }
+}
+
+void PartRegistry::ensureAllMeta() const {
+    StringList names;
+    for (const auto& [full_name, entry] : m_entries) {
+        if (entry.introspector) {
+            names.push_back(full_name);
+        }
+    }
+    for (const auto& name : names) {
+        ensureMeta(name);
+    }
 }
 
 bool PartRegistry::unregister(const string& full_name) {
-    auto iter = m_entries.find(full_name);
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
     if (iter == m_entries.end()) {
         return false;
     }
     auto& names = m_by_type[iter->second.meta.type];
-    names.erase(std::remove(names.begin(), names.end(), full_name), names.end());
+    names.erase(std::remove(names.begin(), names.end(), key), names.end());
+    if (iter->second.introspector) {
+        // the pending introspector goes away with the entry
+        m_pending_introspect.fetch_sub(1, std::memory_order_acq_rel);
+    }
     m_entries.erase(iter);
     return true;
 }
@@ -252,21 +328,25 @@ void PartRegistry::clear() {
 }
 
 bool PartRegistry::has(const string& full_name) const {
-    return m_entries.count(full_name) != 0;
+    return m_entries.count(toLower(full_name)) != 0;
 }
 
 const PartMeta& PartRegistry::getMeta(const string& full_name) const {
-    auto iter = m_entries.find(full_name);
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
     HKU_CHECK_THROW(iter != m_entries.end(), std::out_of_range, "Part not registered: {}",
                     full_name);
+    ensureMeta(key);
     return iter->second.meta;
 }
 
 bool PartRegistry::tryGetMeta(const string& full_name, PartMeta& out) const {
-    auto iter = m_entries.find(full_name);
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
     if (iter == m_entries.end()) {
         return false;
     }
+    ensureMeta(key);
     out = iter->second.meta;
     return true;
 }
@@ -293,6 +373,7 @@ vector<PartMeta> PartRegistry::getMetaList(PartType type) const {
     }
     metas.reserve(iter->second.size());
     for (const auto& name : iter->second) {
+        ensureMeta(name);
         metas.push_back(m_entries.at(name).meta);
     }
     return metas;
@@ -317,30 +398,38 @@ vector<PartMeta> PartRegistry::search(const string& keyword, std::optional<PartT
                 continue;
             }
         }
-        result.push_back(meta);
+        // only the matched parts need their meta introspected
+        ensureMeta(full_name);
+        result.push_back(entry.meta);
     }
     return result;
 }
 
 Part PartRegistry::create(const string& full_name) const {
-    auto iter = m_entries.find(full_name);
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
     HKU_CHECK_THROW(iter != m_entries.end(), std::out_of_range, "Part not registered: {}",
                     full_name);
+    ensureMeta(key);
     return createWithMeta(iter->second.meta, iter->second.creator, Parameter(), PartParamMap());
 }
 
 Part PartRegistry::create(const string& full_name, const Parameter& scalars) const {
-    auto iter = m_entries.find(full_name);
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
     HKU_CHECK_THROW(iter != m_entries.end(), std::out_of_range, "Part not registered: {}",
                     full_name);
+    ensureMeta(key);
     return createWithMeta(iter->second.meta, iter->second.creator, scalars, PartParamMap());
 }
 
 Part PartRegistry::create(const string& full_name, const Parameter& scalars,
                           const PartParamMap& parts) const {
-    auto iter = m_entries.find(full_name);
+    string key = toLower(full_name);
+    auto iter = m_entries.find(key);
     HKU_CHECK_THROW(iter != m_entries.end(), std::out_of_range, "Part not registered: {}",
                     full_name);
+    ensureMeta(key);
     return createWithMeta(iter->second.meta, iter->second.creator, scalars, parts);
 }
 
@@ -365,12 +454,13 @@ Part PartRegistry::createFromString(const string& expr) const {
     HKU_CHECK_THROW(!name.empty(), std::invalid_argument, "Empty part name in expression: {}",
                     expr);
 
-    // Resolve the name: exact full_name first, then the short C++ name (meta.name), then a
-    // unique ".name" suffix of the full_names; all matches must be unique
-    auto iter = m_entries.find(name);
+    // Resolve the name (case insensitive): exact full_name first, then the short C++ name
+    // (meta.name), then a unique ".name" suffix of the full_names; all matches must be unique
+    string key = toLower(name);
+    auto iter = m_entries.find(key);
     if (iter == m_entries.end()) {
         for (const auto& [full_name, entry] : m_entries) {
-            if (entry.meta.name == name) {
+            if (toLower(entry.meta.name) == key) {
                 HKU_CHECK_THROW(iter == m_entries.end(), std::invalid_argument,
                                 "Ambiguous part name \"{}\" in expression: {}", name, expr);
                 iter = m_entries.find(full_name);
@@ -378,7 +468,7 @@ Part PartRegistry::createFromString(const string& expr) const {
         }
     }
     if (iter == m_entries.end()) {
-        string suffix = "." + name;
+        string suffix = "." + key;
         for (const auto& [full_name, entry] : m_entries) {
             if (full_name.size() > suffix.size() &&
                 full_name.compare(full_name.size() - suffix.size(), suffix.size(), suffix) == 0) {
@@ -391,6 +481,7 @@ Part PartRegistry::createFromString(const string& expr) const {
                         name, expr);
     }
 
+    ensureMeta(iter->first);
     const PartMeta& meta = iter->second.meta;
     Parameter sc;
     if (has_args && !args_str.empty()) {
@@ -500,6 +591,7 @@ Part PartRegistry::createWithMeta(const PartMeta& meta, const Creator& creator,
 }
 
 string PartRegistry::toJson(std::optional<PartType> type) const {
+    ensureAllMeta();
     string out = "[";
     bool first = true;
     auto append = [&](const PartMeta& m) {

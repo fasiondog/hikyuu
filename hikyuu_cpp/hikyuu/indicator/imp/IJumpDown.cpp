@@ -6,6 +6,7 @@
  */
 
 #include "IJumpDown.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IJumpDown)
@@ -42,6 +43,10 @@ void IJumpDown::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
 Indicator HKU_API JUMPDOWN() {
     return Indicator(make_shared<IJumpDown>());
+}
+
+void registerPart_JUMPDOWN() {
+    registerIndicatorPart("core.ind.jumpdown", [] { return JUMPDOWN(); });
 }
 
 } /* namespace hku */

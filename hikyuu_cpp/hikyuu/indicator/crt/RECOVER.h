@@ -43,4 +43,6 @@ inline Indicator RECOVER_EQUAL_BACKWARD(const KData& kdata) {
     return RECOVER_EQUAL_BACKWARD(kdata.close());
 }
 
+void registerPart_RECOVER_FORWARD();
+
 }  // namespace hku

@@ -6,6 +6,7 @@
  */
 
 #include <algorithm>
+#include "hikyuu/part/PartRegister.h"
 #include <cmath>
 #include <optional>
 
@@ -79,7 +80,7 @@ void UniformSlippage::_reset() {
     }
 }
 
-price_t UniformSlippage ::_getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t UniformSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
     bool adverse_only = getParam<bool>("adverse_only");
@@ -88,7 +89,7 @@ price_t UniformSlippage ::_getRealBuyPrice(const Datetime& datetime, price_t pri
     return adverse_only ? price + std::abs(value) : price + value;
 }
 
-price_t UniformSlippage ::_getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t UniformSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
     bool adverse_only = getParam<bool>("adverse_only");
@@ -131,6 +132,25 @@ SlippagePtr HKU_API SP_Uniform(double min_value, double max_value, bool adverse_
     param.set<double>("short_max_value", short_max_value.value_or(max_value));
     ptr->setParameter(param);
     return ptr;
+}
+
+void registerPart_SP_Uniform() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sp.uniform"), void());
+    PartMeta meta;
+    meta.type = PartType::SP;
+    meta.name = "SP_Uniform";
+    meta.full_name = "core.sp.uniform";
+    meta.params.push_back(
+      ParamMeta{.name = "min_value", .type = "double", .default_value = "-0.05"});
+    meta.params.push_back(
+      ParamMeta{.name = "max_value", .type = "double", .default_value = "0.05"});
+    meta.params.push_back(
+      ParamMeta{.name = "adverse_only", .type = "bool", .default_value = "true"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SP_Uniform(sc.get<double>("min_value"), sc.get<double>("max_value"),
+                          sc.get<bool>("adverse_only"), std::nullopt, std::nullopt);
+    });
 }
 
 } /* namespace hku */

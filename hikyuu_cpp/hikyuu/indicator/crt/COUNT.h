@@ -51,6 +51,8 @@ inline Indicator COUNT(const Indicator& ind, const Indicator& n) {
     return COUNT(IndParam(n))(ind);
 }
 
+void registerPart_COUNT();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_COUNT_H_ */

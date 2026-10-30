@@ -6,6 +6,8 @@
  */
 
 #include "IDma.h"
+#include "hikyuu/part/PartRegister.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IDma)
@@ -72,6 +74,22 @@ Indicator HKU_API DMA(const Indicator& x, const Indicator& a, bool fill_null) {
     auto p = make_shared<IDma>(a, fill_null);
     Indicator result(p);
     return result(x);
+}
+
+void registerPart_DMA() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "DMA";
+    meta.params.push_back(
+      ParamMeta{.name = "x", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "a", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.dma", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return DMA(std::get<Indicator>(pp.at("x").at(0)), std::get<Indicator>(pp.at("a").at(0)),
+                     sc.get<bool>("fill_null"));
+      });
 }
 
 }  // namespace hku

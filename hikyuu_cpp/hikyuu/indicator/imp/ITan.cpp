@@ -8,6 +8,7 @@
  */
 
 #include "ITan.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ITan)
@@ -40,6 +41,10 @@ void ITan::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API TAN() {
     return Indicator(make_shared<ITan>());
+}
+
+void registerPart_TAN() {
+    registerIndicatorPart("core.ind.tan", [] { return TAN(); });
 }
 
 } /* namespace hku */

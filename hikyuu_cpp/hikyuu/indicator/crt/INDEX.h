@@ -67,4 +67,6 @@ Indicator HKU_API INDEXADV(const KQuery& query);
 Indicator HKU_API INDEXDEC();
 Indicator HKU_API INDEXDEC(const KQuery& query);
 
+void registerPart_INDEXO();
+
 }  // namespace hku

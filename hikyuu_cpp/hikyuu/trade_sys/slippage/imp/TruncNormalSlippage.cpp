@@ -6,6 +6,7 @@
  */
 
 #include <algorithm>
+#include "hikyuu/part/PartRegister.h"
 #include <cmath>
 #include <optional>
 #include <random>
@@ -229,6 +230,28 @@ SlippagePtr HKU_API SP_TruncNormal(double mean, double stddev, double min_value,
     param.set<double>("short_max_value", short_max_value.value_or(max_value));
     ptr->setParameter(param);
     return ptr;
+}
+
+void registerPart_SP_TruncNormal() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sp.truncnormal"), void());
+    PartMeta meta;
+    meta.type = PartType::SP;
+    meta.name = "SP_TruncNormal";
+    meta.full_name = "core.sp.truncnormal";
+    meta.params.push_back(ParamMeta{.name = "mean", .type = "double", .default_value = "0.0"});
+    meta.params.push_back(ParamMeta{.name = "stddev", .type = "double", .default_value = "0.05"});
+    meta.params.push_back(
+      ParamMeta{.name = "min_value", .type = "double", .default_value = "-0.1"});
+    meta.params.push_back(ParamMeta{.name = "max_value", .type = "double", .default_value = "0.1"});
+    meta.params.push_back(
+      ParamMeta{.name = "adverse_only", .type = "bool", .default_value = "true"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SP_TruncNormal(sc.get<double>("mean"), sc.get<double>("stddev"),
+                              sc.get<double>("min_value"), sc.get<double>("max_value"),
+                              sc.get<bool>("adverse_only"), std::nullopt, std::nullopt,
+                              std::nullopt, std::nullopt);
+    });
 }
 
 } /* namespace hku */

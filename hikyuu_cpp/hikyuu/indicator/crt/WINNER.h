@@ -35,6 +35,8 @@ inline Indicator WINNER(Indicator::value_t val) {
     return WINNER(CVAL(val));
 }
 
+void registerPart_WINNER();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_WINNER_H_ */

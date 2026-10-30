@@ -6,6 +6,7 @@
  */
 
 #include "CycleSignal.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::CycleSignal)
@@ -43,6 +44,17 @@ void CycleSignal::_calculate(const KData& kdata) {
 
 SignalPtr HKU_API SG_Cycle() {
     return make_shared<CycleSignal>();
+}
+
+void registerPart_SG_Cycle() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sg.cycle"), void());
+    PartMeta meta;
+    meta.type = PartType::SG;
+    meta.name = "SG_Cycle";
+    meta.full_name = "core.sg.cycle";
+    reg.registerPart(
+      meta, [](const Parameter& sc, const PartParamMap& pp) -> Part { return SG_Cycle(); });
 }
 
 }  // namespace hku

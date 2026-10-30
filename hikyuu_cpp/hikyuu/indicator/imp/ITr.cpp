@@ -6,6 +6,7 @@
  */
 
 #include "ITr.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ITr)
@@ -56,6 +57,10 @@ Indicator HKU_API TR(const KData& k) {
     auto p = make_shared<ITr>();
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_TR() {
+    registerIndicatorPart("core.ind.tr", [] { return TR(); });
 }
 
 } /* namespace hku */

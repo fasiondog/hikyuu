@@ -8,6 +8,7 @@
  */
 
 #include "IBarsLast.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IBarsLast)
@@ -60,6 +61,10 @@ void IBarsLast::_calculate(const Indicator& ind) {
 
 Indicator HKU_API BARSLAST() {
     return Indicator(make_shared<IBarsLast>());
+}
+
+void registerPart_BARSLAST() {
+    registerIndicatorPart("core.ind.barslast", [] { return BARSLAST(); });
 }
 
 } /* namespace hku */

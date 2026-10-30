@@ -35,6 +35,8 @@ namespace hku {
 Indicator HKU_API TIMELINE();
 Indicator HKU_API TIMELINE(const KData&);
 
+void registerPart_TIMELINE();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_TIMELINE_H_ */

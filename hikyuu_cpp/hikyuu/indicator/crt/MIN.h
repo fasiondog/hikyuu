@@ -44,6 +44,8 @@ inline Indicator MIN(Indicator::value_t val, const Indicator& ind) {
     return result;
 }
 
+void registerPart_MIN();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_MIN_H_ */

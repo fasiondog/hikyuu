@@ -24,6 +24,8 @@ namespace hku {
  */
 CNPtr HKU_API CN_OPLine(const Indicator& op);
 
+void registerPart_CN_OPLine();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_CONDITION_CRT_CN_OPLINE_H_ */

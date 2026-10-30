@@ -39,6 +39,8 @@ inline Indicator STDEV(const Indicator& data, const Indicator& n) {
     return STDEV(IndParam(n))(data);
 }
 
+void registerPart_STDEV();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_STDEV_H_ */

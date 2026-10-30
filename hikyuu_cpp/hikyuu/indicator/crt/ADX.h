@@ -60,6 +60,8 @@ Indicator HKU_API ADX(int n = 14);
  */
 Indicator HKU_API ADX(const KData& kdata, int n = 14);
 
+void registerPart_ADX();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ADX_H_ */

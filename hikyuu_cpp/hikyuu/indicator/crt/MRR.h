@@ -26,4 +26,6 @@ inline Indicator MRR(const Indicator& ind, int n = 0) {
     return MRR(n)(ind);
 }
 
+void registerPart_MRR();
+
 }  // namespace hku

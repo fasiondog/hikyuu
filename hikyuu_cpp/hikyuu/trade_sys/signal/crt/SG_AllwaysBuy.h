@@ -18,4 +18,6 @@ namespace hku {
  */
 SignalPtr HKU_API SG_AllwaysBuy();
 
+void registerPart_SG_AllwaysBuy();
+
 }  // namespace hku

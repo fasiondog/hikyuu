@@ -37,4 +37,6 @@ inline Indicator FACTOR(const string& name) {
     return FACTOR(Factor(name));
 }
 
+void registerPart_FACTOR();
+
 }  // namespace hku

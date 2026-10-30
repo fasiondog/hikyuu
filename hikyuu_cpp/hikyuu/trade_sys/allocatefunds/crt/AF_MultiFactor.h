@@ -29,6 +29,8 @@ namespace hku {
  */
 AFPtr HKU_API AF_MultiFactor(bool auto_adjust_weight = true);
 
+void registerPart_AF_MultiFactor();
+
 }  // namespace hku
 
 #endif /* TRADE_SYS_ALLOCATEFUNDS_CRT_AF_MULTIFACTOR_H_ */

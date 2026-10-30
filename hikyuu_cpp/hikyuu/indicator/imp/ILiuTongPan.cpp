@@ -7,6 +7,7 @@
 
 #include "ILiuTongPan.h"
 #include "StockWeightFill.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ILiuTongPan)
@@ -45,6 +46,10 @@ Indicator HKU_API LIUTONGPAN(const KData& k) {
     auto p = make_shared<ILiuTongPan>();
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_LIUTONGPAN() {
+    registerIndicatorPart("core.ind.liutongpan", [] { return LIUTONGPAN(); });
 }
 
 } /* namespace hku */

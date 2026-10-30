@@ -39,6 +39,8 @@ inline Indicator HHV(const Indicator& ind, const Indicator& n) {
     return HHV(IndParam(n))(ind);
 }
 
+void registerPart_HHV();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_HHV_H_ */

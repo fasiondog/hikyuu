@@ -36,6 +36,8 @@ inline Indicator VAR(const Indicator& data, const Indicator& n) {
     return VAR(IndParam(n))(data);
 }
 
+void registerPart_VAR();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_VAR_H_ */

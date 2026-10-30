@@ -24,4 +24,6 @@ Indicator HKU_API COV(const Indicator& ind1, const Indicator& ind2, int n = 10,
                       bool fill_null = true);
 Indicator HKU_API COV(const Indicator& ref_ind, int n = 10, bool fill_null = true);
 
+void registerPart_COV();
+
 }  // namespace hku

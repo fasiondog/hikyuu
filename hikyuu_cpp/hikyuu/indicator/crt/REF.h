@@ -43,6 +43,8 @@ inline Indicator REF(const Indicator& ind, const Indicator& n) {
     return REF(IndParam(n))(ind);
 }
 
+void registerPart_REF();
+
 } /* namespace hku */
 
 #endif /* INDICATOR_CRT_REF_H_ */

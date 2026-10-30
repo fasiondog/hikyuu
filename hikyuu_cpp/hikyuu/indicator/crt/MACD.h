@@ -60,6 +60,8 @@ inline Indicator MACD(const Indicator& data, const Indicator& n1, const Indicato
     return MACD(IndParam(n1), IndParam(n2), IndParam(n3))(data);
 }
 
+void registerPart_MACD();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_MACD_H_ */

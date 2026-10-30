@@ -8,6 +8,7 @@
  */
 
 #include "ISqrt.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISqrt)
@@ -40,6 +41,10 @@ void ISqrt::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API SQRT() {
     return Indicator(make_shared<ISqrt>());
+}
+
+void registerPart_SQRT() {
+    registerIndicatorPart("core.ind.sqrt", [] { return SQRT(); });
 }
 
 } /* namespace hku */

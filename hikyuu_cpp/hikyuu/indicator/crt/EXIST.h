@@ -39,6 +39,8 @@ inline Indicator EXIST(const Indicator& ind, const Indicator& n) {
     return EXIST(IndParam(n))(ind);
 }
 
+void registerPart_EXIST();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_EXIST_H_ */

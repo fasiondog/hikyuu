@@ -27,4 +27,6 @@ SEPtr HKU_API SE_Signal();
  */
 SEPtr HKU_API SE_Signal(const StockList& stock_list, const SystemPtr& sys);
 
+void registerPart_SE_Signal();
+
 }  // namespace hku

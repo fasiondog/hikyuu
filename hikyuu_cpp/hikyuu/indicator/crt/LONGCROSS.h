@@ -63,6 +63,8 @@ inline Indicator LONGCROSS(Indicator::value_t x, Indicator::value_t y, const Ind
     return LONGCROSS(CVAL(x), CVAL(y), n);
 }
 
+void registerPart_LONGCROSS();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_LONGCROSS_H_ */

@@ -36,6 +36,8 @@ inline Indicator ROC(const Indicator& ind, const Indicator& n) {
     return ROC(IndParam(n))(ind);
 }
 
+void registerPart_ROC();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_ROC_H_ */

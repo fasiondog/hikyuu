@@ -7,6 +7,7 @@
 
 #include "hikyuu/StockTypeInfo.h"
 #include "IIsLimitDown.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIsLimitDown)
@@ -83,6 +84,10 @@ Indicator HKU_API ISLIMITDOWN(const KData& k) {
     auto p = make_shared<IIsLimitDown>();
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_ISLIMITDOWN() {
+    registerIndicatorPart("core.ind.islimitdown", [] { return ISLIMITDOWN(); });
 }
 
 }  // namespace hku

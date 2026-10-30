@@ -6,6 +6,7 @@
  */
 
 #include "FixedRiskMoneyManager.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedRiskMoneyManager)
@@ -42,6 +43,19 @@ MoneyManagerPtr HKU_API MM_FixedRisk(double risk) {
     MoneyManagerPtr p = make_shared<FixedRiskMoneyManager>();
     p->setParam<double>("risk", risk);
     return p;
+}
+
+void registerPart_MM_FixedRisk() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.fixedrisk"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_FixedRisk";
+    meta.full_name = "core.mm.fixedrisk";
+    meta.params.push_back(ParamMeta{.name = "risk", .type = "double", .default_value = "1000.00"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return MM_FixedRisk(sc.get<double>("risk"));
+    });
 }
 
 } /* namespace hku */

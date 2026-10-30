@@ -35,6 +35,8 @@ inline Indicator SQRT(Indicator::value_t val) {
     return SQRT(CVAL(val));
 }
 
+void registerPart_SQRT();
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_SQRT_H_ */

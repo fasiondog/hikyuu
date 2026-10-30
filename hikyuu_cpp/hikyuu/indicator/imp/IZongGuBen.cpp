@@ -7,6 +7,7 @@
 
 #include "IZongGuBen.h"
 #include "StockWeightFill.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IZongGuBen)
@@ -54,6 +55,10 @@ Indicator HKU_API ZONGGUBEN(const KData& k) {
     auto p = make_shared<IZongGuBen>();
     p->setContext(k);
     return Indicator(p);
+}
+
+void registerPart_ZONGGUBEN() {
+    registerIndicatorPart("core.ind.zongguben", [] { return ZONGGUBEN(); });
 }
 
 } /* namespace hku */

@@ -6,6 +6,7 @@
  */
 
 #include "IKData.h"
+#include "hikyuu/part/PartRegister.h"
 #include <boost/algorithm/string.hpp>
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -213,4 +214,8 @@ Indicator HKU_API KDATA_PART(const string& part) {
     p->name("KDATA_PART");
     return p->calculate();
 }
+void registerPart_KDATA() {
+    registerIndicatorPart("core.ind.kdata", [] { return KDATA(); });
+}
+
 } /* namespace hku */
