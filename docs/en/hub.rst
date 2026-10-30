@@ -75,7 +75,8 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
 
     Get a strategy part
 
-    :param str name: strategy part name
+    :param str name: strategy part name; the built-in parts live in the "core" hub, e.g. "core.ind.ma",
+        and are created from the in-memory registry without touching the database
     :param args: positional arguments passed to the strategy part
     :param kwargs: keyword arguments passed to the strategy part
     :return: strategy part instance
@@ -86,7 +87,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
 
     Get the list of available strategy part names
 
-    :param str name: repository name
+    :param str hub: repository name; "core" returns the built-in parts, and omitting it includes them
     :param str part_type: part type
     :return: list of strategy part names
     :rtype: list
@@ -106,7 +107,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     Example: search_part('MA')  # part names in the public hikyuu_hub repository are in Chinese, so Chinese keywords such as '趋势' (trend) also work
 
     :param str name: part name
-    :param str hub: repository name
+    :param str hub: repository name; "core" is the built-in part hub, and omitting it searches it too
     :param str part_type: part type
     :param str label: label
     :return: list of matching strategy part names

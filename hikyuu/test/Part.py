@@ -10,6 +10,7 @@ import json
 import unittest
 
 import hikyuu
+from hikyuu.hub import PartNotFoundError
 
 
 class PartTest(unittest.TestCase):
@@ -96,6 +97,42 @@ class PartTest(unittest.TestCase):
         self.assertIsInstance(data, list)
         self.assertTrue(len(data) > 0)
         self.assertTrue(all(item["type"] == "tc" for item in data))
+
+    def test_hub_get_part(self):
+        self.assertTrue(hikyuu.get_part("core.ind.ma").equal(MA()))
+        self.assertTrue(hikyuu.get_part("core.ind.ma", n=10).equal(MA(10)))
+        self.assertTrue(hikyuu.get_part("Core.IND.MA", n=10).equal(MA(10)))
+
+        with self.assertRaises(PartNotFoundError):
+            hikyuu.get_part("core.ind.nonexistent")
+        with self.assertRaises(ValueError):
+            hikyuu.get_part("core.ind.ma", n=10.5)
+
+    def test_hub_get_part_with_part_param(self):
+        band = hikyuu.get_part("core.sg.band", ind=MA(10), lower=10, upper=20)
+        self.assertEqual(band.name, "SG_Band")
+
+        self.assertEqual(hikyuu.get_part("core.st.indicator", ind=MA(5)).name, "ST_Indicator")
+        # an int is accepted for a double param
+        self.assertEqual(hikyuu.get_part("core.st.fixedpercent", p=1).get_param("p"), 1.0)
+
+        with self.assertRaises(ValueError):
+            hikyuu.get_part("core.sg.band", ind=MA(10))
+
+    def test_hub_core_info_and_search(self):
+        info = hikyuu.get_part_info("core.ind.ma")
+        self.assertEqual(info["name"], "core.ind.ma")
+        self.assertIn('part("core.ind.ma",n=22', info["doc"])
+
+        names = hikyuu.get_part_name_list(hub="core", part_type="ind")
+        self.assertEqual(len(names), 138)
+        self.assertIn("core.ind.ma", names)
+        self.assertIn("core.ind.ma", hikyuu.get_part_name_list())
+        self.assertEqual(hikyuu.get_part_name_list(hub="CORE", part_type="ind"), names)
+
+        self.assertEqual(hikyuu.search_part(name="sg.band", hub="core", part_type="sg"), ["core.sg.band"])
+        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 6)
+        self.assertEqual(hikyuu.search_part(hub="nonexistent-hub-xyz"), [])
 
     def test_python_part(self):
         def factory(scalars, parts):

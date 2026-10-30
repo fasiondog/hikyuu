@@ -120,6 +120,31 @@ void export_part_main(py::module& m) {
         },
         py::arg("full_name"), py::arg("scalars"), "Create a part overriding scalar params")
       .def(
+        "create",
+        [](const PartRegistry& reg, const std::string& full_name, const Parameter& scalars,
+           const py::dict& parts) {
+            auto items = py::reinterpret_borrow<py::object>(parts).attr("items")();
+            PartParamMap part_map;
+            for (py::handle item_pair : items) {
+                py::tuple pair = py::reinterpret_borrow<py::tuple>(item_pair);
+                const auto param_name = py::cast<std::string>(pair[0]);
+                py::handle value = pair[1];
+                if (py::isinstance<py::list>(value) || py::isinstance<py::tuple>(value)) {
+                    for (py::handle item : value) {
+                        part_map[param_name].push_back(
+                          pywrap::partFromPython(py::reinterpret_borrow<py::object>(item)));
+                    }
+                } else {
+                    part_map[param_name].push_back(
+                      pywrap::partFromPython(py::reinterpret_borrow<py::object>(value)));
+                }
+            }
+            return pywrap::partToPython(reg.create(full_name, scalars, part_map));
+        },
+        py::arg("full_name"), py::arg("scalars"), py::arg("parts"),
+        "Create a part overriding scalar params and part-typed params; each part-typed param "
+        "takes a part or a list of parts")
+      .def(
         "create_from_string",
         [](const PartRegistry& reg, const std::string& expr) {
             return pywrap::partToPython(reg.createFromString(expr));

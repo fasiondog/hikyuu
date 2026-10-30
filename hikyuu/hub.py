@@ -168,6 +168,11 @@ def dbsession(func):
     return wrapfunc
 
 
+def _is_core_hub(hub):
+    """Whether the given repository name refers to the built-in parts"""
+    return isinstance(hub, str) and hub.lower() == 'core'
+
+
 class HubManager(metaclass=SingletonType):
     """Strategy repository management"""
     def __init__(self):
@@ -441,21 +446,61 @@ class HubManager(metaclass=SingletonType):
             except FileNotFoundError:
                 continue
 
-    @dbsession
     def get_part(self, name, **kwargs):
         """Get the specified strategy part
 
-        :param str name: the strategy part name
+        :param str name: the strategy part name; the built-in parts live in the "core" hub,
+            e.g. "core.ind.ma", and are served from the in-memory registry without touching the
+            database
         :param kwargs: other part-related arguments
         """
         name_parts = name.split('.')
+        if _is_core_hub(name_parts[0]):
+            return self._get_core_part(name, **kwargs)
+
         checkif(
             len(name_parts) < 2 or (
                 name_parts[-2]
                 not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')
             ), name, PartNameError
         )
+        return self._get_db_part(name, **kwargs)
 
+    def _get_core_part(self, name, **kwargs):
+        """Create a built-in part from the in-memory registry"""
+        from hikyuu import Parameter, part as parts
+
+        reg = parts.PartRegistry.instance()
+        full_name = name.lower()
+        checkif(
+            not reg.has(full_name), full_name, PartNotFoundError, cause='does not exist in the core hub'
+        )
+
+        if not kwargs:
+            return reg.create(full_name)
+
+        meta = reg.get_meta(full_name)
+        part_param_names = {param.name for param in meta.params if param.is_part_param}
+        double_param_names = {param.name for param in meta.params if param.type == 'double'}
+        scalars = Parameter()
+        part_params = {}
+        for key, value in kwargs.items():
+            if key in part_param_names:
+                part_params[key] = value
+                continue
+            # The registry requires the exact declared type, while python ints are natural for double params
+            if key in double_param_names and isinstance(value, int) and not isinstance(value, bool):
+                value = float(value)
+            scalars[key] = value
+
+        if part_params:
+            return reg.create(full_name, scalars, part_params)
+        return reg.create(full_name, scalars)
+
+    @dbsession
+    def _get_db_part(self, name, **kwargs):
+        """Create a part from a database hub"""
+        name_parts = name.split('.')
         # If no repository name is specified, the 'default' repository is used by default
         part_name = 'default.{}'.format(name) if len(name_parts) == 2 else name
         part_model = self._session.query(PartModel).filter_by(name=part_name).first()
@@ -497,12 +542,40 @@ class HubManager(metaclass=SingletonType):
             raise PartNotFoundError(part_name, 'Please check whether the path of the part exists')
         return part_module
 
-    @dbsession
     def get_part_info(self, name):
         """Get the strategy part information
 
         :param str name: the part name
         """
+        if _is_core_hub(name.split('.')[0]):
+            return self._get_core_part_info(name)
+        return self._get_db_part_info(name)
+
+    @staticmethod
+    def _get_core_part_info(name):
+        """Get the information of a built-in part from the in-memory registry"""
+        from hikyuu import part as parts
+
+        full_name = name.lower()
+        reg = parts.PartRegistry.instance()
+        checkif(
+            not reg.has(full_name), full_name, PartNotFoundError, cause='does not exist in the core hub'
+        )
+
+        meta = reg.get_meta(full_name)
+        doc = '\npart("{}",'.format(full_name)
+        for param in meta.params:
+            if param.required:
+                doc += '{}, '.format(param.name)
+            else:
+                doc += '{}={}, '.format(param.name, param.default_value)
+        doc += ')\n'
+        doc += meta.doc
+        return {'name': full_name, 'author': meta.author, 'version': meta.version, 'doc': doc}
+
+    @dbsession
+    def _get_db_part_info(self, name):
+        """Get the information of a part stored in a database hub"""
         part_model = self._session.query(PartModel).filter_by(name=name).first()
         checkif(part_model is None, name, PartNotFoundError, cause='does not exist in the repository')
         try:
@@ -552,13 +625,33 @@ class HubManager(metaclass=SingletonType):
         """Return the list of the repository names"""
         return [record[0] for record in self._session.query(HubModel.name).all()]
 
-    @dbsession
     def get_part_name_list(self, hub=None, part_type=None):
         """Get the list of the part names
 
         :param str hub: the repository name
         :param str part_type: the part type
         """
+        if _is_core_hub(hub):
+            return self._get_core_part_name_list(part_type)
+        names = self._get_db_part_name_list(hub, part_type)
+        if hub is None:
+            names += self._get_core_part_name_list(part_type)
+        return names
+
+    @staticmethod
+    def _get_core_part_name_list(part_type=None):
+        """Get the name list of the built-in parts from the in-memory registry"""
+        from hikyuu import part as parts
+
+        reg = parts.PartRegistry.instance()
+        if part_type is None:
+            return reg.get_name_list()
+        part_type = parts.PartType.__members__.get(str(part_type).upper())
+        return [] if part_type is None else reg.get_name_list(part_type)
+
+    @dbsession
+    def _get_db_part_name_list(self, hub=None, part_type=None):
+        """Get the name list of the parts stored in the database hubs"""
         if hub is None and part_type is None:
             results = self._session.query(PartModel.name).all()
         elif hub is None:
@@ -582,7 +675,6 @@ class HubManager(metaclass=SingletonType):
         checkif(hub_model is None, local_base, HubNotFoundError)
         return hub_model.name
 
-    @dbsession
     def search_part(self, name: str = None, hub: str = None, part_type: str = None, label=None):
         """Search parts
         :param str name: the part name
@@ -592,12 +684,44 @@ class HubManager(metaclass=SingletonType):
         :return: the list of the part names
         :rtype: list
         """
+        is_core = _is_core_hub(hub)
+        names = [] if is_core else self._search_db_part(name, hub, part_type, label)
+        if hub is None or is_core:
+            names += self._search_core_part(name, part_type, label)
+        return names
+
+    @staticmethod
+    def _search_core_part(name=None, part_type=None, label=None):
+        """Search the built-in parts in the in-memory registry"""
+        from hikyuu import part as parts
+
+        reg = parts.PartRegistry.instance()
+        if part_type is None:
+            names = reg.get_name_list()
+        else:
+            part_type = parts.PartType.__members__.get(str(part_type).upper())
+            if part_type is None:
+                return []
+            names = reg.get_name_list(part_type)
+
+        if name is not None:
+            name = name.lower()
+            names = [full_name for full_name in names if name in full_name.lower()]
+
+        if label is not None:
+            label = label.lower()
+            names = [full_name for full_name in names if label in reg.get_meta(full_name).label.lower()]
+        return names
+
+    @dbsession
+    def _search_db_part(self, name: str = None, hub: str = None, part_type: str = None, label=None):
+        """Search the parts stored in the database hubs"""
         parts = None
         if name is not None:
             parts = self._session.query(PartModel).filter(PartModel.name.like(f'%{name}%'))
         if hub is not None:
             if parts is None:
-                parts = self._session.query(PartModel).fileter(PartModel.hub_name.like(f'%{hub}%'))
+                parts = self._session.query(PartModel).filter(PartModel.hub_name.like(f'%{hub}%'))
             else:
                 parts = parts.filter(PartModel.hub_name.like(f'%{hub}%'))
         if part_type is not None:

@@ -824,6 +824,8 @@ MarketInfo StockManager::getMarketInfo(const string& market) const noexcept {
     if (iter != m_marketInfoDict.end()) {
         result = iter->second;
     } else {
+        HKU_ERROR_IF_RETURN(!m_baseInfoDriver, result,
+                            "The base info driver is not initialized!");
         result = m_baseInfoDriver->getMarketInfo(market_tmp);
         if (result != Null<MarketInfo>()) {
             m_marketInfoDict[market_tmp] = result;
@@ -843,6 +845,8 @@ StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     if (iter != m_stockTypeInfo.end()) {
         result = iter->second;
     } else {
+        HKU_ERROR_IF_RETURN(!m_baseInfoDriver, result,
+                            "The base info driver is not initialized, call load_hikyuu first!");
         result = m_baseInfoDriver->getStockTypeInfo(type);
         if (result != Null<StockTypeInfo>()) {
             m_stockTypeInfo[type] = result;
