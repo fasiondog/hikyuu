@@ -6,6 +6,8 @@
  */
 
 #include "doctest/doctest.h"
+#include <set>
+#include <hikyuu/part/PartRegistration.h>
 #include <hikyuu/part/PartRegistry.h>
 #include <nlohmann/json.hpp>
 
@@ -343,6 +345,51 @@ TEST_CASE("test_PartRegistry_toJson") {
     }
 
     reg.unregister(name);
+}
+
+/** @par Test points */
+TEST_CASE("test_PartRegistry_meta_consistency") {
+    registerAllBuiltinParts();
+    auto& reg = PartRegistry::instance();
+
+    /** @arg every registered meta is self consistent */
+    const std::set<string> part_type_names = {
+      "Indicator",     "Signal",      "MoneyManager", "Stoploss",     "Condition",
+      "Environment",   "ProfitGoal",  "Slippage",     "Portfolio",    "Selector",
+      "AllocateFunds", "MultiFactor", "System",       "TradeManager", "TradeCost"};
+
+    vector<string> problems;
+    for (auto type : {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG,
+                      PartType::SP, PartType::AF, PartType::CN, PartType::EV, PartType::MF,
+                      PartType::PF, PartType::SE, PartType::SYS, PartType::TM, PartType::TC}) {
+        for (const auto& m : reg.getMetaList(type)) {
+            std::set<string> names;
+            for (const auto& p : m.params) {
+                if (!names.insert(p.name).second) {
+                    problems.push_back(
+                      fmt::format("{}: duplicate param \"{}\"", m.full_name, p.name));
+                }
+                if (p.required && !p.default_value.empty()) {
+                    problems.push_back(fmt::format("{}: param \"{}\" is required but has a default",
+                                                   m.full_name, p.name));
+                }
+                if (p.is_list && !p.is_part_param) {
+                    problems.push_back(fmt::format("{}: param \"{}\" is a list but not part-typed",
+                                                   m.full_name, p.name));
+                }
+                if (p.is_part_param && part_type_names.count(p.type) == 0) {
+                    problems.push_back(fmt::format("{}: param \"{}\" has unknown part type \"{}\"",
+                                                   m.full_name, p.name, p.type));
+                }
+            }
+        }
+    }
+    string joined;
+    for (const auto& problem : problems) {
+        joined += problem + "\n";
+    }
+    INFO(joined);
+    CHECK_UNARY(problems.empty());
 }
 
 /** @} */

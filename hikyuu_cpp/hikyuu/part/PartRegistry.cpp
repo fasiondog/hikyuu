@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <set>
 #include <boost/lexical_cast.hpp>
 #include <fmt/format.h>
 
@@ -49,6 +50,8 @@ std::optional<PartType> partTypeFromParamType(const string& type) {
         return PartType::SYS;
     } else if (type == "TradeManager") {
         return PartType::TM;
+    } else if (type == "TradeCost") {
+        return PartType::TC;
     }
     return std::nullopt;
 }
@@ -484,41 +487,64 @@ Part PartRegistry::createFromString(const string& expr) const {
     ensureMeta(iter->first);
     const PartMeta& meta = iter->second.meta;
     Parameter sc;
+    PartParamMap pp;
     if (has_args && !args_str.empty()) {
-        size_t start = 0;
-        while (start <= args_str.size()) {
-            size_t pos = args_str.find(',', start);
-            string item =
-              trim(args_str.substr(start, pos == string::npos ? string::npos : pos - start));
-            if (!item.empty()) {
-                size_t eq = item.find('=');
-                HKU_CHECK_THROW(eq != string::npos, std::invalid_argument,
-                                "Invalid argument \"{}\" (expected k=v) in expression: {}", item,
-                                expr);
-                string k = trim(item.substr(0, eq));
-                string v = trim(item.substr(eq + 1));
-                const ParamMeta* pm = nullptr;
-                for (const auto& p : meta.params) {
-                    if (p.name == k) {
-                        pm = &p;
-                        break;
-                    }
+        // split the top level arguments on commas, ignoring the ones nested in parentheses
+        vector<string> items;
+        string cur;
+        int depth = 0;
+        for (char c : args_str) {
+            if (c == '(') {
+                ++depth;
+            } else if (c == ')') {
+                --depth;
+            }
+            if (c == ',' && depth == 0) {
+                items.push_back(cur);
+                cur.clear();
+            } else {
+                cur.push_back(c);
+            }
+        }
+        items.push_back(cur);
+        HKU_CHECK_THROW(depth == 0, std::invalid_argument,
+                        "Unbalanced parentheses in part expression: {}", expr);
+
+        std::set<string> seen;
+        for (const auto& raw : items) {
+            string item = trim(raw);
+            if (item.empty()) {
+                continue;
+            }
+            size_t eq = item.find('=');
+            HKU_CHECK_THROW(eq != string::npos, std::invalid_argument,
+                            "Invalid argument \"{}\" (expected k=v) in expression: {}", item, expr);
+            string k = trim(item.substr(0, eq));
+            string v = trim(item.substr(eq + 1));
+            HKU_CHECK_THROW(seen.insert(k).second, std::invalid_argument,
+                            "Duplicate param \"{}\" in expression: {}", k, expr);
+            const ParamMeta* pm = nullptr;
+            for (const auto& p : meta.params) {
+                if (p.name == k) {
+                    pm = &p;
+                    break;
                 }
-                HKU_CHECK_THROW(pm != nullptr, std::invalid_argument,
-                                "Unknown param \"{}\" for part \"{}\": {}", k, meta.full_name,
-                                expr);
-                HKU_CHECK_THROW(!pm->is_part_param, std::invalid_argument,
-                                "Part-typed param \"{}\" cannot be set in a string expression: {}",
-                                k, expr);
+            }
+            HKU_CHECK_THROW(pm != nullptr, std::invalid_argument,
+                            "Unknown param \"{}\" for part \"{}\": {}", k, meta.full_name, expr);
+            if (pm->is_part_param) {
+                HKU_CHECK_THROW(
+                  !pm->is_list, std::invalid_argument,
+                  "List-typed param \"{}\" of part \"{}\" cannot be set from a string "
+                  "expression, pass it via the PartParamMap",
+                  k, meta.full_name);
+                pp[pm->name].push_back(createFromString(v));
+            } else {
                 setFromString(sc, *pm, v, expr);
             }
-            if (pos == string::npos) {
-                break;
-            }
-            start = pos + 1;
         }
     }
-    return createWithMeta(meta, iter->second.creator, sc, PartParamMap());
+    return createWithMeta(meta, iter->second.creator, sc, pp);
 }
 
 Part PartRegistry::createWithMeta(const PartMeta& meta, const Creator& creator,

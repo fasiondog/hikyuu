@@ -229,6 +229,12 @@ TEST_CASE("test_PartRegistry_createFromString") {
     /** @arg an unknown param name throws listing the part */
     CHECK_THROWS_AS(reg.createFromString("MA(m=10)"), std::invalid_argument);
 
+    /** @arg a duplicated param throws instead of silently keeping the last one */
+    CHECK_THROWS_AS(reg.createFromString("MA(n=10,n=20)"), std::invalid_argument);
+
+    /** @arg unbalanced parentheses inside the argument list throw */
+    CHECK_THROWS_AS(reg.createFromString("MA(n=(10)"), std::invalid_argument);
+
     /** @arg a value of the wrong type throws with the expected type */
     CHECK_THROWS_AS(reg.createFromString("MA(n=abc)"), std::invalid_argument);
 
@@ -245,8 +251,25 @@ TEST_CASE("test_PartRegistry_createFromString") {
     /** @arg an unregistered part throws */
     CHECK_THROWS_AS(reg.createFromString("UNKNOWN_PART(n=1)"), std::out_of_range);
 
-    /** @arg a part-typed param cannot be set in a string expression */
-    CHECK_THROWS_AS(reg.createFromString("SG_Band(ind=MA)"), std::invalid_argument);
+    /** @arg a part-typed param is resolved recursively from a nested expression */
+    auto band = tryGetAs<SGPtr>(reg.createFromString("SG_Band(ind=MA(n=10),lower=10,upper=20)"));
+    CHECK_UNARY(band.has_value());
+    CHECK_UNARY(*band != nullptr);
+    CHECK(partTypeOf(*band) == PartType::SG);
+
+    /** @arg the nested part keeps its own params and the full names also work */
+    auto nested =
+      tryGetAs<SGPtr>(reg.createFromString("core.sg.band(ind=core.ind.ma(n=5),lower=1,upper=2)"));
+    CHECK_UNARY(nested.has_value());
+    CHECK_UNARY(*nested != nullptr);
+
+    /** @arg a nested part of the wrong type throws */
+    CHECK_THROWS_AS(reg.createFromString("SG_Band(ind=TC_FixedETF,lower=10,upper=20)"),
+                    std::invalid_argument);
+
+    /** @arg a list-typed part param cannot be set from a string expression */
+    CHECK_THROWS_AS(reg.createFromString("SYS_WalkForward(candidate_sys_list=SYS_Simple)"),
+                    std::invalid_argument);
 }
 
 /** @} */
