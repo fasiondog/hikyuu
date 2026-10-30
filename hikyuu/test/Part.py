@@ -6,11 +6,14 @@
 # ===============================================================================
 
 from test_init import *
+import os
+import subprocess
+import sys
 import json
 import unittest
 
 import hikyuu
-from hikyuu.hub import PartNotFoundError
+from hikyuu.hub import HubNameError, PartNotFoundError
 
 
 class PartTest(unittest.TestCase):
@@ -134,6 +137,13 @@ class PartTest(unittest.TestCase):
         self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 6)
         self.assertEqual(hikyuu.search_part(hub="nonexistent-hub-xyz"), [])
 
+    def test_add_hub_reserved_name(self):
+        for name in ("core", "Core", "CORE"):
+            with self.assertRaises(HubNameError):
+                hikyuu.add_local_hub(name, "not-exists-path-for-test")
+            with self.assertRaises(HubNameError):
+                hikyuu.add_remote_hub(name, "https://example.com/not-exists.git")
+
     def test_python_part(self):
         def factory(scalars, parts):
             return MA(scalars["n"])
@@ -148,7 +158,7 @@ class PartTest(unittest.TestCase):
         meta.params = [param]
 
         reg = hikyuu.part.PartRegistry.instance()
-        hikyuu.part.register_python_part("core.ind.pyma", meta, factory)
+        hikyuu.register_python_part("core.ind.pyma", meta, factory)
         try:
             self.assertTrue(reg.has("core.ind.pyma"))
             m = reg.get_meta("core.ind.pyma")
@@ -180,21 +190,21 @@ class PartTest(unittest.TestCase):
 
         reg = hikyuu.part.PartRegistry.instance()
         try:
-            hikyuu.part.register_python_part(
+            hikyuu.register_python_part(
                 "core.ind.pyma2", make_meta("PyMA2"), lambda s, p: MA(10)
             )
 
             with self.assertRaises(ValueError):
-                hikyuu.part.register_python_part(
+                hikyuu.register_python_part(
                     "core.ind.pyma2", make_meta("PyMA2"), lambda s, p: MA(20)
                 )
 
             with self.assertRaises(ValueError):
-                hikyuu.part.register_python_part(
+                hikyuu.register_python_part(
                     "core.ind.ma", make_meta("MA"), lambda s, p: MA(30)
                 )
 
-            hikyuu.part.register_python_part(
+            hikyuu.register_python_part(
                 "core.ind.pyma2", make_meta("PyMA2"), lambda s, p: MA(99), overwrite=True
             )
             self.assertEqual(reg.create("core.ind.pyma2").get_param("n"), 99)
@@ -212,11 +222,79 @@ class PartTest(unittest.TestCase):
 
         reg = hikyuu.part.PartRegistry.instance()
         try:
-            hikyuu.part.register_python_part("core.ind.pybad", meta, lambda s, p: 42)
+            hikyuu.register_python_part("core.ind.pybad", meta, lambda s, p: 42)
             with self.assertRaises(hikyuu.HKUException):
                 reg.create("core.ind.pybad")
         finally:
             hikyuu.part.release_python_parts()
+
+    def test_register_python_part_validation(self):
+        reg = hikyuu.part.PartRegistry.instance()
+
+        def make_meta(param=None):
+            meta = hikyuu.part.PartMeta()
+            meta.type = hikyuu.part.PartType.IND
+            meta.name = "PyCheck"
+            if param is not None:
+                meta.params = [param]
+            return meta
+
+        def make_param(name="n", default="10", required=False, is_part_param=False, is_list=False):
+            param = hikyuu.part.ParamMeta()
+            param.name = name
+            param.type = "int"
+            param.default_value = default
+            param.required = required
+            param.is_part_param = is_part_param
+            param.is_list = is_list
+            return param
+
+        def factory(scalars, parts):
+            return MA()
+
+        meta = make_meta()
+        for full_name in ("pycheck", "default.ind.pycheck", "core.foo.pycheck"):
+            with self.assertRaises(ValueError):
+                hikyuu.register_python_part(full_name, meta, factory)
+
+        with self.assertRaises(ValueError):
+            hikyuu.register_python_part("core.sg.pycheck", meta, factory)
+
+        with self.assertRaises(ValueError):
+            hikyuu.register_python_part("core.ind.pycheck", meta, 42)
+
+        with self.assertRaises(ValueError):
+            hikyuu.register_python_part("core.ind.pycheck", make_meta(make_param(required=True)), factory)
+
+        with self.assertRaises(ValueError):
+            hikyuu.register_python_part("core.ind.pycheck", make_meta(make_param(is_list=True)), factory)
+
+        with self.assertRaises(ValueError):
+            hikyuu.register_python_part("core.ind.pycheck", make_meta(make_param("")), factory)
+
+        duplicated = make_meta()
+        duplicated.params = [make_param("n"), make_param("n")]
+        with self.assertRaises(ValueError):
+            hikyuu.register_python_part("core.ind.pycheck", duplicated, factory)
+
+        self.assertFalse(reg.has("core.ind.pycheck"))
+
+    def test_python_part_process_exit(self):
+        base = os.path.dirname(os.path.dirname(os.path.abspath(hikyuu.__file__)))
+        code = "\n".join(
+            [
+                "import hikyuu as hku",
+                "meta = hku.part.PartMeta()",
+                "meta.type = hku.part.PartType.IND",
+                "meta.name = 'PyExit'",
+                "hku.register_python_part('core.ind.pyexit', meta, lambda s, p: hku.MA())",
+                "assert hku.part.PartRegistry.instance().has('core.ind.pyexit')",
+            ]
+        )
+        env = dict(os.environ)
+        env['PYTHONPATH'] = base + os.pathsep + env.get('PYTHONPATH', '')
+        result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 def suite():

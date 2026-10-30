@@ -104,6 +104,15 @@ class HubNameRepeatError(Exception):
         )
 
 
+class HubNameError(Exception):
+    def __init__(self, name, cause):
+        self.name = name
+        self.cause = cause
+
+    def __str__(self):
+        return 'Invalid repository name ("{}"), {}!'.format(self.name, self.cause)
+
+
 class HubNotFoundError(Exception):
     def __init__(self, name):
         self.name = name
@@ -265,10 +274,16 @@ class HubManager(metaclass=SingletonType):
     def add_remote_hub(self, name, url, branch='main'):
         """Add a remote strategy repository
 
-        :param str name: the local repository name (named by yourself)
+        :param str name: the local repository name (named by yourself); "core" is reserved for the
+            built-in parts and cannot be used
         :param str url: the git repository url
         :param str branch: the git repository branch
         """
+        checkif(
+            isinstance(name, str) and name.lower() == 'core', name, HubNameError,
+            cause='is reserved for the built-in parts, please use another name'
+        )
+
         record = self._session.query(HubModel).filter(HubModel.name == name).first()
         checkif(record is not None, name, HubNameRepeatError)
 
@@ -289,9 +304,15 @@ class HubManager(metaclass=SingletonType):
     def add_local_hub(self, name, path):
         """Add a local data repository
 
-        :param str name: the repository name
+        :param str name: the repository name; "core" is reserved for the built-in parts and
+            cannot be used
         :param str path: the local full path
         """
+        checkif(
+            isinstance(name, str) and name.lower() == 'core', name, HubNameError,
+            cause='is reserved for the built-in parts, please use another name'
+        )
+
         checkif(not os.path.lexists(path), 'The specified path ("{}") cannot be found'.format(path))
 
         # Get the absolute path
@@ -519,10 +540,9 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_part_module(self, name):
-        """Get the specified strategy part
+        """Get the module of the specified strategy part stored in a repository
 
         :param str name: the strategy part name
-        :param kwargs: other part-related arguments
         """
         name_parts = name.split('.')
         checkif(
@@ -741,7 +761,8 @@ class HubManager(metaclass=SingletonType):
 def add_remote_hub(name, url, branch='main'):
     """Add a remote strategy repository
 
-    :param str name: the local repository name (named by yourself)
+    :param str name: the local repository name (named by yourself); "core" is reserved for the
+        built-in parts and cannot be used
     :param str url: the git repository url
     :param str branch: the git repository branch
     """
@@ -751,7 +772,8 @@ def add_remote_hub(name, url, branch='main'):
 def add_local_hub(name, path):
     """Add a local data repository
 
-    :param str name: the repository name
+    :param str name: the repository name; "core" is reserved for the built-in parts and cannot
+        be used
     :param str path: the local full path
     """
     HubManager().add_local_hub(name, path)
@@ -842,7 +864,7 @@ def get_part_name_list(hub=None, part_type=None):
 def get_part_module(part_name: str):
     """Get the part module
     :param str part_name: the part name
-    :return: the part module
+    :return: the module that contains the part.py of a repository part
     :rtype: module
     """
     return HubManager().get_part_module(part_name)

@@ -16,7 +16,7 @@ HUB 指的是量化交易策略部件的平台，用于：
     
     增加远程策略仓库
 
-    :param str name: 本地仓库名称（自行起名）
+    :param str name: 本地仓库名称（自行起名，不能为 "core"，该名称为内置部件仓库保留）
     :param str url: git 仓库地址
     :param str branch: git 仓库分支
 
@@ -25,7 +25,7 @@ HUB 指的是量化交易策略部件的平台，用于：
 
     增加本地策略仓库
 
-    :param str name: 本地仓库名称（自行起名）
+    :param str name: 本地仓库名称（自行起名，不能为 "core"，该名称为内置部件仓库保留）
     :param str path: 本地仓库路径
 
 
@@ -107,5 +107,17 @@ HUB 指的是量化交易策略部件的平台，用于：
     :param str part_type: 部件类型
     :param str label: 标签
     :return: 策略部件名称列表
+
+
+.. py:function:: register_python_part(full_name, meta, factory, overwrite=False)
+
+    将 python 定义的部件注册进内置部件仓库，注册后可由 ``get_part`` 或 C++ 侧 ``PartRegistry.create`` 按名创建
+
+    示例: register_python_part('core.ind.pyma', meta, lambda scalars, parts: MA(scalars['n']))
+
+    :param str full_name: 部件全名，形如 "core.<类型>.<名称>"，其类型须与 meta 的类型一致
+    :param PartMeta meta: 部件元信息
+    :param factory: python 可调用对象 ``factory(scalars, parts)``，返回部件实例
+    :param bool overwrite: 是否覆盖已注册的同名部件（内置、插件或 python），默认 False 时报错
 
 

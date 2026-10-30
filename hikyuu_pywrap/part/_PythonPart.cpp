@@ -121,7 +121,9 @@ void releasePythonParts() {
 }
 
 void export_python_part(py::module& part) {
-    part.def("register_python_part", &registerPythonPart, py::arg("full_name"), py::arg("meta"),
+    // The python side must register through hikyuu.register_python_part (part_bridge.py), which
+    // validates the full name and the meta before handing over; this binding is the raw channel
+    part.def("_register_python_part", &registerPythonPart, py::arg("full_name"), py::arg("meta"),
              py::arg("factory"), py::arg("overwrite") = false,
              "Register a part whose factory is a python callable factory(scalars, parts) -> part; "
              "an existing registration is rejected unless overwrite is True");

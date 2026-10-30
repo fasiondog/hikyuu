@@ -63,6 +63,7 @@ try:
     from .trade_sys import *
     from .analysis import *
     from .hub import *
+    from .part_bridge import *
     from .draw import *
 except Exception as e:
     info = sys.exc_info()

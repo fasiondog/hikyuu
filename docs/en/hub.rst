@@ -19,7 +19,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     
     Add a remote strategy repository
 
-    :param str name: local repository name (choose your own)
+    :param str name: local repository name (choose your own; "core" is reserved for the built-in part hub)
     :param str url: URL of the git repository
     :param str branch: branch of the git repository
 
@@ -28,7 +28,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
 
     Add a local strategy repository
 
-    :param str name: local repository name (choose your own)
+    :param str name: local repository name (choose your own; "core" is reserved for the built-in part hub)
     :param str path: path of the local repository
 
 
@@ -111,3 +111,16 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     :param str part_type: part type
     :param str label: label
     :return: list of matching strategy part names
+
+
+.. py:function:: register_python_part(full_name, meta, factory, overwrite=False)
+
+    Register a python defined part into the built-in hub, so that it can be created by name with
+    ``get_part`` or by the C++ ``PartRegistry.create``
+
+    Example: register_python_part('core.ind.pyma', meta, lambda scalars, parts: MA(scalars['n']))
+
+    :param str full_name: part full name in the form "core.<type>.<name>", its type must match the meta type
+    :param PartMeta meta: part meta info
+    :param factory: the callable ``factory(scalars, parts)`` returning the part instance
+    :param bool overwrite: replace an existing registration (built-in, plugin or python), an existing one is rejected by default
