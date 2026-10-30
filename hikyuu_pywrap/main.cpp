@@ -53,6 +53,8 @@ void export_strategy_main(py::module& m);
 
 void export_plugin(py::module& m);
 
+void export_part_main(py::module& m);
+
 #if PY_MINOR_VERSION == 8
 PYBIND11_MODULE(core38, m) {
 #elif PY_MINOR_VERSION == 9
@@ -141,6 +143,8 @@ PYBIND11_MODULE(core, m) {
 
     export_global_main(m);
     export_io_redirect(m);
+
+    export_part_main(m);
 
     export_plugin(m);
 

@@ -100,8 +100,8 @@ public:
     Part create(const string& full_name, const Parameter& scalars, const PartParamMap& parts) const;
     /**
      * Parse "Name(k1=v1,k2=v2)" or "part.Name(k1=v1)" and create.
-     * Part-typed params are not supported here (only the programming interface), nested part
-     * expressions will be added later.
+     * Part-typed params are resolved recursively (e.g. "SG_Band(ind=MA(n=10),lower=10,upper=20)");
+     * list-typed part params are not supported here, use the programming interface instead.
      */
     Part createFromString(const string& expr) const;
 

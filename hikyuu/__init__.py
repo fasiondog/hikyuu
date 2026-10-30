@@ -93,6 +93,9 @@ def hku_cleanup():
     # Release all K-line data, to prevent the python-implemented extended K-line conversion function from raising an exception at exit due to the GIL
     release_extra_ktype()
 
+    # Release the python part factories before the interpreter shuts down
+    part.release_python_parts()
+
 
 atexit.register(hku_cleanup)
 
