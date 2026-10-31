@@ -71,24 +71,23 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     :rtype: str
 
 
-.. py:function:: get_part(name, *args, **kwargs)
+.. py:function:: get_part(name, **kwargs)
 
     Get a strategy part
 
     :param str name: strategy part name; the built-in parts live in the "core" hub, e.g. "core.ind.ma",
         and are created from the in-memory registry without touching the database
-    :param args: positional arguments passed to the strategy part
     :param kwargs: keyword arguments passed to the strategy part
     :return: strategy part instance
     :rtype: object
 
 
-.. py:function:: get_part_name_list(self, hub=None, part_type=None)
+.. py:function:: get_part_name_list(hub=None, part_type=None)
 
     Get the list of available strategy part names
 
     :param str hub: repository name; "core" returns the built-in parts, and omitting it includes them
-    :param str part_type: part type
+    :param part_type: part type, given as its name (case insensitive) or as the PartType enum
     :return: list of strategy part names
     :rtype: list
 
@@ -108,7 +107,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
 
     :param str name: part name
     :param str hub: repository name; "core" is the built-in part hub, and omitting it searches it too
-    :param str part_type: part type
+    :param part_type: part type, given as its name (case insensitive) or as the PartType enum
     :param str label: label
     :return: list of matching strategy part names
 

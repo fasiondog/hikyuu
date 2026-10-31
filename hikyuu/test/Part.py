@@ -133,9 +133,31 @@ class PartTest(unittest.TestCase):
         self.assertIn("core.ind.ma", hikyuu.get_part_name_list())
         self.assertEqual(hikyuu.get_part_name_list(hub="CORE", part_type="ind"), names)
 
+        # the part type also accepts any-case names and the PartType enum itself
+        self.assertEqual(hikyuu.get_part_name_list(hub="core", part_type="IND"), names)
+        self.assertEqual(hikyuu.get_part_name_list(hub="core", part_type="Ind"), names)
+        self.assertEqual(
+            hikyuu.get_part_name_list(hub="core", part_type=hikyuu.part.PartType.IND), names
+        )
+        self.assertEqual(hikyuu.get_part_name_list(hub="core", part_type="not-a-type"), [])
+
         self.assertEqual(hikyuu.search_part(name="sg.band", hub="core", part_type="sg"), ["core.sg.band"])
+        sg_names = hikyuu.search_part(hub="core", part_type="SG")
+        self.assertIn("core.sg.band", sg_names)
+        self.assertTrue(all(name.startswith("core.sg.") for name in sg_names))
+        self.assertEqual(
+            sg_names, hikyuu.search_part(hub="core", part_type=hikyuu.part.PartType.SG)
+        )
         self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 6)
         self.assertEqual(hikyuu.search_part(hub="nonexistent-hub-xyz"), [])
+
+    def test_normalize_part_type(self):
+        normalize = hikyuu.hub._normalize_part_type
+        self.assertIsNone(normalize(None))
+        self.assertIsNone(normalize("not-a-type"))
+        self.assertEqual(normalize("ind"), hikyuu.part.PartType.IND)
+        self.assertEqual(normalize("SG"), hikyuu.part.PartType.SG)
+        self.assertIs(normalize(hikyuu.part.PartType.TC), hikyuu.part.PartType.TC)
 
     def test_add_hub_reserved_name(self):
         for name in ("core", "Core", "CORE"):

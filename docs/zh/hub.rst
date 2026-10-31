@@ -68,23 +68,22 @@ HUB 指的是量化交易策略部件的平台，用于：
     :rtype: str
 
 
-.. py:function:: get_part(name, *args, **kwargs)
+.. py:function:: get_part(name, **kwargs)
 
     获取策略部件
 
     :param str name: 策略部件名称；内置部件位于 "core" 仓库，如 "core.ind.ma"，直接从内存注册表创建，不访问数据库
-    :param args: 策略部件参数
     :param kwargs: 策略部件参数
     :return: 策略部件实例
     :rtype: object
 
 
-.. py:function:: get_part_name_list(self, hub=None, part_type=None)
+.. py:function:: get_part_name_list(hub=None, part_type=None)
 
     获取策略部件名称列表
 
     :param str hub: 仓库名称；为 "core" 时返回内置部件，省略时同时包含内置部件
-    :param str part_type: 部件类型
+    :param part_type: 部件类型，可传类型名（不区分大小写）或 PartType 枚举
     :return: 策略部件名称列表
     :rtype: list
 
@@ -104,7 +103,7 @@ HUB 指的是量化交易策略部件的平台，用于：
 
     :param str name: 部件名称
     :param str hub: 仓库名称；"core" 为内置部件仓库，省略时同时搜索内置部件
-    :param str part_type: 部件类型
+    :param part_type: 部件类型，可传类型名（不区分大小写）或 PartType 枚举
     :param str label: 标签
     :return: 策略部件名称列表
 

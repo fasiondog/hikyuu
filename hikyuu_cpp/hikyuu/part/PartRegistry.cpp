@@ -244,33 +244,38 @@ void PartRegistry::setIntrospector(const string& full_name,
 
 void PartRegistry::ensureMeta(const string& full_name) const {
     // Fast path: the atomic pending counter keeps the common case lock free without racing with
-    // the thread that consumes the introspector
+    // the thread that consumes the introspector. The counter is decremented only after the
+    // introspected meta has been fully committed, so a reader that observes zero pairs (acquire)
+    // with that drop (release) and may read the meta without a lock.
     if (m_pending_introspect.load(std::memory_order_acquire) == 0) {
         return;
     }
 
-    std::function<void(PartMeta&)> fn;
-    PartMeta* target = nullptr;
-    {
-        std::lock_guard<std::mutex> guard(m_introspect_mutex);
-        auto iter = m_entries.find(full_name);
-        if (iter == m_entries.end() || !iter->second.introspector) {
-            return;
-        }
-        fn = std::move(iter->second.introspector);
-        iter->second.introspector = nullptr;
-        m_pending_introspect.fetch_sub(1, std::memory_order_acq_rel);
-        target = &iter->second.meta;
+    // The introspection and its commit are serialized by the introspect mutex: the meta is
+    // written while the lock is held, so a reader that passed the slow path never observes a
+    // partially written meta, and no pointer into the entry escapes the lock.
+    std::lock_guard<std::recursive_mutex> guard(m_introspect_mutex);
+    auto iter = m_entries.find(full_name);
+    if (iter == m_entries.end() || !iter->second.introspector) {
+        return;
     }
+    auto introspector = std::move(iter->second.introspector);
+    iter->second.introspector = nullptr;
 
-    // A throwing introspector must not break the caller: the meta keeps what was registered
+    // A throwing introspector must not break the caller: the meta keeps whatever the introspector
+    // filled in before failing, and the registered fields otherwise
+    PartMeta meta = iter->second.meta;
     try {
-        fn(*target);
+        introspector(meta);
     } catch (const std::exception& e) {
         HKU_WARN("Failed to introspect the part {}: {}", full_name, e.what());
     } catch (...) {
         HKU_WARN("Failed to introspect the part {}", full_name);
     }
+    iter->second.meta = std::move(meta);
+    // The commit above precedes the drop of the pending counter: pairs with the acquire in the
+    // fast path
+    m_pending_introspect.fetch_sub(1, std::memory_order_acq_rel);
 }
 
 void PartRegistry::ensureAllMeta() const {
@@ -326,8 +331,12 @@ void PartRegistry::unregisterBySource(PartMeta::Source source) {
 }
 
 void PartRegistry::clear() {
+    // The introspectors are dropped with the entries; reset the pending counter under the same
+    // mutex so the fast path stays consistent if the registry is filled again after a clear
+    std::lock_guard<std::recursive_mutex> guard(m_introspect_mutex);
     m_entries.clear();
     m_by_type.clear();
+    m_pending_introspect.store(0, std::memory_order_release);
 }
 
 bool PartRegistry::has(const string& full_name) const {

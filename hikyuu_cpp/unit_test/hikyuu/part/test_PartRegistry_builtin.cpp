@@ -6,6 +6,8 @@
  */
 
 #include "doctest/doctest.h"
+#include <atomic>
+#include <thread>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/part/PartRegistration.h>
 #include <hikyuu/part/PartRegistry.h>
@@ -54,6 +56,46 @@ TEST_CASE("test_registerIndicatorParts") {
     /** @arg the registration is idempotent */
     registerIndicatorParts();
     CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
+}
+
+/** @par Test points */
+TEST_CASE("test_registerIndicatorParts_concurrent_introspection") {
+    PartRegistry::release();
+    registerIndicatorParts();
+
+    /** @arg concurrent first-time meta access of the same parts does not race */
+    std::atomic<int> ok{0};
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 8; i++) {
+        threads.emplace_back([&ok]() {
+            auto& reg = PartRegistry::instance();
+            for (int j = 0; j < 50; j++) {
+                PartMeta meta;
+                if (!reg.tryGetMeta("core.ind.ma", meta)) {
+                    return;
+                }
+                if (meta.params.size() != 1 || meta.params[0].name != "n") {
+                    return;
+                }
+                auto ind = std::get<Indicator>(reg.create("core.ind.ma"));
+                if (!ind.alike(MA())) {
+                    return;
+                }
+            }
+            ok.fetch_add(1);
+        });
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
+    CHECK_EQ(ok.load(), 8);
+
+    /** @arg the registry keeps consistent after the concurrent access */
+    auto& reg = PartRegistry::instance();
+    CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
+    const PartMeta& meta = reg.getMeta("core.ind.ma");
+    CHECK_EQ(meta.name, "MA");
+    CHECK_EQ(meta.params[0].default_value, "22");
 }
 
 /** @} */

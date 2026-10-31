@@ -76,15 +76,13 @@ def main() -> int:
             problems.append(f"{header.relative_to(CPP).as_posix()}: no registerPart_XXX declared")
 
     # the full_name segment is lower case by convention; flag any mixed-case core.* string.
-    # test_PartRegistry_builtin.cpp deliberately queries in upper case to cover the
-    # case-insensitive lookup, so it is exempt.
+    # only the library sources are scanned: the unit tests live outside the CPP root and may
+    # query in upper case on purpose to cover the case-insensitive lookup.
     name_pat = re.compile(r"core\.[a-z]+\.([A-Za-z0-9_]+)")
     sources = sorted(CPP.rglob("*.cpp")) + sorted(CPP.rglob("*.h"))
     sources.append(CPP.parent.parent / "AGENTS.md")
     for source in sources:
         rel = "AGENTS.md" if source.name == "AGENTS.md" else source.relative_to(CPP).as_posix()
-        if rel == "hikyuu_cpp/unit_test/hikyuu/part/test_PartRegistry_builtin.cpp":
-            continue
         for m in name_pat.finditer(read(source)):
             if any(c.isupper() for c in m.group(1)):
                 problems.append(f'{rel}: non-lower-case part name "{m.group(0)}"')

@@ -182,6 +182,17 @@ def _is_core_hub(hub):
     return isinstance(hub, str) and hub.lower() == 'core'
 
 
+def _normalize_part_type(part_type):
+    """Convert a part type to the PartType enum; accepts the enum itself or its name (any case)"""
+    if part_type is None:
+        return None
+    from hikyuu import part as parts
+
+    if isinstance(part_type, parts.PartType):
+        return part_type
+    return parts.PartType.__members__.get(str(part_type).upper())
+
+
 class HubManager(metaclass=SingletonType):
     """Strategy repository management"""
     def __init__(self):
@@ -666,12 +677,18 @@ class HubManager(metaclass=SingletonType):
         reg = parts.PartRegistry.instance()
         if part_type is None:
             return reg.get_name_list()
-        part_type = parts.PartType.__members__.get(str(part_type).upper())
+        part_type = _normalize_part_type(part_type)
         return [] if part_type is None else reg.get_name_list(part_type)
 
     @dbsession
     def _get_db_part_name_list(self, hub=None, part_type=None):
         """Get the name list of the parts stored in the database hubs"""
+        if part_type is not None:
+            part_type_enum = _normalize_part_type(part_type)
+            if part_type_enum is None:
+                return []
+            # the part column stores the lowercase enum name (e.g. "sg")
+            part_type = part_type_enum.name.lower()
         if hub is None and part_type is None:
             results = self._session.query(PartModel.name).all()
         elif hub is None:
@@ -719,7 +736,7 @@ class HubManager(metaclass=SingletonType):
         if part_type is None:
             names = reg.get_name_list()
         else:
-            part_type = parts.PartType.__members__.get(str(part_type).upper())
+            part_type = _normalize_part_type(part_type)
             if part_type is None:
                 return []
             names = reg.get_name_list(part_type)
@@ -737,6 +754,13 @@ class HubManager(metaclass=SingletonType):
     def _search_db_part(self, name: str = None, hub: str = None, part_type: str = None, label=None):
         """Search the parts stored in the database hubs"""
         parts = None
+        if part_type is not None:
+            part_type_enum = _normalize_part_type(part_type)
+            if part_type_enum is None:
+                return []
+            # the part column stores the lowercase enum name (e.g. "sg"); an exact match instead
+            # of LIKE since the part type is a closed set
+            part_type = part_type_enum.name.lower()
         if name is not None:
             parts = self._session.query(PartModel).filter(PartModel.name.like(f'%{name}%'))
         if hub is not None:
@@ -746,9 +770,9 @@ class HubManager(metaclass=SingletonType):
                 parts = parts.filter(PartModel.hub_name.like(f'%{hub}%'))
         if part_type is not None:
             if parts is None:
-                parts = self._session.query(PartModel).filter(PartModel.part.like(f'%{part_type}%'))
+                parts = self._session.query(PartModel).filter(PartModel.part == part_type)
             else:
-                parts = parts.filter(PartModel.part.like(f'%{part_type}%'))
+                parts = parts.filter(PartModel.part == part_type)
         if label is not None:
             if parts is None:
                 parts = self._session.query(PartModel).filter(PartModel.label.like(f'%{label}%'))
@@ -804,14 +828,13 @@ def remove_hub(name):
     HubManager().remove_hub(name)
 
 
-def get_part(name, *args, **kwargs):
+def get_part(name, **kwargs):
     """Get the specified strategy part
 
     :param str name: the strategy part name
-    :param args: other part-related arguments
-    :param kwargs: other part-related arguments
+    :param kwargs: the part params
     """
-    return HubManager().get_part(name, *args, **kwargs)
+    return HubManager().get_part(name, **kwargs)
 
 
 def get_part_list(name_list):

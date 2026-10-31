@@ -141,7 +141,7 @@ void GlobalInitializer::clean() {
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
     // Wait for the background preload thread to exit: it must happen before any tg->stop(),
-    // eradicating the concurrent access of the preload thread to m_load_tg (C3: TOCTOU/UAF). That
+    // eradicating the concurrent access of the preload thread to m_load_tg. That
     // thread does not involve nng and exits quickly after the cancel, so the join is safe (the same
     // on Windows, which does not conflict with the existing decision of skipping the nng teardown
     // in its process exit path).

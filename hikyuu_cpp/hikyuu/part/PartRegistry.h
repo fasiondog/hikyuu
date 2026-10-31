@@ -135,7 +135,9 @@ private:
 
     mutable std::map<string, Entry> m_entries;  // key: full_name
     std::map<PartType, StringList> m_by_type;   // full_name index by category, registered order
-    mutable std::mutex m_introspect_mutex;      // serializes the lazy introspection
+    mutable std::recursive_mutex m_introspect_mutex;  // serializes the lazy introspection;
+                                                      // recursive so an introspector may query
+                                                      // the registry for other parts
     mutable std::atomic<size_t> m_pending_introspect{0};  // number of pending introspectors
 };
 
