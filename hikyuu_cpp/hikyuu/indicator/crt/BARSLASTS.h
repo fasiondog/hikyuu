@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_BARSLASTS_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -55,7 +56,16 @@ inline Indicator BARSLASTS(Indicator::value_t val, const Indicator& n) {
     return BARSLASTS(CVAL(val), IndParam(n));
 }
 
-void registerPart_BARSLASTS();
+inline void registerPart_BARSLASTS() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "BARSLASTS";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.barslasts", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return BARSLASTS(static_cast<int>(sc.get<int64_t>("n")));
+                          });
+}
 
 }  // namespace hku
 

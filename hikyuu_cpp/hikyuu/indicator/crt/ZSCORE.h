@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -31,6 +32,8 @@ inline Indicator ZSCORE(const Indicator& data, bool outExtreme = false, double n
     return ZSCORE(outExtreme, nsigma, recursive)(data);
 }
 
-void registerPart_ZSCORE();
+inline void registerPart_ZSCORE() {
+    registerIndicatorPart("core.ind.zscore", [] { return ZSCORE(); });
+}
 
 }  // namespace hku

@@ -8,7 +8,6 @@
  */
 
 #include "IAsin.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAsin)
@@ -41,10 +40,6 @@ void IAsin::_increment_calculate(const Indicator &data, size_t start_pos) {
 
 Indicator HKU_API ASIN() {
     return Indicator(make_shared<IAsin>());
-}
-
-void registerPart_ASIN() {
-    registerIndicatorPart("core.ind.asin", [] { return ASIN(); });
 }
 
 } /* namespace hku */

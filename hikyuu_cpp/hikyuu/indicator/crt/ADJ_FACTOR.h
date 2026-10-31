@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 #include "KDATA.h"
 
 namespace hku {
@@ -167,6 +168,8 @@ inline Indicator ADJ_VOL(const KData& kdata) {
     return ADJ_VOL()(kdata);
 }
 
-void registerPart_ADJ_FACTOR();
+inline void registerPart_ADJ_FACTOR() {
+    registerIndicatorPart("core.ind.adj_factor", [] { return ADJ_FACTOR(); });
+}
 
 }  // namespace hku

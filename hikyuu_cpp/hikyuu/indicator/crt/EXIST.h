@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_EXIST_H_
 #define INDICATOR_CRT_EXIST_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,7 +40,9 @@ inline Indicator EXIST(const Indicator& ind, const Indicator& n) {
     return EXIST(IndParam(n))(ind);
 }
 
-void registerPart_EXIST();
+inline void registerPart_EXIST() {
+    registerIndicatorPart("core.ind.exist", [] { return EXIST(); });
+}
 
 }  // namespace hku
 

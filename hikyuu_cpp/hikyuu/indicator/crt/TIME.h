@@ -6,7 +6,8 @@
  */
 
 #pragma once
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -103,6 +104,8 @@ Indicator HKU_API HOUR(const KData&);
 Indicator HKU_API MINUTE();
 Indicator HKU_API MINUTE(const KData&);
 
-void registerPart_DATE();
+inline void registerPart_DATE() {
+    registerIndicatorPart("core.ind.date", [] { return DATE(); });
+}
 
 }  // namespace hku

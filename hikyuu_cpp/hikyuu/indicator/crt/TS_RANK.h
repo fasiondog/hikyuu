@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_TS_RANK_H_
 #define INDICATOR_CRT_TS_RANK_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -71,7 +72,9 @@ inline Indicator TS_RANK(const Indicator& ind, const Indicator& n) {
     return TS_RANK(IndParam(n))(ind);
 }
 
-void registerPart_TS_RANK();
+inline void registerPart_TS_RANK() {
+    registerIndicatorPart("core.ind.ts_rank", [] { return TS_RANK(); });
+}
 
 }  // namespace hku
 

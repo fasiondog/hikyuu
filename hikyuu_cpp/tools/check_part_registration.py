@@ -1,9 +1,9 @@
 """Check the consistency of the built-in part registration.
 
-Every built-in factory is expected to pair a `void registerPart_XXX();` declaration (in its crt
-header), a definition (in the imp/*.cpp or the module build_in.cpp) and one call inside the
-module aggregation function of the module build_in.cpp. Nothing is generated here: the script
-only reports the mismatches, so it is safe to run in CI.
+Every built-in factory is expected to pair an inline-defined `registerPart_XXX()` (in its crt
+header, so that the registration sees the factory defaults regardless of the unity build order)
+and one call inside the module aggregation function of the module build_in.cpp. Nothing is
+generated here: the script only reports the mismatches, so it is safe to run in CI.
 
 Usage: python hikyuu_cpp/tools/check_part_registration.py
 """
@@ -14,8 +14,8 @@ from pathlib import Path
 
 CPP = Path(__file__).resolve().parents[1] / "hikyuu"
 
-DECL = re.compile(r"void\s+(registerPart_\w+)\s*\(\s*\)\s*;")
-DEF = re.compile(r"void\s+(registerPart_\w+)\s*\(\s*\)\s*\{")
+DECL = re.compile(r"(?:inline\s+)?void\s+(registerPart_\w+)\s*\(\s*\)\s*[;{]")
+DEF = re.compile(r"(?:inline\s+)?void\s+(registerPart_\w+)\s*\(\s*\)\s*\{")
 CALL = re.compile(r"^\s+(registerPart_\w+)\s*\(\s*\)\s*;\s*$", re.M)
 
 # crt headers that are combinations of existing parts rather than a creatable part
@@ -42,9 +42,10 @@ def main() -> int:
         for name in DECL.findall(read(header)):
             decl.setdefault(name, header.relative_to(CPP).as_posix())
 
-    # a definition may live anywhere in the library (imp, crt or the module aggregation file)
+    # a definition may live inline in its crt header or in the module aggregation file
     defined = {}
-    for source in sorted(CPP.rglob("*.cpp")):
+    sources = sorted(headers) + sorted(CPP.rglob("*.cpp"))
+    for source in sources:
         for name in DEF.findall(read(source)):
             defined.setdefault(name, source.relative_to(CPP).as_posix())
 

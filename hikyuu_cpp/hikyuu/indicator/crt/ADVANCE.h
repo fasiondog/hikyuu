@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_ADVANCE_H_
 #define INDICATOR_CRT_ADVANCE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 #include "../../StockTypeInfo.h"
 
 namespace hku {
@@ -32,7 +33,9 @@ Indicator HKU_API ADVANCE(const KQuery& query = KQueryByIndex(-100), const strin
                           int stk_type = STOCKTYPE_A, bool ignore_context = false,
                           bool fill_null = true);
 
-void registerPart_ADVANCE();
+inline void registerPart_ADVANCE() {
+    registerIndicatorPart("core.ind.advance", [] { return ADVANCE(); });
+}
 
 }  // namespace hku
 

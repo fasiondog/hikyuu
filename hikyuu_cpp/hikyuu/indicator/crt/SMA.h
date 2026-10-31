@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_SMA_H_
 #define INDICATOR_CRT_SMA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -71,7 +72,9 @@ inline Indicator SMA(const Indicator& ind, const Indicator& n, const Indicator& 
     return SMA(IndParam(n), IndParam(m))(ind);
 }
 
-void registerPart_SMA();
+inline void registerPart_SMA() {
+    registerIndicatorPart("core.ind.sma", [] { return SMA(); });
+}
 
 }  // namespace hku
 

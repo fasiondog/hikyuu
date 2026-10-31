@@ -8,7 +8,6 @@
  */
 
 #include "ITimeLine.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ITimeLine)
@@ -65,10 +64,6 @@ Indicator HKU_API TIMELINE(const KData& k) {
     auto p = make_shared<ITimeLine>();
     p->setContext(k);
     return Indicator(p);
-}
-
-void registerPart_TIMELINE() {
-    registerIndicatorPart("core.ind.timeline", [] { return TIMELINE(); });
 }
 
 } /* namespace hku */

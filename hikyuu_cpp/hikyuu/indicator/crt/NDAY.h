@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_NDAY_H_
 
 #include "EVERY.h"
+#include "hikyuu/part/PartRegister.h"
 #include "REF.h"
 
 namespace hku {
@@ -38,7 +39,21 @@ inline Indicator NDAY(const Indicator& x, const Indicator& y, const IndParam& n)
     return result;
 }
 
-void registerPart_NDAY();
+inline void registerPart_NDAY() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "NDAY";
+    meta.params.push_back(
+      ParamMeta{.name = "x", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "y", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "3"});
+    registerIndicatorPart(
+      "core.ind.nday", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return NDAY(std::get<Indicator>(pp.at("x").at(0)), std::get<Indicator>(pp.at("y").at(0)),
+                      static_cast<int>(sc.get<int64_t>("n")));
+      });
+}
 
 }  // namespace hku
 

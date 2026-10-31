@@ -8,7 +8,6 @@
  */
 
 #include "IAtan.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAtan)
@@ -41,10 +40,6 @@ void IAtan::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API ATAN() {
     return Indicator(make_shared<IAtan>());
-}
-
-void registerPart_ATAN() {
-    registerIndicatorPart("core.ind.atan", [] { return ATAN(); });
 }
 
 } /* namespace hku */

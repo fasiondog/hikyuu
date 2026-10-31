@@ -6,7 +6,6 @@
  */
 
 #include "ILog.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ILog)
@@ -39,10 +38,6 @@ void ILog::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API LOG() {
     return Indicator(make_shared<ILog>());
-}
-
-void registerPart_LOG() {
-    registerIndicatorPart("core.ind.log", [] { return LOG(); });
 }
 
 } /* namespace hku */

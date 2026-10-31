@@ -8,7 +8,6 @@
  */
 
 #include "ISign.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISign)
@@ -48,10 +47,6 @@ void ISign::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
 Indicator HKU_API SGN() {
     return Indicator(make_shared<ISign>());
-}
-
-void registerPart_SGN() {
-    registerIndicatorPart("core.ind.sgn", [] { return SGN(); });
 }
 
 } /* namespace hku */

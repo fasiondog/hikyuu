@@ -8,7 +8,6 @@
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "IPriceList.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -144,18 +143,6 @@ Indicator HKU_API PRICELIST(DatetimeList&& dates, double value, int discard) {
     IndicatorImpPtr ptr = make_shared<IPriceList>(dates.size(), value, discard);
     ptr->setParam<DatetimeList>("align_date_list", std::move(dates));
     return ptr->calculate();
-}
-
-void registerPart_PRICELIST() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "PRICELIST";
-    meta.params.push_back(ParamMeta{.name = "data", .type = "PriceList", .required = true});
-    meta.params.push_back(ParamMeta{.name = "discard", .type = "int", .default_value = "0"});
-    registerIndicatorPart(
-      "core.ind.pricelist", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
-          return PRICELIST(sc.get<PriceList>("data"), static_cast<int>(sc.get<int64_t>("discard")));
-      });
 }
 
 } /* namespace hku */

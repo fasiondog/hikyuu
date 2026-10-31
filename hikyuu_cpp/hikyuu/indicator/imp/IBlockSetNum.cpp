@@ -9,9 +9,8 @@
 
 #include <algorithm>
 #include "IBlockSetNum.h"
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 #include "../../StockManager.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -114,18 +113,6 @@ Indicator HKU_API BLOCKSETNUM(const Block& block, const KQuery& query) {
 
 Indicator HKU_API BLOCKSETNUM(const Block& block) {
     return BLOCKSETNUM(block, KQuery(0, 0));
-}
-
-void registerPart_BLOCKSETNUM() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "BLOCKSETNUM";
-    meta.params.push_back(ParamMeta{.name = "blk", .type = "Block", .required = true});
-    meta.params.push_back(ParamMeta{.name = "query", .type = "KQuery", .required = true});
-    registerIndicatorPart("core.ind.blocksetnum", meta,
-                          [](const Parameter& sc, const PartParamMap&) -> Part {
-                              return BLOCKSETNUM(sc.get<Block>("blk"), sc.get<KQuery>("query"));
-                          });
 }
 
 } /* namespace hku */

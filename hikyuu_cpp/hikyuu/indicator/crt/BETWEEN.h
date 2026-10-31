@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_BETWEEN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -81,7 +82,23 @@ inline Indicator BETWEEN(Indicator::value_t a, Indicator::value_t b, Indicator::
     return result;
 }
 
-void registerPart_BETWEEN();
+inline void registerPart_BETWEEN() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "BETWEEN";
+    meta.params.push_back(
+      ParamMeta{.name = "x", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "y", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "z", .type = "Indicator", .required = true, .is_part_param = true});
+    registerIndicatorPart("core.ind.between", meta,
+                          [](const Parameter&, const PartParamMap& pp) -> Part {
+                              return BETWEEN(std::get<Indicator>(pp.at("x").at(0)),
+                                             std::get<Indicator>(pp.at("y").at(0)),
+                                             std::get<Indicator>(pp.at("z").at(0)));
+                          });
+}
 
 }  // namespace hku
 

@@ -8,12 +8,11 @@
  */
 
 #include "IAdvance.h"
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 #include "../crt/KDATA.h"
 #include "../crt/REF.h"
 #include "../crt/ALIGN.h"
 #include "../../StockManager.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAdvance)
@@ -172,10 +171,6 @@ Indicator HKU_API ADVANCE(const KQuery& query, const string& market, int stk_typ
     p->setParam<bool>("fill_null", fill_null);
     p->calculate();
     return Indicator(p);
-}
-
-void registerPart_ADVANCE() {
-    registerIndicatorPart("core.ind.advance", [] { return ADVANCE(); });
 }
 
 } /* namespace hku */

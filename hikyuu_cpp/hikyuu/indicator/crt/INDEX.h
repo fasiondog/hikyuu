@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -67,6 +68,8 @@ Indicator HKU_API INDEXADV(const KQuery& query);
 Indicator HKU_API INDEXDEC();
 Indicator HKU_API INDEXDEC(const KQuery& query);
 
-void registerPart_INDEXO();
+inline void registerPart_INDEXO() {
+    registerIndicatorPart("core.ind.indexo", [] { return INDEXO(); });
+}
 
 }  // namespace hku

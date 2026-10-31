@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -43,6 +44,8 @@ inline Indicator RECOVER_EQUAL_BACKWARD(const KData& kdata) {
     return RECOVER_EQUAL_BACKWARD(kdata.close());
 }
 
-void registerPart_RECOVER_FORWARD();
+inline void registerPart_RECOVER_FORWARD() {
+    registerIndicatorPart("core.ind.recover_forward", [] { return RECOVER_FORWARD(); });
+}
 
 }  // namespace hku

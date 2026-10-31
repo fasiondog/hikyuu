@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_ISINFA_H_
 #define INDICATOR_CRT_ISINFA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -23,7 +24,9 @@ inline Indicator ISINFA(const Indicator& ind) {
     return ISINFA()(ind);
 }
 
-void registerPart_ISINFA();
+inline void registerPart_ISINFA() {
+    registerIndicatorPart("core.ind.isinfa", [] { return ISINFA(); });
+}
 
 }  // namespace hku
 

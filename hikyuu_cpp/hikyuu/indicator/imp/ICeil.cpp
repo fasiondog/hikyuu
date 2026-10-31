@@ -8,7 +8,6 @@
  */
 
 #include "ICeil.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICeil)
@@ -41,10 +40,6 @@ void ICeil::_increment_calculate(const Indicator &data, size_t start_pos) {
 
 Indicator HKU_API CEILING() {
     return Indicator(make_shared<ICeil>());
-}
-
-void registerPart_CEILING() {
-    registerIndicatorPart("core.ind.ceiling", [] { return CEILING(); });
 }
 
 } /* namespace hku */

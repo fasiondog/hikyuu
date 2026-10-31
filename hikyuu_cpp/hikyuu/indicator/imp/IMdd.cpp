@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "IMdd.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IMdd)
@@ -152,10 +151,6 @@ Indicator HKU_API MDD(int n) {
     IndicatorImpPtr p = make_shared<IMdd>();
     p->setParam<int>("n", n);
     return Indicator(p);
-}
-
-void registerPart_MDD() {
-    registerIndicatorPart("core.ind.mdd", [] { return MDD(); });
 }
 
 }  // namespace hku

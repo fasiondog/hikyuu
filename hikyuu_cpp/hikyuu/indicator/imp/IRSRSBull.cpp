@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "IRSRSBull.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRSRSBull)
@@ -197,10 +196,6 @@ Indicator HKU_API RSRS_BULL(const KData& kdata, int n, int m) {
     p->setParam<int>("m", m);
     p->setContext(kdata);
     return Indicator(p);
-}
-
-void registerPart_RSRS_BULL() {
-    registerIndicatorPart("core.ind.rsrs_bull", [] { return RSRS_BULL(); });
 }
 
 }  // namespace hku

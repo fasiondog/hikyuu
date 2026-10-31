@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_ATAN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -29,7 +30,9 @@ inline Indicator ATAN(Indicator::value_t val) {
     return ATAN(CVAL(val));
 }
 
-void registerPart_ATAN();
+inline void registerPart_ATAN() {
+    registerIndicatorPart("core.ind.atan", [] { return ATAN(); });
+}
 
 }  // namespace hku
 

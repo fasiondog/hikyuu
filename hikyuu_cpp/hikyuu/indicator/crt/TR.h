@@ -10,7 +10,8 @@
 #ifndef INDICATOR_CRT_TR_H_
 #define INDICATOR_CRT_TR_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -36,7 +37,9 @@ namespace hku {
 Indicator HKU_API TR();
 Indicator HKU_API TR(const KData&);
 
-void registerPart_TR();
+inline void registerPart_TR() {
+    registerIndicatorPart("core.ind.tr", [] { return TR(); });
+}
 
 }  // namespace hku
 

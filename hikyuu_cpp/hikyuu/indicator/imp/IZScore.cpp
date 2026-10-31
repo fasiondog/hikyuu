@@ -6,7 +6,6 @@
  */
 
 #include "IZScore.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IZScore)
@@ -114,10 +113,6 @@ void IZScore::_calculate(const Indicator &data) {
 
 Indicator HKU_API ZSCORE(bool outExtreme, double nsigma, bool recursive) {
     return Indicator(make_shared<IZScore>(outExtreme, nsigma, recursive));
-}
-
-void registerPart_ZSCORE() {
-    registerIndicatorPart("core.ind.zscore", [] { return ZSCORE(); });
 }
 
 }  // namespace hku

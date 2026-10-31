@@ -6,7 +6,6 @@
  */
 
 #include "INot.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::INot)
@@ -39,10 +38,6 @@ void INot::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API NOT() {
     return Indicator(make_shared<INot>());
-}
-
-void registerPart_NOT() {
-    registerIndicatorPart("core.ind.not", [] { return NOT(); });
 }
 
 } /* namespace hku */

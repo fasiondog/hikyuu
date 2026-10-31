@@ -10,7 +10,6 @@
 #include <climits>
 #include "IVarp.h"
 #include "../crt/MA.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IVarp)
@@ -201,10 +200,6 @@ Indicator HKU_API VARP(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IVarp>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_VARP() {
-    registerIndicatorPart("core.ind.varp", [] { return VARP(); });
 }
 
 } /* namespace hku */

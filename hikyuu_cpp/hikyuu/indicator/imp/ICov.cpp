@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "ICov.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -223,24 +222,6 @@ Indicator HKU_API COV(const Indicator& ind1, const Indicator& ind2, int n, bool 
     auto p = make_shared<ICov>(ind2, n, fill_null);
     Indicator result(p);
     return result(ind1);
-}
-
-void registerPart_COV() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "COV";
-    meta.params.push_back(
-      ParamMeta{.name = "ind1", .type = "Indicator", .required = true, .is_part_param = true});
-    meta.params.push_back(
-      ParamMeta{.name = "ind2", .type = "Indicator", .required = true, .is_part_param = true});
-    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "10"});
-    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
-    registerIndicatorPart(
-      "core.ind.cov", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-          return COV(std::get<Indicator>(pp.at("ind1").at(0)),
-                     std::get<Indicator>(pp.at("ind2").at(0)),
-                     static_cast<int>(sc.get<int64_t>("n")), sc.get<bool>("fill_null"));
-      });
 }
 
 }  // namespace hku

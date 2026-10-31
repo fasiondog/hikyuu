@@ -10,7 +10,6 @@
 #include <cmath>
 #include <climits>
 #include "IRocp.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRocp)
@@ -107,10 +106,6 @@ Indicator HKU_API ROCP(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IRocp>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_ROCP() {
-    registerIndicatorPart("core.ind.rocp", [] { return ROCP(); });
 }
 
 } /* namespace hku */

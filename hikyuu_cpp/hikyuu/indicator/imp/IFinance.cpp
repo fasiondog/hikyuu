@@ -7,7 +7,6 @@
 
 #include "hikyuu/StockManager.h"
 #include "IFinance.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -180,17 +179,6 @@ Indicator HKU_API FINANCE(const KData& k, const string& field_name) {
     p->setParam<string>("field_name", field_name);
     p->setContext(k);
     return Indicator(p);
-}
-
-void registerPart_FINANCE() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "FINANCE";
-    meta.params.push_back(ParamMeta{.name = "field_ix", .type = "int", .required = true});
-    registerIndicatorPart("core.ind.finance", meta,
-                          [](const Parameter& sc, const PartParamMap&) -> Part {
-                              return FINANCE(static_cast<int>(sc.get<int64_t>("field_ix")));
-                          });
 }
 
 }  // namespace hku

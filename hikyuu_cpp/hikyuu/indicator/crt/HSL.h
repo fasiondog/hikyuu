@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_HSL_H_
 
 #include "KDATA.h"
+#include "hikyuu/part/PartRegister.h"
 #include "LIUTONGPAN.h"
 
 namespace hku {
@@ -27,7 +28,15 @@ namespace hku {
 Indicator HKU_API HSL(const KData& k);
 Indicator HKU_API HSL();
 
-void registerPart_HSL();
+inline void registerPart_HSL() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "HSL";
+    meta.params.push_back(ParamMeta{.name = "k", .type = "KData", .required = true});
+    registerIndicatorPart(
+      "core.ind.hsl", meta,
+      [](const Parameter& sc, const PartParamMap&) -> Part { return HSL(sc.get<KData>("k")); });
+}
 
 }  // namespace hku
 #endif /* INDICATOR_CRT_HSL_H_ */

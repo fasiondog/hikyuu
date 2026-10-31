@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_ACOS_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -30,7 +31,9 @@ inline Indicator ACOS(Indicator::value_t val) {
     return ACOS(CVAL(val));
 }
 
-void registerPart_ACOS();
+inline void registerPart_ACOS() {
+    registerIndicatorPart("core.ind.acos", [] { return ACOS(); });
+}
 
 }  // namespace hku
 

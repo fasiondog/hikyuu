@@ -9,7 +9,6 @@
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "IIndex.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIndex)
@@ -126,10 +125,6 @@ Indicator HKU_API INDEXA(bool fill_null) {
 
 Indicator HKU_API INDEXV(bool fill_null) {
     return INDEX("VOL", fill_null);
-}
-
-void registerPart_INDEXO() {
-    registerIndicatorPart("core.ind.indexo", [] { return INDEXO(); });
 }
 
 }  // namespace hku

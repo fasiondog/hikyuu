@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "IHhvbars.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IHhvbars)
@@ -172,10 +171,6 @@ Indicator HKU_API HHVBARS(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IHhvbars>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_HHVBARS() {
-    registerIndicatorPart("core.ind.hhvbars", [] { return HHVBARS(); });
 }
 
 } /* namespace hku */

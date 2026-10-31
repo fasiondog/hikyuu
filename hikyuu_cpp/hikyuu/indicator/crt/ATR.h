@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_ATR_H_
 #define INDICATOR_CRT_ATR_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -28,7 +29,9 @@ Indicator HKU_API ATR(int n = 14);
  */
 Indicator HKU_API ATR(const KData& kdata, int n = 14);
 
-void registerPart_ATR();
+inline void registerPart_ATR() {
+    registerIndicatorPart("core.ind.atr", [] { return ATR(); });
+}
 
 }  // namespace hku
 

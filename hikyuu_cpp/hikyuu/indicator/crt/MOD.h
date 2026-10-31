@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_MOD_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -41,7 +42,20 @@ inline Indicator MOD(Indicator::value_t ind1, Indicator::value_t ind2) {
     return CVAL(ind1) % CVAL(ind2);
 }
 
-void registerPart_MOD();
+inline void registerPart_MOD() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "MOD";
+    meta.params.push_back(
+      ParamMeta{.name = "ind1", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ind2", .type = "Indicator", .required = true, .is_part_param = true});
+    registerIndicatorPart("core.ind.mod", meta,
+                          [](const Parameter&, const PartParamMap& pp) -> Part {
+                              return MOD(std::get<Indicator>(pp.at("ind1").at(0)),
+                                         std::get<Indicator>(pp.at("ind2").at(0)));
+                          });
+}
 
 }  // namespace hku
 

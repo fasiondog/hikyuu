@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "IBarsSince.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IBarsSince)
@@ -97,10 +96,6 @@ Indicator HKU_API BARSSINCEN(int n) {
     auto p = make_shared<IBarsSince>();
     p->setParam<int>("n", n);
     return Indicator(p);
-}
-
-void registerPart_BARSSINCE() {
-    registerIndicatorPart("core.ind.barssince", [] { return BARSSINCE(); });
 }
 
 } /* namespace hku */

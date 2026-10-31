@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_ROC_H_
 #define INDICATOR_CRT_ROC_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -36,7 +37,9 @@ inline Indicator ROC(const Indicator& ind, const Indicator& n) {
     return ROC(IndParam(n))(ind);
 }
 
-void registerPart_ROC();
+inline void registerPart_ROC() {
+    registerIndicatorPart("core.ind.roc", [] { return ROC(); });
+}
 
 }  // namespace hku
 

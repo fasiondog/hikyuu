@@ -6,7 +6,6 @@
  */
 
 #include "IFactor.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -77,19 +76,6 @@ void IFactor::_calculate(const Indicator& data) {
 
 Indicator HKU_API FACTOR(const Factor& factor) {
     return Indicator(make_shared<IFactor>(factor));
-}
-
-void registerPart_FACTOR() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "FACTOR";
-    meta.params.push_back(ParamMeta{.name = "factor", .type = "Factor", .required = true});
-    registerIndicatorPart(
-      "core.ind.factor", meta, [](const Parameter&, const PartParamMap&) -> Part {
-          HKU_THROW_EXCEPTION(std::logic_error,
-                              "FACTOR can not be created from the registry, it needs a Factor");
-          return Indicator();
-      });
 }
 
 } /* namespace hku */

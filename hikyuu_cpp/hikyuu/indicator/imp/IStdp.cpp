@@ -10,7 +10,6 @@
 #include <climits>
 #include "IStdp.h"
 #include "../crt/MA.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IStdp)
@@ -170,10 +169,6 @@ Indicator HKU_API STDP(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IStdp>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_STDP() {
-    registerIndicatorPart("core.ind.stdp", [] { return STDP(); });
 }
 
 } /* namespace hku */

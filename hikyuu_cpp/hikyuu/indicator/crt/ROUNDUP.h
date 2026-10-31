@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_ROUNDUP_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -31,7 +32,9 @@ inline Indicator ROUNDUP(Indicator::value_t val, int n = 2) {
     return ROUNDUP(CVAL(val), n);
 }
 
-void registerPart_ROUNDUP();
+inline void registerPart_ROUNDUP() {
+    registerIndicatorPart("core.ind.roundup", [] { return ROUNDUP(); });
+}
 
 }  // namespace hku
 

@@ -6,7 +6,6 @@
  */
 
 #include "ICval.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -132,18 +131,6 @@ Indicator HKU_API CVAL(const Indicator& ind, double value, int discard) {
 
     p->setContext(ind.getContext());
     return Indicator(p);
-}
-
-void registerPart_CVAL() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "CVAL";
-    meta.params.push_back(ParamMeta{.name = "value", .type = "double", .required = true});
-    meta.params.push_back(ParamMeta{.name = "discard", .type = "int", .default_value = "0"});
-    registerIndicatorPart(
-      "core.ind.cval", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
-          return CVAL(sc.get<double>("value"), static_cast<size_t>(sc.get<int64_t>("discard")));
-      });
 }
 
 } /* namespace hku */

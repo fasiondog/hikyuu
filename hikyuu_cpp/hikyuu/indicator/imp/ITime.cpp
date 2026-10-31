@@ -6,7 +6,6 @@
  */
 
 #include "ITime.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ITime)
@@ -223,10 +222,6 @@ Indicator HKU_API MINUTE() {
     p->setParam<string>("type", "MINUTE");
     p->name("MINUTE");
     return p->calculate();
-}
-
-void registerPart_DATE() {
-    registerIndicatorPart("core.ind.date", [] { return DATE(); });
 }
 
 }  // namespace hku

@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "IExist.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IExist)
@@ -131,10 +130,6 @@ Indicator HKU_API EXIST(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IExist>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_EXIST() {
-    registerIndicatorPart("core.ind.exist", [] { return EXIST(); });
 }
 
 } /* namespace hku */

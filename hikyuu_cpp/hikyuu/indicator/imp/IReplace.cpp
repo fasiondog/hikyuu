@@ -7,7 +7,6 @@
 
 #include "hikyuu/utilities/arithmetic.h"
 #include "IReplace.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IReplace)
@@ -67,10 +66,6 @@ Indicator HKU_API REPLACE(double old_value, double new_value, bool ignore_discar
     p->setParam<double>("new_value", new_value);
     p->setParam<bool>("ignore_discard", ignore_discard);
     return Indicator(p);
-}
-
-void registerPart_REPLACE() {
-    registerIndicatorPart("core.ind.replace", [] { return REPLACE(); });
 }
 
 } /* namespace hku */

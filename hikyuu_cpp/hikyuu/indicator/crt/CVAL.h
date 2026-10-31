@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_CVAL_H_
 #define INDICATOR_CRT_CVAL_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -38,7 +39,17 @@ Indicator HKU_API CVAL(double value, size_t discard = 0);
  */
 Indicator HKU_API CVAL(const Indicator& ind, double value = 0.0, int discard = 0);
 
-void registerPart_CVAL();
+inline void registerPart_CVAL() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CVAL";
+    meta.params.push_back(ParamMeta{.name = "value", .type = "double", .required = true});
+    meta.params.push_back(ParamMeta{.name = "discard", .type = "int", .default_value = "0"});
+    registerIndicatorPart(
+      "core.ind.cval", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return CVAL(sc.get<double>("value"), static_cast<size_t>(sc.get<int64_t>("discard")));
+      });
+}
 
 }  // namespace hku
 

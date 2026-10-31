@@ -6,7 +6,6 @@
  */
 
 #include "IExp.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IExp)
@@ -39,10 +38,6 @@ void IExp::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API EXP() {
     return Indicator(make_shared<IExp>());
-}
-
-void registerPart_EXP() {
-    registerIndicatorPart("core.ind.exp", [] { return EXP(); });
 }
 
 } /* namespace hku */

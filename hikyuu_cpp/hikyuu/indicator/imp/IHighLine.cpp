@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "IHighLine.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IHighLine)
@@ -166,10 +165,6 @@ Indicator HKU_API HHV(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IHighLine>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_HHV() {
-    registerIndicatorPart("core.ind.hhv", [] { return HHV(); });
 }
 
 } /* namespace hku */

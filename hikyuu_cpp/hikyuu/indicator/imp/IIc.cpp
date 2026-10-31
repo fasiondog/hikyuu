@@ -14,7 +14,6 @@
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "../utils.h"
 #include "IIc.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -243,22 +242,6 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
     }
 
     return PRICELIST(ret, discard);
-}
-
-void registerPart_IC() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "IC";
-    meta.params.push_back(ParamMeta{.name = "stks", .type = "StockList", .required = true});
-    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "1"});
-    meta.params.push_back(ParamMeta{.name = "spearman", .type = "bool", .default_value = "true"});
-    meta.params.push_back(ParamMeta{.name = "strict", .type = "bool", .default_value = "false"});
-    registerIndicatorPart(
-      "core.ind.ic", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
-          HKU_THROW_EXCEPTION(std::logic_error,
-                              "IC can not be created from the registry, it needs a StockList");
-          return Indicator();
-      });
 }
 
 }  // namespace hku

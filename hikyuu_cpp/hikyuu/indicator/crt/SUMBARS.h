@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_SUMBARS_H_
 #define INDICATOR_CRT_SUMBARS_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -54,7 +55,16 @@ inline Indicator SUMBARS(const Indicator& ind, const Indicator& a) {
     return SUMBARS(IndParam(a))(ind);
 }
 
-void registerPart_SUMBARS();
+inline void registerPart_SUMBARS() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "SUMBARS";
+    meta.params.push_back(ParamMeta{.name = "a", .type = "double", .required = true});
+    registerIndicatorPart("core.ind.sumbars", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return SUMBARS(sc.get<double>("a"));
+                          });
+}
 
 }  // namespace hku
 

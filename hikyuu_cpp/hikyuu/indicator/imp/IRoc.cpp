@@ -10,7 +10,6 @@
 #include <cmath>
 #include <climits>
 #include "IRoc.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRoc)
@@ -107,10 +106,6 @@ Indicator HKU_API ROC(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IRoc>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_ROC() {
-    registerIndicatorPart("core.ind.roc", [] { return ROC(); });
 }
 
 } /* namespace hku */

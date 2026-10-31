@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_BARSLASTCOUNT_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -28,7 +29,9 @@ inline Indicator BARSLASTCOUNT(const Indicator& ind) {
     return BARSLASTCOUNT()(ind);
 }
 
-void registerPart_BARSLASTCOUNT();
+inline void registerPart_BARSLASTCOUNT() {
+    registerIndicatorPart("core.ind.barslastcount", [] { return BARSLASTCOUNT(); });
+}
 
 }  // namespace hku
 

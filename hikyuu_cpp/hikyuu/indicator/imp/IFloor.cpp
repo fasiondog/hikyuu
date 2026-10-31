@@ -8,7 +8,6 @@
  */
 
 #include "IFloor.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IFloor)
@@ -41,10 +40,6 @@ void IFloor::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API FLOOR() {
     return Indicator(make_shared<IFloor>());
-}
-
-void registerPart_FLOOR() {
-    registerIndicatorPart("core.ind.floor", [] { return FLOOR(); });
 }
 
 } /* namespace hku */

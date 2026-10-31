@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "ILowLineBars.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ILowLineBars)
@@ -170,10 +169,6 @@ Indicator HKU_API LLVBARS(const IndParam& n) {
     IndicatorImpPtr p = make_shared<ILowLineBars>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_LLVBARS() {
-    registerIndicatorPart("core.ind.llvbars", [] { return LLVBARS(); });
 }
 
 } /* namespace hku */

@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_WINNER_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -35,7 +36,9 @@ inline Indicator WINNER(Indicator::value_t val) {
     return WINNER(CVAL(val));
 }
 
-void registerPart_WINNER();
+inline void registerPart_WINNER() {
+    registerIndicatorPart("core.ind.winner", [] { return WINNER(); });
+}
 
 }  // namespace hku
 

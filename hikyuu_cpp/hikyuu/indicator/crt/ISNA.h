@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_ISNA_H_
 #define INDICATOR_CRT_ISNA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -24,7 +25,9 @@ inline Indicator ISNA(const Indicator& ind, bool ignore_discard = false) {
     return ISNA(ignore_discard)(ind);
 }
 
-void registerPart_ISNA();
+inline void registerPart_ISNA() {
+    registerIndicatorPart("core.ind.isna", [] { return ISNA(); });
+}
 
 }  // namespace hku
 

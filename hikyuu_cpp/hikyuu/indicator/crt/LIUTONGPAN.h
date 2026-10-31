@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_LIUTONGPAN_H_
 #define INDICATOR_CRT_LIUTONGPAN_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 #define CAPITAL LIUTONGPAN
 
@@ -19,7 +20,9 @@ namespace hku {
 Indicator HKU_API LIUTONGPAN();
 Indicator HKU_API LIUTONGPAN(const KData&);
 
-void registerPart_LIUTONGPAN();
+inline void registerPart_LIUTONGPAN() {
+    registerIndicatorPart("core.ind.liutongpan", [] { return LIUTONGPAN(); });
+}
 
 }  // namespace hku
 

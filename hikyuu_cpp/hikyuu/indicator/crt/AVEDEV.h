@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_AVEDEV_H_
 
 #include "MA.h"
+#include "hikyuu/part/PartRegister.h"
 #include "ABS.h"
 
 namespace hku {
@@ -40,7 +41,19 @@ inline Indicator AVEDEV(const Indicator& ind, const IndParam& n) {
     return result;
 }
 
-void registerPart_AVEDEV();
+inline void registerPart_AVEDEV() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "AVEDEV";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "22"});
+    registerIndicatorPart("core.ind.avedev", meta,
+                          [](const Parameter& sc, const PartParamMap& pp) -> Part {
+                              return AVEDEV(std::get<Indicator>(pp.at("ind").at(0)),
+                                            static_cast<int>(sc.get<int64_t>("n")));
+                          });
+}
 
 }  // namespace hku
 

@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_INTPART_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -31,7 +32,9 @@ inline Indicator INTPART(Indicator::value_t val) {
     return INTPART(CVAL(val));
 }
 
-void registerPart_INTPART();
+inline void registerPart_INTPART() {
+    registerIndicatorPart("core.ind.intpart", [] { return INTPART(); });
+}
 
 }  // namespace hku
 

@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -26,6 +27,15 @@ Indicator HKU_API CODELIKE(const string& pattern);
  */
 Indicator HKU_API CODELIKE(const KData& kdata, const string& pattern);
 
-void registerPart_CODELIKE();
+inline void registerPart_CODELIKE() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CODELIKE";
+    meta.params.push_back(ParamMeta{.name = "pattern", .type = "string", .required = true});
+    registerIndicatorPart("core.ind.codelike", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return CODELIKE(sc.get<string>("pattern"));
+                          });
+}
 
 }  // namespace hku

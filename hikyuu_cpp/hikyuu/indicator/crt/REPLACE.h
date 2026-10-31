@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -28,6 +29,8 @@ inline Indicator REPLACE(const Indicator& ind, double old_val = Null<double>(),
     return REPLACE(old_val, new_val, ignore_discard)(ind);
 }
 
-void registerPart_REPLACE();
+inline void registerPart_REPLACE() {
+    registerIndicatorPart("core.ind.replace", [] { return REPLACE(); });
+}
 
 }  // namespace hku

@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_ISLASTBAR_H_
 #define INDICATOR_CRT_ISLASTBAR_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -24,7 +25,9 @@ inline Indicator ISLASTBAR(const Indicator& ind) {
     return ISLASTBAR()(ind);
 }
 
-void registerPart_ISLASTBAR();
+inline void registerPart_ISLASTBAR() {
+    registerIndicatorPart("core.ind.islastbar", [] { return ISLASTBAR(); });
+}
 
 }  // namespace hku
 

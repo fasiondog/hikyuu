@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "IRSRSBeta.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRSRSBeta)
@@ -121,10 +120,6 @@ Indicator HKU_API RSRS_BETA(const KData& kdata, int n) {
     p->setParam<int>("n", n);
     p->setContext(kdata);
     return Indicator(p);
-}
-
-void registerPart_RSRS_BETA() {
-    registerIndicatorPart("core.ind.rsrs_beta", [] { return RSRS_BETA(); });
 }
 
 }  // namespace hku

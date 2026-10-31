@@ -7,7 +7,6 @@
 
 #include "IKData.h"
 #include "IRecover.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRecover)
@@ -131,10 +130,6 @@ Indicator HKU_API RECOVER_EQUAL_FORWARD(const Indicator& ind) {
 Indicator HKU_API RECOVER_EQUAL_BACKWARD(const Indicator& ind) {
     IRecover::checkInputIndicator(ind);
     return RECOVER_EQUAL_BACKWARD()(ind);
-}
-
-void registerPart_RECOVER_FORWARD() {
-    registerIndicatorPart("core.ind.recover_forward", [] { return RECOVER_FORWARD(); });
 }
 
 }  // namespace hku

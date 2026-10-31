@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "ITsRank.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ITsRank)
@@ -130,10 +129,6 @@ Indicator HKU_API TS_RANK(const IndParam& n) {
     IndicatorImpPtr p = make_shared<ITsRank>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_TS_RANK() {
-    registerIndicatorPart("core.ind.ts_rank", [] { return TS_RANK(); });
 }
 
 } /* namespace hku */

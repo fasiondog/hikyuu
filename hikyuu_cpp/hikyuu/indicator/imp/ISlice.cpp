@@ -7,7 +7,6 @@
 
 #include <cstring>
 #include "ISlice.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -118,19 +117,6 @@ Indicator HKU_API SLICE(int64_t start, int64_t end, int result_index) {
     p->setParam<int64_t>("start", start);
     p->setParam<int64_t>("end", end);
     return Indicator(p);
-}
-
-void registerPart_SLICE() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "SLICE";
-    meta.params.push_back(ParamMeta{.name = "data", .type = "PriceList", .required = true});
-    meta.params.push_back(ParamMeta{.name = "start", .type = "int", .required = true});
-    meta.params.push_back(ParamMeta{.name = "end", .type = "int", .required = true});
-    registerIndicatorPart(
-      "core.ind.slice", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
-          return SLICE(sc.get<PriceList>("data"), sc.get<int64_t>("start"), sc.get<int64_t>("end"));
-      });
 }
 
 }  // namespace hku

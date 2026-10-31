@@ -8,7 +8,6 @@
  */
 
 #include "IRound.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IRound)
@@ -55,10 +54,6 @@ Indicator HKU_API ROUND(int ndigits) {
     IndicatorImpPtr p = make_shared<IRound>();
     p->setParam<int>("ndigits", ndigits);
     return Indicator(p);
-}
-
-void registerPart_ROUND() {
-    registerIndicatorPart("core.ind.round", [] { return ROUND(); });
 }
 
 } /* namespace hku */

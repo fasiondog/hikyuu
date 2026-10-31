@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_KURT_H_
 #define INDICATOR_CRT_KURT_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -36,7 +37,9 @@ inline Indicator KURT(const Indicator& data, const Indicator& n) {
     return KURT(IndParam(n))(data);
 }
 
-void registerPart_KURT();
+inline void registerPart_KURT() {
+    registerIndicatorPart("core.ind.kurt", [] { return KURT(); });
+}
 
 }  // namespace hku
 

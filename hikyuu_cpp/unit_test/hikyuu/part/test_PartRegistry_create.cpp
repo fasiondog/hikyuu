@@ -9,7 +9,9 @@
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/part/PartRegistration.h>
 #include <hikyuu/part/PartRegistry.h>
+#include <hikyuu/trade_manage/TradeManagerBase.h>
 #include <hikyuu/trade_manage/crt/TC_FixedETF.h>
+#include <hikyuu/trade_sys/signal/SignalBase.h>
 
 using namespace hku;
 

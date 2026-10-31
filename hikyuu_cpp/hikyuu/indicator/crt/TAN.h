@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_TAN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -29,7 +30,9 @@ inline Indicator TAN(Indicator::value_t val) {
     return TAN(CVAL(val));
 }
 
-void registerPart_TAN();
+inline void registerPart_TAN() {
+    registerIndicatorPart("core.ind.tan", [] { return TAN(); });
+}
 
 }  // namespace hku
 

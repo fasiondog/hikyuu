@@ -8,7 +8,6 @@
 #include "hikyuu/utilities/thread/algorithm.h"
 #include "hikyuu/indicator/crt/COST.h"
 #include "IWinner.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IWinner)
@@ -105,10 +104,6 @@ void IWinner::_calculate(const Indicator &data) {
 
 Indicator HKU_API WINNER() {
     return Indicator(make_shared<IWinner>());
-}
-
-void registerPart_WINNER() {
-    registerIndicatorPart("core.ind.winner", [] { return WINNER(); });
 }
 
 } /* namespace hku */

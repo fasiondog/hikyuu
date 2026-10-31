@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_LN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -30,7 +31,9 @@ inline Indicator LN(Indicator::value_t val) {
     return LN(CVAL(val));
 }
 
-void registerPart_LN();
+inline void registerPart_LN() {
+    registerIndicatorPart("core.ind.ln", [] { return LN(); });
+}
 
 }  // namespace hku
 

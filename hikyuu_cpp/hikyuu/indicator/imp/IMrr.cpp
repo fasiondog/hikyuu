@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "IMrr.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IMrr)
@@ -144,10 +143,6 @@ Indicator HKU_API MRR(int n) {
     IndicatorImpPtr p = make_shared<IMrr>();
     p->setParam<int>("n", n);
     return Indicator(p);
-}
-
-void registerPart_MRR() {
-    registerIndicatorPart("core.ind.mrr", [] { return MRR(); });
 }
 
 }  // namespace hku

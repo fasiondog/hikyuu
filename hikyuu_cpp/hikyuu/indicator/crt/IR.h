@@ -8,6 +8,7 @@
 #pragma once
 
 #include "ROCP.h"
+#include "hikyuu/part/PartRegister.h"
 #include "STDEV.h"
 
 namespace hku {
@@ -48,6 +49,20 @@ inline Indicator IR(const Indicator& p, const Indicator& b, int n = 100) {
     return ret;
 }
 
-void registerPart_IR();
+inline void registerPart_IR() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "IR";
+    meta.params.push_back(
+      ParamMeta{.name = "p", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "b", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "100"});
+    registerIndicatorPart(
+      "core.ind.ir", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return IR(std::get<Indicator>(pp.at("p").at(0)), std::get<Indicator>(pp.at("b").at(0)),
+                    static_cast<int>(sc.get<int64_t>("n")));
+      });
+}
 
 }  // namespace hku

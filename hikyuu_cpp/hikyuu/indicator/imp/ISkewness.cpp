@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "ISkewness.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISkewness)
@@ -252,10 +251,6 @@ Indicator HKU_API SKEW(const IndParam& n) {
     IndicatorImpPtr p = make_shared<ISkewness>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_SKEW() {
-    registerIndicatorPart("core.ind.skew", [] { return SKEW(); });
 }
 
 } /* namespace hku */

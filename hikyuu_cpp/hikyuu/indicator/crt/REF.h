@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_REF_H_
 #define INDICATOR_CRT_REF_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -43,7 +44,16 @@ inline Indicator REF(const Indicator& ind, const Indicator& n) {
     return REF(IndParam(n))(ind);
 }
 
-void registerPart_REF();
+inline void registerPart_REF() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "REF";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.ref", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return REF(static_cast<int>(sc.get<int64_t>("n")));
+                          });
+}
 
 } /* namespace hku */
 

@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_SGN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -27,7 +28,9 @@ inline Indicator SGN(Indicator::value_t val) {
     return SGN(CVAL(val));
 }
 
-void registerPart_SGN();
+inline void registerPart_SGN() {
+    registerIndicatorPart("core.ind.sgn", [] { return SGN(); });
+}
 
 }  // namespace hku
 

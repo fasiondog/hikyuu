@@ -9,7 +9,6 @@
 #include <cmath>
 #include "../crt/CVAL.h"
 #include "IAma.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAma)
@@ -428,10 +427,6 @@ Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, const IndParam&
     p->setIndParam("fast_n", fast_n);
     p->setIndParam("slow_n", slow_n);
     return Indicator(p);
-}
-
-void registerPart_AMA() {
-    registerIndicatorPart("core.ind.ama", [] { return AMA(); });
 }
 
 } /* namespace hku */

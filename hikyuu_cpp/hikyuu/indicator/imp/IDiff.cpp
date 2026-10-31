@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "IDiff.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IDiff)
@@ -62,10 +61,6 @@ Indicator HKU_API DIFF(int n) {
 
 Indicator HKU_API DIFF(const Indicator& data, int n) {
     return DIFF(n)(data);
-}
-
-void registerPart_DIFF() {
-    registerIndicatorPart("core.ind.diff", [] { return DIFF(); });
 }
 
 } /* namespace hku */

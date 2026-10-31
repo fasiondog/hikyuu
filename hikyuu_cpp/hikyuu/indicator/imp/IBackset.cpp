@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "IBackset.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IBackset)
@@ -83,10 +82,6 @@ Indicator HKU_API BACKSET(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IBackset>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_BACKSET() {
-    registerIndicatorPart("core.ind.backset", [] { return BACKSET(); });
 }
 
 } /* namespace hku */

@@ -9,7 +9,6 @@
 
 #include <climits>
 #include "IKurtosis.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IKurtosis)
@@ -270,10 +269,6 @@ Indicator HKU_API KURT(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IKurtosis>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_KURT() {
-    registerIndicatorPart("core.ind.kurt", [] { return KURT(); });
 }
 
 } /* namespace hku */

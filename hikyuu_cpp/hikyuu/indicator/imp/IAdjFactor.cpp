@@ -6,7 +6,6 @@
  */
 
 #include "IAdjFactor.h"
-#include "hikyuu/part/PartRegister.h"
 #include <vector>
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -101,10 +100,6 @@ Indicator HKU_API ADJ_FACTOR(const KData& k) {
     auto p = make_shared<IAdjFactor>();
     p->setContext(k);
     return Indicator(p);
-}
-
-void registerPart_ADJ_FACTOR() {
-    registerIndicatorPart("core.ind.adj_factor", [] { return ADJ_FACTOR(); });
 }
 
 } /* namespace hku */

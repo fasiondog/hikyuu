@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_HHV_H_
 #define INDICATOR_CRT_HHV_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,7 +40,9 @@ inline Indicator HHV(const Indicator& ind, const Indicator& n) {
     return HHV(IndParam(n))(ind);
 }
 
-void registerPart_HHV();
+inline void registerPart_HHV() {
+    registerIndicatorPart("core.ind.hhv", [] { return HHV(); });
+}
 
 }  // namespace hku
 

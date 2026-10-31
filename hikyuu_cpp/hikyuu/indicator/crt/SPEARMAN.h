@@ -6,7 +6,8 @@
  */
 
 #pragma once
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -25,6 +26,22 @@ Indicator HKU_API SPEARMAN(const Indicator& ind, const Indicator& ref_ind, int n
                            bool fill_null = true);
 Indicator HKU_API SPEARMAN(const Indicator& ref_ind, int n = 0, bool fill_null = true);
 
-void registerPart_SPEARMAN();
+inline void registerPart_SPEARMAN() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "SPEARMAN";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ref_ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "0"});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.spearman", meta, [](const Parameter &sc, const PartParamMap &pp) -> Part {
+          return SPEARMAN(std::get<Indicator>(pp.at("ind").at(0)),
+                          std::get<Indicator>(pp.at("ref_ind").at(0)),
+                          static_cast<int>(sc.get<int64_t>("n")), sc.get<bool>("fill_null"));
+      });
+}
 
 }  // namespace hku

@@ -7,7 +7,6 @@
 
 #include <climits>
 #include "IAdx.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAdx)
@@ -163,10 +162,6 @@ Indicator HKU_API ADX(const KData& kdata, int n) {
     p->setParam<int>("n", n);
     p->setContext(kdata);
     return Indicator(p);
-}
-
-void registerPart_ADX() {
-    registerIndicatorPart("core.ind.adx", [] { return ADX(); });
 }
 
 } /* namespace hku */

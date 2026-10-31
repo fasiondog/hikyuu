@@ -8,7 +8,6 @@
  */
 
 #include "IBarsCount.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IBarsCount)
@@ -75,10 +74,6 @@ void IBarsCount::_calculate(const Indicator& ind) {
 
 Indicator HKU_API BARSCOUNT() {
     return Indicator(make_shared<IBarsCount>());
-}
-
-void registerPart_BARSCOUNT() {
-    registerIndicatorPart("core.ind.barscount", [] { return BARSCOUNT(); });
 }
 
 } /* namespace hku */

@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_STKTYPE_H_
 #define INDICATOR_CRT_STKTYPE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -45,7 +46,9 @@ namespace hku {
 Indicator HKU_API STKTYPE();
 Indicator HKU_API STKTYPE(const KData& k);
 
-void registerPart_STKTYPE();
+inline void registerPart_STKTYPE() {
+    registerIndicatorPart("core.ind.stktype", [] { return STKTYPE(); });
+}
 
 }  // namespace hku
 

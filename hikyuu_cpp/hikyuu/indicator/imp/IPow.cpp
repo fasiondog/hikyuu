@@ -8,7 +8,6 @@
  */
 
 #include "IPow.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -59,17 +58,6 @@ Indicator HKU_API POW(const IndParam& n) {
     IndicatorImpPtr p = make_shared<IPow>();
     p->setIndParam("n", n);
     return Indicator(p);
-}
-
-void registerPart_POW() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "POW";
-    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
-    registerIndicatorPart("core.ind.pow", meta,
-                          [](const Parameter& sc, const PartParamMap&) -> Part {
-                              return POW(static_cast<int>(sc.get<int64_t>("n")));
-                          });
 }
 
 } /* namespace hku */

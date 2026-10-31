@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_PRICELIST_H_
 #define INDICATOR_CRT_PRICELIST_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 #define VALUE PRICELIST
 
@@ -46,7 +47,17 @@ Indicator PRICELIST(ValueT* data, size_t total) {
     return PRICELIST(tmp);
 }
 
-void registerPart_PRICELIST();
+inline void registerPart_PRICELIST() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "PRICELIST";
+    meta.params.push_back(ParamMeta{.name = "data", .type = "PriceList", .required = true});
+    meta.params.push_back(ParamMeta{.name = "discard", .type = "int", .default_value = "0"});
+    registerIndicatorPart(
+      "core.ind.pricelist", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return PRICELIST(sc.get<PriceList>("data"), static_cast<int>(sc.get<int64_t>("discard")));
+      });
+}
 
 }  // namespace hku
 

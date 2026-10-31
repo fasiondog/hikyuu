@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_DOWNNDAY_H_
 
 #include "EVERY.h"
+#include "hikyuu/part/PartRegister.h"
 #include "REF.h"
 
 namespace hku {
@@ -38,7 +39,19 @@ inline Indicator DOWNNDAY(const Indicator& ind, const IndParam& n) {
     return result;
 }
 
-void registerPart_DOWNNDAY();
+inline void registerPart_DOWNNDAY() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "DOWNNDAY";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "3"});
+    registerIndicatorPart("core.ind.downnday", meta,
+                          [](const Parameter& sc, const PartParamMap& pp) -> Part {
+                              return DOWNNDAY(std::get<Indicator>(pp.at("ind").at(0)),
+                                              static_cast<int>(sc.get<int64_t>("n")));
+                          });
+}
 
 }  // namespace hku
 

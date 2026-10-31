@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_BARSSINCE_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -58,7 +59,9 @@ inline Indicator BARSSINCEN(const Indicator& ind, int n) {
     return BARSSINCEN(n)(ind);
 }
 
-void registerPart_BARSSINCE();
+inline void registerPart_BARSSINCE() {
+    registerIndicatorPart("core.ind.barssince", [] { return BARSSINCE(); });
+}
 
 }  // namespace hku
 

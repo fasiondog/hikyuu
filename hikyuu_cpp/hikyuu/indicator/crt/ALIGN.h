@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_ALIGN_H_
 #define INDICATOR_CRT_ALIGN_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -43,7 +44,9 @@ inline Indicator ALIGN(const Indicator& ind, const KData& ref, bool fill_null = 
     return ALIGN(ref.getDatetimeList(), fill_null)(ind);
 }
 
-void registerPart_ALIGN();
+inline void registerPart_ALIGN() {
+    registerIndicatorPart("core.ind.align", [] { return ALIGN(); });
+}
 
 }  // namespace hku
 

@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_SAFTYLOSS_H_
 #define INDICATOR_CRT_SAFTYLOSS_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -83,7 +84,9 @@ inline Indicator SAFTYLOSS(const Indicator& data, const Indicator& n1, const Ind
     return SAFTYLOSS(IndParam(n1), IndParam(n2), IndParam(p))(data);
 }
 
-void registerPart_SAFTYLOSS();
+inline void registerPart_SAFTYLOSS() {
+    registerIndicatorPart("core.ind.saftyloss", [] { return SAFTYLOSS(); });
+}
 
 }  // namespace hku
 

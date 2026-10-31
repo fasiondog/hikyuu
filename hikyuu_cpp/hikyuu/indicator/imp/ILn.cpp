@@ -6,7 +6,6 @@
  */
 
 #include "ILn.h"
-#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ILn)
@@ -39,10 +38,6 @@ void ILn::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 Indicator HKU_API LN() {
     return Indicator(make_shared<ILn>());
-}
-
-void registerPart_LN() {
-    registerIndicatorPart("core.ind.ln", [] { return LN(); });
 }
 
 } /* namespace hku */

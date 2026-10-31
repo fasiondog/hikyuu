@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -21,6 +22,8 @@ inline Indicator JUMPUP(const Indicator& ind) {
     return JUMPUP()(ind);
 }
 
-void registerPart_JUMPUP();
+inline void registerPart_JUMPUP() {
+    registerIndicatorPart("core.ind.jumpup", [] { return JUMPUP(); });
+}
 
 }  // namespace hku

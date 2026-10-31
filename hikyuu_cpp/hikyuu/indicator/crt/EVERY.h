@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_EVERY_H_
 #define INDICATOR_CRT_EVERY_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -40,7 +41,9 @@ inline Indicator EVERY(const Indicator& ind, const Indicator& n) {
     return EVERY(IndParam(n))(ind);
 }
 
-void registerPart_EVERY();
+inline void registerPart_EVERY() {
+    registerIndicatorPart("core.ind.every", [] { return EVERY(); });
+}
 
 }  // namespace hku
 

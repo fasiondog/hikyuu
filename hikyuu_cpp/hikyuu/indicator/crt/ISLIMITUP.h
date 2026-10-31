@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -62,6 +63,8 @@ Indicator HKU_API ISLIMITUP();
  */
 Indicator HKU_API ISLIMITUP(const KData& k);
 
-void registerPart_ISLIMITUP();
+inline void registerPart_ISLIMITUP() {
+    registerIndicatorPart("core.ind.islimitup", [] { return ISLIMITUP(); });
+}
 
 }  // namespace hku

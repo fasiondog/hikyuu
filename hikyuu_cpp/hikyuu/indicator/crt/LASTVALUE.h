@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_LASTVALUE_H_
 #define INDICATOR_CRT_LASTVALUE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -26,7 +27,9 @@ inline Indicator LASTVALUE(const Indicator& ind, bool ignore_discard = false) {
     return LASTVALUE(ignore_discard)(ind);
 }
 
-void registerPart_LASTVALUE();
+inline void registerPart_LASTVALUE() {
+    registerIndicatorPart("core.ind.lastvalue", [] { return LASTVALUE(); });
+}
 
 }  // namespace hku
 

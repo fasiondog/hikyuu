@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_MACD_H_
 #define INDICATOR_CRT_MACD_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -60,7 +61,9 @@ inline Indicator MACD(const Indicator& data, const Indicator& n1, const Indicato
     return MACD(IndParam(n1), IndParam(n2), IndParam(n3))(data);
 }
 
-void registerPart_MACD();
+inline void registerPart_MACD() {
+    registerIndicatorPart("core.ind.macd", [] { return MACD(); });
+}
 
 }  // namespace hku
 

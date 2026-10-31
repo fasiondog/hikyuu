@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,6 +40,22 @@ Indicator HKU_API BETA(const Indicator& ind1, const Indicator& ind2, int n = 10,
                        bool fill_null = true);
 Indicator HKU_API BETA(const Indicator& ref_ind, int n = 10, bool fill_null = true);
 
-void registerPart_BETA();
+inline void registerPart_BETA() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "BETA";
+    meta.params.push_back(
+      ParamMeta{.name = "ind1", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ind2", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "10"});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.beta", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return BETA(std::get<Indicator>(pp.at("ind1").at(0)),
+                      std::get<Indicator>(pp.at("ind2").at(0)),
+                      static_cast<int>(sc.get<int64_t>("n")), sc.get<bool>("fill_null"));
+      });
+}
 
 }  // namespace hku

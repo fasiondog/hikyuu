@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_POW_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -44,7 +45,16 @@ inline Indicator POW(Indicator::value_t val, int n) {
     return POW(CVAL(val), n);
 }
 
-void registerPart_POW();
+inline void registerPart_POW() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "POW";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.pow", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return POW(static_cast<int>(sc.get<int64_t>("n")));
+                          });
+}
 
 }  // namespace hku
 

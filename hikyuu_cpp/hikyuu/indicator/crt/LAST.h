@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_LAST_H_
 
 #include "EVERY.h"
+#include "hikyuu/part/PartRegister.h"
 #include "REF.h"
 #include "MAX.h"
 #include "MIN.h"
@@ -96,7 +97,9 @@ inline Indicator LAST(const Indicator& ind, const Indicator& m, const Indicator&
     return LAST(IndParam(m), IndParam(n))(ind);
 }
 
-void registerPart_LAST();
+inline void registerPart_LAST() {
+    registerIndicatorPart("core.ind.last", [] { return LAST(); });
+}
 
 }  // namespace hku
 

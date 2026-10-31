@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,6 +40,8 @@ namespace hku {
 Indicator HKU_API RSRS_BETA(int n = 20);
 Indicator HKU_API RSRS_BETA(const KData& kdata, int n = 20);
 
-void registerPart_RSRS_BETA();
+inline void registerPart_RSRS_BETA() {
+    registerIndicatorPart("core.ind.rsrs_beta", [] { return RSRS_BETA(); });
+}
 
 }  // namespace hku

@@ -7,7 +7,6 @@
 
 #include "hikyuu/Block.h"
 #include "IInBlock.h"
-#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -66,18 +65,6 @@ Indicator HKU_API INBLOCK(const KData& k, const string& category, const string& 
     p->setParam<string>("name", name);
     p->setContext(k);
     return Indicator(p);
-}
-
-void registerPart_INBLOCK() {
-    PartMeta meta;
-    meta.type = PartType::IND;
-    meta.name = "INBLOCK";
-    meta.params.push_back(ParamMeta{.name = "category", .type = "string", .required = true});
-    meta.params.push_back(ParamMeta{.name = "name", .type = "string", .required = true});
-    registerIndicatorPart("core.ind.inblock", meta,
-                          [](const Parameter& sc, const PartParamMap&) -> Part {
-                              return INBLOCK(sc.get<string>("category"), sc.get<string>("name"));
-                          });
 }
 
 } /* namespace hku */

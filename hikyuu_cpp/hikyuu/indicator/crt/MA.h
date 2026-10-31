@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_MA_H_
 #define INDICATOR_CRT_MA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -22,7 +23,9 @@ namespace hku {
 Indicator HKU_API MA(int n = 22);
 Indicator HKU_API MA(const IndParam& n);
 
-void registerPart_MA();
+inline void registerPart_MA() {
+    registerIndicatorPart("core.ind.ma", [] { return MA(); });
+}
 
 /**
  * Simple moving average
