@@ -27,11 +27,11 @@ guarantee.
 **Its purpose, in two sentences: never let a strategy that "runs" but does not hold up be taken as a
 conclusion; and never let a full-market validation become waiting.**
 
-**Speed is not fewer steps — it is what makes "verify every step" affordable on an ordinary machine**:
-on an Orange Pi 5 Plus (an ARM single-board computer), a full `SYS_Simple` run for each of the 3,547
-currently valid non-index securities over the eleven years 2015–2026 — the EMA5 self-cross with its own
-EMA10 from `SG_Flex(EMA(C, 5), slow_n=10)` plus `MM_FixedCount(100)`, each on its own ledger, on warm
-data and walking them in a single serial process — takes about 13 seconds.
+**Within controllable cost and performance constraints, speed is the core foundation for full-market,
+multi-strategy research**: on an Orange Pi 5 Plus (an ARM single-board computer), a full `SYS_Simple` run
+for each of the 3,547 currently valid non-index securities over the eleven years 2015–2026 — the EMA5
+self-cross with its own EMA10 from `SG_Flex(EMA(C, 5), slow_n=10)` plus `MM_FixedCount(100)`, each on its
+own ledger, on warm data and walking them in a single serial process — takes about 13 seconds.
 
 Two means serve the first sentence: **splitting the structure along theoretical questions** — a strategy must
 answer market environment, condition, signal, position sizing, exit and fill price; a portfolio must
@@ -84,12 +84,12 @@ ledger, the same guards, only without an interpreter in between.
 
 ## 🔗 Quick Links
 
-| Item                         | Link                                                                                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🏠 **Project home page**     | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                     |
-| 📚 **Documentation**         | [https://hikyuu-en.readthedocs.io/en/latest/](https://hikyuu-en.readthedocs.io/en/latest/)                                       |
+| Item                         | Link                                                                                                                                                      |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🏠 **Project home page**     | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                                |
+| 📚 **Documentation**         | [https://hikyuu-en.readthedocs.io/en/latest/](https://hikyuu-en.readthedocs.io/en/latest/)                                                                |
 | 🚀 **Getting started**       | [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True) |
-| 🧰 **Strategy part library** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                              |
+| 🧰 **Strategy part library** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                                          |
 
 ---
 
@@ -213,11 +213,11 @@ sys.run(sm['sz000001'], Query(-150))
 > the framework — enforced by the framework and guarded at the entry points, not by a reminder in the
 > docs.
 
-| Layer | What it answers |
-| :--- | :--- |
-| Trading theory | Which parts make up a strategy; which layers organize a portfolio |
-| Trading rules | How a trade fills, pays fees, adjusts for equity events and is priced in the market |
-| Calculation | How nulls and numbers stay consistent along the whole computation chain |
+| Layer          | What it answers                                                                     |
+| :------------- | :---------------------------------------------------------------------------------- |
+| Trading theory | Which parts make up a strategy; which layers organize a portfolio                   |
+| Trading rules  | How a trade fills, pays fees, adjusts for equity events and is priced in the market |
+| Calculation    | How nulls and numbers stay consistent along the whole computation chain             |
 
 **Trading theory**: the split follows theoretical structure, not code responsibilities — a strategy must
 answer market environment (`EV`), condition (`CN`), signal (`SG`), position sizing (`MM`), exit (`ST` /
@@ -319,11 +319,11 @@ print(top.tm.get_funds().total_assets)
 The same engine supports three portfolio run modes, each with its own factory (an existing portfolio can
 also switch explicitly via `set_mode`):
 
-| Factory | Account topology and money flow | Methodology | Typical scenarios |
-| :--- | :--- | :--- | :--- |
-| `PF_SignalAggregate` (mode A) | Sub-systems run on fixed shadow accounts purely as signal sources; the parent converts their intents into execution orders through the AF's L2 conversion, applies L3 portfolio risk control and orders uniformly | Signal / view aggregation and portfolio construction; multi-factor scores can drive selection or weights | Overlaying multiple strategy views on one instrument pool; factor-weighted selection |
-| `PF_Simple` (mode B) | On rebalance days the AF allocates a quota to each sub-system; sub-systems decide autonomously within their quota and the parent passes their orders through | Asset allocation and rebalancing: weights / risk budgeting / rebalance cycle | FOF / MOM, core-satellite, periodic rebalancing |
-| `PF_WithoutAF` (mode C) | No shadow accounts; sub-systems trade directly on the parent's real account using their own MM | Parallel execution of systematic trading: each system keeps its full decision chain | Reproducing the legacy `Portfolio` backtest semantics; multiple strategies sharing one cash pool |
+| Factory                       | Account topology and money flow                                                                                                                                                                                   | Methodology                                                                                              | Typical scenarios                                                                                |
+| :---------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------- |
+| `PF_SignalAggregate` (mode A) | Sub-systems run on fixed shadow accounts purely as signal sources; the parent converts their intents into execution orders through the AF's L2 conversion, applies L3 portfolio risk control and orders uniformly | Signal / view aggregation and portfolio construction; multi-factor scores can drive selection or weights | Overlaying multiple strategy views on one instrument pool; factor-weighted selection             |
+| `PF_Simple` (mode B)          | On rebalance days the AF allocates a quota to each sub-system; sub-systems decide autonomously within their quota and the parent passes their orders through                                                      | Asset allocation and rebalancing: weights / risk budgeting / rebalance cycle                             | FOF / MOM, core-satellite, periodic rebalancing                                                  |
+| `PF_WithoutAF` (mode C)       | No shadow accounts; sub-systems trade directly on the parent's real account using their own MM                                                                                                                    | Parallel execution of systematic trading: each system keeps its full decision chain                      | Reproducing the legacy `Portfolio` backtest semantics; multiple strategies sharing one cash pool |
 
 When personal capital is limited and strategies are many, mode A is more practical: sub-systems act as
 signal sources only and hold no capital; the parent account synthesizes the views into a net position and
@@ -362,14 +362,14 @@ hierarchy can be organized as "team → group → member" using the same nesting
 > order sizes, stop-loss, take-profit, fill timing and costs live in a separate execution layer that is
 > not one abstraction with the strategy.
 
-| Dimension | Event-driven parallel strategies | Vectorized factor / signal research | Hikyuu |
-| :--- | :--- | :--- | :--- |
-| Hierarchy model | Strategies side by side on one account, no portfolio layer | Signal matrix → portfolio weights → separate executor | Portfolio and strategy are isomorphic, arbitrarily deep nesting |
-| Portfolio-layer duties | Hand-written wrapper for allocation and rebalancing | Weights come out of the optimizer / model | `SE` selection + `AF` (L1 weights / L2 conversion / L3 risk control) + `MF` scoring built in |
-| Trading semantics | Implemented by each strategy | Carried by a separate executor, not one abstraction with the strategy | `EV` / `CN` / `SG` / `MM` / `ST` / `TP` / `PG` / `SP` + itemized costs, equity adjustments, delayed fills and retries |
-| State synchronization | Shared cash pool; sub-systems influence each other only indirectly | No day-by-day state machine | At the open / close stages of the same bar, the parent account keeps one set of books |
-| Compute kernel | Mostly interpreted implementations | Vectorized acceleration | C++ kernel + native multi-threading, with optional local vectorized compilation (the `local` option) |
-| AI takeover granularity | Generate a whole strategy or parameter set | Generate factors / portfolio weights | Can go down to a single part; the rest stays framework-managed |
+| Dimension               | Event-driven parallel strategies                                   | Vectorized factor / signal research                                   | Hikyuu                                                                                                                |
+| :---------------------- | :----------------------------------------------------------------- | :-------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
+| Hierarchy model         | Strategies side by side on one account, no portfolio layer         | Signal matrix → portfolio weights → separate executor                 | Portfolio and strategy are isomorphic, arbitrarily deep nesting                                                       |
+| Portfolio-layer duties  | Hand-written wrapper for allocation and rebalancing                | Weights come out of the optimizer / model                             | `SE` selection + `AF` (L1 weights / L2 conversion / L3 risk control) + `MF` scoring built in                          |
+| Trading semantics       | Implemented by each strategy                                       | Carried by a separate executor, not one abstraction with the strategy | `EV` / `CN` / `SG` / `MM` / `ST` / `TP` / `PG` / `SP` + itemized costs, equity adjustments, delayed fills and retries |
+| State synchronization   | Shared cash pool; sub-systems influence each other only indirectly | No day-by-day state machine                                           | At the open / close stages of the same bar, the parent account keeps one set of books                                 |
+| Compute kernel          | Mostly interpreted implementations                                 | Vectorized acceleration                                               | C++ kernel + native multi-threading, with optional local vectorized compilation (the `local` option)                  |
+| AI takeover granularity | Generate a whole strategy or parameter set                         | Generate factors / portfolio weights                                  | Can go down to a single part; the rest stays framework-managed                                                        |
 
 If you only do factor research in a vectorized environment, the division of the other two lines is not
 necessarily a problem; Hikyuu's choice is to bring the portfolio layer and trading semantics into one
@@ -395,11 +395,11 @@ replacement", we have not seen a second implementation among publicly visible op
 > real fills and costs takes a thick wrapper layer. In Hikyuu the take-profit is already an independent
 > object (`TP`): write a `TP` subclass and nothing else moves.
 
-| Three things AI integration must solve | Most frameworks | Hikyuu |
-| :--- | :--- | :--- |
-| Pull out the decision point | Edit the strategy code, or generate the whole strategy | Parts are already objects; swap one |
-| Host account and position state | Maintain it yourself, or expose internals | Hosted by `TM`; read directly via `get_funds(dt)` |
-| Make the reward reflect real friction | Rebuild costs / equity adjustments / fill conventions | NAV already net of costs, equity-adjusted, filled at real timing |
+| Three things AI integration must solve | Most frameworks                                        | Hikyuu                                                           |
+| :------------------------------------- | :----------------------------------------------------- | :--------------------------------------------------------------- |
+| Pull out the decision point            | Edit the strategy code, or generate the whole strategy | Parts are already objects; swap one                              |
+| Host account and position state        | Maintain it yourself, or expose internals              | Hosted by `TM`; read directly via `get_funds(dt)`                |
+| Make the reward reflect real friction  | Rebuild costs / equity adjustments / fill conventions  | NAV already net of costs, equity-adjusted, filled at real timing |
 
 > Both costs shrink at once: the **search space** narrows from "strategies × parameters" to "the output
 > of one part"; the **experiment cost** drops from "build an adapter layer" to "write one part". Add the
@@ -432,25 +432,25 @@ This table is the **slot list of the domain model**: every row is a replaceable 
 `MM` / `ST` / `TP` / `PG` / `SP`; `SE` / `AF` / `MF`) — swap any one and settlement, costs and validation
 remain with the framework.
 
-| Layer                    | Part                         | Description                                        |
-| :----------------------- | :--------------------------- | :------------------------------------------------- |
-| **Portfolio layer**      | `PF_*` (portfolio factories; `Portfolio` is a compatibility alias) | Multi-asset, multi-strategy portfolios: selection, fund allocation and unified accounting |
-|                          | `Selector / SE`              | System / strategy screening                        |
-|                          | `AllocateFunds / AF`         | Fund allocation: portfolio-level L1 weights / L2 conversion / L3 risk control |
-|                          | `MultiFactor / MF`           | Multi-factor model: factor scoring and ranking     |
-| **Trading system SYS**   | `Environment / EV`           | Market environment: validity assessment of the broad market regime |
-|                          | `Condition / CN`             | Condition: situations where the system applies     |
-|                          | `Signal / SG`                | Signal generator: produces buy / sell signals      |
-|                          | `MoneyManager / MM`          | Money management: order size control               |
-|                          | `Stoploss / ST`              | Stop-loss: risk-control exit                       |
-|                          | `Takeprofit / TP`            | Take-profit: exit when the target level is reached |
-|                          | `ProfitGoal / PG`            | Profit goal: exit when the target is reached       |
-|                          | `Slippage / SP`              | Slippage: price simulation in backtesting          |
-| **Trade management**     | `TradeManager / TM`          | Trade manager: account cash and position records   |
-|                          | `OrderBroker / OB`           | Order broker: broker connection for live trading   |
-| **Data layer**           | `StockManager`               | Unified security management                        |
-|                          | `KData`                      | K-line price / volume series                       |
-|                          | `Query`                      | Time-range query and filtering                     |
+| Layer                  | Part                                                               | Description                                                                               |
+| :--------------------- | :----------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| **Portfolio layer**    | `PF_*` (portfolio factories; `Portfolio` is a compatibility alias) | Multi-asset, multi-strategy portfolios: selection, fund allocation and unified accounting |
+|                        | `Selector / SE`                                                    | System / strategy screening                                                               |
+|                        | `AllocateFunds / AF`                                               | Fund allocation: portfolio-level L1 weights / L2 conversion / L3 risk control             |
+|                        | `MultiFactor / MF`                                                 | Multi-factor model: factor scoring and ranking                                            |
+| **Trading system SYS** | `Environment / EV`                                                 | Market environment: validity assessment of the broad market regime                        |
+|                        | `Condition / CN`                                                   | Condition: situations where the system applies                                            |
+|                        | `Signal / SG`                                                      | Signal generator: produces buy / sell signals                                             |
+|                        | `MoneyManager / MM`                                                | Money management: order size control                                                      |
+|                        | `Stoploss / ST`                                                    | Stop-loss: risk-control exit                                                              |
+|                        | `Takeprofit / TP`                                                  | Take-profit: exit when the target level is reached                                        |
+|                        | `ProfitGoal / PG`                                                  | Profit goal: exit when the target is reached                                              |
+|                        | `Slippage / SP`                                                    | Slippage: price simulation in backtesting                                                 |
+| **Trade management**   | `TradeManager / TM`                                                | Trade manager: account cash and position records                                          |
+|                        | `OrderBroker / OB`                                                 | Order broker: broker connection for live trading                                          |
+| **Data layer**         | `StockManager`                                                     | Unified security management                                                               |
+|                        | `KData`                                                            | K-line price / volume series                                                              |
+|                        | `Query`                                                            | Time-range query and filtering                                                            |
 
 ---
 
@@ -458,11 +458,11 @@ remain with the framework.
 
 > A **Star ⭐** is welcome, as are contributions
 
-| Platform        | Link                                                                      | Recommendation        |
-| :-------------- | :------------------------------------------------------------------------ | :-------------------- |
-| **GitHub**      | [https://github.com/fasiondog/hikyuu](https://github.com/fasiondog/hikyuu) | Overseas              |
-| **Gitee**       | [https://gitee.com/fasiondog/hikyuu](https://gitee.com/fasiondog/hikyuu)   | ✅ Recommended in China |
-| **GitCode**     | [https://gitcode.com/hikyuu/hikyuu](https://gitcode.com/hikyuu/hikyuu)     | ✅ Recommended in China |
+| Platform    | Link                                                                       | Recommendation          |
+| :---------- | :------------------------------------------------------------------------- | :---------------------- |
+| **GitHub**  | [https://github.com/fasiondog/hikyuu](https://github.com/fasiondog/hikyuu) | Overseas                |
+| **Gitee**   | [https://gitee.com/fasiondog/hikyuu](https://gitee.com/fasiondog/hikyuu)   | ✅ Recommended in China |
+| **GitCode** | [https://gitcode.com/hikyuu/hikyuu](https://gitcode.com/hikyuu/hikyuu)     | ✅ Recommended in China |
 
 ---
 
