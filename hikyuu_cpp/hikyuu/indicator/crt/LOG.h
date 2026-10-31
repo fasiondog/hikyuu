@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_LOG_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -27,6 +28,10 @@ inline Indicator LOG(const Indicator& ind) {
 
 inline Indicator LOG(Indicator::value_t val) {
     return LOG(CVAL(val));
+}
+
+inline void registerPart_LOG() {
+    registerIndicatorPart("core.ind.log", [] { return LOG(); });
 }
 
 }  // namespace hku

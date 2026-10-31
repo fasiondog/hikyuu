@@ -6,6 +6,7 @@
  */
 
 #include "FixedAPre2015TradeCost.h"
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/arithmetic.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -61,6 +62,30 @@ TradeCostPtr HKU_API TC_FixedAPre2015(price_t commission, price_t lowestCommissi
                                       price_t lowestTransferfee) {
     return make_shared<FixedAPre2015TradeCost>(commission, lowestCommission, stamptax, transferfee,
                                                lowestTransferfee);
+}
+
+void registerPart_TC_FixedAPre2015() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.tc.fixedapre2015"), void());
+    PartMeta meta;
+    meta.type = PartType::TC;
+    meta.name = "TC_FixedAPre2015";
+    meta.full_name = "core.tc.fixedapre2015";
+    meta.params.push_back(
+      ParamMeta{.name = "commission", .type = "double", .default_value = "0.0018"});
+    meta.params.push_back(
+      ParamMeta{.name = "lowestCommission", .type = "double", .default_value = "5.0"});
+    meta.params.push_back(
+      ParamMeta{.name = "stamptax", .type = "double", .default_value = "0.001"});
+    meta.params.push_back(
+      ParamMeta{.name = "transferfee", .type = "double", .default_value = "0.001"});
+    meta.params.push_back(
+      ParamMeta{.name = "lowestTransferfee", .type = "double", .default_value = "1.0"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return TC_FixedAPre2015(sc.get<double>("commission"), sc.get<double>("lowestCommission"),
+                                sc.get<double>("stamptax"), sc.get<double>("transferfee"),
+                                sc.get<double>("lowestTransferfee"));
+    });
 }
 
 } /* namespace hku */

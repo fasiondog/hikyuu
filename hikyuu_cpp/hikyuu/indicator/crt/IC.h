@@ -8,7 +8,8 @@
 #pragma once
 
 #include "hikyuu/Block.h"
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -63,5 +64,21 @@ inline Indicator IC(const Indicator& ind, const Block& blk, int n = 1, bool spea
  */
 Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n = 1, bool use_spearman = true,
                      bool strict = false);
+
+inline void registerPart_IC() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "IC";
+    meta.params.push_back(ParamMeta{.name = "stks", .type = "StockList", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "1"});
+    meta.params.push_back(ParamMeta{.name = "spearman", .type = "bool", .default_value = "true"});
+    meta.params.push_back(ParamMeta{.name = "strict", .type = "bool", .default_value = "false"});
+    registerIndicatorPart(
+      "core.ind.ic", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          HKU_THROW_EXCEPTION(std::logic_error,
+                              "IC can not be created from the registry, it needs a StockList");
+          return Indicator();
+      });
+}
 
 }  // namespace hku

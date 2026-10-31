@@ -67,6 +67,8 @@ MultiSystemPtr HKU_API PF_Simple(const TMPtr& tm = TradeManagerPtr(), const SEPt
                                  bool delay_to_trading_day = true, bool trade_on_close = true,
                                  bool sell_at_not_selected = true);
 
+void registerPart_PF_Simple();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_PORTFOLIO_CRT_PF_SIMPLE_H_ */

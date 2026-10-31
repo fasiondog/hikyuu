@@ -25,6 +25,8 @@ namespace hku {
  */
 SlippagePtr HKU_API SP_FixedPercent(double p = 0.001, std::optional<double> short_p = std::nullopt);
 
+void registerPart_SP_FixedPercent();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDPERCENT_H_ */

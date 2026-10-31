@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "FixedPercentStoploss.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -60,6 +61,19 @@ StoplossPtr HKU_API ST_FixedPercent(double p) {
     StoplossPtr result = make_shared<FixedPercentStoploss>();
     result->setParam<double>("p", p);
     return result;
+}
+
+void registerPart_ST_FixedPercent() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.st.fixedpercent"), void());
+    PartMeta meta;
+    meta.type = PartType::ST;
+    meta.name = "ST_FixedPercent";
+    meta.full_name = "core.st.fixedpercent";
+    meta.params.push_back(ParamMeta{.name = "p", .type = "double", .default_value = "0.03"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return ST_FixedPercent(sc.get<double>("p"));
+    });
 }
 
 } /* namespace hku */

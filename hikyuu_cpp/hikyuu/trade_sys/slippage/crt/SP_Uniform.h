@@ -28,4 +28,6 @@ SlippagePtr HKU_API SP_Uniform(double min_value = -0.05, double max_value = 0.05
                                std::optional<double> short_min_value = std::nullopt,
                                std::optional<double> short_max_value = std::nullopt);
 
+void registerPart_SP_Uniform();
+
 } /* namespace hku */

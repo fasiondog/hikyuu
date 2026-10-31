@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_KALMAN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -26,6 +27,10 @@ Indicator HKU_API KALMAN(double q = 0.01, double r = 0.1);
 
 inline Indicator KALMAN(const Indicator& ind, double q = 0.01, double r = 0.1) {
     return KALMAN(q, r)(ind);
+}
+
+inline void registerPart_KALMAN() {
+    registerIndicatorPart("core.ind.kalman", [] { return KALMAN(); });
 }
 
 }  // namespace hku

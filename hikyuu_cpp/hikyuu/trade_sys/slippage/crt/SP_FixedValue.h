@@ -26,6 +26,8 @@ namespace hku {
 SlippagePtr HKU_API SP_FixedValue(double value = 0.01,
                                   std::optional<double> short_value = std::nullopt);
 
+void registerPart_SP_FixedValue();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDVALUE_H_ */

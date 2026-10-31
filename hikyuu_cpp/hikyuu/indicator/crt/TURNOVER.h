@@ -6,7 +6,8 @@
  */
 
 #pragma once
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -18,5 +19,9 @@ namespace hku {
 Indicator HKU_API TURNOVER(int n = 1);
 
 Indicator HKU_API TURNOVER(const KData& kdata, int n = 1);
+
+inline void registerPart_TURNOVER() {
+    registerIndicatorPart("core.ind.turnover", [] { return TURNOVER(); });
+}
 
 }  // namespace hku

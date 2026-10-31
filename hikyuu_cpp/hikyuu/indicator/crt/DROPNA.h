@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_DROPNA_H_
 #define INDICATOR_CRT_DROPNA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -28,6 +29,10 @@ Indicator HKU_API DROPNA(bool drop_inf = false);
 
 inline Indicator DROPNA(const Indicator& ind, bool drop_inf = false) {
     return DROPNA(drop_inf)(ind);
+}
+
+inline void registerPart_DROPNA() {
+    registerIndicatorPart("core.ind.dropna", [] { return DROPNA(); });
 }
 
 }  // namespace hku

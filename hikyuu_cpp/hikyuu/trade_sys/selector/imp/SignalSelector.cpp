@@ -6,6 +6,7 @@
  */
 
 #include "SignalSelector.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::SignalSelector)
@@ -55,6 +56,17 @@ SEPtr HKU_API SE_Signal(const StockList& stock_list, const SystemPtr& sys) {
     SelectorPtr p = make_shared<SignalSelector>();
     p->addStockList(stock_list, sys);
     return p;
+}
+
+void registerPart_SE_Signal() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.se.signal"), void());
+    PartMeta meta;
+    meta.type = PartType::SE;
+    meta.name = "SE_Signal";
+    meta.full_name = "core.se.signal";
+    reg.registerPart(
+      meta, [](const Parameter& sc, const PartParamMap& pp) -> Part { return SE_Signal(); });
 }
 
 }  // namespace hku

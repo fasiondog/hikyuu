@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_AMA_H_
 #define INDICATOR_CRT_AMA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -113,6 +114,10 @@ inline Indicator AMA(const Indicator& ind, const Indicator& n, int fast_n,
 inline Indicator AMA(const Indicator& ind, const Indicator& n, const Indicator& fast_n,
                      const Indicator& slow_n) {
     return AMA(IndParam(n), IndParam(fast_n), IndParam(slow_n))(ind);
+}
+
+inline void registerPart_AMA() {
+    registerIndicatorPart("core.ind.ama", [] { return AMA(); });
 }
 
 }  // namespace hku

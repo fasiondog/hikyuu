@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_ROUND_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -30,6 +31,10 @@ inline Indicator ROUND(const Indicator& ind, int n = 2) {
 
 inline Indicator ROUND(Indicator::value_t val, int n = 2) {
     return ROUND(CVAL(val), n);
+}
+
+inline void registerPart_ROUND() {
+    registerIndicatorPart("core.ind.round", [] { return ROUND(); });
 }
 
 }  // namespace hku

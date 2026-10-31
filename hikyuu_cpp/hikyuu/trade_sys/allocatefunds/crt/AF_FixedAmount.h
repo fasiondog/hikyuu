@@ -29,6 +29,8 @@ namespace hku {
  */
 AFPtr HKU_API AF_FixedAmount(double amount = 20000.0);
 
+void registerPart_AF_FixedAmount();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_ALLOCATEFUNDS_CRT_AF_FIXEDAMOUNT_H_ */

@@ -55,6 +55,8 @@ SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filt
  */
 SignalPtr HKU_API SG_Single2(const Indicator& ind, int filter_n = 20, double filter_p = 0.1);
 
+void registerPart_SG_Single();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SIGNAL_CRT_SINGLE_SG_H_ */

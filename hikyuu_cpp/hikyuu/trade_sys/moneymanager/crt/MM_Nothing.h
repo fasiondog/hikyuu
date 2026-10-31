@@ -20,6 +20,8 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_Nothing();
 
+void registerPart_MM_Nothing();
+
 }  // namespace hku
 
 #endif /* NOTHING_MM_H_ */

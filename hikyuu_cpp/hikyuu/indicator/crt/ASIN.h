@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_ASIN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -28,6 +29,10 @@ inline Indicator ASIN(const Indicator& ind) {
 
 inline Indicator ASIN(Indicator::value_t val) {
     return ASIN(CVAL(val));
+}
+
+inline void registerPart_ASIN() {
+    registerIndicatorPart("core.ind.asin", [] { return ASIN(); });
 }
 
 }  // namespace hku

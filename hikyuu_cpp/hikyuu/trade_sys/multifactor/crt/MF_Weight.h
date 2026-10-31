@@ -132,4 +132,6 @@ inline MultiFactorPtr MF_Weight(const IndicatorList& inds, const PriceList& weig
                      mode, save_all_factors);
 }
 
+void registerPart_MF_Weight();
+
 }  // namespace hku

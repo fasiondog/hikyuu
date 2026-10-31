@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -66,5 +67,9 @@ Indicator HKU_API INDEXADV(const KQuery& query);
  *  The data is fetched when building the formula, so the engine must be initialized first */
 Indicator HKU_API INDEXDEC();
 Indicator HKU_API INDEXDEC(const KQuery& query);
+
+inline void registerPart_INDEXO() {
+    registerIndicatorPart("core.ind.indexo", [] { return INDEXO(); });
+}
 
 }  // namespace hku

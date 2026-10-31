@@ -9,9 +9,10 @@
 
 #include "hikyuu/utilities/thread/thread.h"
 #include "IInSum.h"
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 #include "../crt/ALIGN.h"
 #include "../../StockManager.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IInSum)

@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "OPLineCondition.h"
 #include "../../../trade_manage/crt/crtTM.h"
 #include "../../../trade_manage/crt/TC_Zero.h"
@@ -35,8 +36,8 @@ void OPLineCondition::_calculate() {
     Stock stock = m_kdata.getStock();
     KQuery query = m_kdata.getQuery();
 
-    // Reuse the previous embedded-backtest result when the inputs are unchanged; the backtest is the
-    // dominant cost and is run in full on every setTO otherwise
+    // Reuse the previous embedded-backtest result when the inputs are unchanged; the backtest is
+    // the dominant cost and is run in full on every setTO otherwise
     if (!m_last_x.empty() && m_last_stock == stock && m_last_query == query && m_last_sg == m_sg) {
         DatetimeList dates = m_kdata.getDatetimeList();
         auto const* xdata = m_last_x.data();
@@ -86,6 +87,20 @@ void OPLineCondition::_calculate() {
 
 CNPtr HKU_API CN_OPLine(const Indicator& op) {
     return make_shared<OPLineCondition>(op);
+}
+
+void registerPart_CN_OPLine() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.cn.opline"), void());
+    PartMeta meta;
+    meta.type = PartType::CN;
+    meta.name = "CN_OPLine";
+    meta.full_name = "core.cn.opline";
+    meta.params.push_back(
+      ParamMeta{.name = "op", .type = "Indicator", .required = true, .is_part_param = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return CN_OPLine(std::get<Indicator>(pp.at("op").at(0)));
+    });
 }
 
 } /* namespace hku */

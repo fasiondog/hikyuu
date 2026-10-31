@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include <optional>
 #include <random>
 #include "LogNormalSlippage.h"
@@ -143,6 +144,23 @@ SlippagePtr HKU_API SP_LogNormal(double mean, double stddev, bool adverse_only,
     ptr->setParam("short_mean", short_mean.value_or(mean));
     ptr->setParam("short_stddev", short_stddev.value_or(stddev));
     return ptr;
+}
+
+void registerPart_SP_LogNormal() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sp.lognormal"), void());
+    PartMeta meta;
+    meta.type = PartType::SP;
+    meta.name = "SP_LogNormal";
+    meta.full_name = "core.sp.lognormal";
+    meta.params.push_back(ParamMeta{.name = "mean", .type = "double", .default_value = "0.0"});
+    meta.params.push_back(ParamMeta{.name = "stddev", .type = "double", .default_value = "0.05"});
+    meta.params.push_back(
+      ParamMeta{.name = "adverse_only", .type = "bool", .default_value = "true"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SP_LogNormal(sc.get<double>("mean"), sc.get<double>("stddev"),
+                            sc.get<bool>("adverse_only"), std::nullopt, std::nullopt);
+    });
 }
 
 } /* namespace hku */

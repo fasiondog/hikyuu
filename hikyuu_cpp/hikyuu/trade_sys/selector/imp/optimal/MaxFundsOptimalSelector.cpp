@@ -6,6 +6,7 @@
  */
 
 #include "MaxFundsOptimalSelector.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::MaxFundsOptimalSelector)
@@ -32,6 +33,18 @@ double MaxFundsOptimalSelector::evaluate(const SYSPtr& sys, const Datetime& endD
 
 SEPtr HKU_API SE_MaxFundsOptimal() {
     return make_shared<MaxFundsOptimalSelector>();
+}
+
+void registerPart_SE_MaxFundsOptimal() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.se.maxfundsoptimal"), void());
+    PartMeta meta;
+    meta.type = PartType::SE;
+    meta.name = "SE_MaxFundsOptimal";
+    meta.full_name = "core.se.maxfundsoptimal";
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SE_MaxFundsOptimal();
+    });
 }
 
 }  // namespace hku

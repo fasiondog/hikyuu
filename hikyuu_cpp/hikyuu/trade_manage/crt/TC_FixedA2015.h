@@ -41,6 +41,8 @@ namespace hku {
 TradeCostPtr HKU_API TC_FixedA2015(price_t commission = 0.0018, price_t lowestCommission = 5.0,
                                    price_t stamptax = 0.001, price_t transferfee = 0.00002);
 
+void registerPart_TC_FixedA2015();
+
 }  // namespace hku
 
 #endif /* TRADE_MANAGE_CRT_TC_FIXEDA2015_H_ */

@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_EXP_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -26,6 +27,10 @@ inline Indicator EXP(const Indicator& ind) {
 
 inline Indicator EXP(Indicator::value_t val) {
     return EXP(CVAL(val));
+}
+
+inline void registerPart_EXP() {
+    registerIndicatorPart("core.ind.exp", [] { return EXP(); });
 }
 
 }  // namespace hku

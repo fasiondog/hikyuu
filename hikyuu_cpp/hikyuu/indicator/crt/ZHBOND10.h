@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -23,6 +24,10 @@ Indicator HKU_API ZHBOND10(const DatetimeList& dates, double default_val = 4.0);
 Indicator HKU_API ZHBOND10(const KData& k, double default_val = 4.0);
 inline Indicator ZHBOND10(const Indicator& ind, double default_val = 4.0) {
     return ZHBOND10(default_val)(ind);
+}
+
+inline void registerPart_ZHBOND10() {
+    registerIndicatorPart("core.ind.zhbond10", [] { return ZHBOND10(); });
 }
 
 }  // namespace hku

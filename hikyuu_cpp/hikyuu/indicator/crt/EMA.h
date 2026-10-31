@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_EMA_H_
 #define INDICATOR_CRT_EMA_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -42,6 +43,10 @@ inline Indicator EMA(const Indicator& data, const IndParam& n) {
 
 inline Indicator EMA(const Indicator& data, const Indicator& n) {
     return EMA(IndParam(n))(data);
+}
+
+inline void registerPart_EMA() {
+    registerIndicatorPart("core.ind.ema", [] { return EMA(); });
 }
 
 }  // namespace hku

@@ -6,6 +6,7 @@
  */
 
 #include "IResult.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IResult)

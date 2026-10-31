@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_SQRT_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -33,6 +34,10 @@ inline Indicator SQRT(const Indicator& ind) {
 
 inline Indicator SQRT(Indicator::value_t val) {
     return SQRT(CVAL(val));
+}
+
+inline void registerPart_SQRT() {
+    registerIndicatorPart("core.ind.sqrt", [] { return SQRT(); });
 }
 
 }  // namespace hku

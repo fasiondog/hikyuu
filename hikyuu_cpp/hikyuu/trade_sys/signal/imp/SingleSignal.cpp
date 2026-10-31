@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "../../../indicator/crt/DIFF.h"
@@ -88,6 +89,23 @@ SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n, double filter_p)
     p->setParam<int>("filter_n", filter_n);
     p->setParam<double>("filter_p", filter_p);
     return p;
+}
+
+void registerPart_SG_Single() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sg.single"), void());
+    PartMeta meta;
+    meta.type = PartType::SG;
+    meta.name = "SG_Single";
+    meta.full_name = "core.sg.single";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "filter_n", .type = "int", .default_value = "20"});
+    meta.params.push_back(ParamMeta{.name = "filter_p", .type = "double", .default_value = "0.1"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SG_Single(std::get<Indicator>(pp.at("ind").at(0)),
+                         static_cast<int>(sc.get<int64_t>("filter_n")), sc.get<double>("filter_p"));
+    });
 }
 
 } /* namespace hku */

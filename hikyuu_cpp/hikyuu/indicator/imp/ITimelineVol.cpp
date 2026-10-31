@@ -24,4 +24,4 @@ Indicator HKU_API TIMELINEVOL(const KData& k) {
     return ind;
 }
 
-}
+}  // namespace hku

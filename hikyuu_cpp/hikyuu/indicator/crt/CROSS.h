@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_CROSS_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 #include "REF.h"
 
 namespace hku {
@@ -36,6 +37,21 @@ inline Indicator CROSS(Indicator::value_t x, const Indicator& y) {
 
 inline Indicator CROSS(Indicator::value_t x, Indicator::value_t y) {
     return CROSS(CVAL(x), CVAL(y));
+}
+
+inline void registerPart_CROSS() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "CROSS";
+    meta.params.push_back(
+      ParamMeta{.name = "x", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "y", .type = "Indicator", .required = true, .is_part_param = true});
+    registerIndicatorPart("core.ind.cross", meta,
+                          [](const Parameter&, const PartParamMap& pp) -> Part {
+                              return CROSS(std::get<Indicator>(pp.at("x").at(0)),
+                                           std::get<Indicator>(pp.at("y").at(0)));
+                          });
 }
 
 }  // namespace hku

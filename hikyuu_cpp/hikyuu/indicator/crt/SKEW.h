@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_SKEW_H_
 #define INDICATOR_CRT_SKEW_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,6 +35,10 @@ inline Indicator SKEW(const Indicator& data, const IndParam& n) {
 
 inline Indicator SKEW(const Indicator& data, const Indicator& n) {
     return SKEW(IndParam(n))(data);
+}
+
+inline void registerPart_SKEW() {
+    registerIndicatorPart("core.ind.skew", [] { return SKEW(); });
 }
 
 }  // namespace hku

@@ -18,4 +18,6 @@ namespace hku {
  */
 EVPtr HKU_API EV_Manual();
 
+void registerPart_EV_Manual();
+
 }  // namespace hku

@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_DIFF_H_
 #define INDICATOR_CRT_DIFF_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -27,6 +28,10 @@ Indicator HKU_API DIFF(int n = 1);
  * @ingroup Indicator
  */
 Indicator HKU_API DIFF(const Indicator& data, int n = 1);
+
+inline void registerPart_DIFF() {
+    registerIndicatorPart("core.ind.diff", [] { return DIFF(); });
+}
 
 }  // namespace hku
 

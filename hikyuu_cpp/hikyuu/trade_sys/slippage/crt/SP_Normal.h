@@ -27,4 +27,6 @@ SlippagePtr HKU_API SP_Normal(double mean = 0.0, double stddev = 0.05, bool adve
                               std::optional<double> short_mean = std::nullopt,
                               std::optional<double> short_stddev = std::nullopt);
 
+void registerPart_SP_Normal();
+
 } /* namespace hku */

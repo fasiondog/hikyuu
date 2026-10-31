@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_SIN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -27,6 +28,10 @@ inline Indicator SIN(const Indicator& ind) {
 
 inline Indicator SIN(Indicator::value_t val) {
     return SIN(CVAL(val));
+}
+
+inline void registerPart_SIN() {
+    registerIndicatorPart("core.ind.sin", [] { return SIN(); });
 }
 
 }  // namespace hku

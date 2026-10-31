@@ -135,6 +135,7 @@ target("unit-test")
     add_files("./hikyuu/trade_sys/stoploss/**.cpp", {unity_group="stoploss"})
     add_files("./hikyuu/trade_sys/system/**.cpp", {unity_group="system"})
     add_files("./hikyuu/utilities/**.cpp", {unity_group="utilities"})
+    add_files("./hikyuu/part/**.cpp", {unity_group="part"})
 
     if has_config("ta_lib") then
         add_files("hikyuu/indicator_talib/**.cpp", {unity_group="talib"})

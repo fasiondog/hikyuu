@@ -10,7 +10,8 @@
 #ifndef INDICATOR_CRT_TR_H_
 #define INDICATOR_CRT_TR_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -26,7 +27,8 @@ namespace hku {
  *  2. the absolute value of the difference between the high price of the current period and the
  *     close price (PC) of the previous period
 
- *  3. the absolute value of the difference between the low price of the current period and the close
+ *  3. the absolute value of the difference between the low price of the current period and the
+ close
  *     price of the previous period
 
  * </pre>
@@ -34,6 +36,10 @@ namespace hku {
  */
 Indicator HKU_API TR();
 Indicator HKU_API TR(const KData&);
+
+inline void registerPart_TR() {
+    registerIndicatorPart("core.ind.tr", [] { return TR(); });
+}
 
 }  // namespace hku
 

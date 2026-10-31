@@ -6,7 +6,8 @@
  */
 
 #pragma once
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -69,5 +70,9 @@ Indicator HKU_API VOL(const KData&);
  */
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& kpart);
 Indicator HKU_API KDATA_PART(const string& kpart);
+
+inline void registerPart_KDATA() {
+    registerIndicatorPart("core.ind.kdata", [] { return KDATA(); });
+}
 
 }  // namespace hku

@@ -121,4 +121,6 @@ inline MultiFactorPtr MF_ICIRWeight(const IndicatorList& inds, const StockList& 
                          spearman, mode, save_all_factors);
 }
 
+void registerPart_MF_ICIRWeight();
+
 }  // namespace hku

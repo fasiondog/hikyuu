@@ -80,4 +80,6 @@ inline SelectorPtr SE_MultiFactor(const IndicatorList& src_inds, int topn = 10, 
     return SE_MultiFactor(FactorSet(src_inds), topn, ic_n, ic_rolling_n, ref_stk, spearman, mode);
 }
 
+void registerPart_SE_MultiFactor();
+
 }  // namespace hku

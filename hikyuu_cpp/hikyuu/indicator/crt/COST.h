@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_COST_H_
 
 #include "KDATA.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -31,6 +32,18 @@ namespace hku {
  */
 Indicator HKU_API COST(const KData& k, double x = 10.0);
 Indicator HKU_API COST(double x = 10.0);
+
+inline void registerPart_COST() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "COST";
+    meta.params.push_back(ParamMeta{.name = "k", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "x", .type = "double", .default_value = "10.0"});
+    registerIndicatorPart("core.ind.cost", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return COST(sc.get<KData>("k"), sc.get<double>("x"));
+                          });
+}
 
 }  // namespace hku
 #endif /* INDICATOR_CRT_COST_H_ */

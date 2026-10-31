@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -22,5 +23,9 @@ namespace hku {
  */
 Indicator HKU_API ZONGGUBEN();
 Indicator HKU_API ZONGGUBEN(const KData&);
+
+inline void registerPart_ZONGGUBEN() {
+    registerIndicatorPart("core.ind.zongguben", [] { return ZONGGUBEN(); });
+}
 
 }  // namespace hku

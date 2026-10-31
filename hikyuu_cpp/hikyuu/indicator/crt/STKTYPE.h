@@ -11,30 +11,31 @@
 #ifndef INDICATOR_CRT_STKTYPE_H_
 #define INDICATOR_CRT_STKTYPE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
 /**
  * Get the stock type indicator
 
- * 
+ *
  * Return the type value of the current stock (the StockType enumeration value)
 
- * 
+ *
  * @param k K-line data context (optional)
 
  * @return the indicator object, the value at every position is the type value of the stock
 
  * @ingroup Indicator
- * 
+ *
  * @par Example:
 
  * @code
  * // Use the default context
 
  * auto stktype = STKTYPE();
- * 
+ *
  * // The given K-line data
 
  * Stock stock = sm.getStock("sh000001");
@@ -44,6 +45,10 @@ namespace hku {
  */
 Indicator HKU_API STKTYPE();
 Indicator HKU_API STKTYPE(const KData& k);
+
+inline void registerPart_STKTYPE() {
+    registerIndicatorPart("core.ind.stktype", [] { return STKTYPE(); });
+}
 
 }  // namespace hku
 

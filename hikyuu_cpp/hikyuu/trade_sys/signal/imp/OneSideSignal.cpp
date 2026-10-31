@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "OneSideSignal.h"
@@ -70,6 +71,21 @@ void OneSideSignal::_calculate(const KData& kdata) {
 
 SignalPtr HKU_API SG_OneSide(const Indicator& ind, bool is_buy) {
     return make_shared<OneSideSignal>(ind, is_buy);
+}
+
+void registerPart_SG_OneSide() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sg.oneside"), void());
+    PartMeta meta;
+    meta.type = PartType::SG;
+    meta.name = "SG_OneSide";
+    meta.full_name = "core.sg.oneside";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "is_buy", .type = "bool", .required = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SG_OneSide(std::get<Indicator>(pp.at("ind").at(0)), sc.get<bool>("is_buy"));
+    });
 }
 
 } /* namespace hku */

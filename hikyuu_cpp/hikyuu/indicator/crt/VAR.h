@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_VAR_H_
 #define INDICATOR_CRT_VAR_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,6 +35,10 @@ inline Indicator VAR(const Indicator& data, const IndParam& n) {
 
 inline Indicator VAR(const Indicator& data, const Indicator& n) {
     return VAR(IndParam(n))(data);
+}
+
+inline void registerPart_VAR() {
+    registerIndicatorPart("core.ind.var", [] { return VAR(); });
 }
 
 }  // namespace hku

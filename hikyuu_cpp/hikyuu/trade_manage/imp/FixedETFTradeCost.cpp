@@ -3,6 +3,7 @@
  */
 
 #include "FixedETFTradeCost.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedETFTradeCost)
@@ -70,6 +71,22 @@ TradeCostPtr HKU_API TC_FixedETF(price_t commission, price_t lowestCommission) {
     p->setParam<price_t>("commission", commission);
     p->setParam<price_t>("lowest_commission", lowestCommission);
     return p;
+}
+
+void registerPart_TC_FixedETF() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.tc.fixedetf"), void());
+    PartMeta meta;
+    meta.type = PartType::TC;
+    meta.name = "TC_FixedETF";
+    meta.full_name = "core.tc.fixedetf";
+    meta.params.push_back(
+      ParamMeta{.name = "commission", .type = "double", .default_value = "0.0001"});
+    meta.params.push_back(
+      ParamMeta{.name = "lowestCommission", .type = "double", .default_value = "5.0"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return TC_FixedETF(sc.get<double>("commission"), sc.get<double>("lowestCommission"));
+    });
 }
 
 } /* namespace hku */

@@ -25,6 +25,8 @@ namespace hku {
  */
 SignalPtr HKU_API SG_Flex(const Indicator& op, int slow_n);
 
+void registerPart_SG_Flex();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_ */

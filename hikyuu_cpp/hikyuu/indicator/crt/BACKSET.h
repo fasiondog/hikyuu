@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_BACKSET_H_
 #define INDICATOR_CRT_BACKSET_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,6 +40,10 @@ inline Indicator BACKSET(const Indicator& ind, const IndParam& n) {
 
 inline Indicator BACKSET(const Indicator& ind, const Indicator& n) {
     return BACKSET(IndParam(n))(ind);
+}
+
+inline void registerPart_BACKSET() {
+    registerIndicatorPart("core.ind.backset", [] { return BACKSET(); });
 }
 
 }  // namespace hku

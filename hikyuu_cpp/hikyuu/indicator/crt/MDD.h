@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -36,6 +37,10 @@ Indicator HKU_API MDD(int n = 0);
  */
 inline Indicator MDD(const Indicator& ind, int n = 0) {
     return MDD(n)(ind);
+}
+
+inline void registerPart_MDD() {
+    registerIndicatorPart("core.ind.mdd", [] { return MDD(); });
 }
 
 }  // namespace hku

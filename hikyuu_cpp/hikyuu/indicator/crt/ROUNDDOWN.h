@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_ROUNDDOWN_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -29,6 +30,10 @@ inline Indicator ROUNDDOWN(const Indicator& ind, int n = 2) {
 
 inline Indicator ROUNDDOWN(Indicator::value_t val, int n = 2) {
     return ROUNDDOWN(CVAL(val), n);
+}
+
+inline void registerPart_ROUNDDOWN() {
+    registerIndicatorPart("core.ind.rounddown", [] { return ROUNDDOWN(); });
 }
 
 }  // namespace hku

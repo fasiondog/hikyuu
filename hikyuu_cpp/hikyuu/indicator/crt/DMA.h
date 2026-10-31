@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_DMA_H_
 
 #include "REF.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -40,6 +41,22 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API DMA(const Indicator& x, const Indicator& a, bool fill_null = true);
+
+inline void registerPart_DMA() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "DMA";
+    meta.params.push_back(
+      ParamMeta{.name = "x", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "a", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "fill_null", .type = "bool", .default_value = "true"});
+    registerIndicatorPart(
+      "core.ind.dma", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          return DMA(std::get<Indicator>(pp.at("x").at(0)), std::get<Indicator>(pp.at("a").at(0)),
+                     sc.get<bool>("fill_null"));
+      });
+}
 
 }  // namespace hku
 

@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -19,5 +20,17 @@ namespace hku {
  */
 Indicator HKU_API BLOCKSETNUM(const Block& blk, const KQuery& query);
 Indicator HKU_API BLOCKSETNUM(const Block& blk);
+
+inline void registerPart_BLOCKSETNUM() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "BLOCKSETNUM";
+    meta.params.push_back(ParamMeta{.name = "blk", .type = "Block", .required = true});
+    meta.params.push_back(ParamMeta{.name = "query", .type = "KQuery", .required = true});
+    registerIndicatorPart("core.ind.blocksetnum", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return BLOCKSETNUM(sc.get<Block>("blk"), sc.get<KQuery>("query"));
+                          });
+}
 
 }  // namespace hku

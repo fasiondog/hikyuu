@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_HHVBARS_H_
 #define INDICATOR_CRT_HHVBARS_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,6 +40,10 @@ inline Indicator HHVBARS(const Indicator& ind, const IndParam& n) {
 
 inline Indicator HHVBARS(const Indicator& ind, const Indicator& n) {
     return HHVBARS(IndParam(n))(ind);
+}
+
+inline void registerPart_HHVBARS() {
+    registerIndicatorPart("core.ind.hhvbars", [] { return HHVBARS(); });
 }
 
 }  // namespace hku

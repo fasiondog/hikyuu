@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "BoolSignal.h"
@@ -64,6 +65,24 @@ SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell, bool alte
     auto p = make_shared<BoolSignal>(buy, sell);
     p->setParam<bool>("alternate", alternate);
     return p;
+}
+
+void registerPart_SG_Bool() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sg.bool"), void());
+    PartMeta meta;
+    meta.type = PartType::SG;
+    meta.name = "SG_Bool";
+    meta.full_name = "core.sg.bool";
+    meta.params.push_back(
+      ParamMeta{.name = "buy", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "sell", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "alternate", .type = "bool", .default_value = "true"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return SG_Bool(std::get<Indicator>(pp.at("buy").at(0)),
+                       std::get<Indicator>(pp.at("sell").at(0)), sc.get<bool>("alternate"));
+    });
 }
 
 } /* namespace hku */

@@ -8,7 +8,8 @@
 #ifndef INDICATOR_CRT_RSI_H_
 #define INDICATOR_CRT_RSI_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 #include "REF.h"
 #include "EMA.h"
 #include "CVAL.h"
@@ -21,6 +22,10 @@ namespace hku {
  */
 Indicator HKU_API RSI(int n = 14);
 Indicator HKU_API RSI(const Indicator& data, int n = 14);
+
+inline void registerPart_RSI() {
+    registerIndicatorPart("core.ind.rsi", [] { return RSI(); });
+}
 
 }  // namespace hku
 

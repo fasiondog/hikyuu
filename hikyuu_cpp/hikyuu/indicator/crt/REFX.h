@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -22,6 +23,17 @@ namespace hku {
 Indicator HKU_API REFX(int n);
 inline Indicator REFX(const Indicator& ind, int n) {
     return REFX(n)(ind);
+}
+
+inline void registerPart_REFX() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "REFX";
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .required = true});
+    registerIndicatorPart("core.ind.refx", meta,
+                          [](const Parameter &sc, const PartParamMap &) -> Part {
+                              return REFX(static_cast<int>(sc.get<int64_t>("n")));
+                          });
 }
 
 }  // namespace hku

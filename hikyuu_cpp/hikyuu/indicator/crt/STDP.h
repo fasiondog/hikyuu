@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_STDP_H_
 #define INDICATOR_CRT_STDP_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -31,6 +32,10 @@ inline Indicator STDP(const Indicator& data, const IndParam& n) {
 
 inline Indicator STDP(const Indicator& data, const Indicator& n) {
     return STDP(IndParam(n))(data);
+}
+
+inline void registerPart_STDP() {
+    registerIndicatorPart("core.ind.stdp", [] { return STDP(); });
 }
 
 }  // namespace hku

@@ -7,6 +7,7 @@
 
 #include <climits>
 #include "IAdx2.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IAdx2)

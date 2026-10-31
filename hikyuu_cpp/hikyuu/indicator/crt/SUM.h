@@ -10,7 +10,8 @@
 #ifndef INDICATOR_CRT_SUM_H_
 #define INDICATOR_CRT_SUM_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -49,6 +50,10 @@ inline Indicator SUM(const Indicator& ind, const IndParam& n) {
 
 inline Indicator SUM(const Indicator& ind, const Indicator& n) {
     return SUM(IndParam(n))(ind);
+}
+
+inline void registerPart_SUM() {
+    registerIndicatorPart("core.ind.sum", [] { return SUM(); });
 }
 
 }  // namespace hku

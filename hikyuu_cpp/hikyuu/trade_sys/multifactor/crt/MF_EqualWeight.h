@@ -108,4 +108,6 @@ inline MultiFactorPtr MF_EqualWeight(const IndicatorList& inds, const StockList&
                           mode, save_all_factors);
 }
 
+void registerPart_MF_EqualWeight();
+
 }  // namespace hku

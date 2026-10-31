@@ -10,6 +10,7 @@
 #define INDICATOR_CRT_ABS_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -25,6 +26,10 @@ inline Indicator ABS(const Indicator& ind) {
 
 inline Indicator ABS(Indicator::value_t val) {
     return ABS(CVAL(val));
+}
+
+inline void registerPart_ABS() {
+    registerIndicatorPart("core.ind.abs", [] { return ABS(); });
 }
 
 }  // namespace hku

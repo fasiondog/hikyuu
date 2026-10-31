@@ -28,6 +28,8 @@ namespace hku {
  */
 AFPtr HKU_API AF_FixedWeight(double weight = 0.1);
 
+void registerPart_AF_FixedWeight();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_ALLOCATEFUNDS_CRT_AF_FIXEDWEIGHT_H_ */

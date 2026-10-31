@@ -1,5 +1,6 @@
 #pragma once
 #include <hikyuu/indicator/Indicator.h>
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -35,5 +36,17 @@ Indicator HKU_API ADX2(const KData& kdata, int n = 14);
  * @return the ADX2 indicator calculator
  */
 Indicator HKU_API ADX2(int n = 14);
+
+inline void registerPart_ADX2() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "ADX2";
+    meta.params.push_back(ParamMeta{.name = "kdata", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "14"});
+    registerIndicatorPart(
+      "core.ind.adx2", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return ADX2(sc.get<KData>("kdata"), static_cast<int>(sc.get<int64_t>("n")));
+      });
+}
 
 }  // namespace hku

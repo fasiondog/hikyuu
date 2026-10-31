@@ -14,6 +14,7 @@
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "../utils.h"
 #include "IIc.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IIc)
@@ -172,9 +173,8 @@ price_t calc_day_ic(const IndicatorList& ref_inds, const IndicatorList& returns,
         buf_a[j] = ref_inds[j][i];
         buf_b[j] = returns[j][i];
     }
-    return use_spearman
-             ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
-             : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
+    return use_spearman ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
+                        : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
 }
 
 }  // namespace

@@ -213,4 +213,5 @@ Indicator HKU_API KDATA_PART(const string& part) {
     p->name("KDATA_PART");
     return p->calculate();
 }
+
 } /* namespace hku */

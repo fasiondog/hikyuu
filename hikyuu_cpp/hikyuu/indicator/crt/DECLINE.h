@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_DECLINE_H_
 #define INDICATOR_CRT_DECLINE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 #include "../../StockTypeInfo.h"
 
 namespace hku {
@@ -31,6 +32,10 @@ namespace hku {
 Indicator HKU_API DECLINE(const KQuery& query = KQueryByIndex(-100), const string& market = "SH",
                           int stk_type = STOCKTYPE_A, bool ignore_context = false,
                           bool fill_null = true);
+
+inline void registerPart_DECLINE() {
+    registerIndicatorPart("core.ind.decline", [] { return DECLINE(); });
+}
 
 }  // namespace hku
 

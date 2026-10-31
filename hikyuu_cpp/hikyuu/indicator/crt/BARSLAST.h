@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_BARSLAST_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,6 +35,10 @@ inline Indicator BARSLAST(const Indicator& ind) {
 
 inline Indicator BARSLAST(Indicator::value_t val) {
     return BARSLAST(CVAL(val));
+}
+
+inline void registerPart_BARSLAST() {
+    registerIndicatorPart("core.ind.barslast", [] { return BARSLAST(); });
 }
 
 }  // namespace hku

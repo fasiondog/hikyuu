@@ -16,7 +16,7 @@ HUB 指的是量化交易策略部件的平台，用于：
     
     增加远程策略仓库
 
-    :param str name: 本地仓库名称（自行起名）
+    :param str name: 本地仓库名称（自行起名，不能为 "core"，该名称为内置部件仓库保留）
     :param str url: git 仓库地址
     :param str branch: git 仓库分支
 
@@ -25,7 +25,7 @@ HUB 指的是量化交易策略部件的平台，用于：
 
     增加本地策略仓库
 
-    :param str name: 本地仓库名称（自行起名）
+    :param str name: 本地仓库名称（自行起名，不能为 "core"，该名称为内置部件仓库保留）
     :param str path: 本地仓库路径
 
 
@@ -68,23 +68,22 @@ HUB 指的是量化交易策略部件的平台，用于：
     :rtype: str
 
 
-.. py:function:: get_part(name, *args, **kwargs)
+.. py:function:: get_part(name, **kwargs)
 
     获取策略部件
 
-    :param str name: 策略部件名称
-    :param args: 策略部件参数
+    :param str name: 策略部件名称；内置部件位于 "core" 仓库，如 "core.ind.ma"，直接从内存注册表创建，不访问数据库
     :param kwargs: 策略部件参数
     :return: 策略部件实例
     :rtype: object
 
 
-.. py:function:: get_part_name_list(self, hub=None, part_type=None)
+.. py:function:: get_part_name_list(hub=None, part_type=None)
 
     获取策略部件名称列表
 
-    :param str name: 仓库名称
-    :param str part_type: 部件类型
+    :param str hub: 仓库名称；为 "core" 时返回内置部件，省略时同时包含内置部件
+    :param part_type: 部件类型，可传类型名（不区分大小写）或 PartType 枚举
     :return: 策略部件名称列表
     :rtype: list
 
@@ -103,9 +102,21 @@ HUB 指的是量化交易策略部件的平台，用于：
     示例: search_part('趋势')
 
     :param str name: 部件名称
-    :param str hub: 仓库名称
-    :param str part_type: 部件类型
+    :param str hub: 仓库名称；"core" 为内置部件仓库，省略时同时搜索内置部件
+    :param part_type: 部件类型，可传类型名（不区分大小写）或 PartType 枚举
     :param str label: 标签
     :return: 策略部件名称列表
+
+
+.. py:function:: register_python_part(full_name, meta, factory, overwrite=False)
+
+    将 python 定义的部件注册进内置部件仓库，注册后可由 ``get_part`` 或 C++ 侧 ``PartRegistry.create`` 按名创建
+
+    示例: register_python_part('core.ind.pyma', meta, lambda scalars, parts: MA(scalars['n']))
+
+    :param str full_name: 部件全名，形如 "core.<类型>.<名称>"，其类型须与 meta 的类型一致
+    :param PartMeta meta: 部件元信息
+    :param factory: python 可调用对象 ``factory(scalars, parts)``，返回部件实例
+    :param bool overwrite: 是否覆盖已注册的同名部件（内置、插件或 python），默认 False 时报错
 
 

@@ -30,6 +30,8 @@ TradeManagerPtr HKU_API crtTM(const Datetime& datetime = Datetime(199001010000LL
                               price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
                               const string& name = "SYS");
 
+void registerPart_crtTM();
+
 }  // namespace hku
 
 #endif /* CRTTM_H_ */

@@ -26,6 +26,8 @@ namespace hku {
  */
 ProfitGoalPtr HKU_API PG_FixedHoldDays(int days = 5);
 
+void registerPart_PG_FixedHoldDays();
+
 } /* namespace hku */
 
 #endif /* TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDPERCENT_H_ */

@@ -57,6 +57,8 @@ SystemPtr HKU_API SYS_Simple(
   const StoplossPtr& tp = StoplossPtr(), const ProfitGoalPtr& pg = ProfitGoalPtr(),
   const SlippagePtr& sp = SlippagePtr());
 
+void registerPart_SYS_Simple();
+
 }  // namespace hku
 
 #endif /* CRTSIMPLESYSTEM_H_ */

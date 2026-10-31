@@ -8,6 +8,7 @@
 #pragma once
 
 #include "MA.h"
+#include "hikyuu/part/PartRegister.h"
 #include "STDEV.h"
 
 namespace hku {
@@ -52,6 +53,25 @@ inline Indicator ICIR(const Indicator& ind, const Block& blk, int n = 1, int rol
     x.setParam<int>("n", n);
     x.setParam<int>("rolling_n", rolling_n);
     return x;
+}
+
+inline void registerPart_ICIR() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "ICIR";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "stks", .type = "StockList", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "1"});
+    meta.params.push_back(ParamMeta{.name = "rolling_n", .type = "int", .default_value = "120"});
+    meta.params.push_back(ParamMeta{.name = "spearman", .type = "bool", .default_value = "true"});
+    meta.params.push_back(ParamMeta{.name = "strict", .type = "bool", .default_value = "false"});
+    registerIndicatorPart(
+      "core.ind.icir", meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+          HKU_THROW_EXCEPTION(std::logic_error,
+                              "ICIR can not be created from the registry, it needs a StockList");
+          return Indicator();
+      });
 }
 
 }  // namespace hku

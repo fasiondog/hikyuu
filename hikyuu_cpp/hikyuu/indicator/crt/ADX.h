@@ -2,7 +2,8 @@
 #ifndef INDICATOR_CRT_ADX_H_
 #define INDICATOR_CRT_ADX_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -59,6 +60,10 @@ Indicator HKU_API ADX(int n = 14);
  * @ingroup Indicator
  */
 Indicator HKU_API ADX(const KData& kdata, int n = 14);
+
+inline void registerPart_ADX() {
+    registerIndicatorPart("core.ind.adx", [] { return ADX(); });
+}
 
 }  // namespace hku
 

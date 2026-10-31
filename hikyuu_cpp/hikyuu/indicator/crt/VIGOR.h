@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_VIGOR_H_
 #define INDICATOR_CRT_VIGOR_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,6 +35,18 @@ namespace hku {
 Indicator HKU_API VIGOR(const KData& kdata, int n = 2);
 
 Indicator HKU_API VIGOR(int n = 2);
+
+inline void registerPart_VIGOR() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "VIGOR";
+    meta.params.push_back(ParamMeta{.name = "kdata", .type = "KData", .required = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "2"});
+    registerIndicatorPart(
+      "core.ind.vigor", meta, [](const Parameter& sc, const PartParamMap&) -> Part {
+          return VIGOR(sc.get<KData>("kdata"), static_cast<int>(sc.get<int64_t>("n")));
+      });
+}
 
 }  // namespace hku
 

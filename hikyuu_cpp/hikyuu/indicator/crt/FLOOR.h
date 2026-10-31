@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_FLOOR_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -29,6 +30,10 @@ inline Indicator FLOOR(const Indicator& ind) {
 
 inline Indicator FLOOR(Indicator::value_t val) {
     return FLOOR(CVAL(val));
+}
+
+inline void registerPart_FLOOR() {
+    registerIndicatorPart("core.ind.floor", [] { return FLOOR(); });
 }
 
 }  // namespace hku

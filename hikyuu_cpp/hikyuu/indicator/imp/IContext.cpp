@@ -9,6 +9,7 @@
 #include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
 #include "IContext.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IContext)

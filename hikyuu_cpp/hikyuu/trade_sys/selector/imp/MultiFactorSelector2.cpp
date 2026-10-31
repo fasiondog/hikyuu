@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/trade_sys/multifactor/build_in.h"
+#include "hikyuu/part/PartRegister.h"
 #include "MultiFactorSelector2.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -165,6 +166,17 @@ SelectorPtr HKU_API SE_MultiFactor2(const FactorSet& factorset, int ic_n, int ic
     p->setParam<string>("mode", mode);
     p->setScoresFilter(filter);
     return p;
+}
+
+void registerPart_SE_MultiFactor2() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.se.multifactor2"), void());
+    PartMeta meta;
+    meta.type = PartType::SE;
+    meta.name = "SE_MultiFactor2";
+    meta.full_name = "core.se.multifactor2";
+    reg.registerPart(
+      meta, [](const Parameter& sc, const PartParamMap& pp) -> Part { return SE_MultiFactor2(); });
 }
 
 }  // namespace hku

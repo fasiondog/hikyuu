@@ -32,4 +32,6 @@ SEPtr HKU_API SE_PerformanceOptimal(const string& key = "Account Avg Annual Retu
 SEPtr HKU_API
 SE_EvaluateOptimal(std::function<double(const SystemPtr&, const Datetime&)>&& evaluate);
 
+void registerPart_SE_MaxFundsOptimal();
+
 }  // namespace hku

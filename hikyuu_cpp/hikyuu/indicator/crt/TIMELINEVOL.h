@@ -9,12 +9,17 @@
 #ifndef INDICATOR_CRT_TIMELINEVOL_H_
 #define INDICATOR_CRT_TIMELINEVOL_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
 Indicator HKU_API TIMELINEVOL();
 Indicator HKU_API TIMELINEVOL(const KData&);
+
+inline void registerPart_TIMELINEVOL() {
+    registerIndicatorPart("core.ind.timelinevol", [] { return TIMELINEVOL(); });
+}
 
 }  // namespace hku
 

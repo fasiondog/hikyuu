@@ -19,7 +19,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     
     Add a remote strategy repository
 
-    :param str name: local repository name (choose your own)
+    :param str name: local repository name (choose your own; "core" is reserved for the built-in part hub)
     :param str url: URL of the git repository
     :param str branch: branch of the git repository
 
@@ -28,7 +28,7 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
 
     Add a local strategy repository
 
-    :param str name: local repository name (choose your own)
+    :param str name: local repository name (choose your own; "core" is reserved for the built-in part hub)
     :param str path: path of the local repository
 
 
@@ -71,23 +71,23 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     :rtype: str
 
 
-.. py:function:: get_part(name, *args, **kwargs)
+.. py:function:: get_part(name, **kwargs)
 
     Get a strategy part
 
-    :param str name: strategy part name
-    :param args: positional arguments passed to the strategy part
+    :param str name: strategy part name; the built-in parts live in the "core" hub, e.g. "core.ind.ma",
+        and are created from the in-memory registry without touching the database
     :param kwargs: keyword arguments passed to the strategy part
     :return: strategy part instance
     :rtype: object
 
 
-.. py:function:: get_part_name_list(self, hub=None, part_type=None)
+.. py:function:: get_part_name_list(hub=None, part_type=None)
 
     Get the list of available strategy part names
 
-    :param str name: repository name
-    :param str part_type: part type
+    :param str hub: repository name; "core" returns the built-in parts, and omitting it includes them
+    :param part_type: part type, given as its name (case insensitive) or as the PartType enum
     :return: list of strategy part names
     :rtype: list
 
@@ -106,7 +106,20 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     Example: search_part('MA')  # part names in the public hikyuu_hub repository are in Chinese, so Chinese keywords such as '趋势' (trend) also work
 
     :param str name: part name
-    :param str hub: repository name
-    :param str part_type: part type
+    :param str hub: repository name; "core" is the built-in part hub, and omitting it searches it too
+    :param part_type: part type, given as its name (case insensitive) or as the PartType enum
     :param str label: label
     :return: list of matching strategy part names
+
+
+.. py:function:: register_python_part(full_name, meta, factory, overwrite=False)
+
+    Register a python defined part into the built-in hub, so that it can be created by name with
+    ``get_part`` or by the C++ ``PartRegistry.create``
+
+    Example: register_python_part('core.ind.pyma', meta, lambda scalars, parts: MA(scalars['n']))
+
+    :param str full_name: part full name in the form "core.<type>.<name>", its type must match the meta type
+    :param PartMeta meta: part meta info
+    :param factory: the callable ``factory(scalars, parts)`` returning the part instance
+    :param bool overwrite: replace an existing registration (built-in, plugin or python), an existing one is rejected by default

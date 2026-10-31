@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,5 +35,17 @@ Indicator HKU_API INBLOCK(const string& category, const string& name);
  * @return Indicator
  */
 Indicator HKU_API INBLOCK(const KData& kdata, const string& category, const string& name);
+
+inline void registerPart_INBLOCK() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "INBLOCK";
+    meta.params.push_back(ParamMeta{.name = "category", .type = "string", .required = true});
+    meta.params.push_back(ParamMeta{.name = "name", .type = "string", .required = true});
+    registerIndicatorPart("core.ind.inblock", meta,
+                          [](const Parameter& sc, const PartParamMap&) -> Part {
+                              return INBLOCK(sc.get<string>("category"), sc.get<string>("name"));
+                          });
+}
 
 }  // namespace hku

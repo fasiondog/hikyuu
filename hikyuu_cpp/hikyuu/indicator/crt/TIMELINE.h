@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_TIMELINE_H_
 #define INDICATOR_CRT_TIMELINE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,6 +35,10 @@ namespace hku {
  */
 Indicator HKU_API TIMELINE();
 Indicator HKU_API TIMELINE(const KData&);
+
+inline void registerPart_TIMELINE() {
+    registerIndicatorPart("core.ind.timeline", [] { return TIMELINE(); });
+}
 
 }  // namespace hku
 

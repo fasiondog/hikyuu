@@ -28,6 +28,8 @@ namespace hku {
  */
 TradeCostPtr HKU_API TC_FixedETF(price_t commission = 0.0001, price_t lowestCommission = 5.0);
 
+void registerPart_TC_FixedETF();
+
 }  // namespace hku
 
 #endif /* TRADE_MANAGE_CRT_TC_FIXEDETF_H_ */

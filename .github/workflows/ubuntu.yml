@@ -23,6 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check part registration
+        run: python3 hikyuu_cpp/tools/check_part_registration.py
 
       - name: Cache packages
         id: cache-xmake-ubuntu

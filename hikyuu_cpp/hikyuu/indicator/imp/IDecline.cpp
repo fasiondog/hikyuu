@@ -8,7 +8,7 @@
  */
 
 #include "IDecline.h"
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
 #include "../crt/KDATA.h"
 #include "../crt/REF.h"
 #include "../crt/ALIGN.h"

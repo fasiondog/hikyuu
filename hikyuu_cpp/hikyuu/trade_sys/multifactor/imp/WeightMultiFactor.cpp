@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/utilities/thread/algorithm.h"
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "WeightMultiFactor.h"
 
@@ -79,6 +80,17 @@ MultiFactorPtr HKU_API MF_Weight(const PriceList& weights, const StockList& stks
                                  int mode, bool save_all_factors) {
     return make_shared<WeightMultiFactor>(weights, stks, query, ref_stk, ic_n, spearman, mode,
                                           save_all_factors);
+}
+
+void registerPart_MF_Weight() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mf.weight"), void());
+    PartMeta meta;
+    meta.type = PartType::MF;
+    meta.name = "MF_Weight";
+    meta.full_name = "core.mf.weight";
+    reg.registerPart(
+      meta, [](const Parameter& sc, const PartParamMap& pp) -> Part { return MF_Weight(); });
 }
 
 }  // namespace hku

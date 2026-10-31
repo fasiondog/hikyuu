@@ -21,6 +21,8 @@ namespace hku {
  */
 StoplossPtr HKU_API ST_FixedPercent(double p = 0.03);
 
+void registerPart_ST_FixedPercent();
+
 }  // namespace hku
 
 #endif /* FIXEDPERCENT_SL_H_ */

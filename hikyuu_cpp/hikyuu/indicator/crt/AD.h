@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_AD_H_
 #define INDICATOR_CRT_AD_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -25,6 +26,16 @@ namespace hku {
  */
 Indicator HKU_API AD(const KData& k);
 Indicator HKU_API AD();
+
+inline void registerPart_AD() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "AD";
+    meta.params.push_back(ParamMeta{.name = "k", .type = "KData", .required = true});
+    registerIndicatorPart(
+      "core.ind.ad", meta,
+      [](const Parameter& sc, const PartParamMap&) -> Part { return AD(sc.get<KData>("k")); });
+}
 
 }  // namespace hku
 

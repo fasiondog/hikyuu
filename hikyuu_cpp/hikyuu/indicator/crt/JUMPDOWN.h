@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -19,6 +20,10 @@ Indicator HKU_API JUMPDOWN();
 
 inline Indicator JUMPDOWN(const Indicator& ind) {
     return JUMPDOWN()(ind);
+}
+
+inline void registerPart_JUMPDOWN() {
+    registerIndicatorPart("core.ind.jumpdown", [] { return JUMPDOWN(); });
 }
 
 }  // namespace hku

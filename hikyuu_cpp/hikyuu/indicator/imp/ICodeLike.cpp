@@ -8,6 +8,7 @@
 #include "hikyuu/Stock.h"
 #include "ICodeLike.h"
 #include "WildcardMatch.h"
+#include "hikyuu/utilities/Log.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICodeLike)

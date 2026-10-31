@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/trade_sys/selector/crt/SE_Optimal.h"
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h"
 #include "hikyuu/trade_manage/Performance.h"
 #include "WalkForwardSystem.h"
@@ -549,6 +550,37 @@ SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list, const Tr
     ret->setParam<int>("train_len", train_len);
     ret->setParam<int>("test_len", test_len);
     return ret;
+}
+
+void registerPart_SYS_WalkForward() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.sys.walkforward"), void());
+    PartMeta meta;
+    meta.type = PartType::SYS;
+    meta.name = "SYS_WalkForward";
+    meta.full_name = "core.sys.walkforward";
+    meta.params.push_back(ParamMeta{.name = "candidate_sys_list",
+                                    .type = "System",
+                                    .required = true,
+                                    .is_part_param = true,
+                                    .is_list = true});
+    meta.params.push_back(ParamMeta{.name = "tm", .type = "TradeManager", .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "train_len", .type = "int", .default_value = "100"});
+    meta.params.push_back(ParamMeta{.name = "test_len", .type = "int", .default_value = "20"});
+    meta.params.push_back(ParamMeta{.name = "se", .type = "Selector", .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "train_tm", .type = "TradeManager", .is_part_param = true});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        SystemList sys_list;
+        for (const auto& part : pp.at("candidate_sys_list")) {
+            sys_list.push_back(std::get<SYSPtr>(part));
+        }
+        return SYS_WalkForward(sys_list, partOr<TradeManagerPtr>(pp, "tm", TradeManagerPtr()),
+                               static_cast<size_t>(sc.get<int64_t>("train_len")),
+                               static_cast<size_t>(sc.get<int64_t>("test_len")),
+                               partOr<SEPtr>(pp, "se", SE_PerformanceOptimal()),
+                               partOr<TradeManagerPtr>(pp, "train_tm", TradeManagerPtr()));
+    });
 }
 
 }  // namespace hku

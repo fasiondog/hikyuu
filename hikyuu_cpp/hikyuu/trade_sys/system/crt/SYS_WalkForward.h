@@ -18,4 +18,6 @@ SystemPtr HKU_API SYS_WalkForward(const SystemList& candidate_sys_list,
                                   const SelectorPtr& se = SE_PerformanceOptimal(),
                                   const TradeManagerPtr& train_tm = TradeManagerPtr());
 
+void registerPart_SYS_WalkForward();
+
 }  // namespace hku

@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_MAX_H_
 #define INDICATOR_CRT_MAX_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -43,6 +44,21 @@ inline Indicator MAX(Indicator::value_t val, const Indicator& ind) {
     Indicator result = IF(val > ind, val, ind);
     result.name("MAX");
     return result;
+}
+
+inline void registerPart_MAX() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "MAX";
+    meta.params.push_back(
+      ParamMeta{.name = "ind1", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "ind2", .type = "Indicator", .required = true, .is_part_param = true});
+    registerIndicatorPart("core.ind.max", meta,
+                          [](const Parameter&, const PartParamMap& pp) -> Part {
+                              return MAX(std::get<Indicator>(pp.at("ind1").at(0)),
+                                         std::get<Indicator>(pp.at("ind2").at(0)));
+                          });
 }
 
 }  // namespace hku

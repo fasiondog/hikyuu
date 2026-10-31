@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_CEILING_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -29,6 +30,10 @@ inline Indicator CEILING(const Indicator& ind) {
 
 inline Indicator CEILING(Indicator::value_t val) {
     return CEILING(CVAL(val));
+}
+
+inline void registerPart_CEILING() {
+    registerIndicatorPart("core.ind.ceiling", [] { return CEILING(); });
 }
 
 }  // namespace hku

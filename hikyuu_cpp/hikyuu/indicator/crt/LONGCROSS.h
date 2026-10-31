@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_LONGCROSS_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 #include "EVERY.h"
 #include "REF.h"
 
@@ -61,6 +62,23 @@ inline Indicator LONGCROSS(Indicator::value_t x, Indicator::value_t y, int n = 3
 
 inline Indicator LONGCROSS(Indicator::value_t x, Indicator::value_t y, const Indicator& n) {
     return LONGCROSS(CVAL(x), CVAL(y), n);
+}
+
+inline void registerPart_LONGCROSS() {
+    PartMeta meta;
+    meta.type = PartType::IND;
+    meta.name = "LONGCROSS";
+    meta.params.push_back(
+      ParamMeta{.name = "x", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(
+      ParamMeta{.name = "y", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "n", .type = "int", .default_value = "3"});
+    registerIndicatorPart("core.ind.longcross", meta,
+                          [](const Parameter& sc, const PartParamMap& pp) -> Part {
+                              return LONGCROSS(std::get<Indicator>(pp.at("x").at(0)),
+                                               std::get<Indicator>(pp.at("y").at(0)),
+                                               static_cast<int>(sc.get<int64_t>("n")));
+                          });
 }
 
 }  // namespace hku

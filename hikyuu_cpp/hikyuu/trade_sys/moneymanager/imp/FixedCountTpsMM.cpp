@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "hikyuu/part/PartRegister.h"
 #include "hikyuu/utilities/arithmetic.h"
 #include "FixedCountTpsMM.h"
 
@@ -89,6 +90,23 @@ double FixedCountTpsMM::_getSellNumber(const Datetime& datetime, const Stock& st
 MoneyManagerPtr HKU_API MM_FixedCountTps(const vector<double>& buy_counts,
                                          const vector<double>& sell_counts) {
     return make_shared<FixedCountTpsMM>(buy_counts, sell_counts);
+}
+
+void registerPart_MM_FixedCountTps() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.fixedcounttps"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_FixedCountTps";
+    meta.full_name = "core.mm.fixedcounttps";
+    meta.params.push_back(ParamMeta{.name = "buy_counts", .type = "PriceList", .required = true});
+    meta.params.push_back(ParamMeta{.name = "sell_counts", .type = "PriceList", .required = true});
+    reg.registerPart(meta, [](const Parameter&, const PartParamMap&) -> Part {
+        HKU_THROW_EXCEPTION(std::logic_error,
+                            "MM_FixedCountTps takes count lists, create it through the programming "
+                            "interface");
+        return MMPtr();
+    });
 }
 
 } /* namespace hku */

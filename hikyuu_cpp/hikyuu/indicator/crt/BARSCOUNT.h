@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_BARSCOUNT_H_
 #define INDICATOR_CRT_BARSCOUNT_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -30,6 +31,10 @@ Indicator HKU_API BARSCOUNT();
 
 inline Indicator BARSCOUNT(const Indicator& ind) {
     return BARSCOUNT()(ind);
+}
+
+inline void registerPart_BARSCOUNT() {
+    registerIndicatorPart("core.ind.barscount", [] { return BARSCOUNT(); });
 }
 
 }  // namespace hku

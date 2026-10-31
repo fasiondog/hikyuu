@@ -9,7 +9,8 @@
 #ifndef INDICATOR_CRT_SLOPE_H_
 #define INDICATOR_CRT_SLOPE_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -51,6 +52,10 @@ inline Indicator HKU_API SLOPE(const Indicator& ind, const IndParam& n) {
 
 inline Indicator SLOPE(const Indicator& ind, const Indicator& n) {
     return SLOPE(IndParam(n))(ind);
+}
+
+inline void registerPart_SLOPE() {
+    registerIndicatorPart("core.ind.slope", [] { return SLOPE(); });
 }
 
 }  // namespace hku

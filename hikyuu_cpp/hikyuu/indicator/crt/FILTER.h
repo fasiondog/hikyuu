@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_FILTER_H_
 #define INDICATOR_CRT_FILTER_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -39,6 +40,10 @@ inline Indicator FILTER(const Indicator& ind, const IndParam& n) {
 
 inline Indicator FILTER(const Indicator& ind, const Indicator& n) {
     return FILTER(IndParam(n))(ind);
+}
+
+inline void registerPart_FILTER() {
+    registerIndicatorPart("core.ind.filter", [] { return FILTER(); });
 }
 
 }  // namespace hku

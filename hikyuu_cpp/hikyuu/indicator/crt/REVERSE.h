@@ -12,6 +12,7 @@
 #define INDICATOR_CRT_REVERSE_H_
 
 #include "CVAL.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -27,6 +28,10 @@ inline Indicator REVERSE(const Indicator& ind) {
 
 inline Indicator REVERSE(Indicator::value_t val) {
     return REVERSE(CVAL(val));
+}
+
+inline void registerPart_REVERSE() {
+    registerIndicatorPart("core.ind.reverse", [] { return REVERSE(); });
 }
 
 }  // namespace hku

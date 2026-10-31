@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/StockManager.h"
+#include "hikyuu/part/PartRegister.h"
 #include "BoolEnvironment.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -75,6 +76,21 @@ EVPtr HKU_API EV_Bool(const Indicator& ind, const string& market) {
     EVPtr p = make_shared<BoolEnvironment>(ind);
     p->setParam<string>("market", market);
     return p;
+}
+
+void registerPart_EV_Bool() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.ev.bool"), void());
+    PartMeta meta;
+    meta.type = PartType::EV;
+    meta.name = "EV_Bool";
+    meta.full_name = "core.ev.bool";
+    meta.params.push_back(
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "market", .type = "string", .default_value = "SH"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return EV_Bool(std::get<Indicator>(pp.at("ind").at(0)), sc.get<string>("market"));
+    });
 }
 
 }  // namespace hku

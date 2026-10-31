@@ -11,7 +11,8 @@
 #ifndef INDICATOR_CRT_DEVSQ_H_
 #define INDICATOR_CRT_DEVSQ_H_
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -34,6 +35,10 @@ inline Indicator DEVSQ(const Indicator& data, const IndParam& n) {
 
 inline Indicator DEVSQ(const Indicator& data, const Indicator& n) {
     return DEVSQ(IndParam(n))(data);
+}
+
+inline void registerPart_DEVSQ() {
+    registerIndicatorPart("core.ind.devsq", [] { return DEVSQ(); });
 }
 
 }  // namespace hku

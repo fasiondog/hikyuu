@@ -83,4 +83,6 @@ inline SelectorPtr SE_MultiFactor2(const IndicatorList& src_inds, int ic_n = 5,
                            filter);
 }
 
+void registerPart_SE_MultiFactor2();
+
 }  // namespace hku

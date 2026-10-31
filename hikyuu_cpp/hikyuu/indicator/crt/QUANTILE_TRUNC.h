@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../Indicator.h"
+#include "hikyuu/indicator/Indicator.h"
+#include "hikyuu/part/PartRegister.h"
 
 namespace hku {
 
@@ -25,6 +26,10 @@ Indicator HKU_API QUANTILE_TRUNC(int n = 60, double quantile_min = 0.01,
 inline Indicator QUANTILE_TRUNC(const Indicator& data, int n = 60, double quantile_min = 0.01,
                                 double quantile_max = 0.99) {
     return QUANTILE_TRUNC(n, quantile_min, quantile_max)(data);
+}
+
+inline void registerPart_QUANTILE_TRUNC() {
+    registerIndicatorPart("core.ind.quantile_trunc", [] { return QUANTILE_TRUNC(); });
 }
 
 }  // namespace hku

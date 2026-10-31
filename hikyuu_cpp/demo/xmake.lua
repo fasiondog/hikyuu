@@ -86,3 +86,39 @@ target("thread-bench")
     add_files("./thread_bench.cpp")
 target_end()
 
+target("part-bench")
+    set_kind("binary")
+    set_default(false)
+
+    add_packages("boost", "spdlog", "fmt", "nng", "nlohmann_json")
+    add_includedirs("..")
+
+    if is_plat("windows") and get_config("kind") == "shared" then
+        add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
+        add_defines("SQLITE_API=__declspec(dllimport)")
+    end
+
+    add_deps("hikyuu")
+
+    add_files("./part_bench.cpp")
+target_end()
+
+target("part-dump")
+    set_kind("binary")
+    set_default(false)
+
+    add_packages("boost", "spdlog", "fmt", "nng", "nlohmann_json")
+    add_includedirs("..")
+
+    if is_plat("windows") and get_config("kind") == "shared" then
+        add_defines("HKU_API=__declspec(dllimport)")
+        add_defines("HKU_UTILS_API=__declspec(dllimport)")
+        add_defines("SQLITE_API=__declspec(dllimport)")
+    end
+
+    add_deps("hikyuu")
+
+    add_files("./part_dump.cpp")
+target_end()
+

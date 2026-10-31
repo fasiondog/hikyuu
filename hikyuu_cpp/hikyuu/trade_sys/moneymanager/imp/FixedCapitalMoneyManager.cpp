@@ -6,6 +6,7 @@
  */
 
 #include "FixedCapitalMoneyManager.h"
+#include "hikyuu/part/PartRegister.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedCapitalMoneyManager)
@@ -43,6 +44,20 @@ MoneyManagerPtr HKU_API MM_FixedCapital(double capital) {
     MoneyManagerPtr p = make_shared<FixedCapitalMoneyManager>();
     p->setParam<double>("capital", capital);
     return p;
+}
+
+void registerPart_MM_FixedCapital() {
+    auto& reg = PartRegistry::instance();
+    HKU_IF_RETURN(reg.has("core.mm.fixedcapital"), void());
+    PartMeta meta;
+    meta.type = PartType::MM;
+    meta.name = "MM_FixedCapital";
+    meta.full_name = "core.mm.fixedcapital";
+    meta.params.push_back(
+      ParamMeta{.name = "capital", .type = "double", .default_value = "10000.00"});
+    reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        return MM_FixedCapital(sc.get<double>("capital"));
+    });
 }
 
 } /* namespace hku */
