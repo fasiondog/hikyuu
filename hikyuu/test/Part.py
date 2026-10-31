@@ -166,6 +166,18 @@ class PartTest(unittest.TestCase):
             with self.assertRaises(HubNameError):
                 hikyuu.add_remote_hub(name, "https://example.com/not-exists.git")
 
+    def test_hub_exceptions_exported(self):
+        # the hub exceptions are raised by the top level functions, so they must be reachable
+        # from the package top level as well
+        self.assertIs(hikyuu.HubNameError, hikyuu.hub.HubNameError)
+        self.assertIs(hikyuu.HubNameRepeatError, hikyuu.hub.HubNameRepeatError)
+        self.assertIs(hikyuu.HubNotFoundError, hikyuu.hub.HubNotFoundError)
+        self.assertIs(hikyuu.ModuleConflictError, hikyuu.hub.ModuleConflictError)
+        self.assertIs(hikyuu.PartNotFoundError, hikyuu.hub.PartNotFoundError)
+        self.assertIs(hikyuu.PartNameError, hikyuu.hub.PartNameError)
+        with self.assertRaises(hikyuu.HubNameError):
+            hikyuu.add_local_hub("core", "not-exists-path-for-test")
+
     def test_python_part(self):
         def factory(scalars, parts):
             return MA(scalars["n"])

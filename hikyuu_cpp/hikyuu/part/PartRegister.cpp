@@ -110,7 +110,10 @@ void registerIndicatorPart(const string& full_name, const PartMeta& meta,
     PartMeta m(meta);
     m.type = PartType::IND;
     m.full_name = full_name;
-    m.name = full_name.substr(full_name.rfind('.') + 1);
+    if (m.name.empty()) {
+        // the C++ name is kept verbatim, fall back to the full_name segment
+        m.name = full_name.substr(full_name.rfind('.') + 1);
+    }
     reg.registerPart(m, creator);
 }
 

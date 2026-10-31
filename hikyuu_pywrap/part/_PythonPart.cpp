@@ -14,6 +14,7 @@
 #include <hikyuu/part/PartRegistry.h>
 #include <hikyuu/utilities/Log.h>
 
+#include "../pybind_utils.h"
 #include "part_convert.h"
 
 namespace py = pybind11;
@@ -49,18 +50,13 @@ py::object findFactory(const std::string& full_name) {
     return py::none();
 }
 
-bool interpreterShuttingDown() {
-#if PY_VERSION_HEX >= 0x030D0000
-    return Py_IsFinalizing() != 0;
-#else
-    return Py_IsInitialized() == 0;
-#endif
-}
-
 }  // namespace
 
 void registerPythonPart(const std::string& full_name, const PartMeta& meta, py::object factory,
                         bool overwrite) {
+    // the creator below and release_python_parts consult this flag
+    register_finalizing_flag();
+
     HKU_CHECK_THROW(!full_name.empty(), std::invalid_argument, "Empty part full_name: {}",
                     full_name);
     HKU_CHECK_THROW(!factory.is_none() && PyCallable_Check(factory.ptr()) != 0,
@@ -88,6 +84,14 @@ void registerPythonPart(const std::string& full_name, const PartMeta& meta, py::
     reg.registerPart(
       part_meta,
       [full_name](const Parameter& scalars, const PartParamMap& parts) -> Part {
+          // acquiring the GIL while the interpreter is finalizing is fatal: fail with a plain
+          // C++ exception instead
+          if (g_interpreter_finalizing().load(std::memory_order_acquire)) {
+              HKU_THROW_EXCEPTION(std::runtime_error,
+                                  "The python factory of part \"{}\" is no longer available: the "
+                                  "python interpreter is shutting down",
+                                  full_name);
+          }
           py::gil_scoped_acquire gil;
           py::object factory = findFactory(full_name);
           HKU_CHECK_THROW(!factory.is_none(), std::runtime_error,
@@ -111,7 +115,7 @@ void releasePythonParts() {
     if (g_python_parts == nullptr || g_python_parts->empty()) {
         return;
     }
-    if (interpreterShuttingDown()) {
+    if (g_interpreter_finalizing().load(std::memory_order_acquire)) {
         // Leaking is preferred over crashing during the interpreter shutdown
         return;
     }

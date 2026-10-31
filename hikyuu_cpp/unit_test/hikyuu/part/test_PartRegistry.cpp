@@ -392,4 +392,76 @@ TEST_CASE("test_PartRegistry_meta_consistency") {
     CHECK_UNARY(problems.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_PartRegistry_bool_param") {
+    auto& reg = PartRegistry::instance();
+    string name = "testhub.ind.boolparam";
+    reg.unregister(name);
+
+    auto flag = std::make_shared<bool>(false);
+    PartMeta meta = makeMeta(name, PartType::IND, PartMeta::Source::BUILTIN);
+    meta.params.push_back(ParamMeta{.name = "flag", .type = "bool", .default_value = "true"});
+    reg.registerPart(meta, [flag](const Parameter& sc, const PartRegistry::PartParamMap&) {
+        *flag = sc.get<bool>("flag");
+        return Part(Indicator());
+    });
+
+    /** @arg the textual default is injected */
+    reg.create(name);
+    CHECK_UNARY(*flag);
+
+    /** @arg the text forms true/false/1/0 are accepted case insensitively */
+    reg.createFromString(name + "(flag=FALSE)");
+    CHECK_UNARY_FALSE(*flag);
+    reg.createFromString(name + "(flag=TRUE)");
+    CHECK_UNARY(*flag);
+    reg.createFromString(name + "(flag=0)");
+    CHECK_UNARY_FALSE(*flag);
+    reg.createFromString(name + "(flag=1)");
+    CHECK_UNARY(*flag);
+
+    /** @arg an unknown bool text is rejected instead of being silently false */
+    CHECK_THROWS_AS(reg.createFromString(name + "(flag=yes)"), std::invalid_argument);
+    CHECK_UNARY(*flag);
+
+    /** @arg an invalid bool default is rejected instead of being silently false */
+    string bad_name = "testhub.ind.boolbad";
+    reg.unregister(bad_name);
+    PartMeta bad_meta = makeMeta(bad_name, PartType::IND, PartMeta::Source::BUILTIN);
+    bad_meta.params.push_back(ParamMeta{.name = "flag", .type = "bool", .default_value = "yes"});
+    reg.registerPart(bad_meta, [](const Parameter&, const PartRegistry::PartParamMap&) {
+        return Part(Indicator());
+    });
+    CHECK_THROWS_AS(reg.create(bad_name), std::invalid_argument);
+
+    reg.unregister(name);
+    reg.unregister(bad_name);
+}
+
+/** @par Test points */
+TEST_CASE("test_PartRegistry_createFromString_nesting") {
+    auto& reg = PartRegistry::instance();
+    string name = "testhub.ind.nested";
+    reg.unregister(name);
+
+    PartMeta meta = makeMeta(name, PartType::IND, PartMeta::Source::BUILTIN);
+    meta.params.push_back(ParamMeta{.name = "ind", .type = "Indicator", .is_part_param = true});
+    reg.registerPart(meta, [](const Parameter&, const PartRegistry::PartParamMap&) {
+        return Part(Indicator());
+    });
+
+    /** @arg a shallow nesting of the part params is resolved */
+    auto part = reg.createFromString(name + "(ind=" + name + ")");
+    CHECK_UNARY(std::holds_alternative<Indicator>(part));
+
+    /** @arg an expression nested beyond the limit is rejected instead of exhausting the stack */
+    string deep = name;
+    for (int i = 0; i < 40; i++) {
+        deep = name + "(ind=" + deep + ")";
+    }
+    CHECK_THROWS_AS(reg.createFromString(deep), std::invalid_argument);
+
+    reg.unregister(name);
+}
+
 /** @} */

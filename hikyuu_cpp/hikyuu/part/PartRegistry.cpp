@@ -56,6 +56,34 @@ std::optional<PartType> partTypeFromParamType(const string& type) {
     return std::nullopt;
 }
 
+string trim(const string& s) {
+    size_t start = s.find_first_not_of(" \t\r\n");
+    if (start == string::npos) {
+        return string();
+    }
+    size_t end = s.find_last_not_of(" \t\r\n");
+    return s.substr(start, end - start + 1);
+}
+
+string toLower(const string& s) {
+    string out(s);
+    std::transform(out.begin(), out.end(), out.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    return out;
+}
+
+/** Parse a textual bool param: true/false/1/0, case insensitive; nullopt for anything else */
+std::optional<bool> toBool(const string& v) {
+    string lower = toLower(trim(v));
+    if (lower == "true" || lower == "1") {
+        return true;
+    }
+    if (lower == "false" || lower == "0") {
+        return false;
+    }
+    return std::nullopt;
+}
+
 /** Fill the missing scalar param with its declared string default; unsupported types are left
  *  to the creator (via tryGet) */
 void injectDefault(Parameter& sc, const ParamMeta& p) {
@@ -68,7 +96,12 @@ void injectDefault(Parameter& sc, const ParamMeta& p) {
         } else if (p.type == "double") {
             sc.set<double>(p.name, boost::lexical_cast<double>(v));
         } else if (p.type == "bool") {
-            sc.set<bool>(p.name, v == "true" || v == "1");
+            auto value = toBool(v);
+            HKU_CHECK_THROW(value.has_value(), std::invalid_argument,
+                            "Invalid default value \"{}\" for param \"{}\": expected "
+                            "true/false/1/0",
+                            v, p.name);
+            sc.set<bool>(p.name, *value);
         } else if (p.type == "string") {
             sc.set<string>(p.name, v);
         } else {
@@ -87,22 +120,6 @@ void injectDefault(Parameter& sc, const ParamMeta& p) {
     }
 }
 
-string trim(const string& s) {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    if (start == string::npos) {
-        return string();
-    }
-    size_t end = s.find_last_not_of(" \t\r\n");
-    return s.substr(start, end - start + 1);
-}
-
-string toLower(const string& s) {
-    string out(s);
-    std::transform(out.begin(), out.end(), out.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-    return out;
-}
-
 /** Set a scalar param from a string expression, with the expression as error context */
 void setFromString(Parameter& sc, const ParamMeta& p, const string& v, const string& expr) {
     try {
@@ -113,7 +130,11 @@ void setFromString(Parameter& sc, const ParamMeta& p, const string& v, const str
         } else if (p.type == "double") {
             sc.set<double>(p.name, boost::lexical_cast<double>(v));
         } else if (p.type == "bool") {
-            sc.set<bool>(p.name, v == "true" || v == "1");
+            auto value = toBool(v);
+            HKU_CHECK_THROW(value.has_value(), std::invalid_argument,
+                            "Param \"{}\" expects type bool, invalid value \"{}\": {}", p.name, v,
+                            expr);
+            sc.set<bool>(p.name, *value);
         } else if (p.type == "string") {
             sc.set<string>(p.name, v);
         } else {
@@ -446,6 +467,15 @@ Part PartRegistry::create(const string& full_name, const Parameter& scalars,
 }
 
 Part PartRegistry::createFromString(const string& expr) const {
+    return createFromStringImpl(expr, 0);
+}
+
+Part PartRegistry::createFromStringImpl(const string& expr, size_t depth) const {
+    // guard the nesting recursion against a stack overflow on a malformed input
+    HKU_CHECK_THROW(depth <= MAX_EXPR_NESTING_DEPTH, std::invalid_argument,
+                    "Part expression nested too deeply (max {} levels): {}", MAX_EXPR_NESTING_DEPTH,
+                    expr);
+
     // Format: "Name" | "Name(k1=v1,k2=v2)" | "part.Name(...)" | "hub.part.Name(...)"
     string src = trim(expr);
     HKU_CHECK_THROW(!src.empty(), std::invalid_argument, "Empty part expression: {}", expr);
@@ -501,14 +531,14 @@ Part PartRegistry::createFromString(const string& expr) const {
         // split the top level arguments on commas, ignoring the ones nested in parentheses
         vector<string> items;
         string cur;
-        int depth = 0;
+        int paren_depth = 0;
         for (char c : args_str) {
             if (c == '(') {
-                ++depth;
+                ++paren_depth;
             } else if (c == ')') {
-                --depth;
+                --paren_depth;
             }
-            if (c == ',' && depth == 0) {
+            if (c == ',' && paren_depth == 0) {
                 items.push_back(cur);
                 cur.clear();
             } else {
@@ -516,7 +546,7 @@ Part PartRegistry::createFromString(const string& expr) const {
             }
         }
         items.push_back(cur);
-        HKU_CHECK_THROW(depth == 0, std::invalid_argument,
+        HKU_CHECK_THROW(paren_depth == 0, std::invalid_argument,
                         "Unbalanced parentheses in part expression: {}", expr);
 
         std::set<string> seen;
@@ -547,7 +577,7 @@ Part PartRegistry::createFromString(const string& expr) const {
                   "List-typed param \"{}\" of part \"{}\" cannot be set from a string "
                   "expression, pass it via the PartParamMap",
                   k, meta.full_name);
-                pp[pm->name].push_back(createFromString(v));
+                pp[pm->name].push_back(createFromStringImpl(v, depth + 1));
             } else {
                 setFromString(sc, *pm, v, expr);
             }

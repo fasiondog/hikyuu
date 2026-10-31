@@ -937,6 +937,13 @@ __all__ = [
     'get_part_name_list',
     'get_current_hub',
     'search_part',
+    # raised by the api above, so they must be reachable from the package top level
+    'HubNameRepeatError',
+    'HubNameError',
+    'HubNotFoundError',
+    'ModuleConflictError',
+    'PartNotFoundError',
+    'PartNameError',
 ]
 
 if __name__ == "__main__":

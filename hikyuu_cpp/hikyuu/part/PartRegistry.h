@@ -100,8 +100,9 @@ public:
     Part create(const string& full_name, const Parameter& scalars, const PartParamMap& parts) const;
     /**
      * Parse "Name(k1=v1,k2=v2)" or "part.Name(k1=v1)" and create.
-     * Part-typed params are resolved recursively (e.g. "SG_Band(ind=MA(n=10),lower=10,upper=20)");
-     * list-typed part params are not supported here, use the programming interface instead.
+     * Part-typed params are resolved recursively (e.g. "SG_Band(ind=MA(n=10),lower=10,upper=20)"),
+     * up to 32 levels of nesting; list-typed part params are not supported here, use the
+     * programming interface instead.
      */
     Part createFromString(const string& expr) const;
 
@@ -115,6 +116,9 @@ public:
 private:
     PartRegistry() = default;
 
+    /** Max nesting depth of the part-typed params in a createFromString expression */
+    static constexpr size_t MAX_EXPR_NESTING_DEPTH = 32;
+
     struct Entry {
         PartMeta meta;
         Creator creator;
@@ -124,6 +128,9 @@ private:
     /** Validate the inputs against the meta, fill defaults, then invoke the creator */
     Part createWithMeta(const PartMeta& meta, const Creator& creator, const Parameter& scalars,
                         const PartParamMap& parts) const;
+
+    /** createFromString with the current nesting depth of the part-typed params */
+    Part createFromStringImpl(const string& expr, size_t depth) const;
 
     /** Run the pending introspector of the given part, if any */
     void ensureMeta(const string& full_name) const;

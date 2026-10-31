@@ -33,6 +33,10 @@ TEST_CASE("test_registerIndicatorParts") {
     const PartMeta& meta = reg.getMeta("core.ind.ma");
     CHECK_EQ(meta.name, "MA");
 
+    /** @arg the hand-written C++ name of a part with the explicit meta is kept verbatim */
+    CHECK_EQ(reg.getMeta("core.ind.avedev").name, "AVEDEV");
+    CHECK_EQ(reg.getMeta("core.ind.icir").name, "ICIR");
+
     /** @arg the lookup is case insensitive */
     CHECK_EQ(reg.getMeta("core.ind.MA").full_name, "core.ind.ma");
     CHECK_UNARY(reg.has("CORE.IND.MA"));
