@@ -27,11 +27,16 @@ guarantee.
 **Its purpose, in two sentences: never let a strategy that "runs" but does not hold up be taken as a
 conclusion; and never let a full-market validation become waiting.**
 
-**Within controllable cost and performance constraints, speed is the core foundation for full-market,
-multi-strategy research**: on an Orange Pi 5 Plus (an ARM single-board computer), a full `SYS_Simple` run
-for each of the 3,547 currently valid non-index securities over the eleven years 2015–2026 — the EMA5
-self-cross with its own EMA10 from `SG_Flex(EMA(C, 5), slow_n=10)` plus `MM_FixedCount(100)`, each on its
-own ledger, on warm data and walking them in a single serial process — takes about 13 seconds.
+* **Within controllable cost and performance constraints, speed is the core foundation for full-market,
+  multi-strategy research**: on an Orange Pi 5 Plus (an ARM single-board computer), a full `SYS_Simple` run
+  for each of the 3,547 currently valid non-index securities over the eleven years 2015–2026 — the EMA5
+  self-cross with its own EMA10 from `SG_Flex(EMA(C, 5), slow_n=10)` plus `MM_FixedCount(100)`, each on its
+  own ledger, on warm data and walking them in a single serial process — takes about 13 seconds.
+* **Across the complete trade chain, the computation and rules of financial semantics are what guarantee
+  strategy correctness**: under arbitrarily complex strategy compositions, every link — fills, costs,
+  ex-rights adjustments and performance conventions — still runs by the real rules and is booked trade by
+  trade; no matter how deep the composition nests, the financial semantics of each trade are still
+  safeguarded as a whole.
 
 Two means serve the first sentence: **splitting the structure along theoretical questions** — a strategy must
 answer market environment, condition, signal, position sizing, exit and fill price; a portfolio must
