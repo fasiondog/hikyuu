@@ -7,6 +7,7 @@
 
 #include "hikyuu/GlobalInitializer.h"
 #include "hikyuu/part/PartRegistry.h"
+#include "hikyuu/utilities/arithmetic.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -21,7 +22,7 @@ namespace hku {
 namespace {
 
 /** Map a part-typed param type name to its PartType; std::nullopt skips the element check */
-std::optional<PartType> partTypeFromParamType(const string& type) {
+static std::optional<PartType> partTypeFromParamType(const string& type) {
     if (type == "Indicator") {
         return PartType::IND;
     } else if (type == "Signal") {
@@ -56,25 +57,18 @@ std::optional<PartType> partTypeFromParamType(const string& type) {
     return std::nullopt;
 }
 
-string trim(const string& s) {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    if (start == string::npos) {
-        return string();
-    }
-    size_t end = s.find_last_not_of(" \t\r\n");
-    return s.substr(start, end - start + 1);
-}
-
-string toLower(const string& s) {
+/** A lower-cased copy of the input, over the unified to_lower */
+static string toLower(const string& s) {
     string out(s);
-    std::transform(out.begin(), out.end(), out.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+    to_lower(out);
     return out;
 }
 
 /** Parse a textual bool param: true/false/1/0, case insensitive; nullopt for anything else */
-std::optional<bool> toBool(const string& v) {
-    string lower = toLower(trim(v));
+static std::optional<bool> toBool(const string& v) {
+    string lower(v);
+    trim(lower);
+    to_lower(lower);
     if (lower == "true" || lower == "1") {
         return true;
     }
@@ -86,7 +80,7 @@ std::optional<bool> toBool(const string& v) {
 
 /** Fill the missing scalar param with its declared string default; unsupported types are left
  *  to the creator (via tryGet) */
-void injectDefault(Parameter& sc, const ParamMeta& p) {
+static void injectDefault(Parameter& sc, const ParamMeta& p) {
     const string& v = p.default_value;
     try {
         if (p.type == "int") {
@@ -121,7 +115,7 @@ void injectDefault(Parameter& sc, const ParamMeta& p) {
 }
 
 /** Set a scalar param from a string expression, with the expression as error context */
-void setFromString(Parameter& sc, const ParamMeta& p, const string& v, const string& expr) {
+static void setFromString(Parameter& sc, const ParamMeta& p, const string& v, const string& expr) {
     try {
         if (p.type == "int") {
             sc.set<int>(p.name, boost::lexical_cast<int>(v));
@@ -150,7 +144,7 @@ void setFromString(Parameter& sc, const ParamMeta& p, const string& v, const str
     }
 }
 
-string escapeJson(const string& s) {
+static string escapeJson(const string& s) {
     string out;
     out.reserve(s.size());
     for (char c : s) {
@@ -415,7 +409,9 @@ vector<PartMeta> PartRegistry::getMetaList(PartType type) const {
 vector<PartMeta> PartRegistry::search(const string& keyword, std::optional<PartType> type,
                                       const string& label) const {
     vector<PartMeta> result;
-    string lower_keyword = toLower(trim(keyword));
+    string lower_keyword(keyword);
+    trim(lower_keyword);
+    to_lower(lower_keyword);
     for (const auto& [full_name, entry] : m_entries) {
         const PartMeta& meta = entry.meta;
         if (type && meta.type != *type) {
@@ -477,7 +473,8 @@ Part PartRegistry::createFromStringImpl(const string& expr, size_t depth) const 
                     expr);
 
     // Format: "Name" | "Name(k1=v1,k2=v2)" | "part.Name(...)" | "hub.part.Name(...)"
-    string src = trim(expr);
+    string src(expr);
+    trim(src);
     HKU_CHECK_THROW(!src.empty(), std::invalid_argument, "Empty part expression: {}", expr);
 
     string name;
@@ -489,7 +486,8 @@ Part PartRegistry::createFromStringImpl(const string& expr, size_t depth) const 
     } else {
         HKU_CHECK_THROW(src.back() == ')', std::invalid_argument,
                         "Unbalanced parentheses in part expression: {}", expr);
-        name = trim(src.substr(0, lpos));
+        name = src.substr(0, lpos);
+        trim(name);
         args_str = src.substr(lpos + 1, src.size() - lpos - 2);
         has_args = true;
     }
@@ -551,15 +549,18 @@ Part PartRegistry::createFromStringImpl(const string& expr, size_t depth) const 
 
         std::set<string> seen;
         for (const auto& raw : items) {
-            string item = trim(raw);
+            string item(raw);
+            trim(item);
             if (item.empty()) {
                 continue;
             }
             size_t eq = item.find('=');
             HKU_CHECK_THROW(eq != string::npos, std::invalid_argument,
                             "Invalid argument \"{}\" (expected k=v) in expression: {}", item, expr);
-            string k = trim(item.substr(0, eq));
-            string v = trim(item.substr(eq + 1));
+            string k = item.substr(0, eq);
+            trim(k);
+            string v = item.substr(eq + 1);
+            trim(v);
             HKU_CHECK_THROW(seen.insert(k).second, std::invalid_argument,
                             "Duplicate param \"{}\" in expression: {}", k, expr);
             const ParamMeta* pm = nullptr;

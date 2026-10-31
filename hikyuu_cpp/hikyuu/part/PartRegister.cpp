@@ -20,7 +20,7 @@ namespace {
 const StringList TEXTUAL_TYPES{"int", "int64", "double", "bool", "string"};
 
 /** Render one introspected param as its default value string; empty means "not representable" */
-string paramToString(const Parameter& param, const string& name) {
+static string paramToString(const Parameter& param, const string& name) {
     string type = param.type(name);
     if (type == "int" || type == "int64") {
         return fmt::format("{}", param.get<int64_t>(name));
@@ -40,7 +40,7 @@ string paramToString(const Parameter& param, const string& name) {
 }
 
 /** Apply one introspected scalar onto the prototype; unknown types are left untouched */
-void applyParam(Indicator& ind, const Parameter& sc, const string& name) {
+static void applyParam(Indicator& ind, const Parameter& sc, const string& name) {
     string type = sc.type(name);
     if (type == "int" || type == "int64") {
         ind.setParam<int64_t>(name, sc.get<int64_t>(name));
