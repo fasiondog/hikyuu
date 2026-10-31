@@ -239,7 +239,9 @@ MF_PY_PART_GIL_RELEASE_PROBE = (
 # A Python custom indicator as the factor formula makes the factor a python-part model. The
 # values are computed on the thread-pool workers, so the binding must release the GIL before
 # entering the parallel section: otherwise the workers block on the GIL held by the waiting
-# caller and the call never returns.
+# caller and the call never returns. Covers all the parallel value entries: Factor.get_values,
+# FactorSet.get_values and FactorSet.get_all_values (the last one uses a small block to keep it
+# fast).
 FACTOR_PARALLEL_PY_PART_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
     "import os; os.chdir(r'{root}')\n"
@@ -265,6 +267,11 @@ FACTOR_PARALLEL_PY_PART_PROBE = (
     "fs = FactorSet()\n"
     "fs.add(formula)\n"
     "assert len(fs.get_values(stks, q)) == 3\n"
+    "blk = Block('test', 'gil_probe')\n"
+    "blk.add(stks)\n"
+    "fs2 = FactorSet('FS_GIL_PROBE', Query.DAY, blk)\n"
+    "fs2.add(formula)\n"
+    "assert len(fs2.get_all_values(q)) == 3\n"
     "print('OK')\n"
 ).format(root=REPO_ROOT, config=CONFIG)
 
