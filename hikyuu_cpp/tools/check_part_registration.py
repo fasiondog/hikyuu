@@ -18,13 +18,13 @@ DECL = re.compile(r"(?:inline\s+)?void\s+(registerPart_\w+)\s*\(\s*\)\s*[;{]")
 DEF = re.compile(r"(?:inline\s+)?void\s+(registerPart_\w+)\s*\(\s*\)\s*\{")
 CALL = re.compile(r"^\s+(registerPart_\w+)\s*\(\s*\)\s*;\s*$", re.M)
 
-# crt headers that are combinations of existing parts rather than a creatable part
+# crt headers that intentionally declare no registerPart_XXX: the combination headers (they
+# only compose existing parts) and the test fixture
 EXCLUDED_HEADERS = {
     "SG_Logic.h",
     "CN_Logic.h",
     "EV_Logic.h",
     "SE_Logic.h",
-    "PF_Mode.h",
     "TC_TestStub.h",
 }
 

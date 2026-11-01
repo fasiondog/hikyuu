@@ -158,7 +158,7 @@ TEST_CASE("test_PartRegistry_create_tm") {
     auto& reg = PartRegistry::instance();
 
     /** @arg the TM part is created with its defaults */
-    Part part = reg.create("core.tm.crttm");
+    Part part = reg.create("core.tm.simple");
     auto tm = tryGetAs<TradeManagerPtr>(part);
     CHECK_UNARY(tm.has_value());
     CHECK_UNARY(*tm != nullptr);
@@ -167,13 +167,13 @@ TEST_CASE("test_PartRegistry_create_tm") {
     /** @arg the scalar overrides reach the creator */
     Parameter sc;
     sc.set<string>("name", "TEST_TM");
-    auto tm2 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.crttm", sc)).value();
+    auto tm2 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.simple", sc)).value();
     CHECK(tm2->name() == "TEST_TM");
 
     /** @arg the part-typed costfunc is passed via the PartParamMap */
     PartRegistry::PartParamMap parts;
     parts["costfunc"] = {Part(TC_FixedETF())};
-    auto tm3 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.crttm", Parameter(), parts)).value();
+    auto tm3 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.simple", Parameter(), parts)).value();
     CHECK_UNARY(tm3->costFunc() != nullptr);
     CHECK(tm3->costFunc()->name() == "TC_FixedETF");
 }

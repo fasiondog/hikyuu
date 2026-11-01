@@ -17,11 +17,11 @@ TradeManagerPtr HKU_API crtTM(const Datetime& datetime, price_t initcash,
 
 void registerPart_crtTM() {
     auto& reg = PartRegistry::instance();
-    HKU_IF_RETURN(reg.has("core.tm.crttm"), void());
+    HKU_IF_RETURN(reg.has("core.tm.simple"), void());
     PartMeta meta;
     meta.type = PartType::TM;
     meta.name = "crtTM";
-    meta.full_name = "core.tm.crttm";
+    meta.full_name = "core.tm.simple";
     meta.params.push_back(ParamMeta{.name = "datetime", .type = "Datetime"});
     meta.params.push_back(
       ParamMeta{.name = "initcash", .type = "double", .default_value = "100000.0"});

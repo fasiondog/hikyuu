@@ -256,7 +256,7 @@ These contracts were settled during the 2026-10 indicator audit; treat them as b
 
 ### Built-in Part Registration
 
-Every built-in factory (201 parts: 138 indicators + 63 components) is registered into the `PartRegistry` (`hikyuu_cpp/hikyuu/part/`). Adding a new built-in part requires **two places in sync**:
+Every built-in factory (204 parts: 138 indicators + 66 components) is registered into the `PartRegistry` (`hikyuu_cpp/hikyuu/part/`). Adding a new built-in part requires **two places in sync**:
 
 1. define `inline void registerPart_XXX() { ... }` in the part's `crt/XXX.h` (no `HKU_API`; only the module aggregation functions and `registerAllBuiltinParts()` are exported). For an indicator the definition **must** live in the crt header rather than in `imp/*.cpp`: the registration calls the factory with its default arguments, which are only declared in that header, and whether a cpp definition happens to see them depends on the unity build order; indicators use `registerIndicatorPart("core.ind.xxx", [] { return XXX(...); })` for lazy prototype introspection. Components do not rely on the factory defaults, so their `registerPart_XXX()` may stay next to the factory implementation while hand-writing the `PartMeta` plus a dual-channel creator;
 2. add one call line in the aggregation function of the module `build_in.cpp` (`registerSignalParts()` / `registerTradeManageParts()` / ...).

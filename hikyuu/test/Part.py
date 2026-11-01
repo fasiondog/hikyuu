@@ -19,13 +19,13 @@ from hikyuu.hub import HubNameError, PartNotFoundError
 class PartTest(unittest.TestCase):
     def test_registry(self):
         reg = hikyuu.part.PartRegistry.instance()
-        self.assertEqual(reg.size(), 201)
+        self.assertEqual(reg.size(), 204)
         self.assertTrue(reg.has("core.ind.ma"))
         self.assertTrue(reg.has("core.ind.MA"))
         self.assertFalse(reg.has("core.ind.nonexistent"))
 
         names = reg.get_name_list()
-        self.assertEqual(len(names), 201)
+        self.assertEqual(len(names), 204)
         self.assertIn("core.ind.ma", names)
 
         ind_names = reg.get_name_list(hikyuu.part.PartType.IND)
@@ -178,6 +178,55 @@ class PartTest(unittest.TestCase):
         with self.assertRaises(hikyuu.HubNameError):
             hikyuu.add_local_hub("core", "not-exists-path-for-test")
 
+    def test_hub_name_list_contains_core(self):
+        names = hikyuu.get_hub_name_list()
+        self.assertEqual(names[0], "core")
+        self.assertEqual(names.count("core"), 1)
+
+    def test_core_hub_path(self):
+        # the built-in hub has no local path, so it reports an empty string instead of raising
+        self.assertEqual(hikyuu.get_hub_path("core"), "")
+        self.assertEqual(hikyuu.get_hub_path("Core"), "")
+
+        # an unregistered hub still raises
+        with self.assertRaises(hikyuu.HubNotFoundError):
+            hikyuu.get_hub_path("nonexistent-hub-xyz")
+
+    def test_core_hub_reserved(self):
+        for name in ("core", "Core", "CORE"):
+            with self.assertRaises(HubNameError):
+                hikyuu.remove_hub(name)
+            with self.assertRaises(HubNameError):
+                hikyuu.update_hub(name)
+            with self.assertRaises(HubNameError):
+                hikyuu.build_hub(name)
+        # the built-in hub stays visible after the rejected operations
+        self.assertIn("core", hikyuu.get_hub_name_list())
+
+    def test_core_pf_mode_parts(self):
+        reg = hikyuu.part.PartRegistry.instance()
+        for name, mode, semantic in (
+            ("core.pf.modea", "A", "core.pf.signalaggregate"),
+            ("core.pf.modeb", "B", "core.pf.simple"),
+            ("core.pf.modec", "C", "core.pf.withoutaf"),
+        ):
+            self.assertTrue(reg.has(name))
+            meta = reg.get_meta(name)
+            self.assertEqual(meta.type, hikyuu.part.PartType.PF)
+            self.assertEqual(meta.name, "PF_Mode" + mode)
+
+            # the alias shares the params and default values of its semantic part
+            semantic_meta = reg.get_meta(semantic)
+            self.assertEqual(
+                [(p.name, p.default_value) for p in meta.params],
+                [(p.name, p.default_value) for p in semantic_meta.params],
+            )
+
+            self.assertEqual(hikyuu.get_part(name).mode, mode)
+
+        self.assertIn("core.pf.modea", hikyuu.get_part_name_list(hub="core", part_type="pf"))
+        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="pf")), 6)
+
     def test_python_part(self):
         def factory(scalars, parts):
             return MA(scalars["n"])
@@ -208,7 +257,7 @@ class PartTest(unittest.TestCase):
             hikyuu.part.release_python_parts()
 
         self.assertFalse(reg.has("core.ind.pyma"))
-        self.assertEqual(reg.size(), 201)
+        self.assertEqual(reg.size(), 204)
 
     def test_python_part_conflict(self):
         def make_meta(name):
@@ -247,7 +296,7 @@ class PartTest(unittest.TestCase):
 
         self.assertFalse(reg.has("core.ind.pyma2"))
         self.assertTrue(reg.has("core.ind.ma"))
-        self.assertEqual(reg.size(), 201)
+        self.assertEqual(reg.size(), 204)
 
     def test_python_part_bad_return(self):
         meta = hikyuu.part.PartMeta()
