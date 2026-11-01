@@ -10,3 +10,4 @@
    indicator
    talib
    ind_class
+   pyfunc

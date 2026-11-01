@@ -125,19 +125,19 @@ Indicator Indicator::operator()(const Indicator& ind) {
         return p->calculate();
     }
 
-    // AST node pruning: when the operator (m_imp) is semantically equivalent to the operand (ind),
-    // reuse the already calculated ind (which holds a valid buffer), instead of returning an empty
-    // clone shell of m_imp (the size of m_imp is 0 when it has not been calculated). Note: reusing
-    // ind makes the return value share the underlying node with ind, which relies on the immutable
-    // parameter semantics of hikyuu (alike has verified that m_params are the same, setParam
-    // triggers an in-place recalculation and the sharing is safe).
+    // Alike pruning: reuse the calculated ind instead of an uncalculated clone shell of m_imp;
+    // sharing is safe since alike guarantees identical params and setParam recalculates in place
     if (m_imp->alike(*ind.getImp())) {
         return ind;
     }
 
     IndicatorImpPtr p = m_imp->clone();
     p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp());
-    return p->calculate();
+    Indicator result = p->calculate();
+
+    // A Python-inherited imp: only the clone-created owner keeps the Python part alive
+    HKU_IF_RETURN(result.getImp().get() != p.get(), result);
+    return Indicator(p);
 }
 
 HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {

@@ -9,6 +9,7 @@
 #include <cstring>
 #include "../gil_policy.h"
 #include "../pybind_utils.h"
+#include "pyfunc/make_kernel.h"
 
 namespace py = pybind11;
 using namespace hku;
@@ -264,6 +265,37 @@ set_context(self, stock, query)
                ScopeGilRelease gil(!self.hasPythonPart());
                return self();
            })
+
+      .def(
+        "apply",
+        [](const Indicator& self, const py::object& func, int64_t resultNum,
+           std::optional<int64_t> discard, const std::string& view, bool withDates, bool stateless,
+           const std::string& name, const py::object& hints) {
+            return pyfunc::npApply(self, func, resultNum, discard, view, withDates, stateless, name,
+                                   hints);
+        },
+        py::arg("func"), py::kw_only(), py::arg("result_num") = 1, py::arg("discard") = py::none(),
+        py::arg("view") = "numpy", py::arg("with_dates") = false, py::arg("stateless") = false,
+        py::arg("name") = "APPLY", py::arg("hints") = py::none(),
+        R"(apply(self, func, *, result_num=1, discard=None, view="numpy", with_dates=False,
+        stateless=False, name="APPLY", hints=None)
+
+    Apply a Python function to this indicator over the whole series.
+
+    The callable runs once per calculation, never per element; the output length equals the input
+    length and a missing value is NaN, which is mapped to Null.
+
+    :param func: a numpy ufunc, a plain callable, a pandas callable (view="pandas"), or a
+           ctypes / numba cfunc receiving the raw buffers
+    :param int result_num: the number of the result sets, it must match the returned results
+    :param discard: the leading points to discard, None inherits the input discard
+    :param str view: "numpy" (default) or "pandas"
+    :param bool with_dates: pass the date list as the first argument of a plain callable
+    :param bool stateless: declare the callable as a pure function (batch reuse and node sharing)
+    :param str name: the indicator name
+    :param dict hints: {"contiguous": bool, "raw": bool}; "raw" calls a numba cfunc through its
+           address and drops the GIL, see np_apply for the exact rules
+    :rtype: Indicator)")
 
       .def("__hash__", [](const Indicator& self) { return std::hash<Indicator>()(self); })
 

@@ -19,6 +19,7 @@ void export_IndicatorImp(py::module& m);
 void export_IndParam(py::module& m);
 void export_Indicator_build_in(py::module& m);
 void export_Indicator_ta_lib(py::module& m);
+void export_Indicator_pyfunc(py::module& m);
 
 void export_indicator_main(py::module& m) {
     export_Indicator(m);
@@ -26,6 +27,7 @@ void export_indicator_main(py::module& m) {
     export_IndParam(m);
     export_Indicator_build_in(m);
     export_Indicator_ta_lib(m);
+    export_Indicator_pyfunc(m);
 
     m.def(
       "batch_calculate_inds",

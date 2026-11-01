@@ -17,6 +17,7 @@ import StockTypeInfo
 import Stock
 import KData
 import Indicator
+import NpApply
 import TradeCost
 
 import Environment
@@ -58,6 +59,12 @@ if __name__ == "__main__":
     suite.addTest(Indicator.suite())
     suite.addTest(Indicator.suiteTestIndicatorContext())
     suite.addTest(Indicator.suiteTestConcatToDf())
+    suite.addTest(NpApply.suite())
+    suite.addTest(NpApply.suiteNpApplyResult())
+    suite.addTest(NpApply.suiteNpApplyContract())
+    suite.addTest(NpApply.suiteNpApplyTree())
+    suite.addTest(NpApply.suiteNpApplyReject())
+    suite.addTest(NpApply.suiteNpApplyRaw())
     suite.addTest(TradeCost.suite())
 
     suite.addTest(Environment.suite())
