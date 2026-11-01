@@ -13,8 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14]
-        arch: [arm64, x86_64]
+        # macOS 14 image retired on 2026-11-02; GitHub will drop x86_64 macOS runners
+        # after the macOS 15 image retires in fall 2027, so only build on arm64
+        os: [macos-26]
+        arch: [arm64]
         kind: [shared]
         python-version: ['3.12', '3.13']
 
