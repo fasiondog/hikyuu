@@ -35,8 +35,9 @@ target("core")
         add_cxflags("-Wno-error=parentheses-equality -Wno-error=missing-braces")
     end
 
-    if is_plat("linux", "cross") then 
+    if is_plat("linux", "cross") then
         add_rpathdirs("$ORIGIN", "$ORIGIN/cpp")
+        add_cxflags("-fvisibility=hidden", "-fvisibility-inlines-hidden")
     end
 
     if is_plat("macosx") then
