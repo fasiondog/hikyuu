@@ -35,9 +35,17 @@ def _make_ms(stock, kdata, count=1):
     return ms
 
 
-def _measure_progress(work):
-    """Run work() and return how many loop iterations a background Python thread
-    managed meanwhile; a large count proves the GIL was released."""
+_TARGET_WINDOW = 0.5
+
+
+def _spin_fraction(work):
+    """Run work() once with a spinning background Python thread and return the fraction
+    of its free-running speed the spinner kept.
+
+    The absolute iteration count is machine speed and load dependent (a busy test suite
+    may starve the spinner), so the rate is normalized by the spinner's own free rate
+    measured just before the work: ~1% while the GIL is held, tens of percent when it
+    is released, shrinking under CPU saturation."""
     counter = [0]
     stop = threading.Event()
 
@@ -49,12 +57,28 @@ def _measure_progress(work):
     thread = threading.Thread(target=spin)
     thread.start()
     time.sleep(0.05)
+    # the free-running rate under the current machine speed and load
     before = counter[0]
+    start = time.perf_counter()
+    time.sleep(0.1)
+    free_rate = (counter[0] - before) / (time.perf_counter() - start)
+    # the rate while work() runs
+    before = counter[0]
+    start = time.perf_counter()
     work()
+    elapsed = time.perf_counter() - start
     progress = counter[0] - before
     stop.set()
     thread.join()
-    return progress
+    if free_rate <= 0 or elapsed <= 0:
+        return 0.0
+    return progress / (free_rate * elapsed)
+
+
+def _measure_progress(work, attempts=3):
+    """The best of a few attempts, so a transient scheduling hiccup does not fail the
+    check."""
+    return max(_spin_fraction(work) for _ in range(attempts))
 
 
 def _calibrated_work(build_call, probe):
@@ -67,16 +91,52 @@ def _calibrated_work(build_call, probe):
     start = time.perf_counter()
     probe()
     elapsed = time.perf_counter() - start
-    target_window = 0.5
     max_window = 5.0
-    rounds = max(1, int(target_window / max(elapsed, 1e-9)))
+    rounds = max(1, int(_TARGET_WINDOW / max(elapsed, 1e-9)))
     rounds = min(rounds, max(1, int(max_window / max(elapsed, 1e-9))))
 
     def work():
         for _ in range(rounds):
             probe()
 
+    work.rounds = rounds
     return work
+
+
+def _gil_holding_control(rounds):
+    """A pure-Python workload performing the same number of GIL-holding calls as the
+    work under check, so both measurements give the spinner the same boundary steals
+    while the GIL is held; it serves as the reference level of _assert_releases_gil."""
+    start = time.perf_counter()
+    total = 0
+    for i in range(10000):
+        total += i
+    unit = time.perf_counter() - start  # seconds per 10000 busy iterations
+    body = max(1, int(10000 * (_TARGET_WINDOW / max(rounds, 1)) / max(unit, 1e-9)))
+
+    def work():
+        for _ in range(rounds):
+            total = 0
+            for i in range(body):
+                total += i
+
+    return work
+
+
+def _assert_releases_gil(testcase, work):
+    """Check on testcase that work() releases the GIL, adaptive to machine speed and
+    load: the spinner's fraction of its free rate while work() runs is compared with a
+    GIL-holding pure-Python control of the same call count. Releasing the GIL leaves
+    the spinner a multiple of the control level (measured 4x-50x here), holding it does
+    not (~1x). The control is measured only when the fraction is not already clearly
+    above any control level."""
+    released = _measure_progress(work)
+    if released > 0.1:
+        return
+    held = _measure_progress(_gil_holding_control(work.rounds))
+    testcase.assertGreater(
+        released, held * 2.5, 'the GIL does not appear to be released: fraction '
+        '{:.4f}, GIL-holding control {:.4f}'.format(released, held))
 
 
 class MiscTest(unittest.TestCase):
@@ -95,9 +155,7 @@ class MiscTest(unittest.TestCase):
     def test_parallel_run_sys_releases_gil(self):
         sys_list = [_make_sys(self.stock, self.kdata) for _ in range(20)]
         def probe(): return parallel_run_sys(sys_list, Query(0, 10000), reset=True)
-        work = _calibrated_work(None, probe)
-        progress = _measure_progress(work)
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_sys_run_releases_gil(self):
         sys = _make_sys(self.stock, self.kdata)
@@ -105,8 +163,7 @@ class MiscTest(unittest.TestCase):
         def probe():
             return sys.run(self.kdata, True, True)
 
-        progress = _measure_progress(_calibrated_work(None, probe))
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_sys_run_query_releases_gil(self):
         sys = _make_sys(self.stock, self.kdata)
@@ -114,8 +171,7 @@ class MiscTest(unittest.TestCase):
         def probe():
             return sys.run(Query(0, 10000), True, True)
 
-        progress = _measure_progress(_calibrated_work(None, probe))
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_sys_run_with_python_part(self):
         # The GIL is released even with Python parts: the trampolines reacquire it per
@@ -142,8 +198,7 @@ class MiscTest(unittest.TestCase):
         def probe():
             return ms.run(self.kdata, True, True)
 
-        progress = _measure_progress(_calibrated_work(None, probe))
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_multi_system_run_moment_releases_gil(self):
         ms = _make_ms(self.stock, self.kdata)
@@ -153,8 +208,7 @@ class MiscTest(unittest.TestCase):
         def probe():
             return ms.runMoment(last)
 
-        progress = _measure_progress(_calibrated_work(None, probe))
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_multi_system_run_with_python_part(self):
         class MySG(SignalBase):
@@ -206,9 +260,7 @@ class MiscTest(unittest.TestCase):
     def test_get_funds_list_releases_gil(self):
         tm_list = [crtTM() for _ in range(50)]
         def probe(): return get_funds_list(tm_list, self.ref_dates)
-        work = _calibrated_work(None, probe)
-        progress = _measure_progress(work)
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_get_performance_list_result(self):
         tm_list = [crtTM() for _ in range(4)]
@@ -220,9 +272,7 @@ class MiscTest(unittest.TestCase):
     def test_get_performance_list_releases_gil(self):
         tm_list = [crtTM() for _ in range(50)]
         def probe(): return get_performance_list(tm_list, Datetime(2024, 12, 31))
-        work = _calibrated_work(None, probe)
-        progress = _measure_progress(work)
-        self.assertGreater(progress, 100)
+        _assert_releases_gil(self, _calibrated_work(None, probe))
 
     def test_now_default_args_not_frozen_at_import(self):
         # The "current time" defaults used to be evaluated once at import time and frozen
