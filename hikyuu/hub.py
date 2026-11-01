@@ -177,9 +177,20 @@ def dbsession(func):
     return wrapfunc
 
 
+CORE_HUB_NAME = 'core'
+
+
 def _is_core_hub(hub):
     """Whether the given repository name refers to the built-in parts"""
-    return isinstance(hub, str) and hub.lower() == 'core'
+    return isinstance(hub, str) and hub.lower() == CORE_HUB_NAME
+
+
+def _check_core_hub_operation(name, action):
+    """Reject an operation that the reserved built-in hub does not support"""
+    checkif(
+        _is_core_hub(name), name, HubNameError,
+        cause='is reserved for the built-in parts and cannot be {}'.format(action)
+    )
 
 
 def _normalize_part_type(part_type):
@@ -290,10 +301,7 @@ class HubManager(metaclass=SingletonType):
         :param str url: the git repository url
         :param str branch: the git repository branch
         """
-        checkif(
-            isinstance(name, str) and name.lower() == 'core', name, HubNameError,
-            cause='is reserved for the built-in parts, please use another name'
-        )
+        _check_core_hub_operation(name, 'added')
 
         record = self._session.query(HubModel).filter(HubModel.name == name).first()
         checkif(record is not None, name, HubNameRepeatError)
@@ -319,10 +327,7 @@ class HubManager(metaclass=SingletonType):
             cannot be used
         :param str path: the local full path
         """
-        checkif(
-            isinstance(name, str) and name.lower() == 'core', name, HubNameError,
-            cause='is reserved for the built-in parts, please use another name'
-        )
+        _check_core_hub_operation(name, 'added')
 
         checkif(not os.path.lexists(path), 'The specified path ("{}") cannot be found'.format(path))
 
@@ -357,8 +362,9 @@ class HubManager(metaclass=SingletonType):
     def update_hub(self, name):
         """Update the specified repository
 
-        :param str name: the repository name
+        :param str name: the repository name; the built-in "core" hub cannot be updated
         """
+        _check_core_hub_operation(name, 'updated')
         hub_model = self._session.query(HubModel).filter_by(name=name).first()
         checkif(hub_model is None, 'The specified repository ({}) does not exist!'.format(name))
 
@@ -371,9 +377,10 @@ class HubManager(metaclass=SingletonType):
     def build_hub(self, name, cmd='buildall'):
         """Build the cpp part
 
-        :param str name: the repository name
+        :param str name: the repository name; the built-in "core" hub cannot be built
         :param str cmd: the command arguments after python setup.py in the repository, e.g. build -t ind -n cpp_example
         """
+        _check_core_hub_operation(name, 'built')
         hub_model = self._session.query(HubModel).filter_by(name=name).first()
         checkif(hub_model is None, 'The specified repository ({}) does not exist!'.format(name))
         if sys.platform == 'win32':
@@ -385,8 +392,9 @@ class HubManager(metaclass=SingletonType):
     def remove_hub(self, name):
         """Remove the specified repository
 
-        :param str name: the repository name
+        :param str name: the repository name; the built-in "core" hub cannot be removed
         """
+        _check_core_hub_operation(name, 'removed')
         self._session.query(PartModel).filter_by(hub_name=name).delete()
         self._session.query(HubModel).filter_by(name=name).delete()
 
@@ -646,15 +654,20 @@ class HubManager(metaclass=SingletonType):
         """Get the local path of the repository
 
         :param str name: the repository name
+        :return: the local path of the repository, or an empty string for the built-in "core"
+            hub, which has no local path
         """
+        if _is_core_hub(name):
+            return ''
         path = self._session.query(HubModel.local).filter_by(name=name).first()
         checkif(path is None, name, HubNotFoundError)
         return path[0]
 
     @dbsession
     def get_hub_name_list(self):
-        """Return the list of the repository names"""
-        return [record[0] for record in self._session.query(HubModel.name).all()]
+        """Return the list of the repository names, starting with the built-in "core" hub"""
+        names = [record[0] for record in self._session.query(HubModel.name).all()]
+        return [CORE_HUB_NAME] + [name for name in names if not _is_core_hub(name)]
 
     def get_part_name_list(self, hub=None, part_type=None):
         """Get the list of the part names
@@ -806,7 +819,7 @@ def add_local_hub(name, path):
 def update_hub(name):
     """Update the specified repository
 
-    :param str name: the repository name
+    :param str name: the repository name; the built-in "core" hub cannot be updated
     """
     HubManager().update_hub(name)
 
@@ -814,7 +827,7 @@ def update_hub(name):
 def build_hub(name, cmd='buildall'):
     """Build the cpp part
 
-    :param str name: the repository name
+    :param str name: the repository name; the built-in "core" hub cannot be built
     :param str cmd: the command arguments after python setup.py in the repository, e.g. build -t ind -n cpp_example
     """
     HubManager().build_hub(name, cmd)
@@ -823,7 +836,7 @@ def build_hub(name, cmd='buildall'):
 def remove_hub(name):
     """Remove the specified repository
 
-    :param str name: the repository name
+    :param str name: the repository name; the built-in "core" parts hub cannot be removed
     """
     HubManager().remove_hub(name)
 
@@ -852,6 +865,8 @@ def get_hub_path(name):
     """Get the local path of the repository
 
     :param str name: the repository name
+    :return: the local path of the repository, or an empty string for the built-in "core"
+        hub, which has no local path
     """
     return HubManager().get_hub_path(name)
 
@@ -872,7 +887,7 @@ help_part = print_part_info
 
 
 def get_hub_name_list():
-    """Return the list of the repository names"""
+    """Return the list of the repository names, starting with the built-in "core" hub"""
     return HubManager().get_hub_name_list()
 
 

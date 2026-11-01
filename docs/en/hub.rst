@@ -36,19 +36,19 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
 
     Update a strategy repository
 
-    :param str name: repository name
+    :param str name: repository name (the built-in "core" part hub cannot be updated)
 
 
 .. py:function:: remove_hub(name)
 
     Remove a strategy repository
 
-    :param str name: repository name
+    :param str name: repository name (the built-in "core" part hub cannot be removed)
 
 
 .. py:function:: get_hub_name_list()
 
-    Get the list of registered strategy repository names
+    Get the list of registered strategy repository names, the built-in "core" part hub comes first
 
     :return: list of repository names
     :rtype: list
@@ -59,6 +59,9 @@ For details on how to use the HUB, see the article `Hikyuu Hub: user guide for t
     Get the path of a strategy repository
 
     :param str name: repository name
+    :return: local path of the repository; the built-in "core" part hub has no local path and
+        returns an empty string
+    :rtype: str
 
 
 .. py:function:: get_current_hub(filename)

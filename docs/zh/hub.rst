@@ -33,19 +33,19 @@ HUB 指的是量化交易策略部件的平台，用于：
 
     更新策略仓库
 
-    :param str name: 仓库名称
+    :param str name: 仓库名称（内置部件仓库 "core" 不可更新）
 
 
 .. py:function:: remove_hub(name)
 
     删除策略仓库
 
-    :param str name: 仓库名称
+    :param str name: 仓库名称（内置部件仓库 "core" 不可删除）
 
 
 .. py:function:: get_hub_name_list()
 
-    获取策略仓库名称列表
+    获取策略仓库名称列表（首项为内置部件仓库 "core"）
 
     :return: 仓库列表
     :rtype: list
@@ -56,6 +56,8 @@ HUB 指的是量化交易策略部件的平台，用于：
     获取策略仓库路径
 
     :param str name: 仓库名称
+    :return: 仓库本地路径；内置部件仓库 "core" 无本地路径，返回空字符串
+    :rtype: str
 
 
 .. py:function:: get_current_hub(filename)
