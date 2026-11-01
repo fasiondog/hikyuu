@@ -34,6 +34,11 @@
 * :py:func:`ZSCORE` - ZScore 标准化
 
 
+**自定义函数指标**
+
+* :py:func:`np_apply` - 将 numpy / pandas / ctypes 自定义函数包装为指标，对整段序列执行一次计算，详见 :doc:`pyfunc`
+
+
 **行情指标**
 
 * :py:func:`KDATA` - 包装KData成Indicator，用于其他指标计算

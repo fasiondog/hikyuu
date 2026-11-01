@@ -167,6 +167,14 @@ Indicator
 
         Main use case: quickly pulling the latest data for calculation in live trading.
 
+    .. py:method:: apply(self, func, *, result_num=1, discard=None, view="numpy", with_dates=False, stateless=False, name="APPLY", hints=None)
+
+        Wrap a custom function as a new indicator, using this indicator as the input; the function
+        runs once over the whole series
+
+        The parameters are identical to :py:func:`np_apply`, see :doc:`pyfunc`. The returned indicator
+        is a new one; this indicator is left unchanged.
+
     .. py:method:: to_array(self, result_index=0)
 
         Convert the specified result set to a numpy.array

@@ -165,6 +165,12 @@ Indicator
 
         主要用途：实盘时，快速获取最新数据进行计算
 
+    .. py:method:: apply(self, func, *, result_num=1, discard=None, view="numpy", with_dates=False, stateless=False, name="APPLY", hints=None)
+
+        以当前指标为输入，将自定义函数包装为新的指标，函数对整段序列执行一次
+
+        参数含义与 :py:func:`np_apply` 完全相同，详见 :doc:`pyfunc`。返回的是独立的新指标，当前指标不受影响。
+
     .. py:method:: to_array(self, result_index=0)
 
         将指定结果集转换为 numpy.array

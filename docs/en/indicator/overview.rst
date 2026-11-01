@@ -34,6 +34,11 @@ Technical Indicator Overview
 * :py:func:`ZSCORE` - Z-score normalization
 
 
+**Custom Function Indicators**
+
+* :py:func:`np_apply` - wrap a numpy / pandas / ctypes custom function as an indicator running once over the whole series; see :doc:`pyfunc`
+
+
 **Market Data Indicators**
 
 * :py:func:`KDATA` - wrap KData (bar data) as an Indicator for use in other indicator calculations
