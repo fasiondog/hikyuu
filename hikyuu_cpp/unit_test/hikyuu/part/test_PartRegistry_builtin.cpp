@@ -21,12 +21,12 @@ using namespace hku;
  */
 
 /** @par Test points */
-TEST_CASE("test_registerIndicatorParts") {
+TEST_CASE("test_registerAllBuiltinParts") {
     PartRegistry::release();
-    registerIndicatorParts();
+    registerAllBuiltinParts();
     auto& reg = PartRegistry::instance();
 
-    /** @arg all the built-in indicators are registered */
+    /** @arg all the built-in parts are registered, the indicator set included */
     CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
 
     /** @arg the meta is introspected from the prototype */
@@ -58,14 +58,14 @@ TEST_CASE("test_registerIndicatorParts") {
     CHECK_UNARY(ind10.alike(MA(10)));
 
     /** @arg the registration is idempotent */
-    registerIndicatorParts();
+    registerAllBuiltinParts();
     CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
 }
 
 /** @par Test points */
-TEST_CASE("test_registerIndicatorParts_concurrent_introspection") {
+TEST_CASE("test_registerAllBuiltinParts_concurrent_introspection") {
     PartRegistry::release();
-    registerIndicatorParts();
+    registerAllBuiltinParts();
 
     /** @arg concurrent first-time meta access of the same parts does not race */
     std::atomic<int> ok{0};

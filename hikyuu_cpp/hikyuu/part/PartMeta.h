@@ -33,9 +33,11 @@ struct HKU_API ParamMeta {
 struct HKU_API PartMeta {
     PartType type{PartType::IND};
     string name;       // "MA" / "SG_Band"
-    string full_name;  // "core." + partTypeName(type) + "." + name, e.g. "core.ind.ma" /
-                       // "core.sg.band"; the C++ name is kept verbatim, the type segment is
-                       // lowercase; the hub name mapping is produced by the generation script
+    string full_name;  // by convention "core." + partTypeName(type) + "." + lower(name), e.g.
+                       // "core.ind.ma" / "core.sg.band"; the C++ name is kept verbatim. A few
+                       // entries use a semantic short name instead of the factory name:
+                       // "core.tm.simple" (crtTM) and "core.pf.modea/b/c" (PF_ModeA/B/C); the hub
+                       // name mapping is produced by the generation script
     string author;
     string version;
     string doc;

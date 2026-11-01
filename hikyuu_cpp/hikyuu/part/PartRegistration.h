@@ -21,23 +21,24 @@ namespace hku {
  * called again after a registry reset.
  *
  * The declarations are collected here (instead of each module build_in.h) so that
- * GlobalInitializer does not have to pull in all the crt headers. They are exported (unlike the
- * per part registerPart_XXX()) because the unit tests and the hosts may trigger them explicitly.
+ * GlobalInitializer does not have to pull in all the crt headers. They are internal to the
+ * library: registerAllBuiltinParts() is the only exported entry point, and the hosts and the
+ * tests call the modules through it.
  */
-HKU_API void registerIndicatorParts();
-HKU_API void registerSignalParts();
-HKU_API void registerConditionParts();
-HKU_API void registerEnvironmentParts();
-HKU_API void registerMoneyManagerParts();
-HKU_API void registerStoplossParts();
-HKU_API void registerProfitGoalParts();
-HKU_API void registerSlippageParts();
-HKU_API void registerPortfolioParts();
-HKU_API void registerSelectorParts();
-HKU_API void registerAllocateFundsParts();
-HKU_API void registerMultiFactorParts();
-HKU_API void registerSystemParts();
-HKU_API void registerTradeManageParts();
+void registerIndicatorParts();
+void registerSignalParts();
+void registerConditionParts();
+void registerEnvironmentParts();
+void registerMoneyManagerParts();
+void registerStoplossParts();
+void registerProfitGoalParts();
+void registerSlippageParts();
+void registerPortfolioParts();
+void registerSelectorParts();
+void registerAllocateFundsParts();
+void registerMultiFactorParts();
+void registerSystemParts();
+void registerTradeManageParts();
 
 /** Register every built-in part; called from GlobalInitializer::init() */
 HKU_API void registerAllBuiltinParts();
