@@ -212,6 +212,7 @@
 
 * :py:func:`FACTOR` - 因子指标转换，将Factor对象转换为Indicator
 * :py:func:`IC` - 计算因子 IC 值
+* :py:func:`TS_IC` - 计算因子相对其自身标的的时序 IC
 * :py:func:`IR` - 用于计算账户收益与参照收益的IR
 * :py:func:`ICIR` - 计算因子 IC 的 IR 值
 

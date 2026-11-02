@@ -27,7 +27,7 @@ TEST_CASE("test_registerAllBuiltinParts") {
     auto& reg = PartRegistry::instance();
 
     /** @arg all the built-in parts are registered, the indicator set included */
-    CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
+    CHECK_EQ(reg.getNameList(PartType::IND).size(), 139);
 
     /** @arg the meta is introspected from the prototype */
     const PartMeta& meta = reg.getMeta("core.ind.ma");
@@ -59,7 +59,7 @@ TEST_CASE("test_registerAllBuiltinParts") {
 
     /** @arg the registration is idempotent */
     registerAllBuiltinParts();
-    CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
+    CHECK_EQ(reg.getNameList(PartType::IND).size(), 139);
 }
 
 /** @par Test points */
@@ -96,7 +96,7 @@ TEST_CASE("test_registerAllBuiltinParts_concurrent_introspection") {
 
     /** @arg the registry keeps consistent after the concurrent access */
     auto& reg = PartRegistry::instance();
-    CHECK_EQ(reg.getNameList(PartType::IND).size(), 138);
+    CHECK_EQ(reg.getNameList(PartType::IND).size(), 139);
     const PartMeta& meta = reg.getMeta("core.ind.ma");
     CHECK_EQ(meta.name, "MA");
     CHECK_EQ(meta.params[0].default_value, "22");

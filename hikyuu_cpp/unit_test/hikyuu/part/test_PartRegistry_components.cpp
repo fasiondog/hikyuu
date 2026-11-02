@@ -70,7 +70,7 @@ TEST_CASE("test_registerComponentParts") {
             CHECK_UNARY(inserted);
         }
     }
-    CHECK_EQ(names.size(), 204);
+    CHECK_EQ(names.size(), 205);
 }
 
 /** @par Test points */

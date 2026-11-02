@@ -90,6 +90,7 @@ void registerIndicatorParts() {
     registerPart_TIMELINE();
     registerPart_TIMELINEVOL();
     registerPart_TR();
+    registerPart_TS_IC();
     registerPart_TS_RANK();
     registerPart_VAR();
     registerPart_VARP();

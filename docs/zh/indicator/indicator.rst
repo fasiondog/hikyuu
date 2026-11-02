@@ -1190,6 +1190,23 @@
     :rtype: Indicator
 
 
+.. py:function:: TS_IC(ind[, n=30, ic_n=1, spearman=True, strict=False])
+
+    计算指定因子相对其自身标的的时序 IC （默认为 RankIC）
+
+    与截面 IC（在每个交易日于股票维度上对因子与 n 日收益做相关）不同，TS_IC 在时间维度上，将因子序列与该标的自身的 ic_n 日收益序列在长度为 n 的滚动窗口内做相关。每日配对为「t-ic_n 时刻的因子值 ↔ [t-ic_n, t] 的实现收益」，与 IC 惯例一致；收益序列由当前 K 线内部计算（ROCP(CLOSE, ic_n)），因此只需喂入因子。
+
+    spearman=True（默认）先对窗口内的配对求秩再计算相关，并剔除窗口内含非有限值的配对；Pearson 不做剔除，窗口内任一非有限值会传播使该窗口输出 Null。
+
+    strict=True 按因子观测日重新索引结果（左移 ic_n），末尾 ic_n 位为 NA（其前视收益尚未实现）。实时/回测决策路径应保持默认非 strict，以避免前视偏差。
+
+    :param int n: 时序相关的滚动窗口（>= 2）
+    :param int ic_n: 与因子配对的收益跨度（对应的 ic_n 日收益率）
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
+    :param bool strict: 按因子观测日重新索引（前视 IC），末尾 ic_n 位为 NA
+    :rtype: Indicator
+
+
 .. py:function:: ICIR(ind, stks[, n=1, rolling_n=120, spearman=True])
 
     计算 IC 因子 IR = IC的多周期均值/IC的标准方差

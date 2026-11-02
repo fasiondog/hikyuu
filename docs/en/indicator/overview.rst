@@ -212,6 +212,7 @@ Indicators natively support the operators "+", "-", "*", "/", "&" (logical and),
 
 * :py:func:`FACTOR` - factor conversion: turn a Factor object into an Indicator
 * :py:func:`IC` - calculate the factor IC (information coefficient)
+* :py:func:`TS_IC` - calculate the time-series IC of the factor relative to its own security
 * :py:func:`IR` - calculate the information ratio of the account returns against a reference return
 * :py:func:`ICIR` - calculate the IR of the factor IC series
 

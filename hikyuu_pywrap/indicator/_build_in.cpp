@@ -2486,6 +2486,35 @@ void export_Indicator_build_in(py::module& m) {
     :param bool spearman: use the spearman correlation coefficient, otherwise pearson
     :param bool strict: whether the strict IC mode)");
 
+    m.def("TS_IC", py::overload_cast<int, int, bool, bool>(TS_IC), py::arg("n") = 30,
+          py::arg("ic_n") = 1, py::arg("spearman") = true, py::arg("strict") = false);
+    m.def("TS_IC", py::overload_cast<const Indicator&, int, int, bool, bool>(TS_IC),
+          py::arg("ind"), py::arg("n") = 30, py::arg("ic_n") = 1, py::arg("spearman") = true,
+          py::arg("strict") = false,
+          R"(TS_IC([ind, n=30, ic_n=1, spearman=True, strict=False]) -> Indicator
+
+    Time-series information coefficient (IC) of a factor for a single security.
+
+    Unlike IC (which correlates the factor and the n-day return across stocks on each day), TS_IC
+    correlates the factor series with the security's own ic_n-day return series along the time
+    axis, within a rolling window of n observations. The daily pair is (factor observed at t-ic_n,
+    return over [t-ic_n, t]), matching the IC convention; the return is computed internally from
+    the current KData (ROCP(CLOSE, ic_n)), so only the factor is fed in.
+
+    Spearman (default) ranks the pairs inside each window before correlating and excludes pairs
+    with a non-finite value; Pearson does not filter, so a non-finite value inside the window
+    propagates and the whole window yields Null.
+
+    strict=True re-indexes the result by the factor observation date (shift left by ic_n); the
+    trailing ic_n values become Null because their forward returns are not yet realized. Keep the
+    default (non-strict) for any live / backtest decision path to avoid look-ahead bias.
+
+    :param Indicator ind: the input factor
+    :param int n: the rolling correlation window (>= 2)
+    :param int ic_n: the ic_n-day return span paired with the factor
+    :param bool spearman: use the spearman correlation coefficient, otherwise pearson
+    :param bool strict: re-index by factor observation date; the last ic_n values are Null)");
+
     m.def("ZSCORE", ZSCORE_1, py::arg("out_extreme") = false, py::arg("nsigma") = 3.0,
           py::arg("recursive") = false);
     m.def("ZSCORE", ZSCORE_2, py::arg("data"), py::arg("out_extreme") = false,

@@ -1217,6 +1217,31 @@ Parameter domain (n and the window)
     :rtype: Indicator
 
 
+.. py:function:: TS_IC(ind[, n=30, ic_n=1, spearman=True, strict=False])
+
+    Calculate the time-series IC of the specified factor relative to its own security (the RankIC by default)
+
+    Unlike the cross-section IC (which correlates the factor and the n-day return across stocks on each
+    day), TS_IC correlates the factor series with the security's own ic_n-day return series along the
+    time axis, within a rolling window of n observations. The daily pair is (factor observed at
+    t-ic_n, return over [t-ic_n, t]), matching the IC convention; the return is computed internally
+    from the current KData (ROCP(CLOSE, ic_n)), so only the factor is fed in.
+
+    Spearman (default) ranks the pairs inside each window before correlating and excludes pairs with
+    a non-finite value; Pearson does not filter, so a non-finite value inside the window propagates
+    and the whole window yields Null.
+
+    strict=True re-indexes the result by the factor observation date (shift left by ic_n); the
+    trailing ic_n values become NA because their forward returns are not yet realized. Keep the
+    default (non-strict) for any live / backtest decision path to avoid look-ahead bias.
+
+    :param int n: the rolling correlation window (>= 2)
+    :param int ic_n: the ic_n-day return span paired with the factor
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param bool strict: re-index by factor observation date (forward IC); the last ic_n values are NA
+    :rtype: Indicator
+
+
 .. py:function:: ICIR(ind, stks[, n=1, rolling_n=120, spearman=True])
 
     Calculate the IC factor IR = the multi-period average of the IC / the standard deviation of the IC
