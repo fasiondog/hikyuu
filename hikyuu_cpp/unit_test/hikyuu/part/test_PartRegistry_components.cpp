@@ -80,7 +80,8 @@ TEST_CASE("test_registerPortfolioModeAliasParts") {
     auto& reg = PartRegistry::instance();
 
     /** @arg every mode alias is exported as a part */
-    for (const string& name : {"core.pf.modea", "core.pf.modeb", "core.pf.modec"}) {
+    vector<string> mode_names = {"core.pf.modea", "core.pf.modeb", "core.pf.modec"};
+    for (const string& name : mode_names) {
         CHECK_UNARY(reg.has(name));
     }
 
