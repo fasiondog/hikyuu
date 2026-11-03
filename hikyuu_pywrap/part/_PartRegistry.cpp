@@ -17,12 +17,10 @@
 namespace py = pybind11;
 using namespace hku;
 
-void export_python_part(py::module& part);
+void export_python_part(py::module& m);
 
 void export_part_main(py::module& m) {
-    py::module part = m.def_submodule("part", "Part registry: meta info and creation by name");
-
-    py::enum_<PartType>(part, "PartType", "Part category")
+    py::enum_<PartType>(m, "PartType", "Part category")
       .value("IND", PartType::IND, "Indicator")
       .value("SG", PartType::SG, "Signal")
       .value("MM", PartType::MM, "Money manager")
@@ -38,16 +36,14 @@ void export_part_main(py::module& m) {
       .value("SYS", PartType::SYS, "System")
       .value("TM", PartType::TM, "Trade manager")
       .value("TC", PartType::TC, "Trade cost")
-      .value("MG", PartType::MG, "Margin")
-      .export_values();
+      .value("MG", PartType::MG, "Margin");
 
-    py::enum_<PartMeta::Source>(part, "Source", "Where a part comes from")
+    py::enum_<PartMeta::Source>(m, "PartSource", "Where a part comes from")
       .value("BUILTIN", PartMeta::Source::BUILTIN, "Built into the core library")
       .value("PLUGIN", PartMeta::Source::PLUGIN, "Loaded from a plugin")
-      .value("PYTHON", PartMeta::Source::PYTHON, "Defined in Python")
-      .export_values();
+      .value("PYTHON", PartMeta::Source::PYTHON, "Defined in Python");
 
-    py::class_<ParamMeta>(part, "ParamMeta", "Meta info of a single parameter")
+    py::class_<ParamMeta>(m, "ParamMeta", "Meta info of a single parameter")
       .def(py::init<>())
       .def_readwrite("name", &ParamMeta::name, "Parameter name")
       .def_readwrite("type", &ParamMeta::type, "Parameter type")
@@ -60,7 +56,7 @@ void export_part_main(py::module& m) {
                      "Whether it is carried by the part param map")
       .def_readwrite("is_list", &ParamMeta::is_list, "Whether it is a part-typed list");
 
-    py::class_<PartMeta>(part, "PartMeta", "Meta info of a registered part")
+    py::class_<PartMeta>(m, "PartMeta", "Meta info of a registered part")
       .def(py::init<>())
       .def_readwrite("type", &PartMeta::type, "Part category")
       .def_readwrite("name", &PartMeta::name, "C++ name")
@@ -83,7 +79,7 @@ void export_part_main(py::module& m) {
       .def_property_readonly(
         "type_name", [](const PartMeta& m) { return partTypeName(m.type); }, "Category string");
 
-    py::class_<PartRegistry>(part, "PartRegistry", "The process wide part registry")
+    py::class_<PartRegistry>(m, "PartRegistry", "The process wide part registry")
       .def_static("instance", &PartRegistry::instance, py::return_value_policy::reference,
                   "Get the singleton")
       .def("has", &PartRegistry::has, py::arg("full_name"),
@@ -160,5 +156,5 @@ void export_part_main(py::module& m) {
           return fmt::format("<PartRegistry size={}>", reg.size());
       });
 
-    export_python_part(part);
+    export_python_part(m);
 }

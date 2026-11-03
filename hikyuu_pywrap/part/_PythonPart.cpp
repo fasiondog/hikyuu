@@ -124,15 +124,15 @@ void releasePythonParts() {
     PartRegistry::instance().unregisterBySource(PartMeta::Source::PYTHON);
 }
 
-void export_python_part(py::module& part) {
+void export_python_part(py::module& m) {
     // The python side must register through hikyuu.register_python_part (part_bridge.py), which
     // validates the full name and the meta before handing over; this binding is the raw channel
-    part.def("_register_python_part", &registerPythonPart, py::arg("full_name"), py::arg("meta"),
-             py::arg("factory"), py::arg("overwrite") = false,
-             "Register a part whose factory is a python callable factory(scalars, parts) -> part; "
-             "an existing registration is rejected unless overwrite is True");
-    part.def("release_python_parts", &releasePythonParts,
-             "Release the python factories and unregister the python parts; called before the "
-             "interpreter shutdown. A part registered with overwrite=True replaces the original "
-             "one for good: the original is not restored on release");
+    m.def("_register_python_part", &registerPythonPart, py::arg("full_name"), py::arg("meta"),
+          py::arg("factory"), py::arg("overwrite") = false,
+          "Register a part whose factory is a python callable factory(scalars, parts) -> part; "
+          "an existing registration is rejected unless overwrite is True");
+    m.def("release_python_parts", &releasePythonParts,
+          "Release the python factories and unregister the python parts; called before the "
+          "interpreter shutdown. A part registered with overwrite=True replaces the original "
+          "one for good: the original is not restored on release");
 }

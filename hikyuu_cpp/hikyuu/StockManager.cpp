@@ -552,7 +552,8 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes,
 void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
                                          const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side; loaded/total is no longer counted here
-    auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
+    bool bulk_finance_done = false;
+    auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes, bulk_finance_done);
 
     // Load the K-lines of the other securities (they may use different K-line drivers)
     this->m_load_tg = std::make_unique<ThreadPool>();
@@ -601,7 +602,10 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
         _fireLoadEvent(LoadEvent::KDATA_PRELOAD_FINISHED);
     }
 
-    if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+    // The bulk load above already covered the whole finance table, so the per-security load is
+    // skipped once it has run (an empty result means there is no finance data at all)
+    if (!m_cancel_load && !bulk_finance_done &&
+        m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
         m_load_tg = std::make_unique<ThreadPool>();
         std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
@@ -638,7 +642,7 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
 }
 
 std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
-  const vector<KQuery::KType>& ktypes) {
+  const vector<KQuery::KType>& ktypes, bool& bulk_finance_done) {
     std::unordered_set<string> loaded_codes;
     HKU_IF_RETURN(!m_context.isAll(), loaded_codes);
     auto driver = _getKDataDriverPool();
@@ -708,6 +712,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 
     if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
         auto finances = m_baseInfoDriver->getAllHistoryFinance(m_cancel_load);
+        bulk_finance_done = true;
         if (!finances.empty() && !m_cancel_load) {
             std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
             for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {

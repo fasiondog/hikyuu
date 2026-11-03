@@ -95,7 +95,7 @@ def hku_cleanup():
     release_extra_ktype()
 
     # Release the python part factories before the interpreter shuts down
-    part.release_python_parts()
+    release_python_parts()
 
 
 atexit.register(hku_cleanup)

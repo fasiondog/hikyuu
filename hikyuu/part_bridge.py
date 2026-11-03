@@ -4,7 +4,13 @@
 # Python side wrapper of the python part bridge: validate the arguments before handing them to the
 # C++ registry, so that a malformed part is reported with a clear message.
 
-from .core import part
+import sys
+
+from .core import PartMeta, PartType
+
+# The core module carries no __all__, so "import *" in core.py skips underscore names; take the raw
+# channel straight from the extension module
+_register_python_part = sys.modules[PartType.__module__]._register_python_part
 
 __all__ = ['register_python_part']
 
@@ -49,16 +55,16 @@ def register_python_part(full_name, meta, factory, overwrite=False):
             'Invalid part full name: "{}", expected the form "core.<type>.<name>"!'.format(full_name)
         )
 
-    if not isinstance(meta, part.PartMeta):
+    if not isinstance(meta, PartMeta):
         raise ValueError('The meta of part "{}" must be a PartMeta!'.format(full_name))
 
-    part_type = part.PartType.__members__.get(name_parts[1].upper())
+    part_type = PartType.__members__.get(name_parts[1].upper())
     if part_type is None:
         raise ValueError(
             'Invalid part type "{}" in the part full name "{}"!'.format(name_parts[1], full_name)
         )
 
-    if not isinstance(meta.type, part.PartType) or meta.type != part_type:
+    if not isinstance(meta.type, PartType) or meta.type != part_type:
         raise ValueError(
             'The meta type "{}" does not match the part full name "{}"!'.format(meta.type, full_name)
         )
@@ -71,4 +77,4 @@ def register_python_part(full_name, meta, factory, overwrite=False):
     if not callable(factory):
         raise ValueError('The factory of part "{}" is not callable!'.format(full_name))
 
-    part._register_python_part(full_name, meta, factory, overwrite)
+    _register_python_part(full_name, meta, factory, overwrite)

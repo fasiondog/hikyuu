@@ -180,7 +180,7 @@ msgstr "当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回�
 #: hikyuu/draw/drawplot/matplotlib_draw.py:954
 #, python-brace-format
 msgid "Win Rate: {}    Avg Win/Avg Loss: 1 : {}    Sharpe Ratio: {}"
-msgstr "系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}  夏普比率: {:<.2f}"
+msgstr "系统胜率: {}    盈/亏比: 1 : {}    夏普比率: {}"
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:330
 #, python-brace-format
