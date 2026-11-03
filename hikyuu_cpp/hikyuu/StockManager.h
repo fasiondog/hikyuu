@@ -380,7 +380,9 @@ private:
 
     /* Load the K-line data into the cache */
     void loadAllKData();
-    std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
+
+    std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes,
+                                                              bool& bulk_finance_done);
 
     /* Load all the K-line data and historical finance data serially (when the driver does not
      * support parallel loading), executed in a separate thread */
