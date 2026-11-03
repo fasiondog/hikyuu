@@ -197,11 +197,11 @@ def _normalize_part_type(part_type):
     """Convert a part type to the PartType enum; accepts the enum itself or its name (any case)"""
     if part_type is None:
         return None
-    from hikyuu import part as parts
+    from hikyuu import PartType
 
-    if isinstance(part_type, parts.PartType):
+    if isinstance(part_type, PartType):
         return part_type
-    return parts.PartType.__members__.get(str(part_type).upper())
+    return PartType.__members__.get(str(part_type).upper())
 
 
 class HubManager(metaclass=SingletonType):
@@ -508,9 +508,9 @@ class HubManager(metaclass=SingletonType):
 
     def _get_core_part(self, name, **kwargs):
         """Create a built-in part from the in-memory registry"""
-        from hikyuu import Parameter, part as parts
+        from hikyuu import Parameter, PartRegistry
 
-        reg = parts.PartRegistry.instance()
+        reg = PartRegistry.instance()
         full_name = name.lower()
         checkif(
             not reg.has(full_name), full_name, PartNotFoundError, cause='does not exist in the core hub'
@@ -593,10 +593,10 @@ class HubManager(metaclass=SingletonType):
     @staticmethod
     def _get_core_part_info(name):
         """Get the information of a built-in part from the in-memory registry"""
-        from hikyuu import part as parts
+        from hikyuu import PartRegistry
 
         full_name = name.lower()
-        reg = parts.PartRegistry.instance()
+        reg = PartRegistry.instance()
         checkif(
             not reg.has(full_name), full_name, PartNotFoundError, cause='does not exist in the core hub'
         )
@@ -685,9 +685,9 @@ class HubManager(metaclass=SingletonType):
     @staticmethod
     def _get_core_part_name_list(part_type=None):
         """Get the name list of the built-in parts from the in-memory registry"""
-        from hikyuu import part as parts
+        from hikyuu import PartRegistry
 
-        reg = parts.PartRegistry.instance()
+        reg = PartRegistry.instance()
         if part_type is None:
             return reg.get_name_list()
         part_type = _normalize_part_type(part_type)
@@ -743,9 +743,9 @@ class HubManager(metaclass=SingletonType):
     @staticmethod
     def _search_core_part(name=None, part_type=None, label=None):
         """Search the built-in parts in the in-memory registry"""
-        from hikyuu import part as parts
+        from hikyuu import PartRegistry
 
-        reg = parts.PartRegistry.instance()
+        reg = PartRegistry.instance()
         if part_type is None:
             names = reg.get_name_list()
         else:
