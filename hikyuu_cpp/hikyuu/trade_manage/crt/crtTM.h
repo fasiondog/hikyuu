@@ -10,6 +10,7 @@
 #define CRTTM_H_
 
 #include "../TradeManager.h"
+#include "../MarginBase.h"
 #include "TC_Zero.h"
 
 namespace hku {
@@ -24,11 +25,12 @@ namespace hku {
  * @param initcash initial cash, 100000 by default
  * @param costfunc trade cost algorithm, the zero cost algorithm by default
  * @param name account name, "SYS" by default
+ * @param margin margin model, null means keeping the account default model (MG_Fixed(0.6))
  * @see TradeManager
  */
 TradeManagerPtr HKU_API crtTM(const Datetime& datetime = Datetime(199001010000LL),
                               price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
-                              const string& name = "SYS");
+                              const string& name = "SYS", const MarginPtr& margin = nullptr);
 
 void registerPart_crtTM();
 

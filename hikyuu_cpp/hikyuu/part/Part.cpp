@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/part/Part.h"
+#include "hikyuu/trade_manage/MarginBase.h"
 #include "hikyuu/trade_manage/TradeCostBase.h"
 #include "hikyuu/trade_manage/TradeManagerBase.h"
 #include "hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h"
@@ -55,6 +56,8 @@ const char* partTypeName(PartType type) {
             return "tm";
         case PartType::TC:
             return "tc";
+        case PartType::MG:
+            return "mg";
     }
     return "unknown";
 }
@@ -90,6 +93,8 @@ std::optional<PartType> parsePartType(const string& name) {
         return PartType::TM;
     } else if (name == "tc") {
         return PartType::TC;
+    } else if (name == "mg") {
+        return PartType::MG;
     }
     return std::nullopt;
 }
@@ -160,6 +165,10 @@ struct PartTypeOf<TradeManagerPtr> {
 template <>
 struct PartTypeOf<TradeCostPtr> {
     static constexpr PartType value = PartType::TC;
+};
+template <>
+struct PartTypeOf<MarginPtr> {
+    static constexpr PartType value = PartType::MG;
 };
 
 /** All alternatives must map to distinct PartType values */

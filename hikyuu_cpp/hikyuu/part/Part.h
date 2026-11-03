@@ -31,15 +31,16 @@ class System;
 class MultiSystem;
 class TradeManagerBase;
 class TradeCostBase;
+class MarginBase;
 
 /**
  * Part category, aligned with the part dictionary of hikyuu/hub.py (the hub's "other" is
  * excluded). TM/TC are hikyuu extensions beyond the hub part dictionary (TM currently has
  * only the crtTM factory, TC has the TC_* factories); both may be extended in the future.
  */
-enum class PartType { IND, SG, MM, ST, CN, EV, PG, SP, PF, SE, AF, MF, SYS, TM, TC };
+enum class PartType { IND, SG, MM, ST, CN, EV, PG, SP, PF, SE, AF, MF, SYS, TM, TC, MG };
 
-/** Get the string name of the part category: "ind" / "sg" / ... / "tc" */
+/** Get the string name of the part category: "ind" / "sg" / ... / "tc" / "mg" */
 HKU_API const char* partTypeName(PartType type);
 
 /** Parse the part category from its string name; returns std::nullopt if invalid */
@@ -69,9 +70,10 @@ using MFPtr = std::shared_ptr<MultiFactorBase>;             // Same as MultiFact
 using SYSPtr = std::shared_ptr<System>;                     // Same as System.h
 using TradeManagerPtr = std::shared_ptr<TradeManagerBase>;  // Same as TradeManagerBase.h
 using TradeCostPtr = std::shared_ptr<TradeCostBase>;        // Same as TradeCostBase.h
+using MarginPtr = std::shared_ptr<MarginBase>;              // Same as MarginBase.h
 
 using Part = std::variant<Indicator, SignalPtr, MMPtr, STPtr, CNPtr, EVPtr, PGPtr, SPPtr, PFPtr,
-                          SEPtr, AFPtr, MFPtr, SYSPtr, TradeManagerPtr, TradeCostPtr>;
+                          SEPtr, AFPtr, MFPtr, SYSPtr, TradeManagerPtr, TradeCostPtr, MarginPtr>;
 
 /** Part list for list-typed params (e.g. SystemList, IndicatorList) */
 using PartList = std::vector<Part>;

@@ -19,13 +19,13 @@ from hikyuu.hub import HubNameError, PartNotFoundError
 class PartTest(unittest.TestCase):
     def test_registry(self):
         reg = hikyuu.part.PartRegistry.instance()
-        self.assertEqual(reg.size(), 205)
+        self.assertEqual(reg.size(), 208)
         self.assertTrue(reg.has("core.ind.ma"))
         self.assertTrue(reg.has("core.ind.MA"))
         self.assertFalse(reg.has("core.ind.nonexistent"))
 
         names = reg.get_name_list()
-        self.assertEqual(len(names), 205)
+        self.assertEqual(len(names), 208)
         self.assertIn("core.ind.ma", names)
 
         ind_names = reg.get_name_list(hikyuu.part.PartType.IND)
@@ -149,6 +149,7 @@ class PartTest(unittest.TestCase):
             sg_names, hikyuu.search_part(hub="core", part_type=hikyuu.part.PartType.SG)
         )
         self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 6)
+        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="mg")), 3)
         self.assertEqual(hikyuu.search_part(hub="nonexistent-hub-xyz"), [])
 
     def test_normalize_part_type(self):
@@ -257,7 +258,7 @@ class PartTest(unittest.TestCase):
             hikyuu.part.release_python_parts()
 
         self.assertFalse(reg.has("core.ind.pyma"))
-        self.assertEqual(reg.size(), 205)
+        self.assertEqual(reg.size(), 208)
 
     def test_python_part_conflict(self):
         def make_meta(name):
@@ -296,7 +297,7 @@ class PartTest(unittest.TestCase):
 
         self.assertFalse(reg.has("core.ind.pyma2"))
         self.assertTrue(reg.has("core.ind.ma"))
-        self.assertEqual(reg.size(), 205)
+        self.assertEqual(reg.size(), 208)
 
     def test_python_part_bad_return(self):
         meta = hikyuu.part.PartMeta()

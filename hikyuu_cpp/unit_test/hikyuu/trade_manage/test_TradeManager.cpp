@@ -1070,6 +1070,74 @@ TEST_CASE("test_TradeManager_updateWithWeight_bonus_cash_no_double_count") {
     CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
 }
 
+/** @par Test point: the margin gate of buy and sellShort reads the available margin, which is
+ *  served by getFunds and applies the ex-rights weights itself. Reading it after the trade flow
+ *  has already updated the weights (and dropped that stock's check frontier) rescans the same
+ *  window, so every dividend and gift would be booked twice. Both gates must therefore run before
+ *  any state change.*/
+TEST_CASE("test_TradeManager_margin_gate_applies_weight_once") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    /** @arg sellShort with the automatic securities lending on */
+    {
+        TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+        tm->setParam<bool>("support_borrow_stock", true);
+        tm->buy(Datetime(199305200000L), stk, 55.7, 100);  // cash -> 94430
+        auto short_open = tm->sellShort(Datetime(199305250000L), stk, 27.5, 100);
+        /** @arg The short opening itself goes through, not just the bookkeeping below */
+        CHECK_EQ(short_open.business, BUSINESS_SELL_SHORT);
+
+        TradeRecordList tr_list = tm->getTradeList();
+        size_t bonus_count = 0, gift_count = 0;
+        price_t bonus_cash = 0.0;
+        for (const auto& t : tr_list) {
+            if (t.datetime != Datetime(199305240000L))
+                continue;
+            if (t.business == BUSINESS_BONUS) {
+                ++bonus_count;
+                bonus_cash = t.cash;
+            } else if (t.business == BUSINESS_GIFT) {
+                ++gift_count;
+            }
+        }
+
+        /** @arg The dividend and the gift of the weight date are each booked exactly once */
+        CHECK_EQ(bonus_count, 1);
+        CHECK_EQ(gift_count, 1);
+
+        /** @arg The cash carries a single dividend, and the replay agrees with the snapshot */
+        CHECK_EQ(bonus_cash, 94460);
+        CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
+    }
+
+    /** @arg buy with the automatic financing on, adding to an existing holding */
+    {
+        TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+        tm->setParam<bool>("support_borrow_cash", true);
+        tm->buy(Datetime(199305200000L), stk, 55.7, 100);  // cash -> 94430
+        auto add = tm->buy(Datetime(199305250000L), stk, 27.5, 100);
+        /** @arg Likewise the financing buy fills, so the assertions below are not vacuously true */
+        CHECK_EQ(add.business, BUSINESS_BUY);
+
+        TradeRecordList tr_list = tm->getTradeList();
+        size_t bonus_count = 0, gift_count = 0;
+        for (const auto& t : tr_list) {
+            if (t.datetime != Datetime(199305240000L))
+                continue;
+            if (t.business == BUSINESS_BONUS)
+                ++bonus_count;
+            else if (t.business == BUSINESS_GIFT)
+                ++gift_count;
+        }
+
+        /** @arg The very same weight date is applied once on the financing path too */
+        CHECK_EQ(bonus_count, 1);
+        CHECK_EQ(gift_count, 1);
+        CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
+    }
+}
+
 /** @par Test point: test addTradeRecord */
 TEST_CASE("test_TradeManager_addTradeRecord") {
     StockManager& sm = StockManager::instance();

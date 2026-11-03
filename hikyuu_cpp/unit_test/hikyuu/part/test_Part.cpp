@@ -21,9 +21,9 @@ using namespace hku;
 
 /** @par Test points */
 TEST_CASE("test_Part_variant_size") {
-    /** @arg the variant holds exactly the declared 15 alternatives */
-    static_assert(std::variant_size_v<Part> == 15, "Part alternative count changed");
-    CHECK(std::variant_size_v<Part> == 15);
+    /** @arg the variant holds exactly the declared 16 alternatives */
+    static_assert(std::variant_size_v<Part> == 16, "Part alternative count changed");
+    CHECK(std::variant_size_v<Part> == 16);
 }
 
 /** @par Test points */
@@ -32,7 +32,7 @@ TEST_CASE("test_partTypeName_parsePartType") {
     const PartType types[] = {PartType::IND, PartType::SG, PartType::MM, PartType::ST,
                               PartType::CN,  PartType::EV, PartType::PG, PartType::SP,
                               PartType::PF,  PartType::SE, PartType::AF, PartType::MF,
-                              PartType::SYS, PartType::TM, PartType::TC};
+                              PartType::SYS, PartType::TM, PartType::TC, PartType::MG};
     for (PartType type : types) {
         const char* name = partTypeName(type);
         CHECK(name != nullptr);
@@ -67,6 +67,7 @@ TEST_CASE("test_partTypeOf") {
     CHECK(partTypeOf(Part(SYSPtr())) == PartType::SYS);
     CHECK(partTypeOf(Part(TradeManagerPtr())) == PartType::TM);
     CHECK(partTypeOf(Part(TradeCostPtr())) == PartType::TC);
+    CHECK(partTypeOf(Part(MarginPtr())) == PartType::MG);
 }
 
 /** @par Test points */

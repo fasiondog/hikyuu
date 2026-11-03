@@ -42,6 +42,7 @@ TEST_CASE("test_registerComponentParts") {
     CHECK_EQ(reg.getNameList(PartType::SYS).size(), 2);
     CHECK_EQ(reg.getNameList(PartType::TM).size(), 1);
     CHECK_EQ(reg.getNameList(PartType::TC).size(), 6);
+    CHECK_EQ(reg.getNameList(PartType::MG).size(), 3);
 
     /** @arg a component is created from its scalar and part params */
     Parameter sc;
@@ -62,15 +63,16 @@ TEST_CASE("test_registerComponentParts") {
     /** @arg the short names stay unique across all categories (they are a secondary lookup key
      *  of createFromString) */
     std::set<string> names;
-    for (auto type : {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG,
-                      PartType::SP, PartType::AF, PartType::CN, PartType::EV, PartType::MF,
-                      PartType::PF, PartType::SE, PartType::SYS, PartType::TM, PartType::TC}) {
+    for (auto type :
+         {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG, PartType::SP,
+          PartType::AF, PartType::CN, PartType::EV, PartType::MF, PartType::PF, PartType::SE,
+          PartType::SYS, PartType::TM, PartType::TC, PartType::MG}) {
         for (const auto& m : reg.getMetaList(type)) {
             bool inserted = names.insert(m.name).second;
             CHECK_UNARY(inserted);
         }
     }
-    CHECK_EQ(names.size(), 205);
+    CHECK_EQ(names.size(), 208);
 }
 
 /** @par Test points */

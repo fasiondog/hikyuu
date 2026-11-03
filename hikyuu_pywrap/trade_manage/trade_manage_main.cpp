@@ -11,6 +11,7 @@ namespace py = pybind11;
 
 void export_CostRecord(py::module& m);
 void export_TradeCost(py::module& m);
+void export_Margin(py::module& m);
 void export_build_in(py::module& m);
 void export_PositionRecord(py::module& m);
 void export_TradeRecord(py::module& m);
@@ -25,6 +26,7 @@ void export_trade_manage_main(py::module& m) {
     export_CostRecord(m);
     export_PositionRecord(m);
     export_TradeCost(m);
+    export_Margin(m);
     export_TradeRecord(m);
     export_FundsRecord(m);
     export_BorrowRecord(m);

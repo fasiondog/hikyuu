@@ -38,6 +38,7 @@ void export_part_main(py::module& m) {
       .value("SYS", PartType::SYS, "System")
       .value("TM", PartType::TM, "Trade manager")
       .value("TC", PartType::TC, "Trade cost")
+      .value("MG", PartType::MG, "Margin")
       .export_values();
 
     py::enum_<PartMeta::Source>(part, "Source", "Where a part comes from")

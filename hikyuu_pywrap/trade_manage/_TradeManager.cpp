@@ -253,6 +253,9 @@ public:
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
+MarginPtr (TradeManagerBase::*get_margin)() const = &TradeManagerBase::margin;
+void (TradeManagerBase::*set_margin)(const MarginPtr&) = &TradeManagerBase::margin;
+
 TradeRecordList (TradeManagerBase::*_getTradeList_1)() const = &TradeManagerBase::getTradeList;
 TradeRecordList (TradeManagerBase::*_getTradeList_2)(const Datetime&, const Datetime&) const =
   &TradeManagerBase::getTradeList;
@@ -299,6 +302,68 @@ Common parameters:
         "(Read-only) the price precision, the same as the common parameter 'precision'")
 
       .def_property("cost_func", get_costFunc, set_costFunc, "The trade cost algorithm")
+
+      .def_property("margin", get_margin, set_margin,
+                    R"(The margin model of the account (MarginBase)
+
+    Setting it to None falls back to the plain cash model MG_None. The default model of a new
+    account is MG_Fixed(0.6), i.e. the legacy 60 % buying power.)")
+
+      .def("get_open_margin", &TradeManagerBase::getOpenMargin, py::arg("date"), py::arg("stock"),
+           py::arg("price"), py::arg("num"), py::arg("side") = MarginSide::LONG,
+           R"(get_open_margin(self, date, stock, price, num, side=MarginSide.LONG)
+
+    Get the margin occupied by an opening, according to the account margin model
+
+    :param Datetime date: the trade moment
+    :param Stock stock: the security to open
+    :param float price: the opening price
+    :param float num: the opening quantity
+    :param MarginSide side: the long or the short side
+    :return: the occupied funds
+    :rtype: float)")
+
+      .def("get_maintain_margin", &TradeManagerBase::getMaintainMargin, py::arg("date"),
+           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("side") = MarginSide::LONG,
+           R"(get_maintain_margin(self, date, stock, price, num, side=MarginSide.LONG)
+
+    Get the maintain margin (the additional-margin threshold) of an opening
+
+    :return: the maintain margin
+    :rtype: float)")
+
+      .def("get_max_open_number", &TradeManagerBase::getMaxOpenNumber, py::arg("date"),
+           py::arg("stock"), py::arg("price"), py::arg("available"),
+           py::arg("side") = MarginSide::LONG,
+           R"(get_max_open_number(self, date, stock, price, available, side=MarginSide.LONG)
+
+    Get the maximum openable quantity under the given available funds
+
+    :param float available: the available funds
+    :return: the quantity, 0 when nothing can be opened
+    :rtype: float)")
+
+      .def("get_occupied_margin", &TradeManagerBase::getOccupiedMargin, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_occupied_margin(self, date, ktype="DAY")
+
+    The margin occupied by the current long and short positions at the given moment
+
+    :param Datetime date: the given moment
+    :param str ktype: the K-line type used to get the position price
+    :return: the occupied margin
+    :rtype: float)")
+
+      .def("get_available_margin", &TradeManagerBase::getAvailableMargin, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_available_margin(self, date, ktype="DAY")
+
+    The available funds for a new opening, i.e. the net assets minus the occupied margin
+
+    :param Datetime date: the given moment
+    :param str ktype: the K-line type used to get the position price
+    :return: the available funds
+    :rtype: float)")
 
       .def_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
                     &TradeManagerBase::setBrokerLastDatetime,

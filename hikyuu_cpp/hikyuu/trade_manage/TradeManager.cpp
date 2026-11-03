@@ -13,6 +13,7 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include "TradeManager.h"
+#include "crt/MG_Fixed.h"
 #include "../lang.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"
@@ -101,6 +102,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
     setParam<bool>("support_borrow_cash", false);   // Whether to finance automatically
     setParam<bool>("support_borrow_stock", false);  // Whether to borrow stocks automatically
     setParam<bool>("save_action", true);            // Whether to save the commands
+    m_margin = MG_Fixed(0.6);  // Legacy behaviour: margin financing at 60 % buying power
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -147,6 +149,7 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_tmp_weight_checked_until = m_tmp_weight_checked_until;
 
     p->m_cash = m_cash;
+    p->m_margin = m_margin;
     p->m_checkin_cash = m_checkin_cash;
     p->m_checkout_cash = m_checkout_cash;
     p->m_checkin_stock = m_checkin_stock;
@@ -164,8 +167,7 @@ TradeManagerPtr TradeManager::_clone() {
 }
 
 double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
-    // TODO get the margin ratio, it is fixed to 60% by default
-    return 0.6;
+    return m_margin ? m_margin->getMarginRate(datetime, stock, MarginSide::LONG) : 1.0;
 }
 
 Datetime TradeManager::firstDatetime() const {
@@ -865,6 +867,25 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     }
 #endif
 
+    // The margin gate must run before updateWithWeight: the available margin is read through
+    // getFunds, which normalizes the date to 23:59 and applies the ex-rights/ex-dividend weights
+    // itself. Reading it after the update below (and after that stock's check frontier is dropped)
+    // would rescan the same weight window and book every bonus/gift/suogu twice
+    // realPrice 0 is the legal market-order placeholder (the dealing price comes from the
+    // broker), the quota cannot be measured without a price and the plain cash/borrow logic
+    // below handles it; the gate applies only to priced orders
+    if (getParam<bool>("support_borrow_cash") && realPrice > 0.0) {
+        // The admission test uses the margin of the requested order itself instead of the floored
+        // whole-unit quota: the latter loses one unit to floating-point rounding and rejects
+        // odd-lot orders the account can still afford
+        price_t available = getAvailableMargin(datetime);
+        price_t need = getOpenMargin(datetime, stock, realPrice, number, MarginSide::LONG);
+        double tolerance = std::max(1e-9, available * 1e-12);
+        HKU_WARN_IF_RETURN(need > available + tolerance, result,
+                           "{} {} Can't buy, needed margin({:<.4f}) > available({:<.4f})!",
+                           datetime, stock.market_code(), need, available);
+    }
+
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
     // The holding grows at this datetime; drop that stock's check frontier so an out-of-order
@@ -880,21 +901,11 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
 
     if (getParam<bool>("support_borrow_cash")) {
-        // Get the required principal amount
-        CostRecord bor_cost = getBorrowCashCost(datetime, money);
-        double rate = getMarginRate(datetime, stock);
-        price_t x = roundEx(m_cash / rate + cost.total + bor_cost.total, precision);
-        price_t need_cash = roundEx(money + cost.total, precision);
-
-        // The buying power must be validated before any side effect
-        HKU_WARN_IF_RETURN(x < need_cash, result,
-                           "{} {} Can't buy, need cash({:<.4f}) > buying power({:<.4f})!", datetime,
-                           stock.market_code(), need_cash, x);
-
         // Borrow on demand, including the cost of the borrow itself: the buy cost is computed on
         // the real borrow amount (not on the full trade money), and the post-borrow cash is
         // simulated with the same formula borrowCash uses before creating any debt, so a failed
         // buy never leaves a loan record behind
+        price_t need_cash = roundEx(money + cost.total, precision);
         price_t gap = roundEx(need_cash - m_cash, precision);
         if (gap > 0.0) {
             bool covered = false;
@@ -1097,6 +1108,21 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
       "{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ", datetime,
       stock.market_code(), stoploss, realPrice);
 
+    // Every margin model caps a short opening by the available margin, no matter whether the
+    // account borrows securities automatically. The available funds are the net assets minus the
+    // occupied margin, because a short opening adds the sale proceeds to the cash. Like in buy,
+    // this gate must run before updateWithWeight to keep the weights from being applied twice,
+    // and it is skipped for the legal realPrice=0 market-order placeholder (see buy)
+    if (m_margin && m_margin->isMarginTrading(stock) && realPrice > 0.0) {
+        // The margin of the short order itself, judged with a tolerance, same as buy
+        price_t available = getAvailableMargin(datetime);
+        price_t need = getOpenMargin(datetime, stock, realPrice, number, MarginSide::SHORT);
+        double tolerance = std::max(1e-9, available * 1e-12);
+        HKU_WARN_IF_RETURN(need > available + tolerance, result,
+                           "{} {} Can't sellShort, needed margin({:<.4f}) > available({:<.4f})!",
+                           datetime, stock.market_code(), need, available);
+    }
+
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
     // The short position grows at this datetime; drop the check frontier for this stock (see buy)
@@ -1104,67 +1130,62 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     int precision = getParam<int>("precision");
 
-    if (getParam<bool>("support_borrow_stock")) {
-        CostRecord cost = getSellCost(datetime, stock, realPrice, number);
-        price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
-        price_t x = roundEx(m_cash / getMarginRate(datetime, stock), precision);
-        // A-share margin trading: insufficient collateral rejects the order; injecting cash through
-        // checkin would create external funds out of thin air and pollute base_cash (the return
-        // denominator)
-        HKU_WARN_IF_RETURN(x < money, result,
-                           "{} {} Can't sellShort, need margin({:<.4f}) > buying power({:<.4f})!",
-                           datetime, stock.market_code(), money, x);
-
-        // Borrow on demand: the unsold stock already in the pool is used first, only the
-        // shortfall creates new debt
-        double borrow_num = number;
-        borrow_stock_map_type::const_iterator pool_iter = m_borrow_stock.find(stock.id());
-        if (pool_iter != m_borrow_stock.end()) {
-            double unsold = pool_iter->second.number;
-            position_map_type::const_iterator old_pos = m_short_position.find(stock.id());
-            if (old_pos != m_short_position.end()) {
-                unsold -= old_pos->second.number;
-            }
-            // The short position must not exceed the borrowed quantity (an inconsistent account);
-            // reject before borrowing so that no debt residue is left behind
-            HKU_WARN_IF_RETURN(unsold < 0.0, result, "{} {} Borrowed Stock had all selled!",
-                               datetime, stock.market_code());
-            if (unsold > 0.0) {
-                borrow_num = number > unsold ? number - unsold : 0.0;
-            }
-        }
-        if (borrow_num > 0.0) {
-            borrowStock(datetime, stock, realPrice, borrow_num);
-        }
-    }
-
-    // Judge whether there is a borrowed stock and its quantity
-    borrow_stock_map_type::const_iterator bor_iter;
-    bor_iter = m_borrow_stock.find(stock.id());
-    HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), result,
-                        "{} {} Non borrowed, can't sell short! ", datetime, stock.market_code());
-
-    double total_borrow_num = bor_iter->second.number;
-    double can_sell_num = 0;
     position_map_type::iterator pos_iter = m_short_position.find(stock.id());
-    if (pos_iter == m_short_position.end()) {
-        // The borrowed stock has not been sold
-        can_sell_num = total_borrow_num;
-
-    } else {
-        // The borrowed stock has been sold
-        HKU_ERROR_IF_RETURN(pos_iter->second.number >= total_borrow_num, result,
-                            "{} {} Borrowed Stock had all selled!", datetime, stock.market_code());
-
-        // The quantity that can be sold = the total borrowed - the already sold quantity
-        can_sell_num = total_borrow_num - pos_iter->second.number;
-    }
-
-    // If the planned sell quantity is greater than the sellable quantity, sell the sellable
-    // quantity
     double sell_num = number;
-    if (number > can_sell_num) {
-        sell_num = can_sell_num;
+    // Securities that can not be lent out (futures, crypto, ...) book the short directly, without
+    // the borrow/return accounting
+    if (!m_margin || m_margin->needBorrowAsset(stock)) {
+        if (getParam<bool>("support_borrow_stock")) {
+            // Borrow on demand: the unsold stock already in the pool is used first, only the
+            // shortfall creates new debt
+            double borrow_num = number;
+            borrow_stock_map_type::const_iterator pool_iter = m_borrow_stock.find(stock.id());
+            if (pool_iter != m_borrow_stock.end()) {
+                double unsold = pool_iter->second.number;
+                if (pos_iter != m_short_position.end()) {
+                    unsold -= pos_iter->second.number;
+                }
+                // The short position must not exceed the borrowed quantity (an inconsistent
+                // account); reject before borrowing so that no debt residue is left behind
+                HKU_WARN_IF_RETURN(unsold < 0.0, result, "{} {} Borrowed Stock had all selled!",
+                                   datetime, stock.market_code());
+                if (unsold > 0.0) {
+                    borrow_num = number > unsold ? number - unsold : 0.0;
+                }
+            }
+            if (borrow_num > 0.0) {
+                borrowStock(datetime, stock, realPrice, borrow_num);
+            }
+        }
+
+        // Judge whether there is a borrowed stock and its quantity
+        borrow_stock_map_type::const_iterator bor_iter;
+        bor_iter = m_borrow_stock.find(stock.id());
+        HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), result,
+                            "{} {} Non borrowed, can't sell short! ", datetime,
+                            stock.market_code());
+
+        double total_borrow_num = bor_iter->second.number;
+        double can_sell_num = 0;
+        if (pos_iter == m_short_position.end()) {
+            // The borrowed stock has not been sold
+            can_sell_num = total_borrow_num;
+
+        } else {
+            // The borrowed stock has been sold
+            HKU_ERROR_IF_RETURN(pos_iter->second.number >= total_borrow_num, result,
+                                "{} {} Borrowed Stock had all selled!", datetime,
+                                stock.market_code());
+
+            // The quantity that can be sold = the total borrowed - the already sold quantity
+            can_sell_num = total_borrow_num - pos_iter->second.number;
+        }
+
+        // If the planned sell quantity is greater than the sellable quantity, sell the sellable
+        // quantity
+        if (number > can_sell_num) {
+            sell_num = can_sell_num;
+        }
     }
 
     CostRecord cost = getSellCost(datetime, stock, realPrice, sell_num);
@@ -1305,7 +1326,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         }
     }
 
-    if (getParam<bool>("support_borrow_stock")) {
+    if (getParam<bool>("support_borrow_stock") && (!m_margin || m_margin->needBorrowAsset(stock))) {
         returnStock(datetime, stock, realPrice, real_number);
     }
 

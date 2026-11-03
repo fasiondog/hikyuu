@@ -7,6 +7,7 @@
 
 #include "part_convert.h"
 
+#include <hikyuu/trade_manage/MarginBase.h>
 #include <hikyuu/trade_manage/TradeCostBase.h>
 #include <hikyuu/trade_manage/TradeManagerBase.h>
 #include <hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h>
@@ -39,7 +40,8 @@ py::object partToPython(const Part& part) {
       [](const SEPtr& p) { return py::cast(p); }, [](const AFPtr& p) { return py::cast(p); },
       [](const MFPtr& p) { return py::cast(p); }, [](const SYSPtr& p) { return py::cast(p); },
       [](const TradeManagerPtr& p) { return py::cast(p); },
-      [](const TradeCostPtr& p) { return py::cast(p); });
+      [](const TradeCostPtr& p) { return py::cast(p); },
+      [](const MarginPtr& p) { return py::cast(p); });
 }
 
 Part partFromPython(const py::object& obj) {
@@ -87,6 +89,9 @@ Part partFromPython(const py::object& obj) {
     }
     if (py::isinstance<TradeCostBase>(obj)) {
         return py::cast<TradeCostPtr>(obj);
+    }
+    if (py::isinstance<MarginBase>(obj)) {
+        return py::cast<MarginPtr>(obj);
     }
 
     HKU_THROW(

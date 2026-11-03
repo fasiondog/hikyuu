@@ -50,9 +50,57 @@ public:
      * Get the margin rate of the given security
      * @param datetime date
      * @param stock the given security
+     * @note Before the window the rate is 1.0, i.e. the plain no-leverage semantics; 0 would read
+     * as an infinite buying power
      */
     virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override {
-        return (datetime >= m_run_start) ? m_tm->getMarginRate(datetime, stock) : 0.0;
+        return (datetime >= m_run_start) ? m_tm->getMarginRate(datetime, stock) : 1.0;
+    }
+
+    /**
+     * The margin model of the wrapped account
+     * @note Forwarded instead of copied: the base accessors are virtual, so a snapshot taken at
+     *       construction would go stale as soon as the host system swaps its own model
+     */
+    virtual MarginPtr margin() const override {
+        return m_tm->margin();
+    }
+
+    virtual void margin(const MarginPtr& m) override {
+        m_tm->margin(m);
+    }
+
+    virtual price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                  double num, MarginSide side) const override {
+        return m_tm->getOpenMargin(datetime, stock, price, num, side);
+    }
+
+    virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                      double num, MarginSide side) const override {
+        return m_tm->getMaintainMargin(datetime, stock, price, num, side);
+    }
+
+    /** Before the window nothing may be opened, so the quota stays 0 */
+    virtual double getMaxOpenNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                    price_t available, MarginSide side) const override {
+        return (datetime >= m_run_start)
+                 ? m_tm->getMaxOpenNumber(datetime, stock, price, available, side)
+                 : 0.0;
+    }
+
+    virtual price_t getOccupiedMargin(const Datetime& datetime,
+                                      KQuery::KType ktype = KQuery::DAY) const override {
+        return m_tm->getOccupiedMargin(datetime, ktype);
+    }
+
+    virtual price_t getAvailableMargin(const Datetime& datetime,
+                                       KQuery::KType ktype = KQuery::DAY) override {
+        return m_tm->getAvailableMargin(datetime, ktype);
+    }
+
+    /** A Python defined cost or margin model of the wrapped account decides the pickling too */
+    virtual bool hasPythonPart() const noexcept override {
+        return m_tm->hasPythonPart();
     }
 
     /** Initial cash */

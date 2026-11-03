@@ -17,5 +17,8 @@
 #include "crt/TC_FixedA2015.h"
 #include "crt/TC_FixedA2017.h"
 #include "crt/TC_FixedETF.h"
+#include "crt/MG_ByType.h"
+#include "crt/MG_Fixed.h"
+#include "crt/MG_None.h"
 
 #endif /* TRADE_MANAGE_BUILD_IN_H_ */

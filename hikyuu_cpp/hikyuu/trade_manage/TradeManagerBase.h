@@ -15,6 +15,8 @@
 #include "LoanRecord.h"
 #include "TradeCostBase.h"
 #include "OrderBrokerBase.h"
+#include "MarginBase.h"
+#include "crt/MG_None.h"
 #include "crt/TC_Zero.h"
 #include "../utilities/Parameter.h"
 
@@ -70,6 +72,95 @@ public:
     /** Set the trade cost algorithm pointer */
     void costFunc(const TradeCostPtr& func) {
         m_costfunc = func;
+    }
+
+    /** Get the margin model; null means the account has no margin model at all */
+    virtual MarginPtr margin() const {
+        return m_margin;
+    }
+
+    /** Set the margin model; a null pointer falls back to the plain cash model */
+    virtual void margin(const MarginPtr& m) {
+        m_margin = m ? m : MG_None();
+    }
+
+    /** Margin occupied by an opening; 0 when no margin model is set */
+    virtual price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                  double num, MarginSide side) const {
+        return m_margin ? m_margin->getOpenMargin(datetime, stock, price, num, side) : 0.0;
+    }
+
+    /** Maintain margin of an opening; 0 when no margin model is set */
+    virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                      double num, MarginSide side) const {
+        return m_margin ? m_margin->getMaintainMargin(datetime, stock, price, num, side) : 0.0;
+    }
+
+    /** Maximum openable quantity under the given funds; 0 when no margin model is set */
+    virtual double getMaxOpenNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                    price_t available, MarginSide side) const {
+        return m_margin ? m_margin->getMaxOpenNumber(datetime, stock, price, available, side) : 0.0;
+    }
+
+    /**
+     * Margin occupied by the current long and short positions at the given moment
+     * @details A position of a security not covered by the margin model takes nothing, so a mixed
+     *          account does not count its plain cash holdings as occupied funds
+     * @note The positions are priced exactly like getFunds does, otherwise the two halves of
+     *       getAvailableMargin would come from two different snapshots
+     * @note The occupied margin is always measured on the current positions, therefore it is
+     *       only meaningful for the current or a future moment
+     */
+    virtual price_t getOccupiedMargin(const Datetime& datetime,
+                                      KQuery::KType ktype = KQuery::DAY) const {
+        price_t result = 0.0;
+        HKU_IF_RETURN(!m_margin, result);
+
+        // Mirror the valuation moment of getFunds: an unset date or the last trade date values at
+        // the last trade moment, any other date at the close of that day
+        Datetime valued = (datetime == Null<Datetime>() || datetime == lastDatetime())
+                            ? lastDatetime()
+                            : Datetime(datetime.year(), datetime.month(), datetime.day(), 23, 59);
+
+        PositionRecordList positions = getPositionList();
+        for (const auto& record : positions) {
+            if (!m_margin->isMarginTrading(record.stock))
+                continue;
+            price_t price = record.stock.getMarketValue(valued, ktype);
+            result +=
+              m_margin->getOpenMargin(valued, record.stock, price, record.number, MarginSide::LONG);
+        }
+
+        positions = getShortPositionList();
+        for (const auto& record : positions) {
+            if (!m_margin->isMarginTrading(record.stock))
+                continue;
+            price_t price = record.stock.getMarketValue(valued, ktype);
+            result += m_margin->getOpenMargin(valued, record.stock, price, record.number,
+                                              MarginSide::SHORT);
+        }
+        return result;
+    }
+
+    /**
+     * Available funds for a new opening, i.e. the net assets minus the occupied margin
+     * @note The net assets are used instead of the cash: a short opening brings the sale proceeds
+     *       into the cash, which would otherwise allow an unlimited number of shorts
+     * @note Not const only because getFunds is not const (it lazily applies the ex-rights weights);
+     *       a caller must therefore read it before mutating the account in a trade flow
+     * @note The two halves are sequenced on purpose: getFunds applies the pending weights and thus
+     *       changes the positions, so it must complete before getOccupiedMargin reads them (the
+     *       operand order of operator- is otherwise unspecified)
+     * @note Only the current or a future moment is supported: for a past date getFunds replays the
+     *       historical holdings while getOccupiedMargin stays on the current ones, so mixing them
+     *       would subtract today's occupation from a past net value
+     */
+    virtual price_t getAvailableMargin(const Datetime& datetime,
+                                       KQuery::KType ktype = KQuery::DAY) {
+        HKU_CHECK(datetime == Null<Datetime>() || datetime >= lastDatetime(),
+                  "getAvailableMargin supports only the current or a future moment!");
+        price_t net_assets = getFunds(datetime, ktype).net_assets();
+        return net_assets - getOccupiedMargin(datetime, ktype);
     }
 
     /**
@@ -175,6 +266,7 @@ public:
         p->m_is_python_object = m_is_python_object;
         p->m_broker_last_datetime = m_broker_last_datetime;
         p->m_costfunc = m_costfunc;
+        p->m_margin = m_margin;
         p->m_broker_list = m_broker_list;
         return p;
     }
@@ -843,14 +935,16 @@ public:
         return m_is_python_object;
     }
 
-    /** Whether this trade manager or its cost function is defined in Python */
+    /** Whether this trade manager, its cost function or its margin model is defined in Python */
     virtual bool hasPythonPart() const noexcept {
-        return m_is_python_object || (m_costfunc && m_costfunc->hasPythonPart());
+        return m_is_python_object || (m_costfunc && m_costfunc->hasPythonPart()) ||
+               (m_margin && m_margin->hasPythonPart());
     }
 
 protected:
     string m_name;            // Account name
     TradeCostPtr m_costfunc;  // Cost algorithm
+    MarginPtr m_margin;       // Margin model, null when the account has none
 
     Datetime m_broker_last_datetime;     // The last moment an order broker performed an operation,
                                          // i.e. the current startup time
@@ -869,6 +963,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(m_margin);
+        }
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
@@ -879,6 +976,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        // A version 0 archive has no margin model: the value set by the constructor is kept
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(m_margin);
+        }
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
@@ -919,6 +1020,11 @@ inline std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
 }
 
 }  // namespace hku
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = no margin model in the archive, 1 = m_margin added
+BOOST_CLASS_VERSION(::hku::TradeManagerBase, 1)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>

@@ -14,6 +14,8 @@
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Bool.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
+#include <hikyuu/trade_sys/system/imp/WalkForwardTradeManager.h>
+#include <hikyuu/trade_manage/crt/MG_ByType.h>
 #include "create_test_sys.h"
 
 using namespace hku;
@@ -257,6 +259,41 @@ TEST_CASE("test_SYS_WalkForward_runMoment_without_calculation_throws") {
       SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, SE_MaxFundsOptimal());
     sys->setStock(getStock("sz000001"));
     CHECK_THROWS_AS(sys->runMoment(Datetime(201112050000LL)), std::exception);
+}
+
+/** @par Check point: the walk-forward view answers the margin queries of the account it wraps;
+ * before the run window the ratio view reads as no leverage and the quota forbids any opening */
+TEST_CASE("test_SYS_WalkForward_margin_view") {
+    Stock stk = getStock("sz000001");
+    Datetime run_start(201112050000LL);
+
+    TMPtr real = crtTM(Datetime(201101040000LL), 100000.0);
+    real->margin(MG_ByType("1:0.20", 0.0, 0.9));
+
+    auto view = std::make_shared<WalkForwardTradeManager>(real, run_start);
+
+    /** @arg The model itself is forwarded, not a snapshot taken at construction */
+    REQUIRE_UNARY(view->margin() != nullptr);
+    CHECK_EQ(view->margin()->name(), "MG_ByType");
+    CHECK_EQ(view->getMarginRate(run_start, stk), 0.20);
+    real->margin(MG_ByType("1:0.30", 0.0, 0.9));
+    CHECK_EQ(view->getMarginRate(run_start, stk), 0.30);
+
+    /** @arg Inside the window the quota follows the wrapped account */
+    price_t price = 10.0;
+    price_t available = 100000.0;
+    CHECK_EQ(view->getMaxOpenNumber(run_start, stk, price, available, MarginSide::LONG),
+             real->getMaxOpenNumber(run_start, stk, price, available, MarginSide::LONG));
+    CHECK_UNARY(view->getMaxOpenNumber(run_start, stk, price, available, MarginSide::LONG) > 0.0);
+
+    /** @arg Before the window nothing may be opened, while the ratio stays a plain 1.0 */
+    Datetime before(201111040000LL);
+    CHECK_EQ(view->getMarginRate(before, stk), 1.0);
+    CHECK_EQ(view->getMaxOpenNumber(before, stk, price, available, MarginSide::LONG), 0.0);
+
+    /** @arg The account level views are forwarded too */
+    CHECK_EQ(view->getOccupiedMargin(run_start), real->getOccupiedMargin(run_start));
+    CHECK_EQ(view->getAvailableMargin(run_start), real->getAvailableMargin(run_start));
 }
 
 //-----------------------------------------------------------------------------
