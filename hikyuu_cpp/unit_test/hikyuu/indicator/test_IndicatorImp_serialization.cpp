@@ -12,12 +12,18 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/os.h>
+#include <hikyuu/factor/Factor.h>
+#include <hikyuu/indicator/crt/ABS.h>
 #include <hikyuu/indicator/crt/EXP.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/LOG.h>
 #include <hikyuu/indicator/crt/MA.h>
+#include <hikyuu/indicator/crt/MAX.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/POW.h>
+#include <hikyuu/indicator/crt/REF.h>
 #include <hikyuu/indicator/crt/SLOPE.h>
+#include <hikyuu/indicator/crt/SUM.h>
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/archive/binary_iarchive.hpp>
@@ -85,9 +91,9 @@ PriceList specialValues(bool includeSubnormal = true) {
     PriceList px;
     px.push_back(1e-7);
     px.push_back(1e-12);
-    px.push_back(2.5e-6);           // the legacy format rounded it to 3e-6
-    px.push_back(1.234567890123);   // 16 significant digits
-    px.push_back(-0.0);             // the sign bit must survive
+    px.push_back(2.5e-6);          // the legacy format rounded it to 3e-6
+    px.push_back(1.234567890123);  // 16 significant digits
+    px.push_back(-0.0);            // the sign bit must survive
     if (includeSubnormal) {
         px.push_back(5e-324);  // the smallest subnormal
     }
@@ -102,8 +108,7 @@ PriceList specialValues(bool includeSubnormal = true) {
 /** @par Test points */
 TEST_CASE("test_indicator_serialization_legacy_format") {
     // A legacy archive saved by the previous format version must stay readable
-    std::ifstream is(fmt::format("{}/test_data/legacy_ma.plk", getCurrentDir()),
-                     std::ios::binary);
+    std::ifstream is(fmt::format("{}/test_data/legacy_ma.plk", getCurrentDir()), std::ios::binary);
     REQUIRE_UNARY(is.good());
 
     Indicator back;
@@ -138,8 +143,8 @@ TEST_CASE("test_indicator_serialization_value_precision") {
     REQUIRE_EQ(x.size(), px.size());
 
     /** @arg the binary archive (the one python pickle uses) keeps every bit */
-    checkRoundTrip(x, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(
-                        x));
+    checkRoundTrip(x,
+                   roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(x));
 }
 
 /** @par Test points */
@@ -152,14 +157,14 @@ TEST_CASE("test_indicator_serialization_value_precision_text") {
     Indicator finite = PRICELIST(specialValues(false));
     Indicator with_subnormal = POW(PRICELIST(PriceList{2.0}), -1074);  // 2^-1074, the smallest
                                                                        // subnormal
-    Indicator with_nan = LOG(PRICELIST(PriceList{-1.0, 2.0, -3.0}));       // NaN, ln2, NaN
-    Indicator with_inf = EXP(PRICELIST(PriceList{1000.0, 1.0}));           // +Inf, e
-    Indicator with_ninf = LOG(PRICELIST(PriceList{0.0, 1.0}));             // -Inf, 0
+    Indicator with_nan = LOG(PRICELIST(PriceList{-1.0, 2.0, -3.0}));   // NaN, ln2, NaN
+    Indicator with_inf = EXP(PRICELIST(PriceList{1000.0, 1.0}));       // +Inf, e
+    Indicator with_ninf = LOG(PRICELIST(PriceList{0.0, 1.0}));         // -Inf, 0
 
     for (const Indicator* x : {&finite, &with_subnormal, &with_nan, &with_inf, &with_ninf}) {
         /** @arg the text archive keeps every bit of the result buffers, NaN and Inf included */
-        checkRoundTrip(*x, roundTrip<boost::archive::text_oarchive,
-                                      boost::archive::text_iarchive>(*x));
+        checkRoundTrip(*x,
+                       roundTrip<boost::archive::text_oarchive, boost::archive::text_iarchive>(*x));
     }
 }
 
@@ -174,13 +179,13 @@ TEST_CASE("test_indicator_serialization_calculated_values") {
     Indicator slope = SLOPE(PRICELIST(px), 4);  // three results
 
     /** @arg a calculated indicator round trips bitwise, its NaN discard prefix included */
-    checkRoundTrip(ma, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(
-                         ma));
+    checkRoundTrip(ma,
+                   roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(ma));
     checkRoundTrip(ma, roundTrip<boost::archive::text_oarchive, boost::archive::text_iarchive>(ma));
 
     /** @arg every result set of a multi-result indicator round trips bitwise */
-    checkRoundTrip(slope, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(
-                            slope));
+    checkRoundTrip(
+      slope, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(slope));
     checkRoundTrip(slope,
                    roundTrip<boost::archive::text_oarchive, boost::archive::text_iarchive>(slope));
 }
@@ -199,10 +204,10 @@ TEST_CASE("test_indicator_serialization_nan_in_series") {
     Indicator slope = SLOPE(PRICELIST(px), 4);
 
     /** @arg the binary archive keeps every bit of a series holding NaN and Inf */
-    checkRoundTrip(ma, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(
-                         ma));
-    checkRoundTrip(slope, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(
-                            slope));
+    checkRoundTrip(ma,
+                   roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(ma));
+    checkRoundTrip(
+      slope, roundTrip<boost::archive::binary_oarchive, boost::archive::binary_iarchive>(slope));
 }
 
 /** @par Test points */
@@ -226,6 +231,52 @@ TEST_CASE("test_indicator_serialization_volume") {
     /** @arg the archive stays close to the raw data size instead of the legacy string size */
     CHECK_LT(archive_size, raw_size * 3);
     HKU_INFO("serialized size: {} bytes (raw data: {} bytes)", archive_size, raw_size);
+}
+
+namespace {
+
+Indicator cmoFormula() {
+    // A formula whose repeated sub expressions make the clone merge actually replace nodes, the
+    // shape of the reported failing factor
+    Indicator c = CLOSE();
+    Indicator diff = c - REF(c, 1);
+    Indicator abs_sum = SUM(ABS(diff), 14);
+    Indicator up = SUM(MAX(diff, 0), 14);
+    Indicator down = SUM(MAX(REF(c, 1) - c, 0), 14);
+    return IF(abs_sum > 0, 100 * (up - down) / abs_sum, 0);
+}
+
+}  // namespace
+
+/** @par Test points */
+TEST_CASE("test_indicator_serialization_alike_merge_loaded_formula") {
+    Indicator formula = cmoFormula();
+    Indicator source = formula.clone();
+    source.setContext(KData());
+    Indicator loaded =
+      roundTrip<boost::archive::text_oarchive, boost::archive::text_iarchive>(source);
+
+    // A deserialized graph has no parent links, so every clone level runs its own merge
+    /** @arg the deserialized graph survives the clone merge without corrupting the heap */
+    Indicator cloned = loaded.clone();
+    CHECK_EQ(cloned.formula(), formula.formula());
+
+    /** @arg cloning the already merged graph is stable */
+    CHECK_EQ(cloned.clone().formula(), formula.formula());
+}
+
+/** @par Test points */
+TEST_CASE("test_indicator_serialization_alike_merge_factor") {
+    Indicator formula = cmoFormula();
+    Indicator source = formula.clone();
+    source.setContext(KData());
+    Indicator loaded =
+      roundTrip<boost::archive::text_oarchive, boost::archive::text_iarchive>(source);
+
+    /** @arg the Factor constructor clones the loaded formula without corrupting the heap */
+    Factor factor("CMO", loaded, KQuery::DAY, "", "");
+    REQUIRE_FALSE(factor.isNull());
+    CHECK_EQ(factor.formula().formula(), formula.formula());
 }
 
 /** @} */

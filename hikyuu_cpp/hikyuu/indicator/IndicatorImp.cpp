@@ -1740,6 +1740,9 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
 
 void IndicatorImp::inner_repeatALikeNodes(vector<IndicatorImpPtr> &sub_nodes) {
     vector<IndicatorImpPtr> tmp_nodes;
+    // The replaced nodes must stay alive until the merge ends: the raw m_parent pointers of the
+    // surviving nodes may still point into their subtrees
+    vector<IndicatorImpPtr> keep_alive;
     size_t total = sub_nodes.size();
     for (size_t i = 0; i < total; i++) {
         const auto &cur = sub_nodes[i];
@@ -1778,6 +1781,7 @@ void IndicatorImp::inner_repeatALikeNodes(vector<IndicatorImpPtr> &sub_nodes) {
                     }
                 }
 
+                keep_alive.push_back(node);
                 node = cur;
             }
         }
