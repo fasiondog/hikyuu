@@ -243,9 +243,7 @@ def historyfinancialreader(filepath):
         info_data = cw_file.read(struct.calcsize(report_pack_format))
         cw_info = list(struct.unpack(report_pack_format, info_data))
         raw_date = cw_info[313]  # 财务公告日期
-        # Non-finite (NaN/Inf) or 0 means the announcement date is missing, do not fabricate
-        # a fake date
-        if not math.isfinite(raw_date) or raw_date == 0:
+        if not math.isfinite(raw_date):
             hku_warn("Ignore invalid report_date: {}", raw_date)
             continue
         report_date = int(raw_date)
