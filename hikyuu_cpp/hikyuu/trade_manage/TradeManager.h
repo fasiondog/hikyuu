@@ -409,6 +409,12 @@ private:
     // Save the trade actions in the form of a script, so that they can be corrected and calibrated
     void _saveAction(const TradeRecord&);
 
+    /** Whether the security is past its registered expiry (see Stock::lastDatetime) */
+    bool _isExpired(const Datetime& datetime, const Stock& stock) const {
+        const Datetime& last_date = stock.lastDatetime();
+        return !last_date.isNull() && datetime > last_date;
+    }
+
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);
     bool _add_sell_tr(const TradeRecord&);

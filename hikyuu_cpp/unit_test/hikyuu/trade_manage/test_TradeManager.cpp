@@ -1913,4 +1913,47 @@ TEST_CASE("test_TradeManager_profit_cum_change_curve") {
     }
 }
 
+/** @par Test points: the expiry guard (Stock::lastDatetime) refuses opening past the registered
+ * endDate, while the last trading day and the securities without a registered expiry stay
+ * tradable (the guard covers the direct TM calls; the backtest System path never exceeds the
+ * stock's own bar axis) */
+TEST_CASE("test_TradeManager_check_expiry") {
+    StockManager& sm = StockManager::instance();
+    // Borrow a real stock's data driver so the synthetic contracts are not null (the same pattern
+    // as test_crtFixedAPre2015TC.cpp)
+    auto driver = sm.getStock("sh600004").getKDataDirver();
+    // Standalone contracts, like a registered futures contract: one with an expiry, one without
+    Stock expired("SHF", "rb2510", "rb", 12, true, Datetime(202001010000), Datetime(202012150000),
+                  1.0, 10.0, 0, 1, 100000);
+    expired.setKDataDriver(driver);
+    Stock listed("SHF", "rb2601", "rb", 12, true, Datetime(202001010000), Null<Datetime>(), 1.0,
+                 10.0, 0, 1, 100000);
+    listed.setKDataDriver(driver);
+    REQUIRE_UNARY(!expired.isNull());
+    REQUIRE_UNARY(expired.lastDatetime() == Datetime(202012150000));
+    REQUIRE_UNARY(listed.lastDatetime().isNull());
+
+    TradeManagerPtr tm = crtTM(Datetime(202001010000), 100000, TC_Zero(), "TEST");
+
+    /** @arg an expired buy is refused */
+    auto tr = tm->buy(Datetime(202101010000), expired, 4000.0, 1);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+
+    /** @arg an expired sellShort is refused */
+    tr = tm->sellShort(Datetime(202101010000), expired, 4000.0, 1);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+
+    /** @arg the last trading day itself stays tradable */
+    auto bought = tm->buy(Datetime(202012150000), expired, 4000.0, 1);
+    CHECK_EQ(bought.business, BUSINESS_BUY);
+
+    /** @arg a security without a registered expiry (Null lastDatetime) stays tradable */
+    tr = tm->buy(Datetime(202101010000), listed, 4000.0, 1);
+    CHECK_EQ(tr.business, BUSINESS_BUY);
+
+    /** @arg closing an expired position is not blocked (sell / buyShort stay open) */
+    auto sold = tm->sell(Datetime(202101010000), expired, 4000.0, 1);
+    CHECK_EQ(sold.business, BUSINESS_SELL);
+}
+
 /** @} */

@@ -843,6 +843,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
+    HKU_WARN_IF_RETURN(_isExpired(datetime, stock), result, "{} {} expired({}), can't buy!",
+                       datetime, stock.market_code(), stock.lastDatetime());
 
 #if 0  // The check here is cancelled to relax the restriction and improve the efficiency; TM is
        // only responsible for the trade management and is not allowed to check
@@ -1103,6 +1105,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
+    HKU_WARN_IF_RETURN(_isExpired(datetime, stock), result, "{} {} expired({}), can't sellShort!",
+                       datetime, stock.market_code(), stock.lastDatetime());
     HKU_ERROR_IF_RETURN(
       stoploss != 0.0 && stoploss < realPrice, result,
       "{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ", datetime,
