@@ -93,6 +93,36 @@ HKU_API bool forwardPullFromBufferServer(const std::string& addr,
                                          const KQuery::KType& ktype);
 
 /**
+ * Register the K-line types published by the shared memory snapshot (called by the shmserver
+ * plugin after a successful connect). Only these types receive the realtime mirror updates in the
+ * service process; the other types are served by the local driver of the client and can be cached.
+ * An empty list means the snapshot is mapped but publishes no K-line type.
+ */
+HKU_API void setShmCoveredKTypes(const std::vector<KQuery::KType>& ktypes) noexcept;
+
+/** Unregister the coverage list; the coverage is unknown afterwards */
+HKU_API void clearShmCoveredKTypes() noexcept;
+
+/**
+ * Register the base type of an extended K-line type (called by the core when the type is
+ * registered); an extended type inherits the realtime coverage of its base type
+ */
+HKU_API void registerExtraKTypeBase(const KQuery::KType& ktype,
+                                    const KQuery::KType& basetype) noexcept;
+
+/** Unregister all the extended K-line type bases (called when the extra types are released) */
+HKU_API void clearExtraKTypeBases() noexcept;
+
+/**
+ * Whether the given K-line type is served by the realtime mirrored shared memory snapshot
+ * @note An extended K-line type inherits the coverage of its base type. When the coverage is not
+ *       registered (an old plugin, a failed mapping or the standalone mode), the client mode
+ *       conservatively returns true so its callers skip the caches; the standalone mode returns
+ *       false.
+ */
+HKU_API bool isShmKTypeCovered(const KQuery::KType& ktype) noexcept;
+
+/**
  * Set the interruption checker during a long blocking wait (such as waiting for the data service to
  * be ready); true means the wait should be interrupted
  * @details In the python environment it is registered by the binding layer (the pending signal is
