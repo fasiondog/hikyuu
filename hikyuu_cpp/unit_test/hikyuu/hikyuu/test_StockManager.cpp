@@ -81,7 +81,7 @@ bool hasBlock(const BlockList& blocks, const string& category, const string& nam
 TEST_CASE("test_StockManager_size") {
     StockManager& sm = StockManager::instance();
     /** @arg Check that it matches the security count of the test data */
-    CHECK_EQ(sm.size(), 4729);
+    CHECK_EQ(sm.size(), 4753);
 }
 
 /** @par Test points */
@@ -317,6 +317,15 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_EQ(sm.isTradingHours(Datetime(202109301500LL)), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109301501LL)), false);
     CHECK_THROWS(sm.isTradingHours(Datetime(202109301500LL), "invalid"));
+    /** @arg A 24h market (equal session bounds, 0/0/0/0) is tradable at any intraday time */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "FX"), true);
+    /** @arg The holiday check still wins for a 24h market */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "BINANCE"), false);
+    /** @arg A market with explicit sessions (SHF 930-1130/1330-1500) is unaffected */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "SHF"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301200LL), "SHF"), false);
 }
 
 /** @par Test points */
@@ -410,7 +419,7 @@ TEST_CASE("test_StockManager_loadAllStocks_by_context") {
     // Restore the full load for the following cases
     sm.reloadWith(org_context);
     sm.joinPreloadThread();
-    CHECK_EQ(sm.size(), 4729);
+    CHECK_EQ(sm.size(), 4753);
 }
 
 /** @par Test points */

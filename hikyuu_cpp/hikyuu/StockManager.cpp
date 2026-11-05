@@ -793,6 +793,8 @@ Stock StockManager::getStock(const string& querystr) const {
         std::string prefix = query_str.substr(0, pos);
         query_str = suffix + prefix;
     }
+    // The CRYPTO market_code carries a slash (BINANCE/BTCUSDT) while the dictionary key does not
+    query_str.erase(std::remove(query_str.begin(), query_str.end(), '/'), query_str.end());
     std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
     return (iter != m_stockDict.end()) ? iter->second : result;
@@ -1002,6 +1004,10 @@ bool StockManager::isTradingHours(const Datetime& d, const string& market) const
     auto hour = d - d.startOfDay();
     MarketInfo marketinfo = getMarketInfo(market);
     HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    // Same convention as Stock::isTransactionTime: equal session bounds mean unlimited (24h)
+    HKU_IF_RETURN(marketinfo.openTime1() == marketinfo.closeTime1() &&
+                    marketinfo.openTime2() == marketinfo.closeTime2(),
+                  true);
     HKU_IF_RETURN((hour >= marketinfo.openTime1() && hour <= marketinfo.closeTime1()) ||
                     (hour >= marketinfo.openTime2() && hour <= marketinfo.closeTime2()),
                   true);
@@ -1009,7 +1015,8 @@ bool StockManager::isTradingHours(const Datetime& d, const string& market) const
 }
 
 bool StockManager::addStock(const Stock& stock) {
-    string market_code(stock.market_code());
+    // Key by market + code like loadAllStocks does; market_code() carries a slash for CRYPTO
+    string market_code(fmt::format("{}{}", stock.market(), stock.code()));
     to_upper(market_code);
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     HKU_ERROR_IF_RETURN(m_stockDict.find(market_code) != m_stockDict.end(), false,
@@ -1021,6 +1028,9 @@ bool StockManager::addStock(const Stock& stock) {
 void StockManager::removeStock(const string& market_code) {
     string n_market_code(market_code);
     to_upper(n_market_code);
+    // Tolerate the slash-form CRYPTO market_code, same as getStock
+    n_market_code.erase(std::remove(n_market_code.begin(), n_market_code.end(), '/'),
+                        n_market_code.end());
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(n_market_code);
     if (iter != m_stockDict.end()) {
