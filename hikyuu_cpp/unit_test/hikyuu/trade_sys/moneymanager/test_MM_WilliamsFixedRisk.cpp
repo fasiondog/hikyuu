@@ -8,7 +8,7 @@
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/data_driver/DataDriverFactory.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_WilliamsFixedRisk.h>
 
 using namespace hku;

@@ -11,11 +11,11 @@
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/NOT.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Bool.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/system/imp/WalkForwardTradeManager.h>
-#include <hikyuu/trade_manage/crt/MG_ByType.h>
+#include <hikyuu/trade_manage/margin/crt/MG_ByType.h>
 #include "create_test_sys.h"
 
 using namespace hku;

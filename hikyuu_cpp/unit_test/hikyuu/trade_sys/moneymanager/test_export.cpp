@@ -14,7 +14,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/build_in.h>
 
 using namespace hku;

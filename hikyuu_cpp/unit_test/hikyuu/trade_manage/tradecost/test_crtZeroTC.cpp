@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
 
 #include <hikyuu/config.h>
 #if HKU_SUPPORT_SERIALIZATION

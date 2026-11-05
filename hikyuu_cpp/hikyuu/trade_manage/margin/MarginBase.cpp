@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include "MarginBase.h"
-#include "../StockTypeInfo.h"
+#include "../../StockTypeInfo.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::MarginBase)

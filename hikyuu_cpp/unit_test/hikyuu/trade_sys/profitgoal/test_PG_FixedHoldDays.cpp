@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/profitgoal/crt/PG_FixedHoldDays.h>
 
 using namespace hku;

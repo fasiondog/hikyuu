@@ -8,7 +8,7 @@
 #include "FixedATradeCostBase.h"
 #include "hikyuu/utilities/Log.h"
 #include "hikyuu/utilities/arithmetic.h"
-#include "../../StockTypeInfo.h"
+#include "../../../StockTypeInfo.h"
 
 namespace hku {
 

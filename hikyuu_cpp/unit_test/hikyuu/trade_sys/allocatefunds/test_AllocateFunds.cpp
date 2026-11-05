@@ -13,7 +13,7 @@
 #include <cmath>
 #include <limits>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_EqualWeight.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedAmount.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedWeightList.h>

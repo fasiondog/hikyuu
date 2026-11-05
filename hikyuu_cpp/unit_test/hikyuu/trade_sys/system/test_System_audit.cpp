@@ -15,7 +15,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/system/imp/MultiSystem.h>
 #include <hikyuu/trade_sys/system/imp/WalkForwardSystem.h>

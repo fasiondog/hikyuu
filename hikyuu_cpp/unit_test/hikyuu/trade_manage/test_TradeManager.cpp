@@ -8,10 +8,10 @@
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/OrderBrokerBase.h>
-#include <hikyuu/trade_manage/crt/TC_TestStub.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
-#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_TestStub.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedAPre2015.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_manage/Performance.h>
 
 #include <fstream>

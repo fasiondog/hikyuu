@@ -9,7 +9,7 @@
 #include "test_sys.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>

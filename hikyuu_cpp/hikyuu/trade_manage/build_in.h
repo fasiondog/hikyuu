@@ -9,16 +9,8 @@
 #ifndef TRADE_MANAGE_BUILD_IN_H_
 #define TRADE_MANAGE_BUILD_IN_H_
 
-#include "crt/crtTM.h"
-#include "crt/TC_TestStub.h"
-#include "crt/TC_Zero.h"
-#include "crt/TC_FixedA.h"
-#include "crt/TC_FixedAPre2015.h"
-#include "crt/TC_FixedA2015.h"
-#include "crt/TC_FixedA2017.h"
-#include "crt/TC_FixedETF.h"
-#include "crt/MG_ByType.h"
-#include "crt/MG_Fixed.h"
-#include "crt/MG_None.h"
+#include "crtTM.h"
+#include "margin/build_in.h"
+#include "tradecost/build_in.h"
 
 #endif /* TRADE_MANAGE_BUILD_IN_H_ */

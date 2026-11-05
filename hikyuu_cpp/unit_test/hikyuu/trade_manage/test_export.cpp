@@ -13,9 +13,9 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/TradeManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
-#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedAPre2015.h>
 
 using namespace hku;
 

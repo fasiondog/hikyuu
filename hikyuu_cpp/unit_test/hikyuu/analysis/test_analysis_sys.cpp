@@ -16,7 +16,7 @@
 #include <hikyuu/analysis/combinate.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Bool.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>

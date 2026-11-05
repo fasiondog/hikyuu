@@ -6,8 +6,8 @@
  */
 
 #include "hikyuu/part/Part.h"
-#include "hikyuu/trade_manage/MarginBase.h"
-#include "hikyuu/trade_manage/TradeCostBase.h"
+#include "hikyuu/trade_manage/margin/MarginBase.h"
+#include "hikyuu/trade_manage/tradecost/TradeCostBase.h"
 #include "hikyuu/trade_manage/TradeManagerBase.h"
 #include "hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h"
 #include "hikyuu/trade_sys/condition/ConditionBase.h"

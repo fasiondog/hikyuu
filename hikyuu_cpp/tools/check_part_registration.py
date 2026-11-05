@@ -34,7 +34,7 @@ def read(path: Path) -> str:
 
 
 def main() -> int:
-    headers = sorted(CPP.glob("**/crt/**/*.h")) + sorted(CPP.glob("*/crt/*.h"))
+    headers = sorted(CPP.glob("**/crt/**/*.h")) + sorted(CPP.glob("*/crt/*.h")) + sorted(CPP.glob("*/crt*.h"))
     build_ins = sorted(CPP.glob("**/build_in.cpp"))
 
     decl = {}

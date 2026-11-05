@@ -12,7 +12,7 @@
 #include <hikyuu/trade_sys/selector/crt/SE_MultiFactor2.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/AMA.h>

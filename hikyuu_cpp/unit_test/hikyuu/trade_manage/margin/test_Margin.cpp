@@ -6,9 +6,10 @@
  */
 
 #include "doctest/doctest.h"
-#include <hikyuu/trade_manage/crt/MG_Fixed.h>
-#include <hikyuu/trade_manage/crt/MG_None.h>
-#include <hikyuu/trade_manage/crt/MG_ByType.h>
+#include <hikyuu/StockTypeInfo.h>
+#include <hikyuu/trade_manage/margin/crt/MG_Fixed.h>
+#include <hikyuu/trade_manage/margin/crt/MG_None.h>
+#include <hikyuu/trade_manage/margin/crt/MG_ByType.h>
 
 using namespace hku;
 

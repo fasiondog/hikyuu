@@ -8,7 +8,7 @@
 #include "doctest/doctest.h"
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/part/Part.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Band.h>
 
 using namespace hku;

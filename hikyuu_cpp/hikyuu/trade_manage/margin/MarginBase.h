@@ -9,8 +9,8 @@
 #ifndef TRADE_MANAGE_MARGINGBASE_H_
 #define TRADE_MANAGE_MARGINGBASE_H_
 
-#include "../Stock.h"
-#include "../utilities/Parameter.h"
+#include "../../Stock.h"
+#include "../../utilities/Parameter.h"
 
 namespace hku {
 

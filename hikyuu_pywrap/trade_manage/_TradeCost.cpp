@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/trade_manage/TradeCostBase.h>
+#include <hikyuu/trade_manage/tradecost/TradeCostBase.h>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;

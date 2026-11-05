@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_manage/build_in.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_TestStub.h>
 #include "../pybind_utils.h"
 
 using namespace hku;

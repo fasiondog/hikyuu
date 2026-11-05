@@ -7,8 +7,8 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCapitalFunds.h>
 
 using namespace hku;

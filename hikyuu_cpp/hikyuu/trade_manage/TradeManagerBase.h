@@ -13,11 +13,11 @@
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "LoanRecord.h"
-#include "TradeCostBase.h"
+#include "tradecost/TradeCostBase.h"
 #include "OrderBrokerBase.h"
-#include "MarginBase.h"
-#include "crt/MG_None.h"
-#include "crt/TC_Zero.h"
+#include "margin/MarginBase.h"
+#include "margin/crt/MG_None.h"
+#include "tradecost/crt/TC_Zero.h"
 #include "../utilities/Parameter.h"
 
 namespace hku {

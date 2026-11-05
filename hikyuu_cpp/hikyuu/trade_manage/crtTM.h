@@ -9,9 +9,9 @@
 #ifndef CRTTM_H_
 #define CRTTM_H_
 
-#include "../TradeManager.h"
-#include "../MarginBase.h"
-#include "TC_Zero.h"
+#include "TradeManager.h"
+#include "margin/MarginBase.h"
+#include "tradecost/crt/TC_Zero.h"
 
 namespace hku {
 

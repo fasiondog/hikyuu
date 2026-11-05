@@ -10,8 +10,8 @@
 #include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/build_in.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/stoploss/StoplossBase.h>

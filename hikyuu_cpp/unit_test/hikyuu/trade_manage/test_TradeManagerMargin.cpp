@@ -12,11 +12,11 @@
 #include <sstream>
 #include <hikyuu/config.h>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
-#include <hikyuu/trade_manage/crt/MG_Fixed.h>
-#include <hikyuu/trade_manage/crt/MG_None.h>
-#include <hikyuu/trade_manage/crt/MG_ByType.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/margin/crt/MG_Fixed.h>
+#include <hikyuu/trade_manage/margin/crt/MG_None.h>
+#include <hikyuu/trade_manage/margin/crt/MG_ByType.h>
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/archive/xml_oarchive.hpp>

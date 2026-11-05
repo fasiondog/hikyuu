@@ -57,8 +57,8 @@
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA2017.h>
 #include "create_test_sys.h"
 
 using namespace hku;

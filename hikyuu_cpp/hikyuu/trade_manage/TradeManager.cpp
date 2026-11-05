@@ -13,7 +13,7 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include "TradeManager.h"
-#include "crt/MG_Fixed.h"
+#include "margin/crt/MG_Fixed.h"
 #include "../lang.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"

@@ -10,9 +10,9 @@
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/strategy/Strategy.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
 
 using namespace hku;
 

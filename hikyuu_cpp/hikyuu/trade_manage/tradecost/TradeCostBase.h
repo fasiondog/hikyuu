@@ -9,9 +9,9 @@
 #ifndef TRADECOSTBASE_H_
 #define TRADECOSTBASE_H_
 
-#include "../Stock.h"
-#include "../utilities/Parameter.h"
-#include "CostRecord.h"
+#include "../../Stock.h"
+#include "../../utilities/Parameter.h"
+#include "../CostRecord.h"
 
 namespace hku {
 
