@@ -15,8 +15,6 @@
 using namespace hku;
 using namespace hku::ipc;
 
-namespace {
-
 /** A forwarding recorder: it captures the arguments and the returns of the registered callbacks,
  * verifying that the core library keeps plain callbacks only, depending on no shm type */
 struct ForwardRecorder {
@@ -37,7 +35,7 @@ struct ForwardRecorder {
 
 /** Build the callback group registered to the thin forwarding layer (in the real scenario it is
  * built and registered by the shmserver plugin after a successful connect) */
-ShmClientForwarders makeForwarders(ForwardRecorder& rec) {
+static ShmClientForwarders makeForwarders(ForwardRecorder& rec) {
     ShmClientForwarders fwd;
     fwd.realtimeUpdate = [&rec](const std::string& market_code, const KQuery::KType& ktype,
                                 const KRecord& record) {
@@ -64,8 +62,6 @@ ShmClientForwarders makeForwarders(ForwardRecorder& rec) {
     };
     return fwd;
 }
-
-}  // namespace
 
 /**
  * @defgroup test_shm_client_hook_suite test_shm_client_hook_suite
@@ -150,6 +146,86 @@ TEST_CASE("test_ShmClientHook_interrupt") {
      */
     setInterruptChecker(nullptr);
     CHECK_UNARY(!checkInterrupted());
+}
+
+/** @par Test points */
+TEST_CASE("test_ShmClientHook_covered_ktypes") {
+    auto& sm = StockManager::instance();
+    clearShmCoveredKTypes();
+
+    /** @arg Unregistered coverage in the standalone mode is not covered, so its cache is enabled */
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY));
+
+    /** @arg Unregistered coverage in the client mode is conservative: every type is treated as
+     * covered so its caller skips the cache (an old plugin or a failed shm mapping) */
+    sm._testingSetIpcClientMode(true);
+    CHECK_UNARY(isShmKTypeCovered(KQuery::DAY));
+    CHECK_UNARY(isShmKTypeCovered(KQuery::MIN5));
+
+    /** @arg A registered list overrides the conservative default also in the client mode; its
+     * types are recognized case-insensitively */
+    setShmCoveredKTypes({KQuery::DAY, KQuery::MIN5, "day"});
+    CHECK_UNARY(isShmKTypeCovered(KQuery::DAY));
+    CHECK_UNARY(isShmKTypeCovered("day"));
+    CHECK_UNARY(isShmKTypeCovered(KQuery::MIN5));
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::MIN));
+    CHECK_UNARY(!isShmKTypeCovered(""));
+
+    /** @arg An empty registered list means the snapshot is mapped but publishes nothing */
+    setShmCoveredKTypes({});
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY));
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::MIN5));
+
+    /** @arg Clearing restores the conservative default in the client mode */
+    clearShmCoveredKTypes();
+    CHECK_UNARY(isShmKTypeCovered(KQuery::MIN5));
+
+    /** @arg Restore the process state so the other cases in the same process are not polluted */
+    sm._testingSetIpcClientMode(false);
+    clearExtraKTypeBases();
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY));
+}
+
+/** @par Test points */
+TEST_CASE("test_ShmClientHook_extra_ktype_bases") {
+    clearShmCoveredKTypes();
+    clearExtraKTypeBases();
+    setShmCoveredKTypes({KQuery::DAY});
+
+    /** @arg An unregistered extra type keeps the ordinary lookup result */
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY3));
+
+    /** @arg A registered extra type inherits the coverage of its base type */
+    registerExtraKTypeBase(KQuery::DAY3, KQuery::DAY);
+    CHECK_UNARY(isShmKTypeCovered(KQuery::DAY3));
+
+    /** @arg Both the extra type and its base are matched case-insensitively */
+    registerExtraKTypeBase("day5", "day");
+    CHECK_UNARY(isShmKTypeCovered(KQuery::DAY5));
+    CHECK_UNARY(isShmKTypeCovered("day5"));
+
+    /** @arg An extra type whose base is served locally is not covered */
+    registerExtraKTypeBase(KQuery::MIN3, KQuery::MIN);
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::MIN3));
+
+    /** @arg Re-registering the same extra type replaces its base */
+    registerExtraKTypeBase(KQuery::DAY3, KQuery::MIN);
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY3));
+
+    /** @arg Clearing the bases restores the ordinary lookup result */
+    clearExtraKTypeBases();
+    CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY5));
+
+    /** @arg Unknown coverage remains conservative for extra types in the client mode */
+    clearShmCoveredKTypes();
+    StockManager::instance()._testingSetIpcClientMode(true);
+    registerExtraKTypeBase(KQuery::DAY3, KQuery::DAY);
+    CHECK_UNARY(isShmKTypeCovered(KQuery::DAY3));
+
+    /** @arg Restore the process state so the other cases in the same process are not polluted */
+    StockManager::instance()._testingSetIpcClientMode(false);
+    clearShmCoveredKTypes();
+    clearExtraKTypeBases();
 }
 
 /** @} */

@@ -6,6 +6,7 @@
  */
 
 #include "hikyuu/KDataPrivatedBufferImp.h"
+#include "hikyuu/data_driver/ipc/ShmClientHook.h"
 #include "interface/plugins.h"
 #include "hkuextra.h"
 
@@ -17,6 +18,8 @@ void HKU_API registerExtraKType(const string& ktype, const string& basetype, int
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA));
     plugin->registerKTypeExtra(ktype, basetype, minutes, getPhaseEnd);
+    HKU_IF_RETURN(!plugin->isExtraKType(ktype), void());
+    ipc::registerExtraKTypeBase(ktype, basetype);
 }
 
 void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t nbars) {
@@ -24,9 +27,12 @@ void HKU_API registerExtraKType(const string& ktype, const string& basetype, int
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_ERROR_IF_RETURN(!plugin, void(), htr("Can't find {} plugin!", HKU_PLUGIN_HKU_EXTRA));
     plugin->registerKTypeExtra(ktype, basetype, nbars, std::function<Datetime(const Datetime&)>());
+    HKU_IF_RETURN(!plugin->isExtraKType(ktype), void());
+    ipc::registerExtraKTypeBase(ktype, basetype);
 }
 
 void HKU_API releaseExtraKType() {
+    ipc::clearExtraKTypeBases();
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA, false);
     HKU_IF_RETURN(!plugin, void());
@@ -88,6 +94,10 @@ size_t getStockExtraCount(const Stock& stk, const string& ktype) {
 }
 
 KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) {
+    // A cached private copy freezes at the insertion moment; the shm mirrored types always need a
+    // fresh buffer built from the latest data, so the plugin cache is bypassed here
+    HKU_IF_RETURN(ipc::isShmKTypeCovered(query.kType()),
+                  make_shared<KDataPrivatedBufferImp>(stk, query));
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);
     HKU_IF_RETURN(!plugin, make_shared<KDataPrivatedBufferImp>(stk, query));

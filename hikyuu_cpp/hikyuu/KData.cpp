@@ -5,14 +5,14 @@
  *      Author: fasiondog
  */
 
+#include <fstream>
+#include <utility>
 #include "KData.h"
 #include "StockManager.h"
 #include "KDataSharedBufferImp.h"
-#include "KDataPrivatedBufferImp.h"
 #include "KDataShmBufferImp.h"
 #include "indicator/crt/KDATA.h"
 #include "plugin/hkuextra.h"
-#include <fstream>
 
 namespace hku {
 
@@ -191,8 +191,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         return KQueryByDate(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
     }
 
-    HKU_IF_RETURN(
-      empty(), KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType()));
+    HKU_IF_RETURN(empty(), KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType()));
 
     Datetime end_;
     if ((query.queryType() == KQuery::INDEX && query.end() == Null<int64_t>()) ||
@@ -237,7 +236,7 @@ KData KData::getKData(const KQuery::KType& ktype) const {
     if (ktype_upper == getQuery().kType()) {
         return KData(m_imp);
     }
- 
+
     HKU_IF_RETURN(empty(), KData(stk, KQuery(0, 0, ktype, getQuery().recoverType())));
     ret = stk.getKData(getOtherQueryByDate(front().datetime, back().datetime, ktype));
     return ret;
