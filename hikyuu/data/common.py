@@ -27,6 +27,7 @@ import re
 import akshare as ak
 import pandas as pd
 import datetime
+import math
 from hikyuu.util import *
 
 
@@ -241,8 +242,20 @@ def historyfinancialreader(filepath):
         cw_file.seek(foa)
         info_data = cw_file.read(struct.calcsize(report_pack_format))
         cw_info = list(struct.unpack(report_pack_format, info_data))
-        report_date = int(cw_info[313])  # 财务公告日期
+        raw_date = cw_info[313]  # 财务公告日期
+        if not math.isfinite(raw_date):
+            hku_warn("Ignore invalid report_date: {}", raw_date)
+            continue
+        report_date = int(raw_date)
         report_date = 19000000 + report_date if report_date > 800000 else 20000000 + report_date
+        year = report_date // 10000
+        month = (report_date // 100) % 100
+        day = report_date % 100
+        if month == 0 and day == 0:
+            report_date = year * 10000 + 101
+        elif not (1 <= month <= 12 and 1 <= day <= 31):
+            hku_warn("Ignore invalid report_date: {}", report_date)
+            continue
         results.append((file_date, modifiy_code(code), report_date, info_data))
     cw_file.close()
     return results

@@ -237,7 +237,11 @@ void IInSum::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     int mode = getParam<int>("mode");
-    if (ind.size() == 0) {
+    // Only rank modes (4/5) consume ind's own data as the current-stock baseline; modes
+    // 0-3 aggregate the per-stock list from getAllIndicators and must tolerate an empty
+    // ind (e.g. no kline context), otherwise block queries such as
+    // INSUM(block, query, ISLIMITUP(), 0) collapse to all-NaN.
+    if ((mode == 4 || mode == 5) && ind.size() == 0) {
         m_discard = total;
         return;
     }

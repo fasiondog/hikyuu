@@ -1056,9 +1056,10 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
     if (copy_len > 0) {
         for (size_t r = 0; r < m_result_num; ++r) {
             HKU_ASSERT(m_pBuffer[r]);
-            m_pBuffer[r]->resize(total, Null<value_t>());
+            // Shift before resizing so the source range stays inside the buffer
             auto *dst = this->data(r);
             memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+            m_pBuffer[r]->resize(total, Null<value_t>());
         }
     }
 
@@ -1243,13 +1244,19 @@ size_t IndicatorImp::increment_execute() {
     }
 
     size_t total = m_context.size();
-    size_t copy_len = m_old_context.size() - copy_start_pos;
+    size_t old_total = m_old_context.size();
+    // A cached context longer than the new one cannot be shifted into the buffer
+    if (copy_start_pos > old_total || old_total - copy_start_pos > total) {
+        return null_pos;
+    }
+
+    size_t copy_len = old_total - copy_start_pos;
     if (copy_len == 0) {
         return null_pos;
     }
 
     size_t start_pos = m_context.getPos(m_old_context.back().datetime);
-    if (start_pos == null_pos) {
+    if (start_pos == null_pos || start_pos > total) {
         return null_pos;
     }
 
@@ -1259,9 +1266,10 @@ size_t IndicatorImp::increment_execute() {
 
     for (size_t r = 0; r < m_result_num; ++r) {
         HKU_ASSERT(m_pBuffer[r] != nullptr);
-        m_pBuffer[r]->resize(total, Null<value_t>());
+        // Shift before resizing so the source range stays inside the buffer
         auto *dst = this->data(r);
         memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        m_pBuffer[r]->resize(total, Null<value_t>());
     }
 
     return start_pos;
@@ -1477,13 +1485,19 @@ size_t IndicatorImp::increment_execute_if() {
     }
 
     size_t total = m_context.size();
-    size_t copy_len = m_old_context.size() - copy_start_pos;
+    size_t old_total = m_old_context.size();
+    // A cached context longer than the new one cannot be shifted into the buffer
+    if (copy_start_pos > old_total || old_total - copy_start_pos > total) {
+        return null_pos;
+    }
+
+    size_t copy_len = old_total - copy_start_pos;
     if (copy_len == 0) {
         return null_pos;
     }
 
     size_t start_pos = m_context.getPos(m_old_context.back().datetime);
-    if (start_pos == null_pos) {
+    if (start_pos == null_pos || start_pos > total) {
         return null_pos;
     }
 
@@ -1493,9 +1507,10 @@ size_t IndicatorImp::increment_execute_if() {
 
     for (size_t r = 0; r < m_result_num; ++r) {
         HKU_ASSERT(m_pBuffer[r]);
-        m_pBuffer[r]->resize(total, Null<value_t>());
+        // Shift before resizing so the source range stays inside the buffer
         auto *dst = this->data(r);
         memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
+        m_pBuffer[r]->resize(total, Null<value_t>());
     }
 
     return start_pos;
@@ -1740,6 +1755,8 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
 
 void IndicatorImp::inner_repeatALikeNodes(vector<IndicatorImpPtr> &sub_nodes) {
     vector<IndicatorImpPtr> tmp_nodes;
+    // Keep the replaced nodes alive: the raw m_parent pointers may still point into their subtrees
+    vector<IndicatorImpPtr> keep_alive;
     size_t total = sub_nodes.size();
     for (size_t i = 0; i < total; i++) {
         const auto &cur = sub_nodes[i];
@@ -1778,6 +1795,7 @@ void IndicatorImp::inner_repeatALikeNodes(vector<IndicatorImpPtr> &sub_nodes) {
                     }
                 }
 
+                keep_alive.push_back(node);
                 node = cur;
             }
         }

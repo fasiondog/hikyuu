@@ -2,6 +2,22 @@
 
 # 版本发布说明
 
+## 3.0.1 - 2026年11月4日
+
+**🚀 新增特性**
+
+* feat(part): 新增统一部件注册表体系，由 C++ 导出全部内置部件并支持 Python 端自定义部件：`PartRegistry` 集中注册全部内置工厂（204 个：138 指标 + 66 组件）并携带 `PartMeta` 元信息自省；配套的内置只读 `"core"` hub 从该注册表提供内置部件，`get_part("core.ind.ma", ...)` 直接从内存创建、不再访问数据库；可经 `register_python_part` 注册 Python 自定义部件；`PF_ModeA` / `PF_ModeB` / `PF_ModeC` 亦作为内置部件导出（`core.pf.modea` / `core.pf.modeb` / `core.pf.modec`）
+* feat(indicator): 新增 `TS_IC` 时序信息系数指标，在时间维度上于长度为 n 的滚动窗口内将因子序列与该标的自身的 ic_n 日收益序列做相关（默认 RankIC，收益由 K 线内部按 `ROCP(CLOSE, ic_n)` 计算，只需喂入因子）
+* feat(indicator): 新增 `np_apply` / `Indicator.apply`，将 numpy / pandas / ctypes 自定义函数包装为整段运行一次的指标节点，可像普通节点一样参与指标运算、信号生成与批量计算（支持 raw numba 模式，输入为单个或最多 6 个指标）
+
+**⚡️ 优化改进**
+
+* perf(data): 整段批量财报加载覆盖全表后跳过逐标的的历史财报加载循环（批量结果为空即表示无任何财报数据）
+
+**🐞 缺陷修复**
+
+* fix(i18n): 修正 zh_CN draw 翻译中占位符格式不匹配，导致 matplot 绘制系统绩效失败
+
 ## 3.0.0 - 2026年10月28日
 
 **🚀 新增特性**

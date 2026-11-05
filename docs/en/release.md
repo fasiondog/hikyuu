@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.0.1 - November 4, 2026
+
+**🚀 New Features**
+
+* feat(part): a new unified part registry, exporting all built-in parts from C++ and accepting Python-defined parts: `PartRegistry` registers every built-in factory (204 parts: 138 indicators + 66 components) with `PartMeta` introspection; the companion read-only built-in `"core"` hub serves the built-in parts from that registry, so `get_part("core.ind.ma", ...)` is created straight from memory without touching a database; a Python-defined part can be registered through `register_python_part`; `PF_ModeA` / `PF_ModeB` / `PF_ModeC` are exported as built-in parts too (`core.pf.modea` / `core.pf.modeb` / `core.pf.modec`)
+* feat(indicator): new `TS_IC` time-series information coefficient, correlating a factor series against its own security's `ic_n`-day return series over a rolling window of length `n` along the time axis (RankIC by default; the return is computed inside the K-line via `ROCP(CLOSE, ic_n)`, so only the factor needs to be fed in)
+* feat(indicator): new `np_apply` / `Indicator.apply`, wrapping a numpy / pandas / ctypes custom function as an indicator node that runs once over the whole series and takes part in indicator arithmetic, signal generation and batch calculation like any other node (a raw numba mode is supported; the input is a single indicator or up to 6 indicators)
+
+**⚡️ Improvements**
+
+* perf(data): skip the per-security history finance loop once the one-shot bulk finance load has covered the whole table (an empty bulk result means there is no finance data at all)
+
+**🐞 Bug Fixes**
+
+* fix(i18n): correct a placeholder format mismatch in the zh_CN draw translation, which made the matplotlib system performance plot fail
+
 ## 3.0.0 - October 28, 2026
 
 **🚀 New Features**
