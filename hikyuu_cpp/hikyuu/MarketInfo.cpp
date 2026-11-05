@@ -26,15 +26,25 @@ string MarketInfo::toString() const {
        << m_lastDate << sp << m_openTime1.hours() << ":" << m_openTime1.minutes() << sp
        << m_closeTime1.hours() << ":" << m_closeTime1.minutes() << sp << m_openTime2.hours() << ":"
        << m_openTime2.minutes() << sp << m_closeTime2.hours() << ":" << m_closeTime2.minutes()
-       << ")";
+       << sp << m_tzOffsetMin << sp << m_dstRule << sp << m_dataLag << ")";
     return os.str();
+}
+
+bool MarketInfo::equals(const MarketInfo& rhs) const {
+    return m_market == rhs.m_market && m_name == rhs.m_name &&
+           m_description == rhs.m_description && m_code == rhs.m_code &&
+           m_lastDate == rhs.m_lastDate && m_openTime1 == rhs.m_openTime1 &&
+           m_closeTime1 == rhs.m_closeTime1 && m_openTime2 == rhs.m_openTime2 &&
+           m_closeTime2 == rhs.m_closeTime2 && m_tzOffsetMin == rhs.m_tzOffsetMin &&
+           m_dstRule == rhs.m_dstRule && m_dataLag == rhs.m_dataLag;
 }
 
 MarketInfo::MarketInfo() {}
 
 MarketInfo::MarketInfo(const string& market, const string& name, const string& description,
                        const string& code, const Datetime& lastDate, TimeDelta openTime1,
-                       TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2)
+                       TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2,
+                       int tzOffsetMin, int dstRule, int dataLag)
 : m_market(market),
   m_name(name),
   m_description(description),
@@ -43,7 +53,10 @@ MarketInfo::MarketInfo(const string& market, const string& name, const string& d
   m_openTime1(openTime1),
   m_closeTime1(closeTime1),
   m_openTime2(openTime2),
-  m_closeTime2(closeTime2) {}
+  m_closeTime2(closeTime2),
+  m_tzOffsetMin(tzOffsetMin),
+  m_dstRule(dstRule),
+  m_dataLag(dataLag) {}
 
 MarketInfo::MarketInfo(MarketInfo&& rhs) noexcept
 : m_market(std::move(rhs.m_market)),
@@ -54,7 +67,10 @@ MarketInfo::MarketInfo(MarketInfo&& rhs) noexcept
   m_openTime1(std::move(rhs.m_openTime1)),
   m_closeTime1(std::move(rhs.m_closeTime1)),
   m_openTime2(std::move(rhs.m_openTime2)),
-  m_closeTime2(std::move(rhs.m_closeTime2)) {}
+  m_closeTime2(std::move(rhs.m_closeTime2)),
+  m_tzOffsetMin(rhs.m_tzOffsetMin),
+  m_dstRule(rhs.m_dstRule),
+  m_dataLag(rhs.m_dataLag) {}
 
 MarketInfo& MarketInfo::operator=(MarketInfo&& rhs) noexcept {
     if (this != &rhs) {
@@ -67,6 +83,9 @@ MarketInfo& MarketInfo::operator=(MarketInfo&& rhs) noexcept {
         m_closeTime1 = std::move(rhs.m_closeTime1);
         m_openTime2 = std::move(rhs.m_openTime2);
         m_closeTime2 = std::move(rhs.m_closeTime2);
+        m_tzOffsetMin = rhs.m_tzOffsetMin;
+        m_dstRule = rhs.m_dstRule;
+        m_dataLag = rhs.m_dataLag;
     }
     return *this;
 }

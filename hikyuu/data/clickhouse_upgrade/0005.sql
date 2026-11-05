@@ -1,3 +1,10 @@
+ALTER TABLE hku_base.market ADD COLUMN IF NOT EXISTS tz_offset_min Int32 DEFAULT 480;
+ALTER TABLE hku_base.market ADD COLUMN IF NOT EXISTS dst_rule Int32 DEFAULT 0;
+ALTER TABLE hku_base.market ADD COLUMN IF NOT EXISTS data_lag Int32 DEFAULT 0;
+ALTER TABLE hku_base.market UPDATE tz_offset_min=480, dst_rule=0, data_lag=0 WHERE market IN ('SH', 'SZ', 'BJ', 'SHF', 'DCE', 'CZC', 'CFE', 'GFE', 'INE', 'HK') SETTINGS mutations_sync = 1;
+ALTER TABLE hku_base.market UPDATE tz_offset_min=0, dst_rule=0, data_lag=0 WHERE market IN ('FX', 'BINANCE') SETTINGS mutations_sync = 1;
+ALTER TABLE hku_base.market UPDATE tz_offset_min=-300, dst_rule=1, data_lag=1 WHERE market IN ('NASDAQ', 'NYSE') SETTINGS mutations_sync = 1;
+
 INSERT INTO hku_base.stocktypeinfo (type, precision, tick, tickValue, minTradeNumber, maxTradeNumber, description)
 SELECT * FROM (SELECT 10 AS type, 6 AS precision, 0.000001 AS tick, 0.000001 AS tickValue, 1 AS minTradeNumber, 1000000 AS maxTradeNumber, '数字币' AS description)
 WHERE NOT EXISTS (SELECT * FROM hku_base.stocktypeinfo WHERE type = 10);
@@ -18,48 +25,48 @@ INSERT INTO hku_base.stocktypeinfo (type, precision, tick, tickValue, minTradeNu
 SELECT * FROM (SELECT 15 AS type, 2 AS precision, 0.01 AS tick, 0.01 AS tickValue, 1 AS minTradeNumber, 1000000 AS maxTradeNumber, '美股' AS description)
 WHERE NOT EXISTS (SELECT * FROM hku_base.stocktypeinfo WHERE type = 15);
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'SHF' AS market, '上海期货交易所' AS name, '上海期货市场' AS description, 'rb0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'SHF' AS market, '上海期货交易所' AS name, '上海期货市场' AS description, 'rb0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'SHF');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'DCE' AS market, '大连商品交易所' AS name, '大连期货市场' AS description, 'i0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'DCE' AS market, '大连商品交易所' AS name, '大连期货市场' AS description, 'i0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'DCE');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'CZC' AS market, '郑州商品交易所' AS name, '郑州期货市场' AS description, 'SR0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'CZC' AS market, '郑州商品交易所' AS name, '郑州期货市场' AS description, 'SR0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'CZC');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'CFE' AS market, '中国金融期货交易所' AS name, '中金所市场' AS description, 'IF0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'CFE' AS market, '中国金融期货交易所' AS name, '中金所市场' AS description, 'IF0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'CFE');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'GFE' AS market, '广州期货交易所' AS name, '广期所市场' AS description, 'si0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'GFE' AS market, '广州期货交易所' AS name, '广期所市场' AS description, 'si0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'GFE');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'INE' AS market, '上海国际能源交易中心' AS name, '能源中心市场' AS description, 'sc0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'INE' AS market, '上海国际能源交易中心' AS name, '能源中心市场' AS description, 'sc0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'INE');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'FX' AS market, '外汇市场' AS name, '外汇市场' AS description, 'EURUSD' AS code, 19900101 AS lastDate, 0 AS openTime1, 0 AS closeTime1, 0 AS openTime2, 0 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'FX' AS market, '外汇市场' AS name, '外汇市场' AS description, 'EURUSD' AS code, 19900101 AS lastDate, 0 AS openTime1, 0 AS closeTime1, 0 AS openTime2, 0 AS closeTime2, 0 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'FX');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'HK' AS market, '香港交易所' AS name, '香港市场' AS description, 'HSI' AS code, 19900101 AS lastDate, 930 AS openTime1, 1200 AS closeTime1, 1300 AS openTime2, 1600 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'HK' AS market, '香港交易所' AS name, '香港市场' AS description, 'HSI' AS code, 19900101 AS lastDate, 930 AS openTime1, 1200 AS closeTime1, 1300 AS openTime2, 1600 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'HK');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'NASDAQ' AS market, '纳斯达克交易所' AS name, '纳斯达克市场' AS description, 'NDX' AS code, 19900101 AS lastDate, 930 AS openTime1, 1600 AS closeTime1, 0 AS openTime2, 0 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'NASDAQ' AS market, '纳斯达克交易所' AS name, '纳斯达克市场' AS description, 'NDX' AS code, 19900101 AS lastDate, 930 AS openTime1, 1600 AS closeTime1, 0 AS openTime2, 0 AS closeTime2, -300 AS tz_offset_min, 1 AS dst_rule, 1 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'NASDAQ');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'NYSE' AS market, '纽约证券交易所' AS name, '纽约市场' AS description, 'DJI' AS code, 19900101 AS lastDate, 930 AS openTime1, 1600 AS closeTime1, 0 AS openTime2, 0 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'NYSE' AS market, '纽约证券交易所' AS name, '纽约市场' AS description, 'DJI' AS code, 19900101 AS lastDate, 930 AS openTime1, 1600 AS closeTime1, 0 AS openTime2, 0 AS closeTime2, -300 AS tz_offset_min, 1 AS dst_rule, 1 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'NYSE');
 
-INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2)
-SELECT * FROM (SELECT 'BINANCE' AS market, '币安交易所' AS name, '数字币市场' AS description, 'BTCUSDT' AS code, 19900101 AS lastDate, 0 AS openTime1, 0 AS closeTime1, 0 AS openTime2, 0 AS closeTime2)
+INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
+SELECT * FROM (SELECT 'BINANCE' AS market, '币安交易所' AS name, '数字币市场' AS description, 'BTCUSDT' AS code, 19900101 AS lastDate, 0 AS openTime1, 0 AS closeTime1, 0 AS openTime2, 0 AS closeTime2, 0 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'BINANCE');
 
 INSERT INTO hku_base.stock (market, code, name, type, valid, startDate, endDate)
@@ -106,4 +113,4 @@ INSERT INTO hku_base.stock (market, code, name, type, valid, startDate, endDate)
 SELECT * FROM (SELECT 'BINANCE' AS market, 'BTCUSDT' AS code, '比特币USDT' AS name, 10 AS type, 1 AS valid, 19900101 AS startDate, 99999999 AS endDate)
 WHERE NOT EXISTS (SELECT * FROM hku_base.stock WHERE market = 'BINANCE' AND code = 'BTCUSDT');
 
-ALTER TABLE `hku_base`.`version` UPDATE `version` = 5 WHERE `id` = 0;
+ALTER TABLE `hku_base`.`version` UPDATE `version` = 5 WHERE `id` = 0 SETTINGS mutations_sync = 1;

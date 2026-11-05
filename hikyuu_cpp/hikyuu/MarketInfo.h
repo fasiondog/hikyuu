@@ -32,10 +32,14 @@ public:
      * @param closeTime1 end time of trading session 1
      * @param openTime2 start time of trading session 2
      * @param closeTime2 end time of trading session 2
+     * @param tzOffsetMin standard UTC offset in minutes (e.g. 480 for UTC+8)
+     * @param dstRule daylight saving rule: 0=none, 1=US, 2=EU
+     * @param dataLag visibility delay in trading days relative to the base market
      */
     MarketInfo(const string& market, const string& name, const string& description,
                const string& code, const Datetime& lastDate, TimeDelta openTime1,
-               TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2);
+               TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2,
+               int tzOffsetMin = 480, int dstRule = 0, int dataLag = 0);
 
     MarketInfo(const MarketInfo&) = default;
     MarketInfo& operator=(const MarketInfo&) = default;
@@ -88,6 +92,24 @@ public:
         return m_closeTime2;
     }
 
+    /** Standard UTC offset in minutes (e.g. 480 for UTC+8) */
+    int tzOffsetMin() const noexcept {
+        return m_tzOffsetMin;
+    }
+
+    /** Daylight saving rule: 0=none, 1=US, 2=EU */
+    int dstRule() const noexcept {
+        return m_dstRule;
+    }
+
+    /** Visibility delay in trading days relative to the base market */
+    int dataLag() const noexcept {
+        return m_dataLag;
+    }
+
+    /** Whether all the fields are equal (operator== only compares the market) */
+    bool equals(const MarketInfo& rhs) const;
+
     /** Used by __str__ of python only */
     string toString() const;
 
@@ -101,11 +123,15 @@ private:
     TimeDelta m_closeTime1;  // Morning closing time
     TimeDelta m_openTime2;   // Afternoon opening time
     TimeDelta m_closeTime2;  // Afternoon closing time
+    int m_tzOffsetMin{480};  // Standard UTC offset in minutes
+    int m_dstRule{0};        // Daylight saving rule: 0=none, 1=US, 2=EU
+    int m_dataLag{0};        // Visibility delay in trading days relative to the base market
 };
 
 /**
  * Output the market information, e.g.:
- * MarketInfo(SH, Shanghai Stock Exchange, Shanghai market, 000001, 2011-Dec-06 00:00:00)
+ * MarketInfo(SH, Shanghai Stock Exchange, Shanghai market, 000001, 2011-Dec-06 00:00:00, 9:30,
+ * 11:30, 13:0, 15:0, 480, 0, 0)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream&, const MarketInfo&);

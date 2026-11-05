@@ -136,6 +136,29 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_EQ(marketInfo.openTime2(), TimeDelta(0, 13, 00));
     CHECK_EQ(marketInfo.closeTime2(), TimeDelta(0, 15, 00));
 
+    /** @arg Time zone fields of an A-share market: UTC+8, no DST, no lag */
+    CHECK_EQ(marketInfo.tzOffsetMin(), 480);
+    CHECK_EQ(marketInfo.dstRule(), 0);
+    CHECK_EQ(marketInfo.dataLag(), 0);
+
+    /** @arg Time zone fields of a US market: UTC-5 standard, US DST rule, one day lag */
+    MarketInfo nasdaq = sm.getMarketInfo("NASDAQ");
+    CHECK_NE(nasdaq, Null<MarketInfo>());
+    CHECK_EQ(nasdaq.tzOffsetMin(), -300);
+    CHECK_EQ(nasdaq.dstRule(), 1);
+    CHECK_EQ(nasdaq.dataLag(), 1);
+
+    /** @arg Time zone fields of a 24h market: UTC, no DST, no lag */
+    MarketInfo binance = sm.getMarketInfo("BINANCE");
+    CHECK_NE(binance, Null<MarketInfo>());
+    CHECK_EQ(binance.tzOffsetMin(), 0);
+    CHECK_EQ(binance.dstRule(), 0);
+    CHECK_EQ(binance.dataLag(), 0);
+
+    /** @arg equals compares every field while operator== only compares the market */
+    CHECK_UNARY(nasdaq.equals(sm.getMarketInfo("NASDAQ")));
+    CHECK_UNARY(!nasdaq.equals(marketInfo));
+
     /** @arg Query an existing market with an all-lowercase market name */
     marketInfo = sm.getMarketInfo("sh");
     CHECK_NE(marketInfo, Null<MarketInfo>());

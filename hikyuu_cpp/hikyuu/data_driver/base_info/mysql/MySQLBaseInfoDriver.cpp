@@ -59,7 +59,8 @@ vector<MarketInfo> MySQLBaseInfoDriver::getAllMarketInfo() {
             try {
                 result.emplace_back(info.market(), info.name(), info.description(), info.code(),
                                     info.lastDate(), info.openTime1(), info.closeTime1(),
-                                    info.openTime2(), info.closeTime2());
+                                    info.openTime2(), info.closeTime2(), info.tzOffsetMin(),
+                                    info.dstRule(), info.dataLag());
             } catch (std::exception &e) {
                 HKU_ERROR("Failed load market, {}", e.what());
             } catch (...) {
@@ -226,7 +227,8 @@ MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
         if (!info.market().empty()) {
             result = MarketInfo(info.market(), info.name(), info.description(), info.code(),
                                 info.lastDate(), info.openTime1(), info.closeTime1(),
-                                info.openTime2(), info.closeTime2());
+                                info.openTime2(), info.closeTime2(), info.tzOffsetMin(),
+                                info.dstRule(), info.dataLag());
         }
     } catch (...) {
     }
