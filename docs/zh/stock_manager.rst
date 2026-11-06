@@ -400,16 +400,22 @@ StockManager/Block/Stock
         :return: 日期列表
         :rtype: DatetimeList
         
-    .. py:method:: is_holiday(self, d)
+    .. py:method:: is_holiday(self, d, market="SH")
 
-        判断时间对应日期是否为节假日(仅使用A股市场)
+        判断时间对应日期是否为指定市场的节假日
 
         :param Datetime d: 指定的时间
+        :param str market: 市场简称，使用该市场的节假日日历，默认为 "SH"
+        :return: 是否为节假日
         :rtype: bool
+
+        .. note:: 周末按市场区分：加密货币（24x7）周末不休市，其余市场周末休市；无自定义节假日行的市场工作日均不休市
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 
         判断指定时间对应的日期是否为交易时间
+
+        节假日闸门按指定市场自身的日历与周末规则判断（如 BINANCE 周末不休市）
 
         :param Datetime d: 待判断的时间
         :param str market: 市场简称

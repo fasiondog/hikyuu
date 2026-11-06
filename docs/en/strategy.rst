@@ -101,16 +101,17 @@ Common parameters:
 
         :param func: a callable that must accept one parameter: func(stg: Strategy)
         :param TimeDelta time: the time interval, e.g. an interval of 3 seconds: TimeDelta(0, 0, 0, 3) or Seconds(3)
-        :param str market: which market's open/close hours to use; defaults to "SH"
+        :param str market: which market's open/close hours and holiday calendar to use; defaults to "SH"
         :param ignore_market: whether to ignore market open/close hours; defaults to False
 
-    .. py:method:: run_daily_at(self, func, time, ignore_holiday=True)
+    .. py:method:: run_daily_at(self, func, time, ignore_holiday=True, market="SH")
 
         Register a callback that runs at a fixed time every day.
 
         :param func: a callable that must accept one parameter: func(stg: Strategy)
         :param TimeDelta time: the execution time, e.g. 15:00 every day: TimeDelta(0, 15); must be less than 1 day
         :param ignore_holiday: do not execute on holidays; defaults to True
+        :param str market: the market whose holiday calendar is used when ignore_holiday is True; defaults to "SH"
 
         .. note:: only one task can be registered at a given time; registering another one at the same time raises an exception
 

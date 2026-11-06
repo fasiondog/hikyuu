@@ -34,7 +34,7 @@ public:
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) override;
     virtual StockInfo getStockInfo(string market, const string& code) override;
     virtual vector<StockInfo> getAllStockInfo() override;
-    virtual std::unordered_set<Datetime> getAllHolidays() override;
+    virtual std::unordered_map<std::string, std::unordered_set<Datetime>> getAllHolidays() override;
     virtual ZhBond10List getAllZhBond10() override;
 
     virtual vector<std::pair<size_t, string>> getHistoryFinanceField() override;

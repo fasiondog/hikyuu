@@ -28,7 +28,7 @@ from pathlib import Path
 
 import mysql.connector
 
-from hikyuu.data.common import get_stktype_list, get_new_holidays
+from hikyuu.data.common import CN_HOLIDAY_MARKETS, get_stktype_list, get_new_holidays
 from hikyuu.util import hku_debug, hku_info
 
 
@@ -134,17 +134,23 @@ def get_stock_list(connect, market, quotations):
 
 
 def import_new_holidays(connect):
-    """导入新的交易所休假日历"""
+    """导入新的交易所休假日历（按市场写入，数据源仅覆盖中国）"""
     cur = connect.cursor()
-    cur.execute("select date from `hku_base`.`holiday` order by date desc limit 1")
-    a = cur.fetchall()
-    last_date = a[0][0] if a else 19901219
-    holidays = get_new_holidays()
-    new_holidays = [(int(v), ) for v in holidays if int(v) > last_date]
-    if new_holidays:
-        cur.executemany("insert into `hku_base`.`holiday` (date) values (%s)", new_holidays)
-        connect.commit()
-        cur.close()
+    # 数据源可能给出重复日期，新库有 unique(market,date)，不去重会直接抛 IntegrityError 打断整个导入
+    holidays = sorted({int(v) for v in get_new_holidays()})
+    for market in CN_HOLIDAY_MARKETS:
+        cur.execute(
+            "select date from `hku_base`.`holiday` where market=%s order by date desc limit 1",
+            (market, ))
+        a = cur.fetchall()
+        last_date = a[0][0] if a else 19901219
+        new_holidays = [(market, v) for v in holidays if v > last_date]
+        if new_holidays:
+            cur.executemany(
+                "insert ignore into `hku_base`.`holiday` (market, date) values (%s, %s)",
+                new_holidays)
+    connect.commit()
+    cur.close()
 
 
 def get_table(connect, market, code, ktype):

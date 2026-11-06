@@ -364,6 +364,39 @@ TEST_CASE("test_StockManager_isHoliday") {
     CHECK_EQ(sm.isHoliday(Datetime(202101030000LL)), true);  // Sunday
     CHECK_EQ(sm.isHoliday(Datetime(202110010000LL)), true);
     CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
+    /** @arg The calendar is per market: the CN holiday applies to the A-share / futures
+    markets but not to a market without its own holiday rows */
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "SH"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "SHF"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "SZ"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "INE"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "BINANCE"), false);
+    /** @arg An unknown market has no weekday holidays but still follows the weekend rule */
+    CHECK_EQ(sm.isHoliday(Datetime(202109300000LL), "NOSUCH"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "NOSUCH"), true);
+    /** @arg The weekend rule is per market: the 24/7 crypto market is open on weekends */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    /** @arg The market code is case-insensitive (each layer normalizes independently) */
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "sh"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "binance"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "sh"), true);
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_isHoliday_weekendCache") {
+    auto& sm = StockManager::instance();
+    /** @arg repeated calls hit the weekend-rule cache and stay stable */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    /** @arg an unknown market is never cached; repeated calls re-query and stay stable */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "NOSUCH"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "NOSUCH"), true);
+    /** @arg the cached and re-queried paths agree with the first evaluation */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
 }
 
 /** @par Test points */
@@ -390,8 +423,17 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "BINANCE"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "BINANCE"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "FX"), true);
-    /** @arg The holiday check still wins for a 24h market */
-    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "BINANCE"), false);
+    /** @arg The holiday check uses the market's own calendar: the A-share holiday does not
+    close the crypto market, but it does close the futures markets sharing the CN calendar */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "SHF"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "SH"), false);
+    /** @arg The weekend rule is per market: the 24/7 crypto market trades on weekends,
+    the FX market (24h sessions but a weekday calendar) is still closed */
+    CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "FX"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
     /** @arg A market with explicit sessions (SHF 930-1130/1330-1500) is unaffected */
     CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "SHF"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109301200LL), "SHF"), false);

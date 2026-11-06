@@ -29,7 +29,7 @@ from pathlib import Path
 import clickhouse_connect
 
 from hikyuu import Datetime, UTCOffset
-from hikyuu.data.common import get_stktype_list, get_new_holidays
+from hikyuu.data.common import CN_HOLIDAY_MARKETS, get_stktype_list, get_new_holidays
 from hikyuu.util import hku_catch, hku_debug, hku_info
 
 
@@ -59,7 +59,8 @@ def create_database(connect):
                 try:
                     connect.command(stmt)
                 except Exception as e:
-                    print(f"执行失败: {stmt[:30]}... 错误: {e}")
+                    # 升级失败必须显式中断：脚本末尾会推进 version，静默继续会让失败的脚本永不重跑
+                    raise RuntimeError(f"执行失败: {stmt[:60]}... 错误: {e}") from e
 
     db_version = get_db_version(connect)
     files = [x for x in Path(sql_dir).iterdir()
@@ -77,7 +78,8 @@ def create_database(connect):
                 try:
                     connect.command(stmt)
                 except Exception as e:
-                    print(f"执行失败: {stmt[:30]}... 错误: {e}")
+                    # 升级失败必须显式中断：脚本末尾会推进 version，静默继续会让失败的脚本永不重跑
+                    raise RuntimeError(f"执行失败: {stmt[:60]}... 错误: {e}") from e
 
 
 def get_codepre_list(connect, market, quotations):
@@ -99,15 +101,20 @@ def get_stock_list(connect, market, quotations):
 
 
 def import_new_holidays(connect):
-    """导入新的交易所休假日历"""
-    last_date = connect.command("select date from `hku_base`.`holiday` order by date desc limit 1")
-    last_date = last_date if type(last_date) == int else 19901219
-    holidays = get_new_holidays()
-    new_holidays = [(int(v),) for v in holidays if int(v) > last_date]
-    if new_holidays:
-        ic = connect.create_insert_context(table='holiday', database='hku_base',
-                                           data=new_holidays)
-        connect.insert(context=ic)
+    """导入新的交易所休假日历（按市场写入，数据源仅覆盖中国）"""
+    # MergeTree 不去重，重复日期会直接写入多行，与 sqlite/mysql 保持一致先去重
+    holidays = sorted({int(v) for v in get_new_holidays()})
+    for market in CN_HOLIDAY_MARKETS:
+        last_date = connect.command(
+            "select date from `hku_base`.`holiday` where market='{}' order by date desc limit 1"
+            .format(market))
+        last_date = last_date if type(last_date) == int else 19901219
+        new_holidays = [(market, v) for v in holidays if v > last_date]
+        if new_holidays:
+            ic = connect.create_insert_context(table='holiday', database='hku_base',
+                                               column_names=['market', 'date'],
+                                               data=new_holidays)
+            connect.insert(context=ic)
 
 
 def get_table(connect, market, code, ktype):

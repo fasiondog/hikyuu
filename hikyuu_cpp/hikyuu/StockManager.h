@@ -10,7 +10,10 @@
 #define STOCKMANAGER_H_
 
 #include <mutex>
+#include <shared_mutex>
 #include <thread>
+#include <unordered_map>
+#include <unordered_set>
 #include "hikyuu/utilities/Parameter.h"
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/utilities/plugin/PluginManager.h"
@@ -220,8 +223,18 @@ public:
     const ZhBond10List& getZhBond10() const;
 
     /**
+     * Whether the date of the given time is a holiday for the given market
+     * @note Saturdays / Sundays count as holidays except for the 24h crypto markets; a market
+     *       without its own holiday rows has no weekday holidays, while the weekend rule still
+     *       applies; Null<Datetime>() throws an exception
+     * @param d the given time
+     * @param market the given market
+     */
+    bool isHoliday(const Datetime& d, const std::string& market) const;
+
+    /**
      * Whether the date of the given time is a holiday (including Saturday and Sunday)
-     * @note Only the mainland China market is supported; Null<Datetime>() throws an exception
+     * @note Deprecated: use isHoliday(d, market) instead; equivalent to isHoliday(d, "SH")
      * @param d the given time
      */
     bool isHoliday(const Datetime& d) const;
@@ -397,6 +410,10 @@ private:
     void _loadAllKDataSafely(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes,
                              bool parallel);
 
+    /* Whether Saturday / Sunday count as holidays for the market: false for the 24h crypto
+     * markets (judged by the stock type of the representative index), true otherwise */
+    bool _weekendIsHoliday(const std::string& market) const;
+
     /*
      * Dispatch the data loading event to the registered plugin callbacks (declared unconditionally;
      * called by loadData and the two loading functions). The core library no longer perceives the
@@ -459,7 +476,13 @@ private:
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
     mutable StockTypeInfoMap m_stockTypeInfo;
 
-    std::unordered_set<Datetime> m_holidays;  // Holidays
+    typedef std::unordered_map<std::string, std::unordered_set<Datetime>> HolidayMap;
+    HolidayMap m_holidays;  // Holidays grouped by market
+
+    // Whether Saturday / Sunday count as holidays for the market (false for the 24h crypto
+    // markets); a missing representative index keeps the default true and is not cached
+    mutable std::unordered_map<std::string, bool> m_weekend_holiday;
+    mutable std::shared_mutex m_weekend_holiday_mutex;
 
     ZhBond10List m_zh_bond10;  // 10-year Chinese government bond yield data
 

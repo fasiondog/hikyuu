@@ -251,16 +251,21 @@ StockTypeInfo MySQLBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     return result;
 }
 
-std::unordered_set<Datetime> MySQLBaseInfoDriver::getAllHolidays() {
+std::unordered_map<std::string, std::unordered_set<Datetime>>
+MySQLBaseInfoDriver::getAllHolidays() {
     HKU_ASSERT(m_pool);
-    std::unordered_set<Datetime> result;
+    std::unordered_map<std::string, std::unordered_set<Datetime>> result;
     try {
         auto con = m_pool->get();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
         for (const auto &holiday : holidays) {
             try {
-                result.insert(holiday.datetime());
+                // 先取 datetime：损坏行先抛出，避免 operator[] 抢先注册空市场条目
+                Datetime d = holiday.datetime();
+                std::string market(holiday.market);
+                to_upper(market);
+                result[std::move(market)].insert(d);
             } catch (std::exception &e) {
                 HKU_WARN(e.what());
             } catch (...) {

@@ -249,8 +249,7 @@ void Strategy::runDaily(const std::function<void(Strategy*)>& func, const TimeDe
         run_at.func = [this, market = run_at.market, f = std::move(func)]() {
             const auto& sm = StockManager::instance();
             auto today = Datetime::today();
-            int day = today.dayOfWeek();
-            if (day == 0 || day == 6 || sm.isHoliday(today)) {
+            if (sm.isHoliday(today, market)) {
                 return;
             }
 
@@ -408,19 +407,19 @@ void Strategy::_runDaily() {
 }
 
 void Strategy::runDailyAt(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
-                          bool ignoreHoliday) {
+                          bool ignoreHoliday, const std::string& market) {
     HKU_CHECK(func, "Invalid func!");
+    HKU_CHECK(!market.empty(), "The market can not be empty!");
     HKU_CHECK(delta < Days(1), "TimeDelta must < Days(1)!");
     HKU_CHECK(m_run_daily_at_funcs.find(delta) == m_run_daily_at_funcs.end(),
               "A task already exists at this point in time!");
 
     std::function<void()> new_func;
     if (ignoreHoliday) {
-        new_func = [this, f = std::move(func)]() {
+        new_func = [this, market, f = std::move(func)]() {
             const auto& sm = StockManager::instance();
             auto today = Datetime::today();
-            int day = today.dayOfWeek();
-            if (day != 0 && day != 6 && !sm.isHoliday(today)) {
+            if (!sm.isHoliday(today, market)) {
                 event([this, f]() { f(this); });
             }
         };

@@ -191,6 +191,10 @@ def get_new_holidays():
     return [v[0] for v in day if len(v) >= 3 and v[2] == '中国']
 
 
+# 共享中国交易日历的市场（节假日数据源只覆盖中国；港/美/汇/币无节假日行，工作日按非假日处理，周末按周末规则处理）
+CN_HOLIDAY_MARKETS = ("SH", "SZ", "BJ", "SHF", "DCE", "CZC", "CFE", "GFE", "INE")
+
+
 @hku_catch(ret=[], trace=True)
 @timeout(60)
 def get_china_bond10_rate(start_date="19901219"):

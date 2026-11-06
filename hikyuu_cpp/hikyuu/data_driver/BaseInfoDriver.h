@@ -9,6 +9,7 @@
 #ifndef BASEINFODRIVER_H_
 #define BASEINFODRIVER_H_
 
+#include <unordered_map>
 #include <unordered_set>
 #include "../utilities/Parameter.h"
 #include "../MarketInfo.h"
@@ -208,9 +209,9 @@ public:
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
 
     /**
-     * Get all the holiday dates
+     * Get all the holiday dates, grouped by market
      */
-    virtual std::unordered_set<Datetime> getAllHolidays() = 0;
+    virtual std::unordered_map<std::string, std::unordered_set<Datetime>> getAllHolidays() = 0;
 
     /**
      * Get the All Zh Bond10 object

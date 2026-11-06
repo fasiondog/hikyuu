@@ -99,7 +99,8 @@ void export_BaseInfoDriver(py::module& m) {
     :param int type: the security type
     :return: the corresponding security type information; if it does not exist, return Null<StockTypeInfo>())")
       .def("getAllHolidays", &BaseInfoDriver::getAllHolidays,
-           "[Subclass interface (Required)] Get all the holiday dates")
+           "[Subclass interface (Required)] Get all the holiday dates, grouped by market "
+           "(a dict of market -> set of Datetime)")
       .def("getAllZhBond10", &BaseInfoDriver::getAllZhBond10,
            "[Subclass interface (Required)] Get all the Chinese 10-year treasury bond information");
 }

@@ -428,17 +428,24 @@ StockManager/Block/Stock
         :return: the list of trading dates
         :rtype: DatetimeList
 
-    .. py:method:: is_holiday(self, d)
+    .. py:method:: is_holiday(self, d, market="SH")
 
-        Return whether the date of the given time is a market holiday (the A-share calendar
-        only)
+        Return whether the date of the given time is a holiday of the given market
 
         :param Datetime d: the specified time
+        :param str market: the market abbreviation whose holiday calendar is used; defaults to "SH"
+        :return: True if it is a holiday
         :rtype: bool
+
+        .. note:: the weekend rule is per market: the 24x7 crypto markets trade through the weekend,
+           while the other markets are closed; a market without its own holiday rows has no weekday
+           holidays
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 
         Return whether the given time falls within trading hours
+
+        The holiday gate follows the given market's own calendar and weekend rule (e.g. BINANCE trades on weekends)
 
         :param Datetime d: the time to check
         :param str market: the market abbreviation

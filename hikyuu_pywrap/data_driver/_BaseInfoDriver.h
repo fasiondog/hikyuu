@@ -99,8 +99,10 @@ public:
         PYBIND11_OVERLOAD_PURE(StockTypeInfo, BaseInfoDriver, getStockTypeInfo, type);
     }
 
-    std::unordered_set<Datetime> getAllHolidays() override {
-        PYBIND11_OVERLOAD_PURE(std::unordered_set<Datetime>, BaseInfoDriver, getAllHolidays, );
+    std::unordered_map<std::string, std::unordered_set<Datetime>> getAllHolidays() override {
+        // The macro splits its arguments on commas, so the map type must go in through an alias
+        using HolidayMap = std::unordered_map<std::string, std::unordered_set<Datetime>>;
+        PYBIND11_OVERLOAD_PURE(HolidayMap, BaseInfoDriver, getAllHolidays, );
     }
 
     ZhBond10List getAllZhBond10() override {

@@ -995,12 +995,44 @@ const ZhBond10List& StockManager::getZhBond10() const {
 }
 
 bool StockManager::isHoliday(const Datetime& d) const {
-    HKU_IF_RETURN(d.dayOfWeek() == 0 || d.dayOfWeek() == 6, true);
-    return m_holidays.count(d.startOfDay());
+    return isHoliday(d, "SH");
+}
+
+bool StockManager::isHoliday(const Datetime& d, const string& market) const {
+    string code(market);
+    to_upper(code);
+    if (d.dayOfWeek() == 0 || d.dayOfWeek() == 6) {
+        return _weekendIsHoliday(code);
+    }
+    auto iter = m_holidays.find(code);
+    return iter != m_holidays.end() && iter->second.count(d.startOfDay()) > 0;
+}
+
+bool StockManager::_weekendIsHoliday(const string& market) const {
+    {
+        std::shared_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
+        auto iter = m_weekend_holiday.find(market);
+        if (iter != m_weekend_holiday.end()) {
+            return iter->second;
+        }
+    }
+
+    MarketInfo marketinfo = getMarketInfo(market);
+    HKU_IF_RETURN(marketinfo == Null<MarketInfo>(), true);
+
+    // The 24h crypto markets trade through the weekend; without the representative index the
+    // default is kept and not cached, so a later call after the stocks are loaded re-evaluates it
+    Stock index = getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()));
+    HKU_IF_RETURN(index.isNull(), true);
+
+    bool weekend_holiday = index.type() != STOCKTYPE_CRYPTO;
+    std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
+    m_weekend_holiday[market] = weekend_holiday;
+    return weekend_holiday;
 }
 
 bool StockManager::isTradingHours(const Datetime& d, const string& market) const {
-    HKU_IF_RETURN(isHoliday(d), false);
+    HKU_IF_RETURN(isHoliday(d, market), false);
     auto hour = d - d.startOfDay();
     MarketInfo marketinfo = getMarketInfo(market);
     HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
@@ -1158,6 +1190,13 @@ void StockManager::loadAllMarketInfos() {
         to_upper(market);
         m_marketInfoDict[market] = marketInfo;
     }
+
+    // The representative index of a market may become resolvable after a reload; the cached
+    // weekend rule is derived from it, so drop the cache to let it be re-evaluated
+    {
+        std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
+        m_weekend_holiday.clear();
+    }
 }
 
 void StockManager::loadAllStockTypeInfo() {
@@ -1171,9 +1210,17 @@ void StockManager::loadAllStockTypeInfo() {
 }
 
 void StockManager::loadAllHolidays() {
+    // 市场键统一大写：内置驱动已转大写，第三方/Python 驱动可能返回小写，
+    // 而查询侧（isHoliday/getMarketInfo）按大写查找，不归一将静默丢失该市场的工作日假日
     auto holidays = m_baseInfoDriver->getAllHolidays();
-    std::unordered_set<Datetime> tmp_holidays(holidays.begin(), holidays.end());
-    m_holidays = std::move(tmp_holidays);
+    HolidayMap normalized;
+    normalized.reserve(holidays.size());
+    for (const auto& item : holidays) {
+        std::string market(item.first);
+        to_upper(market);
+        normalized[market].insert(item.second.begin(), item.second.end());
+    }
+    m_holidays = std::move(normalized);
 }
 
 void StockManager::loadInnerBlocks() {

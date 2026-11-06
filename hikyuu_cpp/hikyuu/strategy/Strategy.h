@@ -89,9 +89,10 @@ public:
      * @param func the task to be executed
      * @param delta the given time
      * @param ignoreHoliday ignore the holidays, i.e. it is not executed on holidays
+     * @param market the market whose holiday calendar is used when ignoreHoliday is true
      */
     void runDailyAt(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
-                    bool ignoreHoliday = true);
+                    bool ignoreHoliday = true, const std::string& market = "SH");
 
     /**
      * It is called when the correct data changes, i.e. the change of the corresponding market data

@@ -1341,12 +1341,13 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
     // shmMirror is a safe no-op).
     if (StockManager::instance().isIpcClientMode() && !isBuffer(inktype)) {
         HKU_IF_RETURN(
-          record.datetime.isNull() || StockManager::instance().isHoliday(record.datetime), void());
+          record.datetime.isNull() || StockManager::instance().isHoliday(record.datetime, market()),
+          void());
         ipc::forwardRealtimeUpdate(market_code(), inktype, record);
         return;
     }
     HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull() ||
-                    StockManager::instance().isHoliday(record.datetime),
+                    StockManager::instance().isHoliday(record.datetime, market()),
                   void());
 
     string ktype(inktype);

@@ -101,16 +101,17 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 
         :param func: 可调用对象，需接收一个参数：func(stg: Strategy)
         :param TimeDelta time: 间隔时间，如间隔 3 秒：TimeDelta(0, 0, 0, 3) 或 Seconds(3)
-        :param str market: 使用哪个市场的开闭市时间，默认为"SH"
+        :param str market: 使用哪个市场的开闭市时间与节假日日历，默认为"SH"
         :param ignore_market: 忽略市场开闭市时间，默认为 False
 
-    .. py:method:: run_daily_at(self, func, time, ignore_holiday=True)
+    .. py:method:: run_daily_at(self, func, time, ignore_holiday=True, market="SH")
 
         设置每日定点执行回调
 
         :param func: 可调用对象，需接收一个参数：func(stg: Strategy)
         :param TimeDelta time: 执行时刻，如每日 15 点：TimeDelta(0, 15)，必须小于 1 天
         :param ignore_holiday: 节假日不执行，默认为 True
+        :param str market: ignore_holiday 为 True 时使用哪个市场的节假日日历，默认为 "SH"
 
         .. note:: 同一时刻只能注册一个任务，重复注册将抛出异常
 

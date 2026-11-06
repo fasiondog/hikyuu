@@ -199,12 +199,13 @@ void export_Strategy(py::module& m) {
 
     :param func: a callable object such as an ordinary function, func(stg: Strategy)
     :param TimeDelta time: the interval time, e.g. an interval of 3 seconds: TimeDelta(0, 0, 0, 3) or Seconds(3)
-    :param str market: which market's open/close times to use
+    :param str market: which market's open/close times and holiday calendar to use
     :param ignore_market: ignore the market open/close times)")
 
       .def(
         "run_daily_at",
-        [](Strategy& self, py::object func, const TimeDelta& time, bool ignore_holiday) {
+        [](Strategy& self, py::object func, const TimeDelta& time, bool ignore_holiday,
+           const std::string& market) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
             auto c_func = make_gil_safe(func.attr("__call__"));
@@ -224,16 +225,19 @@ void export_Strategy(py::module& m) {
                     HKU_ERROR("Unknown error!");
                 }
             };
-            self.runDailyAt(new_func, time, ignore_holiday);
+            self.runDailyAt(new_func, time, ignore_holiday, market);
         },
         py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true,
-        R"(run_daily_at(self, func)
+        py::arg("market") = "SH",
+        R"(run_daily_at(self, func, time, ignore_holiday=True, market="SH")
 
     Set the callback executed at a fixed time every day
 
     :param func: a callable object such as an ordinary function, func(stg: Strategy)
     :param TimeDelta time: the execution moment, e.g. at 15 o'clock every day: TimeDelta(0, 15)
-    :param ignore_holiday: do not execute on the holidays)")
+    :param ignore_holiday: do not execute on the holidays
+    :param str market: the market whose holiday calendar is used when ignore_holiday is True;
+        defaults to "SH")")
 
       .def("today", &Strategy::today, R"(today(self)
 
