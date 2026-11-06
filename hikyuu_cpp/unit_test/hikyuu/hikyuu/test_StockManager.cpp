@@ -6,11 +6,13 @@
  */
 
 #include "doctest/doctest.h"
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <thread>
 #include <hikyuu/StockManager.h>
@@ -249,6 +251,50 @@ TEST_CASE("test_StockManager_getTradingCalendar") {
                        sm.getStock(sz_info.market() + sz_info.code())};
     DatetimeList merged = sm.getTradingCalendar(stk_list, KQuery());
     CHECK_GT(merged.size(), 0);
+
+    /** @arg Every market whose representative index has K-line data yields a non-empty,
+    ascending calendar that honours the queried date range */
+    for (const char* market : {"SHF", "CZC", "CFE", "DCE", "INE", "GFE", "HK", "NASDAQ", "NYSE"}) {
+        MarketInfo info = sm.getMarketInfo(market);
+        CHECK_UNARY(!(info == Null<MarketInfo>()));
+        if (info == Null<MarketInfo>())
+            continue;
+        Stock index = sm.getStock(info.market() + info.code());
+        CHECK_UNARY(!index.isNull());
+        if (index.isNull())
+            continue;
+        DatetimeList actual = sm.getTradingCalendar(KQuery(), market);
+        /** @arg calendar length matches the driver record count of the index */
+        CHECK_UNARY(actual.size() > 0);
+        CHECK_EQ(actual.size(), index.getCount(KQuery::DAY));
+        /** @arg calendar is strictly ascending and inside a sane date range */
+        CHECK_UNARY(std::is_sorted(actual.begin(), actual.end()));
+        CHECK_UNARY(actual.front() >= Datetime(19900101) && actual.back() <= Datetime(20300101));
+        /** @arg a date-range query is forwarded: the tail half re-queried equals its suffix */
+        size_t half = actual.size() / 2;
+        DatetimeList tail = sm.getTradingCalendar(
+          KQueryByDate(actual[half], Null<Datetime>(), KQuery::DAY), market);
+        CHECK_UNARY(tail == DatetimeList(actual.begin() + half, actual.end()));
+    }
+
+    /** @arg Markets registered without K-line data keep an empty calendar and do not throw */
+    for (const char* market : {"BJ", "FX", "BINANCE"}) {
+        CHECK_UNARY(!(sm.getMarketInfo(market) == Null<MarketInfo>()));
+        CHECK_EQ(sm.getTradingCalendar(KQuery(), market).size(), 0);
+    }
+
+    /** @arg The merged axis equals the exact union of the single-market axes */
+    MarketInfo shf_info = sm.getMarketInfo("SHF");
+    StockList cross_list{sm.getStock(sh_info.market() + sh_info.code()),
+                         sm.getStock(shf_info.market() + shf_info.code())};
+    DatetimeList sh_axis = sm.getTradingCalendar(KQuery(), "SH");
+    DatetimeList shf_axis = sm.getTradingCalendar(KQuery(), "SHF");
+    DatetimeList cross = sm.getTradingCalendar(cross_list, KQuery());
+    std::set<Datetime> want(sh_axis.begin(), sh_axis.end());
+    want.insert(shf_axis.begin(), shf_axis.end());
+    CHECK_EQ(cross.size(), want.size());
+    CHECK_UNARY(std::is_sorted(cross.begin(), cross.end()));
+    CHECK_EQ(std::set<Datetime>(cross.begin(), cross.end()).size(), cross.size());
 }
 
 /** @par Test points */
