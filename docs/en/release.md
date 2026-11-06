@@ -1,5 +1,14 @@
 # Release Notes
 
+## 3.0.2 - November 6, 2026
+
+**🐞 Bug Fixes**
+
+* fix(data): strengthen the filtering of invalid dates when importing historical finance data
+* fix(indicator): limit the INSUM empty-input guard to the rank modes, so an empty input is no longer wrongly intercepted in the non-rank modes
+* fix(indicator): fix the overflow when saving a factor with too many nested levels (a replaced node was released early during deserialization)
+* fix(ipc): fix the extended K-line cache being invalidated under shared-memory mode
+
 ## 3.0.1 - November 4, 2026
 
 **🚀 New Features**
