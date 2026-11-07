@@ -262,13 +262,13 @@ Built-in Asset Allocation Algorithms
     :param list weights: the specified list of weight proportions
     :return: the fund allocation algorithm instance (``AFPtr``)
 
-.. py:function:: AF_FixedAmount([amount = 20000.0])
+.. py:function:: AF_FixedAmount([fixed_amount = 20000.0])
 
     Fixed-amount fund allocation (L1 equal weight + L2 fixed amount): allocates an equal amount of capital to each selected instrument.
 
     The current implementation requires ``fixed_amount >= 0`` and rebalances by the net amount.
 
-    :param float amount: the maximum trade amount
+    :param float fixed_amount: the maximum trade amount
     :return: the fund allocation algorithm instance (``AFPtr``)
 
 .. py:function:: AF_MultiFactor([auto_adjust_weight = True])

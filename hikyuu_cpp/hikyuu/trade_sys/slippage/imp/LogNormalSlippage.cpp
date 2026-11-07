@@ -157,9 +157,17 @@ void registerPart_SP_LogNormal() {
     meta.params.push_back(ParamMeta{.name = "stddev", .type = "double", .default_value = "0.05"});
     meta.params.push_back(
       ParamMeta{.name = "adverse_only", .type = "bool", .default_value = "true"});
+    meta.params.push_back(ParamMeta{.name = "short_mean", .type = "double"});
+    meta.params.push_back(ParamMeta{.name = "short_stddev", .type = "double"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        auto short_mean = sc.have("short_mean")
+                            ? std::optional<double>(sc.get<double>("short_mean"))
+                            : std::nullopt;
+        auto short_stddev = sc.have("short_stddev")
+                              ? std::optional<double>(sc.get<double>("short_stddev"))
+                              : std::nullopt;
         return SP_LogNormal(sc.get<double>("mean"), sc.get<double>("stddev"),
-                            sc.get<bool>("adverse_only"), std::nullopt, std::nullopt);
+                            sc.get<bool>("adverse_only"), short_mean, short_stddev);
     });
 }
 

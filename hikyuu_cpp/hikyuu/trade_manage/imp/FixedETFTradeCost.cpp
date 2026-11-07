@@ -83,9 +83,9 @@ void registerPart_TC_FixedETF() {
     meta.params.push_back(
       ParamMeta{.name = "commission", .type = "double", .default_value = "0.0001"});
     meta.params.push_back(
-      ParamMeta{.name = "lowestCommission", .type = "double", .default_value = "5.0"});
+      ParamMeta{.name = "lowest_commission", .type = "double", .default_value = "5.0"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return TC_FixedETF(sc.get<double>("commission"), sc.get<double>("lowestCommission"));
+        return TC_FixedETF(sc.get<double>("commission"), sc.get<double>("lowest_commission"));
     });
 }
 

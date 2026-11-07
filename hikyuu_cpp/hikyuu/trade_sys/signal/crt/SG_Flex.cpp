@@ -25,10 +25,10 @@ void registerPart_SG_Flex() {
     meta.name = "SG_Flex";
     meta.full_name = "core.sg.flex";
     meta.params.push_back(
-      ParamMeta{.name = "op", .type = "Indicator", .required = true, .is_part_param = true});
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "slow_n", .type = "int", .required = true});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return SG_Flex(std::get<Indicator>(pp.at("op").at(0)),
+        return SG_Flex(std::get<Indicator>(pp.at("ind").at(0)),
                        static_cast<int>(sc.get<int64_t>("slow_n")));
     });
 }

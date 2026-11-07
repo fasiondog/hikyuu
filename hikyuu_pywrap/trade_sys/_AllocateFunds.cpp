@@ -202,12 +202,12 @@ Common parameters:
 
     The equal weight asset allocation; allocate the selected assets with an equal ratio (L1 equal weight 1/N))");
 
-    m.def("AF_FixedAmount", AF_FixedAmount, py::arg("amount") = 20000.0,
-          R"(AF_FixedAmount(amount=20000.0)
+    m.def("AF_FixedAmount", AF_FixedAmount, py::arg("fixed_amount") = 20000.0,
+          R"(AF_FixedAmount(fixed_amount=20000.0)
 
     The fixed amount asset allocation (L1 equal weight + L2 fixed amount)
 
-    :param float amount: the maximum trading amount)");
+    :param float fixed_amount: the maximum trading amount)");
 
     m.def("AF_FixedWeight", AF_FixedWeight, py::arg("weight") = 0.1, R"(AF_FixedWeight(weight=0.1)
 

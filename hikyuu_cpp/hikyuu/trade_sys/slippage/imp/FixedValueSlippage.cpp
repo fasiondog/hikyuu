@@ -63,8 +63,12 @@ void registerPart_SP_FixedValue() {
     meta.name = "SP_FixedValue";
     meta.full_name = "core.sp.fixedvalue";
     meta.params.push_back(ParamMeta{.name = "value", .type = "double", .default_value = "0.01"});
+    meta.params.push_back(ParamMeta{.name = "short_value", .type = "double"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return SP_FixedValue(sc.get<double>("value"), std::nullopt);
+        auto short_value = sc.have("short_value")
+                             ? std::optional<double>(sc.get<double>("short_value"))
+                             : std::nullopt;
+        return SP_FixedValue(sc.get<double>("value"), short_value);
     });
 }
 

@@ -56,13 +56,13 @@ void registerPart_TC_FixedA2015() {
     meta.params.push_back(
       ParamMeta{.name = "commission", .type = "double", .default_value = "0.0018"});
     meta.params.push_back(
-      ParamMeta{.name = "lowestCommission", .type = "double", .default_value = "5.0"});
+      ParamMeta{.name = "lowest_commission", .type = "double", .default_value = "5.0"});
     meta.params.push_back(
       ParamMeta{.name = "stamptax", .type = "double", .default_value = "0.001"});
     meta.params.push_back(
       ParamMeta{.name = "transferfee", .type = "double", .default_value = "0.00002"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return TC_FixedA2015(sc.get<double>("commission"), sc.get<double>("lowestCommission"),
+        return TC_FixedA2015(sc.get<double>("commission"), sc.get<double>("lowest_commission"),
                              sc.get<double>("stamptax"), sc.get<double>("transferfee"));
     });
 }

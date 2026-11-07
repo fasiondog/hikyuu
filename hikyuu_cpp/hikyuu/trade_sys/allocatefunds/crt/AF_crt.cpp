@@ -104,9 +104,9 @@ void registerPart_AF_FixedAmount() {
     meta.name = "AF_FixedAmount";
     meta.full_name = "core.af.fixedamount";
     meta.params.push_back(
-      ParamMeta{.name = "amount", .type = "double", .default_value = "20000.0"});
+      ParamMeta{.name = "fixed_amount", .type = "double", .default_value = "20000.0"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return AF_FixedAmount(sc.get<double>("amount"));
+        return AF_FixedAmount(sc.get<double>("fixed_amount"));
     });
 }
 
