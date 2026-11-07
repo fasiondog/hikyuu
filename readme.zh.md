@@ -274,6 +274,8 @@ print(top.tm.get_funds().total_assets)
 > 项目由 **C++ 核心库**、**Python 接口层**、**交互式探索工具** 三部分构成，每个部件可独立替换、自由组合
 >
 > 数据层支持 **HDF5 / MySQL / ClickHouse / SQLite** 四种存储（默认 HDF5；ClickHouse 经插件扩展，分钟级数据的读写快于 HDF5、空间占用远低于 MySQL，更适配分钟级及以下高频数据）。
+>
+> 多市场数据支持：可在同一 `StockManager` 内登记多市场（各市场独立时区 / 节假日 / 量纲口径，读取侧统一时间表达），跨市场资金口径用 `net_assets()`；当前边界——SQLite 后端仅支持 K 线且需每市场每周期独立库文件、期货回测无盯市与强平、跨币种需数据侧预换算本位币，详见[多市场数据](https://hikyuu.readthedocs.io/zh-cn/latest/multimarket.html)。
 
 <p align="center">
   <img src="docs/zh/_static/10002-function-arc.png" alt="功能架构" width="800">

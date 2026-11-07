@@ -71,6 +71,15 @@ public:
 
     static int32_t getKTypeInMin(const KType& ktype);
 
+    /**
+     * Whether the K type is an intraday one, i.e. its datetime denotes a real moment and takes part
+     * in the unified time expression conversion
+     * @details Exactly 0 < getKTypeInMin(ktype) < 1440 plus TRANS; day and higher types are pure
+     * trading-day labels and would shift across days. isBaseKType is no substitute: WEEK..YEAR and
+     * MIN15..HOUR2 are both base types.
+     */
+    static bool isIntradayKType(const KType& ktype);
+
     static int32_t getBaseKTypeInMin(const KType& ktype) noexcept;
 
     static int64_t getKTypeInSeconds(const KType& ktype);

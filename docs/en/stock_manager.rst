@@ -439,7 +439,29 @@ StockManager/Block/Stock
 
         .. note:: the weekend rule is per market: the 24x7 crypto markets trade through the weekend,
            while the other markets are closed; a market without its own holiday rows has no weekday
-           holidays
+           holidays (its weekdays are trading days)
+
+    .. py:method:: market_local_to_unified(self, d, market)
+
+        Convert a datetime written in the market's own local wall clock to the unified time expression (Beijing)
+
+        K-line datetimes are already returned in the unified expression, so a query written in the same
+        expression needs no conversion; use this helper only when the instant comes from that market's
+        local clock. Day and higher datetimes are pure trading-day labels and must not be converted.
+
+        :param Datetime d: the datetime in the local wall clock of that market
+        :param str market: the market abbreviation
+        :return: the datetime in the unified expression
+        :rtype: Datetime
+
+    .. py:method:: unified_to_market_local(self, d, market)
+
+        Convert a datetime of the unified time expression (Beijing) to the market's own local wall clock
+
+        :param Datetime d: the datetime in the unified expression
+        :param str market: the market abbreviation
+        :return: the datetime in the local wall clock of that market
+        :rtype: Datetime
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 

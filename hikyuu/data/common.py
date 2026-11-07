@@ -191,7 +191,8 @@ def get_new_holidays():
     return [v[0] for v in day if len(v) >= 3 and v[2] == '中国']
 
 
-# 共享中国交易日历的市场（节假日数据源只覆盖中国；港/美/汇/币无节假日行，工作日按非假日处理，周末按周末规则处理）
+# Markets sharing the China trading calendar: the holiday data source covers China only;
+# HK/US/FX/crypto have no holiday rows - weekdays are non-holidays, weekends by weekend rules
 CN_HOLIDAY_MARKETS = ("SH", "SZ", "BJ", "SHF", "DCE", "CZC", "CFE", "GFE", "INE")
 
 

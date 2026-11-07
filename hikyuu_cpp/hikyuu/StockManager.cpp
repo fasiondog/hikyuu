@@ -691,6 +691,10 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 
         auto k = sh000001.getKRecord(0, ktypes[i]);
         if (k.isValid()) {
+            // The column bulk interface takes one global lower bound and cannot reverse-normalize
+            // per market, so intraday types bulk-load only for identity markets; the rest keep
+            // using the Stock-layer funnel that clamps in the market's own clock
+            bool intraday = KQuery::isIntradayKType(ktypes[i]);
             auto datas =
               driver->getConnect()->getAllKRecordList(ktypes[i], k.datetime, m_cancel_load);
             if (!datas.empty() && !m_cancel_load) {
@@ -701,6 +705,9 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
                     }
                     auto date_iter = datas.find(iter->second.market_code());
                     if (date_iter != datas.end()) {
+                        if (intraday && !getMarketInfo(iter->second.market()).isUnifiedClock()) {
+                            continue;
+                        }
                         iter->second.loadKDataToBufferFromKRecordList(ktypes[i],
                                                                       std::move(date_iter->second));
                         loaded_codes.insert(iter->second.market_code());
@@ -1020,8 +1027,7 @@ bool StockManager::_weekendIsHoliday(const string& market) const {
     MarketInfo marketinfo = getMarketInfo(market);
     HKU_IF_RETURN(marketinfo == Null<MarketInfo>(), true);
 
-    // The 24h crypto markets trade through the weekend; without the representative index the
-    // default is kept and not cached, so a later call after the stocks are loaded re-evaluates it
+    // The 24h crypto markets trade through weekends; a missing index keeps the default uncached
     Stock index = getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()));
     HKU_IF_RETURN(index.isNull(), true);
 
@@ -1029,6 +1035,20 @@ bool StockManager::_weekendIsHoliday(const string& market) const {
     std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
     m_weekend_holiday[market] = weekend_holiday;
     return weekend_holiday;
+}
+
+Datetime StockManager::marketLocalToUnified(const Datetime& d, const string& market) const {
+    HKU_CHECK(!market.empty(), "The market can not be empty!");
+    MarketInfo marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    return marketinfo.localToUnified(d);
+}
+
+Datetime StockManager::unifiedToMarketLocal(const Datetime& d, const string& market) const {
+    HKU_CHECK(!market.empty(), "The market can not be empty!");
+    MarketInfo marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    return marketinfo.unifiedToLocal(d);
 }
 
 bool StockManager::isTradingHours(const Datetime& d, const string& market) const {
@@ -1076,30 +1096,34 @@ void StockManager::loadAllStocks() {
     if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
     } else {
-        auto load_stock_code_list = m_context.getAllNeedLoadStockCodeList();
         auto all_market = getAllMarket();
-        for (auto stkcode : load_stock_code_list) {
-            to_upper(stkcode);
+        for (const auto& stkcode : m_context.getAllNeedLoadStockCodeList()) {
+            // Normalize like getStock: uppercase, no CRYPTO slash (stored codes must match)
+            string upper_code(stkcode);
+            to_upper(upper_code);
+            upper_code.erase(std::remove(upper_code.begin(), upper_code.end(), '/'),
+                             upper_code.end());
             const string* matched_market = nullptr;
-            for (auto& market : all_market) {
-                if (market.empty() || stkcode.size() <= market.size()) {
+            for (const auto& market : all_market) {
+                if (market.empty() || upper_code.size() <= market.size()) {
                     continue;
                 }
-                if (stkcode.compare(0, market.size(), market) == 0 &&
+                if (upper_code.compare(0, market.size(), market) == 0 &&
                     (!matched_market || market.size() > matched_market->size())) {
                     matched_market = &market;
                 }
             }
-            bool find = false;
-            if (matched_market) {
-                auto info = m_baseInfoDriver->getStockInfo(*matched_market,
-                                                           stkcode.substr(matched_market->size()));
-                if (!info.market.empty() && !info.code.empty()) {
-                    stockInfos.push_back(std::move(info));
-                    find = true;
-                }
+            if (!matched_market) {
+                HKU_WARN("Invalid stock code: {}", stkcode);
+                continue;
             }
-            HKU_WARN_IF(!find, "Invalid stock code: {}", stkcode);
+            auto info = m_baseInfoDriver->getStockInfo(*matched_market,
+                                                       upper_code.substr(matched_market->size()));
+            HKU_WARN_IF(info.market.empty() || info.code.empty(), "Invalid stock code: {}",
+                        stkcode);
+            if (!info.market.empty() && !info.code.empty()) {
+                stockInfos.push_back(std::move(info));
+            }
         }
     }
 
@@ -1191,8 +1215,7 @@ void StockManager::loadAllMarketInfos() {
         m_marketInfoDict[market] = marketInfo;
     }
 
-    // The representative index of a market may become resolvable after a reload; the cached
-    // weekend rule is derived from it, so drop the cache to let it be re-evaluated
+    // The weekend-rule cache derives from the representative index, so drop it to re-evaluate
     {
         std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
         m_weekend_holiday.clear();
@@ -1210,8 +1233,9 @@ void StockManager::loadAllStockTypeInfo() {
 }
 
 void StockManager::loadAllHolidays() {
-    // 市场键统一大写：内置驱动已转大写，第三方/Python 驱动可能返回小写，
-    // 而查询侧（isHoliday/getMarketInfo）按大写查找，不归一将静默丢失该市场的工作日假日
+    // Normalize market keys to upper case: third-party/Python drivers may return lower case,
+    // while the query side (isHoliday/getMarketInfo) looks up by upper case, so unnormalized
+    // keys would silently drop that market's holidays
     auto holidays = m_baseInfoDriver->getAllHolidays();
     HolidayMap normalized;
     normalized.reserve(holidays.size());

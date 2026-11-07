@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef TRADE_MANAGE_MARGINGBASE_H_
-#define TRADE_MANAGE_MARGINGBASE_H_
+#ifndef TRADE_MANAGE_MARGIN_MARGINBASE_H_
+#define TRADE_MANAGE_MARGIN_MARGINBASE_H_
 
 #include "../../Stock.h"
 #include "../../utilities/Parameter.h"
@@ -187,4 +187,4 @@ template <>
 struct fmt::formatter<hku::MarginPtr> : ostream_formatter {};
 #endif
 
-#endif /* TRADE_MANAGE_MARGINGBASE_H_ */
+#endif /* TRADE_MANAGE_MARGIN_MARGINBASE_H_ */

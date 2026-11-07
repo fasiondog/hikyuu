@@ -19,6 +19,9 @@ namespace hku {
  */
 class HKU_API MarketInfo {
 public:
+    /** The offset in minutes of the unified expression (Beijing wall clock, UTC+8) */
+    static constexpr int UNIFIED_TZ_OFFSET_MIN = 480;
+
     /** Default constructor, returns Null<MarketInfo>() */
     MarketInfo();
 
@@ -110,10 +113,34 @@ public:
     /** Whether all the fields are equal (operator== only compares the market) */
     bool equals(const MarketInfo& rhs) const;
 
+    /**
+     * Convert a market-local wall-clock datetime into the unified expression (Beijing)
+     * @details CN / HK (offset 480, no daylight) returns the input unchanged; null in, null out
+     */
+    Datetime localToUnified(const Datetime&) const;
+
+    /**
+     * Convert a unified expression (Beijing) datetime back to the market-local wall clock
+     * @details Exact inverse of localToUnified; the repeated local hour of a daylight transition
+     * resolves to the standard side (which is why the constructor rejects such sessions)
+     */
+    Datetime unifiedToLocal(const Datetime&) const;
+
+    /** Whether the market trades in the ambiguous local hour [01:00,02:00) of its daylight rule */
+    bool hasAmbiguousSession() const;
+
+    /** Whether the local wall clock already is the unified expression (CN / HK identity) */
+    bool isUnifiedClock() const noexcept {
+        return m_tzOffsetMin == UNIFIED_TZ_OFFSET_MIN && m_dstRule == 0;
+    }
+
     /** Used by __str__ of python only */
     string toString() const;
 
 private:
+    /** Whether the given UTC instant falls inside the daylight period of the market's rule */
+    bool _isDstUTC(const Datetime& utc) const;
+
     string m_market;         // Market identifier
     string m_name;           // Market name
     string m_description;    // Description
@@ -123,9 +150,9 @@ private:
     TimeDelta m_closeTime1;  // Morning closing time
     TimeDelta m_openTime2;   // Afternoon opening time
     TimeDelta m_closeTime2;  // Afternoon closing time
-    int m_tzOffsetMin{480};  // Standard UTC offset in minutes
-    int m_dstRule{0};        // Daylight saving rule: 0=none, 1=US, 2=EU
-    int m_dataLag{0};        // Visibility delay in trading days relative to the base market
+    int m_tzOffsetMin{UNIFIED_TZ_OFFSET_MIN};  // Standard UTC offset in minutes
+    int m_dstRule{0};                          // Daylight saving rule: 0=none, 1=US, 2=EU
+    int m_dataLag{0};  // Visibility delay in trading days relative to the base market
 };
 
 /**

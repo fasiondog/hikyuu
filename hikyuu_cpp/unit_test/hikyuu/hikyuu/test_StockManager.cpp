@@ -272,8 +272,8 @@ TEST_CASE("test_StockManager_getTradingCalendar") {
         CHECK_UNARY(actual.front() >= Datetime(19900101) && actual.back() <= Datetime(20300101));
         /** @arg a date-range query is forwarded: the tail half re-queried equals its suffix */
         size_t half = actual.size() / 2;
-        DatetimeList tail = sm.getTradingCalendar(
-          KQueryByDate(actual[half], Null<Datetime>(), KQuery::DAY), market);
+        DatetimeList tail =
+          sm.getTradingCalendar(KQueryByDate(actual[half], Null<Datetime>(), KQuery::DAY), market);
         CHECK_UNARY(tail == DatetimeList(actual.begin() + half, actual.end()));
     }
 
@@ -400,6 +400,24 @@ TEST_CASE("test_StockManager_isHoliday_weekendCache") {
 }
 
 /** @par Test points */
+TEST_CASE("test_StockManager_timeConvert") {
+    auto& sm = StockManager::instance();
+    /** @arg US Eastern DST: local 09:45 = Beijing same-day 21:45 (+12h) */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202607010945LL), "NASDAQ"), Datetime(202607012145LL));
+    /** @arg US Eastern standard time: 13 hours apart */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202601050945LL), "NASDAQ"), Datetime(202601052245LL));
+    /** @arg unifiedToMarketLocal is the inverse of marketLocalToUnified */
+    CHECK_EQ(sm.unifiedToMarketLocal(Datetime(202607012145LL), "NASDAQ"), Datetime(202607010945LL));
+    /** @arg identity market (A-share) is returned as is */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202607010945LL), "SH"), Datetime(202607010945LL));
+    /** @arg market name is case-insensitive */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202607010945LL), "nasdaq"), Datetime(202607012145LL));
+    /** @arg unregistered or empty market throws instead of silently treated as identity */
+    CHECK_THROWS_AS(sm.marketLocalToUnified(Datetime(202607010945LL), "NOSUCH"), std::exception);
+    CHECK_THROWS_AS(sm.unifiedToMarketLocal(Datetime(202607010945LL), ""), std::exception);
+}
+
+/** @par Test points */
 TEST_CASE("test_StockManager_isTradingHours") {
     auto& sm = StockManager::instance();
     CHECK_THROWS(sm.isTradingHours(Datetime()));
@@ -423,13 +441,11 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "BINANCE"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "BINANCE"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "FX"), true);
-    /** @arg The holiday check uses the market's own calendar: the A-share holiday does not
-    close the crypto market, but it does close the futures markets sharing the CN calendar */
+    /** @arg The holiday check uses the market's own calendar: CN holiday closes SHF, not BINANCE */
     CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "BINANCE"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "SHF"), false);
     CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "SH"), false);
-    /** @arg The weekend rule is per market: the 24/7 crypto market trades on weekends,
-    the FX market (24h sessions but a weekday calendar) is still closed */
+    /** @arg The weekend rule is per market: crypto trades on weekends, FX (weekday calendar) not */
     CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "BINANCE"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "FX"), false);
     CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
@@ -558,9 +574,8 @@ TEST_CASE("test_StockManager_getStockList") {
 
     /** @arg The user filter may re-enter the manager (getStock) without deadlock,
      * because the dictionary lock is released before the filter runs */
-    StockList reentrant = sm.getStockList([&sm](const Stock& s) {
-        return !sm.getStock(s.market_code()).isNull();
-    });
+    StockList reentrant =
+      sm.getStockList([&sm](const Stock& s) { return !sm.getStock(s.market_code()).isNull(); });
     CHECK_EQ(reentrant.size(), sm.size());
 
     /** @arg Regression guard: a filter that requests the unique lock (addStock)

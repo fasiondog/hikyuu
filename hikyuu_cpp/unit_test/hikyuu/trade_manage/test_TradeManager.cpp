@@ -1913,14 +1913,11 @@ TEST_CASE("test_TradeManager_profit_cum_change_curve") {
     }
 }
 
-/** @par Test points: the expiry guard (Stock::lastDatetime) refuses opening past the registered
- * endDate, while the last trading day and the securities without a registered expiry stay
- * tradable (the guard covers the direct TM calls; the backtest System path never exceeds the
- * stock's own bar axis) */
+/** @par Test points: the expiry guard refuses opening past the registered endDate, while the last
+ * trading day and securities without a registered expiry stay tradable */
 TEST_CASE("test_TradeManager_check_expiry") {
     StockManager& sm = StockManager::instance();
-    // Borrow a real stock's data driver so the synthetic contracts are not null (the same pattern
-    // as test_crtFixedAPre2015TC.cpp)
+    // Borrow a real stock's data driver so the synthetic contracts are not null
     auto driver = sm.getStock("sh600004").getKDataDirver();
     // Standalone contracts, like a registered futures contract: one with an expiry, one without
     Stock expired("SHF", "rb2510", "rb", 12, true, Datetime(202001010000), Datetime(202012150000),

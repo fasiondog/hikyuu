@@ -162,6 +162,31 @@ class MarginTest(unittest.TestCase):
         tm.margin = None
         self.assertEqual(tm.margin.name, "MG_None")
 
+    def test_TradeManager_short_position(self):
+        """The short-side position bookkeeping is visible through the accessors"""
+        rb = sm['SHFRB0000']
+        bar = rb.get_kdata(Query(100, 101, "DAY"))[0]
+
+        tm = crtTM(bar.datetime, 100000.0, TC_Zero())
+        tm.margin = MG_Fixed(0.6, 0.6)
+        self.assertFalse(tm.have_short(rb))
+        self.assertEqual(len(tm.get_short_position_list()), 0)
+        self.assertEqual(len(tm.get_borrow_stock_list()), 0)
+        self.assertEqual(tm.get_debt_number(bar.datetime, rb), 0.0)
+        self.assertEqual(tm.get_debt_cash(bar.datetime), 0.0)
+
+        tr = tm.sell_short(bar.datetime, rb, bar.close, 10.0)
+        self.assertEqual(tr.business, BUSINESS.SELL_SHORT)
+        self.assertTrue(tm.have_short(rb))
+        self.assertAlmostEqual(tm.get_short_position(rb).number, 10.0)
+        self.assertEqual(len(tm.get_short_position_list()), 1)
+
+        tr = tm.buy_short(bar.datetime, rb, bar.close, 10.0)
+        self.assertEqual(tr.business, BUSINESS.BUY_SHORT)
+        self.assertFalse(tm.have_short(rb))
+        self.assertEqual(len(tm.get_short_position_list()), 0)
+        self.assertEqual(len(tm.get_short_history_position_list()), 1)
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MarginTest)

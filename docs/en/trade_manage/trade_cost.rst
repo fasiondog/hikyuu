@@ -82,6 +82,31 @@ The calculation rules are as follows:: python
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
+Generic Fixed-rate Trade Cost Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the futures, FX and crypto markets, i.e. any market without a dedicated cost model. The
+calculation rules are as follows:
+
+* Buy: max(commission * turnover, lowest_commission) + per_lot * number + others
+* Sell: the same, plus stamptax * turnover
+
+The turnover is price * number * contract multiplier, where the multiplier comes from the unit of
+the security (1 for stocks, the contract size for futures), so one formula covers both. The per-lot
+fee and the extra charges both land in CostRecord.others.
+
+.. py:function:: TC_Fixed([commission=0.0, lowest_commission=0.0, stamptax=0.0, per_lot=0.0, others=0.0])
+
+    The generic fixed-rate trade cost algorithm for the futures, FX and crypto markets
+
+    :param float commission: the commission rate of the turnover
+    :param float lowest_commission: the minimum commission
+    :param float stamptax: the stamp duty rate, charged on sells only
+    :param float per_lot: the fixed fee per lot (contract), e.g. the exchange fee
+    :param float others: the fixed extra charge, e.g. the delivery and funding fees
+    :return: an instance of a :py:class:`TradeCostBase` subclass
+
+
 Custom Trade Cost Algorithm
 ---------------------------
 

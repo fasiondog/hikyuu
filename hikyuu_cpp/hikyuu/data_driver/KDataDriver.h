@@ -87,6 +87,15 @@ public:
     virtual bool canParallelLoad() = 0;
 
     /**
+     * Whether the driver already gives the datetime in the unified time expression
+     * @details Server-backed proxy drivers read buffers normalized once on the server side;
+     * converting again would shift every bar twice. Raw-storage drivers keep the default false.
+     */
+    virtual bool isUnifiedOutput() const {
+        return false;
+    }
+
+    /**
      * Get the amount of the K-line data of the given type
      * @param market market abbreviation
      * @param code   security code
@@ -214,6 +223,10 @@ public:
 
     bool canParallelLoad() {
         return m_driver->canParallelLoad();
+    }
+
+    bool isUnifiedOutput() {
+        return m_driver->isUnifiedOutput();
     }
 
     size_t getCount(const string& market, const string& code, const KQuery::KType& kType) {

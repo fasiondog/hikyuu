@@ -13,6 +13,7 @@
 #include "crt/TC_FixedAPre2015.h"
 #include "crt/TC_FixedA2015.h"
 #include "crt/TC_FixedA2017.h"
+#include "crt/TC_Fixed.h"
 #include "crt/TC_FixedETF.h"
 #include "crt/TC_Zero.h"
 

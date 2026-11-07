@@ -157,8 +157,14 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
         end_minute = close1;
     }
 
+    // The bucketing above runs on the market's local clock while Stock inputs take the unified
+    // expression, so convert here once (identity markets and day labels never convert)
+    bool need_unify(!market_info.isUnifiedClock());
+
     // Calculate the accumulated turnover amount and volume before that day
-    KRecordList klist = stk.getKRecordList(KQuery(today, end_minute, ktype));
+    KRecordList klist = stk.getKRecordList(
+      KQuery(need_unify ? market_info.localToUnified(today) : today,
+             need_unify ? market_info.localToUnified(end_minute) : end_minute, ktype));
     price_t sum_amount = 0.0, sum_volume = 0.0;
     for (const auto& k : klist) {
         sum_amount += k.transAmount;
@@ -175,7 +181,8 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     // When the collection interval is smaller than ktype, the OHLC appears in the ktype values only
     // after several collections The open, the high and the low must all use the current spot close
     // price (because the open, the high and the low in the spot are the values of the whole day)
-    KRecord krecord(end_minute, spot.close, spot.close, spot.close, spot.close, amount, volume);
+    KRecord krecord(need_unify ? market_info.localToUnified(end_minute) : end_minute, spot.close,
+                    spot.close, spot.close, spot.close, amount, volume);
     stk.realtimeUpdate(krecord, ktype);
 }
 

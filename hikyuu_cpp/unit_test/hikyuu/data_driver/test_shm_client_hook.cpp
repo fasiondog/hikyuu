@@ -156,14 +156,12 @@ TEST_CASE("test_ShmClientHook_covered_ktypes") {
     /** @arg Unregistered coverage in the standalone mode is not covered, so its cache is enabled */
     CHECK_UNARY(!isShmKTypeCovered(KQuery::DAY));
 
-    /** @arg Unregistered coverage in the client mode is conservative: every type is treated as
-     * covered so its caller skips the cache (an old plugin or a failed shm mapping) */
+    /** @arg Unregistered coverage in client mode is conservative: treat all types as covered */
     sm._testingSetIpcClientMode(true);
     CHECK_UNARY(isShmKTypeCovered(KQuery::DAY));
     CHECK_UNARY(isShmKTypeCovered(KQuery::MIN5));
 
-    /** @arg A registered list overrides the conservative default also in the client mode; its
-     * types are recognized case-insensitively */
+    /** @arg A registered list overrides the conservative default also in client mode */
     setShmCoveredKTypes({KQuery::DAY, KQuery::MIN5, "day"});
     CHECK_UNARY(isShmKTypeCovered(KQuery::DAY));
     CHECK_UNARY(isShmKTypeCovered("day"));

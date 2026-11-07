@@ -134,9 +134,9 @@ def get_stock_list(connect, market, quotations):
 
 
 def import_new_holidays(connect):
-    """导入新的交易所休假日历（按市场写入，数据源仅覆盖中国）"""
+    """Import a new exchange holiday calendar (written per market; the data source covers China only)"""
     cur = connect.cursor()
-    # 数据源可能给出重复日期，新库有 unique(market,date)，不去重会直接抛 IntegrityError 打断整个导入
+    # source may give duplicate dates; new schema has unique(market,date) - dedup first or IntegrityError aborts
     holidays = sorted({int(v) for v in get_new_holidays()})
     for market in CN_HOLIDAY_MARKETS:
         cur.execute(

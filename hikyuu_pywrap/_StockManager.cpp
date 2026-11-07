@@ -330,6 +330,34 @@ void export_StockManager(py::module& m) {
     :return: whether it is a holiday
     :rtype: bool)")
 
+      .def("market_local_to_unified", &StockManager::marketLocalToUnified, py::arg("d"),
+           py::arg("market"),
+           R"(market_local_to_unified(self, d, market)
+
+    Convert a datetime written in the market's own local wall clock to the unified time
+    expression (Beijing)
+
+    K-line datetimes are already returned in the unified expression, so a query written in the same
+    expression needs no conversion; use this helper only when an instant is given in the local clock
+    of that market. Day and higher K-line datetimes are pure trading-day labels and must not be
+    converted.
+
+    :param Datetime d: the datetime in the local wall clock of the given market
+    :param str market: the market abbreviation
+    :return: the datetime in the unified expression
+    :rtype: Datetime)")
+
+      .def("unified_to_market_local", &StockManager::unifiedToMarketLocal, py::arg("d"),
+           py::arg("market"),
+           R"(unified_to_market_local(self, d, market)
+
+    Convert a datetime of the unified time expression (Beijing) to the market's own local wall clock
+
+    :param Datetime d: the datetime in the unified expression
+    :param str market: the market abbreviation
+    :return: the datetime in the local wall clock of that market
+    :rtype: Datetime)")
+
       .def("is_trading_hours", &StockManager::isTradingHours, py::arg("d"),
            py::arg("market") = "SH", R"(is_trading_hours(self, d)
 

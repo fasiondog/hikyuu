@@ -43,6 +43,20 @@ void export_build_in(py::module& m) {
     :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def(
+      "TC_Fixed", TC_Fixed, py::arg("commission") = 0.0, py::arg("lowest_commission") = 0.0,
+      py::arg("stamptax") = 0.0, py::arg("per_lot") = 0.0, py::arg("others") = 0.0,
+      R"(TC_Fixed([commission=0.0, lowest_commission=0.0, stamptax=0.0, per_lot=0.0, others=0.0])
+
+    The generic fixed-rate trade cost algorithm for the futures, FX and crypto markets: the fee is max(commission * price * number * unit, lowest_commission) + per_lot * number + others, and a sell adds the stamp duty stamptax * price * number * unit.
+
+    :param float commission: the commission ratio of the turnover value
+    :param float lowest_commission: the lowest commission value
+    :param float stamptax: the stamp duty, charged on sells only
+    :param float per_lot: the fixed fee per lot (contract)
+    :param float others: the fixed extra charge (delivery / funding fees)
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
+
+    m.def(
       "TC_FixedA2015", TC_FixedA2015, py::arg("commission") = 0.0018,
       py::arg("lowest_commission") = 5.0, py::arg("stamptax") = 0.001,
       py::arg("transferfee") = 0.00002,

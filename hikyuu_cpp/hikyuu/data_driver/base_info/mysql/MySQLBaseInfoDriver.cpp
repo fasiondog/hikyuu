@@ -225,10 +225,10 @@ MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
         to_upper(new_market);
         con->load(info, Field("market") == new_market);
         if (!info.market().empty()) {
-            result = MarketInfo(info.market(), info.name(), info.description(), info.code(),
-                                info.lastDate(), info.openTime1(), info.closeTime1(),
-                                info.openTime2(), info.closeTime2(), info.tzOffsetMin(),
-                                info.dstRule(), info.dataLag());
+            result =
+              MarketInfo(info.market(), info.name(), info.description(), info.code(),
+                         info.lastDate(), info.openTime1(), info.closeTime1(), info.openTime2(),
+                         info.closeTime2(), info.tzOffsetMin(), info.dstRule(), info.dataLag());
         }
     } catch (...) {
     }
@@ -261,7 +261,8 @@ MySQLBaseInfoDriver::getAllHolidays() {
         con->batchLoad(holidays);
         for (const auto &holiday : holidays) {
             try {
-                // 先取 datetime：损坏行先抛出，避免 operator[] 抢先注册空市场条目
+                // Fetch datetime first: broken rows throw before operator[]
+                // registers an empty market entry
                 Datetime d = holiday.datetime();
                 std::string market(holiday.market);
                 to_upper(market);

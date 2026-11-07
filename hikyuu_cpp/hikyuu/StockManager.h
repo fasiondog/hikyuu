@@ -224,13 +224,29 @@ public:
 
     /**
      * Whether the date of the given time is a holiday for the given market
-     * @note Saturdays / Sundays count as holidays except for the 24h crypto markets; a market
-     *       without its own holiday rows has no weekday holidays, while the weekend rule still
-     *       applies; Null<Datetime>() throws an exception
+     * @note Weekends count as holidays except for the 24h crypto markets; a market without its
+     *       own holiday rows has no weekday holidays; Null<Datetime>() throws
      * @param d the given time
      * @param market the given market
      */
     bool isHoliday(const Datetime& d, const std::string& market) const;
+
+    /**
+     * Convert a market-local wall-clock datetime to the unified time expression (Beijing)
+     * @details Bar datetimes read back from the K-line interface are already unified; use this
+     * only for instants given in the market's own clock. Day and higher labels must not be
+     * converted (no ktype here; the caller decides what to convert).
+     * @param d the datetime in the local wall clock of the given market
+     * @param market the given market
+     */
+    Datetime marketLocalToUnified(const Datetime& d, const string& market) const;
+
+    /**
+     * Convert a datetime of the unified time expression (Beijing) to the market-local wall clock
+     * @param d the datetime in the unified expression
+     * @param market the given market
+     */
+    Datetime unifiedToMarketLocal(const Datetime& d, const string& market) const;
 
     /**
      * Whether the date of the given time is a holiday (including Saturday and Sunday)
@@ -255,20 +271,16 @@ public:
     /**
      * Get the equity/dividend adjustment (weight) list of the given security (through the base info
      * driver; in client mode it reads shm first and falls back to IPC/local when not covered)
-     * @note Used by StockManager::loadAllStockWeights to materialize the full weight set at startup
-     *       (the isAll branch calls getAllStockWeightList); in client mode it is also used by
-     *       Stock::getWeight as the lazy-loading fallback for securities that were not materialized
-     *       (config disabled, added by addStock, newly constructed, ...)
+     * @note Materializes the full weight set at startup (loadAllStockWeights) and serves as the
+     *       lazy-loading fallback of Stock::getWeight for non-materialized securities
      */
     StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
 
     /**
      * Add a Stock; only for special Stocks that are added temporarily
-     *
-     * Note: the added security is out of the startup loadAllStockWeights scope and does not get
-     * its ex-rights/ex-dividend data materialized: in the standalone main process getWeight
-     * returns empty for it (only the client / shm server roles would lazily load it on demand).
-     * This is intentional for the temporary special stocks this API targets.
+     * @note The added security is out of the startup loadAllStockWeights scope and gets no
+     *       materialized ex-rights data: getWeight returns empty for it in the standalone main
+     *       process (only the client / shm server roles lazily load it on demand) - intentional
      * @param stock
      * @return true on success | false on failure
      */
@@ -330,36 +342,19 @@ public:
     }
 
     /*
-     * Wait for the background preload thread to exit (idempotent: it returns immediately when the
-     * thread was never started or has already finished). It is only called on the program exit
-     * path, after cancelLoad() and before stopping m_load_tg, so that concurrent access
-     * (TOCTOU/UAF) to m_load_tg from the preload thread and the exit sequence is eliminated. That
-     * thread only loads data and dispatches load events, it performs no nng operation at all, and
-     * it checks m_cancel_load all the way, so it exits quickly after being cancelled; therefore
-     * this join will not become a new blocking point during the static destruction phase on
-     * Windows.
+     * Join the background preload thread on the exit path (after cancelLoad(), before stopping
+     * m_load_tg), eliminating the concurrent access (TOCTOU/UAF) to m_load_tg; idempotent, and the
+     * thread exits quickly once cancelled, so the join is not a new blocking point on exit
      */
     void joinPreloadThread();
 
     /**
-     * Release the locally cached weight and historical finance data of each security under the shm
-     * server role, reclaiming the memory duplicated with the shared-memory snapshot
-     * @details Called by the shmserver plugin after the "base info snapshot containing historical
-     *          finance data" is published successfully (the HISTORY_FINANCE_LOADED branch of
-     *          _onLoadEvent and the fallback publish at start()). After that, clients read through
-     *          shared memory, so the server does not need to keep two copies. It really runs only
-     *          when this process acts as the shm server and is not in client mode, otherwise it is
-     * a no-op:
-     *          - After the call, m_weight_ready / m_history_finance_ready of each security are set
-     * to false, the cache containers are cleared and the memory is returned; later Stock::getWeight
-     * / Stock::getHistoryFinance (IPC fallback reply, in-process API access) lazily reload them
-     * through the base info driver on demand, so the result stays correct at the cost of the first
-     * query of the accessed security;
-     *          - On the next data reload, loadAllStockWeights / the historical finance preload
-     *            materialize them again first, so the next snapshot rebuild is not affected;
-     *          - Never call it after publishing only the weight data (include_finance=false, i.e.
-     * the first publish after BASE_DATA_READY), otherwise the following publish that includes
-     *            finance data would read an empty weight table.
+     * Release the locally cached weight / historical finance data of each security under the shm
+     * server role, reclaiming the memory duplicated with the shared-memory snapshot; a no-op in
+     * other roles. Released data lazily reloads from the base info driver on demand, and the next
+     * reload materializes it again.
+     * @warning Do not call before the snapshot publish that includes finance data, otherwise that
+     * publish would read an empty weight table.
      */
     void releaseShmServerBaseInfoCache();
 
@@ -401,9 +396,7 @@ private:
      * support parallel loading), executed in a separate thread */
     void _loadAllKDataSerial(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes);
 
-    /* Load all the K-line data and historical finance data in parallel, executed in a separate
-     * thread
-     */
+    /* Load all the K-line data and historical finance data in parallel, in a separate thread */
     void _loadAllKDataParallel(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes);
 
     /* Run the preload body inside a catch-all: an escaping exception would call std::terminate */
@@ -414,12 +407,8 @@ private:
      * markets (judged by the stock type of the representative index), true otherwise */
     bool _weekendIsHoliday(const std::string& market) const;
 
-    /*
-     * Dispatch the data loading event to the registered plugin callbacks (declared unconditionally;
-     * called by loadData and the two loading functions). The core library no longer perceives the
-     * existence of the server, it only notifies in order; there is no overhead when no callback is
-     * registered.
-     */
+    /* Dispatch the data loading event to the registered plugin callbacks, in order; no overhead
+     * when no callback is registered */
     void _fireLoadEvent(LoadEvent event);
 
     /* Load the holiday information */
@@ -515,10 +504,9 @@ private:
 using LoadEventCallback = std::function<void(LoadEvent)>;
 
 /**
- * Register a data loading event callback, returning the callback id (subscribed when a plugin
- * start()s, used to publish the snapshot at the right moment)
- * @note The lock of the callback container is heap allocated and never released, so this function
- * and its inverse are safe to call during the static destruction phase as well
+ * Register a data loading event callback, returning the callback id
+ * @note The callback container's lock is heap allocated and never released, so both functions are
+ * safe during the static destruction phase
  */
 HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
 
@@ -527,12 +515,8 @@ HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
  * from inside a callback), so destroying the callback context right after it is safe */
 HKU_API void unregisterLoadEventCallback(size_t id);
 
-/**
- * Mark this process as the shm server role: _negotiateShmServer() skips the client negotiation
- * accordingly (to prevent self-connection)
- * @details Called by the facade startShmServer() before the plugin is loaded; it is safe to set
- * even if StockManager has not been initialized yet
- */
+/** Mark this process as the shm server role, so _negotiateShmServer() skips the client negotiation
+ * (to prevent self-connection); safe to call before initialization */
 HKU_API void setShmServerRole(bool role) noexcept;
 HKU_API bool isShmServerRole() noexcept;
 

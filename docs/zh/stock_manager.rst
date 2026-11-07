@@ -409,7 +409,28 @@ StockManager/Block/Stock
         :return: 是否为节假日
         :rtype: bool
 
-        .. note:: 周末按市场区分：加密货币（24x7）周末不休市，其余市场周末休市；无自定义节假日行的市场工作日均不休市
+        .. note:: 周末按市场区分：加密货币（24x7）周末不休市，其余市场周末休市；无自有节假日行的市场，工作日不算假日（照常交易）
+
+    .. py:method:: market_local_to_unified(self, d, market)
+
+        将以市场本地墙钟书写的时间转为统一表达（北京时间 naive）
+
+        K 线读出的 datetime 本身已是统一表达，用同一口径书写查询无需转换；仅当时刻来自该市场本地
+        钟面时才用本函数。日线及以上为纯交易日标签，禁止转换。
+
+        :param Datetime d: 该市场本地墙钟下的时间
+        :param str market: 市场简称
+        :return: 统一表达下的时间
+        :rtype: Datetime
+
+    .. py:method:: unified_to_market_local(self, d, market)
+
+        将统一表达（北京时间 naive）的时间转为该市场本地墙钟
+
+        :param Datetime d: 统一表达下的时间
+        :param str market: 市场简称
+        :return: 该市场本地墙钟下的时间
+        :rtype: Datetime
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 

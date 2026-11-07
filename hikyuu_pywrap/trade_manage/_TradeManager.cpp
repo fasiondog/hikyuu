@@ -97,7 +97,7 @@ public:
     }
 
     double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
-        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_debt_num", getDebtNumber, datetime,
+        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_debt_number", getDebtNumber, datetime,
                                stock);
     }
 
@@ -415,6 +415,13 @@ Common parameters:
     :param Stock stock: the specified security
     :rtype: bool)")
 
+      .def("have_short", &TradeManagerBase::haveShort, R"(have_short(self, stock)
+
+    Whether the given security is currently held in the short position
+
+    :param Stock stock: the specified security
+    :rtype: bool)")
+
       .def("get_stock_num", &TradeManagerBase::getStockNumber, R"(get_stock_num(self)
 
     The number of the kinds of the securities currently held, i.e. how many stocks are currently held (not the position size of each stock)
@@ -432,6 +439,22 @@ Common parameters:
         :rtype: int)")
 
       .def("get_short_hold_num", &TradeManagerBase::getShortHoldNumber)
+
+      .def("get_debt_number", &TradeManagerBase::getDebtNumber,
+           R"(get_debt_number(self, datetime, stock)
+
+    Get the number of the borrowed shares at the specified moment
+
+    :param Datetime datetime: the specified moment
+    :param Stock stock: the specified security
+    :rtype: float)")
+
+      .def("get_debt_cash", &TradeManagerBase::getDebtCash, R"(get_debt_cash(self, datetime)
+
+    Get the borrowed cash amount at the specified moment
+
+    :param Datetime datetime: the specified moment
+    :rtype: float)")
 
       .def("get_trade_list", _getTradeList_1)
       .def("get_trade_list", _getTradeList_2, R"(get_trade_list(self[, start, end])
@@ -460,6 +483,35 @@ Common parameters:
     Get all the historical position records, i.e. the closed records
 
     :rtype: PositionRecordList)")
+
+      .def("get_short_position_list", &TradeManagerBase::getShortPositionList,
+           R"(get_short_position_list(self)
+
+    Get all the current short position records
+
+    :rtype: PositionRecordList)")
+
+      .def("get_short_history_position_list", &TradeManagerBase::getShortHistoryPositionList,
+           R"(get_short_history_position_list(self)
+
+    Get all the historical short position records, i.e. the closed records
+
+    :rtype: PositionRecordList)")
+
+      .def("get_short_position", &TradeManagerBase::getShortPosition,
+           R"(get_short_position(self, stock)
+
+    Get the current short position record; if not held short, return PositionRecord()
+
+    :param Stock stock: the specified security
+    :rtype: PositionRecord)")
+
+      .def("get_borrow_stock_list", &TradeManagerBase::getBorrowStockList,
+           R"(get_borrow_stock_list(self)
+
+    Get the list of the currently borrowed shares
+
+    :rtype: BorrowRecordList)")
 
       .def("get_position", &TradeManagerBase::getPosition, R"(get_position(self, date, stock)
 
@@ -656,8 +708,45 @@ Common parameters:
     :param string remark:     the trade remark
     :rtype: TradeRecord)")
 
-      .def("buy_short", &TradeManagerBase::buyShort)
-      .def("sell_short", &TradeManagerBase::sellShort)
+      .def(
+        "buy_short", &TradeManagerBase::buyShort, py::arg("datetime"), py::arg("stock"),
+        py::arg("real_price"), py::arg("num") = MAX_DOUBLE, py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
+        py::arg("remark") = "",
+        R"(buy_short(self, datetime, stock, real_price[, num=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
+
+    The short-side buy operation, i.e. closing a short position
+
+    :param Datetime datetime: the trade time
+    :param Stock stock:       the security traded
+    :param float real_price:  the actual trade price
+    :param float num:         the trade quantity; constant.max_double means closing all
+    :param float stoploss:    the stop-loss price
+    :param float goal_price:  the target price
+    :param float plan_price:  the originally planned price
+    :param SystemPart part:   the source of the trading instruction
+    :param string remark:     the trade remark
+    :rtype: TradeRecord)")
+
+      .def(
+        "sell_short", &TradeManagerBase::sellShort, py::arg("datetime"), py::arg("stock"),
+        py::arg("real_price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
+        py::arg("remark") = "",
+        R"(sell_short(self, datetime, stock, real_price, num[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
+
+    The short-side sell operation, i.e. opening a short position
+
+    :param Datetime datetime: the trade time
+    :param Stock stock:       the security traded
+    :param float real_price:  the actual trade price
+    :param float num:         the trade quantity
+    :param float stoploss:    the stop-loss price
+    :param float goal_price:  the target price
+    :param float plan_price:  the originally planned price
+    :param SystemPart part:   the source of the trading instruction
+    :param string remark:     the trade remark
+    :rtype: TradeRecord)")
 
       .def("add_trade_record", &TradeManagerBase::addTradeRecord, R"(add_trade_record(self, tr)
 

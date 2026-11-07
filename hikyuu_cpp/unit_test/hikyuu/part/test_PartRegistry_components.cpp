@@ -41,7 +41,8 @@ TEST_CASE("test_registerComponentParts") {
     CHECK_EQ(reg.getNameList(PartType::SE).size(), 5);
     CHECK_EQ(reg.getNameList(PartType::SYS).size(), 2);
     CHECK_EQ(reg.getNameList(PartType::TM).size(), 1);
-    CHECK_EQ(reg.getNameList(PartType::TC).size(), 6);
+    CHECK_EQ(reg.getNameList(PartType::TC).size(), 7);
+    CHECK_UNARY(reg.has("core.tc.fixed"));
     CHECK_EQ(reg.getNameList(PartType::MG).size(), 3);
 
     /** @arg a component is created from its scalar and part params */
@@ -72,7 +73,7 @@ TEST_CASE("test_registerComponentParts") {
             CHECK_UNARY(inserted);
         }
     }
-    CHECK_EQ(names.size(), 208);
+    CHECK_EQ(names.size(), 209);
 }
 
 /** @par Test points */

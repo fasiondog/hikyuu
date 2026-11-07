@@ -79,6 +79,18 @@ vector<KQuery::KType> KQuery::getExtraKTypeList() {
     return hku::getExtraKTypeList();
 }
 
+bool KQuery::isIntradayKType(const KType& ktype) {
+    string nktype(ktype);
+    to_upper(nktype);
+    // TRANS carries no entry in g_ktype2min (it is measured in seconds), so it is tested here
+    // before the lookup falls through to the extra-ktype plugin
+    if (nktype == TRANS) {
+        return true;
+    }
+    int32_t in_min = getKTypeInMin(nktype);
+    return in_min > 0 && in_min < 1440;
+}
+
 int32_t KQuery::getKTypeInMin(const KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);

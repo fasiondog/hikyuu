@@ -12,6 +12,7 @@
 #include <shared_mutex>
 #include "StockWeight.h"
 #include "KQuery.h"
+#include "MarketInfo.h"
 #include "TimeLineRecord.h"
 #include "TransRecord.h"
 #include "HistoryFinanceInfo.h"
@@ -157,22 +158,11 @@ public:
      * @param start start date
      * @param end end date
      * @return the list of weight records that satisfy the condition
-     * @note The weight cache strategy depends on the process role:
-     *       - Client mode (IPC): at startup, the full weight set is materialized according to the
-     *         load_stock_weight config (the source is the shared-memory snapshot published by the
-     *         main process: IpcBaseInfoDriver shm first, falling back to IPC/local when not
-     *         covered), so getWeight hits the local cache directly. Only when the config is
-     *         disabled (load_stock_weight=false), or for securities that were not materialized
-     *         (added by addStock, newly constructed, ...), the whole weight list of the security is
-     *         read through the driver on first access and then cached (an empty result is cached as
-     *         well, to avoid repeated empty queries).
-     *       - shm server role: after the base info snapshot containing finance data is published,
-     *         StockManager::releaseShmServerBaseInfoCache() releases the local weight cache of each
-     *         security to reclaim memory (clients read through shared memory, so the server does
-     * not need to keep a copy). Later access to a released security (IPC fallback reply, or the
-     *         in-process API) lazily reloads and caches it again, so the result stays correct.
-     *       - Plain standalone main process: only the local cache materialized at startup is read,
-     *         with no lazy-loading fallback.
+     * @note Client mode materializes the full set at startup from the shm snapshot and hits the
+     *       local cache (non-materialized securities lazily load and cache on first access); the
+     *       shm server role releases its cache after the finance snapshot publish (see
+     *       StockManager::releaseShmServerBaseInfoCache) and lazily reloads on demand; the
+     *       standalone process reads only the cache materialized at startup
      */
     StockWeightList getWeight(const Datetime& start = Datetime::min(),
                               const Datetime& end = Null<Datetime>()) const;
@@ -242,15 +232,10 @@ public:
     vector<Block> getBelongToBlockList(const string& category) const;
 
     /**
-     * Get the historical financial information
-     * @note Returns a copy of the historical financial records. The main process (not in client
-     *       mode) returns a copy of its materialized internal cache; after that cache is released
-     * by StockManager::releaseShmServerBaseInfoCache() (invoked by the shm server role once the
-     *       snapshot containing finance data has been published), it is lazily reloaded on demand.
-     *       In client mode (IPC) it is not materialized locally; instead it is read on demand
-     *       through the base info driver from the shared-memory snapshot published by the main
-     *       process (IpcBaseInfoDriver shm first, falling back to IPC/local when not covered), so
-     *       that it does not duplicate the snapshot in the client's memory.
+     * Get the historical financial information (a copy of the records)
+     * @note The main process serves it from its materialized cache (lazily reloaded after
+     *       releaseShmServerBaseInfoCache); client mode does not materialize locally, it reads
+     *       through the base info driver from the shared-memory snapshot on demand
      */
     vector<HistoryFinanceInfo> getHistoryFinance() const;
 
@@ -324,6 +309,23 @@ private:
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
 
     KRecordList _getKRecordList(const KQuery& query) const;
+
+    /*
+     * The market info for the unified time conversion, or an identity one when nothing needs
+     * converting (day-and-higher ktypes, unified-clock or unregistered markets); call sites test
+     * isUnifiedClock() to skip the conversion
+     */
+    MarketInfo _timeZone(const KQuery::KType& ktype) const;
+
+    /* Rewrite a DATE query's bounds from the unified expression to the market local one, so a
+     * driver comparing raw stored numbers sees its own expression */
+    KQuery _localQuery(const KQuery& query, const MarketInfo& tz) const;
+
+    /* Rewrite driver records (market local) to the unified expression; the driver must not
+     * already output unified data */
+    void _unify(KRecordList&, const MarketInfo& tz) const;
+    void _unify(TimeLineList&, const MarketInfo& tz) const;
+    void _unify(TransList&, const MarketInfo& tz) const;
 
     // Only called by StockManager during initialization
     void setPreload(const vector<KQuery::KType>& preload_ktypes);

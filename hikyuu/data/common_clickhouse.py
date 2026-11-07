@@ -59,8 +59,8 @@ def create_database(connect):
                 try:
                     connect.command(stmt)
                 except Exception as e:
-                    # 升级失败必须显式中断：脚本末尾会推进 version，静默继续会让失败的脚本永不重跑
-                    raise RuntimeError(f"执行失败: {stmt[:60]}... 错误: {e}") from e
+                    # upgrade failure must abort: the script tail advances version; silent run lets it never rerun
+                    raise RuntimeError(f"execute failed: {stmt[:60]}... error: {e}") from e
 
     db_version = get_db_version(connect)
     files = [x for x in Path(sql_dir).iterdir()
@@ -78,8 +78,8 @@ def create_database(connect):
                 try:
                     connect.command(stmt)
                 except Exception as e:
-                    # 升级失败必须显式中断：脚本末尾会推进 version，静默继续会让失败的脚本永不重跑
-                    raise RuntimeError(f"执行失败: {stmt[:60]}... 错误: {e}") from e
+                    # upgrade failure must abort: the script tail advances version; silent run lets it never rerun
+                    raise RuntimeError(f"execute failed: {stmt[:60]}... error: {e}") from e
 
 
 def get_codepre_list(connect, market, quotations):
@@ -101,8 +101,8 @@ def get_stock_list(connect, market, quotations):
 
 
 def import_new_holidays(connect):
-    """导入新的交易所休假日历（按市场写入，数据源仅覆盖中国）"""
-    # MergeTree 不去重，重复日期会直接写入多行，与 sqlite/mysql 保持一致先去重
+    """Import a new exchange holiday calendar (written per market; the data source covers China only)"""
+    # MergeTree does not dedup; duplicate dates write multiple rows - dedup to stay consistent with sqlite/mysql
     holidays = sorted({int(v) for v in get_new_holidays()})
     for market in CN_HOLIDAY_MARKETS:
         last_date = connect.command(

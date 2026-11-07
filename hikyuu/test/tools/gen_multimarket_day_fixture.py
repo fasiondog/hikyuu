@@ -1,24 +1,31 @@
 # coding: utf-8
-"""多市场代表指数日线 fixture 生成器
+"""Multi-market representative index day-bar fixture generator
 
-用途：为多市场单测准备 test_data/{market}_day.h5（hdf5 后端、只做日线）。
-落盘格式与 hikyuu/data/tdx_to_h5.py + common_h5.py 完全一致：
-  - 数据集名 = MARKET + code 原样拼接（HDF5 大小写敏感，C++ 侧按 market + code 直取）；
-  - datetime = 交易日 yyyymmdd0000（日线为纯日期标签，不做时区换算，见设计文档 G1）；
-  - 四价 = 真实价 x 1000 的整数（h5 驱动读侧固定 x0.001，与 precision 无关；故 h5 只能存 3 位小数）；
-  - transAmount 为近似值（close x volume），非真实成交额：未乘合约乘数/每手股数，
-    指数类的 volume 为成分股合计、与点位相乘无经济含义；单测不断言其绝对值。
-    transCount 日线直接存 API 值（手）。
+Purpose: prepare test_data/{market}_day.h5 for multi-market unit tests (hdf5 backend,
+day bars only). The on-disk format is identical to hikyuu/data/tdx_to_h5.py + common_h5.py:
+  - dataset name = MARKET + code concatenated verbatim (HDF5 is case-sensitive; the C++
+    side looks up by market + code directly);
+  - datetime = trading day yyyymmdd0000 (day bars are pure date labels, no tz conversion);
+  - the four prices = real price x 1000 as integers (the h5 driver read side is fixed at
+    x0.001 regardless of precision; hence h5 can store only 3 decimals);
+  - transAmount is approximate (close x volume), not the real turnover: the contract
+    multiplier / lot size is not applied, and for index-like instruments volume is the
+    constituent total whose product with the index level has no economic meaning; unit
+    tests do not assert its absolute value. transCount stores the API value as-is (lots)
+    for day bars.
 
-尽力而为：目标窗口取不到时顺着候选源链尝试，仍不覆盖则退到"该源实际可得起点 + 3 年"，
-并在 manifest 里登记偏差；彻底取不到数的市场标记为未覆盖（真实取数属 W3-a 导入程序职责）。
+Best effort: when the target window is unavailable, walk the candidate source chain; if
+still not covered, fall back to "the source's actual earliest date + 3 years" and record
+the deviation in the manifest; markets with no data at all are marked uncovered (real
+data fetching belongs to the import program).
 
-用法：
-    python hikyuu/test/tools/gen_multimarket_day_fixture.py              # 优先用 CSV 缓存，缺失才取数
-    python hikyuu/test/tools/gen_multimarket_day_fixture.py --refresh    # 强制重新取数
+Usage:
+    python hikyuu/test/tools/gen_multimarket_day_fixture.py              # prefer CSV cache; fetch only if missing
+    python hikyuu/test/tools/gen_multimarket_day_fixture.py --refresh    # force re-fetch
     python hikyuu/test/tools/gen_multimarket_day_fixture.py --markets SHF,HK
 
-CSV 缓存目录 test_data/downloads/multi_market/ 不入库；manifest（取数审计记录）与生成的 .h5 一并入库。
+The CSV cache dir test_data/downloads/multi_market/ is not committed; the manifest (fetch
+audit record) and the generated .h5 files are committed together.
 """
 
 import argparse
@@ -30,21 +37,21 @@ import sys
 import tables as tb
 
 CACHE_DIR = os.path.join("test_data", "downloads", "multi_market")
-MANIFEST = os.path.join("test_data", "multi_market_manifest.csv")  # 入库，审计偏差与未覆盖原因
+MANIFEST = os.path.join("test_data", "multi_market_manifest.csv")  # committed; audits deviations/uncovered reasons
 SANE_MIN = datetime.date(1970, 1, 1)
 FALLBACK_YEARS = 3
 
-# 目标窗口与 A 股 fixture 对齐（sh_day.h5 止于 2011-12-06）；2011 后才有的品种从真实上市日起。
+# Target window aligns with the A-share fixture (sh_day.h5 ends 2011-12-06); newer instruments start at listing day
 SPEC = [
-    # market, code, precision, start, end, 源候选链
-    ("SHF", "rb0000", 2, "20090327", "20111206", [("fut", "RB0"), ("fut_zh", "RB0")]),
+    # market, code, precision, start, end, candidate source chain
+    ("SHF", "RB0000", 2, "20090327", "20111206", [("fut", "RB0"), ("fut_zh", "RB0")]),
     ("CZC", "SR0000", 2, "20060106", "20111206", [("fut", "SR0"), ("fut_zh", "SR0")]),
     ("CFE", "IF0000", 2, "20100416", "20111206", [("fut_zh", "IF0"), ("fut", "IF0")]),
-    ("DCE", "i0000", 2, "20131018", "20161017", [("fut_zh", "I0")]),
-    ("INE", "sc0000", 2, "20180326", "20210325", [("fut_zh", "SC0")]),
-    ("GFE", "si0000", 2, "20221220", "20241219", [("fut_zh", "SI0")]),
+    ("DCE", "I0000", 2, "20131018", "20161017", [("fut_zh", "I0")]),
+    ("INE", "SC0000", 2, "20180326", "20210325", [("fut_zh", "SC0")]),
+    ("GFE", "SI0000", 2, "20221220", "20241219", [("fut_zh", "SI0")]),
     ("HK", "HSI", 2, "20050104", "20111206", [("hk_idx", "HSI")]),
-    # 代表指数必须与 Market.code 身份一致：.IXIC（综合指数）历史更长但不可冒名替代 NDX
+    # The index must match the Market.code identity: .IXIC (composite) is longer but must not stand in for NDX
     ("NASDAQ", "NDX", 2, "20050104", "20111206", [("us_idx", ".NDX")]),
     ("NYSE", "DJI", 2, "20050104", "20111206", [("us_idx", ".DJI")]),
     ("FX", "EURUSD", 5, "20050104", "20111206",
@@ -57,7 +64,7 @@ CN_COLS = {"日期": "date", "开盘价": "open", "最高价": "high", "最低�
 
 
 class KDayRecord(tb.IsDescription):
-    """与 common_h5.H5Record 同构（C++ 侧按字段名取值，顺序无关）"""
+    """Same layout as common_h5.H5Record (the C++ side reads by field name, order-free)"""
     datetime = tb.UInt64Col()
     openPrice = tb.UInt32Col()
     highPrice = tb.UInt32Col()
@@ -98,14 +105,15 @@ def plus_years(d, years):
 
 
 def fetch(kind, symbol):
-    """返回升序 (date, open, high, low, close, volume)；源只提供成交量的，量记 0"""
+    """Return ascending (date, open, high, low, close, volume); sources without volume record 0"""
     import akshare as ak
 
     if kind == "crypto":
-        raise ValueError("crypto_js_spot 只有实时价、无日线历史，待导入程序提供历史源")
+        raise ValueError("crypto_js_spot has no daily history yet; historical source pending in the import program")
 
     if kind == "fx_boc":
-        # 中行牌价：折算价为每 100 外币兑人民币，除以 100 得单位价；买价作低、卖价作高
+        # BOC quote: the conversion price is per 100 units of foreign currency to CNY,
+        # divide by 100 for the unit price; bid acts as low, ask as high
         df = ak.currency_boc_sina(symbol=symbol, start_date="20040101", end_date="20251231")
         df = df.rename(columns={"日期": "date"})
         rows = []
@@ -121,7 +129,7 @@ def fetch(kind, symbol):
             rows.append((d, mid, max(mid, hi), min(mid, lo), mid, 0))
         rows.sort(key=lambda x: x[0])
         if not rows:
-            raise ValueError("空结果")
+            raise ValueError("empty result")
         return rows
 
     if kind == "ccy_ts":
@@ -140,7 +148,7 @@ def fetch(kind, symbol):
     api = api.rename(columns=CN_COLS)
     cols = list(api.columns)
     if "close" not in cols:
-        raise KeyError("无法识别的列名: %s" % cols)
+        raise KeyError("unrecognized columns: %s" % cols)
 
     rows = []
     for r in api.itertuples(index=False):
@@ -157,7 +165,7 @@ def fetch(kind, symbol):
         rows.append((d, o, h, l, c, v))
     rows.sort(key=lambda x: x[0])
     if not rows:
-        raise ValueError("空结果")
+        raise ValueError("empty result")
     return rows
 
 
@@ -182,14 +190,15 @@ def save_cache(path, rows):
 
 
 def src_path(market, code):
-    """缓存旁注真实来源，避免缓存命中时把 source 记成 "cache"""
+    """Records the real source beside the cache, so a cache hit does not record source as "cache"""
     return os.path.join(CACHE_DIR, "%s_%s.src" % (market, code))
 
 
 def sanitize(rows):
-    """坏 bar 的统一出口（缓存与在线取数都过这一道）：四价齐全、high >= max(open,close)、
-    low <= min(open,close)、剔除周末。指数/期货/股票类源均无周末交易；将来接入 FX/CRYPTO
-    的周末时段需放宽此规则。"""
+    """The single exit for bad bars (both cache and online fetch pass through): all four
+    prices present, high >= max(open,close), low <= min(open,close), weekends dropped.
+    Index/futures/stock sources have no weekend trading; future FX/CRYPTO weekend sessions
+    will need to relax this rule."""
     out = []
     for r in rows:
         d, o, h, l, c = r[0], r[1], r[2], r[3], r[4]
@@ -204,17 +213,18 @@ def sanitize(rows):
 
 
 def pick_window(market, code, d1, d2, sources, refresh):
-    """按候选源链取窗口数据。返回 (rows, 说明, 偏差)；窗口不覆盖时退到可得起点 + 3 年"""
+    """Fetch window data along the candidate source chain. Returns (rows, source, deviation);
+    falls back to earliest available + 3 years when the window is not covered"""
     path = cache_path(market, code)
     errs = []
-    longest = None  # (rows, 源说明)
+    longest = None  # (rows, source note)
 
     if os.path.exists(path) and not refresh:
         rows = load_cache(path)
         if not rows:
-            raise RuntimeError("缓存为空: %s（用 --refresh 重新取数）" % path)
+            raise RuntimeError("cache empty: %s (re-fetch with --refresh)" % path)
         clean = sanitize(rows)
-        if len(clean) != len(rows):  # 旧缓存可能早于过滤逻辑，清洗后回写
+        if len(clean) != len(rows):  # old cache may predate the filter logic; write back after cleaning
             save_cache(path, clean)
         src = "cache"
         if os.path.exists(src_path(market, code)):
@@ -229,16 +239,16 @@ def pick_window(market, code, d1, d2, sources, refresh):
             except Exception as e:  # noqa: BLE001
                 errs.append("%s(%s): %s" % (kind, symbol, str(e)[:70]))
         if not cands and os.path.exists(path):
-            # 刷新失败时不倒退：已有缓存仍可产出 fixture
+            # no regression on refresh failure: existing cache can still produce the fixture
             rows = sanitize(load_cache(path))
             if rows:
-                errs.append("刷新失败，回退旧缓存")
+                errs.append("refresh failed, falling back to old cache")
                 cands = [(rows, "cache")]
         if cands:
-            # 缓存取覆盖面最广的一份，保证离线重跑与 --refresh 语义成立
+            # take the widest-coverage candidate to keep offline reruns and --refresh semantics valid
             best = max(cands, key=lambda x: len(x[0]))
             if not best[0]:
-                raise RuntimeError("源返回空数据: %s" % best[1])
+                raise RuntimeError("source returned empty data: %s" % best[1])
             save_cache(path, best[0])
             with open(src_path(market, code), "w", encoding="utf8") as f:
                 f.write(best[1])
@@ -248,35 +258,38 @@ def pick_window(market, code, d1, d2, sources, refresh):
             longest = (rows, src)
         picked = [r for r in rows if d1 <= r[0] <= d2]
         if picked:
-            # 起点、终点对称检查：任一侧不满足目标窗口都记入偏差
+            # symmetric start/end check: either side missing the target window is recorded as a deviation
             notes = []
             if (picked[0][0] - d1).days > 7:
-                notes.append("起点 %.0f 天延迟" % (picked[0][0] - d1).days)
+                notes.append("start delayed by %.0f days" % (picked[0][0] - d1).days)
             if (d2 - picked[-1][0]).days > 7:
-                notes.append("终点提前 %.0f 天" % (d2 - picked[-1][0]).days)
+                notes.append("end short by %.0f days" % (d2 - picked[-1][0]).days)
             return picked, src, "; ".join(notes)
 
     if longest is None:
-        raise RuntimeError("; ".join(errs) or "无可用源")
+        raise RuntimeError("; ".join(errs) or "no available source")
     rows, src = longest
     if not rows:
-        raise RuntimeError("无可用数据: %s" % src)
+        raise RuntimeError("no available data: %s" % src)
     s = rows[0][0]
     e = plus_years(s, FALLBACK_YEARS)
     picked = [r for r in rows if s <= r[0] <= e]
-    dev = "窗口 %s~%s 未覆盖，退到可得起点 %s + %d 年" % (ymd(d1), ymd(d2), ymd(s), FALLBACK_YEARS)
+    dev = ("window %s~%s not covered; fell back to earliest available %s + %d years"
+           % (ymd(d1), ymd(d2), ymd(s), FALLBACK_YEARS))
     return picked, src, dev
 
 
 def build_h5(market, code, rows, dest_dir):
-    """h5 驱动读侧固定 x0.001（H5KDataDriver.cpp:619-622），故价格必须存 price x 1000，
-    与 stocktypeinfo.precision 无关（precision 只影响显示位数）。因此 h5 后端价格上限 3 位小数，
-    源价多于 3 位小数的字段会被舍入 —— 属后端能力边界，在生成时给出精度丢失计数。"""
+    """The h5 driver read side is fixed at x0.001 (H5KDataDriver.cpp:619-622), so prices
+    must be stored as price x 1000, regardless of stocktypeinfo.precision (precision only
+    affects display digits). Hence the h5 backend caps prices at 3 decimals; source prices
+    with more decimals get rounded - a backend capability boundary; generation reports the
+    lost-precision count."""
     filename = os.path.join(dest_dir, "%s_day.h5" % market.lower())
     if os.path.exists(filename):
         os.remove(filename)
     scale = 1000
-    # 按实际数据统计被舍入的价格字段数（源数据的真实小数位与 SPEC.precision 无关）
+    # count price fields rounded from the actual data (source decimals are unrelated to SPEC.precision)
     lost = 0
     for _, o, h, l, c, _ in rows:
         for v in (o, h, l, c):
@@ -286,7 +299,8 @@ def build_h5(market, code, rows, dest_dir):
     filters = tb.Filters(complevel=9, complib="zlib", shuffle=True)
     with tb.open_file(filename, "w", filters=filters) as h5f:
         group = h5f.create_group("/", "data")
-        table = h5f.create_table(group, market + code, KDayRecord, expectedrows=len(rows))
+        table = h5f.create_table(group, (market + code).upper(), KDayRecord,
+                                 expectedrows=len(rows))
         row = table.row
         for d, o, h, l, c, vol in rows:
             row["datetime"] = ymd(d) * 10000
@@ -294,22 +308,22 @@ def build_h5(market, code, rows, dest_dir):
             row["highPrice"] = int(round(h * scale))
             row["lowPrice"] = int(round(l * scale))
             row["closePrice"] = int(round(c * scale))
-            # 成交额为近似口径：未乘合约乘数/每手股数（unit 由品种级覆盖），
-            # 存千元（驱动 x0.1 -> API 万元）；单测不断言 amount 绝对值
+            # transAmount is approximate: contract multiplier / lot size not applied
+            # (unit is overridden per variety); stored in thousands (driver x0.1 -> API 10k)
             row["transAmount"] = int(round(c * vol))
             row["transCount"] = int(vol)
             row.append()
         table.flush()
-    note = "" if not lost else "h5 精度上限 3 位小数，%d 个价格字段被舍入（%d 根 bar）" % (lost, len(rows))
+    note = "" if not lost else "h5 caps at 3 decimals: %d price fields rounded (%d bars)" % (lost, len(rows))
     return filename, note
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--refresh", action="store_true", help="忽略 CSV 缓存重新取数")
-    ap.add_argument("--markets", default="", help="逗号分隔市场名，缺省全部")
-    ap.add_argument("--dest", default="test_data", help="h5 输出目录")
-    ap.add_argument("--list", action="store_true", help="仅列出配置")
+    ap.add_argument("--refresh", action="store_true", help="ignore the CSV cache and re-fetch")
+    ap.add_argument("--markets", default="", help="comma-separated market names; default all")
+    ap.add_argument("--dest", default="test_data", help="h5 output directory")
+    ap.add_argument("--list", action="store_true", help="list the spec only")
     args = ap.parse_args()
 
     if args.list:
@@ -335,9 +349,9 @@ def main():
             manifest.append([market, code, len(rows), ymd(rows[0][0]), ymd(rows[-1][0]), src, dev])
             summary.append("OK   %-8s %-8s rows=%-5d %s~%s%s"
                            % (market, code, len(rows), rows[0][0], rows[-1][0],
-                              "  [偏差] " + dev if dev else ""))
+                              "  [dev] " + dev if dev else ""))
         except Exception as e:  # noqa: BLE001
-            manifest.append([market, code, 0, "", "", "", "未覆盖: %s" % e])
+            manifest.append([market, code, 0, "", "", "", "uncovered: %s" % e])
             summary.append("FAIL %-8s %-8s %s" % (market, code, e))
 
     with open(MANIFEST, "w", newline="", encoding="utf8") as f:

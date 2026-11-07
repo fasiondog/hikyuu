@@ -1,9 +1,9 @@
--- 注意：MySQL DDL 自动提交，本脚本不支持中断后直接重跑（重跑会在 ADD COLUMN 处报 Duplicate column）。
--- 若在 ADD COLUMN 与版本推进之间中断，需先手动执行
+-- Note: MySQL DDL auto-commits; this script does not support rerun after interruption (rerun hits
+-- "Duplicate column" at ADD COLUMN). If interrupted between ADD COLUMN and the version bump,
+-- manually run the following first, then rerun this script:
 --   ALTER TABLE `hku_base`.`holiday` DROP COLUMN `market`;
--- 再重跑本脚本。
 ALTER TABLE `hku_base`.`holiday` ADD COLUMN `market` VARCHAR(20) NOT NULL DEFAULT 'SH';
--- 旧库无唯一约束，历史重复导入可能留下同 (market,date) 多行，先清重再加唯一键
+-- old schemas have no unique key; repeated imports may leave duplicate (market,date) rows - dedup first, then add the unique key
 DELETE h1 FROM `hku_base`.`holiday` h1
   JOIN `hku_base`.`holiday` h2
     ON h1.`market` = h2.`market` AND h1.`date` = h2.`date` AND h1.`id` > h2.`id`;

@@ -28,7 +28,8 @@ TEST_CASE("test_MarketInfo_serialize") {
     string filename(sm.tmpdir());
     filename += "/MarketInfo.xml";
 
-    // NASDAQ 携带非默认的时区字段值（-300/1/1），避免与类内默认值(480/0/0)混淆而无法区分字段错位
+    // NASDAQ carries non-default tz values (-300/1/1) so field misalignment is distinguishable
+    // from the in-class defaults (480/0/0)
     MarketInfo m1 = sm.getMarketInfo("NASDAQ");
     {
         std::ofstream ofs(filename);
