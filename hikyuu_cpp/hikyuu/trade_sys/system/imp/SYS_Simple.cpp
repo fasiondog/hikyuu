@@ -29,7 +29,7 @@ void registerPart_SYS_Simple() {
     meta.params.push_back(ParamMeta{.name = "ev", .type = "Environment", .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "cn", .type = "Condition", .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "sg", .type = "Signal", .is_part_param = true});
-    meta.params.push_back(ParamMeta{.name = "sl", .type = "Stoploss", .is_part_param = true});
+    meta.params.push_back(ParamMeta{.name = "st", .type = "Stoploss", .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "tp", .type = "Stoploss", .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "pg", .type = "ProfitGoal", .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "sp", .type = "Slippage", .is_part_param = true});
@@ -39,7 +39,7 @@ void registerPart_SYS_Simple() {
                           partOr<EnvironmentPtr>(pp, "ev", EnvironmentPtr()),
                           partOr<ConditionPtr>(pp, "cn", ConditionPtr()),
                           partOr<SignalPtr>(pp, "sg", SignalPtr()),
-                          partOr<StoplossPtr>(pp, "sl", StoplossPtr()),
+                          partOr<StoplossPtr>(pp, "st", StoplossPtr()),
                           partOr<StoplossPtr>(pp, "tp", StoplossPtr()),
                           partOr<ProfitGoalPtr>(pp, "pg", ProfitGoalPtr()),
                           partOr<SlippagePtr>(pp, "sp", SlippagePtr()));

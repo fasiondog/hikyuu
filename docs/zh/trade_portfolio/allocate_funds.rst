@@ -231,13 +231,13 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     :param list weights: 指定的资产比例列表
     :return: 资产分配算法实例（``AFPtr``）
 
-.. py:function:: AF_FixedAmount([amount = 20000.0])
+.. py:function:: AF_FixedAmount([fixed_amount = 20000.0])
 
     固定金额资产分配（L1 等权 + L2 固定金额），对选中的资产进行等金额分配。
 
     当前实现要求 ``fixed_amount >= 0``，且按净额调仓。
 
-    :param float amount: 交易最大金额
+    :param float fixed_amount: 交易最大金额
     :return: 资产分配算法实例（``AFPtr``）
 
 .. py:function:: AF_MultiFactor([auto_adjust_weight = True])

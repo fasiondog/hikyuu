@@ -559,7 +559,7 @@ void registerPart_SYS_WalkForward() {
     meta.type = PartType::SYS;
     meta.name = "SYS_WalkForward";
     meta.full_name = "core.sys.walkforward";
-    meta.params.push_back(ParamMeta{.name = "candidate_sys_list",
+    meta.params.push_back(ParamMeta{.name = "sys_list",
                                     .type = "System",
                                     .required = true,
                                     .is_part_param = true,
@@ -572,7 +572,7 @@ void registerPart_SYS_WalkForward() {
       ParamMeta{.name = "train_tm", .type = "TradeManager", .is_part_param = true});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
         SystemList sys_list;
-        for (const auto& part : pp.at("candidate_sys_list")) {
+        for (const auto& part : pp.at("sys_list")) {
             sys_list.push_back(std::get<SYSPtr>(part));
         }
         return SYS_WalkForward(sys_list, partOr<TradeManagerPtr>(pp, "tm", TradeManagerPtr()),

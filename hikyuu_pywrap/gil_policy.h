@@ -49,19 +49,17 @@ class __attribute__((visibility("hidden"))) ScopeGilRelease {
 class ScopeGilRelease {
 #endif
 public:
-    explicit ScopeGilRelease(bool python_free) {
-        if (python_free && pythonInJupyter()) {
-            m_stream_guard = std::make_unique<OStreamToPython>(false);
-        }
-        m_gil_guard = std::make_unique<pybind11::gil_scoped_release>();
-    }
+    explicit ScopeGilRelease(bool python_free)
+    : m_stream_guard(python_free && pythonInJupyter() ? std::make_unique<OStreamToPython>(false)
+                                                      : nullptr) {}
 
     ScopeGilRelease(const ScopeGilRelease&) = delete;
     ScopeGilRelease& operator=(const ScopeGilRelease&) = delete;
 
 private:
+    // Order matters: the stream guard touches Python; the GIL guard stays a value member.
     std::unique_ptr<OStreamToPython> m_stream_guard;
-    std::unique_ptr<pybind11::gil_scoped_release> m_gil_guard;
+    pybind11::gil_scoped_release m_gil_guard;
 };
 
 }  // namespace hku

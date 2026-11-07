@@ -21,45 +21,45 @@ Shanghai-Shenzhen A-share Trade Cost Algorithm
 * TC_FixedA is the rolling default cost model and always reflects the latest-year rates; the year-named models (TC_FixedAPre2015 / 2015 / 2017) stay frozen for historical backtests.
 * Since 2022-04-29 the transfer fee is 0.01‰ of turnover (both directions, Shanghai, Shenzhen and Beijing); since 2023-08-28 the sell-side stamp duty is 0.5‰.
 
-.. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.0005, transferfee=0.00001])
+.. py:function:: TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
     The current A-share trade cost algorithm (rolling default, always the latest rates): transfer fee 0.01‰ of turnover charged in both directions on all markets, sell-side stamp duty 0.5‰
 
     :param float commission: the commission rate
-    :param float lowestCommission: the minimum commission
+    :param float lowest_commission: the minimum commission
     :param float stamptax: the stamp duty rate
     :param float transferfee: the transfer fee rate
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
-.. py:function:: TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+.. py:function:: TC_FixedA2015([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.00002])
 
     The A-share trade cost algorithm for August 1, 2015 and later; the Shanghai transfer fee was changed to 0.002% (0.02‰) of turnover
 
     :param float commission: the commission rate
-    :param float lowestCommission: the minimum commission
+    :param float lowest_commission: the minimum commission
     :param float stamptax: the stamp duty rate
     :param float transferfee: the transfer fee rate
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
-.. py:function:: TC_FixedA2017([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+.. py:function:: TC_FixedA2017([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.00002])
 
     The A-share trade cost algorithm for January 1, 2017 and later; the Shenzhen transfer fee is listed separately and both markets are charged 0.02‰ of turnover in both directions
 
     :param float commission: the commission rate
-    :param float lowestCommission: the minimum commission
+    :param float lowest_commission: the minimum commission
     :param float stamptax: the stamp duty rate
     :param float transferfee: the transfer fee rate
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
-.. py:function:: TC_FixedAPre2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
+.. py:function:: TC_FixedAPre2015([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.001, lowest_transferfee=1.0])
 
     The A-share trade cost algorithm before August 1, 2015: the Shanghai transfer fee was 0.1% of the traded share quantity (1 yuan per 1000 shares, minimum 1 yuan), and the Shenzhen market charged no transfer fee
 
     :param float commission: the commission rate
-    :param float lowestCommission: the minimum commission
+    :param float lowest_commission: the minimum commission
     :param float stamptax: the stamp duty rate
     :param float transferfee: the transfer fee rate
-    :param float lowestTransferfee: the minimum transfer fee
+    :param float lowest_transferfee: the minimum transfer fee
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
@@ -73,12 +73,12 @@ The calculation rules are as follows:: python
     
     No stamp duty or transfer fee.
 
-.. py:function:: TC_FixedETF([commission=0.0001, lowestCommission=5.0])
+.. py:function:: TC_FixedETF([commission=0.0001, lowest_commission=5.0])
 
     The ETF trade cost algorithm; commission is charged on both the buy and sell sides, with no stamp duty or transfer fee
 
     :param float commission: the commission rate, defaulting to one ten-thousandth (0.01%)
-    :param float lowestCommission: the minimum commission, defaulting to 5 yuan per trade
+    :param float lowest_commission: the minimum commission, defaulting to 5 yuan per trade
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 

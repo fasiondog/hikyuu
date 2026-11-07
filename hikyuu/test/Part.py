@@ -86,7 +86,7 @@ class PartTest(unittest.TestCase):
             reg.create_from_string("UNKNOWN(n=1)")
         with self.assertRaises(ValueError):
             reg.create_from_string(
-                "SYS_WalkForward(candidate_sys_list=SYS_Simple)"
+                "SYS_WalkForward(sys_list=SYS_Simple)"
             )
 
     def test_search_and_json(self):
@@ -121,6 +121,52 @@ class PartTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hikyuu.get_part("core.sg.band", ind=MA(10))
+
+    def test_renamed_part_param_keys(self):
+        # AF_FixedAmount: Part key equals the class setParam key fixed_amount
+        af = hikyuu.get_part("core.af.fixedamount", fixed_amount=30000.0)
+        self.assertEqual(af.get_param("fixed_amount"), 30000.0)
+
+        # crtTM Part keys align with the Python factory keyword names
+        # (get_part reserves `name` for the part full name, so the `name` param is covered
+        # by the C++ registry test instead)
+        tm = hikyuu.get_part("core.tm.simple", init_cash=200000.0)
+        self.assertEqual(tm.init_cash, 200000.0)
+
+        # SG_Flex Part key ind (aligned with Python)
+        flex = hikyuu.get_part("core.sg.flex", ind=MA(10), slow_n=20)
+        self.assertEqual(flex.name, "SG_Flex")
+
+        # CN_OPLine Part key ind (aligned with Python and CN_Bool)
+        cn = hikyuu.get_part("core.cn.opline", ind=MA(10))
+        self.assertEqual(cn.name, "CN_OPLine")
+
+        # SYS_Simple Part key st (aligned with the Python lambda parameter)
+        sys_simple = hikyuu.get_part("core.sys.simple", st=ST_FixedPercent())
+        self.assertIsNotNone(sys_simple.st)
+
+        # SP_* short_* optional keys reach the class setParam under the same name
+        sp = hikyuu.get_part("core.sp.fixedpercent", p=0.002, short_p=0.003)
+        self.assertEqual(sp.get_param("p"), 0.002)
+        self.assertEqual(sp.get_param("short_p"), 0.003)
+        sp_default = hikyuu.get_part("core.sp.fixedpercent", p=0.002)
+        self.assertEqual(sp_default.get_param("short_p"), 0.002)
+
+        normal = hikyuu.get_part(
+            "core.sp.normal", mean=0.01, stddev=0.05, short_mean=0.02, short_stddev=0.06
+        )
+        self.assertEqual(normal.get_param("short_mean"), 0.02)
+        self.assertEqual(normal.get_param("short_stddev"), 0.06)
+
+        uni = hikyuu.get_part(
+            "core.sp.uniform",
+            min_value=-0.05,
+            max_value=0.05,
+            short_min_value=-0.08,
+            short_max_value=0.08,
+        )
+        self.assertEqual(uni.get_param("short_min_value"), -0.08)
+        self.assertEqual(uni.get_param("short_max_value"), 0.08)
 
     def test_hub_core_info_and_search(self):
         info = hikyuu.get_part_info("core.ind.ma")

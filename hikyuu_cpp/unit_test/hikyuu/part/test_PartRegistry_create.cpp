@@ -10,8 +10,16 @@
 #include <hikyuu/part/PartRegistration.h>
 #include <hikyuu/part/PartRegistry.h>
 #include <hikyuu/trade_manage/TradeManagerBase.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_manage/tradecost/crt/TC_FixedETF.h>
+#include <hikyuu/trade_sys/allocatefunds/build_in.h>
+#include <hikyuu/trade_sys/condition/build_in.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
+#include <hikyuu/trade_sys/signal/build_in.h>
+#include <hikyuu/trade_sys/slippage/build_in.h>
+#include <hikyuu/trade_sys/stoploss/build_in.h>
+#include <hikyuu/trade_sys/system/System.h>
+#include <hikyuu/trade_sys/system/build_in.h>
 
 using namespace hku;
 
@@ -170,9 +178,9 @@ TEST_CASE("test_PartRegistry_create_tm") {
     auto tm2 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.simple", sc)).value();
     CHECK(tm2->name() == "TEST_TM");
 
-    /** @arg the part-typed costfunc is passed via the PartParamMap */
+    /** @arg the part-typed cost_func is passed via the PartParamMap */
     PartRegistry::PartParamMap parts;
-    parts["costfunc"] = {Part(TC_FixedETF())};
+    parts["cost_func"] = {Part(TC_FixedETF())};
     auto tm3 = tryGetAs<TradeManagerPtr>(reg.create("core.tm.simple", Parameter(), parts)).value();
     CHECK_UNARY(tm3->costFunc() != nullptr);
     CHECK(tm3->costFunc()->name() == "TC_FixedETF");
@@ -270,8 +278,96 @@ TEST_CASE("test_PartRegistry_createFromString") {
                     std::invalid_argument);
 
     /** @arg a list-typed part param cannot be set from a string expression */
-    CHECK_THROWS_AS(reg.createFromString("SYS_WalkForward(candidate_sys_list=SYS_Simple)"),
+    CHECK_THROWS_AS(reg.createFromString("SYS_WalkForward(sys_list=SYS_Simple)"),
                     std::invalid_argument);
+}
+
+/** @par Test points */
+TEST_CASE("test_PartRegistry_create_renamed_keys") {
+    registerAllBuiltinParts();
+    auto& reg = PartRegistry::instance();
+
+    /** @arg AF_FixedAmount persists the Part key under the class setParam key fixed_amount */
+    Parameter af;
+    af.set<double>("fixed_amount", 30000.0);
+    auto afp = std::get<AFPtr>(reg.create("core.af.fixedamount", af));
+    CHECK_EQ(afp->getParam<double>("fixed_amount"), 30000.0);
+
+    /** @arg crtTM reads date / init_cash / name / cost_func from the Part channels */
+    Parameter tm_sc;
+    tm_sc.set<double>("init_cash", 300000.0);
+    tm_sc.set<string>("name", "RENAMED_TM");
+    PartRegistry::PartParamMap tm_parts;
+    tm_parts["cost_func"] = {Part(TC_FixedETF())};
+    auto tm = std::get<TradeManagerPtr>(reg.create("core.tm.simple", tm_sc, tm_parts));
+    CHECK_EQ(tm->initCash(), 300000.0);
+    CHECK_EQ(tm->name(), "RENAMED_TM");
+    CHECK_EQ(tm->costFunc()->name(), "TC_FixedETF");
+
+    /** @arg SG_Flex accepts the Part key ind */
+    Parameter flex_sc;
+    flex_sc.set<int64_t>("slow_n", 20);
+    PartRegistry::PartParamMap flex_parts;
+    flex_parts["ind"] = {Part(MA(10))};
+    auto flex = std::get<SGPtr>(reg.create("core.sg.flex", flex_sc, flex_parts));
+    CHECK_UNARY(flex != nullptr);
+
+    /** @arg CN_OPLine accepts the Part key ind (same spelling as CN_Bool and the docs) */
+    PartRegistry::PartParamMap cn_parts;
+    cn_parts["ind"] = {Part(MA(10))};
+    auto cn = std::get<CNPtr>(reg.create("core.cn.opline", Parameter(), cn_parts));
+    CHECK_UNARY(cn != nullptr);
+    CHECK_EQ(cn->name(), "CN_OPLine");
+
+    /** @arg SYS_Simple accepts the Part key st */
+    PartRegistry::PartParamMap sys_parts;
+    sys_parts["st"] = {Part(ST_FixedPercent())};
+    auto sys = std::get<SystemPtr>(reg.create("core.sys.simple", Parameter(), sys_parts));
+    CHECK_UNARY(sys->getST() != nullptr);
+
+    /** @arg SYS_WalkForward declares the Part key sys_list */
+    const PartMeta& wf_meta = reg.getMeta("core.sys.walkforward");
+    bool has_sys_list = false;
+    for (const auto& p : wf_meta.params) {
+        if (p.name == "sys_list") {
+            has_sys_list = true;
+        }
+    }
+    CHECK_UNARY(has_sys_list);
+
+    /** @arg SP_FixedPercent reads the short_p optional and forwards it to the factory */
+    Parameter sp_sc;
+    sp_sc.set<double>("p", 0.002);
+    sp_sc.set<double>("short_p", 0.003);
+    auto sp1 = std::get<SPPtr>(reg.create("core.sp.fixedpercent", sp_sc));
+    CHECK_EQ(sp1->getParam<double>("p"), 0.002);
+    CHECK_EQ(sp1->getParam<double>("short_p"), 0.003);
+
+    /** @arg omitting short_p falls back to the p value (factory default behavior) */
+    Parameter sp_default;
+    sp_default.set<double>("p", 0.002);
+    auto sp2 = std::get<SPPtr>(reg.create("core.sp.fixedpercent", sp_default));
+    CHECK_EQ(sp2->getParam<double>("short_p"), 0.002);
+
+    /** @arg SP_Normal accepts the short_mean / short_stddev optional keys */
+    Parameter normal_sc;
+    normal_sc.set<double>("mean", 0.01);
+    normal_sc.set<double>("stddev", 0.05);
+    normal_sc.set<double>("short_mean", 0.02);
+    normal_sc.set<double>("short_stddev", 0.06);
+    auto normal = std::get<SPPtr>(reg.create("core.sp.normal", normal_sc));
+    CHECK_EQ(normal->getParam<double>("short_mean"), 0.02);
+    CHECK_EQ(normal->getParam<double>("short_stddev"), 0.06);
+
+    /** @arg SP_Uniform accepts the short_min_value / short_max_value optional keys */
+    Parameter uni_sc;
+    uni_sc.set<double>("min_value", -0.05);
+    uni_sc.set<double>("max_value", 0.05);
+    uni_sc.set<double>("short_min_value", -0.08);
+    uni_sc.set<double>("short_max_value", 0.08);
+    auto uni = std::get<SPPtr>(reg.create("core.sp.uniform", uni_sc));
+    CHECK_EQ(uni->getParam<double>("short_min_value"), -0.08);
+    CHECK_EQ(uni->getParam<double>("short_max_value"), 0.08);
 }
 
 /** @} */

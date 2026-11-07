@@ -64,8 +64,11 @@ void registerPart_SP_FixedPercent() {
     meta.name = "SP_FixedPercent";
     meta.full_name = "core.sp.fixedpercent";
     meta.params.push_back(ParamMeta{.name = "p", .type = "double", .default_value = "0.001"});
+    meta.params.push_back(ParamMeta{.name = "short_p", .type = "double"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return SP_FixedPercent(sc.get<double>("p"), std::nullopt);
+        auto short_p =
+          sc.have("short_p") ? std::optional<double>(sc.get<double>("short_p")) : std::nullopt;
+        return SP_FixedPercent(sc.get<double>("p"), short_p);
     });
 }
 

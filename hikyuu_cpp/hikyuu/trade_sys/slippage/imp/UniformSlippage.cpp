@@ -147,9 +147,15 @@ void registerPart_SP_Uniform() {
       ParamMeta{.name = "max_value", .type = "double", .default_value = "0.05"});
     meta.params.push_back(
       ParamMeta{.name = "adverse_only", .type = "bool", .default_value = "true"});
+    meta.params.push_back(ParamMeta{.name = "short_min_value", .type = "double"});
+    meta.params.push_back(ParamMeta{.name = "short_max_value", .type = "double"});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
+        auto opt = [&](const char* k) {
+            return sc.have(k) ? std::optional<double>(sc.get<double>(k)) : std::nullopt;
+        };
         return SP_Uniform(sc.get<double>("min_value"), sc.get<double>("max_value"),
-                          sc.get<bool>("adverse_only"), std::nullopt, std::nullopt);
+                          sc.get<bool>("adverse_only"), opt("short_min_value"),
+                          opt("short_max_value"));
     });
 }
 

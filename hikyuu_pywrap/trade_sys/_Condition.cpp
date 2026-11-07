@@ -165,7 +165,7 @@ void export_Condition(py::module& m) {
 
         DEF_PICKLE(ConditionPtr);
 
-    m.def("CN_OPLine", CN_OPLine, R"(CN_OPLine(ind)
+    m.def("CN_OPLine", CN_OPLine, py::arg("ind"), R"(CN_OPLine(ind)
 
     Fixedly use the minimum trading quantity of the stock to trade; calculate the ind value of the equity curve; when the equity curve is higher than ind, the system is valid, otherwise invalid.
 

@@ -97,9 +97,9 @@ void registerPart_CN_OPLine() {
     meta.name = "CN_OPLine";
     meta.full_name = "core.cn.opline";
     meta.params.push_back(
-      ParamMeta{.name = "op", .type = "Indicator", .required = true, .is_part_param = true});
+      ParamMeta{.name = "ind", .type = "Indicator", .required = true, .is_part_param = true});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
-        return CN_OPLine(std::get<Indicator>(pp.at("op").at(0)));
+        return CN_OPLine(std::get<Indicator>(pp.at("ind").at(0)));
     });
 }
 
