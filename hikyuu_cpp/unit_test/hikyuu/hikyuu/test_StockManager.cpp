@@ -550,6 +550,86 @@ TEST_CASE("test_StockManager_loadAllStocks_by_context") {
 }
 
 /** @par Test points */
+TEST_CASE("test_StockManager_loadAllStocks_load_scope") {
+    auto& sm = StockManager::instance();
+    const StrategyContext org_context = sm.getStrategyContext();
+
+    /** @arg A market scope loads only the listed markets; the two removed stocks prove the reload
+     * follows the scope (the stock dictionary itself is never cleared) */
+    sm.setLoadScope({"SH"}, {});
+    sm.removeStock("SH600000");
+    sm.removeStock("SZ000001");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SH600000").isNull());
+    CHECK_UNARY(sm.getStock("SZ000001").isNull());
+
+    /** @arg The must-load securities are kept even when their market is outside the scope */
+    sm.setLoadScope({"SZ"}, {});
+    sm.removeStock("SH000300");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SZ000001").isNull());
+    CHECK_UNARY(!sm.getStock("SH000300").isNull());
+
+    /** @arg A security type scope works on its own (12 = futures) */
+    sm.setLoadScope({}, {12});
+    sm.removeStock("SH600000");
+    sm.removeStock("SHFRB0000");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SHFRB0000").isNull());
+    CHECK_UNARY(sm.getStock("SH600000").isNull());
+
+    /** @arg Markets and types intersect: both must match */
+    sm.setLoadScope({"SHF"}, {12});
+    sm.removeStock("SHFRB0000");
+    sm.removeStock("SH600000");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SHFRB0000").isNull());
+    CHECK_UNARY(sm.getStock("SH600000").isNull());
+
+    /** @arg "ALL" inside the parameter text means no market restriction (the Python path stores
+     * the raw text, so the consumer itself must understand it) */
+    sm.setLoadScope({"ALL"}, {});
+    sm.removeStock("SH600000");
+    sm.removeStock("SZ000001");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SH600000").isNull());
+    CHECK_UNARY(!sm.getStock("SZ000001").isNull());
+
+    /** @arg A type scope without the index type still keeps the representative index of every
+     * market inside the scope, so the trading calendar survives */
+    sm.setLoadScope({}, {1});
+    sm.removeStock("SH600000");
+    sm.removeStock("SZ399001");
+    sm.removeStock("SH000688");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SH600000").isNull());
+    CHECK_UNARY(!sm.getStock("SZ399001").isNull());
+    CHECK_UNARY(!sm.getMarketStock("SZ").isNull());
+    CHECK_UNARY(sm.getStock("SH000688").isNull());
+
+    /** @arg An unknown market keeps only the must-load securities */
+    sm.setLoadScope({"XX"}, {});
+    sm.removeStock("SH600000");
+    sm.removeStock("SH000300");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(sm.getStock("SH600000").isNull());
+    CHECK_UNARY(!sm.getStock("SH000300").isNull());
+
+    /** @arg Clearing the scope restores the full load */
+    sm.setLoadScope({}, {});
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_EQ(sm.size(), 4753);
+}
+
+/** @par Test points */
 TEST_CASE("test_StockManager_getStockList") {
     StockManager& sm = StockManager::instance();
 

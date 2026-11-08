@@ -123,11 +123,21 @@ Load Scope
   accepted (the SQLite / MySQL K-line table names are lowercased by the driver).
 - ``SH000001`` / ``SH000300`` are the default must-load codes and are always registered
   whatever the list says.
-- ``HKU_STOCK_LIST`` is consumed only by the Python ``load_hikyuu`` (the C++
-  ``hikyuu_init`` binding always loads everything).
+- ``load_hikyuu(market_list=[...])`` limits what ``stock_list=["all"]`` loads by market, and
+  ``stock_type_list=[...]`` does the same by security type; giving both takes the intersection.
+  An empty list means no restriction, and ``ALL`` inside the market list also means no
+  restriction. Securities outside the scope are not registered, take no part in the preload,
+  and the column-first bulk K-line load falls back to the per-security preload. The
+  representative index of every market inside the scope (the index recorded by ``MarketInfo``)
+  is always kept, so the trading calendar still works when ``stock_type_list`` leaves the index
+  type out; the other block indexes still follow the type filter.
+- ``HKU_STOCK_LIST`` is consumed only by the Python ``load_hikyuu`` (the C++ ``hikyuu_init``
+  binding always loads the full scope; C++ callers narrow it with the ``load_market_list`` /
+  ``load_stock_type_list`` hikyuu parameters).
 - When ``stock_list`` is used, the representative indexes of the markets in use must be
   included in the list, otherwise their trading calendars are empty.
-- Preloading takes effect globally per ktype; there is no per-market preload control.
+- Preloading still takes effect globally per ktype (there is no per-market preload switch),
+  but only the registered securities take part in it.
 
 Portfolio Calendar
 ------------------

@@ -63,6 +63,22 @@ public:
      */
     void reloadWith(const StrategyContext& context);
 
+    /**
+     * Restrict what the "ALL" load scope (the context containing "ALL") reads: only the listed
+     * markets / security types are registered; the must-load securities and the representative
+     * index of every market inside the scope are always kept
+     * @note The restriction is kept in the hikyuu parameter (no object layout change, so the
+     *       prebuilt plugins stay binary compatible). Call it after init() or pass the
+     *       load_market_list / load_stock_type_list keys through the hikyuu parameter of init(),
+     *       never while the preload thread is running. Narrowing the scope does not remove the
+     *       already registered securities, so it only shrinks a fresh process
+     * @param marketList the allowed market abbreviations, e.g. {"SH", "SZ"}; empty or containing
+     *        "ALL" means no market restriction
+     * @param typeList the allowed security types, e.g. {STOCKTYPE_A, 12}; empty means no type
+     *        restriction
+     */
+    void setLoadScope(const vector<string>& marketList, const vector<int>& typeList);
+
     /** Quit proactively and release the resources */
     static void quit();
 
@@ -422,6 +438,12 @@ private:
 
     /* Load all the securities */
     void loadAllStocks();
+
+    /* Keep only the securities inside the configured load scope (plus the must-load list) */
+    void _filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) const;
+
+    /* Whether a load scope (market / security type restriction) is configured */
+    bool _hasLoadScope() const;
 
     /* Load the internally generated sectors */
     void loadInnerBlocks();

@@ -85,6 +85,77 @@ static void registerPredefinedExtraKType() {
     }
 }
 
+/* Split a ';' separated load scope text, blank entries and spaces are dropped */
+static void splitLoadScopeText(const string& text, vector<string>& items) {
+    string current;
+    for (const auto ch : text) {
+        if (ch == ';' || ch == ',' || ch == ' ' || ch == '\t') {
+            if (!current.empty()) {
+                items.push_back(current);
+                current.clear();
+            }
+        } else {
+            current.push_back(ch);
+        }
+    }
+    if (!current.empty()) {
+        items.push_back(current);
+    }
+}
+
+/* Normalize a security code for load scope matching: uppercase with the '/' removed */
+static string normalizeLoadScopeCode(const string& code) {
+    string result(code);
+    to_upper(result);
+    result.erase(std::remove(result.begin(), result.end(), '/'), result.end());
+    return result;
+}
+
+void StockManager::setLoadScope(const vector<string>& marketList, const vector<int>& typeList) {
+    // Only the raw text is stored; the empty / "ALL" semantics live in the consumers
+    string markets;
+    for (const auto& market : marketList) {
+        if (!markets.empty()) {
+            markets.push_back(';');
+        }
+        markets += market;
+    }
+
+    string types;
+    for (const auto& type : typeList) {
+        if (!types.empty()) {
+            types.push_back(';');
+        }
+        types += std::to_string(type);
+    }
+
+    m_hikyuuParam.set("load_market_list", markets);
+    m_hikyuuParam.set("load_stock_type_list", types);
+}
+
+bool StockManager::_hasLoadScope() const {
+    vector<string> items;
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_market_list", ""), items);
+    for (const auto& item : items) {
+        string upper_item(item);
+        to_upper(upper_item);
+        if (upper_item != "ALL") {
+            return true;
+        }
+    }
+
+    items.clear();
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_stock_type_list", ""), items);
+    for (const auto& item : items) {
+        try {
+            (void)std::stoi(item);
+            return true;
+        } catch (...) {
+        }
+    }
+    return false;
+}
+
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
@@ -644,7 +715,9 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
 std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
   const vector<KQuery::KType>& ktypes, bool& bulk_finance_done) {
     std::unordered_set<string> loaded_codes;
-    HKU_IF_RETURN(!m_context.isAll(), loaded_codes);
+    // The column bulk interface takes a whole ktype for every code and cannot honor the load
+    // scope, so the per-stock preload below takes over when a scope is configured
+    HKU_IF_RETURN(!m_context.isAll() || _hasLoadScope(), loaded_codes);
     auto driver = _getKDataDriverPool();
     HKU_IF_RETURN(!driver || !driver->getPrototype()->isColumnFirst(), loaded_codes);
 
@@ -1095,6 +1168,9 @@ void StockManager::loadAllStocks() {
     vector<StockInfo> stockInfos;
     if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
+        if (_hasLoadScope()) {
+            _filterStockInfoByLoadScope(stockInfos);
+        }
     } else {
         auto all_market = getAllMarket();
         for (const auto& stkcode : m_context.getAllNeedLoadStockCodeList()) {
@@ -1202,6 +1278,84 @@ void StockManager::loadAllStocks() {
             }
         }
     }
+}
+
+void StockManager::_filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) const {
+    std::set<string> market_scope;
+    vector<string> items;
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_market_list", ""), items);
+    for (const auto& item : items) {
+        string upper_item(item);
+        to_upper(upper_item);
+        // "ALL" means no market restriction at all
+        if (upper_item != "ALL") {
+            market_scope.insert(upper_item);
+        }
+    }
+
+    std::set<int> type_scope;
+    items.clear();
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_stock_type_list", ""), items);
+    for (const auto& item : items) {
+        try {
+            type_scope.insert(std::stoi(item));
+        } catch (...) {
+            HKU_WARN("Invalid security type in the load scope: {}", item);
+        }
+    }
+
+    // The must-load securities and the representative index of every market inside the scope are
+    // kept even when the type filter drops them: they carry the trading calendar and the default
+    // benchmark
+    std::set<string> must_load;
+    for (const auto& code : m_context.getMustLoadStockCodeList()) {
+        must_load.insert(normalizeLoadScopeCode(code));
+    }
+    for (const auto& market : getAllMarket()) {
+        string upper_market(market);
+        to_upper(upper_market);
+        if (!market_scope.empty() && market_scope.find(upper_market) == market_scope.end()) {
+            continue;
+        }
+        auto market_info = getMarketInfo(market);
+        if (market_info != Null<MarketInfo>()) {
+            must_load.insert(normalizeLoadScopeCode(
+              fmt::format("{}{}", market_info.market(), market_info.code())));
+        }
+    }
+
+    const size_t total = stockInfos.size();
+    vector<StockInfo> kept;
+    kept.reserve(total);
+    std::set<string> matched_markets;
+    for (auto& info : stockInfos) {
+        string upper_market(info.market);
+        to_upper(upper_market);
+        const bool market_ok =
+          market_scope.empty() || market_scope.find(upper_market) != market_scope.end();
+        if (market_ok) {
+            matched_markets.insert(upper_market);
+        }
+        const bool type_ok = type_scope.empty() || type_scope.find(info.type) != type_scope.end();
+        if (market_ok && type_ok) {
+            kept.push_back(std::move(info));
+            continue;
+        }
+        string market_code = fmt::format("{}{}", info.market, info.code);
+        if (must_load.find(normalizeLoadScopeCode(market_code)) != must_load.end()) {
+            kept.push_back(std::move(info));
+        }
+    }
+
+    for (const auto& market : market_scope) {
+        HKU_WARN_IF(matched_markets.find(market) == matched_markets.end(),
+                    "No security found in the market {} of the load scope!", market);
+    }
+
+    // fmt requires lvalue arguments here
+    const size_t kept_count = kept.size();
+    HKU_INFO(htr("The load scope keeps {} of {} securities", kept_count, total));
+    stockInfos.swap(kept);
 }
 
 void StockManager::loadAllMarketInfos() {
@@ -1336,6 +1490,8 @@ void StockManager::loadAllStockWeights() {
     // addStock or newly constructed) are still handled by the on-demand lazy loading fallback of
     // Stock::getWeight.
     HKU_INFO(htr("Loading stock weight..."));
+    // The bulk collection is kept even with a load scope: the loop below only fills the registered
+    // securities, so the excluded markets cost a single wide read, not one query per security
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
         for (auto& item : all_stkweight_dict) {
