@@ -92,12 +92,16 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
         }
     }
 
-    // Rely on values.at to fail fast (a per-record data property); only enrich the message
+    // Skip records without the requested field; some reports lack fields that others provide
+    size_t cur_kix = start_pos;
+    size_t pos = 0;
     try {
-        size_t cur_kix = start_pos;
-        size_t pos = 0;
         while (pos < finances_total && cur_kix < total) {
-            auto value = finances[pos].values.at(field_ix);
+            if (field_ix < 0 || field_ix >= static_cast<int>(finances[pos].values.size())) {
+                pos++;
+                continue;
+            }
+            auto value = finances[pos].values[field_ix];
             if (pos + 1 == finances_total) {
                 while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime) {
                     if (dynamic) {
@@ -147,9 +151,9 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
             pos++;
         }
     } catch (const std::exception& e) {
-        HKU_THROW("FINANCE: failed to read field index {}! {}", field_ix, e.what());
+        HKU_THROW("FINANCE: failed to process the record at pos {}! {}", pos, e.what());
     } catch (...) {
-        HKU_THROW("FINANCE: failed to read field index {}! unknown error", field_ix);
+        HKU_THROW("FINANCE: failed to process the record at pos {}! unknown error", pos);
     }
 }
 
