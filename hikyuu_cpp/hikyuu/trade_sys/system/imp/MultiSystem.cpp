@@ -26,6 +26,9 @@ BOOST_CLASS_EXPORT(hku::MultiSystem)
 
 namespace hku {
 
+// The member trading-object bar look-ups (defined with the lag visibility helpers)
+static size_t barPosAt(const KData& to, const Datetime& date);
+
 MultiSystem::MultiSystem() : System() {
     _initAxisParam();
     // The default MM of the aggregate parent system is mode A (signal aggregation, the base
@@ -361,6 +364,11 @@ void MultiSystem::_reset() {
     m_open_trades_date = Datetime();
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
+    // The lag visibility runtime states restart with a fresh run
+    m_last_driven_bar.clear();
+    m_member_drive_cache.clear();
+    m_axis_history.clear();
+    m_member_lag.clear();
     // The one-shot notices must become visible again after a reset: the risks they report
     // (truncated injection, dropped pending batch, skipped net-short calibration) still apply
     m_open_pending_notified = false;
@@ -368,6 +376,7 @@ void MultiSystem::_reset() {
     m_short_reduce_warned = false;
     m_short_inject_warned = false;
     m_no_se_cycle_warned = false;
+    m_axis_rollback_warned = false;
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
     m_running_set.clear();
     m_running_order.clear();
@@ -424,12 +433,18 @@ void MultiSystem::_forceResetAll() {
     m_open_trades_date = Datetime();
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
+    // The lag visibility runtime states restart with a fresh run
+    m_last_driven_bar.clear();
+    m_member_drive_cache.clear();
+    m_axis_history.clear();
+    m_member_lag.clear();
     // The one-shot notices must become visible again after a full reset
     m_open_pending_notified = false;
     m_inject_truncated_notified = false;
     m_short_reduce_warned = false;
     m_short_inject_warned = false;
     m_no_se_cycle_warned = false;
+    m_axis_rollback_warned = false;
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
     m_running_set.clear();
     m_running_order.clear();
@@ -708,8 +723,10 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
 
     // The sub cash has been recycled before (trade_on_close=true), so the net assets measure the
     // holding value; with trade_on_close=false that recycle is skipped and the idle cash must be
-    // excluded too
-    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    // excluded too. The sub legs, the net assets and the quantity basis all use the member-visible
+    // time (see _subLegDate); the parent legs and their pricing stay at the axis day (decision 4)
+    Datetime sub_date = _subLegDate(sys, date);
+    FundsRecord funds = sub_tm->getFunds(sub_date, ktype);
     price_t sub_total = funds.net_assets();
     price_t reduce_base = m_trade_on_close ? sub_total : (sub_total - funds.cash);
     if (sys->isComposite()) {
@@ -746,7 +763,9 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     if (stock.isNull()) {
         return;
     }
-    price_t last_close_price = stock.getMarketValue(date, ktype);
+    // The shares convert in the same price basis as the net assets: the member-visible close, not
+    // the axis-day close the member has not seen yet
+    price_t last_close_price = stock.getMarketValue(sub_date, ktype);
     if (last_close_price <= 0.0) {
         return;  // The security is invalid (e.g. delisted), nothing to do
     }
@@ -754,7 +773,7 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     if (min_num <= 0.0) {
         return;
     }
-    PositionRecord position = sub_tm->getPosition(date, stock);
+    PositionRecord position = sub_tm->getPosition(sub_date, stock);
     double hold_num = position.number;
     if (hold_num <= 0.0) {
         return;
@@ -805,11 +824,11 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     // The sub-system sells on its own book, and the parent sells the same quantity immediately
     // (the master AF executed the reduction inside the sub account and recorded it in the total
     // account), so the freed cash is already in the parent pool when the injection phase runs
-    TradeRecord tr = sys->sellForceOnClose(date, need_back_num, PART_PORTFOLIO);
+    TradeRecord tr = sys->sellForceOnClose(sub_date, need_back_num, PART_PORTFOLIO);
     if (!tr.isNull()) {
-        FundsRecord f2 = sub_tm->getFunds(date, ktype);
+        FundsRecord f2 = sub_tm->getFunds(sub_date, ktype);
         if (f2.cash > 0.0) {
-            sub_tm->checkout(date, f2.cash);
+            sub_tm->checkout(sub_date, f2.cash);
         }
     }
     // The parent sells what its own book actually holds: asking for more than that would be
@@ -844,15 +863,17 @@ price_t MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& d
         return 0.0;
     }
 
-    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    // Below the quota: inject the cash gap (limited by the remaining free cash of the parent pool,
+    // so the sum of the injections within one rebalancing day never exceeds what the parent can
+    // actually fund -- the two books must stay matched). The quota cash lands at the
+    // member-visible time so the member sees and spends it on the shifted drive of this day
+    Datetime sub_date = _subLegDate(sys, date);
+    FundsRecord funds = sub_tm->getFunds(sub_date, ktype);
     price_t sub_total = funds.net_assets();
     if (sub_total >= quota || quota <= 0.0) {
         return 0.0;
     }
 
-    // Below the quota: inject the cash gap (limited by the remaining free cash of the parent pool,
-    // so the sum of the injections within one rebalancing day never exceeds what the parent can
-    // actually fund -- the two books must stay matched)
     price_t diff = quota - sub_total;
     if (diff > parent_cash_limit) {
         // The gap is truncated by the remaining parent cash: without a notice the under-funded
@@ -867,7 +888,7 @@ price_t MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& d
         diff = parent_cash_limit;
     }
     if (diff > 0.0) {
-        sub_tm->checkin(date, diff);
+        sub_tm->checkin(sub_date, diff);
         return diff;
     }
     return 0.0;
@@ -994,30 +1015,53 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                 retry.push_back(a);
                 continue;
             }
-            FundsRecord f = a.sys->getTM()->getFunds(date, ktype);
+            Datetime sub_date = _subLegDate(a.sys, date);
+            FundsRecord f = a.sys->getTM()->getFunds(sub_date, ktype);
             if (f.cash > 0.0) {
-                a.sys->getTM()->checkout(date, f.cash);
+                a.sys->getTM()->checkout(sub_date, f.cash);
             }
             continue;
         }
         // A sub leg is judged and capped by the initiating sub book, a parent leg by the parent
         // book (the parent side can only sell what the parent account actually holds)
-        TMPtr own_tm = (a.sys && a.sys->getTM()) ? a.sys->getTM() : m_tm;
-        price_t price = _getOpenPrice(date, a.stock);
+        const bool is_parent =
+          (a.kind == CalibrationKind::PARENT_SELL || a.kind == CalibrationKind::PARENT_COVER);
         const bool leg_is_buy =
           (a.kind == CalibrationKind::SUB_COVER || a.kind == CalibrationKind::PARENT_COVER);
-        // The parent derives the calibration legs from its own account: a bar it cannot trade is
-        // deferred like a missing quote
-        if (price <= 0.0 || !_isTradableAt(date, a.stock, leg_is_buy)) {
+        TMPtr own_tm = (a.sys && a.sys->getTM()) ? a.sys->getTM() : m_tm;
+        // The member-side leg lives on the member-visible time: it books, prices and judges on the
+        // same visible bar the member itself trades on at this open (the deferred leg is that
+        // member's own next visible open); the parent leg keeps the axis-day bar (decision 4)
+        const Datetime leg_date = is_parent ? date : _subLegDate(a.sys, date);
+        price_t price = 0.0;
+        bool tradable = false;
+        if (is_parent) {
+            price = _getOpenPrice(date, a.stock);
+            tradable = _isTradableAt(date, a.stock, leg_is_buy);
+        } else {
+            const KData to = a.sys ? a.sys->getTO() : KData();
+            const size_t pos = barPosAt(to, leg_date);
+            if (pos != Null<size_t>()) {
+                const KRecord& bar = to.getKRecord(pos);
+                price = bar.openPrice;
+                const KRecord* preday = pos == 0 ? nullptr : &to.getKRecord(pos - 1);
+                tradable = _isTradableBar(bar, preday, leg_is_buy);
+            } else {
+                // A leg stamped outside the member trading object (a replay clamp): fall back to
+                // the axis-day bar
+                price = _getOpenPrice(leg_date, a.stock);
+                tradable = _isTradableAt(leg_date, a.stock, leg_is_buy);
+            }
+        }
+        // A bar the leg cannot trade is deferred like a missing quote
+        if (price <= 0.0 || !tradable) {
             // No quote: the leg is left to the next session -- unless the holding is already gone
             // (e.g. the instrument was delisted and force-cleared while the leg waited): such a
             // dead leg would retry forever and block every future injection
-            const bool is_parent =
-              (a.kind == CalibrationKind::PARENT_SELL || a.kind == CalibrationKind::PARENT_COVER);
             const bool is_long =
               (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::PARENT_SELL);
             TMPtr judge_tm = is_parent ? m_tm : own_tm;
-            const double own = is_long ? judge_tm->getPosition(date, a.stock).number
+            const double own = is_long ? judge_tm->getPosition(leg_date, a.stock).number
                                        : judge_tm->getShortPosition(a.stock).number;
             if (own <= 0.0) {
                 continue;
@@ -1030,17 +1074,19 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                 continue;
             }
             TMPtr sub_tm = a.sys->getTM();
+            // The deferred sub legs book at the member-visible time and price the member's own
+            // visible open (see _subLegDate)
             if (a.kind == CalibrationKind::SUB_SELL) {
-                double num = std::min(a.number, sub_tm->getPosition(date, a.stock).number);
+                double num = std::min(a.number, sub_tm->getPosition(leg_date, a.stock).number);
                 if (num > 0.0) {
-                    sub_tm->sell(date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
+                    sub_tm->sell(leg_date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
                                  "MultiSystem");
                 }
             } else {
                 double num = std::min(a.number, sub_tm->getShortPosition(a.stock).number);
                 if (num > 0.0) {
-                    _topUpCoverCash(sub_tm, _mmAutoCheckin(a.sys), date, a.stock, price, num);
-                    sub_tm->buyShort(date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
+                    _topUpCoverCash(sub_tm, _mmAutoCheckin(a.sys), leg_date, a.stock, price, num);
+                    sub_tm->buyShort(leg_date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
                                      "MultiSystem");
                 }
             }
@@ -1127,8 +1173,10 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
     // Only the sub ledger is cleared: the cash checkout has no parent counterpart, the parent side
-    // is liquidated by its own sell (see the unselected handling), so the two books stay matched
-
+    // is liquidated by its own sell (see the unselected handling), so the two books stay matched.
+    // The direct legs book at the member-visible time (see _subLegDate); a composite book keeps the
+    // raw axis day (its leaves are shifted by the inner aggregate itself)
+    Datetime sub_date = _subLegDate(sys, date);
     Stock stock = sys->getStock();
     if (!m_trade_on_close) {
         // Defer to the next open: the legs of the whole rebalancing share one price basis
@@ -1200,10 +1248,11 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
                 deferred = true;
             }
         } else {
-            PositionRecord position = sub_tm->getPosition(date, stock);
+            // The gate reads the same stance the force sell would see (the member-visible time)
+            PositionRecord position = sub_tm->getPosition(sub_date, stock);
             // A long is sold and a short is covered (System::_sellForce flattens whichever side)
             if (position.number > 0.0 || sub_tm->getShortPosition(stock).number > 0.0) {
-                sys->sellForceOnClose(date, MAX_DOUBLE, PART_PORTFOLIO);
+                sys->sellForceOnClose(sub_date, MAX_DOUBLE, PART_PORTFOLIO);
             }
         }
     }
@@ -1211,9 +1260,9 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
         m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
         return;
     }
-    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    FundsRecord funds = sub_tm->getFunds(sub_date, ktype);
     if (funds.cash > 0.0) {
-        sub_tm->checkout(date, funds.cash);
+        sub_tm->checkout(sub_date, funds.cash);
     }
 }
 
@@ -2269,6 +2318,9 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     MomentResult result;
     HKU_IF_RETURN(!m_tm, result);
     result.datetime = datetime;
+    // The axis day is noted once per stage (the lag history, see _noteAxisDate), before any
+    // member drive decision of this day
+    _noteAxisDate(datetime);
     // The parent handles the delisted instruments uniformly at the open stage: force selling the
     // parent holdings
     TradeRecordList delist_trades = _forceSellDelisted(datetime);
@@ -2371,7 +2423,10 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     // day still has a valid ratio denominator.
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         if (m_sys_list[i]->getTM()) {
-            m_sub_funds_before[i] = m_sys_list[i]->getTM()->getFunds(datetime, ktype);
+            // The member-visible time: a snapshot at the axis day would advance the member holdings
+            // through the corporate actions of a day it has not seen yet
+            m_sub_funds_before[i] =
+              m_sys_list[i]->getTM()->getFunds(_subLegDate(m_sys_list[i], datetime), ktype);
         }
     }
 
@@ -2402,7 +2457,7 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         if (i == Null<size_t>()) {
             continue;
         }
-        MomentResult sub = sys->runMomentOnOpen(datetime);
+        MomentResult sub = _driveMemberOnOpen(sys, datetime);
         for (auto& tr : sub.tradesOnOpen) {
             m_open_trades[i].push_back(tr);
             if (mode_c) {
@@ -2472,6 +2527,9 @@ MomentResult MultiSystem::runMomentOnClose(const Datetime& datetime) {
 
 TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     KQuery::KType ktype = m_kdata.getQuery().kType();
+    // The axis day is noted once per stage (the lag history, see _noteAxisDate), before any
+    // member drive decision of this day
+    _noteAxisDate(datetime);
     TradeSuggestionList suggestions;
     SubSystemContextList contexts;
 
@@ -2507,7 +2565,10 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         KQuery::KType kt = m_kdata.getQuery().kType();
         for (size_t i = 0; i < m_sys_list.size(); ++i) {
             if (m_sys_list[i]->getTM()) {
-                m_sub_funds_before[i] = m_sys_list[i]->getTM()->getFunds(datetime, kt);
+                // The member-visible time: a snapshot at the axis day would advance the member
+                // holdings through the corporate actions of a day it has not seen yet
+                m_sub_funds_before[i] =
+                  m_sys_list[i]->getTM()->getFunds(_subLegDate(m_sys_list[i], datetime), kt);
             }
         }
     }
@@ -2722,9 +2783,12 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 if (m_trade_on_close) {
                     TMPtr sub_tm = sys->getTM();
                     if (sub_tm) {
-                        FundsRecord funds = sub_tm->getFunds(datetime, ktype);
+                        // The recycle books at the member-visible time, so the member's own fills
+                        // at the shifted drive of this day stay monotonic (see _subLegDate)
+                        Datetime sub_date = _subLegDate(sys, datetime);
+                        FundsRecord funds = sub_tm->getFunds(sub_date, ktype);
                         if (funds.cash > 0.0) {
-                            sub_tm->checkout(datetime, funds.cash);
+                            sub_tm->checkout(sub_date, funds.cash);
                         }
                     }
                 }
@@ -2862,7 +2926,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             continue;
         }
 
-        MomentResult sub = sys->runMomentOnClose(datetime);
+        MomentResult sub = _driveMemberOnClose(sys, datetime);
         // The sub-system decision may be reflected in the open trade (the delayed buy) or the close
         // trade (the immediate buy/sell), it is merged and translated into the parent suggestion
         // (mode A/B share this glue). The open buffer is consumed once merged, to avoid the
@@ -2990,7 +3054,7 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
     std::vector<MomentResult> sub_results(m_sys_list.size());
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         SystemPtr& sys = m_sys_list[i];
-        sub_results[i] = sys->runMomentOnClose(datetime);
+        sub_results[i] = _driveMemberOnClose(sys, datetime);
     }
 
     if (!is_adjust) {
@@ -3740,6 +3804,254 @@ KData MultiSystem::_getStockKData(const Stock& stock) {
     return kdata;
 }
 
+void MultiSystem::_noteAxisDate(const Datetime& date) {
+    // The axis days are normalized to the day stamp, so the intraday drives of one session cannot
+    // append twice; a same-day re-drive (the live replay) reuses the history as is
+    Datetime day = date.startOfDay();
+    HKU_IF_RETURN(day.isNull(), void());
+    if (!m_axis_history.empty()) {
+        HKU_IF_RETURN(day == m_axis_history.back(), void());
+        if (day < m_axis_history.back()) {
+            // An out-of-order axis: keeping the history would make the size-1-lag target point
+            // after the current day (a future bar); rebuild it from this day instead (once warned).
+            // The drive decisions and the frozen gates of the dropped days go with it: a replay
+            // needs a reset, the member books are past those days already
+            if (!m_axis_rollback_warned) {
+                m_axis_rollback_warned = true;
+                HKU_WARN(
+                  "{}: the driving axis went back to {} (last day {})! Rebuilding the lag history "
+                  "(reset the system to replay an earlier range; without it the replayed fills of "
+                  "the lag members are dropped)",
+                  name(), day, m_axis_history.back());
+            }
+            m_axis_history.clear();
+            m_member_drive_cache.clear();
+            m_last_driven_bar.clear();
+        }
+    }
+    m_axis_history.push_back(day);
+    // The history only needs to reach back to the largest member lag; re-measure the cap lazily so
+    // members added after the run started are covered as well
+    size_t cap = static_cast<size_t>(_maxMemberLag()) + 1;
+    while (m_axis_history.size() > cap) {
+        m_axis_history.pop_front();
+    }
+}
+
+/** The data_lag of the member market in trading days, resolved once and cached; the shared
+ *  resolution keeps the axis-history cap and the drive-date target lookup from ever diverging.
+ *  Precondition: sys is non-null and its stock is not null (both call sites guard this) */
+int MultiSystem::_memberLagOf(const SystemPtr& sys) {
+    auto iter = m_member_lag.find(sys.get());
+    if (iter != m_member_lag.end()) {
+        return iter->second;
+    }
+    MarketInfo info = StockManager::instance().getMarketInfo(sys->getStock().market());
+    int lag = info == Null<MarketInfo>() ? 0 : info.dataLag();
+    if (lag < 0) {
+        lag = 0;
+    }
+    m_member_lag.emplace(sys.get(), lag);
+    return lag;
+}
+
+/** The latest bar of the member trading object at or before the target (Null when there is none) */
+static Datetime latestBarAtOrBefore(const KData& to, const Datetime& target) {
+    if (to.empty()) {
+        return Datetime();
+    }
+    auto const* ks = to.data();
+    size_t lo = 0;
+    size_t hi = to.size();
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (ks[mid].datetime <= target) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    return lo > 0 ? ks[lo - 1].datetime : Datetime();
+}
+
+/** The position of the bar exactly at the date (Null when the trading object has no such bar) */
+static size_t barPosAt(const KData& to, const Datetime& date) {
+    if (to.empty()) {
+        return Null<size_t>();
+    }
+    auto const* ks = to.data();
+    size_t lo = 0;
+    size_t hi = to.size();
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (ks[mid].datetime < date) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    return (lo < to.size() && ks[lo].datetime == date) ? lo : Null<size_t>();
+}
+
+int MultiSystem::_maxMemberLag() {
+    int max_lag = 0;
+    for (const auto& sys : m_sys_list) {
+        // A nested aggregate has no instrument of its own: it shifts its own leaves recursively
+        if (!sys || sys->isComposite()) {
+            continue;
+        }
+        if (sys->getStock().isNull()) {
+            continue;
+        }
+        int lag = _memberLagOf(sys);
+        if (lag > max_lag) {
+            max_lag = lag;
+        }
+    }
+    return max_lag;
+}
+
+Datetime MultiSystem::_memberDriveDate(const SystemPtr& sys, const Datetime& date) {
+    // The mode C members trade on the shared account of the parent, which cannot book at the
+    // member-visible time (the TM datetime monotonicity), so they keep the raw axis day
+    HKU_IF_RETURN(getMode() == "C", date);
+    // A nested aggregate is driven at the raw axis day: it shifts its own leaves recursively (its
+    // own instrument, when one is set, must not shift it a second time)
+    HKU_IF_RETURN(!sys || sys->isComposite() || sys->getStock().isNull(), date);
+    // Only the daily (or above) axes take the lag: the minute axes are tz-unified instead. The
+    // ktype is resolved once (the lookup warns on unknown names and must not repeat per member)
+    const KQuery::KType ktype = m_kdata.getQuery().kType();
+    if (ktype != m_lag_axis_ktype) {
+        m_lag_axis_ktype = ktype;
+        m_lag_axis_daily_plus = KQuery::getKTypeInSeconds(ktype) >= 86400;
+    }
+    HKU_IF_RETURN(!m_lag_axis_daily_plus, date);
+
+    // The decision is cached per axis day (normalized to the day stamp, so the open at one
+    // intraday time and the close at another still share one decision); the open drive cannot
+    // consume the "new bar" gate of the close stage on the same day
+    const Datetime day = date.startOfDay();
+    auto cache_iter = m_member_drive_cache.find(sys.get());
+    if (cache_iter != m_member_drive_cache.end() && cache_iter->second.first == day) {
+        return cache_iter->second.second;
+    }
+
+    int lag = _memberLagOf(sys);
+
+    Datetime v;
+    if (lag > 0) {
+        // The target is the axis day lag trading days before the given day; without enough history
+        // the member has no visible bar yet
+        if (static_cast<size_t>(lag) < m_axis_history.size()) {
+            const Datetime& target = m_axis_history[m_axis_history.size() - 1 - lag];
+            v = latestBarAtOrBefore(sys->getTO(), target);
+        }
+    } else {
+        // lag == 0: the raw axis day (the leaf itself no-ops on a day without its bar)
+        v = date;
+    }
+
+    // The frozen gate: no new visible bar since the last drive -> skip this axis day. The gate is
+    // committed by the drive itself (see _driveMemberOnOpen/Close), so a look-up of the leg date
+    // cannot mark a member that is not driven today as already driven
+    if (!v.isNull()) {
+        auto driven_iter = m_last_driven_bar.find(sys.get());
+        if (driven_iter != m_last_driven_bar.end() && driven_iter->second == v) {
+            v = Datetime();
+        }
+    }
+    m_member_drive_cache[sys.get()] = std::make_pair(day, v);
+    return v;
+}
+
+bool MultiSystem::_containsMember(const SystemPtr& sys) const {
+    if (!sys) {
+        return false;
+    }
+    for (const auto& member : m_sys_list) {
+        if (member == sys) {
+            return true;
+        }
+        auto* ms = dynamic_cast<MultiSystem*>(member.get());
+        if (ms && ms->_containsMember(sys)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+MultiSystem* MultiSystem::_memberAggregate(const SystemPtr& sys) {
+    if (!sys) {
+        return nullptr;
+    }
+    for (const auto& member : m_sys_list) {
+        if (member == sys) {
+            return nullptr;
+        }
+    }
+    for (const auto& member : m_sys_list) {
+        auto* ms = dynamic_cast<MultiSystem*>(member.get());
+        if (ms && ms->_containsMember(sys)) {
+            return ms;
+        }
+    }
+    return nullptr;
+}
+
+Datetime MultiSystem::_subLegDate(const SystemPtr& sys, const Datetime& date) {
+    // A leaf of a nested aggregate books at the time its own aggregate drives it: the outer clear
+    // legs must not sit after the inner drive. The owner's history must include this day first
+    if (auto* owner = _memberAggregate(sys)) {
+        owner->_noteAxisDate(date);
+        return owner->_subLegDate(sys, date);
+    }
+    Datetime v = _memberDriveDate(sys, date);
+    if (!v.isNull()) {
+        return v;
+    }
+    auto iter = m_last_driven_bar.find(sys.get());
+    if (iter != m_last_driven_bar.end()) {
+        return iter->second;
+    }
+    // The warm-up days (the axis history is not deep enough for a drive yet): book at the bar the
+    // first drive will use, never at the raw day, or that drive of a member closed on this day
+    // (v < the raw day) would be rejected by the member book's datetime monotonicity
+    if (sys) {
+        const KData to = sys->getTO();
+        if (!to.empty()) {
+            Datetime leg;
+            if (!m_axis_history.empty()) {
+                leg = latestBarAtOrBefore(to, m_axis_history.front());
+            }
+            if (leg.isNull()) {
+                leg = to.getKRecord(0).datetime;
+            }
+            TMPtr tm = sys->getTM();
+            if (tm && !tm->lastDatetime().isNull() && leg < tm->lastDatetime()) {
+                leg = tm->lastDatetime();
+            }
+            return leg;
+        }
+    }
+    return date;
+}
+
+MomentResult MultiSystem::_driveMemberOnOpen(const SystemPtr& sys, const Datetime& date) {
+    Datetime v = _memberDriveDate(sys, date);
+    HKU_IF_RETURN(v.isNull(), MomentResult());
+    // The drive commits the frozen gate: only a member that really ran on this bar is marked
+    m_last_driven_bar[sys.get()] = v;
+    return sys->runMomentOnOpen(v);
+}
+
+MomentResult MultiSystem::_driveMemberOnClose(const SystemPtr& sys, const Datetime& date) {
+    Datetime v = _memberDriveDate(sys, date);
+    HKU_IF_RETURN(v.isNull(), MomentResult());
+    // The drive commits the frozen gate: only a member that really ran on this bar is marked
+    m_last_driven_bar[sys.get()] = v;
+    return sys->runMomentOnClose(v);
+}
+
 price_t MultiSystem::_getClosePrice(const Datetime& date, const Stock& stock) {
     if (stock.isNull()) {
         return 0.0;
@@ -3903,13 +4215,17 @@ void MultiSystem::_clearDelistedInSubTree(const SystemPtr& sys, const Stock& sto
     }
     TMPtr tm = sys->getTM();
     if (tm && tm != m_tm) {
-        if (tm->getPosition(date, stock).number > 0.0) {
-            tm->sell(date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
+        // The member-side legs book at the member-visible time: this runs before the same-day
+        // drive, which is shifted before the raw day (see _subLegDate)
+        Datetime sub_date = _subLegDate(sys, date);
+        if (tm->getPosition(sub_date, stock).number > 0.0) {
+            tm->sell(sub_date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
         }
         double short_num = tm->getShortPosition(stock).number;
         if (short_num > 0.0) {
-            _topUpCoverCash(tm, _mmAutoCheckin(sys), date, stock, price, short_num);
-            tm->buyShort(date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
+            _topUpCoverCash(tm, _mmAutoCheckin(sys), sub_date, stock, price, short_num);
+            tm->buyShort(sub_date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO,
+                         "DELIST");
         }
     }
     for (auto& sub : sys->getSubSystemList()) {
@@ -3930,14 +4246,21 @@ void MultiSystem::setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date,
     //   the sub-system reduces the position itself, a warning is recorded here)
     // The aggregate sub-system (nested) also triggers its internal allocation by adjusting the
     // net assets of its virtual account (quota penetration).
+    // Inside the driven axis day the legs book at the member-visible time, the same decision the
+    // member had today (see _subLegDate), so the next drive cannot sit before them; an external
+    // call outside the axis keeps the raw day
     KQuery::KType ktype = m_kdata.getQuery().kType();
     if (ktype.empty()) {
         ktype = KQuery::DAY;
     }
-    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    Datetime sub_date = date;
+    if (!date.isNull() && !m_axis_history.empty() && m_axis_history.back() == date.startOfDay()) {
+        sub_date = _subLegDate(sub_sys, date);
+    }
+    FundsRecord funds = sub_tm->getFunds(sub_date, ktype);
     price_t diff = quota - funds.net_assets();
     if (diff > 0.0) {
-        sub_tm->checkin(date, diff);
+        sub_tm->checkin(sub_date, diff);
     } else if (diff < 0.0) {
         // The quota reduction needs free cash; when the sub-system is fully invested it cannot
         // return the cash itself (it would have to reduce the position on its own). Keep the
@@ -3950,7 +4273,7 @@ void MultiSystem::setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date,
               -diff, funds.cash, sub_sys->name());
             return;
         }
-        sub_tm->checkout(date, -diff);
+        sub_tm->checkout(sub_date, -diff);
     }
 }
 

@@ -178,9 +178,10 @@ def run_acceptance():
     check("tz_source", restored.tz_offset_min == -300 and restored.dst_rule == 1
           and restored.market == "NASDAQ", "pickle roundtrip lost the tz columns")
 
-    # Day look-back: data_lag is declarative, the library does not hide bars; the last bar
-    # at "axis day - lag" is the previous trading day; raw data still holds the axis-day
-    # bar (look-ahead boundary)
+    # Day look-back: data_lag is consumed by the MultiSystem portfolio layer (the member drives
+    # at the last bar at or before the axis day shifted back by the lag trading days); the raw
+    # KData of a single Stock still holds the axis-day bar (the look-ahead boundary for direct
+    # single-System users)
     ndx = sm["NASDAQNDX"]
     ndx_bars = ndx.get_kdata(Query(0, ndx.get_count("DAY"), "DAY"))
     lag = sm.get_market_info("NASDAQ").data_lag

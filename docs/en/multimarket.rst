@@ -36,12 +36,20 @@ Unified Time Expression
   time on entry, and the bar datetimes are normalized to the unified expression on exit;
   ``MarketInfo.isUnifiedClock()`` (timezone +480 without DST) is the identity fast path;
   ``KQuery.isIntradayKType()`` decides which ktypes participate in the conversion.
-- Day-frequency cross-market alignment is by trading-day labels: ``data_lag`` is a
-  declarative field (US / forex = 1, A-share / futures / HK = 0) and the library does
-  **not** shift bars automatically; the strategy layer must look back and take the last
-  bar whose label is ≤ axis day − ``data_lag``. Otherwise the US / forex T-day close
-  becomes visible on base-axis day T — one-sided look-ahead (the portfolio-level lag
-  shift is tracked as a separate work item).
+- Day-frequency cross-market alignment is by trading-day labels: ``data_lag`` (US / forex = 1,
+  A-share / futures / HK = 0) is handled by the library at the portfolio layer — ``MultiSystem``
+  truncates the member visibility on the daily (or above) axis to the last bar whose label is
+  ≤ the axis day shifted back by ``data_lag`` trading days, so the US / forex T-day close becomes
+  visible and executable no earlier than base-axis day T+1. On an axis day where the member market
+  is closed the portfolio still proceeds and the member stays frozen at its last visible close
+  (mode C shared account excluded: its members keep the raw axis-day driving). On the first
+  ``data_lag`` axis days the history is not deep enough and the lagged member is not driven (its
+  shadow-book legs book at the first visible bar instead, so they never sit after the first drive).
+  Used directly on a
+  single ``System``, ``data_lag`` remains a declarative field and the strategy layer must look
+  back itself, otherwise the US / forex T-day close becomes visible on base-axis day T — one-sided
+  look-ahead. The minute-level ktypes never take ``data_lag`` (the timezone unification covers
+  them).
 
 Dimension Conventions
 ---------------------

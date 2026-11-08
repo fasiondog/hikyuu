@@ -29,6 +29,8 @@
 
 #include "../../test_config.h"
 #include <limits>
+#include <algorithm>
+#include <set>
 #include <unordered_map>
 #include <type_traits>
 #include <hikyuu/StockManager.h>
@@ -7687,6 +7689,506 @@ TEST_CASE("test_MultiSystem_is_tradable_bar_by_side") {
 
     /** @arg a one-price bar without a previous bar is left to the next session */
     CHECK_UNARY(!ms.probeTradable(board_up, nullptr, false));
+}
+
+// ============================================================================
+// MultiSystem data_lag visibility (M-B: the member drives at its visible bar)
+// ============================================================================
+
+/** A buy signal on every bar (with the signal alternate state off): one drive per new visible bar
+ *  then buys on every driven bar exactly once, so the trade datetimes expose the driven bars one
+ *  to one regardless of the bar parity */
+class EveryBarBuySignal : public SignalBase {
+public:
+    EveryBarBuySignal() : SignalBase("EveryBarBuySignal") {}
+
+    SignalPtr _clone() override {
+        return std::make_shared<EveryBarBuySignal>();
+    }
+
+    void _calculate(const KData& kdata) override {
+        for (size_t i = 0; i < kdata.size(); ++i) {
+            _addBuySignal(kdata.getKRecord(i).datetime);
+        }
+    }
+};
+
+static SYSPtr create_lag_probe_sys(const Stock& stk, const KQuery& query) {
+    auto sg = SignalPtr(new EveryBarBuySignal());
+    sg->setParam<bool>("alternate", false);  // A one-way probe: the buy on every bar must not be
+                                             // suppressed by the signal alternation state
+    auto sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000000.0), MM_FixedCount(10),
+                          EnvironmentPtr(), ConditionPtr(), sg);
+    // @note under a MultiSystem the aggregate's readyForRun rewrites these delays from its own
+    // trade_on_close (default true), so the fills land on the driven bar's close
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setStock(stk);
+    sys->setTO(stk.getKData(query));
+    return sys;
+}
+
+/** The lag fixtures rely on the NYSE data_lag = 1 registered in the market table: a rebuilt test
+ *  library without it would fail the sequence assertions with a misleading message */
+static void require_nyse_lag_one() {
+    REQUIRE_EQ(StockManager::instance().getMarketInfo("NYSE").dataLag(), 1);
+}
+
+/** Simulate the lag visibility rule on the axis: the member is driven at the latest bar at or
+ *  before the axis day lag trading days back, and only when that bar is new */
+static DatetimeList simulateDrivenBars(const DatetimeList& axis, const DatetimeList& bars,
+                                       int lag) {
+    DatetimeList driven;
+    Datetime last;
+    for (size_t i = 0; i < axis.size(); ++i) {
+        Datetime v;
+        if (lag == 0) {
+            // Mirror the implementation: the lag=0 member is driven at the raw axis day and the
+            // leaf only fills when it has a bar exactly there (an off-axis bar is never seen)
+            if (std::binary_search(bars.begin(), bars.end(), axis[i])) {
+                v = axis[i];
+            }
+        } else if (static_cast<size_t>(lag) <= i) {
+            const Datetime& target = axis[i - lag];
+            for (const auto& dt : bars) {
+                if (dt > target) {
+                    break;
+                }
+                v = dt;
+            }
+        }
+        if (!v.isNull() && v != last) {
+            driven.push_back(v);
+            last = v;
+        }
+    }
+    return driven;
+}
+
+static DatetimeList tradeDatesOf(const SystemPtr& sys, const Stock& stk) {
+    // Only the probe buys: one buy per driven bar, so the sequence mirrors the driven bars; the
+    // calibration force-sells can land on the same visible bar and would skew the count
+    DatetimeList result;
+    for (const auto& tr : sys->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk) {
+            result.push_back(tr.datetime);
+        }
+    }
+    return result;
+}
+
+/** @par Check point (M-B): the member with data_lag is driven at its visible bar (the axis day lag
+ *  trading days back), never at the current axis day bar; the lag=0 member keeps the raw axis-day
+ *  driving. Carrier: SH000001 (lag 0) + NYSEDJI (NYSE, lag 1), the fixture overlap window with the
+ *  US holidays (Jul 5 / Sep 6 2010) falling on SH trading days */
+TEST_CASE("test_MultiSystem_data_lag_visibility") {
+    require_nyse_lag_one();
+    auto& sm = StockManager::instance();
+    Stock sh = getStock("sh000001");
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!sh.isNull());
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100601), Datetime(20101001));
+
+    DatetimeList axis = sm.getTradingCalendar(query);
+    REQUIRE_UNARY(!axis.empty());
+    DatetimeList sh_dates;
+    KData sh_kdata = sh.getKData(query);
+    for (size_t i = 0; i < sh_kdata.size(); ++i) {
+        sh_dates.push_back(sh_kdata.getKRecord(i).datetime);
+    }
+    DatetimeList dji_dates;
+    KData dji_kdata = dji.getKData(query);
+    REQUIRE_GT(dji_kdata.size(), 10);
+    for (size_t i = 0; i < dji_kdata.size(); ++i) {
+        dji_dates.push_back(dji_kdata.getKRecord(i).datetime);
+    }
+
+    auto ms = std::make_shared<MultiSystem>("ms_lag");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setSubInitCash(100000000.0);
+    auto sys_sh = create_lag_probe_sys(sh, query);
+    auto sys_dji = create_lag_probe_sys(dji, query);
+    ms->add(sys_sh);
+    ms->add(sys_dji);
+    ms->run(query);
+
+    /** @arg the lag=1 member is driven exactly at the visible bars (the latest bar at or before the
+     *  previous axis day), never at the current axis day bar; the first axis day has no visible bar
+     *  yet and the US-closed axis days (Jul 5 / Sep 6 2010) freeze the member */
+    DatetimeList expected_dji = simulateDrivenBars(axis, dji_dates, 1);
+    DatetimeList dji_trades = tradeDatesOf(sys_dji, dji);
+    REQUIRE_EQ(dji_trades.size(), expected_dji.size());
+    for (size_t i = 0; i < expected_dji.size(); ++i) {
+        CHECK_EQ(dji_trades[i], expected_dji[i]);
+    }
+
+    /** @arg the lag=0 member keeps the raw axis-day driving (every axis day) */
+    DatetimeList expected_sh = simulateDrivenBars(axis, sh_dates, 0);
+    DatetimeList sh_trades = tradeDatesOf(sys_sh, sh);
+    REQUIRE_EQ(sh_trades.size(), expected_sh.size());
+    for (size_t i = 0; i < expected_sh.size(); ++i) {
+        CHECK_EQ(sh_trades[i], expected_sh[i]);
+    }
+}
+
+/** @par Check point (M-B): mode C keeps the raw axis-day driving (the decided capability
+ *  boundary: a shared account cannot book at the member time without violating the TM datetime
+ *  monotonicity), so the lag=1 member is driven at the current axis day bar when it exists */
+TEST_CASE("test_MultiSystem_data_lag_mode_c_boundary") {
+    require_nyse_lag_one();
+    Stock sh = getStock("sh000001");
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!sh.isNull());
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100601), Datetime(20101001));
+
+    auto& sm = StockManager::instance();
+    DatetimeList axis = sm.getTradingCalendar(query);
+    REQUIRE_UNARY(!axis.empty());
+    DatetimeList dji_dates;
+    KData dji_kdata = dji.getKData(query);
+    REQUIRE_GT(dji_kdata.size(), 10);
+    for (size_t i = 0; i < dji_kdata.size(); ++i) {
+        dji_dates.push_back(dji_kdata.getKRecord(i).datetime);
+    }
+
+    auto ms = std::make_shared<MultiSystem>("ms_lag_c");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setMode("C");
+    ms->add(create_lag_probe_sys(sh, query));
+    auto sys_dji = create_lag_probe_sys(dji, query);
+    ms->add(sys_dji);
+    ms->run(query);
+
+    /** @arg the DJI member trades on every axis day that has a DJI bar, including the first axis
+     *  day (in contrast to the mode A lag shift which skips it) */
+    std::set<Datetime> dji_set(dji_dates.begin(), dji_dates.end());
+    DatetimeList expected;
+    for (const auto& d : axis) {
+        if (dji_set.count(d) > 0) {
+            expected.push_back(d);
+        }
+    }
+    DatetimeList dji_trades = tradeDatesOf(sys_dji, dji);
+    REQUIRE_EQ(dji_trades.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        CHECK_EQ(dji_trades[i], expected[i]);
+    }
+}
+
+/** @par Check point (M-B): on the NYSE calendar axis the NYSE-unique days (SH closed, e.g. the CN
+ *  National Day week 2010) proceed normally: the SH member gets no bar and produces no trade
+ *  (frozen), while the DJI member keeps the lag shift; nothing errors out */
+TEST_CASE("test_MultiSystem_data_lag_freeze_on_unique_days") {
+    require_nyse_lag_one();
+    auto& sm = StockManager::instance();
+    Stock sh = getStock("sh000001");
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!sh.isNull());
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100920), Datetime(20101018));
+
+    DatetimeList axis = sm.getTradingCalendar(query, "NYSE");
+    REQUIRE_GT(axis.size(), 8);
+    DatetimeList sh_dates;
+    KData sh_kdata = sh.getKData(query);
+    for (size_t i = 0; i < sh_kdata.size(); ++i) {
+        sh_dates.push_back(sh_kdata.getKRecord(i).datetime);
+    }
+    DatetimeList dji_dates;
+    KData dji_kdata = dji.getKData(query);
+    REQUIRE_GT(dji_kdata.size(), 8);
+    for (size_t i = 0; i < dji_kdata.size(); ++i) {
+        dji_dates.push_back(dji_kdata.getKRecord(i).datetime);
+    }
+
+    auto ms = std::make_shared<MultiSystem>("ms_lag_nyse");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setSubInitCash(100000000.0);
+    auto sys_sh = create_lag_probe_sys(sh, query);
+    auto sys_dji = create_lag_probe_sys(dji, query);
+    ms->add(sys_sh);
+    ms->add(sys_dji);
+    ms->setAxisMode("calendar");
+    ms->setDateAxis(axis);
+    ms->run(query);
+
+    /** @arg the SH member only trades on the axis days where SH has a bar; the NYSE-unique days
+     *  (the CN holiday week Oct 1-7) produce no SH trade */
+    DatetimeList expected_sh = simulateDrivenBars(axis, sh_dates, 0);
+    DatetimeList sh_trades = tradeDatesOf(sys_sh, sh);
+    REQUIRE_EQ(sh_trades.size(), expected_sh.size());
+    for (size_t i = 0; i < expected_sh.size(); ++i) {
+        CHECK_EQ(sh_trades[i], expected_sh[i]);
+    }
+
+    /** @arg the DJI member keeps the lag on the NYSE axis (driven from the second axis day on) */
+    DatetimeList expected_dji = simulateDrivenBars(axis, dji_dates, 1);
+    DatetimeList dji_trades = tradeDatesOf(sys_dji, dji);
+    REQUIRE_EQ(dji_trades.size(), expected_dji.size());
+    for (size_t i = 0; i < expected_dji.size(); ++i) {
+        CHECK_EQ(dji_trades[i], expected_dji[i]);
+    }
+}
+
+/** @par Check point (M-B review): mode B quota calibration legs book on the shadow account at the
+ *  member-visible time, so the lag=1 member keeps every driven-bar fill on the rebalancing days
+ *  (before the fix the axis-day bookings tripped the sub book's datetime monotonicity and silently
+ *  dropped them); the parent keeps the axis-day bookings */
+TEST_CASE("test_MultiSystem_data_lag_mode_b_calibration") {
+    require_nyse_lag_one();
+    auto& sm = StockManager::instance();
+    Stock sh = getStock("sh000001");
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!sh.isNull());
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100601), Datetime(20101001));
+
+    DatetimeList axis = sm.getTradingCalendar(query);
+    REQUIRE_UNARY(!axis.empty());
+    DatetimeList sh_dates;
+    KData sh_kdata = sh.getKData(query);
+    for (size_t i = 0; i < sh_kdata.size(); ++i) {
+        sh_dates.push_back(sh_kdata.getKRecord(i).datetime);
+    }
+    DatetimeList dji_dates;
+    KData dji_kdata = dji.getKData(query);
+    REQUIRE_GT(dji_kdata.size(), 10);
+    for (size_t i = 0; i < dji_kdata.size(); ++i) {
+        dji_dates.push_back(dji_kdata.getKRecord(i).datetime);
+    }
+
+    auto sys_sh = create_lag_probe_sys(sh, query);
+    auto sys_dji = create_lag_probe_sys(dji, query);
+    auto ms = std::make_shared<MultiSystem>("ms_lag_b");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{sys_sh, sys_dji}));
+    ms->setAF(AF_EqualWeight());
+    ms->setAdjustCycle(2);  // every second axis day is a rebalancing day with calibration legs
+    ms->setTradeOnClose(true);
+    ms->add(sys_sh);
+    ms->add(sys_dji);
+    ms->run(query);
+
+    /** @arg the lag=1 member still fills on every driven bar, the rebalancing days included */
+    DatetimeList expected_dji = simulateDrivenBars(axis, dji_dates, 1);
+    REQUIRE_UNARY(expected_dji.size() > 10);
+    DatetimeList dji_trades = tradeDatesOf(sys_dji, dji);
+    REQUIRE_EQ(dji_trades.size(), expected_dji.size());
+    for (size_t i = 0; i < expected_dji.size(); ++i) {
+        CHECK_EQ(dji_trades[i], expected_dji[i]);
+    }
+
+    /** @arg the lag=0 member is unaffected (the bookings stay at the raw axis day as before) */
+    DatetimeList expected_sh = simulateDrivenBars(axis, sh_dates, 0);
+    DatetimeList sh_trades = tradeDatesOf(sys_sh, sh);
+    REQUIRE_EQ(sh_trades.size(), expected_sh.size());
+    for (size_t i = 0; i < expected_sh.size(); ++i) {
+        CHECK_EQ(sh_trades[i], expected_sh[i]);
+    }
+
+    /** @arg the mode B machinery really ran: the parent mirrored the lag member's buys */
+    size_t parent_dji_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == dji) {
+            parent_dji_buys++;
+        }
+    }
+    CHECK_UNARY(parent_dji_buys > 0);
+}
+
+/** @par Check point (M-B review): the warm-up days (no axis history depth, the member never
+ *  driven yet) book the shadow legs at the first visible bar, not at the raw axis day; before the
+ *  fix the raw-day booking made the first drive (v < the raw day on a member holiday) get silently
+ *  dropped by the sub book's datetime monotonicity. Fixture: the run starts on 2010-07-05, a SH
+ *  trading day on which NYSE is closed (the observed Independence Day), and the member trading
+ *  object extends before the run axis, so the first DJI drive is the 2010-07-02 bar */
+TEST_CASE("test_MultiSystem_data_lag_mode_b_warmup") {
+    require_nyse_lag_one();
+    auto& sm = StockManager::instance();
+    Stock sh = getStock("sh000001");
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!sh.isNull());
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100705), Datetime(20101001));
+    // The member trading object of the lag member extends before the run axis (the common real
+    // setup: the sub-system is prepared with its own wider query and is not re-clipped by the run)
+    KQuery wide_query(Datetime(20100501), Datetime(20101001));
+
+    DatetimeList axis = sm.getTradingCalendar(query);
+    REQUIRE_UNARY(!axis.empty());
+    DatetimeList sh_dates;
+    KData sh_kdata = sh.getKData(query);
+    for (size_t i = 0; i < sh_kdata.size(); ++i) {
+        sh_dates.push_back(sh_kdata.getKRecord(i).datetime);
+    }
+    DatetimeList dji_dates;
+    KData dji_kdata = dji.getKData(wide_query);
+    REQUIRE_GT(dji_kdata.size(), 10);
+    for (size_t i = 0; i < dji_kdata.size(); ++i) {
+        dji_dates.push_back(dji_kdata.getKRecord(i).datetime);
+    }
+
+    /** @arg the fixture really starts on a US market holiday: no DJI bar on the first axis day */
+    REQUIRE_EQ(axis[0], Datetime(20100705));
+    CHECK_UNARY(!std::binary_search(dji_dates.begin(), dji_dates.end(), axis[0]));
+
+    auto sys_sh = create_lag_probe_sys(sh, query);
+    auto sys_dji = create_lag_probe_sys(dji, wide_query);
+    auto ms = std::make_shared<MultiSystem>("ms_lag_warmup");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{sys_sh, sys_dji}));
+    ms->setAF(AF_EqualWeight());
+    ms->setAdjustCycle(2);
+    ms->setTradeOnClose(true);
+    ms->add(sys_sh);
+    ms->add(sys_dji);
+    ms->run(query);
+
+    /** @arg the warm-up legs of the lag=1 member are booked at its first visible bar (before the
+     *  axis start day), so the first drive keeps its fill and the sequence matches the shift */
+    DatetimeList expected_dji = simulateDrivenBars(axis, dji_dates, 1);
+    REQUIRE_UNARY(expected_dji.size() > 10);
+    CHECK_UNARY(expected_dji[0] < axis[0]);
+    DatetimeList dji_trades = tradeDatesOf(sys_dji, dji);
+    REQUIRE_EQ(dji_trades.size(), expected_dji.size());
+    for (size_t i = 0; i < expected_dji.size(); ++i) {
+        CHECK_EQ(dji_trades[i], expected_dji[i]);
+    }
+
+    /** @arg the lag=0 member is unaffected by the warm-up handling */
+    DatetimeList expected_sh = simulateDrivenBars(axis, sh_dates, 0);
+    DatetimeList sh_trades = tradeDatesOf(sys_sh, sh);
+    REQUIRE_EQ(sh_trades.size(), expected_sh.size());
+    for (size_t i = 0; i < expected_sh.size(); ++i) {
+        CHECK_EQ(sh_trades[i], expected_sh[i]);
+    }
+
+    /** @arg the mode B machinery really ran: the parent mirrored the lag member's buys */
+    size_t parent_dji_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == dji) {
+            parent_dji_buys++;
+        }
+    }
+    CHECK_UNARY(parent_dji_buys > 0);
+}
+
+/** @par Check point (M-B review): the liquidation legs of a leaf inside a nested aggregate are
+ *  booked by the aggregate that drives the leaf, not by the outer one; before the fix the outer
+ *  booked them at the raw axis day, after the leaf's visible time. Fixture: outer mode B dropping
+ *  the inner aggregate on the second rebalancing day (2010-07-05, a NYSE holiday), the lag=1 leaf
+ *  is flattened at its visible bar 2010-07-02, not at the raw day */
+TEST_CASE("test_MultiSystem_data_lag_nested_clear_legs") {
+    require_nyse_lag_one();
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100701), Datetime(20101001));
+
+    auto& sm = StockManager::instance();
+    DatetimeList axis = sm.getTradingCalendar(query);
+    REQUIRE_GT(axis.size(), 4);
+    REQUIRE_EQ(axis[2], Datetime(20100705));
+
+    auto leaf = create_lag_probe_sys(dji, query);
+    auto inner = std::make_shared<MultiSystem>("inner_lag");
+    inner->setMode("A");
+    inner->setSubInitCash(100000000.0);
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("ms_lag_nested");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectFirstCallOnlySE>(SystemList{inner}));
+    ms->setSellAtNotSelected(true);
+    ms->setAF(AF_EqualWeight());
+    ms->setAdjustCycle(2);
+    ms->add(inner);
+    ms->run(query);
+
+    /** @arg the leaf is flattened on the rebalancing close of 2010-07-05, but its ledger books at
+     *  its visible bar 2010-07-02 (the inner aggregate's decision, not the outer raw day) */
+    const TradeRecordList& trades = leaf->getTM()->getTradeList();
+    REQUIRE_UNARY(!trades.empty());
+    Datetime last_sell;
+    for (const auto& tr : trades) {
+        if (tr.business == BUSINESS_SELL) {
+            last_sell = tr.datetime;
+        }
+    }
+    CHECK_UNARY(!last_sell.isNull());
+    CHECK_EQ(last_sell, Datetime(20100702));
+    CHECK_UNARY(last_sell < axis[2]);
+
+    /** @arg the leaf book is left flat by the nested clear */
+    CHECK_EQ(leaf->getTM()->getPosition(Datetime(20101001), dji).number, 0.0);
+}
+
+/** @par Check point (M-B review): the deferred calibration legs (trade_on_close=false) of a lag
+ *  member book and price on the member's own visible bar, not on the axis-day bar it has not seen.
+ *  Fixture: the first rebalancing clear happens on the 2010-07-02 close and the legs execute at the
+ *  next open (2010-07-05, a NYSE holiday): the member SELL is booked at 2010-07-02 and priced at
+ *  that bar's open, so the leg neither waits for the absent axis-day quote nor books a future
+ *  price */
+TEST_CASE("test_MultiSystem_data_lag_deferred_leg_pricing") {
+    require_nyse_lag_one();
+    Stock sh = getStock("sh000001");
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE(!sh.isNull());
+    REQUIRE(!dji.isNull());
+    KQuery query(Datetime(20100630), Datetime(20101001));
+
+    auto& sm = StockManager::instance();
+    DatetimeList axis = sm.getTradingCalendar(query);
+    REQUIRE_GT(axis.size(), 4);
+    REQUIRE_EQ(axis[2], Datetime(20100702));
+    REQUIRE_EQ(axis[3], Datetime(20100705));
+
+    // The expected open of the member-visible bar (2010-07-02)
+    KData dji_kdata = dji.getKData(query);
+    const size_t pos = dji_kdata.getPos(Datetime(20100702));
+    REQUIRE_UNARY(pos != Null<size_t>());
+    const double expected_open = dji_kdata.getKRecord(pos).openPrice;
+
+    /** @arg the fixture really exercises the two price bases: no member bar on the execution axis
+     *  day (2010-07-05) and the pre-fix axis-day price (2010-07-06) differs from the visible one */
+    CHECK_UNARY(dji_kdata.getPos(Datetime(20100705)) == Null<size_t>());
+    const size_t pos_axis = dji_kdata.getPos(Datetime(20100706));
+    REQUIRE_UNARY(pos_axis != Null<size_t>());
+    CHECK_UNARY(dji_kdata.getKRecord(pos_axis).openPrice != expected_open);
+
+    auto sys_sh = create_lag_probe_sys(sh, query);
+    auto sys_dji = create_lag_probe_sys(dji, query);
+    auto ms = std::make_shared<MultiSystem>("ms_lag_deferred");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectFirstCallOnlySE>(SystemList{sys_sh, sys_dji}));
+    ms->setSellAtNotSelected(true);
+    ms->setAF(AF_EqualWeight());
+    ms->setAdjustCycle(2);
+    ms->setTradeOnClose(false);
+    ms->add(sys_sh);
+    ms->add(sys_dji);
+    ms->run(query);
+
+    /** @arg the first forced sale of the lag member is booked at its visible bar (2010-07-02) and
+     *  priced at that bar's open, not at the axis-day open of the execution day */
+    Datetime first_sell;
+    double sell_price = 0.0;
+    for (const auto& tr : sys_dji->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == dji) {
+            first_sell = tr.datetime;
+            sell_price = tr.realPrice;
+            break;
+        }
+    }
+    REQUIRE_UNARY(!first_sell.isNull());
+    CHECK_EQ(first_sell, Datetime(20100702));
+    CHECK_UNARY(first_sell < axis[3]);
+    CHECK_EQ(sell_price, expected_open);
 }
 
 /** @} */ /** @} */
