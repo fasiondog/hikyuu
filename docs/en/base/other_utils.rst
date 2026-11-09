@@ -44,7 +44,15 @@ Functions
 
 .. py:function:: initLogger(not_use_color=False, filename="")
 
-    Initialize the log output
+    Initialize the log output (also used to reconfigure it)
+
+    Normally called once at startup, before starting worker threads. Repeated calls replace the
+    current logger and are thread-safe: the replaced logger is kept alive until process exit, so a
+    thread still logging through it never touches a destroyed object. Since old loggers and their
+    log file handles are kept, do not call this in a loop; the logging itself is lock-free.
+
+    Each process has its own logger and must initialize it separately; before the first call
+    spdlog's default logger is used.
 
     :param bool not_use_color: whether to disable the colored output
     :param str filename: the log file name; when empty, it defaults to ./hikyuu.log in the current directory, and the directory must exist and be writable

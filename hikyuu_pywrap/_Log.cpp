@@ -25,8 +25,12 @@ void export_log(py::module& m) {
     m.def(
       "initLogger", initLogger,
       py::arg("not_use_color") = false, py::arg("filename") = std::string(),
-      "Initialize the logger; not_use_color disables the colored output, and an empty filename "
-      "defaults to ./hikyuu.log in the current directory");
+      "Initialize (or replace) the logger; not_use_color disables the colored output, and an empty "
+      "filename defaults to ./hikyuu.log in the current directory.\n\n"
+      "Call it once at startup, before starting worker threads. Repeated calls are thread-safe, "
+      "but the replaced loggers are kept alive until process exit (their log file handles stay "
+      "open), so avoid calling it in a loop. Each process has its own logger and must initialize "
+      "it separately.");
 
     m.def("get_log_level", get_log_level, "Get the current log level");
     m.def("set_log_level", set_log_level, "Set the current log level");
