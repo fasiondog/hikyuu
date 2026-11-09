@@ -386,7 +386,9 @@ private:
     TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyDelay(const KRecord& today, const KRecord& src_today);
     void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
-    void _autoCheckin(const Datetime& datetime, price_t realPrice, double number);
+    /** Top up the cash gap of the coming order when the money manager asks for auto_checkin;
+     * cover tells a short cover (buyShort) from a long opening, their cash needs differ */
+    void _autoCheckin(const Datetime& datetime, price_t realPrice, double number, bool cover);
 
     TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from,
                       price_t goal = Null<price_t>());

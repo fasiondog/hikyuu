@@ -24,7 +24,8 @@ PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
   buyMoney(totalMoney),
   totalCost(totalCost),
   totalRisk(totalRisk),
-  sellMoney(sellMoney) {}
+  sellMoney(sellMoney),
+  openBasis(totalMoney) {}
 
 PositionRecord::PositionRecord(PositionRecord&& rhs)
 : stock(std::move(rhs.stock)),
@@ -38,6 +39,8 @@ PositionRecord::PositionRecord(PositionRecord&& rhs)
   totalCost(rhs.totalCost),
   totalRisk(rhs.totalRisk),
   sellMoney(rhs.sellMoney),
+  margin(rhs.margin),
+  openBasis(rhs.openBasis),
   buyCount(rhs.buyCount),
   sellCount(rhs.sellCount) {}
 
@@ -54,6 +57,8 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rhs) {
         totalCost = rhs.totalCost;
         totalRisk = rhs.totalRisk;
         sellMoney = rhs.sellMoney;
+        margin = rhs.margin;
+        openBasis = rhs.openBasis;
         buyCount = rhs.buyCount;
         sellCount = rhs.sellCount;
     }
@@ -88,7 +93,8 @@ string PositionRecord::str() const {
     os << "Position(" << market << strip << code << strip << name << strip << takeDatetime << strip
        << cleanDatetime << strip << number << strip << costPrice << strip << stoploss << strip
        << goalPrice << strip << totalNumber << strip << buyMoney << strip << totalCost << strip
-       << totalRisk << strip << sellMoney << strip << buyCount << strip << sellCount << ")";
+       << totalRisk << strip << sellMoney << strip << margin << strip << openBasis << strip
+       << buyCount << strip << sellCount << ")";
     os.unsetf(std::ostream::floatfield);
     (void)os.precision();
     return os.str();
@@ -105,6 +111,7 @@ bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
            recordNear(d1.stoploss, d2.stoploss) && recordNear(d1.goalPrice, d2.goalPrice) &&
            recordNear(d1.totalNumber, d2.totalNumber) && recordNear(d1.buyMoney, d2.buyMoney) &&
            recordNear(d1.totalCost, d2.totalCost) && recordNear(d1.sellMoney, d2.sellMoney) &&
+           recordNear(d1.margin, d2.margin) && recordNear(d1.openBasis, d2.openBasis) &&
            d1.buyCount == d2.buyCount && d1.sellCount == d2.sellCount;
 }
 

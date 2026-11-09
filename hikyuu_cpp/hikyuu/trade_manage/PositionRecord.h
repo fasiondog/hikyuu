@@ -55,8 +55,13 @@ public:
     price_t totalRisk{0.0};   ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
                               ///< quantity, excluding the trade cost
     price_t sellMoney{0.0};   ///< Accumulated sell funds
-    size_t buyCount{0};       ///< Number of buys
-    size_t sellCount{0};      ///< Number of sells
+    price_t margin{0.0};      ///< Margin locked by the holding, 0 means the plain cash accounting
+    price_t openBasis{
+      0.0};               ///< Opening notional of the still-held lots (price x number x unit); the
+                          ///< realized profit and the equity of a margin holding are measured
+                          ///< against it, and it is released proportionally as the lots close
+    size_t buyCount{0};   ///< Number of buys
+    size_t sellCount{0};  ///< Number of sells
 
 //===================
 // Serialization support
@@ -83,6 +88,12 @@ private:
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
         ar& BOOST_SERIALIZATION_NVP(buyCount);
         ar& BOOST_SERIALIZATION_NVP(sellCount);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(margin);
+        }
+        if (version >= 2) {
+            ar& BOOST_SERIALIZATION_NVP(openBasis);
+        }
     }
 
     template <class Archive>
@@ -106,6 +117,17 @@ private:
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
         ar& BOOST_SERIALIZATION_NVP(buyCount);
         ar& BOOST_SERIALIZATION_NVP(sellCount);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(margin);
+        }
+        if (version >= 2) {
+            ar& BOOST_SERIALIZATION_NVP(openBasis);
+        } else {
+            // The old archives carried no remaining cost basis; rebuild the best-effort value the
+            // old averaged formula would have produced so the archive stays readable
+            price_t notional = buyMoney > 0.0 ? buyMoney : sellMoney;
+            openBasis = totalNumber > 0.0 ? notional * (number / totalNumber) : 0.0;
+        }
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -124,6 +146,12 @@ HKU_API std::ostream& operator<<(std::ostream&, const PositionRecord&);
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2);
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = the archives without the margin field (plain cash accounting)
+// 1 = the margin field, 2 = the remaining opening cost basis
+BOOST_CLASS_VERSION(::hku::PositionRecord, 2)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>

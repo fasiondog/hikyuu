@@ -406,8 +406,25 @@ void System::readyForRun() {
     if (m_tp)
         m_tp->setTM(m_tm);
 
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
+    // The system switches can only widen the trade manager's financing: a system that leaves them
+    // off must not silently disable a margin account the caller configured, which would drop the
+    // whole book back to the cash accounting
+    bool sys_borrow_cash = getParam<bool>("support_borrow_cash");
+    bool tm_borrow_cash = m_tm->tryGetParam<bool>("support_borrow_cash", false);
+    HKU_WARN_IF(
+      !sys_borrow_cash && tm_borrow_cash,
+      "{} support_borrow_cash=False would disable the financing of the trade manager, the "
+      "account keeps it enabled!",
+      name());
+    m_tm->setParam<bool>("support_borrow_cash", sys_borrow_cash || tm_borrow_cash);
+
+    bool sys_borrow_stock = getParam<bool>("support_borrow_stock");
+    bool tm_borrow_stock = m_tm->tryGetParam<bool>("support_borrow_stock", false);
+    HKU_WARN_IF(!sys_borrow_stock && tm_borrow_stock,
+                "{} support_borrow_stock=False would disable the securities lending of the trade "
+                "manager, the account keeps it enabled!",
+                name());
+    m_tm->setParam<bool>("support_borrow_stock", sys_borrow_stock || tm_borrow_stock);
 }
 
 void System::run(const KQuery& query, bool reset, bool resetAll) {
@@ -960,7 +977,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     }
 
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
-    _autoCheckin(today.datetime, realPrice, number);
+    _autoCheckin(today.datetime, realPrice, number, false);
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
@@ -1051,6 +1068,14 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
                 CostRecord cost = m_tm->getBuyCost(today.datetime, m_stock, realPrice, number);
                 price_t need = roundEx(
                   roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
+                // A margin-accounted opening only pays its margin and the fee, so the same
+                // formula as the trade manager decides whether the fill price still fits the cash
+                if (m_tm->isMarginAccounted(m_stock)) {
+                    need = roundEx(m_tm->getOpenMarginToLock(today.datetime, m_stock, realPrice,
+                                                             number, MarginSide::LONG) +
+                                     cost.total,
+                                   precision);
+                }
                 if (m_tm->cash(today.datetime, m_kdata.getQuery().kType()) < need) {
                     number =
                       _getBuyNumber(today.datetime, realPrice, realPrice - stoploss, req.from);
@@ -1081,7 +1106,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        _autoCheckin(today.datetime, realPrice, number);
+        _autoCheckin(today.datetime, realPrice, number, false);
         TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
                                        goalPrice, planPrice, req.from);
         if (BUSINESS_BUY != record.business) {
@@ -1113,16 +1138,30 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
     m_buyRequestList.push_back(req);
 }
 
-void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number) {
+void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number, bool cover) {
     HKU_IF_RETURN(!m_mm || !m_mm->getParam<bool>("auto_checkin"), void());
     HKU_IF_RETURN(datetime < m_tm->lastDatetime(), void());
 
-    // Deposit once per trade with the affordability formula of TradeManager::buy; the gap is
-    // rounded up so the following buy always passes its cash check
+    // Deposit once per trade with the affordability formula of the trade manager; the gap is
+    // rounded up so the following order always passes its cash check. A margin-accounted opening
+    // only pays its margin and the fee (the rest is financed) and a margin-accounted cover pays
+    // nothing at all (it returns the margin and settles the profit, an overdraft is legal), so
+    // neither may deposit the full notional and inflate the principal
+    if (cover) {
+        PositionRecord pos = m_tm->getShortPosition(m_stock);
+        HKU_IF_RETURN(pos.number <= 0.0 || pos.margin > 0.0, void());
+    }
+
     int precision = m_tm->precision();
     CostRecord cost = m_tm->getBuyCost(datetime, m_stock, realPrice, number);
     price_t needed =
       roundEx(roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
+    if (!cover && m_tm->isMarginAccounted(m_stock)) {
+        needed = roundEx(
+          m_tm->getOpenMarginToLock(datetime, m_stock, realPrice, number, MarginSide::LONG) +
+            cost.total,
+          precision);
+    }
     price_t cash = m_tm->cash(datetime, m_kdata.getQuery().kType());
     if (cash < needed) {
         m_tm->checkin(datetime, roundUp(needed - cash, precision));
@@ -1178,10 +1217,10 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
         }
     }
 
-    // A short cover pays cash like a buy, so it gets the same top-up: a forced liquidation must
-    // not be blocked on a cash-poor account
+    // A short cover pays cash like a buy in the plain books, so it gets the same top-up: a
+    // forced liquidation must not be blocked on a cash-poor account
     if (cover_short) {
-        _autoCheckin(date, realPrice, real_sell_num);
+        _autoCheckin(date, realPrice, real_sell_num, true);
     }
 
     record = cover_short ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num,
@@ -1487,8 +1526,9 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
 
     price_t goalPrice = std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, planPrice);
 
-    // A cover pays cash like a buy: top up the gap, or a cash-poor account cannot close its short
-    _autoCheckin(today.datetime, realPrice, number);
+    // A cover pays cash like a buy in the plain books: top up the gap, or a cash-poor account
+    // cannot close its short
+    _autoCheckin(today.datetime, realPrice, number, true);
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
     if (BUSINESS_BUY_SHORT != record.business) {
@@ -1591,9 +1631,9 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             number = pos.number;
         }
 
-        // A cover pays cash like a buy: top up the gap, or a cash-poor account cannot close its
-        // short
-        _autoCheckin(today.datetime, realPrice, number);
+        // A cover pays cash like a buy in the plain books: top up the gap, or a cash-poor
+        // account cannot close its short
+        _autoCheckin(today.datetime, realPrice, number, true);
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {

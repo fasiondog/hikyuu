@@ -198,3 +198,100 @@ Account side interfaces
     The buying power check runs only when ``support_borrow_cash=True`` (long side) or the margin
     model covers the security (short side); the buy / sell checks of a plain cash account (MG_None
     with no financing) stay exactly as before.
+
+Margin accounting (Phase B)
+---------------------------
+
+``margin_accounting`` is an account-level switch (False by default). With it on, the openings of a
+**margin security** (``is_margin_trading=True`` and ``support_borrow_cash=True`` or
+``need_borrow_asset=False``, i.e. financing buys, futures and crypto) lock the margin only, while
+the other holdings (e.g. a cash A-share buy) keep the full cash accounting.
+
+Booking formulas:
+
+- Open long / short: ``cash -= margin + fee``, ``PositionRecord.margin += margin``; ``buy_money`` /
+  ``sell_money`` keep accumulating the nominal amount for reporting only
+- Close long / short: ``cash += released margin + realized profit - fee``; the released margin is
+  proportional to the closed quantity and the realized profit is computed on the **money basis**:
+  ``closed money - remaining cost basis * (closed number / current number)`` (negated on the short
+  side), where ``closed money = price * number * unit`` and the remaining cost basis is
+  ``PositionRecord.open_basis``, exact whatever the contract multiplier is; a close releases the
+  basis proportionally and an opening only adds the new notional, so a partial close followed by a
+  new opening never dilutes the cost of the lots still held
+- Equity: ``net assets = cash + locked margin + unrealized profit - borrowed funds``; the equity
+  contribution of a margin holding joins ``FundsRecord.market_value`` on either side (the short
+  unrealized profit already carries the direction), ``short_market_value`` keeps only the cash
+  accounted short nominal value
+- Reporting: ``FundsRecord.occupied_margin`` is the locked margin; the settlement price is
+  approximated by the close of the day
+
+.. note::
+
+    ``get_occupied_margin()`` is the **margin requirement** recomputed at the given price over every
+    holding the model covers, the ones booked by the plain cash accounting included (a broker counts
+    the whole collateral), whereas ``FundsRecord.occupied_margin`` is the amount **already locked**
+    on the openings; the gap covers both the mark-to-market drift and the accounting difference, and
+    ``get_available_margin() = net assets - requirement``.
+
+    The margin and the fee of an opening follow the same funding rule as the long side: an account
+    that may borrow (``support_borrow_cash=True``) covers the shortfall with new debt recorded in
+    ``borrow_cash``, the others are rejected when the cash does not suffice, so **an opening never
+    takes the cash negative**; only a closing loss larger than the released margin may do so (a real
+    overdraft), and the following openings are stopped by the quota gate.
+
+    ``auto_checkin`` (a ``MoneyManager`` parameter that makes the ``System`` deposit right before
+    submitting an order, the batch top-up of ``MultiSystem`` following the same caliber) deposits only
+    what the order really pays: a margin-accounted long opening tops up its margin and its fee (the
+    rest is financed, so the principal is not inflated), a margin-accounted short cover tops up
+    nothing (the cover returns the margin and settles the profit, an overdraft being legal), while
+    the plain books still deposit the full traded amount plus its fee.
+
+    A margin requirement below one monetary unit (``10^-precision``, 0.01 by default) locks one unit
+    instead of rounding down to zero: ``margin > 0`` marks a holding booked on the margin basis, so a
+    zero lock would demote it to the cash books (valuing the full nominal amount while next to
+    nothing was paid), which misstates its real exposure; the aggregate requirement returned by
+    ``get_occupied_margin()`` carries no such floor.
+
+    The records replayed by ``add_trade_record`` carry the trades only, not the debt entries
+    (``BUSINESS_BORROW_CASH``) that funded them: when the cash falls short and
+    ``support_borrow_cash=True``, the add path borrows again with the same iteration the live ``buy``
+    / ``sell_short`` uses (the financing fee itself included), so a reimported margin opening is no
+    longer rejected and the rebuilt cash, debt and locked margin match the live books;
+    ``support_borrow_cash=False`` still rejects on insufficient cash. The securities lending fee is
+    financed the same way.
+
+    A short that both locks a margin and borrows securities validates read-only first, then finances
+    once and finally borrows in a single commit: an insufficient lendable pool (unsold quantity too
+    small, nothing to borrow, all sold) or a placeholder price rejects the order **before any booking
+    happens**, leaving neither a ``borrow_cash`` debt nor a financing fee behind; the securities
+    borrow fee counts into the required cash together with the margin, so an over-borrow whose fee
+    has no funding can no longer take the cash negative.
+
+    Switching the accounting for the same security midway (a cash-basis opening later joined by
+    margin lots, or a ``realPrice == 0`` placeholder opening followed by a priced one) creates
+    **mixed lots**: the position-level books keep a single locked margin and one money-basis prorated
+    cost, so the valuation and the close cash flow fold the cash lots' cost into the margin formula,
+    which deviates from the lot-by-lot market practice; the account logs a warning in **either**
+    direction (margin lots joining a cash holding as well as cash lots joining a margin one).
+    Lot-level (per-trade) margin and cost booking, and writing the locked margin into
+    ``TradeRecord``, are registered as follow-up tasks.
+
+    The historical replay (``getFunds(date)``, ``get_funds_list``, ``Performance``) and
+    ``add_trade_record`` recompute the margin with the **current** parameters and margin model:
+    changing ``margin_accounting``, swapping the model or adjusting its rate after the openings makes
+    the replayed books differ from the ones booked at that time; ``PositionRecord.margin > 0`` only
+    marks the holdings the live books already keep by margin.
+
+    The maintain-margin call and the forced liquidation (Phase B-2) and the daily variation-margin
+    posting are not implemented yet; a margin holding **rejects** ``checkin_stock`` /
+    ``checkout_stock`` (a deposit or withdrawal would move the cost basis while the lock stays, which
+    detaches the equity from the assets, so the order is refused and the backfill refuses it too). A
+    ``realPrice == 0`` market-order placeholder opening still keeps the cash accounting, but a margin
+    holding refuses to be closed at a placeholder price (the trade is rejected and the traded price
+    is required, otherwise the locked margin could not be released); the historical replay keeps the
+    margin locked and warns when such a record shows up in the trade list.
+
+    When the margin model reports no requirement at all (or a non-finite one) for a security, that
+    opening falls back to the cash books and pays the full notional (with a warning): a holding with
+    ``margin == 0`` is valued as a cash holding, so keeping the margin branch would count the full
+    market value as equity while no cash was paid.

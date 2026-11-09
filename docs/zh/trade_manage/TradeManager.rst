@@ -12,6 +12,7 @@
     * **support_borrow_cash=False** *(bool)* : 是否自动融资
     * **support_borrow_stock=False** *(bool)* : 是否自动融券
     * **save_action=True** *(bool)* : 是否保存 Python 命令序列
+    * **margin_accounting=False** *(bool)* : 是否按保证金记账（Phase B，仅保证金标的生效，见 :doc:`margin`）
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])

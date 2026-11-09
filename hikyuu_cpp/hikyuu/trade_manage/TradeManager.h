@@ -415,6 +415,10 @@ private:
         return !last_date.isNull() && datetime > last_date;
     }
 
+    /** Fill the cash gap of a replayed opening with new debt, mirroring the live auto-financing:
+     * the exported records carry the trades, not the borrow that funded them */
+    bool _borrowForAdd(const Datetime& datetime, price_t needed);
+
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);
     bool _add_sell_tr(const TradeRecord&);

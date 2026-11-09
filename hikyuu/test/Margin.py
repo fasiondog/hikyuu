@@ -162,6 +162,54 @@ class MarginTest(unittest.TestCase):
         tm.margin = None
         self.assertEqual(tm.margin.name, "MG_None")
 
+    def test_TradeManager_margin_accounting(self):
+        """Phase B: a margin security locks the margin only and reports it"""
+        stock = sm['sh000001']
+        dt = Datetime(200001040000)
+        price = stock.get_market_value(dt, "DAY")
+
+        mg = PythonMargin()
+        tm = crtTM(dt, 100000.0, TC_Zero(), "SYS", mg)
+        self.assertFalse(tm.is_margin_accounted(stock))
+        tm.set_param("margin_accounting", True)
+        self.assertTrue(tm.is_margin_accounted(stock))
+
+        tr = tm.buy(dt, stock, price, 100.0)
+        self.assertEqual(tr.business, BUSINESS.BUY)
+        self.assertAlmostEqual(tr.cash, 95000.0)
+        self.assertAlmostEqual(tm.get_position(dt, stock).margin, 5000.0)
+        self.assertAlmostEqual(tm.get_position(dt, stock).open_basis, price * 100.0 * stock.unit)
+        self.assertAlmostEqual(tm.current_cash, 95000.0)
+
+        funds = tm.get_funds()
+        self.assertAlmostEqual(funds.occupied_margin, 5000.0)
+        self.assertAlmostEqual(funds.market_value, 5000.0)
+        self.assertAlmostEqual(funds.net_assets, 100000.0)
+
+        # the requirement is recomputed, the locked amount is what the openings booked
+        self.assertAlmostEqual(tm.get_occupied_margin(dt), 5000.0)
+        self.assertAlmostEqual(tm.get_available_margin(dt),
+                               funds.net_assets - tm.get_occupied_margin(dt))
+
+        # a temporary model must survive inside the account, both as a constructor argument
+        # and through the setter: its Python half decides the margin
+        tm2 = crtTM(dt, 100000.0, TC_Zero(), "SYS", PythonMargin())
+        tm2.set_param("margin_accounting", True)
+        self.assertTrue(tm2.is_margin_accounted(stock))
+        self.assertAlmostEqual(tm2.buy(dt, stock, price, 100.0).cash, 95000.0)
+
+        tm3 = crtTM(dt, 100000.0, TC_Zero())
+        tm3.margin = PythonMargin()
+        tm3.set_param("margin_accounting", True)
+        self.assertTrue(tm3.is_margin_accounted(stock))
+
+        # closing at the same price returns the whole margin
+        tr = tm.sell(dt, stock, price, 100.0)
+        self.assertEqual(tr.business, BUSINESS.SELL)
+        self.assertAlmostEqual(tr.cash, 100000.0)
+        self.assertAlmostEqual(tm.get_funds().occupied_margin, 0.0)
+        self.assertAlmostEqual(tm.get_position(dt, stock).open_basis, 0.0)
+
     def test_TradeManager_short_position(self):
         """The short-side position bookkeeping is visible through the accessors"""
         rb = sm['SHFRB0000']

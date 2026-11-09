@@ -11,6 +11,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/margin/crt/MG_Fixed.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
@@ -218,6 +219,78 @@ TEST_CASE("test_SYS_Simple_for_base_auto_checkin") {
     for (const auto& kv : checkin_counts) {
         CHECK_LE(kv.second, buy_counts[kv.first]);
     }
+}
+
+/** @par Test point (auto_checkin deposits only the margin of a margin-accounted buy) */
+TEST_CASE("test_SYS_Simple_for_base_auto_checkin_margin") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    REQUIRE_UNARY(!stk.isNull());
+    Datetime start_date(199911100000LL);
+    Datetime end_date(200002250000LL);
+    KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
+
+    // A cash-poor margin account: every buy needs a top-up, but only for its margin (the rest is
+    // financed), so the deposit must stay within the margin of the buy it serves
+    TMPtr tm = crtTM(Datetime(199001010000LL), 10000, TC_Zero(), "TEST_TM", MG_Fixed(0.5));
+    tm->setParam<bool>("margin_accounting", true);
+    // An A-share margin account needs the financing switch, otherwise the whole notional is
+    // charged from the cash (isMarginAccounted)
+    tm->setParam<bool>("support_borrow_cash", true);
+
+    /** @arg the account really books this security by margin */
+    CHECK_UNARY(tm->isMarginAccounted(stk));
+
+    SYSPtr sys = SYS_Simple();
+    // Non-delayed: at most one order per bar, so every deposit pairs with its own buy
+    sys->setParam("buy_delay", false);
+    sys->setParam("sell_delay", false);
+    // The system leaves the financing switches off: the margin account it is given must keep them,
+    // a system that silently disabled them would drop the whole book back to the cash accounting
+    sys->setTM(tm);
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    MMPtr mm = MM_FixedCount(1000);
+    mm->setParam<bool>("auto_checkin", true);
+    sys->setMM(mm);
+
+    sys->run(stk, query);
+
+    std::map<Datetime, price_t> max_buy_margin, checkin_cash;
+    std::map<Datetime, size_t> checkin_count;
+    TradeRecordList tr_list = tm->getTradeList();
+    for (const auto& tr : tr_list) {
+        if (BUSINESS_BUY == tr.business) {
+            price_t margin =
+              tm->getOpenMargin(tr.datetime, tr.stock, tr.realPrice, tr.number, MarginSide::LONG);
+            auto it = max_buy_margin.find(tr.datetime);
+            if (it == max_buy_margin.end()) {
+                max_buy_margin[tr.datetime] = margin;
+            } else {
+                it->second = std::max(it->second, margin);
+            }
+        } else if (BUSINESS_CHECKIN == tr.business) {
+            checkin_cash[tr.datetime] += tr.realPrice;
+            checkin_count[tr.datetime]++;
+        }
+    }
+
+    /** @arg the scenario really exercised the top-up path of a margin-accounted buy */
+    CHECK_UNARY(!max_buy_margin.empty());
+    CHECK_UNARY(!checkin_cash.empty());
+
+    /** @arg every single deposit stays within the margin of one buy of its date: the rest of the
+     *  notional is financed, so depositing it would inflate the principal */
+    size_t matched = 0;
+    for (const auto& kv : checkin_cash) {
+        auto it = max_buy_margin.find(kv.first);
+        // A rejected buy leaves its deposit idle in the cash, lowering the next gap instead
+        if (it == max_buy_margin.end()) {
+            continue;
+        }
+        ++matched;
+        CHECK_LE(kv.second, it->second * checkin_count[kv.first] + 1e-6);
+    }
+    CHECK_UNARY(matched > 0);
 }
 
 /** @} */

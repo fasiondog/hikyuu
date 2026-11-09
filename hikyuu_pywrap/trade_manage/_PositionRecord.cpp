@@ -42,6 +42,11 @@ void export_PositionRecord(py::module& m) {
                      "The cumulative trading risk = each (the buy price - the stop-loss) * the buy "
                      "quantity, excluding the trading costs")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "The cumulative sell funds (float)")
+      .def_readwrite("margin", &PositionRecord::margin,
+                     "The margin locked by the holding (float); 0 means the plain cash accounting")
+      .def_readwrite("open_basis", &PositionRecord::openBasis,
+                     "The opening notional of the still-held lots (float); released proportionally "
+                     "as the lots close")
       .def_readwrite("buy_count", &PositionRecord::buyCount, "The cumulative buy count (size_t)")
       .def_readwrite("sell_count", &PositionRecord::sellCount, "The cumulative sell count (size_t)")
       .def_property_readonly("total_profit", &PositionRecord::totalProfit,

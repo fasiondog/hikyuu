@@ -2135,7 +2135,11 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
     };
     double need_cover_cash = 0.0;
     double need_buy_cash = 0.0;  // the scale denominator: the margin when financing, full otherwise
-    double need_buy_full = 0.0;  // the full-cash requirement, used by the auto_checkin top-up
+    // What the optional top-up must actually deposit, aligned with System::_autoCheckin: a cover
+    // only pays in the plain books, and a long buy pays its margin when the holding is booked by
+    // margin (the rest is financed)
+    double need_cover_deposit = 0.0;
+    double need_buy_deposit = 0.0;
     for (const auto& s : netted) {
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
@@ -2153,23 +2157,34 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         }
         if (s.short_side) {
             need_cover_cash += buy_cost_total(s, qty);
+            // A margin-accounted short returns its margin and settles the profit instead of paying
+            // the notional, so only the plain books need the cash
+            if (m_tm->getShortPosition(s.stock).margin <= 0.0) {
+                need_cover_deposit += buy_cost_total(s, qty);
+            }
         } else {
-            need_buy_full += buy_cost_total(s, qty);
             if (margin_trading) {
                 double rate = m_tm->getMarginRate(date, s.stock);
                 need_buy_cash += buy_cost_total(s, qty) * ((rate > 0.0) ? rate : 1.0);
             } else {
                 need_buy_cash += buy_cost_total(s, qty);
             }
+            if (m_tm->isMarginAccounted(s.stock)) {
+                need_buy_deposit +=
+                  m_tm->getOpenMarginToLock(date, s.stock, s.plan_price, qty, MarginSide::LONG) +
+                  m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total;
+            } else {
+                need_buy_deposit += buy_cost_total(s, qty);
+            }
         }
     }
     price_t cash = m_tm->getFunds(date, ktype).cash;
-    // The optional top-up (aligned with MoneyManagerBase::auto_checkin): deposit the FULL gap (the
-    // covers plus the unfinanced long buys), so every leg is cash-covered and can be filled at its
-    // planned quantity without borrowing. It raises the parent principal instead of borrowing, so
-    // it is meant to keep the planned quantities tradable, not as a funding policy
-    if (m_auto_checkin && need_cover_cash + need_buy_full > cash) {
-        price_t gap = roundUp(need_cover_cash + need_buy_full - cash, m_tm->precision());
+    // The optional top-up (aligned with MoneyManagerBase::auto_checkin): deposit the gap the legs
+    // really pay, so every leg is cash-covered and can be filled at its planned quantity. It
+    // raises the parent principal instead of borrowing, so it is meant to keep the planned
+    // quantities tradable, not as a funding policy
+    if (m_auto_checkin && need_cover_deposit + need_buy_deposit > cash) {
+        price_t gap = roundUp(need_cover_deposit + need_buy_deposit - cash, m_tm->precision());
         if (m_tm->checkin(date, gap)) {
             cash = m_tm->getFunds(date, ktype).cash;
         } else {
@@ -4129,6 +4144,11 @@ void MultiSystem::_topUpCoverCash(const TMPtr& tm, bool enabled, const Datetime&
                                   const Stock& stock, price_t price, double number) {
     HKU_IF_RETURN(!enabled || !tm || !(price > 0.0) || !(number > 0.0), void());
     HKU_IF_RETURN(date < tm->lastDatetime(), void());
+
+    // A margin-accounted short returns its margin and settles the profit instead of paying the
+    // notional (an overdraft is legal), so it must not deposit anything: that would create new
+    // principal out of a close
+    HKU_IF_RETURN(tm->getShortPosition(stock).margin > 0.0, void());
 
     // The gap is rounded up so that the following cover always passes the cash check of
     // TradeManager::buyShort

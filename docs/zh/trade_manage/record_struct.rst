@@ -132,6 +132,8 @@
     .. py:attribute:: total_cost   累计交易总成本（float）
     .. py:attribute:: total_risk   累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     .. py:attribute:: sell_money   累计卖出资金（float）
+    .. py:attribute:: margin       当前锁定的保证金（float），0 表示现金记账（见 :doc:`margin`）
+    .. py:attribute:: open_basis   仍持有批次的开仓名义金额（float）= 开仓价 × 数量 × unit，平仓时按数量比例释放
 
     
 资产情况记录
@@ -150,6 +152,7 @@
     .. py:attribute:: base_asset         当前投入的资产价值（float）
     .. py:attribute:: borrow_cash        当前借入的资金（float），即负债
     .. py:attribute:: borrow_asset       当前借入证券资产价值（float）
+    .. py:attribute:: occupied_margin    保证金持仓锁定的保证金合计（float），其权益贡献已计入 market_value
 
     只读属性，自动根据上面的属性计算得到的结果:
 

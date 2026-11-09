@@ -12,6 +12,7 @@ Common parameters:
     * **support_borrow_cash=False** *(bool)* : whether to automatically borrow cash (financing / margin)
     * **support_borrow_stock=False** *(bool)* : whether to automatically borrow securities for short selling
     * **save_action=True** *(bool)* : whether to save the Python command sequences
+    * **margin_accounting=False** *(bool)* : whether to book the margin securities by margin only (Phase B, see :doc:`margin`)
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])

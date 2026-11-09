@@ -132,6 +132,8 @@ Position Records
     .. py:attribute:: total_cost     Cumulative total transaction cost (float)
     .. py:attribute:: total_risk     Cumulative risk (float): the sum over all entries of (entry price - stop-loss price) x entry quantity, excluding transaction costs
     .. py:attribute:: sell_money     Cumulative sale proceeds (float)
+    .. py:attribute:: margin         The margin currently locked (float); 0 means the plain cash accounting (see :doc:`margin`)
+    .. py:attribute:: open_basis     The opening notional of the still-held lots (float) = opening price x number x unit, released proportionally as the lots close
 
 
 Funds Records
@@ -150,6 +152,7 @@ Snapshot of the account's current cash, holdings, and borrowings. Returned by :p
     .. py:attribute:: base_asset         Current value of assets contributed in kind (float)
     .. py:attribute:: borrow_cash        Cash borrowed (margin loan), i.e. outstanding debt (float)
     .. py:attribute:: borrow_asset       Market value of borrowed securities (float)
+    .. py:attribute:: occupied_margin    The margin locked by the margin-accounted holdings (float); its equity contribution is already included in market_value
 
     Read-only attributes, computed automatically from the attributes above:
 

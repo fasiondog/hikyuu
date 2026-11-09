@@ -22,6 +22,13 @@ public:
 
         m_name = tm->name();
         m_costfunc = m_tm->costFunc();
+
+        // Mirror the wrapped account's accounting params on the view: getParam/setParam are
+        // non-virtual, so the System pre-checks (the deposit sizing, the delayed-buy re-size,
+        // readyForRun) read the view while the real booking reads the wrapped account. A stale
+        // default would round on another precision grid or warn about a switch the account never
+        // lost. The mirror is read-only: a write through the view never reaches the shared account
+        _mirrorParams();
     }
 
     virtual ~WalkForwardTradeManager() {}
@@ -34,7 +41,18 @@ public:
         WalkForwardTradeManager* p = new WalkForwardTradeManager();
         p->m_tm = m_tm->clone();
         p->m_run_start = m_run_start;
+        p->_mirrorParams();
         return shared_ptr<TradeManagerBase>(p);
+    }
+
+    /** Copy the wrapped account's accounting params onto the view (see the constructor) */
+    void _mirrorParams() {
+        setParam<int>("precision", m_tm->precision());
+        setParam<bool>("margin_accounting", m_tm->tryGetParam<bool>("margin_accounting", false));
+        setParam<bool>("support_borrow_cash",
+                       m_tm->tryGetParam<bool>("support_borrow_cash", false));
+        setParam<bool>("support_borrow_stock",
+                       m_tm->tryGetParam<bool>("support_borrow_stock", false));
     }
 
     /**
@@ -73,6 +91,11 @@ public:
     virtual price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num, MarginSide side) const override {
         return m_tm->getOpenMargin(datetime, stock, price, num, side);
+    }
+
+    /** The accounting switch lives on the wrapped account, so the eligibility follows it */
+    virtual bool isMarginAccounted(const Stock& stock) const override {
+        return m_tm->isMarginAccounted(stock);
     }
 
     virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,

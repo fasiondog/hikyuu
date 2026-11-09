@@ -303,7 +303,7 @@ Common parameters:
 
       .def_property("cost_func", get_costFunc, set_costFunc, "The trade cost algorithm")
 
-      .def_property("margin", get_margin, set_margin,
+      .def_property("margin", get_margin, py::cpp_function(set_margin, py::keep_alive<1, 2>()),
                     R"(The margin model of the account (MarginBase)
 
     Setting it to None falls back to the plain cash model MG_None. The default model of a new
@@ -364,6 +364,15 @@ Common parameters:
     :param str ktype: the K-line type used to get the position price
     :return: the available funds
     :rtype: float)")
+
+      .def("is_margin_accounted", &TradeManagerBase::isMarginAccounted, py::arg("stock"),
+           R"(is_margin_accounted(self, stock)
+
+    Whether an opening of the stock is booked by the margin accounting instead of the full cash
+
+    :param Stock stock: the security to check
+    :return: True when the opening locks the margin only
+    :rtype: bool)")
 
       .def_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
                     &TradeManagerBase::setBrokerLastDatetime,

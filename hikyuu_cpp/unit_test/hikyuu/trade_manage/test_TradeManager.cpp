@@ -1138,6 +1138,39 @@ TEST_CASE("test_TradeManager_margin_gate_applies_weight_once") {
     }
 }
 
+/** @par Test point: a gift rescales the accumulated quantity instead of incrementing it, so the
+ *  averaged cost follows the halved price even when part of the position was sold before the
+ *  ex-rights date ("+= addcount" used to distort the baseline once totalNumber > number) */
+TEST_CASE("test_TradeManager_updateWithWeight_gift_average_price") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 1000000);
+    tm->buy(Datetime(199305200000L), stk, 55.7, 200);
+    tm->sell(Datetime(199305210000L), stk, 60.0, 100);  // partial close: totalNumber stays 200
+
+    PositionRecord before = tm->getPosition(Datetime(199305210000L), stk);
+    REQUIRE_EQ(before.number, 100.0);
+    REQUIRE_EQ(before.totalNumber, 200.0);
+
+    // Any query beyond the ex-rights date applies the 1993-05-24 weights (bonus + gift shares)
+    tm->getFunds(Datetime(199305260000L));
+    PositionRecord after = tm->getPosition(Datetime(199305260000L), stk);
+
+    /** @arg the gift really changed the quantity */
+    CHECK_GT(after.number, before.number);
+    const double ratio = after.number / before.number;
+
+    /** @arg the accumulated quantity follows the same ratio, not the added share count */
+    CHECK_LT(std::fabs(after.totalNumber - before.totalNumber * ratio), 1.0);
+
+    /** @arg the averaged cost follows the halved price (buyMoney keeps its total) */
+    CHECK_EQ(after.buyMoney, before.buyMoney);
+    CHECK_LT(
+      std::fabs(after.buyMoney / after.totalNumber - before.buyMoney / before.totalNumber / ratio),
+      1e-6);
+}
+
 /** @par Test point: test addTradeRecord */
 TEST_CASE("test_TradeManager_addTradeRecord") {
     StockManager& sm = StockManager::instance();

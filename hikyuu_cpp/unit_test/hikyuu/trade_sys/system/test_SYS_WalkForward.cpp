@@ -269,6 +269,11 @@ TEST_CASE("test_SYS_WalkForward_margin_view") {
 
     TMPtr real = crtTM(Datetime(201101040000LL), 100000.0);
     real->margin(MG_ByType("1:0.20", 0.0, 0.9));
+    // A non-default accounting configuration: the view must mirror it or the System pre-checks
+    // would size the deposits and the delayed-buy re-size on the view's stale defaults
+    real->setParam<int>("precision", 3);
+    real->setParam<bool>("margin_accounting", true);
+    real->setParam<bool>("support_borrow_cash", true);
 
     auto view = std::make_shared<WalkForwardTradeManager>(real, run_start);
 
@@ -278,6 +283,24 @@ TEST_CASE("test_SYS_WalkForward_margin_view") {
     CHECK_EQ(view->getMarginRate(run_start, stk), 0.20);
     real->margin(MG_ByType("1:0.30", 0.0, 0.9));
     CHECK_EQ(view->getMarginRate(run_start, stk), 0.30);
+
+    /** @arg The accounting params of the wrapped account are mirrored on the view */
+    CHECK_EQ(view->precision(), 3);
+    CHECK_UNARY(view->isMarginAccounted(stk));
+    CHECK_UNARY(view->tryGetParam<bool>("margin_accounting", false));
+    CHECK_UNARY(view->tryGetParam<bool>("support_borrow_cash", false));
+
+    /** @arg The mirror is read-only: a write through the view never reaches the shared account */
+    view->setParam<bool>("support_borrow_cash", false);
+    CHECK_UNARY(real->getParam<bool>("support_borrow_cash"));
+    view->_mirrorParams();
+    CHECK_UNARY(view->tryGetParam<bool>("support_borrow_cash", false));
+
+    /** @arg A cloned view keeps the mirror of its own wrapped account */
+    auto cloned = std::dynamic_pointer_cast<WalkForwardTradeManager>(view->clone());
+    REQUIRE_UNARY(cloned != nullptr);
+    CHECK_EQ(cloned->precision(), 3);
+    CHECK_UNARY(cloned->tryGetParam<bool>("support_borrow_cash", false));
 
     /** @arg Inside the window the quota follows the wrapped account */
     price_t price = 10.0;

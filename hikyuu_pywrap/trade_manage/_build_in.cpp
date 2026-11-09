@@ -16,6 +16,9 @@ void export_build_in(py::module& m) {
     m.def(
       "crtTM", &crtTM, py::arg("date") = Datetime(199001010000LL), py::arg("init_cash") = 100000,
       py::arg("cost_func") = TC_Zero(), py::arg("name") = "SYS", py::arg("margin") = MarginPtr(),
+      // The account must keep the Python half of a Python-defined margin model alive, otherwise
+      // its overrides silently fall back to the base implementation
+      py::keep_alive<0, 5>(),
       R"(crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS", margin = None])
 
     Create the trade manager module, managing the trade records and the fund usage of the account

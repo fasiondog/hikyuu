@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <cmath>
+
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "PositionExtInfo.h"
@@ -31,6 +33,7 @@ class HKU_API Performance;
  * <pre>
  * Default parameters:
  * precision(int): 2 calculation precision
+ * margin_accounting(bool): false book the openings of the margin securities by margin only
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -45,6 +48,8 @@ public:
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
     : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
         setParam<int>("precision", 2);  // Calculation precision
+        // Phase B real margin accounting: off by default, so the plain cash books stay unchanged
+        setParam<bool>("margin_accounting", false);
     }
 
     virtual ~TradeManagerBase() {}
@@ -90,6 +95,23 @@ public:
         return m_margin ? m_margin->getOpenMargin(datetime, stock, price, num, side) : 0.0;
     }
 
+    /**
+     * Margin an opening really locks: the model requirement on the account rounding grid
+     * @details A requirement below one monetary unit keeps one unit instead of rounding down to
+     * zero. A zero lock would clear the margin marker of the holding and demote it to the cash
+     * books, which would count the full notional as equity while next to nothing was paid.
+     * Returns 0 when the model reports no requirement at all, so the caller falls back to cash.
+     */
+    price_t getOpenMarginToLock(const Datetime& datetime, const Stock& stock, price_t price,
+                                double num, MarginSide side) const {
+        price_t raw = getOpenMargin(datetime, stock, price, num, side);
+        HKU_IF_RETURN(!(raw > 0.0), 0.0);
+
+        int precision = getParam<int>("precision");
+        price_t locked = roundEx(raw, precision);
+        return locked > 0.0 ? locked : 1.0 / std::pow(10.0, double(precision));
+    }
+
     /** Maintain margin of an opening; 0 when no margin model is set */
     virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
                                       double num, MarginSide side) const {
@@ -103,9 +125,30 @@ public:
     }
 
     /**
+     * Whether an opening of the stock is booked by the margin accounting instead of the full cash
+     * @details Only with margin_accounting on; securities covered by the margin model and either
+     *          financed automatically (support_borrow_cash) or free of borrowing (futures, crypto)
+     *          are booked by margin, all the others keep the plain cash accounting
+     */
+    virtual bool isMarginAccounted(const Stock& stock) const {
+        HKU_IF_RETURN(!m_margin || stock.isNull(), false);
+        // An archive written before this switch existed carries no such key
+        HKU_IF_RETURN(!tryGetParam<bool>("margin_accounting", false), false);
+        HKU_IF_RETURN(!m_margin->isMarginTrading(stock), false);
+        bool borrow_cash =
+          haveParam("support_borrow_cash") && getParam<bool>("support_borrow_cash");
+        return borrow_cash || !m_margin->needBorrowAsset(stock);
+    }
+
+    /**
      * Margin occupied by the current long and short positions at the given moment
      * @details A position of a security not covered by the margin model takes nothing, so a mixed
      *          account does not count its plain cash holdings as occupied funds
+     * @note The margin is the requirement recomputed at the given price for every holding the
+     *       model covers, the cash-accounted holdings of a margin security included (a broker
+     * counts the whole collateral), whereas FundsRecord::occupied_margin is the amount already
+     * locked on the margin openings; the two differ by the mark-to-market drift and by the holdings
+     *       opened under the plain cash books
      * @note The positions are priced exactly like getFunds does, otherwise the two halves of
      *       getAvailableMargin would come from two different snapshots
      * @note The occupied margin is always measured on the current positions, therefore it is

@@ -31,6 +31,10 @@ public:
     price_t base_asset{0.0};         /**< Value of the currently invested assets */
     price_t borrow_cash{0.0};        /**< Currently borrowed funds, i.e. the liability */
     price_t borrow_asset{0.0};       /**< Value of the currently borrowed security assets */
+    price_t occupied_margin{0.0};    /**< Margin locked by the margin-accounted holdings, floating
+                                          profit excluded; its contribution is folded into
+                                          market_value for both sides, short_market_value keeps the
+                                          plain cash shorts only */
 
     // Current total assets = cash + long market value + short quantity × (borrow price - current
     // price)
@@ -86,6 +90,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(base_asset);
         ar& BOOST_SERIALIZATION_NVP(borrow_cash);
         ar& BOOST_SERIALIZATION_NVP(borrow_asset);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(occupied_margin);
+        }
     }
 #endif
 };
@@ -102,6 +109,11 @@ HKU_API std::ostream& operator<<(std::ostream&, const FundsRecord&);
 bool HKU_API operator==(const FundsRecord& d1, const FundsRecord& d2);
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = the archives without the occupied margin field (plain cash accounting)
+BOOST_CLASS_VERSION(::hku::FundsRecord, 1)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>
