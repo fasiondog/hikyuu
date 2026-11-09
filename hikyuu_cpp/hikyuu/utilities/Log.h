@@ -97,7 +97,7 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 /** Lock-free hot path used by the HKU_* macros. The returned pointer stays valid for the whole
  *  process lifetime, including when initLogger replaces the logger; only initLogger and the
  *  one-time fallback before it take a lock. */
-spdlog::logger* HKU_UTILS_API getHikyuuLoggerRaw();
+HKU_UTILS_API spdlog::logger* getHikyuuLoggerRaw();
 
 #define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
 #define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)

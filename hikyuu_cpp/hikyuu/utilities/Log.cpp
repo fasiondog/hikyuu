@@ -67,7 +67,7 @@ static void publishLogger(const std::shared_ptr<spdlog::logger>& logger) {
     g_logger_ptr.store(logger.get(), std::memory_order_release);
 }
 
-spdlog::logger* HKU_UTILS_API getHikyuuLoggerRaw() {
+HKU_UTILS_API spdlog::logger* getHikyuuLoggerRaw() {
     spdlog::logger* logger = g_logger_ptr.load(std::memory_order_acquire);
     if (logger) {
         return logger;
