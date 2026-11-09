@@ -170,8 +170,14 @@ class TestConcurrentSetTO(unittest.TestCase):
     def test_concurrent_setTO_clone_reset(self):
         """Concurrent setTO/clone/reset from Python threads must not crash or deadlock"""
         kdata = sm["sh600000"].get_kdata(Query(-100))
-        st_cpp = ST_FixedPercent(0.03)
-        st_py = StoplossPython()
+        # One object per thread: a pure C++ ST releases the GIL during setTO/clone/reset, so
+        # sharing an instance across threads would race on its internal state (m_kdata,
+        # m_calculated, ...). A Python ST holds the GIL and stays serialized, but we still give
+        # it its own object for parity. Matches Signal.py's per-thread objects.
+        st_cpp_1 = ST_FixedPercent(0.03)
+        st_cpp_2 = ST_FixedPercent(0.03)
+        st_py_1 = StoplossPython()
+        st_py_2 = StoplossPython()
 
         errors = []
 
@@ -187,7 +193,8 @@ class TestConcurrentSetTO(unittest.TestCase):
         # A pure C++ ST releases the GIL during setTO/clone/reset, and a Python ST holds it;
         # both must complete without deadlock
         threads = [
-            threading.Thread(target=work, args=(st,)) for st in (st_cpp, st_cpp, st_py, st_py)
+            threading.Thread(target=work, args=(st,))
+            for st in (st_cpp_1, st_cpp_2, st_py_1, st_py_2)
         ]
         for t in threads:
             t.start()
