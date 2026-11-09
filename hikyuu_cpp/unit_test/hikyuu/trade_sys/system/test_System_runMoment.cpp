@@ -86,15 +86,10 @@ public:
         return _getBuyNumber(datetime, stock, price, risk, from);
     }
 };
-}  // namespace
 
-TEST_CASE("test_System_runMoment_all_delayed_trades") {
-    bool split = false;
-    SUBCASE("combined") {}
-    SUBCASE("open_then_close") {
-        split = true;
-    }
-
+// Drive the delayed queue either in one combined moment or as separate open/close calls; both
+// shapes must expose the same fills.
+void checkAllDelayedTrades(bool split) {
     for (auto business : {BUSINESS_BUY, BUSINESS_SELL, BUSINESS_SELL_SHORT, BUSINESS_BUY_SHORT}) {
         CAPTURE(business);
         KData kdata = delayedTradeKData();
@@ -155,19 +150,36 @@ TEST_CASE("test_System_runMoment_all_delayed_trades") {
         CHECK_UNARY(drive(3).tradesOnOpen.empty());
     }
 }
+}  // namespace
+
+TEST_CASE("test_System_runMoment_all_delayed_trades") {
+    SUBCASE("combined") {
+        checkAllDelayedTrades(false);
+    }
+    SUBCASE("open_then_close") {
+        checkAllDelayedTrades(true);
+    }
+}
 
 TEST_CASE("test_System_runMoment_delayed_trade_accounting") {
     KData kdata = delayedTradeKData();
-    auto sg = SG_Manual();
-    sg->setParam<bool>("alternate", false);
-    sg->_addBuySignal(kdata[0].datetime);
-    sg->_addBuySignal(kdata[1].datetime);
-    sg->_addSellSignal(kdata[2].datetime);
-    auto sys = SYS_Simple(crtTM(Datetime(201901010000), 100000.0, TC_Zero()), MM_FixedCount(100),
-                          EnvironmentPtr(), ConditionPtr(), sg);
-    sys->setParam<bool>("sell_delay", false);
-    sys->setTO(kdata);
-    sys->readyForRun();
+    // System::reset() keeps the trade manager, so the batch path is verified on a fresh instance
+    // instead of re-running the moment-driven one on an account that is not reset
+    auto make_sys = [&kdata]() {
+        auto sg = SG_Manual();
+        sg->setParam<bool>("alternate", false);
+        sg->_addBuySignal(kdata[0].datetime);
+        sg->_addBuySignal(kdata[1].datetime);
+        sg->_addSellSignal(kdata[2].datetime);
+        auto sys = SYS_Simple(crtTM(Datetime(201901010000), 100000.0, TC_Zero()),
+                              MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setTO(kdata);
+        sys->readyForRun();
+        return sys;
+    };
+
+    auto sys = make_sys();
     sys->runMoment(kdata[0].datetime);
     sys->runMoment(kdata[1].datetime);
 
@@ -182,12 +194,13 @@ TEST_CASE("test_System_runMoment_delayed_trade_accounting") {
     CHECK_EQ(result.funds.cash, 100000);
     CHECK_UNARY(result.positions.empty());
 
-    /** @arg batch execution and the moment result describe the same ledger */
-    TradeRecordList moment_trades = sys->getTradeRecordList();
-    sys->run(kdata);
-    REQUIRE_EQ(sys->getTradeRecordList().size(), moment_trades.size());
+    /** @arg an independent batch run reproduces the same ledger */
+    const TradeRecordList moment_trades = sys->getTradeRecordList();
+    auto batch = make_sys();
+    batch->run(kdata);
+    REQUIRE_EQ(batch->getTradeRecordList().size(), moment_trades.size());
     for (size_t i = 0; i < moment_trades.size(); ++i) {
-        CHECK_EQ(sys->getTradeRecordList()[i], moment_trades[i]);
+        CHECK_EQ(batch->getTradeRecordList()[i], moment_trades[i]);
     }
 }
 

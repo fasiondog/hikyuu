@@ -272,16 +272,24 @@ TEST_CASE("test_SYS_WalkForward_runMoment_all_delayed_trades") {
     stock.setKRecordList(bars);
     KData kdata =
       stock.getKData(KQueryByDate(bars.front().datetime, bars.back().datetime + Days(1)));
-    auto sg = SG_Manual();
-    sg->setParam<bool>("alternate", false);
-    sg->_addBuySignal(kdata[3].datetime);
-    sg->_addBuySignal(kdata[4].datetime);
-    auto candidate = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
-    auto sys =
-      SYS_WalkForward(SystemList{candidate}, crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()),
-                      3, 5, SE_MaxFundsOptimal());
-    sys->setTO(kdata);
-    sys->readyForRun();
+    // SYS_WalkForward::run() resets the system but keeps the trade manager, so the batch path is
+    // verified on a fresh instance instead of re-running this one on an account that is not reset
+    auto make_sys = [&kdata]() {
+        auto sg = SG_Manual();
+        sg->setParam<bool>("alternate", false);
+        sg->_addBuySignal(kdata[3].datetime);
+        sg->_addBuySignal(kdata[4].datetime);
+        auto candidate =
+          SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+        auto sys = SYS_WalkForward(SystemList{candidate},
+                                   crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()), 3, 5,
+                                   SE_MaxFundsOptimal());
+        sys->setTO(kdata);
+        sys->readyForRun();
+        return sys;
+    };
+
+    auto sys = make_sys();
     for (size_t i = 0; i < 5; ++i) {
         sys->runMomentOnOpen(kdata[i].datetime);
         sys->runMomentOnClose(kdata[i].datetime);
@@ -300,12 +308,13 @@ TEST_CASE("test_SYS_WalkForward_runMoment_all_delayed_trades") {
     CHECK_UNARY(sys->runMomentOnClose(kdata[5].datetime).tradesOnClose.empty());
     CHECK_EQ(sys->getTM()->getHoldNumber(kdata[5].datetime, stock), 200);
 
-    /** @arg the batch path contains the same two fills */
-    TradeRecordList moment_trades = sys->getTradeRecordList();
-    sys->run(kdata);
-    REQUIRE_EQ(sys->getTradeRecordList().size(), moment_trades.size());
+    /** @arg an independent batch run contains the same two fills */
+    const TradeRecordList moment_trades = sys->getTradeRecordList();
+    auto batch = make_sys();
+    batch->run(kdata);
+    REQUIRE_EQ(batch->getTradeRecordList().size(), moment_trades.size());
     for (size_t i = 0; i < moment_trades.size(); ++i) {
-        CHECK_EQ(sys->getTradeRecordList()[i], moment_trades[i]);
+        CHECK_EQ(batch->getTradeRecordList()[i], moment_trades[i]);
     }
 }
 
