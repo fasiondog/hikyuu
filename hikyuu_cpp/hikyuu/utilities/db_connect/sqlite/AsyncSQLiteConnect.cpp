@@ -186,7 +186,11 @@ net::awaitable<int64_t> AsyncSQLiteConnect::exec(const std::string &sql_string) 
         return {rc, affect_rows, rc != SQLITE_OK ? sqlite3_errmsg(m_impl->m_db) : ""};
     };
 
-    auto [rc, affect_rows, errmsg] = co_await co_run(m_impl->m_thread_pool->executor(), exec_func);
+    // GCC cannot prove the coroutine always populates the structured binding, so bind to a
+    // named and default-initialized tuple first to silence -Wmaybe-uninitialized
+    std::tuple<int, int64_t, std::string> result{};
+    result = co_await co_run(m_impl->m_thread_pool->executor(), exec_func);
+    const auto &[rc, affect_rows, errmsg] = result;
 
     SQL_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})", errmsg, sql_string);
 

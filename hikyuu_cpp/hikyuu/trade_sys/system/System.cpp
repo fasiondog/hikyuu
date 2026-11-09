@@ -520,17 +520,15 @@ MomentResult System::runMoment(const Datetime& datetime) {
     result.datetime = datetime;
     result.funds_before_open = m_tm->getFunds(datetime, ktype);
 
-    TradeRecord tr_open = _runMomentOnOpen(today, src_today);
-    if (!tr_open.isNull()) {
-        result.tradesOnOpen.push_back(tr_open);
-    }
+    size_t trade_count = m_trade_list.size();
+    _runMomentOnOpen(today, src_today);
+    result.tradesOnOpen.assign(m_trade_list.begin() + trade_count, m_trade_list.end());
 
     result.funds_before_close = m_tm->getFunds(datetime, ktype);
 
-    TradeRecord tr_close = _runMomentOnClose(today, src_today);
-    if (!tr_close.isNull()) {
-        result.tradesOnClose.push_back(tr_close);
-    }
+    trade_count = m_trade_list.size();
+    _runMomentOnClose(today, src_today);
+    result.tradesOnClose.assign(m_trade_list.begin() + trade_count, m_trade_list.end());
 
     result.funds = m_tm->getFunds(datetime, ktype);
 
@@ -556,10 +554,9 @@ MomentResult System::runMomentOnOpen(const Datetime& datetime) {
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    TradeRecord tr = _runMomentOnOpen(today, src_today);
-    if (!tr.isNull()) {
-        result.tradesOnOpen.push_back(tr);
-    }
+    size_t trade_count = m_trade_list.size();
+    _runMomentOnOpen(today, src_today);
+    result.tradesOnOpen.assign(m_trade_list.begin() + trade_count, m_trade_list.end());
     return result;
 }
 
@@ -571,10 +568,9 @@ MomentResult System::runMomentOnClose(const Datetime& datetime) {
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    TradeRecord tr = _runMomentOnClose(today, src_today);
-    if (!tr.isNull()) {
-        result.tradesOnClose.push_back(tr);
-    }
+    size_t trade_count = m_trade_list.size();
+    _runMomentOnClose(today, src_today);
+    result.tradesOnClose.assign(m_trade_list.begin() + trade_count, m_trade_list.end());
     // Aligned with runMoment: the close stage may also submit the delayed requests (e.g. a delayed
     // buy), surface them so that the upper layer (e.g. the mode A snapshot synthesis) perceives
     // the intent state

@@ -6,7 +6,9 @@
  */
 
 #include <atomic>
+#include <mutex>
 #include <thread>
+#include <vector>
 #include "hikyuu/GlobalInitializer.h"
 #include "os.h"
 #include "Log.h"
@@ -36,20 +38,58 @@ void set_log_level(LOG_LEVEL level) {
     getHikyuuLogger()->set_level((spdlog::level::level_enum)level);
 }
 
-// Cache the "hikyuu" logger instance to avoid hitting the spdlog registry (a global mutex +
-// hash lookup + a shared_ptr copy) on every log call. initLogger registers the logger and
-// refreshes the cache; before the first initLogger the default logger is served as fallback.
-static std::shared_ptr<spdlog::logger> g_hikyuu_logger;
+// The HKU_* macros hit this on every log call, so the read must stay lock-free and refcount-free:
+// a single acquire load of a raw pointer. Only initLogger (startup, rare) publishes a new logger,
+// and it takes the mutex. Pointers stay valid for the process lifetime because every published
+// logger is kept in state.retired: a reader that loaded the old pointer may still be inside spdlog
+// while a re-init replaces it, and C++ background threads may still log during exit.
+static std::atomic<spdlog::logger*> g_logger_ptr{nullptr};
+
+struct LoggerState {
+    std::mutex mutex;
+    std::shared_ptr<spdlog::logger> current;
+    // initLogger is called only a few times, so keeping all instances is cheap
+    std::vector<std::shared_ptr<spdlog::logger>> retired;
+};
+
+// Deliberately leaked: Python's atexit cleanup may destroy spdlog globals while C++ background
+// threads are still logging.
+static LoggerState& loggerState() {
+    static auto* state = new LoggerState();
+    return *state;
+}
+
+// Callers must hold loggerState().mutex.
+static void publishLogger(const std::shared_ptr<spdlog::logger>& logger) {
+    LoggerState& state = loggerState();
+    state.retired.push_back(logger);
+    state.current = logger;
+    g_logger_ptr.store(logger.get(), std::memory_order_release);
+}
+
+HKU_UTILS_API spdlog::logger* getHikyuuLoggerRaw() {
+    spdlog::logger* logger = g_logger_ptr.load(std::memory_order_acquire);
+    if (logger) {
+        return logger;
+    }
+
+    // Before the first initLogger, spdlog's default logger is the fallback. Fetch it before
+    // taking our own mutex, then publish only if nobody else did in the meantime.
+    auto fallback = spdlog::default_logger();
+    LoggerState& state = loggerState();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    if (!g_logger_ptr.load(std::memory_order_relaxed)) {
+        publishLogger(fallback);
+    }
+    return g_logger_ptr.load(std::memory_order_acquire);
+}
 
 std::shared_ptr<spdlog::logger> getHikyuuLogger() {
-    std::shared_ptr<spdlog::logger> logger =
-      std::atomic_load_explicit(&g_hikyuu_logger, std::memory_order_acquire);
-    if (!logger) {
-        logger = spdlog::default_logger();
-        // Concurrent initialization is benign, the last writer wins
-        std::atomic_store_explicit(&g_hikyuu_logger, logger, std::memory_order_release);
-    }
-    return logger;
+    // Cold path: an owning handle keeps the logger alive across a concurrent re-init.
+    getHikyuuLoggerRaw();
+    LoggerState& state = loggerState();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    return state.current;
 }
 
 void HKU_UTILS_API initLogger(bool not_use_color, const std::string& filename) {
@@ -90,7 +130,9 @@ void HKU_UTILS_API initLogger(bool not_use_color, const std::string& filename) {
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v (%s:%#)");
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
-    std::atomic_store_explicit(&g_hikyuu_logger, logger, std::memory_order_release);
+    LoggerState& state = loggerState();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    publishLogger(logger);
 }
 
 }  // namespace hku

@@ -387,9 +387,9 @@ inline SQLStatementPtr DBConnectBase::getStatementWithParams(const std::string &
         return getStatement(sql_statement);
     }
 
-    auto [exec_sql, ordered] = renumberPlaceholders(sql_statement, params);
-    SQLStatementPtr st = getStatement(exec_sql);
-    st->bind_params(ordered);
+    auto placeholders = renumberPlaceholders(sql_statement, params);
+    SQLStatementPtr st = getStatement(placeholders.first);
+    st->bind_params(placeholders.second);
     return st;
 }
 

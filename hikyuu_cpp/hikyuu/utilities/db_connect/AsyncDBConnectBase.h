@@ -342,9 +342,9 @@ inline net::awaitable<AsyncSQLStatementPtr> AsyncDBConnectBase::getStatementWith
         co_return co_await getStatement(sql_statement);
     }
 
-    auto [exec_sql, ordered] = renumberPlaceholders(sql_statement, params);
-    auto st = co_await getStatement(exec_sql);
-    st->bind_params(ordered);
+    auto placeholders = renumberPlaceholders(sql_statement, params);
+    auto st = co_await getStatement(placeholders.first);
+    st->bind_params(placeholders.second);
     co_return st;
 }
 

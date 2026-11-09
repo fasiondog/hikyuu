@@ -67,7 +67,11 @@ enum LOG_LEVEL {
 };
 
 /**
- * Initialize the logger
+ * Initialize or replace the logger. Normally called once at startup, before worker threads start.
+ * Repeated calls are thread-safe: a logger that is replaced stays alive until process exit, so a
+ * thread still logging through the old pointer is safe. Since old loggers (and their log file
+ * handles) are kept, do not call this in a loop. Each process has its own logger and must
+ * initialize it separately; before the first call spdlog's default logger is used.
  * @param not_use_color do not use the colored output
  * @param filename the log file name; it is "./hikyuu.log" in the current directory by default when
  *                 it is empty; you need to guarantee that the directory exists and is writable
@@ -87,14 +91,20 @@ LOG_LEVEL HKU_UTILS_API get_log_level();
  */
 void HKU_UTILS_API set_log_level(LOG_LEVEL level);
 
+/** Owning handle to the current logger, for callers that need to keep it alive. */
 std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 
-#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(::hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(::hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_INFO(...) SPDLOG_LOGGER_INFO(::hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_WARN(...) SPDLOG_LOGGER_WARN(::hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(::hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(::hku::getHikyuuLogger(), __VA_ARGS__)
+/** Lock-free hot path used by the HKU_* macros. The returned pointer stays valid for the whole
+ *  process lifetime, including when initLogger replaces the logger; only initLogger and the
+ *  one-time fallback before it take a lock. */
+HKU_UTILS_API spdlog::logger* getHikyuuLoggerRaw();
+
+#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
+#define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
+#define HKU_INFO(...) SPDLOG_LOGGER_INFO(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
+#define HKU_WARN(...) SPDLOG_LOGGER_WARN(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
+#define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
+#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(::hku::getHikyuuLoggerRaw(), __VA_ARGS__)
 
 ///////////////////////////////////////////////////////////////////////////////
 //

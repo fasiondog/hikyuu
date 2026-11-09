@@ -36,6 +36,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/imp/MultiSystem.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/system/crt/SYS_WalkForward.h>
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
@@ -8189,6 +8190,79 @@ TEST_CASE("test_MultiSystem_data_lag_deferred_leg_pricing") {
     CHECK_EQ(first_sell, Datetime(20100702));
     CHECK_UNARY(first_sell < axis[3]);
     CHECK_EQ(sell_price, expected_open);
+}
+
+TEST_CASE("test_MultiSystem_mode_b_all_delayed_trades") {
+    Stock stock("TEST", "MIRROR", "Delayed mirror");
+    stock.setKRecordList({KRecord(Datetime(202001020000), 10, 11, 9, 10, 100, 100),
+                          KRecord(Datetime(202001030000), 10, 10, 10, 10, 0, 0),
+                          KRecord(Datetime(202001060000), 10, 11, 9, 10, 100, 100),
+                          KRecord(Datetime(202001070000), 10, 11, 9, 10, 100, 100)});
+    KData kdata = stock.getKData(KQuery(0));
+    auto sg = SG_Manual();
+    sg->setParam<bool>("alternate", false);
+    sg->_addBuySignal(kdata[0].datetime);
+    sg->_addBuySignal(kdata[1].datetime);
+    auto child = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    child->setTO(kdata);
+    auto parent = std::make_shared<MultiSystem>(SystemList{child});
+    parent->setTM(crtTM(Datetime(201901010000), 100000.0, TC_Zero()));
+    parent->setMode("B");
+    parent->setAdjustCycle(10);
+    parent->setTradeOnClose(true);
+    parent->run(kdata);
+
+    /** @arg both child fills reach the real parent account on a non-rebalancing bar */
+    REQUIRE_EQ(child->getTradeRecordList().size(), 2);
+    const auto& parent_trades = parent->getTradeRecordList();
+    double bought = 0;
+    for (const auto& tr : parent_trades) {
+        CHECK_EQ(tr.business, BUSINESS_BUY);
+        CHECK_EQ(tr.datetime, kdata[2].datetime);
+        bought += tr.number;
+    }
+    CHECK_EQ(bought, 200);
+    CHECK_EQ(parent->getTM()->getHoldNumber(kdata[3].datetime, stock), 200);
+    CHECK_EQ(child->getTM()->getHoldNumber(kdata[3].datetime, stock), 200);
+    CHECK_EQ(parent->getTM()->currentCash(), child->getTM()->currentCash());
+}
+
+TEST_CASE("test_MultiSystem_mode_c_all_delayed_trades") {
+    Stock stock("TEST", "MODEC", "Delayed shared account");
+    stock.setKRecordList({KRecord(Datetime(202001020000), 10, 11, 9, 10, 100, 100),
+                          KRecord(Datetime(202001030000), 10, 10, 10, 10, 0, 0),
+                          KRecord(Datetime(202001060000), 10, 11, 9, 10, 100, 100),
+                          KRecord(Datetime(202001070000), 10, 11, 9, 10, 100, 100)});
+    KData kdata = stock.getKData(KQuery(0));
+    auto sg = SG_Manual();
+    sg->setParam<bool>("alternate", false);
+    sg->_addBuySignal(kdata[0].datetime);
+    sg->_addBuySignal(kdata[1].datetime);
+    auto child = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    child->setTO(kdata);
+
+    auto parent = std::make_shared<MultiSystem>();
+    parent->setTM(crtTM(Datetime(201901010000), 100000.0, TC_Zero()));
+    parent->setMode("C");
+    parent->setAdjustCycle(10);
+    // Mode C derives its delay mapping from trade_on_close: only toc=false keeps the delayed queue
+    parent->setTradeOnClose(false);
+    parent->add(child);
+    parent->run(kdata);
+
+    /** @arg the sub-system account IS the real account of the parent */
+    CHECK(child->getTM() == parent->getTM());
+
+    /** @arg both delayed fills are reported on the parent ledger, matching the shared account */
+    double bought = 0;
+    for (const auto& tr : parent->getTradeRecordList()) {
+        CHECK_EQ(tr.business, BUSINESS_BUY);
+        CHECK_EQ(tr.datetime, kdata[2].datetime);
+        bought += tr.number;
+    }
+    CHECK_EQ(bought, 200);
+    CHECK_EQ(parent->getTM()->getHoldNumber(kdata[3].datetime, stock), 200);
+    CHECK_EQ(parent->getTradeRecordList().size(), child->getTradeRecordList().size());
 }
 
 /** @} */ /** @} */
