@@ -279,6 +279,20 @@ def run_md2_checks():
         check("variety_override", tm.buy(bar.datetime, rb, bar.close, 10.0).business == BUSINESS.BUY,
               "legal number rejected after the multiplier override")
 
+        # the margin money flows are absolute amounts, so a dropped multiplier shows up as a 10x gap
+        mtm = crtTM(bar.datetime, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.1, 0.1))
+        mtm.set_param("margin_accounting", True)
+        margin = round(0.1 * round(bar.close * 10.0 * 10.0, 2), 2)
+        check("variety_override", mtm.buy(bar.datetime, rb, bar.close, 10.0).business == BUSINESS.BUY,
+              "margin buy rejected after the multiplier override")
+        check("variety_override", abs(mtm.current_cash - (1000000.0 - margin)) < 0.01,
+              "margin buy did not lock the multiplied margin (%s)" % margin)
+        check("variety_override",
+              abs(mtm.get_position(bar.datetime, rb).margin - margin) < 0.01,
+              "the booked position margin is not the multiplied amount")
+        check("variety_override", abs(mtm.get_occupied_margin(bar.datetime) - margin) < 0.01,
+              "the occupied margin view is not scaled by the multiplier")
+
         rb.min_trade_number = 100.0
         tm2 = crtTM(bar.datetime, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.5))
         check("variety_override", tm2.buy(bar.datetime, rb, bar.close, 10.0).business == BUSINESS.INVALID,

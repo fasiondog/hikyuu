@@ -210,6 +210,69 @@ class MarginTest(unittest.TestCase):
         self.assertAlmostEqual(tm.get_funds().occupied_margin, 0.0)
         self.assertAlmostEqual(tm.get_position(dt, stock).open_basis, 0.0)
 
+    def test_TradeManager_margin_accounting_futures_multiplier(self):
+        """Every money flow of a futures trade scales with the contract multiplier
+
+        The fixture data keeps the neutral type-level unit of 1, so the multiplier is overridden at
+        runtime (the variety parameter) and the expected amounts are written as absolute numbers
+        """
+        rb = sm['SHFRB0000']
+        dt = Datetime(200903270000)
+        close = rb.get_market_value(dt, "DAY")
+        tick_value = rb.tick_value
+        self.assertEqual(rb.unit, 1.0)
+
+        multiplier = 10.0       # rebar: 10 tons per lot
+        number = 10.0           # lots
+        nominal = round(close * number * multiplier, 2)
+        margin = round(0.1 * nominal, 2)
+
+        try:
+            rb.tick_value = tick_value * multiplier
+            self.assertEqual(rb.unit, multiplier)
+
+            tm = crtTM(dt, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.1, 0.1))
+            tm.set_param("margin_accounting", True)
+            self.assertTrue(tm.is_margin_accounted(rb))
+
+            # the openable quantity is measured on the margin of one lot
+            self.assertAlmostEqual(tm.get_max_open_number(dt, rb, close, margin), number)
+
+            tr = tm.buy(dt, rb, close, number)
+            self.assertEqual(tr.business, BUSINESS.BUY)
+            self.assertAlmostEqual(tr.cash, 1000000.0 - margin)
+            position = tm.get_position(dt, rb)
+            self.assertAlmostEqual(position.margin, margin)
+            self.assertAlmostEqual(position.open_basis, nominal)
+            self.assertAlmostEqual(tm.get_occupied_margin(dt), margin)
+            self.assertAlmostEqual(tm.get_available_margin(dt), 1000000.0 - margin)
+            funds = tm.get_funds(dt)
+            self.assertAlmostEqual(funds.occupied_margin, margin)
+            self.assertAlmostEqual(funds.net_assets, 1000000.0)
+
+            # closing higher realizes the multiplied difference, the margin comes back
+            up = close + 10.0
+            realized = round((up - close) * number * multiplier, 2)
+            tr = tm.sell(dt, rb, up, number)
+            self.assertEqual(tr.business, BUSINESS.SELL)
+            self.assertAlmostEqual(tm.current_cash, 1000000.0 + realized)
+            self.assertAlmostEqual(tm.get_funds(dt).occupied_margin, 0.0)
+
+            # the short side keeps the same money basis
+            tm2 = crtTM(dt, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.1, 0.1))
+            tm2.set_param("margin_accounting", True)
+            tr = tm2.sell_short(dt, rb, close, number)
+            self.assertEqual(tr.business, BUSINESS.SELL_SHORT)
+            self.assertAlmostEqual(tm2.current_cash, 1000000.0 - margin)
+            self.assertAlmostEqual(tm2.get_short_position(rb).margin, margin)
+            tr = tm2.buy_short(dt, rb, up, number)
+            self.assertEqual(tr.business, BUSINESS.BUY_SHORT)
+            self.assertAlmostEqual(tm2.current_cash, 1000000.0 - realized)
+        finally:
+            rb.tick_value = tick_value
+
+        self.assertAlmostEqual(rb.unit, 1.0)
+
     def test_TradeManager_short_position(self):
         """The short-side position bookkeeping is visible through the accessors"""
         rb = sm['SHFRB0000']

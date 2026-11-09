@@ -131,6 +131,32 @@ static TradeManagerPtr crtMarginAccountTM(const Datetime& datetime, price_t init
     return tm;
 }
 
+namespace {
+
+/**
+ * Overrides the variety-level contract multiplier of a loaded security for the duration of a case
+ * (the runtime override of Stock::tickValue; the fixture keeps the neutral type-level unit of 1, so
+ * without it a missing multiplication would stay invisible). A case using it must write its
+ * expectations with the multiplier as a literal instead of reading stock.unit() back. It changes
+ * the data shared by the whole process, so the cases may not run in parallel
+ */
+class ScopedMultiplier {
+public:
+    ScopedMultiplier(Stock stock, double multiplier)
+    : m_stock(stock), m_tickValue(stock.tickValue()) {
+        m_stock.tickValue(m_tickValue * multiplier);
+    }
+    ~ScopedMultiplier() {
+        m_stock.tickValue(m_tickValue);
+    }
+
+private:
+    Stock m_stock;
+    price_t m_tickValue;
+};
+
+}  // namespace
+
 /** @par Test points */
 TEST_CASE("test_TradeManager_margin_borrowing_power") {
     StockManager& sm = StockManager::instance();
@@ -1096,6 +1122,168 @@ TEST_CASE("test_TradeManager_margin_accounting_futures_unit") {
                BUSINESS_BUY_SHORT);
     // Covering higher is a loss on the short side
     CHECK_EQ(tm2->currentCash(), doctest::Approx(1000000.0 - realized));
+}
+
+/** @par Test points: every money flow of a margin-accounted futures trade scales with the
+ *  contract multiplier; the expected amounts are absolute on purpose */
+TEST_CASE("test_TradeManager_margin_accounting_futures_multiplier") {
+    StockManager& sm = StockManager::instance();
+    Stock rb = sm["SHFRB0000"];
+    REQUIRE_UNARY(!rb.isNull());
+    // The type-level unit of the fixture is the neutral 1, the case supplies the multiplier itself
+    REQUIRE_EQ(rb.unit(), 1.0);
+
+    Datetime dt(200903270000);
+    price_t close = rb.getMarketValue(dt, KQuery::DAY);
+    REQUIRE_UNARY(close > 0.0);
+
+    static const double MULTIPLIER = 10.0;  // rebar: 10 tons per lot
+    ScopedMultiplier scoped(rb, MULTIPLIER);
+    REQUIRE_EQ(rb.unit(), MULTIPLIER);
+
+    double number = 10.0;
+    price_t nominal = roundEx(close * number * MULTIPLIER, 2);
+    price_t margin = roundEx(0.1 * nominal, 2);
+    REQUIRE_UNARY(margin > 0.0);
+
+    // The quantity grid below assumes the lot size divides the tested numbers and the cap stays
+    // above the largest of them, so the fixture cannot silently change those expectations
+    REQUIRE_UNARY(rb.minTradeNumber() > 0.0);
+    REQUIRE_EQ(std::floor(number / rb.minTradeNumber()) * rb.minTradeNumber(), number);
+    REQUIRE_UNARY(rb.maxTradeNumber() >= 10.0 * number);
+
+    auto tm = crtMarginAccountTM(dt, 1000000.0);
+
+    /** @arg The lock is one tenth of the multiplied notional */
+    CHECK_EQ(tm->getOpenMarginToLock(dt, rb, close, number, MarginSide::LONG),
+             doctest::Approx(margin));
+
+    /** @arg The openable quantity is grid-measured on the margin of one lot, not of one share */
+    CHECK_EQ(tm->getMaxOpenNumber(dt, rb, close, margin, MarginSide::LONG),
+             doctest::Approx(number));
+    CHECK_EQ(tm->getMaxOpenNumber(dt, rb, close, 10.0 * margin, MarginSide::LONG),
+             doctest::Approx(10.0 * number));
+
+    REQUIRE_EQ(tm->buy(dt, rb, close, number, 0.0, 0.0, close, PART_SIGNAL).business, BUSINESS_BUY);
+
+    /** @arg The opening pays the margin of the multiplied notional and books it as the lock */
+    CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 - margin));
+    CHECK_EQ(tm->getPosition(dt, rb).margin, doctest::Approx(margin));
+    CHECK_EQ(tm->getPosition(dt, rb).openBasis, doctest::Approx(nominal));
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
+    CHECK_EQ(tm->getOccupiedMargin(dt), doctest::Approx(margin));
+    CHECK_EQ(tm->getAvailableMargin(dt), doctest::Approx(1000000.0 - margin));
+
+    /** @arg At the entry price the equity is still the whole capital, the lock being part of it */
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).net_assets(), doctest::Approx(1000000.0));
+
+    /** @arg Closing half pays the half margin back plus the half notional difference */
+    price_t up = close + 10.0;
+    double half = number / 2.0;
+    price_t released = roundEx(margin * 0.5, 2);
+    price_t realized = roundEx((up - close) * half * MULTIPLIER, 2);
+    REQUIRE_EQ(tm->sell(dt, rb, up, half, 0.0, 0.0, up, PART_SIGNAL).business, BUSINESS_SELL);
+    CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 - margin + released + realized));
+    CHECK_EQ(tm->getPosition(dt, rb).margin, doctest::Approx(margin - released));
+
+    /** @arg Backfilling the same records rebuilds the identical lock, cash and equity */
+    auto copy = crtMarginAccountTM(dt, 1000000.0);
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.business == BUSINESS_INIT || tr.business == BUSINESS_BORROW_CASH) {
+            continue;
+        }
+        REQUIRE_UNARY(copy->addTradeRecord(tr));
+    }
+    CHECK_EQ(copy->currentCash(), doctest::Approx(tm->currentCash()));
+    CHECK_EQ(copy->getPosition(dt, rb).margin, doctest::Approx(margin - released));
+    CHECK_EQ(copy->getPosition(dt, rb).openBasis, doctest::Approx(nominal / 2.0));
+
+    // The rest is closed and re-opened on the next trading day: the day-1 query of the batch view
+    // then takes the trade-list replay branch (a same-day query falls to the live branch) with a
+    // still-open holding, so the replay accumulator runs on the multiplied contract too
+    KQuery next_days = KQueryByDate(dt, Datetime(200904100000), KQuery::DAY);
+    KData next_bars = rb.getKData(next_days);
+    REQUIRE_UNARY(next_bars.size() >= 2);
+    Datetime dt2 = next_bars[1].datetime;
+    REQUIRE_UNARY(dt2 > Datetime(dt.year(), dt.month(), dt.day(), 23, 59));
+    price_t close2 = next_bars[1].closePrice;
+    REQUIRE_UNARY(close2 > 0.0);
+    price_t realized2 = roundEx((close2 - close) * half * MULTIPLIER, 2);
+
+    /** @arg The full close returns the rest, so nothing of the lock stays behind */
+    REQUIRE_EQ(tm->sell(dt2, rb, close2, half, 0.0, 0.0, close2, PART_SIGNAL).business,
+               BUSINESS_SELL);
+    CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 + realized + realized2));
+    CHECK_EQ(tm->getFunds(dt2, KQuery::DAY).occupied_margin, doctest::Approx(0.0));
+
+    price_t nominal2 = roundEx(close2 * number * MULTIPLIER, 2);
+    price_t margin2 = roundEx(0.1 * nominal2, 2);
+    REQUIRE_EQ(tm->buy(dt2, rb, close2, number, 0.0, 0.0, close2, PART_SIGNAL).business,
+               BUSINESS_BUY);
+
+    /** @arg The batch view replays the first day onto its half-closed holding */
+    FundsRecordList replay = tm->getFundsList({dt, dt2});
+    REQUIRE_EQ(replay.size(), 2u);
+    CHECK_EQ(replay[0].occupied_margin, doctest::Approx(margin - released));
+    CHECK_EQ(replay[0].net_assets(), doctest::Approx(1000000.0 + realized));
+
+    /** @arg The latest date reports the live books, the new lock with the entry-price equity */
+    CHECK_EQ(replay[1].occupied_margin, doctest::Approx(margin2));
+    CHECK_EQ(replay[1].net_assets(), doctest::Approx(1000000.0 + realized + realized2));
+}
+
+/** @par Test points: the short side of a multiplied futures contract keeps the same money basis */
+TEST_CASE("test_TradeManager_margin_accounting_futures_multiplier_short") {
+    StockManager& sm = StockManager::instance();
+    Stock rb = sm["SHFRB0000"];
+    REQUIRE_UNARY(!rb.isNull());
+    REQUIRE_EQ(rb.unit(), 1.0);
+
+    Datetime dt(200903270000);
+    price_t close = rb.getMarketValue(dt, KQuery::DAY);
+    REQUIRE_UNARY(close > 0.0);
+
+    static const double MULTIPLIER = 10.0;
+    ScopedMultiplier scoped(rb, MULTIPLIER);
+    REQUIRE_EQ(rb.unit(), MULTIPLIER);
+
+    double number = 10.0;
+    price_t nominal = roundEx(close * number * MULTIPLIER, 2);
+    price_t margin = roundEx(0.1 * nominal, 2);
+    REQUIRE_UNARY(margin > 0.0);
+
+    auto tm = crtMarginAccountTM(dt, 1000000.0);
+    REQUIRE_EQ(tm->sellShort(dt, rb, close, number, 0.0, 0.0, close, PART_SIGNAL).business,
+               BUSINESS_SELL_SHORT);
+
+    /** @arg The short opening locks the multiplied margin and keeps the sale proceeds out */
+    CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 - margin));
+    CHECK_EQ(tm->getShortPosition(rb).margin, doctest::Approx(margin));
+    CHECK_EQ(tm->getShortPosition(rb).openBasis, doctest::Approx(nominal));
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
+    CHECK_EQ(tm->getOccupiedMargin(dt), doctest::Approx(margin));
+
+    /** @arg At the entry price the short leaves the equity at the whole capital */
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).net_assets(), doctest::Approx(1000000.0));
+
+    /** @arg Covering higher realizes the multiplied loss against the released margin */
+    price_t up = close + 10.0;
+    price_t loss = roundEx((up - close) * number * MULTIPLIER, 2);
+    REQUIRE_EQ(tm->buyShort(dt, rb, up, number, 0.0, 0.0, up, PART_SIGNAL).business,
+               BUSINESS_BUY_SHORT);
+    CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 - loss));
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(0.0));
+
+    /** @arg A partial cover releases the margin and keeps the rest of the lock */
+    auto tm2 = crtMarginAccountTM(dt, 1000000.0);
+    double half = number / 2.0;
+    REQUIRE_EQ(tm2->sellShort(dt, rb, close, number, 0.0, 0.0, close, PART_SIGNAL).business,
+               BUSINESS_SELL_SHORT);
+    price_t released = roundEx(margin * 0.5, 2);
+    REQUIRE_EQ(tm2->buyShort(dt, rb, close, half, 0.0, 0.0, close, PART_SIGNAL).business,
+               BUSINESS_BUY_SHORT);
+    CHECK_EQ(tm2->currentCash(), doctest::Approx(1000000.0 - margin + released));
+    CHECK_EQ(tm2->getShortPosition(rb).margin, doctest::Approx(margin - released));
 }
 
 /** @par Test points: the margin accounting warns when cash lots join a margin holding */
