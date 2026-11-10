@@ -50,6 +50,8 @@ public:
     void _mirrorParams() {
         setParam<int>("precision", m_tm->precision());
         setParam<bool>("margin_accounting", m_tm->tryGetParam<bool>("margin_accounting", false));
+        setParam<bool>("settle_with_close", m_tm->tryGetParam<bool>("settle_with_close", true));
+        setParam<bool>("force_liquidate", m_tm->tryGetParam<bool>("force_liquidate", false));
         setParam<bool>("support_borrow_cash",
                        m_tm->tryGetParam<bool>("support_borrow_cash", false));
         setParam<bool>("support_borrow_stock",
@@ -120,6 +122,23 @@ public:
     virtual price_t getAvailableMargin(const Datetime& datetime,
                                        KQuery::KType ktype = KQuery::DAY) override {
         return m_tm->getAvailableMargin(datetime, ktype);
+    }
+
+    /**
+     * Settle the wrapped account
+     * @note Forwarded to the real book (the settlement is a real cash posting) but only inside
+     *       the window: before run_start the real account holds nothing of this run
+     */
+    virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
+        return (datetime >= m_run_start) ? m_tm->settlement(datetime, ktype) : false;
+    }
+
+    virtual bool isSettled(const Datetime& datetime) const override {
+        return m_tm->isSettled(datetime);
+    }
+
+    virtual bool isForcedLiquidationQueued(const Datetime& datetime) const override {
+        return m_tm->isForcedLiquidationQueued(datetime);
     }
 
     /** A Python defined cost or margin model of the wrapped account decides the pickling too */

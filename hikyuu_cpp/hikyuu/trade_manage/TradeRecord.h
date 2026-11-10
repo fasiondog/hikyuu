@@ -21,6 +21,9 @@ namespace hku {
 
 /**
  * Business type
+ * @note The archives store the name returned by getBusinessName() instead of the number, so the
+ *       numbering is a runtime detail: BUSINESS_SETTLEMENT reuses the number the retired
+ *       BUSINESS_INVALID had, which leaves every historical archive readable as is
  * @ingroup TradeManagerClass
  */
 enum BUSINESS {
@@ -43,7 +46,9 @@ enum BUSINESS {
     BUSINESS_BORROW_ADJUST = 16,         /**< Borrowed stock quantity adjustment for ex-rights */
     BUSINESS_SHORT_ADJUST = 17,          /**< Short position quantity adjustment for ex-rights */
     BUSINESS_DIVIDEND_COMPENSATION = 18, /**< Dividend compensation paid to the lender (short) */
-    BUSINESS_INVALID = 19                /**< Invalid type */
+    BUSINESS_SETTLEMENT = 19,            /**< Daily settlement of a margin holding */
+    BUSINESS_INTEREST = 20,              /**< Accrued interest on a liability */
+    BUSINESS_INVALID = 21                /**< Invalid type */
 };
 
 /**
@@ -88,6 +93,8 @@ public:
     CostRecord cost;    ///< Trade cost
     price_t stoploss;   ///< Stop-loss price
     price_t cash;       ///< Cash balance
+    price_t margin;     ///< Margin the opening locked; 0 on the cash books and for every business
+                        ///< other than buy / sell short
     SystemPart from;  ///< Auxiliary record of the trading system part that issued the instruction;
                       ///< Null<int>() means invalid
     string remark;    ///< Remark (at most 100 encoded characters)
@@ -111,6 +118,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(margin);
+        }
         ar& BOOST_SERIALIZATION_NVP(remark);
         string part_name(getSystemPartName(from));
         ar& bs::make_nvp<string>("from", part_name);
@@ -135,6 +145,11 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(margin);
+        } else {
+            margin = 0.0;
+        }
         ar& BOOST_SERIALIZATION_NVP(remark);
         string part_name;
         ar& bs::make_nvp<string>("from", part_name);
@@ -163,6 +178,11 @@ inline bool operator!=(const TradeRecord& d1, const TradeRecord& d2) {
 }
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = the archives without the margin field (the cash books never lock one)
+BOOST_CLASS_VERSION(::hku::TradeRecord, 1)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>

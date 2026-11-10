@@ -378,6 +378,19 @@ public:
                                    const KQuery::KType& ktype = KQuery::DAY) override;
 
     /**
+     * Settle the margin holdings as of the given moment
+     * @note See TradeManagerBase::settlement; the settled state is rebuilt from the trade list, so
+     *       no extra archive member is needed
+     */
+    virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override;
+
+    /** Whether the given moment carries a settlement record already */
+    virtual bool isSettled(const Datetime& datetime) const override;
+
+    /** Whether a forced liquidation armed by settlement() is still pending */
+    virtual bool isForcedLiquidationQueued(const Datetime& datetime) const override;
+
+    /**
      * Add a trade record directly
      * @note If an account initialization record is added, all the existing trade and position
      *       records are cleared
@@ -432,6 +445,7 @@ private:
     bool _add_return_stock_tr(const TradeRecord&);
     bool _add_sell_short_tr(const TradeRecord&);
     bool _add_buy_short_tr(const TradeRecord&);
+    bool _add_settlement_tr(const TradeRecord&);
 
 private:
     Datetime m_init_datetime;         // Account creation date
@@ -475,6 +489,13 @@ private:
     // is immutable (a live refresh is done by the nightly restart/reload, which rebuilds the
     // state), so an already-checked range never needs to be rescanned for late-arriving data.
     unordered_map<uint64_t, Datetime> m_tmp_weight_checked_until;
+
+    // Transient margin risk state, derived and rebuilt by settlement: the state of the last
+    // maintenance check and the moment a forced liquidation was armed at (Null when none is
+    // pending). Not serialized: a reload restarts from a healthy state and the next settlement
+    // re-derives it from the books, so a live account self-heals at its next close.
+    bool m_tmp_margin_called{false};
+    Datetime m_tmp_force_liquidate_date;
 
 //==================================================
 // Serialization support

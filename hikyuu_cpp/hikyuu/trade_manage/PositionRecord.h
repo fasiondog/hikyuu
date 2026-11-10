@@ -42,26 +42,28 @@ public:
      */
     price_t totalProfit() const;
 
-    Stock stock;              ///< Trading object
-    Datetime takeDatetime;    ///< Date of the first position opening
-    Datetime cleanDatetime;   ///< Closing date, it is Null<Datetime>() in the current position
-                              ///< records
-    double number{0.0};       ///< Current held quantity
-    price_t stoploss{0.0};    ///< Current stop-loss price
-    price_t goalPrice{0.0};   ///< Current target price
-    double totalNumber{0.0};  ///< Accumulated held quantity
-    price_t buyMoney{0.0};    ///< Accumulated buy funds
-    price_t totalCost{0.0};   ///< Accumulated total trade cost
-    price_t totalRisk{0.0};   ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
-                              ///< quantity, excluding the trade cost
-    price_t sellMoney{0.0};   ///< Accumulated sell funds
-    price_t margin{0.0};      ///< Margin locked by the holding, 0 means the plain cash accounting
-    price_t openBasis{
-      0.0};               ///< Opening notional of the still-held lots (price x number x unit); the
-                          ///< realized profit and the equity of a margin holding are measured
-                          ///< against it, and it is released proportionally as the lots close
-    size_t buyCount{0};   ///< Number of buys
-    size_t sellCount{0};  ///< Number of sells
+    Stock stock;               ///< Trading object
+    Datetime takeDatetime;     ///< Date of the first position opening
+    Datetime cleanDatetime;    ///< Closing date, it is Null<Datetime>() in the current position
+                               ///< records
+    double number{0.0};        ///< Current held quantity
+    price_t stoploss{0.0};     ///< Current stop-loss price
+    price_t goalPrice{0.0};    ///< Current target price
+    double totalNumber{0.0};   ///< Accumulated held quantity
+    price_t buyMoney{0.0};     ///< Accumulated buy funds
+    price_t totalCost{0.0};    ///< Accumulated total trade cost
+    price_t totalRisk{0.0};    ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
+                               ///< quantity, excluding the trade cost
+    price_t sellMoney{0.0};    ///< Accumulated sell funds
+    price_t margin{0.0};       ///< Margin locked by the holding, 0 means the plain cash accounting
+    price_t openBasis{0.0};    ///< Opening notional of the still-held lots (price x number x unit);
+                               ///< the cost reference, released proportionally as the lots close
+    price_t settleBasis{0.0};  ///< Mark-to-market basis of the still-held lots, rolled to the
+                               ///< settlement price on each settlement; the realized profit and the
+                               ///< equity of a margin holding are measured against it; it equals
+                               ///< openBasis until the first settlement
+    size_t buyCount{0};        ///< Number of buys
+    size_t sellCount{0};       ///< Number of sells
 
 //===================
 // Serialization support
@@ -93,6 +95,9 @@ private:
         }
         if (version >= 2) {
             ar& BOOST_SERIALIZATION_NVP(openBasis);
+        }
+        if (version >= 3) {
+            ar& BOOST_SERIALIZATION_NVP(settleBasis);
         }
     }
 
@@ -128,6 +133,12 @@ private:
             price_t notional = buyMoney > 0.0 ? buyMoney : sellMoney;
             openBasis = totalNumber > 0.0 ? notional * (number / totalNumber) : 0.0;
         }
+        if (version >= 3) {
+            ar& BOOST_SERIALIZATION_NVP(settleBasis);
+        } else {
+            // Before the mark-to-market basis existed the opening notional played both roles
+            settleBasis = openBasis;
+        }
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -150,7 +161,8 @@ bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2);
 #if HKU_SUPPORT_SERIALIZATION
 // 0 = the archives without the margin field (plain cash accounting)
 // 1 = the margin field, 2 = the remaining opening cost basis
-BOOST_CLASS_VERSION(::hku::PositionRecord, 2)
+// 3 = the mark-to-market basis (settleBasis, it equals openBasis before the first settlement)
+BOOST_CLASS_VERSION(::hku::PositionRecord, 3)
 #endif
 
 #if FMT_VERSION >= 90000

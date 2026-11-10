@@ -46,7 +46,11 @@ void export_PositionRecord(py::module& m) {
                      "The margin locked by the holding (float); 0 means the plain cash accounting")
       .def_readwrite("open_basis", &PositionRecord::openBasis,
                      "The opening notional of the still-held lots (float); released proportionally "
-                     "as the lots close")
+                     "as the lots close, the cost reference")
+      .def_readwrite("settle_basis", &PositionRecord::settleBasis,
+                     "The mark-to-market basis of the still-held lots (float); rolled to the "
+                     "settlement price on each settlement and used by the realized profit and the "
+                     "equity of a margin holding")
       .def_readwrite("buy_count", &PositionRecord::buyCount, "The cumulative buy count (size_t)")
       .def_readwrite("sell_count", &PositionRecord::sellCount, "The cumulative sell count (size_t)")
       .def_property_readonly("total_profit", &PositionRecord::totalProfit,
@@ -189,8 +193,7 @@ void export_PositionRecord(py::module& m) {
                       240);
 
           RawData* raw = data.release();
-          return py::array(dtype, total, raw,
-                           py::capsule(raw, [](void* p) { std::free(p); }));
+          return py::array(dtype, total, raw, py::capsule(raw, [](void* p) { std::free(p); }));
       },
       R"(Convert the position list to Numpy
 

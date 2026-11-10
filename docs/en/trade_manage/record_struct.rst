@@ -10,7 +10,7 @@ Trade Business Types
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: trade business type
-    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "BORROW_ADJUST" | "SHORT_ADJUST" | "DIVIDEND_COMPENSATION" | "UNKNOWN")
+    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "BORROW_ADJUST" | "SHORT_ADJUST" | "DIVIDEND_COMPENSATION" | "SETTLEMENT" | "INTEREST" | "UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS
@@ -34,6 +34,8 @@ Trade Business Types
     - BUSINESS.BORROW_ADJUST  - Borrowed stock quantity adjustment (ex-rights)
     - BUSINESS.SHORT_ADJUST   - Short position quantity adjustment (ex-rights)
     - BUSINESS.DIVIDEND_COMPENSATION - Dividend compensation paid to the lender (short)
+    - BUSINESS.SETTLEMENT    - Daily settlement of a margin holding (the settlement price against the mark-to-market basis), see :doc:`margin`
+    - BUSINESS.INTEREST      - Interest accrued on a liability
     - BUSINESS.INVALID        - Invalid type
 
 
@@ -91,9 +93,17 @@ Trade Records
 
     .. py:attribute:: stoploss Stop-loss price (float)
     .. py:attribute:: cash     Cash balance after the fill (float)
+    .. py:attribute:: margin   The margin this opening locked (float); non-zero only for a margin-accounted buy or sell short, 0 for every other business, so a replay reproduces the books of that moment; on a daily settlement record (``SETTLEMENT``) it is the relocked margin after the settlement
     .. py:attribute:: part
 
         Identifies the trading-system part that issued the instruction (see the SystemPart enumeration, also exposed as System.Part).
+
+    .. note::
+
+        A daily settlement record (``BUSINESS.SETTLEMENT``) is not a fill: ``real_price`` is the settlement
+        price, ``number`` carries the direction (positive long, negative short, so a security held on both
+        sides is told apart), ``cash`` is the cash balance after the posting, ``cost`` is 0 and ``part`` is
+        the invalid part (``System.Part.INVALID``).
 
 
 
@@ -133,7 +143,8 @@ Position Records
     .. py:attribute:: total_risk     Cumulative risk (float): the sum over all entries of (entry price - stop-loss price) x entry quantity, excluding transaction costs
     .. py:attribute:: sell_money     Cumulative sale proceeds (float)
     .. py:attribute:: margin         The margin currently locked (float); 0 means the plain cash accounting (see :doc:`margin`)
-    .. py:attribute:: open_basis     The opening notional of the still-held lots (float) = opening price x number x unit, released proportionally as the lots close
+    .. py:attribute:: open_basis     The opening notional of the still-held lots (float) = opening price x number x unit, released proportionally as the lots close; the cost reference
+    .. py:attribute:: settle_basis   The mark-to-market basis of the still-held lots (float); rolled to the settlement price by the daily settlement and equal to open_basis until the first settlement, the basis of the realized profit and of the equity of a margin holding
 
 
 Funds Records

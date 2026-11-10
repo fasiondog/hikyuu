@@ -213,11 +213,13 @@ Booking formulas:
   ``sell_money`` keep accumulating the nominal amount for reporting only
 - Close long / short: ``cash += released margin + realized profit - fee``; the released margin is
   proportional to the closed quantity and the realized profit is computed on the **money basis**:
-  ``closed money - remaining cost basis * (closed number / current number)`` (negated on the short
-  side), where ``closed money = price * number * unit`` and the remaining cost basis is
-  ``PositionRecord.open_basis``, exact whatever the contract multiplier is; a close releases the
-  basis proportionally and an opening only adds the new notional, so a partial close followed by a
-  new opening never dilutes the cost of the lots still held
+  ``closed money - remaining settlement basis * (closed number / current number)`` (negated on the
+  short side), where ``closed money = price * number * unit``; the settlement basis is
+  ``PositionRecord.settle_basis`` (rolled to the settlement price by the daily mark-to-market and
+  equal to the opening notional ``open_basis`` until the first settlement), exact whatever the
+  contract multiplier is; a close releases both bases proportionally and an opening only adds the
+  new notional, so a partial close followed by a new opening never dilutes the cost of the lots
+  still held
 - Equity: ``net assets = cash + locked margin + unrealized profit - borrowed funds``; the equity
   contribution of a margin holding joins ``FundsRecord.market_value`` on either side (the short
   unrealized profit already carries the direction), ``short_market_value`` keeps only the cash
@@ -273,17 +275,17 @@ Booking formulas:
     cost, so the valuation and the close cash flow fold the cash lots' cost into the margin formula,
     which deviates from the lot-by-lot market practice; the account logs a warning in **either**
     direction (margin lots joining a cash holding as well as cash lots joining a margin one).
-    Lot-level (per-trade) margin and cost booking, and writing the locked margin into
-    ``TradeRecord``, are registered as follow-up tasks.
+    Lot-level (per-trade) margin and cost booking are registered as follow-up tasks.
 
-    The historical replay (``getFunds(date)``, ``get_funds_list``, ``Performance``) and
-    ``add_trade_record`` recompute the margin with the **current** parameters and margin model:
-    changing ``margin_accounting``, swapping the model or adjusting its rate after the openings makes
-    the replayed books differ from the ones booked at that time; ``PositionRecord.margin > 0`` only
-    marks the holdings the live books already keep by margin.
+    The margin an opening locked is written into ``TradeRecord.margin`` (0 on the cash books and for
+    every business other than an opening): ``add_trade_record`` and the historical replay prefer that
+    snapshot and only recompute with the **current** parameters and margin model when it is 0. Changing
+    ``margin_accounting``, swapping the model or adjusting its rate after the openings therefore still
+    replays the books booked at that time; ``PositionRecord.margin > 0`` marks the holdings the live
+    books already keep by margin.
 
-    The maintain-margin call and the forced liquidation (Phase B-2) and the daily variation-margin
-    posting are not implemented yet; a margin holding **rejects** ``checkin_stock`` /
+    The daily settlement, the margin call and the forced liquidation follow in *Daily settlement and the risk
+    loop (Phase B-2)* below; a margin holding **rejects** ``checkin_stock`` /
     ``checkout_stock`` (a deposit or withdrawal would move the cost basis while the lock stays, which
     detaches the equity from the assets, so the order is refused and the backfill refuses it too). A
     ``realPrice == 0`` market-order placeholder opening still keeps the cash accounting, but a margin
@@ -295,3 +297,97 @@ Booking formulas:
     opening falls back to the cash books and pays the full notional (with a warning): a holding with
     ``margin == 0`` is valued as a cash holding, so keeping the margin branch would count the full
     market value as equity while no cash was paid.
+
+Daily settlement and the risk loop (Phase B-2)
+----------------------------------------------
+
+A margin account settles once per K-line period at its close: the unrealized profit is posted into the
+cash, the lock is recomputed at the settlement price, and the equity is then checked against the
+maintenance requirement; a shortfall warns and, with ``force_liquidate`` on, also queues a forced
+liquidation that the trading system executes at the next open. The related parameters (account level
+``set_param``):
+
+- ``margin_accounting`` (False by default): the margin accounting switch, nothing is settled while it is off
+- ``settle_with_close`` (True by default): the close of the period is the settlement price; turning it
+  off makes ``settlement()`` return False (no other price source is provided yet)
+- ``force_liquidate`` (False by default): a shortfall of the equity only warns; turning it on queues
+  the forced liquidation as well
+
+.. py:method:: TradeManager.settlement(date, ktype="DAY")
+
+    Settles the margin holdings as of the given moment and returns whether this call **posted** the
+    settlement: a moment settled already returns True (the settlement is idempotent), an account that
+    does not settle (``margin_accounting`` / ``settle_with_close`` off, no margin model) returns False,
+    and an account with nothing to post (empty, or every holding skipped) returns False as well, which
+    is also what ``is_settled`` answers there
+
+    :param Datetime date: the settlement moment, no earlier than ``last_datetime``
+    :param str ktype: the K-line type the settlement price is taken from
+
+.. py:method:: TradeManager.is_settled(date)
+
+    Whether the moment is settled already. Settling is idempotent: a repeated call of the same moment
+    posts nothing twice
+
+.. py:method:: TradeManager.is_forced_liquidation_queued(date)
+
+    Whether a forced liquidation is pending as of the moment: every settlement rebuilds the queue (a
+    recovered account clears it), so it is True once armed until the holdings are flattened and always
+    False on a flat account. The probe answers "armed with something left to close" and consumes
+    nothing itself, so a flattened account stays False even though the armed date is still recorded
+
+What the settlement does (per margin holding; the cash accounted holdings stay out):
+
+- Settlement price: the close of the bar at that moment; without a bar (a suspension) the last valid
+  close is used and the ``remark`` of the settlement record says so
+- Mark-to-market: ``cash += +/- (settlement price * number * unit - settle_basis)`` (positive on the
+  long side, negated on the short one), then ``settle_basis`` is reset to the notional at the
+  settlement price, so the unrealized profit restarts from zero and a close realizes against the
+  latest basis
+- Relock: the lock is recomputed at the settlement price and the difference is posted on the spot
+  (``cash -= difference``); an increase the cash cannot cover is financed like an opening
+  (``support_borrow_cash=True``), otherwise the account goes overdrawn with a warning, because an
+  account already in a margin call must not fail to settle
+- Maintenance: ``sum of get_maintain_margin(...)`` over **every** margin holding, the ones the posting
+  skipped included (a suspension, a bar past the last registered one; without a valid price the unit
+  price is backed out of ``settle_basis``), otherwise those holdings would count on the asset side
+  while missing from the requirement side; the equity is ``cash + sum of the holding equities -
+  borrowed cash`` at that moment, the same caliber as ``get_funds``, and a shortfall raises the margin
+  call (warned once when it turns on, reported as cleared when it recovers)
+- A completed settlement with ``force_liquidate=True`` arms the forced liquidation,
+  ``is_forced_liquidation_queued()`` turning True
+
+Settlement records: every settled holding writes one ``BUSINESS_SETTLEMENT`` record (not a fill) —
+``real_price`` is the settlement price, ``number`` carries the direction (positive long, negative
+short, so a security held on both sides is told apart), ``margin`` is the relocked margin, ``cash`` the
+cash balance after the posting, ``cost`` is 0 and ``part`` is the invalid part.
+
+.. note::
+
+    With the margin accounting off, or with ``settle_with_close=False``, nothing is settled and the
+    books of a cash A-share account stay exactly as before.
+
+    The ``System`` drives every bar as *trade -> expiry flattening -> daily settlement*: the parts
+    trade the bar first, then a margin holding past the last registered bar of its instrument is
+    flattened at the close (G12), and ``settlement()`` runs last; the expiry filling before the
+    settlement is what realizes the profit, and the settlement then works on the flattened books. A
+    forced liquidation armed by the previous settlement is executed right after the next open, before
+    the regular requests, at the open price of that bar and on both sides of the instrument; the
+    filling joins the trade records and the position history like any other.
+
+    The historical replay needs no extra state: the settlement records are part of the books, so
+    ``get_funds(date)``, ``get_funds_list``, ``Performance`` and the backfill of ``add_trade_record``
+    all reproduce the cash, the lock and the basis of the settled day.
+
+    ``MultiSystem`` calls ``settlement()`` on the parent account at the close of its aggregate phase as
+    well (the parent is the real book of the modes A/B, the members being shadow books only); the mode C
+    members share the parent account, so they have settled it at the same moment already and the
+    repeated call is a no-op. The parent has no single instrument, so an armed forced liquidation is
+    executed at the aggregate open by flattening every holding on both sides at the open price, and the
+    delayed entry requests of the members are voided as well (the same caliber as the delayed buy
+    requests ``System`` drops, the reducing orders kept).
+
+    The action script written by ``save_action`` does **not** cover the settlement: the script replays
+    the fills only, so a regenerated run rebuilds an unsettled book and has to call ``settlement()``
+    per period itself (the settlement records still take part in the ``add_trade_record`` backfill,
+    they are just not written to the script).

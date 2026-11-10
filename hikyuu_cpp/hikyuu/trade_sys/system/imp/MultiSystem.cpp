@@ -29,6 +29,20 @@ namespace hku {
 // The member trading-object bar look-ups (defined with the lag visibility helpers)
 static size_t barPosAt(const KData& to, const Datetime& date);
 
+// Void the queued delayed entries of a member tree: after a forced exit the entry intent is
+// void, while the queued exits are kept because they only cut risk (see
+// System::_dropPendingEntries)
+static void dropMemberEntryRequests(const SystemPtr& sys) {
+    if (!sys) {
+        return;
+    }
+    sys->clearDelayBuyRequest();
+    sys->clearDelaySellRequest();
+    for (auto& sub : sys->getSubSystemList()) {
+        dropMemberEntryRequests(sub);
+    }
+}
+
 MultiSystem::MultiSystem() : System() {
     _initAxisParam();
     // The default MM of the aggregate parent system is mode A (signal aggregation, the base
@@ -2344,6 +2358,36 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         m_trade_list.push_back(tr);
     }
 
+    // The margin call armed by the last parent settlement flattens the parent book at this open,
+    // before any queued entry. A queued entry would rebuild the position at this very open and
+    // defeat the risk control, so the entry legs are dropped; the exit legs are kept because they
+    // only cut risk (System::_liquidateOnOpen does the same on a plain system).
+    if (m_tm->isForcedLiquidationQueued(datetime)) {
+        TradeRecordList liquidated = _liquidateParentOnOpen(datetime);
+        for (auto& tr : liquidated) {
+            result.tradesOnOpen.push_back(tr);
+            m_trade_list.push_back(tr);
+        }
+        if (!liquidated.empty()) {
+            // A queued delayed entry of a member would rebuild the flattened position at this very
+            // open, so the entry intents of the whole member tree are voided
+            for (auto& sys : m_sys_list) {
+                dropMemberEntryRequests(sys);
+            }
+            auto& pending = m_open_pending_suggestions;
+            pending.erase(
+              std::remove_if(pending.begin(), pending.end(),
+                             [](const TradeSuggestion& s) {
+                                 return (s.type == SuggestionType::BUY && !s.short_side) ||
+                                        (s.type == SuggestionType::SELL && s.short_side);
+                             }),
+              pending.end());
+            if (pending.empty()) {
+                _clearOpenPendingBatch();
+            }
+        }
+    }
+
     // The deferred quota calibration of the last rebalancing close executes at this open, before
     // the queued suggestions, so all legs share one price basis
     TradeRecordList calibration_trades;
@@ -3489,10 +3533,16 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
                                        assets_before > 0.0 ? turnover_cash / assets_before : 0.0);
     }
 
+    // The day end settlement of the parent account: the aggregate overrides the System open/close
+    // hooks, so without this call the real book of the modes A/B would never be marked to market
+    // nor checked for a margin call. It is idempotent, so the mode C shared account (already
+    // settled by the member drives at this same moment) is left untouched.
+    m_tm->settlement(datetime, m_kdata.getQuery().kType());
+
     // trace: output the rebalancing suggestions and trades
     if (getParam<bool>("trace")) {
-        HKU_INFO_IF(!suggestions.empty(), "[{}] {} | {} adjust suggestions={} executed={}", getPath(), datetime.ymd(), name(), suggestions.size(),
-                 executed.size());
+        HKU_INFO_IF(!suggestions.empty(), "[{}] {} | {} adjust suggestions={} executed={}",
+                    getPath(), datetime.ymd(), name(), suggestions.size(), executed.size());
         for (auto& s : suggestions) {
             const char* typ = s.type == SuggestionType::BUY
                                 ? "BUY"
@@ -4191,7 +4241,7 @@ TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
         price_t price = kdata.getKRecord(kdata.size() - 1).closePrice;
         // The shadow books of the sub-systems must be flattened as well
         for (auto& sys : m_sys_list) {
-            _clearDelistedInSubTree(sys, pos.stock, date, price);
+            _clearStockInSubTree(sys, pos.stock, date, price, "DELIST");
         }
         TradeRecord tr =
           m_tm->sell(date, pos.stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_SYSTEM, "DELIST");
@@ -4216,7 +4266,7 @@ TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
         price_t price = kdata.getKRecord(kdata.size() - 1).closePrice;
         // The shadow books of the sub-systems must be flattened as well
         for (auto& sys : m_sys_list) {
-            _clearDelistedInSubTree(sys, pos.stock, date, price);
+            _clearStockInSubTree(sys, pos.stock, date, price, "DELIST");
         }
         _topUpCoverCash(m_tm, m_auto_checkin, date, pos.stock, price, pos.number);
         TradeRecord tr = m_tm->buyShort(date, pos.stock, price, MAX_DOUBLE, 0.0, 0.0, price,
@@ -4228,8 +4278,8 @@ TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
     return result;
 }
 
-void MultiSystem::_clearDelistedInSubTree(const SystemPtr& sys, const Stock& stock,
-                                          const Datetime& date, price_t price) {
+void MultiSystem::_clearStockInSubTree(const SystemPtr& sys, const Stock& stock,
+                                       const Datetime& date, price_t price, const string& remark) {
     if (!sys) {
         return;
     }
@@ -4239,18 +4289,70 @@ void MultiSystem::_clearDelistedInSubTree(const SystemPtr& sys, const Stock& sto
         // drive, which is shifted before the raw day (see _subLegDate)
         Datetime sub_date = _subLegDate(sys, date);
         if (tm->getPosition(sub_date, stock).number > 0.0) {
-            tm->sell(sub_date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
+            tm->sell(sub_date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, remark);
         }
         double short_num = tm->getShortPosition(stock).number;
         if (short_num > 0.0) {
             _topUpCoverCash(tm, _mmAutoCheckin(sys), sub_date, stock, price, short_num);
             tm->buyShort(sub_date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO,
-                         "DELIST");
+                         remark);
         }
     }
     for (auto& sub : sys->getSubSystemList()) {
-        _clearDelistedInSubTree(sub, stock, date, price);
+        _clearStockInSubTree(sub, stock, date, price, remark);
     }
+}
+
+TradeRecordList MultiSystem::_liquidateParentOnOpen(const Datetime& date) {
+    TradeRecordList result;
+    if (!m_tm) {
+        return result;
+    }
+    // The queue is rebuilt from the fresh equity at every settlement, so an account that has
+    // recovered since does not reach here
+    if (!m_tm->isForcedLiquidationQueued(date)) {
+        return result;
+    }
+    HKU_WARN("{} {}: margin call, the parent holdings are liquidated at the open", date, name());
+
+    auto close_leg = [&](const PositionRecord& pos, bool is_long) {
+        if (pos.stock.isNull() || !(pos.number > 0.0)) {
+            return;
+        }
+        // A suspended instrument has no open quote: keep the holding for the next open rather
+        // than selling it at a made-up price
+        price_t price = _getOpenPrice(date, pos.stock);
+        if (!(price > 0.0)) {
+            HKU_WARN("{} {}: no open quote, the liquidation of {} is deferred", date, name(),
+                     pos.stock.market_code());
+            return;
+        }
+        // The shadow books follow the parent: a member must not keep a position the real account
+        // no longer holds (the delisting path takes the same measure)
+        for (auto& sys : m_sys_list) {
+            _clearStockInSubTree(sys, pos.stock, date, price, "MARGIN_CALL");
+        }
+        TradeRecord tr;
+        if (is_long) {
+            tr = m_tm->sell(date, pos.stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_SYSTEM,
+                            "MARGIN_CALL");
+        } else {
+            _topUpCoverCash(m_tm, m_auto_checkin, date, pos.stock, price, pos.number);
+            tr = m_tm->buyShort(date, pos.stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_SYSTEM,
+                                "MARGIN_CALL");
+        }
+        if (!tr.isNull()) {
+            result.push_back(tr);
+        }
+    };
+    // The lists are copies: the closes below drop the holdings from the account
+    for (const auto& pos : m_tm->getPositionList()) {
+        close_leg(pos, true);
+    }
+    for (const auto& pos : m_tm->getShortPositionList()) {
+        close_leg(pos, false);
+    }
+    return result;
 }
 
 void MultiSystem::setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date, price_t quota) {

@@ -625,12 +625,31 @@ TradeRecord System::_runMomentOnOpen(const KRecord& today, const KRecord& src_to
                         "{}, close: {}, high: {}, low: {}",
                         name(), today.datetime, today.closePrice, today.highPrice, today.lowPrice);
 
+    // A liquidation queued at the previous settlement is executed first: the forced flattening
+    // must not be blocked by the requests queued at the previous close
+    TradeRecord liquidated = _liquidateOnOpen(today, src_today);
+    if (!liquidated.isNull()) {
+        // The account was just closed out: a queued delayed entry would rebuild the position at
+        // this very open and defeat the risk control
+        _dropPendingEntries();
+    }
+
     // Process the existing trade requests
     result = _processRequest(today, src_today);
-    return result;
+    return result.isNull() ? liquidated : result;
 }
 
 TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_today) {
+    // The day end sequence: the trades of the bar, then the expiry flattening, then the daily
+    // settlement. Only a wrapper can keep the settlement behind the early returns of the trading
+    // body, and every driver (run, runMoment*, the aggregate members) goes through it
+    TradeRecord traded = _tradeOnClose(today, src_today);
+    TradeRecord expired = _liquidateOnExpiry(today, src_today);
+    m_tm->settlement(today.datetime, m_kdata.getQuery().kType());
+    return traded.isNull() ? expired : traded;
+}
+
+TradeRecord System::_tradeOnClose(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
 
     //----------------------------------------------------------
@@ -647,26 +666,11 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     m_pre_ev_valid = current_ev_valid;
     m_pre_cn_valid = current_cn_valid;
 
-    // The entry intent is void once the environment or the condition turns invalid: a queued
-    // delayed buy or sell-short would re-enter right after the forced exit (the queued sells and
-    // covers are kept, they cut the risk instead of adding it)
-    auto drop_pending_entries = [&]() {
-        if (!m_buyRequestList.empty()) {
-            HKU_INFO_IF(trace, "[{}] drop {} pending buy request(s)", name(),
-                        m_buyRequestList.size());
-            m_buyRequestList.clear();
-        }
-        if (!m_sellShortRequestList.empty()) {
-            HKU_INFO_IF(trace, "[{}] drop {} pending sell-short request(s)", name(),
-                        m_sellShortRequestList.size());
-            m_sellShortRequestList.clear();
-        }
-    };
-
+    // The entry intent is void once the environment or the condition turns invalid
     // If the current environment is invalid
     if (!current_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] current EV is invalid", name()));
-        drop_pending_entries();
+        _dropPendingEntries();
         TradeRecord tr;
         // If a long position is held, liquidate it; sell_delay decides the fill timing (this close
         // or the next open)
@@ -702,7 +706,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     // If the system is currently invalid
     if (!current_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] current CN is invalid", name()));
-        drop_pending_entries();
+        _dropPendingEntries();
         TradeRecord tr;
         // If a long position is held, liquidate it (the fill timing follows sell_delay)
         if (m_tm->have(m_stock)) {
@@ -883,6 +887,72 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     }
 
     return result;
+}
+
+TradeRecord System::_liquidateOnOpen(const KRecord& today, const KRecord& src_today) {
+    TradeRecord result;
+    HKU_IF_RETURN(!m_tm || m_stock.isNull(), result);
+    // The queue is armed by the previous settlement and the next open is the earliest executable
+    // moment, the same next bar convention the delayed requests follow
+    HKU_IF_RETURN(!m_tm->isForcedLiquidationQueued(today.datetime), result);
+
+    HKU_INFO_IF(getParam<bool>("trace"), "[{}] {} margin call, liquidate at the open", name(),
+                m_stock.market_code());
+
+    // Both sides are flattened at the open: a margin call closes the account, not only the side
+    // the strategy happened to open
+    if (m_tm->have(m_stock)) {
+        result = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, true);
+    }
+    if (m_tm->haveShort(m_stock)) {
+        TradeRecord cover = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, true);
+        if (result.isNull()) {
+            result = cover;
+        }
+    }
+    return result;
+}
+
+TradeRecord System::_liquidateOnExpiry(const KRecord& today, const KRecord& src_today) {
+    TradeRecord result;
+    HKU_IF_RETURN(!m_tm || m_stock.isNull(), result);
+    // Only a margin-locked holding expires; a holding the model booked on the cash side locks
+    // nothing, and the plain cash books keep their positions past the end of the data, so an
+    // A-share backtest stays byte identical
+    HKU_IF_RETURN(m_tm->getPosition(today.datetime, m_stock).margin <= 0.0 &&
+                    m_tm->getShortPosition(m_stock).margin <= 0.0,
+                  result);
+    const Datetime& last = m_stock.lastDatetime();
+    HKU_IF_RETURN(last.isNull() || today.datetime < last, result);
+
+    HKU_INFO_IF(getParam<bool>("trace"), "[{}] {} reached its last bar {}, liquidate at the close",
+                name(), m_stock.market_code(), last);
+
+    // Unconditional (G12): the expiry is a property of the data, not of the margin call state. The
+    // fill takes the close of the expiry bar and never waits for the next open
+    if (m_tm->have(m_stock)) {
+        result = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, false);
+    }
+    if (m_tm->haveShort(m_stock)) {
+        TradeRecord cover = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, false);
+        if (result.isNull()) {
+            result = cover;
+        }
+    }
+    return result;
+}
+
+void System::_dropPendingEntries() {
+    bool trace = getParam<bool>("trace");
+    if (!m_buyRequestList.empty()) {
+        HKU_INFO_IF(trace, "[{}] drop {} pending buy request(s)", name(), m_buyRequestList.size());
+        m_buyRequestList.clear();
+    }
+    if (!m_sellShortRequestList.empty()) {
+        HKU_INFO_IF(trace, "[{}] drop {} pending sell-short request(s)", name(),
+                    m_sellShortRequestList.size());
+        m_sellShortRequestList.clear();
+    }
 }
 
 TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part from) {

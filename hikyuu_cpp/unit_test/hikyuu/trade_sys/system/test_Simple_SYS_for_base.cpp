@@ -365,9 +365,12 @@ TEST_CASE("test_SYS_Simple_for_base_margin_futures_multiplier") {
     PositionRecord pos = tm->getPosition(dt, rb);
     CHECK_EQ(pos.number, doctest::Approx(number));
 
-    /** @arg the lock is the margin of the multiplied notional */
-    CHECK_EQ(pos.margin, doctest::Approx(margin));
+    /** @arg the lock is the margin of the multiplied notional on the opening day */
     CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
+
+    /** @arg the daily settlement of the following bars then relocks the holding at their close */
+    price_t last_close = k[k.size() - 1].closePrice;
+    CHECK_EQ(pos.margin, doctest::Approx(roundEx(0.5 * last_close * number * MULTIPLIER, 2)));
 
     /** @arg the deposit covers the missing half of the margin only */
     price_t checkin = 0.0;

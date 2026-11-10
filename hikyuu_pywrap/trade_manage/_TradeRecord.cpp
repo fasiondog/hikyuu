@@ -36,6 +36,8 @@ void export_TradeRecord(py::module& m) {
       .value("BORROW_ADJUST", BUSINESS_BORROW_ADJUST)
       .value("SHORT_ADJUST", BUSINESS_SHORT_ADJUST)
       .value("DIVIDEND_COMPENSATION", BUSINESS_DIVIDEND_COMPENSATION)
+      .value("SETTLEMENT", BUSINESS_SETTLEMENT)
+      .value("INTEREST", BUSINESS_INTEREST)
       .value("INVALID", BUSINESS_INVALID);
 
     m.def("get_business_name", getBusinessName, R"(get_business_name(business)
@@ -44,7 +46,8 @@ void export_TradeRecord(py::module& m) {
     :return: the trade business type name
              ("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"
               |"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"
-              |"RETURN_STOCK"|"SUOGU"|"BORROW_ADJUST"|"SHORT_ADJUST"|"DIVIDEND_COMPENSATION"|"UNKNOWN")
+              |"RETURN_STOCK"|"SUOGU"|"BORROW_ADJUST"|"SHORT_ADJUST"|"DIVIDEND_COMPENSATION"
+              |"SETTLEMENT"|"INTEREST"|"UNKNOWN")
     :rtype: string)");
 
     py::class_<TradeRecord>(m, "TradeRecord", "The trade record")
@@ -68,6 +71,9 @@ void export_TradeRecord(py::module& m) {
       .def_readwrite("cost", &TradeRecord::cost, "The trading cost")
       .def_readwrite("stoploss", &TradeRecord::stoploss, "The stop-loss price (float)")
       .def_readwrite("cash", &TradeRecord::cash, "The cash balance (float)")
+      .def_readwrite("margin", &TradeRecord::margin,
+                     "The margin locked by the opening (float); 0 on the cash books and for every "
+                     "business other than buy / sell short")
       .def_readwrite("part", &TradeRecord::from,
                      "The source of the trading instruction, distinguishing which part of the "
                      "trading system issued the instruction; see: "

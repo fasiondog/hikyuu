@@ -374,6 +374,40 @@ Common parameters:
     :return: True when the opening locks the margin only
     :rtype: bool)")
 
+      .def("settlement", &TradeManagerBase::settlement, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(settlement(self, date, ktype="DAY")
+
+    Settle the margin holdings as of the given moment
+
+    Every margin-accounted holding is marked to the settlement price (the close of the given
+    K type), the mark-to-market profit is posted into the cash, the locked margin is recomputed at
+    that price with the difference posted, and the maintenance requirement is then checked against
+    the equity. A shortfall only warns unless force_liquidate is on, which queues the flattening
+    for the trading system to execute at the next open. Settling the same moment twice is a no-op.
+
+    :param Datetime date: the settlement moment, later than or equal to lastDatetime()
+    :param str ktype: the K-line type the settlement price is taken from
+    :return: True when the moment ends up settled, False when the account never settles
+    :rtype: bool)")
+
+      .def("is_settled", &TradeManagerBase::isSettled, py::arg("date"),
+           R"(is_settled(self, date)
+
+    Whether the given moment has already been settled
+
+    :param Datetime date: the moment to probe
+    :rtype: bool)")
+
+      .def("is_forced_liquidation_queued", &TradeManagerBase::isForcedLiquidationQueued,
+           py::arg("date"),
+           R"(is_forced_liquidation_queued(self, date)
+
+    Whether a forced liquidation is queued as of the given moment
+
+    :param Datetime date: the moment to probe
+    :rtype: bool)")
+
       .def_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
                     &TradeManagerBase::setBrokerLastDatetime,
                     R"(The moment when the order broker operations actually start.

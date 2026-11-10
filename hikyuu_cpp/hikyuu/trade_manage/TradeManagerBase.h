@@ -34,6 +34,10 @@ class HKU_API Performance;
  * Default parameters:
  * precision(int): 2 calculation precision
  * margin_accounting(bool): false book the openings of the margin securities by margin only
+ * settle_with_close(bool): true use the close as the daily settlement price (D1(c)); off
+ *                           disables the daily settlement, no other price source exists yet
+ * force_liquidate(bool): false only warn on a maintenance shortfall; on queues a forced
+ *                         liquidation for the trading system to execute at the next open
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -50,6 +54,8 @@ public:
         setParam<int>("precision", 2);  // Calculation precision
         // Phase B real margin accounting: off by default, so the plain cash books stay unchanged
         setParam<bool>("margin_accounting", false);
+        setParam<bool>("settle_with_close", true);
+        setParam<bool>("force_liquidate", false);
     }
 
     virtual ~TradeManagerBase() {}
@@ -204,6 +210,56 @@ public:
                   "getAvailableMargin supports only the current or a future moment!");
         price_t net_assets = getFunds(datetime, ktype).net_assets();
         return net_assets - getOccupiedMargin(datetime, ktype);
+    }
+
+    /**
+     * Settle the margin holdings of the account as of the given moment
+     * @details Every margin-accounted holding is marked to the settlement price (the close of the
+     *          given K type, see D1(c)), the mark-to-market profit is posted into the cash, the
+     *          locked margin is recomputed at that price with the difference posted, and then the
+     *          maintenance requirement of the whole book is checked against the equity of the
+     *          account (the holdings the posting skipped still count on both sides). A shortfall
+     *          only warns by default; force_liquidate queues the flattening for the executor of
+     *          the trading system. The plain cash books have nothing to settle and keep their live
+     *          valuation, so an account with margin_accounting off is never touched.
+     * @param datetime the settlement moment, it must be later than or equal to lastDatetime()
+     * @param ktype the K type the settlement price is taken from
+     * @return true when the settlement has been posted (by this call or by an earlier call of the
+     *         same moment); false when the account never settles (the plain cash books, the switch
+     *         turned off) and when there was nothing to post (a flat book, or every holding
+     * skipped)
+     * @note Settling the same moment twice is a no-op, see isSettled()
+     * @note Only the current moment can be settled: the posting is a real cash flow, so the
+     *       historical dates are served by the replay of getFunds / getFundsList instead
+     */
+    virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
+        HKU_IF_RETURN(!tryGetParam<bool>("margin_accounting", false), false);
+        HKU_WARN(
+          "Settlement is not supported by the account {}, the margin holdings stay on "
+          "their opening basis!",
+          m_name);
+        return false;
+    }
+
+    /**
+     * Whether the given moment has already been settled
+     * @param datetime the moment to probe
+     */
+    virtual bool isSettled(const Datetime&) const {
+        return false;
+    }
+
+    /**
+     * Whether a forced liquidation is queued as of the given moment
+     * @details Armed by settlement() when the equity falls below the maintenance requirement with
+     *          force_liquidate on; the trading system flattens the account at the next open. Every
+     *          settlement rebuilds the queue, so a recovered account clears it, and an account with
+     *          nothing left to close answers false even while the armed date is still recorded: the
+     *          probe means "armed and still holding", it consumes nothing itself.
+     * @param datetime the moment to probe
+     */
+    virtual bool isForcedLiquidationQueued(const Datetime&) const {
+        return false;
     }
 
     /**

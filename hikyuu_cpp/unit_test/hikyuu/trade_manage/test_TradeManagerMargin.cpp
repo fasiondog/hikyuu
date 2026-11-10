@@ -572,6 +572,8 @@ TEST_CASE("test_TradeManager_margin_accounting_long") {
     auto trade = tm->buy(dt, stock, close, number, 0.0, 0.0, close, PART_SIGNAL);
     REQUIRE_EQ(trade.business, BUSINESS_BUY);
     CHECK_EQ(trade.cash, doctest::Approx(100000.0 - margin));
+    /** @arg The record keeps the amount the opening locked */
+    CHECK_EQ(trade.margin, doctest::Approx(margin));
     CHECK_EQ(tm->currentCash(), doctest::Approx(100000.0 - margin));
 
     PositionRecord position = tm->getPosition(dt, stock);
@@ -592,6 +594,8 @@ TEST_CASE("test_TradeManager_margin_accounting_long") {
     /** @arg Closing at the same price returns the whole margin and leaves the cash intact */
     auto sell = tm->sell(dt, stock, close, number, 0.0, 0.0, close, PART_SIGNAL);
     REQUIRE_EQ(sell.business, BUSINESS_SELL);
+    /** @arg A close locks nothing */
+    CHECK_EQ(sell.margin, 0.0);
     CHECK_EQ(tm->currentCash(), doctest::Approx(100000.0));
     CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, 0.0);
     CHECK_UNARY(!tm->have(stock));
@@ -615,6 +619,7 @@ TEST_CASE("test_TradeManager_margin_accounting_short") {
     /** @arg A short opening locks the margin instead of crediting the sale proceeds */
     auto open = tm->sellShort(dt, stock, close, number, 0.0, 0.0, close, PART_SIGNAL);
     REQUIRE_EQ(open.business, BUSINESS_SELL_SHORT);
+    CHECK_EQ(open.margin, doctest::Approx(margin));
     CHECK_EQ(tm->currentCash(), doctest::Approx(100000.0 - margin));
     CHECK_EQ(tm->getShortPosition(stock).margin, doctest::Approx(margin));
 
@@ -1170,6 +1175,8 @@ TEST_CASE("test_TradeManager_margin_accounting_futures_multiplier") {
     CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 - margin));
     CHECK_EQ(tm->getPosition(dt, rb).margin, doctest::Approx(margin));
     CHECK_EQ(tm->getPosition(dt, rb).openBasis, doctest::Approx(nominal));
+    /** @arg Before any settlement the profit basis is still the opening notional */
+    CHECK_EQ(tm->getPosition(dt, rb).settleBasis, doctest::Approx(nominal));
     CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
     CHECK_EQ(tm->getOccupiedMargin(dt), doctest::Approx(margin));
     CHECK_EQ(tm->getAvailableMargin(dt), doctest::Approx(1000000.0 - margin));
@@ -1197,6 +1204,7 @@ TEST_CASE("test_TradeManager_margin_accounting_futures_multiplier") {
     CHECK_EQ(copy->currentCash(), doctest::Approx(tm->currentCash()));
     CHECK_EQ(copy->getPosition(dt, rb).margin, doctest::Approx(margin - released));
     CHECK_EQ(copy->getPosition(dt, rb).openBasis, doctest::Approx(nominal / 2.0));
+    CHECK_EQ(copy->getPosition(dt, rb).settleBasis, doctest::Approx(nominal / 2.0));
 
     // The rest is closed and re-opened on the next trading day: the day-1 query of the batch view
     // then takes the trade-list replay branch (a same-day query falls to the live branch) with a
@@ -1260,6 +1268,7 @@ TEST_CASE("test_TradeManager_margin_accounting_futures_multiplier_short") {
     CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 - margin));
     CHECK_EQ(tm->getShortPosition(rb).margin, doctest::Approx(margin));
     CHECK_EQ(tm->getShortPosition(rb).openBasis, doctest::Approx(nominal));
+    CHECK_EQ(tm->getShortPosition(rb).settleBasis, doctest::Approx(nominal));
     CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
     CHECK_EQ(tm->getOccupiedMargin(dt), doctest::Approx(margin));
 
@@ -1372,6 +1381,7 @@ TEST_CASE("test_TradeManager_margin_accounting_dilution") {
 
     /** @arg After the partial close the remaining cost basis is only the unsold half */
     CHECK_EQ(tm->getPosition(dt2, stock).openBasis, doctest::Approx(10.0 * atom));
+    CHECK_EQ(tm->getPosition(dt2, stock).settleBasis, doctest::Approx(10.0 * atom));
     FundsRecord live2 = tm->getFunds(dt2, KQuery::DAY);
 
     REQUIRE_EQ(tm->buy(dt3, stock, 11.0, atom, 0.0, 0.0, 11.0, PART_SIGNAL).business, BUSINESS_BUY);
@@ -1557,6 +1567,7 @@ TEST_CASE("test_TradeManager_margin_accounting_deposit_withdraw") {
     PositionRecord after = tm->getPosition(dt, stock);
     CHECK_EQ(after.number, doctest::Approx(pos.number));
     CHECK_EQ(after.openBasis, doctest::Approx(pos.openBasis));
+    CHECK_EQ(after.settleBasis, doctest::Approx(pos.settleBasis));
     CHECK_EQ(after.margin, doctest::Approx(pos.margin));
     CHECK_EQ(tm->currentCash(), doctest::Approx(cash));
 
@@ -1572,6 +1583,61 @@ TEST_CASE("test_TradeManager_margin_accounting_deposit_withdraw") {
                                                 CostRecord(), 0.0, cash, PART_INVALID)));
     CHECK_EQ(tm->getPosition(dt, stock).number, doctest::Approx(pos.number));
     CHECK_EQ(tm->getPosition(dt, stock).margin, doctest::Approx(pos.margin));
+}
+
+/** @par Test points: the recorded lock decides a backfill and a replay, not the current model */
+TEST_CASE("test_TradeManager_margin_record_snapshot") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    Stock other = sm["sh600000"];
+    REQUIRE_UNARY(!stock.isNull());
+    REQUIRE_UNARY(!other.isNull());
+
+    Datetime dt(200001040000);
+    Datetime dt2(200001050000);
+    price_t close = stock.getMarketValue(dt, KQuery::DAY);
+    REQUIRE_UNARY(close > 0.0);
+    double number = 100.0;
+    price_t margin = roundEx(0.5 * close * number * stock.unit(), 2);
+    REQUIRE_UNARY(margin > 0.0);
+
+    auto tm = crtTM(dt, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.5));
+    tm->setParam<bool>("margin_accounting", true);
+    tm->setParam<bool>("support_borrow_cash", true);
+
+    TradeRecord open = tm->buy(dt, stock, close, number, 0.0, 0.0, close, PART_SIGNAL);
+    REQUIRE_EQ(open.business, BUSINESS_BUY);
+    REQUIRE_EQ(open.margin, doctest::Approx(margin));
+    price_t live_cash = tm->currentCash();
+
+    /** @arg A backfill into an account of another rate reproduces the recorded lock */
+    auto copy = crtTM(dt, 1000000.0, TC_Zero(), "COPY", MG_Fixed(0.2));
+    copy->setParam<bool>("margin_accounting", true);
+    copy->setParam<bool>("support_borrow_cash", true);
+    for (const auto& tr : tm->getTradeList()) {
+        REQUIRE_UNARY(copy->addTradeRecord(tr));
+    }
+    CHECK_EQ(copy->getPosition(dt, stock).margin, doctest::Approx(margin));
+    CHECK_EQ(copy->currentCash(), doctest::Approx(live_cash));
+
+    /** @arg A record without the lock falls back to the model of the account */
+    TradeRecord legacy_record(open);
+    legacy_record.margin = 0.0;
+    auto legacy = crtTM(dt, 1000000.0, TC_Zero(), "LEGACY", MG_Fixed(0.2));
+    legacy->setParam<bool>("margin_accounting", true);
+    legacy->setParam<bool>("support_borrow_cash", true);
+    REQUIRE_UNARY(legacy->addTradeRecord(legacy_record));
+    CHECK_EQ(legacy->getPosition(dt, stock).margin,
+             doctest::Approx(roundEx(0.2 * close * number * stock.unit(), 2)));
+
+    /** @arg A replay keeps the booked lock after the model rate changed */
+    tm->margin()->setParam<double>("rate", 0.1);
+    price_t other_close = other.getMarketValue(dt2, KQuery::DAY);
+    REQUIRE_UNARY(other_close > 0.0);
+    REQUIRE_EQ(
+      tm->buy(dt2, other, other_close, number, 0.0, 0.0, other_close, PART_SIGNAL).business,
+      BUSINESS_BUY);
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
 }
 
 /** @} */

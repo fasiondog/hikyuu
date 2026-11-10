@@ -766,10 +766,16 @@ private:
      * the last trading day of the instrument is earlier than the current running date) */
     TradeRecordList _forceSellDelisted(const Datetime& date);
 
-    /** Flatten the delisted instrument recursively over the sub-system books (a dead instrument
-     *  can never be traded again and would keep distorting the quota calibration) */
-    void _clearDelistedInSubTree(const SystemPtr& sys, const Stock& stock, const Datetime& date,
-                                 price_t price);
+    /** Force closing the parent book at the open when the last settlement armed a margin call
+     *  (force_liquidate), returning the flattening records. The aggregate bypasses the System
+     *  open/close hooks, so this is the parent-side counterpart of System::_liquidateOnOpen. */
+    TradeRecordList _liquidateParentOnOpen(const Datetime& date);
+
+    /** Flatten the instrument recursively over the sub-system books (a dead instrument can never
+     *  be traded again and would keep distorting the quota calibration; a margin-called position
+     *  must not survive on the shadow books once the parent no longer holds it) */
+    void _clearStockInSubTree(const SystemPtr& sys, const Stock& stock, const Datetime& date,
+                              price_t price, const string& remark);
 
     /** Drop the queued batch kept for the next open (the batch and its bookkeeping, the calibration
      *  legs are left untouched) */
@@ -842,23 +848,23 @@ private:
     bool m_external_quota_set{false};
     bool m_external_delegate_notified{false};  // The once-per-instance notice of the nested B
                                                // fallback when the inner cannot consume the budget
-    bool m_multi_parent_warned{false};       // A child driven by another aggregate is warned once
-    bool m_not_ready_warned{false};          // Driving without readyForRun is warned once
+    bool m_multi_parent_warned{false};         // A child driven by another aggregate is warned once
+    bool m_not_ready_warned{false};            // Driving without readyForRun is warned once
     bool m_external_quota_capped_notified{false};  // The once-per-instance notice of the delegated
                                                    // quota capped by the inner reserve
-    bool m_pending_calibration_retry{false};     // The pending calibration is a retry of a previous
-                                                 // suspension, exempt from the cross-day drop
-    Datetime m_open_turnover_date;               // The rebalancing close whose mode C open fills
+    bool m_pending_calibration_retry{false};  // The pending calibration is a retry of a previous
+                                              // suspension, exempt from the cross-day drop
+    Datetime m_open_turnover_date;            // The rebalancing close whose mode C open fills
                                     // carry the turnover (trade_on_close=false); the modes
                                     // A/B attribute through m_open_pending_adjust
-    double m_open_turnover_assets{0.0};     // The assets before that close stage
-    bool m_open_pending_notified{false};    // The once-per-instance notice of the cross-day pending
-                                            // backlog (runtime state, not serialized)
+    double m_open_turnover_assets{0.0};   // The assets before that close stage
+    bool m_open_pending_notified{false};  // The once-per-instance notice of the cross-day pending
+                                          // backlog (runtime state, not serialized)
     bool m_inject_truncated_notified{false};  // The once-per-instance notice of the parent-cash
                                               // truncation of the mode B gap injection (runtime
                                               // state, not serialized)
-    std::set<System*> m_shadow_sys;         // The sub-systems whose shadow account has been created
-                                            // (runtime, not serialized)
+    std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
+                                     // (runtime, not serialized)
     // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides
     // who gets the shared cash first (the cash competition order of the legacy Portfolio);
     // m_running_set is the membership index of the very same content.

@@ -26,6 +26,20 @@ class PythonMargin(MarginBase):
         return PythonMargin()
 
 
+class PythonMaintainMargin(PythonMargin):
+    """A margin model whose maintenance requirement is above the equity of the test account"""
+
+    def __init__(self, maintain=20000.0):
+        super(PythonMaintainMargin, self).__init__()
+        self._maintain = maintain
+
+    def get_maintain_margin(self, date, stock, price, num, side=MarginSide.LONG):
+        return self._maintain
+
+    def _clone(self):
+        return PythonMaintainMargin(self._maintain)
+
+
 class MarginTest(unittest.TestCase):
     def test_MG_None(self):
         stock = sm['sh000001']
@@ -177,8 +191,12 @@ class MarginTest(unittest.TestCase):
         tr = tm.buy(dt, stock, price, 100.0)
         self.assertEqual(tr.business, BUSINESS.BUY)
         self.assertAlmostEqual(tr.cash, 95000.0)
+        self.assertAlmostEqual(tr.margin, 5000.0)
         self.assertAlmostEqual(tm.get_position(dt, stock).margin, 5000.0)
         self.assertAlmostEqual(tm.get_position(dt, stock).open_basis, price * 100.0 * stock.unit)
+        # before any settlement the profit basis is still the opening notional
+        self.assertAlmostEqual(tm.get_position(dt, stock).settle_basis,
+                               price * 100.0 * stock.unit)
         self.assertAlmostEqual(tm.current_cash, 95000.0)
 
         funds = tm.get_funds()
@@ -207,8 +225,10 @@ class MarginTest(unittest.TestCase):
         tr = tm.sell(dt, stock, price, 100.0)
         self.assertEqual(tr.business, BUSINESS.SELL)
         self.assertAlmostEqual(tr.cash, 100000.0)
+        self.assertAlmostEqual(tr.margin, 0.0)
         self.assertAlmostEqual(tm.get_funds().occupied_margin, 0.0)
         self.assertAlmostEqual(tm.get_position(dt, stock).open_basis, 0.0)
+        self.assertAlmostEqual(tm.get_position(dt, stock).settle_basis, 0.0)
 
     def test_TradeManager_margin_accounting_futures_multiplier(self):
         """Every money flow of a futures trade scales with the contract multiplier
@@ -244,6 +264,7 @@ class MarginTest(unittest.TestCase):
             position = tm.get_position(dt, rb)
             self.assertAlmostEqual(position.margin, margin)
             self.assertAlmostEqual(position.open_basis, nominal)
+            self.assertAlmostEqual(position.settle_basis, nominal)
             self.assertAlmostEqual(tm.get_occupied_margin(dt), margin)
             self.assertAlmostEqual(tm.get_available_margin(dt), 1000000.0 - margin)
             funds = tm.get_funds(dt)
@@ -297,6 +318,104 @@ class MarginTest(unittest.TestCase):
         self.assertFalse(tm.have_short(rb))
         self.assertEqual(len(tm.get_short_position_list()), 0)
         self.assertEqual(len(tm.get_short_history_position_list()), 1)
+
+    def test_TradeManager_settlement(self):
+        """Phase B D4: the daily settlement marks the holding to the close and relocks it"""
+        rb = sm['SHFRB0000']
+        bars = rb.get_kdata(Query(100, 104, "DAY"))
+        self.assertGreaterEqual(len(bars), 3)
+        dt1, close1 = bars[0].datetime, bars[0].close
+        dt2, close2 = bars[1].datetime, bars[1].close
+        self.assertNotEqual(close1, close2)
+
+        unit = rb.unit
+        number = 10.0
+        nominal1 = round(close1 * number * unit, 2)
+        lock1 = round(0.1 * nominal1, 2)
+        nominal2 = round(close2 * number * unit, 2)
+        lock2 = round(0.1 * nominal2, 2)
+
+        tm = crtTM(dt1, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.1, 0.0, 0.1))
+        tm.set_param("margin_accounting", True)
+        self.assertEqual(tm.buy(dt1, rb, close1, number).business, BUSINESS.BUY)
+
+        # nothing is settled before the call, and the settlement is idempotent
+        self.assertFalse(tm.is_settled(dt1))
+        self.assertFalse(tm.is_settled(dt2))
+        self.assertTrue(tm.settlement(dt2))
+        self.assertTrue(tm.is_settled(dt2))
+        self.assertFalse(tm.is_settled(dt1))
+
+        # the basis moves to the settlement price and the lock is recomputed on it
+        position = tm.get_position(dt2, rb)
+        self.assertAlmostEqual(position.settle_basis, nominal2)
+        self.assertAlmostEqual(position.margin, lock2)
+
+        # the cash carries the profit net of the margin difference
+        expect_cash = round(1000000.0 - lock1, 2)
+        expect_cash = round(expect_cash + (nominal2 - nominal1), 2)
+        expect_cash = round(expect_cash - round(lock2 - lock1, 2), 2)
+        self.assertAlmostEqual(tm.current_cash, expect_cash)
+
+        # the record carries the settlement price, the signed quantity and the new lock
+        record = tm.get_trade_list()[-1]
+        self.assertEqual(record.business, BUSINESS.SETTLEMENT)
+        self.assertEqual(record.datetime, dt2)
+        self.assertAlmostEqual(record.real_price, close2)
+        self.assertAlmostEqual(record.number, number)
+        self.assertAlmostEqual(record.margin, lock2)
+        self.assertAlmostEqual(record.cash, tm.current_cash)
+
+        count = len(tm.get_trade_list())
+        self.assertTrue(tm.settlement(dt2))
+        self.assertEqual(len(tm.get_trade_list()), count)
+        self.assertAlmostEqual(tm.current_cash, expect_cash)
+
+        # the short side settles with the sign of the quantity
+        tm2 = crtTM(dt1, 1000000.0, TC_Zero(), "SYS", MG_Fixed(0.1, 0.0, 0.1))
+        tm2.set_param("margin_accounting", True)
+        self.assertEqual(tm2.sell_short(dt1, rb, close1, number).business, BUSINESS.SELL_SHORT)
+        self.assertTrue(tm2.settlement(dt2))
+        self.assertAlmostEqual(tm2.get_short_position(rb).settle_basis, nominal2)
+        self.assertEqual(tm2.get_trade_list()[-1].number, -number)
+
+        # the plain cash books never settle
+        plain = crtTM(dt1, 1000000.0, TC_Zero())
+        self.assertEqual(plain.buy(dt1, rb, close1, number).business, BUSINESS.BUY)
+        self.assertFalse(plain.settlement(dt1))
+        self.assertFalse(plain.is_settled(dt1))
+
+    def test_TradeManager_settlement_margin_call(self):
+        """A maintenance shortfall queues the forced liquidation only with force_liquidate on"""
+        rb = sm['SHFRB0000']
+        bars = rb.get_kdata(Query(100, 104, "DAY"))
+        self.assertGreaterEqual(len(bars), 3)
+        dt1, close1 = bars[0].datetime, bars[0].close
+        dt2 = bars[1].datetime
+
+        tm = crtTM(dt1, 10000.0, TC_Zero(), "SYS", PythonMaintainMargin(20000.0))
+        tm.set_param("margin_accounting", True)
+        self.assertEqual(tm.buy(dt1, rb, close1, 10.0).business, BUSINESS.BUY)
+        self.assertTrue(tm.settlement(dt2))
+        self.assertFalse(tm.is_forced_liquidation_queued(dt2))
+
+        queued = crtTM(dt1, 10000.0, TC_Zero(), "SYS", PythonMaintainMargin(20000.0))
+        queued.set_param("margin_accounting", True)
+        queued.set_param("force_liquidate", True)
+        self.assertEqual(queued.buy(dt1, rb, close1, 10.0).business, BUSINESS.BUY)
+        self.assertFalse(queued.is_forced_liquidation_queued(dt1))
+        self.assertTrue(queued.settlement(dt2))
+        self.assertTrue(queued.is_forced_liquidation_queued(dt2))
+        self.assertFalse(queued.is_forced_liquidation_queued(dt1))
+
+        # a flat account has nothing left to liquidate
+        queued.sell(dt2, rb, bars[1].close, 10.0)
+        self.assertFalse(queued.is_forced_liquidation_queued(dt2))
+
+    def test_business_records_for_settlement(self):
+        """The settlement and the interest record types are exposed by name"""
+        self.assertEqual(get_business_name(BUSINESS.SETTLEMENT), "SETTLEMENT")
+        self.assertEqual(get_business_name(BUSINESS.INTEREST), "INTEREST")
 
 
 def suite():
