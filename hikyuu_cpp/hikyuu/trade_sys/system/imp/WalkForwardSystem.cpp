@@ -145,6 +145,19 @@ void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
     sys->m_lastShortTakeProfit = m_lastShortTakeProfit;
 }
 
+void WalkForwardSystem::_applyFinancingSwitches(const SYSPtr& sys) {
+    // The per-window view swallows setParam (non-virtual), so the merged financing switches are
+    // written straight onto the real book this host owns; only-widen, like the merge the
+    // candidate performs on its own view in readyForRun
+    TMPtr tm = getTM();
+    HKU_IF_RETURN(!tm || !sys, void());
+    tm->setParam<bool>("support_borrow_cash", tm->tryGetParam<bool>("support_borrow_cash", false) ||
+                                                sys->getParam<bool>("support_borrow_cash"));
+    tm->setParam<bool>("support_borrow_stock",
+                       tm->tryGetParam<bool>("support_borrow_stock", false) ||
+                         sys->getParam<bool>("support_borrow_stock"));
+}
+
 void WalkForwardSystem::readyForRun() {
     CLS_CHECK(m_tm, "Not TradeManager was specified! {}", name());
     if (!m_train_tm) {
@@ -309,6 +322,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
             sys->setParam<bool>("shared_tm", true);
             sys->setParam<bool>("trace", trace);
             sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[i].run_start));
+            _applyFinancingSwitches(sys);
             syncDataToSystem(sys);
             sys->run(run_kdata, false, false);
             syncDataFromSystem(sys, false);
@@ -406,6 +420,7 @@ MomentResult WalkForwardSystem::driveMoment(const Datetime& datetime, bool open,
             m_cur_sys->setParam<bool>("shared_tm", true);
             m_cur_sys->setParam<bool>("trace", getParam<bool>("trace"));
             m_cur_sys->setTM(crtWalkForwardTM(getTM(), m_run_ranges[idx].run_start));
+            _applyFinancingSwitches(m_cur_sys);
             m_cur_sys->readyForRun();
             m_cur_sys->setTO(windowKDataAt(idx));
             syncDataToSystem(m_cur_sys);

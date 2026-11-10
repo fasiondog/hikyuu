@@ -28,6 +28,7 @@ public:
         // readyForRun) read the view while the real booking reads the wrapped account. A stale
         // default would round on another precision grid or warn about a switch the account never
         // lost. The mirror is read-only: a write through the view never reaches the shared account
+        // (the host WalkForwardSystem writes the merged switches straight onto the real book)
         _mirrorParams();
     }
 

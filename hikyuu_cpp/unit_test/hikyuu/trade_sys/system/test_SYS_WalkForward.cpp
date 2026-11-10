@@ -321,6 +321,102 @@ TEST_CASE("test_SYS_WalkForward_margin_view") {
     CHECK_EQ(view->getAvailableMargin(run_start), real->getAvailableMargin(run_start));
 }
 
+/** @par Check point: the margin lock of the view rounds on the mirrored grid of the account it
+ * wraps, not on the view's own default precision */
+TEST_CASE("test_SYS_WalkForward_margin_view_precision") {
+    Stock stk = getStock("sz000001");
+    Datetime run_start(201112050000LL);
+
+    TMPtr real = crtTM(Datetime(201101040000LL), 100000.0);
+    real->margin(MG_ByType("1:0.112", 0.0, 0.9));
+    real->setParam<int>("precision", 3);
+    auto view = std::make_shared<WalkForwardTradeManager>(real, run_start);
+
+    // 10.15 × 7 = 71.05 of notional × 0.112 = 7.9576, so the third decimal tells the grids apart:
+    // 7.958 on the account grid of 3, 7.96 on the view default grid of 2
+    /** @arg The requirement is measured on the mirrored account grid */
+    CHECK_EQ(view->getOpenMarginToLock(run_start, stk, 10.15, 7, MarginSide::LONG), 7.958);
+    CHECK_EQ(view->getOpenMarginToLock(run_start, stk, 10.15, 7, MarginSide::LONG),
+             real->getOpenMarginToLock(run_start, stk, 10.15, 7, MarginSide::LONG));
+
+    /** @arg The mirror is a construction-time snapshot: a later change of the account grid does
+     *  not retro-apply to the view, the next window build picks it up instead */
+    real->setParam<int>("precision", 2);
+    CHECK_EQ(view->getOpenMarginToLock(run_start, stk, 10.15, 7, MarginSide::LONG), 7.958);
+    auto refreshed = std::make_shared<WalkForwardTradeManager>(real, run_start);
+    CHECK_EQ(refreshed->getOpenMarginToLock(run_start, stk, 10.15, 7, MarginSide::LONG), 7.96);
+}
+
+/** @par Check point: a walk-forward run books the margin like the same run over an account that
+ * already had the financing, i.e. the host carries the candidate switch onto the real book */
+TEST_CASE("test_SYS_WalkForward_margin_run_matches_account_switch") {
+    Stock stk = getStock("sz000001");
+    KQuery query = KQueryByIndex(-125);
+    KData k = stk.getKData(query);
+    REQUIRE_UNARY(k.size() >= 10);
+    Datetime end = k[k.size() - 1].datetime;
+
+    auto make_tm = [](bool borrow_on_account) {
+        auto tm =
+          crtTM(Datetime(201101040000LL), 100000.0, TC_Zero(), "SYS", MG_ByType("1:0.5", 0.0, 0.9));
+        tm->setParam<bool>("margin_accounting", true);
+        tm->setParam<bool>("support_borrow_cash", borrow_on_account);
+        return tm;
+    };
+
+    // The baseline asks for nothing at the system layer and has the financing on the account; the
+    // other one has it only on the system, so the host has to write it onto the real book.
+    // Cash borrowing only: the stock-lending key is written symmetrically but has no runner case
+    // exercising it end to end yet
+    auto base_tm = make_tm(true);
+    auto base_sys =
+      SYS_WalkForward(SystemList{create_test_sys(3, 5)}, base_tm, 30, 20, SE_MaxFundsOptimal());
+    base_sys->setParam<bool>("clean_hold_when_select_changed", false);
+    base_sys->run(stk, query);
+
+    auto real_tm = make_tm(false);
+    auto candidate = create_test_sys(3, 5);
+    candidate->setParam<bool>("support_borrow_cash", true);
+    auto sys = SYS_WalkForward(SystemList{candidate}, real_tm, 30, 20, SE_MaxFundsOptimal());
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
+    sys->run(stk, query);
+
+    /** @arg The switch landed on the shared account the windows trade on */
+    CHECK_UNARY(real_tm->getParam<bool>("support_borrow_cash"));
+
+    /** @arg And both runs booked the same trades and the same cash */
+    TradeRecordList base_tr = base_tm->getTradeList();
+    TradeRecordList tr = real_tm->getTradeList();
+    REQUIRE_UNARY(base_tr.size() > 1);
+    REQUIRE_EQ(tr.size(), base_tr.size());
+    for (size_t i = 0, total = tr.size(); i < total; ++i) {
+        CHECK_EQ(tr[i].datetime, base_tr[i].datetime);
+        CHECK_EQ(tr[i].business, base_tr[i].business);
+        CHECK_EQ(tr[i].number, base_tr[i].number);
+        CHECK_EQ(tr[i].realPrice, base_tr[i].realPrice);
+    }
+    CHECK_EQ(real_tm->currentCash(), base_tm->currentCash());
+    auto base_funds = base_tm->getFunds(end);
+    auto funds = real_tm->getFunds(end);
+    // Pin the margin path as actually exercised over the run, otherwise the parity below turns
+    // vacuous once the end position is flat and the end-time occupation reads zero
+    DatetimeList trade_dates;
+    for (const auto& r : base_tr) {
+        trade_dates.push_back(r.datetime);
+    }
+    FundsList base_funds_curve = base_tm->getFundsList(trade_dates);
+    price_t max_occupied = 0.0;
+    for (const auto& f : base_funds_curve) {
+        if (f.occupied_margin > max_occupied) {
+            max_occupied = f.occupied_margin;
+        }
+    }
+    CHECK_UNARY(max_occupied > 0.0);
+    CHECK_EQ(funds.net_assets(), base_funds.net_assets());
+    CHECK_EQ(funds.borrow_cash, base_funds.borrow_cash);
+    CHECK_EQ(funds.occupied_margin, base_funds.occupied_margin);
+}
+
 TEST_CASE("test_SYS_WalkForward_runMoment_all_delayed_trades") {
     KData calendar = getStock("sh000001").getKData(KQuery(-8));
     REQUIRE_EQ(calendar.size(), 8);
