@@ -19,27 +19,27 @@ INSERT IGNORE INTO `hku_base`.`stocktypeinfo` (`tickValue`, `precision`, `id`, `
 INSERT IGNORE INTO `hku_base`.`stocktypeinfo` (`tickValue`, `precision`, `id`, `type`, `description`, `tick`, `minTradeNumber`, `maxTradeNumber`) VALUES (0.01, 2, 15, 15, '美股', 0.01, 1, 1000000);
 
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)
-SELECT 4, 'SHF', '上海期货交易所', '上海期货市场', 'RB0000', 19900101, 930, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
+SELECT 4, 'SHF', '上海期货交易所', '上海期货市场', 'RB0000', 19900101, 900, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `market` = 'SHF')
   AND NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `marketid` = 4);
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)
-SELECT 5, 'DCE', '大连商品交易所', '大连期货市场', 'I0000', 19900101, 930, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
+SELECT 5, 'DCE', '大连商品交易所', '大连期货市场', 'I0000', 19900101, 900, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `market` = 'DCE')
   AND NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `marketid` = 5);
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)
-SELECT 6, 'CZC', '郑州商品交易所', '郑州期货市场', 'SR0000', 19900101, 930, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
+SELECT 6, 'CZC', '郑州商品交易所', '郑州期货市场', 'SR0000', 19900101, 900, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `market` = 'CZC')
   AND NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `marketid` = 6);
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)
-SELECT 7, 'CFE', '中国金融期货交易所', '中金所市场', 'IF0000', 19900101, 930, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
+SELECT 7, 'CFE', '中国金融期货交易所', '中金所市场', 'IF0000', 19900101, 930, 1130, 1300, 1500, 480, 0, 0 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `market` = 'CFE')
   AND NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `marketid` = 7);
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)
-SELECT 8, 'GFE', '广州期货交易所', '广期所市场', 'SI0000', 19900101, 930, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
+SELECT 8, 'GFE', '广州期货交易所', '广期所市场', 'SI0000', 19900101, 900, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `market` = 'GFE')
   AND NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `marketid` = 8);
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)
-SELECT 9, 'INE', '上海国际能源交易中心', '能源中心市场', 'SC0000', 19900101, 930, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
+SELECT 9, 'INE', '上海国际能源交易中心', '能源中心市场', 'SC0000', 19900101, 900, 1130, 1330, 1500, 480, 0, 0 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `market` = 'INE')
   AND NOT EXISTS (SELECT 1 FROM `hku_base`.`market` WHERE `marketid` = 9);
 INSERT INTO `hku_base`.`market` (`marketid`, `market`, `name`, `description`, `code`, `lastDate`, `openTime1`, `closeTime1`, `openTime2`, `closeTime2`, `tz_offset_min`, `dst_rule`, `data_lag`)

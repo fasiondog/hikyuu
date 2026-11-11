@@ -124,10 +124,23 @@ Hong Kong Stock Trade Cost Algorithm
 For the Hong Kong stocks. The stamp duty, the trading fee and the levies are charged on **both
 the buy and the sell sides** (unlike the one-sided A-share stamp duty):
 
-* Buy / sell: max(commission × turnover, lowest_commission) + stamptax × turnover
-  + tradefee × turnover + per_trade
+* Buy / sell: max(commission × turnover, lowest_commission) + stamp duty rounded up to a whole
+  HK dollar + tradefee × turnover + settlement fee (a ratio, optionally bounded per order)
+  + per_trade
 
-.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.0000555, per_trade=0.0])
+The stamp duty follows the HKEX rule: **an amount below HK$1 is charged as HK$1** (rounded up to
+a whole dollar, not rounded to the cent). The settlement fee is charged as a ratio of the
+turnover with an optional lower / upper bound per order (e.g. the CCASS fee 0.002%, minimum
+HK$2, maximum HK$100); a bound of 0 means the bound is not applied.
+
+.. note::
+    Half-day trading sessions in Hong Kong (Christmas Eve, New Year's Eve, the last trading day
+    before the Lunar New Year, etc., morning session only) are not modelled: the `holiday` table
+    only expresses full-day closures, so 13:00-16:00 on those days is judged tradable by
+    :py:meth:`StockManager.is_trading_hours`. Daily backtests are unaffected; minute-level and
+    live session checks must handle it themselves.
+
+.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.000085, per_trade=0.0, settlefee=0.0, settlefee_min=0.0, settlefee_max=0.0])
 
     The Hong Kong stock trade cost algorithm, charged symmetrically on both sides
 
@@ -135,12 +148,17 @@ the buy and the sell sides** (unlike the one-sided A-share stamp duty):
         defaulting to 2.5 per ten thousand
     :param float lowest_commission: the lowest commission value (double-sided, per order),
         defaulting to HK$3
-    :param float stamptax: the stamp duty rate (charged on both sides), 0.1% since 2023-11-17
+    :param float stamptax: the stamp duty rate (charged on both sides), 0.1% since 2023-11-17;
+        an order below HK$1 is charged as HK$1 (rounded up to a whole dollar)
     :param float tradefee: the aggregated ratio of the exchange trading fee and the SFC / AFIRD
-        levies (double-sided): the HKEX trading fee 0.0027% + the SFC levy 0.0027% + the AFIRD
-        levy 0.00015%, defaulting to 0.0000555; it lands in CostRecord.transferfee
-    :param float per_trade: the fixed charge per order (double-sided, e.g. the settlement fee
-        booked by the broker), defaulting to 0; it lands in CostRecord.others
+        levies (double-sided): the HKEX trading fee 0.00565% + the SFC levy 0.0027% + the AFIRD
+        levy 0.00015%, defaulting to 0.000085; it lands in CostRecord.transferfee
+    :param float per_trade: the fixed charge per order (double-sided), defaulting to 0; it lands
+        in CostRecord.others
+    :param float settlefee: the settlement fee ratio (double-sided, e.g. the CCASS 0.002%),
+        defaulting to 0 (not charged); it is added to CostRecord.transferfee
+    :param float settlefee_min: the lowest settlement fee per order, defaulting to 0 (no bound)
+    :param float settlefee_max: the highest settlement fee per order, defaulting to 0 (no bound)
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 

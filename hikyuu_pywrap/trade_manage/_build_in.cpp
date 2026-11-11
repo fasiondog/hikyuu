@@ -130,16 +130,20 @@ void export_build_in(py::module& m) {
 
     m.def(
       "TC_HK", TC_HK, py::arg("commission") = 0.00025, py::arg("lowest_commission") = 3.0,
-      py::arg("stamptax") = 0.001, py::arg("tradefee") = 0.0000555, py::arg("per_trade") = 0.0,
-      R"(TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.0000555, per_trade=0.0])
+      py::arg("stamptax") = 0.001, py::arg("tradefee") = 0.000085, py::arg("per_trade") = 0.0,
+      py::arg("settlefee") = 0.0, py::arg("settlefee_min") = 0.0, py::arg("settlefee_max") = 0.0,
+      R"(TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.000085, per_trade=0.0, settlefee=0.0, settlefee_min=0.0, settlefee_max=0.0])
 
-    The Hong Kong stock trade cost algorithm. The buy and the sell are charged symmetrically: the broker commission (lifted to the lowest commission per order), the stamp duty (0.1% since 2023-11-17, charged on both sides), the exchange trading fee plus the SFC and AFIRD levies (0.00555% in total by default), and an optional fixed charge per order.
+    The Hong Kong stock trade cost algorithm. The buy and the sell are charged symmetrically: the broker commission (lifted to the lowest commission per order), the stamp duty (0.1% since 2023-11-17, charged on both sides and rounded up to a whole HK dollar per order), the exchange trading fee plus the SFC and AFIRD levies (0.0085% in total by default), the CCASS settlement fee (ratio with an optional lower / upper bound), and an optional fixed charge per order.
 
     :param float commission: the broker commission ratio (double-sided, of the turnover)
     :param float lowest_commission: the lowest commission value (double-sided, per order)
-    :param float stamptax: the stamp duty rate, charged on both sides
+    :param float stamptax: the stamp duty rate, charged on both sides; each order is rounded up to a whole HK dollar
     :param float tradefee: the aggregated ratio of the exchange trading fee and the SFC / AFIRD levies (double-sided); it lands in CostRecord.transferfee
-    :param float per_trade: the fixed charge per order, e.g. the settlement fee booked by the broker; it lands in CostRecord.others
+    :param float per_trade: the fixed charge per order; it lands in CostRecord.others
+    :param float settlefee: the settlement fee ratio (double-sided), 0 means not charged; it is added to CostRecord.transferfee
+    :param float settlefee_min: the lowest settlement fee per order, 0 means the bound is not applied
+    :param float settlefee_max: the highest settlement fee per order, 0 means the bound is not applied
     :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def("TC_Zero", TC_Zero, "The zero trade cost algorithm");

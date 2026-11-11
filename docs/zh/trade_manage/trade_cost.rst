@@ -115,21 +115,35 @@ ETF交易成本算法
 
 适用于港股。港股印花税、交易费与征费均为**买卖双边**收取（与 A 股印花税单边不同）：
 
-* 买入 / 卖出：max(佣金比例 × 成交金额, 最低佣金) + 印花税比例 × 成交金额
-  + 交易费及征费比例 × 成交金额 + 每笔固定费用
+* 买入 / 卖出：max(佣金比例 × 成交金额, 最低佣金) + 向上取整到整元的印花税
+  + 交易费及征费比例 × 成交金额
+  + 结算费（比例计征，可设每笔上下限）+ 每笔固定费用
 
-.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.0000555, per_trade=0.0])
+印花税按港交所规则**每笔不足 1 港元作 1 港元计**（向上取整到整元，非四舍五入到分）；
+结算费为按成交金额比例计征并带每笔上下限的收费（如港股 CCASS 0.002%、最低 2 港元、
+最高 100 港元），下限 / 上限填 0 表示不设该限。
+
+.. note::
+    港股半日市（平安夜、除夕、农历年前最后交易日等仅上午市）未建模，`holiday` 表只能表达
+    整日休市，这些日子的 13:00-16:00 会被 :py:meth:`StockManager.is_trading_hours` 判为交易中；
+    日线回测不受影响，分钟级与实盘时段的判断需自行处理。
+
+.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.000085, per_trade=0.0, settlefee=0.0, settlefee_min=0.0, settlefee_max=0.0])
 
     港股交易成本算法，买卖双边对称收取
 
     :param float commission: 佣金比例（双边，按成交金额），默认万分之2.5
     :param float lowest_commission: 最低佣金值（双边，按笔），默认 3 港元
-    :param float stamptax: 印花税率（双边收取），2023 年 11 月 17 日起为 0.1%
-    :param float tradefee: 交易费及征费合计比例（双边）：联交所交易费 0.0027% +
-        证监会征费 0.0027% + 财汇局征费 0.00015%，默认 0.0000555；计入
+    :param float stamptax: 印花税率（双边收取），2023 年 11 月 17 日起为 0.1%；
+        每笔征收额不足 1 港元作 1 港元计（向上取整到整元）
+    :param float tradefee: 交易费及征费合计比例（双边）：联交所交易费 0.00565% +
+        证监会征费 0.0027% + 财汇局征费 0.00015%，默认 0.000085；计入
         CostRecord.transferfee
-    :param float per_trade: 每笔固定费用（双边，如经纪商代收的结算费），默认 0；
-        计入 CostRecord.others
+    :param float per_trade: 每笔固定费用（双边），默认 0；计入 CostRecord.others
+    :param float settlefee: 结算费比例（双边，如 CCASS 0.002%），默认 0 即不计；
+        与交易费及征费一并计入 CostRecord.transferfee
+    :param float settlefee_min: 结算费每笔最低收费，默认 0 表示不设下限
+    :param float settlefee_max: 结算费每笔最高收费，默认 0 表示不设上限
     :return: :py:class:`TradeCostBase` 子类实例
 
 

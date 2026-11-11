@@ -20,15 +20,18 @@ namespace hku {
  *   buy and sell are charged symmetrically (the stamp duty and the regulatory fees are
  *   two-sided in Hong Kong):
  *     fee = max(commission * price * number * unit, lowest_commission)
- *           + stamptax * price * number * unit
+ *           + ceil(stamptax * price * number * unit)   // rounded up to a whole HK dollar
  *           + tradefee * price * number * unit
+ *           + clamp(settlefee * price * number * unit, settlefee_min, settlefee_max)
  *           + per_trade
  *   commission is the broker commission rate (double-sided, lifted to lowest_commission per
- *   order); stamptax is the stamp duty rate (0.1% since 2023-11-17, charged on both sides);
- *   tradefee aggregates the exchange trading fee and the SFC / AFIRD levies charged on both
- *   sides (0.00555% in total by default); per_trade is the fixed charge per order, e.g. the
- *   settlement fee booked by the broker. tradefee lands in CostRecord.transferfee and
- *   per_trade lands in CostRecord.others.
+ *   order); stamptax is the stamp duty rate (0.1% since 2023-11-17, charged on both sides and
+ *   rounded up to a whole HK dollar per order, as the HKEX does); tradefee aggregates the
+ *   exchange trading fee (0.00565%) and the SFC (0.0027%) / AFIRD (0.00015%) levies charged on
+ *   both sides (0.0085% in total by default); settlefee is the CCASS settlement fee ratio
+ *   (0.002% by default in the market, 0 here) optionally bounded by settlefee_min / settlefee_max
+ *   (0 means the bound is not applied); per_trade is the fixed charge per order. tradefee and
+ *   settlefee land in CostRecord.transferfee, per_trade lands in CostRecord.others.
  * </pre>
  * @ingroup TradeCost
  */
@@ -38,7 +41,8 @@ class HKU_API FixedHKTradeCost : public TradeCostBase {
 public:
     FixedHKTradeCost();
     FixedHKTradeCost(price_t commission, price_t lowestCommission, price_t stamptax,
-                     price_t tradefee, price_t perTrade);
+                     price_t tradefee, price_t perTrade, price_t settlefee = 0.0,
+                     price_t settleFeeMin = 0.0, price_t settleFeeMax = 0.0);
     virtual ~FixedHKTradeCost();
 
     /**

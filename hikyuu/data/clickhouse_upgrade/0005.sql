@@ -27,27 +27,27 @@ SELECT * FROM (SELECT 15 AS type, 2 AS precision, 0.01 AS tick, 0.01 AS tickValu
 WHERE NOT EXISTS (SELECT * FROM hku_base.stocktypeinfo WHERE type = 15);
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
-SELECT * FROM (SELECT 'SHF' AS market, '上海期货交易所' AS name, '上海期货市场' AS description, 'RB0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
+SELECT * FROM (SELECT 'SHF' AS market, '上海期货交易所' AS name, '上海期货市场' AS description, 'RB0000' AS code, 19900101 AS lastDate, 900 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'SHF');
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
-SELECT * FROM (SELECT 'DCE' AS market, '大连商品交易所' AS name, '大连期货市场' AS description, 'I0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
+SELECT * FROM (SELECT 'DCE' AS market, '大连商品交易所' AS name, '大连期货市场' AS description, 'I0000' AS code, 19900101 AS lastDate, 900 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'DCE');
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
-SELECT * FROM (SELECT 'CZC' AS market, '郑州商品交易所' AS name, '郑州期货市场' AS description, 'SR0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
+SELECT * FROM (SELECT 'CZC' AS market, '郑州商品交易所' AS name, '郑州期货市场' AS description, 'SR0000' AS code, 19900101 AS lastDate, 900 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'CZC');
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
-SELECT * FROM (SELECT 'CFE' AS market, '中国金融期货交易所' AS name, '中金所市场' AS description, 'IF0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
+SELECT * FROM (SELECT 'CFE' AS market, '中国金融期货交易所' AS name, '中金所市场' AS description, 'IF0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1300 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'CFE');
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
-SELECT * FROM (SELECT 'GFE' AS market, '广州期货交易所' AS name, '广期所市场' AS description, 'SI0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
+SELECT * FROM (SELECT 'GFE' AS market, '广州期货交易所' AS name, '广期所市场' AS description, 'SI0000' AS code, 19900101 AS lastDate, 900 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'GFE');
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)
-SELECT * FROM (SELECT 'INE' AS market, '上海国际能源交易中心' AS name, '能源中心市场' AS description, 'SC0000' AS code, 19900101 AS lastDate, 930 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
+SELECT * FROM (SELECT 'INE' AS market, '上海国际能源交易中心' AS name, '能源中心市场' AS description, 'SC0000' AS code, 19900101 AS lastDate, 900 AS openTime1, 1130 AS closeTime1, 1330 AS openTime2, 1500 AS closeTime2, 480 AS tz_offset_min, 0 AS dst_rule, 0 AS data_lag)
 WHERE NOT EXISTS (SELECT * FROM hku_base.market WHERE market = 'INE');
 
 INSERT INTO hku_base.market (market, name, description, code, lastDate, openTime1, closeTime1, openTime2, closeTime2, tz_offset_min, dst_rule, data_lag)

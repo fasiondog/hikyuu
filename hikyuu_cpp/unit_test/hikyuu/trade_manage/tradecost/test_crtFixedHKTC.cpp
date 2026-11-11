@@ -122,6 +122,81 @@ TEST_CASE("test_TC_HK_param") {
     CHECK_THROWS_AS(cost->setParam<price_t>("stamptax", -0.1), hku::exception);
     CHECK_THROWS_AS(cost->setParam<price_t>("tradefee", -0.1), hku::exception);
     CHECK_THROWS_AS(cost->setParam<price_t>("per_trade", -1.0), hku::exception);
+    CHECK_THROWS_AS(cost->setParam<price_t>("settlefee", -0.1), hku::exception);
+    CHECK_THROWS_AS(cost->setParam<price_t>("settlefee_min", -1.0), hku::exception);
+    CHECK_THROWS_AS(cost->setParam<price_t>("settlefee_max", -1.0), hku::exception);
+}
+
+/** @par Test points: the stamp duty is rounded up to a whole HK dollar, and the floating point
+ * noise at an exact dollar amount does not add a dollar */
+TEST_CASE("test_TC_HK_stamp_duty_round_up") {
+    StockManager& sm = StockManager::instance();
+    Stock sh = sm.getStock("sh600004");
+    REQUIRE_UNARY(!sh.isNull());
+    const Datetime dt(201001010000);
+    TradeCostPtr cost = TC_HK(0.0, 0.0, 0.001, 0.0, 0.0);
+
+    /** @arg 1050 turnover: 1.05 -> charged as 2 (rounded up to a whole dollar) */
+    CHECK_EQ(cost->getBuyCost(dt, sh, 1.05, 1000).stamptax, 2.0);
+
+    /** @arg An exact dollar amount is kept (the float noise of 10000 * 0.001 must not round up) */
+    CHECK_EQ(cost->getBuyCost(dt, sh, 10.0, 1000).stamptax, 10.0);
+
+    /** @arg 10005 turnover: 10.005 -> charged as 11 */
+    CHECK_EQ(cost->getBuyCost(dt, sh, 10.005, 1000).stamptax, 11.0);
+
+    /** @arg A zero rate charges nothing */
+    CHECK_EQ(TC_HK(0.0, 0.0, 0.0, 0.0, 0.0)->getBuyCost(dt, sh, 10.0, 1000).stamptax, 0.0);
+}
+
+/** @par Test points: the settlement fee is charged as a ratio and bounded per order; a bound of
+ * 0 means the bound is not applied, and a zero ratio charges nothing */
+TEST_CASE("test_TC_HK_settlement_fee") {
+    StockManager& sm = StockManager::instance();
+    Stock sh = sm.getStock("sh600004");
+    REQUIRE_UNARY(!sh.isNull());
+    const Datetime dt(201001010000);
+
+    TradeCostPtr cost = TC_HK(0.0, 0.0, 0.0, 0.0, 0.0, 0.00002, 2.0, 100.0);
+
+    /** @arg 1,000,000 turnover x 0.002% = 20, inside the bounds */
+    CHECK_EQ(cost->getBuyCost(dt, sh, 1000.0, 1000).transferfee, 20.0);
+
+    /** @arg 10,000 turnover x 0.002% = 0.2, lifted to the minimum 2 */
+    CHECK_EQ(cost->getBuyCost(dt, sh, 10.0, 1000).transferfee, 2.0);
+
+    /** @arg 10,000,000 turnover x 0.002% = 200, capped at the maximum 100 */
+    CHECK_EQ(cost->getBuyCost(dt, sh, 10000.0, 1000).transferfee, 100.0);
+
+    /** @arg The fee is charged on the sell side as well */
+    CHECK_EQ(cost->getSellCost(dt, sh, 10.0, 1000).transferfee, 2.0);
+
+    /** @arg A zero ratio charges nothing even with the bounds set */
+    CHECK_EQ(TC_HK(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 100.0)
+               ->getBuyCost(dt, sh, 10.0, 1000)
+               .transferfee,
+             0.0);
+
+    /** @arg A bound of 0 is not applied: the raw ratio is kept above and below */
+    CHECK_EQ(TC_HK(0.0, 0.0, 0.0, 0.0, 0.0, 0.00002)->getBuyCost(dt, sh, 10.0, 1000).transferfee,
+             0.2);
+    CHECK_EQ(TC_HK(0.0, 0.0, 0.0, 0.0, 0.0, 0.00002, 0.0, 0.0)
+               ->getBuyCost(dt, sh, 10000.0, 1000)
+               .transferfee,
+             200.0);
+}
+
+/** @par Test points: the default parameters follow the current Hong Kong fee schedule */
+TEST_CASE("test_TC_HK_default_param") {
+    TradeCostPtr cost = TC_HK();
+
+    /** @arg The exchange fee plus the SFC / AFIRD levies add up to 0.0085% per side */
+    CHECK_EQ(cost->getParam<price_t>("tradefee"), 0.000085);
+
+    /** @arg The settlement fee and its bounds are not charged by default */
+    CHECK_EQ(cost->getParam<price_t>("settlefee"), 0.0);
+    CHECK_EQ(cost->getParam<price_t>("settlefee_min"), 0.0);
+    CHECK_EQ(cost->getParam<price_t>("settlefee_max"), 0.0);
 }
 
 /** @par Test points: the account charges the same record through all four trade entries. The

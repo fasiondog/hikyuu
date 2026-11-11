@@ -466,9 +466,14 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "FX"), false);
     CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
     CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
-    /** @arg A market with explicit sessions (SHF 930-1130/1330-1500) is unaffected */
+    /** @arg A market with explicit sessions (SHF 900-1130/1330-1500) is unaffected */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300859LL), "SHF"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300900LL), "SHF"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "SHF"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109301200LL), "SHF"), false);
+    /** @arg CFE (index futures) opens the afternoon session at 13:00, not 13:30 */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301259LL), "CFE"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301300LL), "CFE"), true);
     /** @arg The input follows the unified clock: NASDAQ (US DST, -300) converts before judging.
      *        On 2021-10-07 (EDT) Beijing 21:30 is 09:30 local; on 2021-12-07 (EST) Beijing
      *        22:30 is 09:30 local */
