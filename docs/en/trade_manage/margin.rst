@@ -320,7 +320,7 @@ Booking formulas:
     cost, so the valuation and the close cash flow fold the cash lots' cost into the margin formula,
     which deviates from the lot-by-lot market practice; the account logs a warning in **either**
     direction (margin lots joining a cash holding as well as cash lots joining a margin one).
-    Lot-level (per-trade) margin and cost booking are registered as follow-up tasks.
+    Lot-level (per-trade) margin and cost booking are not provided.
 
     The margin an opening locked is written into ``TradeRecord.margin`` (0 on the cash books and for
     every business other than an opening): ``add_trade_record`` and the historical replay prefer that
@@ -424,7 +424,8 @@ of the outstanding liabilities is billed in the same batch, so **a billed day is
   every liability, and no age is kept per debt. A debt taken on inside such a window is therefore
   billed over the whole of it (a little too much) and a debt that predates the very first bill is
   billed over a single day (a little too little). This is the accepted simplification of not keeping
-  the days of every debt; billing each loan from its own date needs per loan accounting, later work
+  the days of every debt; billing each loan from its own date needs per loan accounting, which is not
+  provided
 - A lending of a security past its registered last trading day (an expiry, a delisting) is **not billed**
   any more, exactly like the holding settlement treats it: it belongs to the expiry liquidation, so its
   stale last close must not keep billing day after day. One with no settlement price at all is reported
