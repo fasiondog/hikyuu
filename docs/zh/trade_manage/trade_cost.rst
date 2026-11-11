@@ -172,6 +172,32 @@ ETF交易成本算法
     :return: :py:class:`TradeCostBase` 子类实例
 
 
+按市场 / 证券类型路由
+^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: TC_ByMarket([default_cost=TC_Zero(), costs={}])
+
+    本身不收取任何费用，将买卖费用与融券查询转交给该证券对应的成本算法：先按市场代码（如 ``"HK"``）匹配，
+    其次按证券类型（如 ``"type:12"``）匹配，均未注册时使用默认算法。不携带证券的账户级接口（融资借入资金的
+    成本与利率）由默认算法回答。
+
+    :param TradeCost default_cost: 未注册市场使用的兜底算法，默认 TC_Zero
+    :param dict costs: 路由表，市场代码或 ``"type:<n>"`` 映射到成本算法，如
+        ``{"HK": TC_HK(), "type:12": TC_Fixed(0.0001)}``
+    :return: :py:class:`TradeCostBase` 子类实例
+    :raises HKUException: 键为空，或 ``"type:"`` 键缺少类型编号
+
+.. code-block:: python
+
+    # 港股用 TC_HK、期货（类型 12）用 TC_Fixed，其余市场用 A 股费率
+    cost = TC_ByMarket(TC_FixedA(), {"HK": TC_HK(), "type:12": TC_Fixed(0.0001)})
+
+.. note::
+    请在回测开始前配置完毕：路由表不与查询同步，仅未注册市场的首次提示会加锁；未注册市场只提示一次，
+    之后按默认算法计费。经部件注册表 ``core.tc.bymarket`` 创建时只能指定默认算法，路由表须用上述
+    ``costs`` 参数配置。
+
+
 自定义交易成本算法
 ------------------
 

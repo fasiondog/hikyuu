@@ -191,6 +191,37 @@ fee and the extra charges both land in CostRecord.others.
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
+Routing by Market / Security Type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: TC_ByMarket([default_cost=TC_Zero(), costs={}])
+
+    Charge nothing itself and hand the trading fees and the securities lending queries to the
+    algorithm of the security: a security is matched by its market code (e.g. ``"HK"``) first, then
+    by its security type (e.g. ``"type:12"``), and is billed by the default algorithm when neither is
+    registered. The account-level hooks that carry no security (the borrowed cash cost and rate) are
+    answered by the default algorithm.
+
+    :param TradeCost default_cost: the algorithm answering an unregistered market, TC_Zero by
+        default
+    :param dict costs: the routing table, a market code or ``"type:<n>"`` mapped to a cost
+        algorithm, e.g. ``{"HK": TC_HK(), "type:12": TC_Fixed(0.0001)}``
+    :return: an instance of a :py:class:`TradeCostBase` subclass
+    :raises HKUException: an empty key, or a ``"type:"`` key without the type number
+
+.. code-block:: python
+
+    # HK stocks on TC_HK, futures (type 12) on TC_Fixed, the other markets on the A-share fees
+    cost = TC_ByMarket(TC_FixedA(), {"HK": TC_HK(), "type:12": TC_Fixed(0.0001)})
+
+.. note::
+    Configure the routing before the run: the table is not synchronized with the queries and only
+    the one-off unmatched warning takes a lock, so it is not meant to be modified while trading. An
+    unregistered market is reported once and then billed by the default algorithm. Created from the
+    part registry (``core.tc.bymarket``) only the default algorithm can be given; the routing table
+    is configured with the ``costs`` argument above.
+
+
 Custom Trade Cost Algorithm
 ---------------------------
 

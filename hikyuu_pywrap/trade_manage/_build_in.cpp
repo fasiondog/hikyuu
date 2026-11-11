@@ -146,6 +146,29 @@ void export_build_in(py::module& m) {
     :param float settlefee_max: the highest settlement fee per order, 0 means the bound is not applied
     :return: a subclass instance of :py:class:`TradeCostBase`)");
 
+    m.def(
+      "TC_ByMarket",
+      [](const TradeCostPtr& default_cost, const py::dict& costs) {
+          auto cost = std::static_pointer_cast<ByMarketTradeCost>(TC_ByMarket(default_cost));
+          for (auto item : costs) {
+              cost->add(py::cast<string>(item.first), py::cast<TradeCostPtr>(item.second));
+          }
+          return std::static_pointer_cast<TradeCostBase>(cost);
+      },
+      py::arg("default_cost") = TC_Zero(), py::arg("costs") = py::dict(),
+      R"(TC_ByMarket([default_cost=TC_Zero(), costs={}])
+
+    The trade cost algorithm routing every query to the model of the security. It charges nothing itself: the buy / sell / securities lending queries are forwarded to the model registered for the security's market code (e.g. "HK"), then for its security type (e.g. "type:12"), and to the default model when neither is registered. The account-level borrowed cash cost and rate, which carry no security, are answered by the default model.
+
+    :param TradeCost default_cost: the model answering an unregistered market, defaulting to TC_Zero()
+    :param dict costs: the routing table, a market code or "type:<n>" mapped to a TradeCost, e.g. {"HK": TC_HK(), "type:12": TC_Fixed(0.0001)}
+    :return: an instance of :py:class:`TradeCostBase`
+    :raises HKUException: an empty key, or a "type:" key without the type number
+
+    .. note::
+        Configure the routing before the run: the table is not synchronized with the queries, and only the one-off unmatched warning takes a lock.
+    )");
+
     m.def("TC_Zero", TC_Zero, "The zero trade cost algorithm");
 
     m.def("MG_None", MG_None,

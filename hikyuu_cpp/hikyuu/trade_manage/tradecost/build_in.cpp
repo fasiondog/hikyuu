@@ -10,6 +10,7 @@ void registerTradeCostParts() {
     registerPart_TC_FixedAPre2015();
     registerPart_TC_FixedETF();
     registerPart_TC_HK();
+    registerPart_TC_ByMarket();
     registerPart_TC_MarginInterest();
     registerPart_TC_Zero();
 }
