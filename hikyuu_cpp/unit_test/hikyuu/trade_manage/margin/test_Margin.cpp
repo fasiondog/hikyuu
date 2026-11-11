@@ -253,4 +253,58 @@ TEST_CASE("test_MG_ByType_parse_is_exception_safe") {
     CHECK_EQ(fixed->getMaxOpenNumber(dt, a, 1.11, 66.6, MarginSide::LONG), 100.0);
 }
 
+/** @par Test points: the collateral conversion table is independent of the margin one and counts
+ *  every holding in full when it is not configured */
+TEST_CASE("test_MG_ByType_collateral") {
+    Datetime dt(202001010000);
+    Stock fut = mg_mkStock("SHF", 12);
+    Stock a = mg_mkStock("SH", 1);
+    Stock us = mg_mkStock("NASDAQ", 1);
+
+    /** @arg An unconfigured table answers 1.0 for every security, on either side */
+    auto plain = MG_ByType("12:0.2");
+    CHECK_EQ(plain->getCollateralRate(dt, fut, MarginSide::LONG), 1.0);
+    CHECK_EQ(plain->getCollateralRate(dt, a, MarginSide::SHORT), 1.0);
+    CHECK_EQ(plain->getParam<double>("default_collateral_rate"), 1.0);
+
+    /** @arg The type key hits before the market one, with the same syntax as the margin table */
+    auto margin = MG_ByType("12:0.2", 0.0, 0.6, "12:0.75, SH:0.5", 0.9);
+    CHECK_EQ(margin->getCollateralRate(dt, fut, MarginSide::LONG), doctest::Approx(0.75));
+    CHECK_EQ(margin->getCollateralRate(dt, a, MarginSide::LONG), doctest::Approx(0.5));
+
+    /** @arg A security matched by no collateral key falls back to default_collateral_rate */
+    CHECK_EQ(margin->getCollateralRate(dt, us, MarginSide::LONG), doctest::Approx(0.9));
+
+    /** @arg One table serves both sides, and it does not feed the margin ratios */
+    CHECK_EQ(margin->getCollateralRate(dt, fut, MarginSide::SHORT), doctest::Approx(0.75));
+    CHECK_EQ(margin->getMarginRate(dt, fut, MarginSide::LONG), doctest::Approx(0.2));
+
+    /** @arg The margin table stays untouched by the collateral one, and the other way around */
+    auto only_collateral = MG_ByType("", 0.0, 1.0, "12:0.75");
+    CHECK_EQ(only_collateral->getMarginRate(dt, fut, MarginSide::LONG), 1.0);
+    CHECK_EQ(only_collateral->getCollateralRate(dt, fut, MarginSide::LONG), doctest::Approx(0.75));
+
+    /** @arg The models without a table count every holding in full */
+    CHECK_EQ(MG_Fixed(0.6)->getCollateralRate(dt, fut, MarginSide::LONG), 1.0);
+    CHECK_EQ(MG_None()->getCollateralRate(dt, fut, MarginSide::LONG), 1.0);
+
+    /** @arg An invalid collateral expression or fallback throws instead of being ignored */
+    CHECK_THROWS(MG_ByType("", 0.0, 0.6, "SHF:abc"));
+    CHECK_THROWS(MG_ByType("", 0.0, 0.6, "SHF:1.2"));
+    CHECK_THROWS(MG_ByType("", 0.0, 0.6, "", 0.0));
+    CHECK_THROWS(MG_ByType("", 0.0, 0.6, "", 1.1));
+
+    /** @arg A rejected collateral expression leaves the previous table intact */
+    CHECK_THROWS(margin->setParam<string>("collateral_rates", "12:0.5, bad"));
+    CHECK_EQ(margin->getCollateralRate(dt, fut, MarginSide::LONG), doctest::Approx(0.75));
+
+    /** @arg A valid expression replaces the table, and clone carries it over (the rejected string
+     *  still lives in the params, so it has to be replaced before anything re-reads them) */
+    margin->setParam<string>("collateral_rates", "12:0.55, SH:0.5");
+    CHECK_EQ(margin->getCollateralRate(dt, fut, MarginSide::LONG), doctest::Approx(0.55));
+    auto copied = margin->clone();
+    CHECK_EQ(copied->getParam<string>("collateral_rates"), "12:0.55, SH:0.5");
+    CHECK_EQ(copied->getCollateralRate(dt, fut, MarginSide::LONG), doctest::Approx(0.55));
+}
+
 /** @} */

@@ -19,18 +19,35 @@ from hikyuu.hub import HubNameError, PartNotFoundError
 class PartTest(unittest.TestCase):
     def test_registry(self):
         reg = hikyuu.PartRegistry.instance()
-        self.assertEqual(reg.size(), 209)
+        self.assertEqual(reg.size(), 210)
         self.assertTrue(reg.has("core.ind.ma"))
         self.assertTrue(reg.has("core.ind.MA"))
         self.assertFalse(reg.has("core.ind.nonexistent"))
 
         names = reg.get_name_list()
-        self.assertEqual(len(names), 209)
+        self.assertEqual(len(names), 210)
         self.assertIn("core.ind.ma", names)
 
         ind_names = reg.get_name_list(hikyuu.PartType.IND)
         self.assertEqual(len(ind_names), 139)
         self.assertIn("core.ind.ma", ind_names)
+
+    def test_margin_interest_part(self):
+        """The margin interest wrapper is a registered part whose inner model is a part param"""
+        reg = hikyuu.PartRegistry.instance()
+        self.assertTrue(reg.has("core.tc.margininterest"))
+        self.assertIn("core.tc.margininterest", reg.get_name_list(hikyuu.PartType.TC))
+
+        meta = reg.get_meta("core.tc.margininterest")
+        self.assertEqual(meta.name, "TC_MarginInterest")
+        self.assertEqual(meta.type, hikyuu.PartType.TC)
+        self.assertEqual([p.name for p in meta.params], [
+            "trade_cost",
+            "borrow_cash_rate",
+            "borrow_stock_rates",
+            "default_borrow_stock_rate",
+        ])
+        self.assertTrue(meta.params[0].is_part_param)
 
     def test_meta(self):
         reg = hikyuu.PartRegistry.instance()
@@ -194,7 +211,7 @@ class PartTest(unittest.TestCase):
         self.assertEqual(
             sg_names, hikyuu.search_part(hub="core", part_type=hikyuu.PartType.SG)
         )
-        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 7)
+        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 8)
         self.assertEqual(len(hikyuu.search_part(hub="core", part_type="mg")), 3)
         self.assertEqual(hikyuu.search_part(hub="nonexistent-hub-xyz"), [])
 
@@ -304,7 +321,7 @@ class PartTest(unittest.TestCase):
             hikyuu.release_python_parts()
 
         self.assertFalse(reg.has("core.ind.pyma"))
-        self.assertEqual(reg.size(), 209)
+        self.assertEqual(reg.size(), 210)
 
     def test_python_part_conflict(self):
         def make_meta(name):
@@ -343,7 +360,7 @@ class PartTest(unittest.TestCase):
 
         self.assertFalse(reg.has("core.ind.pyma2"))
         self.assertTrue(reg.has("core.ind.ma"))
-        self.assertEqual(reg.size(), 209)
+        self.assertEqual(reg.size(), 210)
 
     def test_python_part_bad_return(self):
         meta = hikyuu.PartMeta()

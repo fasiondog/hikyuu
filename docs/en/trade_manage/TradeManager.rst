@@ -12,7 +12,10 @@ Common parameters:
     * **support_borrow_cash=False** *(bool)* : whether to automatically borrow cash (financing / margin)
     * **support_borrow_stock=False** *(bool)* : whether to automatically borrow securities for short selling
     * **save_action=True** *(bool)* : whether to save the Python command sequences
-    * **margin_accounting=False** *(bool)* : whether to book the margin securities by margin only (Phase B, see :doc:`margin`)
+    * **margin_accounting=False** *(bool)* : whether to book the margin securities by margin only (see :doc:`margin`)
+    * **settle_with_close=True** *(bool)* : whether the settlement uses the closing price of the period (only when the margin accounting is on, see :doc:`margin`)
+    * **force_liquidate=False** *(bool)* : whether a shortfall of the equity queues a forced liquidation (only when the margin accounting is on, see :doc:`margin`)
+    * **annual_days=365** *(int)* : the days of a year, i.e. the denominator prorating the daily interest (only when the margin accounting is on, see :doc:`margin`)
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])

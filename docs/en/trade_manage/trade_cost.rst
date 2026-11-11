@@ -63,6 +63,42 @@ Shanghai-Shenzhen A-share Trade Cost Algorithm
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
+Margin Financing Interest Cost Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The trading fees and the interest are two separate concerns: the A-share, the ETF and the general
+models answer the trading fees only, while **the annualized rates of the margin financing and the
+securities lending are answered by a dedicated wrapper**, so any cost model can be wrapped without
+changing it.
+
+.. py:function:: TC_MarginInterest([trade_cost=TC_Zero(), borrow_cash_rate=0.0, borrow_stock_rates="", default_borrow_stock_rate=0.0])
+
+    Wrap another trade cost algorithm with the annualized rates of the margin financing and the
+    securities lending: the trading fees are delegated to the wrapped algorithm and this one answers
+    the two rates only. The rates are billed by the account settlement, prorated over the calendar
+    days gone by since the last bill with the account ``annual_days`` parameter as the denominator,
+    added to the debt itself instead of paid from the cash and written as ``BUSINESS_INTEREST``
+    records, see :doc:`margin`
+
+    Both rates are 0.0 by default, i.e. nothing is billed, so wrapping an algorithm without
+    configuring a rate leaves the books exactly as they were.
+
+    :param TradeCost trade_cost: the algorithm answering the trading fees, TC_Zero by default
+    :param float borrow_cash_rate: the annualized interest rate of the borrowed cash, in [0, 1); 0.0
+        bills nothing
+    :param str borrow_stock_rates: the securities lending rate table, a ``"key:rate"`` list, e.g.
+        ``"12:0.10, SHF:0.12"``; an all-digit key is a security type, any other key is a market code
+    :param float default_borrow_stock_rate: the rate of a security matched by no key, in [0, 1);
+        0.0 bills nothing
+    :return: an instance of a :py:class:`TradeCostBase` subclass
+
+.. code-block:: python
+
+    # the current A-share fees plus a 6% financing rate and a per-market lending fee table
+    cost = TC_MarginInterest(TC_FixedA(), borrow_cash_rate=0.06, borrow_stock_rates="SH:0.10, SZ:0.12")
+    tm = crtTM(cost_func=cost, margin=MG_ByType("1:0.5"))
+
+
 ETF Trade Cost Algorithm
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -112,13 +148,20 @@ Custom Trade Cost Algorithm
 
 The custom trade cost algorithm interface:
 
-* :py:meth:`TradeCostBase.getBuyCost` - [Required] Get the buy cost
-* :py:meth:`TradeCostBase.getSellCost` - [Required] Get the sell cost
-* :py:meth:`TradeCostBase.getBorrowCashCost` - [Optional] Get the cost of borrowing cash (margin financing)
-* :py:meth:`TradeCostBase.getReturnCashCost` - [Optional] Get the cost of returning the borrowed cash
-* :py:meth:`TradeCostBase.getBorrowStockCost` - [Optional] Get the cost of borrowing stock (short selling)
-* :py:meth:`TradeCostBase.getReturnStockCost` - [Optional] Get the cost of returning the borrowed stock
+* :py:meth:`TradeCostBase.get_buy_cost` - [Required] Get the buy cost
+* :py:meth:`TradeCostBase.get_sell_cost` - [Required] Get the sell cost
+* :py:meth:`TradeCostBase.get_borrow_cash_cost` - [Optional] Get the cost of borrowing cash (margin financing)
+* :py:meth:`TradeCostBase.get_return_cash_cost` - [Optional] Get the cost of returning the borrowed cash
+* :py:meth:`TradeCostBase.get_borrow_stock_cost` - [Optional] Get the cost of borrowing stock (short selling)
+* :py:meth:`TradeCostBase.get_return_stock_cost` - [Optional] Get the cost of returning the borrowed stock
 * :py:meth:`TradeCostBase._clone` - [Required] The subclass clone interface
+
+.. note::
+
+    The names above are the ones a Python subclass has to implement: the C++ account code looks the override up by
+    them and calls back into it. The binding used to look the overrides up by their C++ names (``getBuyCost`` and so
+    on), which disagreed with this list, so an override written as listed here was silently ignored; the lookup is
+    now on the snake_case names, and old code that defined the C++ names has to be renamed.
 
 
 
@@ -215,7 +258,33 @@ Trade Cost Algorithm Base Class
         :param int num: the returned quantity
         :return: the trade cost record
         :rtype: CostRecord
+
+    .. py:method:: get_borrow_cash_rate(self, datetime)
+
+        [Override hook] The annualized interest rate of the borrowed cash, 0.0 by default
         
+        The rate is billed by the account settlement, prorated over the calendar days gone by since
+        the last bill with its ``annual_days`` parameter as the denominator, added to the debt itself
+        instead of paid from the cash, and written as a
+        ``BUSINESS_INTEREST`` record; see :doc:`margin`. The built-in implementation is
+        :py:func:`TC_MarginInterest`
+
+        :param Datetime datetime: the settled moment
+        :return: an annualized decimal rate, e.g. 0.06 for 6% per year
+        :rtype: float
+
+    .. py:method:: get_borrow_stock_rate(self, datetime, stock)
+
+        [Override hook] The annualized fee rate of the borrowed stock, 0.0 by default
+
+        It is billed on the market value of the borrowed shares at the settlement price and joins
+        the cash debt the same way. The built-in implementation is :py:func:`TC_MarginInterest`
+
+        :param Datetime datetime: the settled moment
+        :param Stock stock: the borrowed security
+        :return: an annualized decimal rate, e.g. 0.10 for 10% per year
+        :rtype: float
+
     .. py:method:: _clone(self)
     
         [Override hook] Subclass clone interface

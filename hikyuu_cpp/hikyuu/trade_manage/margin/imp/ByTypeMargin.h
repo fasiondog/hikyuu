@@ -9,7 +9,7 @@
 #ifndef TRADE_MANAGE_IMP_BY_TYPE_MARGIN_H_
 #define TRADE_MANAGE_IMP_BY_TYPE_MARGIN_H_
 
-#include <unordered_map>
+#include "../../RateTable.h"
 #include "../MarginBase.h"
 
 namespace hku {
@@ -24,6 +24,10 @@ namespace hku {
  * @param rates the "key:ratio" list
  * @param maintain_rate maintain margin ratio, 0 means the same as the opening margin
  * @param default_rate ratio of a security matched by no key, (0, 1], 0.6 by default
+ * @param collateral_rates the "key:ratio" list of the collateral conversion rates, same syntax;
+ *                         an empty list counts every holding in full
+ * @param default_collateral_rate conversion rate of a security matched by no collateral key,
+ *                                (0, 1], 1.0 by default
  * @ingroup Margin
  */
 class HKU_API ByTypeMargin : public MarginBase {
@@ -44,24 +48,31 @@ public:
     virtual double getMarginRate(const Datetime& datetime, const Stock& stock,
                                  MarginSide side) const override;
 
+    /** The collateral conversion rate of the security, one table for both sides */
+    virtual double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                                     MarginSide side) const override;
+
     virtual MarginPtr _clone() override;
 
 protected:
     virtual void _checkParam(const string& name) const override;
 
 private:
-    /** Parse the rates expression into the lookup maps; called from _checkParam only, so a query
-     *  method never parses nor throws and a shared instance stays read-only at run time */
+    /** Parse both rate tables; called from _checkParam only, so a query method never parses nor
+     *  throws and a shared instance stays read-only at run time (each table is reparsed only when
+     *  its own expression changed) */
     void parseRates() const;
 
     /** The ratio of the given security, default_rate when no key matches */
     double rateOf(const Stock& stock) const;
 
-    // The maps are derived from the rates param, hence they are not serialized; they are rebuilt by
-    // parseRates on every param check, i.e. on set_param, on clone and on deserialization
-    mutable string m_parsed_src;
-    mutable std::unordered_map<uint32_t, double> m_type_rates;
-    mutable std::unordered_map<string, double> m_market_rates;
+    /** The conversion rate of the given security, default_collateral_rate when no key matches */
+    double collateralRateOf(const Stock& stock) const;
+
+    // The tables are derived from the rate params, hence they are not serialized; they are
+    // rebuilt by parseRates at every param check: set_param, clone and deserialization
+    mutable RateTable m_rates;
+    mutable RateTable m_collateral_rates;
 };
 
 } /* namespace hku */

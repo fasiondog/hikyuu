@@ -353,6 +353,9 @@ price_t TradeManager::getDebtCash(const Datetime& datetime) {
             debt_cash += iter->realPrice;
         } else if (iter->business == BUSINESS_RETURN_CASH) {
             debt_cash -= iter->realPrice;
+        } else if (iter->business == BUSINESS_INTEREST) {
+            // The billed interest became part of the principal, exactly like settlement() does it
+            debt_cash += iter->realPrice;
         }
     }
     return debt_cash;
@@ -1987,6 +1990,12 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 funds.borrow_cash -= iter->realPrice;
                 break;
 
+            case BUSINESS_INTEREST:
+                // Billed into the debt by settlement(), the cash is untouched; a securities lending
+                // carries its own stock but adds to the same cash liability
+                funds.borrow_cash += iter->realPrice;
+                break;
+
             case BUSINESS_BORROW_STOCK:
                 funds.borrow_asset =
                   roundEx(funds.borrow_asset + iter->realPrice * iter->number * iter->stock.unit(),
@@ -2493,6 +2502,10 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     borrow_cash -= trade_iter->realPrice;
                     break;
 
+                case BUSINESS_INTEREST:
+                    borrow_cash += trade_iter->realPrice;
+                    break;
+
                 case BUSINESS_BORROW_STOCK: {
                     borrow_asset =
                       roundEx(borrow_asset + trade_iter->realPrice * trade_iter->number *
@@ -2562,9 +2575,11 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                         iter->second.settle_basis = roundEx(
                           trade_iter->realPrice * iter->second.number * trade_iter->stock.unit(),
                           precision);
-                        if (trade_iter->margin > 0.0) {
-                            iter->second.margin = roundEx(trade_iter->margin, precision);
-                        }
+                        // The record always carries the lock snapshot: a zero demotes the holding
+                        // to the cash books, exactly like the live settlement and the replay of
+                        // getFunds do
+                        iter->second.margin =
+                          roundEx(std::max<price_t>(trade_iter->margin, 0.0), precision);
                     }
                     break;
                 }
@@ -2951,12 +2966,23 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
 
 bool TradeManager::isSettled(const Datetime& datetime) const {
     HKU_IF_RETURN(datetime.isNull(), false);
-    // The trade list is chronologically ordered, so the probe stops at the first older record
+    // Both halves of the batch are daily rules, so any record answers for its whole calendar day,
+    // whatever moment of it it was written at: a system driven by a finer ktype calls settlement
+    // once per bar, and every one of those moments belongs to the same already settled day
+    const Datetime day = datetime.startOfDay();
+    // The trade list is chronologically ordered, so the probe stops at the first earlier day
     for (auto iter = m_trade_list.rbegin(); iter != m_trade_list.rend(); ++iter) {
-        if (iter->datetime < datetime) {
+        const Datetime& date = iter->datetime;
+        if (date < day) {
             break;
         }
-        if (iter->business == BUSINESS_SETTLEMENT && iter->datetime == datetime) {
+        // A later moment belongs to a later batch, which does not settle this one
+        if (datetime < date) {
+            continue;
+        }
+        // An interest record belongs to the same batch, so a day that only billed interest counts
+        // as settled too: otherwise a flat book with an outstanding debt would accrue it again
+        if (iter->business == BUSINESS_SETTLEMENT || iter->business == BUSINESS_INTEREST) {
             return true;
         }
     }
@@ -2979,8 +3005,36 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
     HKU_IF_RETURN(!m_margin, false);
     HKU_WARN_IF_RETURN(datetime < lastDatetime(), false,
                        "{} settlement must be >= lastDatetime({})!", datetime, lastDatetime());
-    // Idempotent: a second call of the same moment must not post the profit twice
-    HKU_IF_RETURN(isSettled(datetime), true);
+    // Idempotent per calendar day: neither half may run twice for the same day, while the two are
+    // gated apart so a day that only billed interest still marks a position opened later on it
+    const Datetime day = datetime.startOfDay();
+    bool marked = false;
+    bool billed = false;
+    // The trade list is chronologically ordered, so the probe stops at the first earlier day
+    for (auto iter = m_trade_list.rbegin(); iter != m_trade_list.rend(); ++iter) {
+        const Datetime& date = iter->datetime;
+        if (date < day) {
+            break;
+        }
+        // A later moment belongs to a later batch, which does not settle this one
+        if (datetime < date) {
+            continue;
+        }
+        if (iter->business == BUSINESS_SETTLEMENT) {
+            marked = true;
+        } else if (iter->business == BUSINESS_INTEREST) {
+            billed = true;
+        }
+        if (marked && billed) {
+            break;
+        }
+    }
+    HKU_IF_RETURN(marked && billed, true);
+
+    // Read the proration base before anything is posted: an invalid value must fail the whole
+    // settlement rather than leave a half settled book behind
+    int annual_days = tryGetParam<int>("annual_days", 365);
+    HKU_CHECK(annual_days > 0, "{}: annual_days({}) must be > 0!", datetime, annual_days);
 
     // The ex-rights adjustment must land before the basis is marked: a gift or a consolidation
     // changes the quantity while the basis keeps its total, so scaling it afterwards would book
@@ -3051,11 +3105,98 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         _saveAction(record);
     };
 
-    for (auto& kv : m_position) {
-        settle_holding(kv.second, true);
+    if (!marked) {
+        for (auto& kv : m_position) {
+            settle_holding(kv.second, true);
+        }
+        for (auto& kv : m_short_position) {
+            settle_holding(kv.second, false);
+        }
     }
-    for (auto& kv : m_short_position) {
-        settle_holding(kv.second, false);
+
+    // Bill the interest of the outstanding liabilities in the same batch, after the posting and
+    // before the risk check, so a billed day is also a called day. The amount joins the debt and is
+    // not paid from the cash: a broker adds it to the principal, which then accrues on its own.
+    bool interest_posted = false;
+    // The interest follows the calendar rather than the bars: one anchor serves the whole book, the
+    // calendar days gone by since it was last billed, so a weekend, a suspension or a coarser
+    // ktype bills the days it waited for instead of a single one. A debt taken on inside such a
+    // window is billed over the whole of it, and a debt that predates the very first bill is billed
+    // over a single day: both follow from the one anchor, accepted as the simplification of not
+    // keeping the days of every debt. Scanned lazily, as a book with nothing to pay never walks the
+    // list
+    bool scanned = false;
+    int days = 1;
+    auto days_to_bill = [&]() -> int {
+        HKU_IF_RETURN(scanned, days);
+        scanned = true;
+        Datetime last;
+        for (auto iter = m_trade_list.rbegin(); iter != m_trade_list.rend(); ++iter) {
+            if (iter->business != BUSINESS_INTEREST) {
+                continue;
+            }
+            last = iter->datetime.startOfDay();
+            break;
+        }
+        // A book never billed before covers a single day
+        days = last.isNull() ? 1 : (int)(day - last).total_days();
+        // Keep the clamped value in the memo: a stale zero would bill nothing at all for the
+        // liability items asked after this one
+        if (days < 1) {
+            days = 1;
+        }
+        return days;
+    };
+    auto accrue_interest = [&](const Stock& stock, price_t debt_base, double rate, double billed_n,
+                               const string& remark) {
+        HKU_IF_RETURN(!(debt_base > 0.0) || !(rate > 0.0), void());
+        price_t interest =
+          roundEx(debt_base * rate * days_to_bill() / (double)annual_days, precision);
+        HKU_IF_RETURN(!(interest > 0.0), void());
+        m_borrow_cash = roundEx(m_borrow_cash + interest, precision);
+        // The billed amount becomes a loan of its own date, so returnCash can still repay the whole
+        // debt from the loan list and the next day bills on it (the compounding of the decision)
+        m_loan_list.push_back(LoanRecord(datetime, interest));
+        // One record per liability item: realPrice carries the billed amount, while the quantity
+        // carries the borrowed base of a securities lending (0 for the cash one, like BORROW_CASH)
+        TradeRecord record(stock, datetime, BUSINESS_INTEREST, interest, interest, 0.0, billed_n,
+                           CostRecord(), 0.0, m_cash, PART_INVALID, remark);
+        m_trade_list.push_back(record);
+        interest_posted = true;
+        _saveAction(record);
+    };
+
+    if (!billed) {
+        accrue_interest(Null<Stock>(), m_borrow_cash, getBorrowCashRate(datetime), 0.0,
+                        "borrow cash");
+        for (const auto& kv : m_borrow_stock) {
+            const BorrowRecord& borrow = kv.second;
+            // A lending past the last registered bar of the security belongs to the expiry
+            // liquidation, exactly like settle_holding treats the holding, so its stale last close
+            // must not keep billing day after day
+            const Datetime& last = borrow.stock.lastDatetime();
+            if (!last.isNull() && datetime > last) {
+                continue;
+            }
+            double rate = getBorrowStockRate(datetime, borrow.stock);
+            if (!(rate > 0.0)) {
+                continue;
+            }
+            // The securities lending is billed on the market value of the borrowed shares at the
+            // settlement price, not on the value they had when they were borrowed, so a lending of
+            // a security that has never been priced at all cannot be billed and must say so instead
+            // of passing silently
+            string remark;
+            price_t price = settle_price(borrow.stock, remark);
+            if (!(price > 0.0)) {
+                HKU_WARN("{} {}: no settlement price, the lending interest is not billed!",
+                         datetime, borrow.stock.market_code());
+                continue;
+            }
+            price_t debt_base = roundEx(price * borrow.number * borrow.stock.unit(), precision);
+            accrue_interest(borrow.stock, debt_base, rate, borrow.number,
+                            remark.empty() ? "borrow stock" : "borrow stock, " + remark);
+        }
     }
 
     // The maintenance requirement covers every margin-locked holding, the ones the posting above
@@ -3134,7 +3275,7 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
                 name());
     // Nothing to post means nothing was settled: an empty account (or one whose whole book was
     // skipped) must not report itself as settled for the moment
-    return posted;
+    return marked || billed || posted || interest_posted;
 }
 
 void TradeManager::_saveAction(const TradeRecord& record) {
@@ -3206,10 +3347,11 @@ void TradeManager::_saveAction(const TradeRecord& record) {
             break;
 
         case BUSINESS_SETTLEMENT:
-            // Deliberately not replayed: the settlement posts a cash flow derived from the price
-            // data and the margin model of that moment, so the regenerated script has to rebuild
-            // it through settlement() rather than pin the numbers as a trade; the full state is
-            // restored by replaying the trade records instead
+        case BUSINESS_INTEREST:
+            // Deliberately not replayed: both belong to the same settlement batch, whose amounts
+            // follow from the price data and the models of that moment, so the regenerated script
+            // has to rebuild them through settlement() rather than pin the numbers as trades; the
+            // full state is restored by replaying the trade records instead
             return;
 
         default:
@@ -3504,6 +3646,9 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
 
         case BUSINESS_SETTLEMENT:
             return _add_settlement_tr(tr);
+
+        case BUSINESS_INTEREST:
+            return _add_interest_tr(tr);
 
         case BUSINESS_INVALID:
         default:
@@ -4131,6 +4276,40 @@ bool TradeManager::_add_settlement_tr(const TradeRecord& tr) {
     }
     m_cash = roundEx(m_cash - delta, precision);
     position.margin = relock;
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+
+    _saveAction(new_tr);
+    return true;
+}
+
+bool TradeManager::_add_interest_tr(const TradeRecord& tr) {
+    HKU_ERROR_IF_RETURN(!(tr.realPrice > 0.0), false, "tr.realPrice({:<.4f}) must be > 0!",
+                        tr.realPrice);
+
+    // Idempotent: the billed amount is a real liability, applying it twice would double it. One
+    // record is written per liability item, so the probe matches the moment and the item (the cash
+    // one carries a null stock, whose id is 0)
+    for (auto iter = m_trade_list.rbegin(); iter != m_trade_list.rend(); ++iter) {
+        if (iter->datetime < tr.datetime) {
+            break;
+        }
+        if (iter->business == BUSINESS_INTEREST && iter->datetime == tr.datetime &&
+            iter->stock.id() == tr.stock.id()) {
+            HKU_WARN("{} {}: the interest has been applied already!", tr.datetime,
+                     tr.stock.isNull() ? "cash" : tr.stock.market_code());
+            return true;
+        }
+    }
+
+    // The debt grows and the cash stays where it is, exactly like settlement() books it; the billed
+    // amount joins the loan list as a principal of its own date so it can be repaid and re-billed
+    int precision = getParam<int>("precision");
+    price_t interest = roundEx(tr.realPrice, precision);
+    m_borrow_cash = roundEx(m_borrow_cash + interest, precision);
+    m_loan_list.push_back(LoanRecord(tr.datetime, interest));
 
     TradeRecord new_tr(tr);
     new_tr.cash = m_cash;

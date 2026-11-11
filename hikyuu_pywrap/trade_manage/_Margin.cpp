@@ -54,6 +54,12 @@ public:
         PYBIND11_OVERRIDE_NAME(double, MarginBase, "get_max_open_number", getMaxOpenNumber,
                                datetime, stock, price, available, side);
     }
+
+    double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                             MarginSide side) const override {
+        PYBIND11_OVERRIDE_NAME(double, MarginBase, "get_collateral_rate", getCollateralRate,
+                               datetime, stock, side);
+    }
 };
 
 void export_Margin(py::module& m) {
@@ -67,12 +73,13 @@ void export_Margin(py::module& m) {
 
     The custom margin model interfaces:
 
-    :py:meth:`MarginBase.getOpenMargin` - [Required] Get the margin occupied by an opening
-    :py:meth:`MarginBase.isMarginTrading` - [Optional] Whether the security uses the margin accounting
-    :py:meth:`MarginBase.needBorrowAsset` - [Optional] Whether a short opening needs borrowing
-    :py:meth:`MarginBase.getMaintainMargin` - [Optional] Get the maintain margin
-    :py:meth:`MarginBase.getMarginRate` - [Optional] The ratio view of the margin
-    :py:meth:`MarginBase.getMaxOpenNumber` - [Optional] The max openable quantity
+    :py:meth:`MarginBase.get_open_margin` - [Required] Get the margin occupied by an opening
+    :py:meth:`MarginBase.is_margin_trading` - [Optional] Whether the security uses the margin accounting
+    :py:meth:`MarginBase.need_borrow_asset` - [Optional] Whether a short opening needs borrowing
+    :py:meth:`MarginBase.get_maintain_margin` - [Optional] Get the maintain margin
+    :py:meth:`MarginBase.get_margin_rate` - [Optional] The ratio view of the margin
+    :py:meth:`MarginBase.get_max_open_number` - [Optional] The max openable quantity
+    :py:meth:`MarginBase.get_collateral_rate` - [Optional] The collateral conversion rate
     :py:meth:`MarginBase._clone` - [Required] The subclass clone interface)")
 
       .def(py::init<const string&>())
@@ -176,6 +183,18 @@ void export_Margin(py::module& m) {
         :param float available: the available funds
         :param MarginSide side: the long or the short side
         :return: the quantity aligned to the minimum trading unit, 0 when nothing can be opened
+        :rtype: float)")
+
+      .def("get_collateral_rate", &MarginBase::getCollateralRate, py::arg("date"), py::arg("stock"),
+           py::arg("side") = MarginSide::LONG,
+           R"(get_collateral_rate(self, date, stock, side=MarginSide.LONG)
+
+        [Overload interface] The collateral conversion rate, a value in (0, 1]
+
+        :param Datetime date: the queried moment
+        :param Stock stock: the held security
+        :param MarginSide side: the long or the short side
+        :return: the part of the market value counted as collateral, 1.0 by default
         :rtype: float)")
 
         DEF_PICKLE(MarginPtr);

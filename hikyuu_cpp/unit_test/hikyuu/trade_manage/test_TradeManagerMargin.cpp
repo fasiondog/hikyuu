@@ -83,6 +83,43 @@ public:
     }
 };
 
+/** A margin model carrying a single collateral conversion rate for the long side, the margin
+ *  ratios being the same as MG_TestNoBorrow's so the two effects stay separable */
+class MG_TestCollateral : public MarginBase {
+    MARGIN_NO_PRIVATE_MEMBER_SERIALIZATION
+
+public:
+    MG_TestCollateral() : MarginBase("MG_TestCollateral") {
+        setParam<double>("rate", 0.1);
+        setParam<double>("collateral_rate", 1.0);
+    }
+
+    // Like MG_TestNoBorrow: without it the account books the opening on plain cash and locks no
+    // margin at all, so the two halves of getAvailableMargin could not be told apart
+    bool needBorrowAsset(const Stock& stock) const override {
+        return false;
+    }
+
+    price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price, double num,
+                          MarginSide side) const override {
+        return getParam<double>("rate") * price * num * stock.unit();
+    }
+
+    double getMarginRate(const Datetime& datetime, const Stock& stock,
+                         MarginSide side) const override {
+        return getParam<double>("rate");
+    }
+
+    double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                             MarginSide side) const override {
+        return side == MarginSide::LONG ? getParam<double>("collateral_rate") : 1.0;
+    }
+
+    MarginPtr _clone() override {
+        return make_shared<MG_TestCollateral>();
+    }
+};
+
 /** A margin model standing in for one defined in Python, which the account must report upward */
 class MG_TestPython : public MarginBase {
     MARGIN_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -124,7 +161,7 @@ public:
     }
 };
 
-/** An account that books the margin securities by margin (Phase B accounting) */
+/** An account that books the margin securities by margin */
 static TradeManagerPtr crtMarginAccountTM(const Datetime& datetime, price_t init_cash) {
     auto tm = crtTM(datetime, init_cash, TC_Zero(), "SYS", make_shared<MG_TestNoBorrow>());
     tm->setParam<bool>("margin_accounting", true);
@@ -1638,6 +1675,77 @@ TEST_CASE("test_TradeManager_margin_record_snapshot") {
       tm->buy(dt2, other, other_close, number, 0.0, 0.0, other_close, PART_SIGNAL).business,
       BUSINESS_BUY);
     CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
+}
+
+/** @par Test points: the collateral conversion rate discounts the long holdings out of the
+ * available funds by exactly the haircut it produces, on the value they really count for, while
+ * the default 1.0 changes nothing */
+TEST_CASE("test_TradeManager_collateral_rate") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    Datetime dt(200001040000);
+    price_t close = stock.getMarketValue(dt, KQuery::DAY);
+    REQUIRE_UNARY(close > 0.0);
+
+    double number = 100.0;
+    price_t nominal = close * number * stock.unit();
+    price_t margin = roundEx(0.1 * nominal, 2);
+    REQUIRE_UNARY(margin > 0.0);
+
+    auto tm = crtTM(dt, 1000000.0, TC_Zero(), "SYS", make_shared<MG_TestCollateral>());
+    tm->setParam<bool>("margin_accounting", true);
+
+    /** @arg An unconfigured table counts every holding in full, so nothing is discounted */
+    CHECK_EQ(tm->getCollateralRate(dt, stock, MarginSide::LONG), 1.0);
+    REQUIRE_EQ(tm->buy(dt, stock, close, number, 0.0, 0.0, close, PART_SIGNAL).business,
+               BUSINESS_BUY);
+    price_t available = tm->getAvailableMargin(dt);
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY), 0.0);
+
+    /** @arg The locked margin alone separates the available funds from the net assets */
+    CHECK_EQ(available, doctest::Approx(tm->getFunds(dt, KQuery::DAY).net_assets() - margin));
+
+    /** @arg Discounting the holding at 0.7 takes the haircut off what the holding contributes to
+     * the equity, not off its full market value: before any settlement that is exactly the locked
+     * margin, the financed part being a liability already */
+    tm->margin()->setParam<double>("collateral_rate", 0.7);
+    price_t haircut = roundEx(margin * (1.0 - 0.7), 2);
+    REQUIRE_UNARY(haircut > 0.0);
+    CHECK_EQ(tm->getCollateralRate(dt, stock, MarginSide::LONG), doctest::Approx(0.7));
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY), doctest::Approx(haircut));
+    CHECK_EQ(tm->getAvailableMargin(dt), doctest::Approx(available - haircut));
+
+    /** @arg The discounted base is the very amount getFunds counts of the holding */
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY),
+             doctest::Approx(roundEx(tm->getFunds(dt, KQuery::DAY).market_value * (1.0 - 0.7), 2)));
+
+    /** @arg The conversion rate is an asset-side rule, leaving the occupation and the equity as
+     * they were */
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).occupied_margin, doctest::Approx(margin));
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).net_assets(), doctest::Approx(1000000.0));
+
+    /** @arg The short side has no collateral to discount */
+    CHECK_EQ(tm->getCollateralRate(dt, stock, MarginSide::SHORT), 1.0);
+
+    /** @arg Back to 1.0 the quota is exactly what it was before the table */
+    tm->margin()->setParam<double>("collateral_rate", 1.0);
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY), 0.0);
+    CHECK_EQ(tm->getAvailableMargin(dt), doctest::Approx(available));
+
+    /** @arg A rate outside (0, 1] broke the contract of the interface: the holding is left
+     * undiscounted with a warning, instead of a haircut growing over the equity it discounts */
+    tm->margin()->setParam<double>("collateral_rate", -0.5);
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY), 0.0);
+    tm->margin()->setParam<double>("collateral_rate", 0.0);
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY), 0.0);
+    tm->margin()->setParam<double>("collateral_rate", std::nan(""));
+    CHECK_EQ(tm->getCollateralHaircut(dt, KQuery::DAY), 0.0);
+
+    /** @arg A past moment is refused, for the discount runs on the current holdings */
+    CHECK_THROWS(tm->getCollateralHaircut(Datetime(200001010000), KQuery::DAY));
+    CHECK_NOTHROW(tm->getCollateralHaircut(Null<Datetime>(), KQuery::DAY));
 }
 
 /** @} */

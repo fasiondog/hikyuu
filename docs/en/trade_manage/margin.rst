@@ -36,7 +36,8 @@ Built-in margin models
     :param float margin_per_lot: the margin of one lot; 0 means using the ratio mode
     :return: an instance of a :py:class:`MarginBase` subclass
 
-.. py:function:: MG_ByType([rates="", maintain_rate=0.0, default_rate=0.6])
+.. py:function:: MG_ByType([rates="", maintain_rate=0.0, default_rate=0.6, collateral_rates="",
+                           default_collateral_rate=1.0])
 
     The margin model keyed by the security type or the market, for a mixed account (e.g. A-share
     cash positions plus futures margin)
@@ -48,13 +49,19 @@ Built-in margin models
         when non-zero it must be <= the opening ratio (a higher one would call the account at open)
     :param float default_rate: the ratio used when no key matches, in (0, 1]; 1.0 also means the
         unmatched securities are plain cash positions and take no occupation
+    :param str collateral_rates: the ``key:ratio`` list of the collateral conversion rates, with
+        the same syntax as rates (the two tables are independent); an empty list counts every
+        holding in full
+    :param float default_collateral_rate: the conversion rate used when no collateral key matches,
+        in (0, 1], 1.0 by default
     :return: an instance of a :py:class:`MarginBase` subclass
 
 .. note::
 
     The long and the short share one ratio. Use the ``rate_short`` of :py:func:`MG_Fixed`, or
     subclass :py:class:`MarginBase` and override :py:meth:`MarginBase.get_open_margin` in Python,
-    when they must differ.
+    when they must differ. The collateral table is shared the same way (the built-in models accept
+    the ``side`` and ignore it).
 
 Custom margin model
 -------------------
@@ -142,6 +149,17 @@ Custom margin model
         :return: the quantity, 0 when nothing can be opened
         :rtype: float
 
+    .. py:method:: get_collateral_rate(self, date, stock, side=MarginSide.LONG)
+
+        [Overload interface] The collateral conversion rate, in (0, 1], i.e. the part of the market
+        value that may count towards the available funds; 1.0 (the full value) by default
+
+        :param Datetime date: the queried moment
+        :param Stock stock: the held security
+        :param MarginSide side: the long or the short side (the built-in models do not separate them)
+        :return: the conversion rate, 1.0 when no table is configured
+        :rtype: float
+
     .. py:method:: _clone(self)
 
         [Overload interface] The subclass clone interface
@@ -188,7 +206,20 @@ Account side interfaces
 
     .. py:method:: get_available_margin(self, date, ktype="DAY")
 
-        The funds available for a new opening, i.e. ``net assets - occupied margin``
+        The funds available for a new opening, i.e. ``net assets - collateral haircut - occupied
+        margin``
+
+    .. py:method:: get_collateral_rate(self, date, stock, side=MarginSide.LONG)
+
+        The collateral conversion rate of the security according to the account margin model; 1.0
+        when the account has no margin model
+
+    .. py:method:: get_collateral_haircut(self, date, ktype="DAY")
+
+        The value the conversion table discounts away, i.e. ``sum of the value counted in the equity
+        * (1 - conversion rate)`` over the long holdings (the locked margin plus the unrealized
+        profit for a margin-accounted holding, the market value for a cash-accounted one); 0.0 when
+        no rate is configured
 
 .. note::
 
@@ -199,8 +230,8 @@ Account side interfaces
     model covers the security (short side); the buy / sell checks of a plain cash account (MG_None
     with no financing) stay exactly as before.
 
-Margin accounting (Phase B)
----------------------------
+Margin accounting
+-----------------
 
 ``margin_accounting`` is an account-level switch (False by default). With it on, the openings of a
 **margin security** (``is_margin_trading=True`` and ``support_borrow_cash=True`` or
@@ -233,7 +264,7 @@ Booking formulas:
     holding the model covers, the ones booked by the plain cash accounting included (a broker counts
     the whole collateral), whereas ``FundsRecord.occupied_margin`` is the amount **already locked**
     on the openings; the gap covers both the mark-to-market drift and the accounting difference, and
-    ``get_available_margin() = net assets - requirement``.
+    ``get_available_margin() = net assets - collateral haircut - requirement``.
 
     The margin and the fee of an opening follow the same funding rule as the long side: an account
     that may borrow (``support_borrow_cash=True``) covers the shortfall with new debt recorded in
@@ -262,6 +293,20 @@ Booking formulas:
     ``support_borrow_cash=False`` still rejects on insufficient cash. The securities lending fee is
     financed the same way.
 
+    The collateral conversion rate changes the asset side of ``get_available_margin()``: the
+    holdings no longer count in full but as ``net assets - sum of the value counted in the equity *
+    (1 - conversion rate) - margin requirement``. The rate applies to the **long holdings of the
+    securities the margin model covers** - the same set the margin requirement is computed on, since
+    a security of the plain cash books neither locks a margin nor counts as collateral. A holding
+    booked by margin is discounted only on what it contributes to the equity (the locked margin plus
+    the unrealized profit): the financed part is already a liability, so discounting the whole market
+    value would remove it twice, and a loss deeper than the margin leaves nothing to discount. The
+    cash and the liabilities always count in full, and a short contributes no asset to discount.
+    The default rate of 1.0 makes the haircut 0, so the available funds stay bit for bit what they
+    were before the rate existed; in the A-share practice a highly volatile or richly valued
+    instrument is usually given a rate below 1.0 to limit how much may be financed on it. The rate
+    touches neither the equity nor the maintenance requirement, it only tightens the opening quota.
+
     A short that both locks a margin and borrows securities validates read-only first, then finances
     once and finally borrows in a single commit: an insufficient lendable pool (unsold quantity too
     small, nothing to borrow, all sold) or a placeholder price rejects the order **before any booking
@@ -284,8 +329,8 @@ Booking formulas:
     replays the books booked at that time; ``PositionRecord.margin > 0`` marks the holdings the live
     books already keep by margin.
 
-    The daily settlement, the margin call and the forced liquidation follow in *Daily settlement and the risk
-    loop (Phase B-2)* below; a margin holding **rejects** ``checkin_stock`` /
+    The daily settlement, the margin call and the forced liquidation follow in *Daily settlement and
+    the risk loop* below; a margin holding **rejects** ``checkin_stock`` /
     ``checkout_stock`` (a deposit or withdrawal would move the cost basis while the lock stays, which
     detaches the equity from the assets, so the order is refused and the backfill refuses it too). A
     ``realPrice == 0`` market-order placeholder opening still keeps the cash accounting, but a margin
@@ -298,12 +343,13 @@ Booking formulas:
     ``margin == 0`` is valued as a cash holding, so keeping the margin branch would count the full
     market value as equity while no cash was paid.
 
-Daily settlement and the risk loop (Phase B-2)
-----------------------------------------------
+Daily settlement and the risk loop
+----------------------------------
 
-A margin account settles once per K-line period at its close: the unrealized profit is posted into the
-cash, the lock is recomputed at the settlement price, and the equity is then checked against the
-maintenance requirement; a shortfall warns and, with ``force_liquidate`` on, also queues a forced
+A margin account settles once per calendar day, at the first bar the trading system closes within it
+(a minute-level system therefore still settles a single time a day): the unrealized profit is posted
+into the cash, the lock is recomputed at the settlement price, and the equity is then checked against
+the maintenance requirement; a shortfall warns and, with ``force_liquidate`` on, also queues a forced
 liquidation that the trading system executes at the next open. The related parameters (account level
 ``set_param``):
 
@@ -312,22 +358,28 @@ liquidation that the trading system executes at the next open. The related param
   off makes ``settlement()`` return False (no other price source is provided yet)
 - ``force_liquidate`` (False by default): a shortfall of the equity only warns; turning it on queues
   the forced liquidation as well
+- ``annual_days`` (365 by default): the days of a year, i.e. the denominator that prorates the
+  interest over the elapsed calendar days; it stays fixed across a year boundary by design
 
 .. py:method:: TradeManager.settlement(date, ktype="DAY")
 
-    Settles the margin holdings as of the given moment and returns whether this call **posted** the
-    settlement: a moment settled already returns True (the settlement is idempotent), an account that
-    does not settle (``margin_accounting`` / ``settle_with_close`` off, no margin model) returns False,
-    and an account with nothing to post (empty, or every holding skipped) returns False as well, which
-    is also what ``is_settled`` answers there
+    Settles the margin holdings as of the given moment and returns whether this call **posted**
+    anything (the mark-to-market or the interest billing): a repeated call of the same calendar day
+    posts nothing twice and returns True (the settlement is idempotent per day, whatever the K type),
+    an account that does not settle (``margin_accounting`` / ``settle_with_close`` off, no margin
+    model) returns False, and an account with nothing to post and nothing to bill (empty, or every
+    holding skipped and no debt) returns False as well, which is
+    also what ``is_settled`` answers there
 
     :param Datetime date: the settlement moment, no earlier than ``last_datetime``
     :param str ktype: the K-line type the settlement price is taken from
 
 .. py:method:: TradeManager.is_settled(date)
 
-    Whether the moment is settled already. Settling is idempotent: a repeated call of the same moment
-    posts nothing twice
+    Whether the calendar day of the moment has entered a settlement batch. Settling is idempotent per
+    calendar day: a repeated call within the same day posts nothing twice. However, the posting and
+    the billing halves are gated apart and this probe answers the **or** of them, so it is True even
+    on a day that only billed interest, which does not mean the holdings were marked
 
 .. py:method:: TradeManager.is_forced_liquidation_queued(date)
 
@@ -357,19 +409,57 @@ What the settlement does (per margin holding; the cash accounted holdings stay o
 - A completed settlement with ``force_liquidate=True`` arms the forced liquidation,
   ``is_forced_liquidation_queued()`` turning True
 
+Interest billing: after the mark-to-market posting and before the risk check, the interest
+of the outstanding liabilities is billed in the same batch, so **a billed day is also a called day**:
+
+- Financing: ``borrow_cash * get_borrow_cash_rate(the settled day) * billed days / annual_days``
+- Securities lending: ``sum of borrowed number * unit * settlement price *
+  get_borrow_stock_rate(the settled day, stock) * billed days / annual_days``, i.e. charged on the
+  market value of the borrowed shares **at the settlement price**, not on the value they had when
+  they were borrowed
+- The billed days follow the **calendar**: the days gone by since the book was last billed (1 for the
+  first bill, the day the debt was taken on), so a weekend, a suspension or a coarser K type bills
+  the days it waited for instead of silently costing nothing
+- The anchor is at the level of the **whole book**: one day, that of the last interest record, serves
+  every liability, and no age is kept per debt. A debt taken on inside such a window is therefore
+  billed over the whole of it (a little too much) and a debt that predates the very first bill is
+  billed over a single day (a little too little). This is the accepted simplification of not keeping
+  the days of every debt; billing each loan from its own date needs per loan accounting, later work
+- A lending of a security past its registered last trading day (an expiry, a delisting) is **not billed**
+  any more, exactly like the holding settlement treats it: it belongs to the expiry liquidation, so its
+  stale last close must not keep billing day after day. One with no settlement price at all is reported
+  and not billed, never silently skipped
+- The billed amount **joins the debt itself and is not paid from the cash** (a broker folds the
+  interest into the principal, which then accrues on its own), and it is appended to the loan list as
+  a loan of its own date, so ``return_cash`` can still repay the whole debt from it
+- The rates belong to the **trade cost model** (see :doc:`trade_cost`); the built-in carrier is
+  ``TC_MarginInterest``, which wraps any cost model, leaving the trading fees to the wrapped one and
+  answering the two rates on top of it, and 0.0 bills nothing
+- The billing is carried by ``settlement()``, hence it requires ``margin_accounting=True``: a plain
+  cash account with a debt but no margin holding needs that switch too, and it must also configure a
+  model that requires no margin at all (``MG_None``). The account is constructed with
+  ``MG_Fixed(0.6)`` by default, and leaving that model in place turns **every** security into a
+  60% margin-accounted one; with ``MG_None`` the books stay plain cash and only the explicit debt
+  is billed. With the switch off the account neither settles nor bills
+
 Settlement records: every settled holding writes one ``BUSINESS_SETTLEMENT`` record (not a fill) —
 ``real_price`` is the settlement price, ``number`` carries the direction (positive long, negative
 short, so a security held on both sides is told apart), ``margin`` is the relocked margin, ``cash`` the
-cash balance after the posting, ``cost`` is 0 and ``part`` is the invalid part.
+cash balance after the posting, ``cost`` is 0 and ``part`` is the invalid part. Interest records: every
+liability item writes one ``BUSINESS_INTEREST`` per day (one for the cash debt, one per borrowed
+security), ``real_price`` is the billed amount, ``number`` the borrowed quantity (0 for the cash
+interest, the same caliber as ``BUSINESS_BORROW_CASH``) and ``stock`` the security (an empty stock for
+the cash interest).
 
 .. note::
 
     With the margin accounting off, or with ``settle_with_close=False``, nothing is settled and the
     books of a cash A-share account stay exactly as before.
 
-    The ``System`` drives every bar as *trade -> expiry flattening -> daily settlement*: the parts
+    The ``System`` drives every bar as *trade -> expiry flattening -> settlement*: the parts
     trade the bar first, then a margin holding past the last registered bar of its instrument is
-    flattened at the close (G12), and ``settlement()`` runs last; the expiry filling before the
+    flattened at the close (G12), and ``settlement()`` runs last, posting only on the first bar of a
+    calendar day; the expiry filling before the
     settlement is what realizes the profit, and the settlement then works on the flattened books. A
     forced liquidation armed by the previous settlement is executed right after the next open, before
     the regular requests, at the open price of that bar and on both sides of the instrument; the
@@ -377,17 +467,19 @@ cash balance after the posting, ``cost`` is 0 and ``part`` is the invalid part.
 
     The historical replay needs no extra state: the settlement records are part of the books, so
     ``get_funds(date)``, ``get_funds_list``, ``Performance`` and the backfill of ``add_trade_record``
-    all reproduce the cash, the lock and the basis of the settled day.
+    all reproduce the cash, the lock and the basis of the settled day; ``BUSINESS_INTEREST`` joins the
+    debt balance the same way (the replay of ``get_debt_cash``, ``get_funds`` and ``get_funds_list``
+    all accumulates it).
 
     ``MultiSystem`` calls ``settlement()`` on the parent account at the close of its aggregate phase as
     well (the parent is the real book of the modes A/B, the members being shadow books only); the mode C
-    members share the parent account, so they have settled it at the same moment already and the
+    members share the parent account, so they have settled its day already and the
     repeated call is a no-op. The parent has no single instrument, so an armed forced liquidation is
     executed at the aggregate open by flattening every holding on both sides at the open price, and the
     delayed entry requests of the members are voided as well (the same caliber as the delayed buy
     requests ``System`` drops, the reducing orders kept).
 
-    The action script written by ``save_action`` does **not** cover the settlement: the script replays
-    the fills only, so a regenerated run rebuilds an unsettled book and has to call ``settlement()``
-    per period itself (the settlement records still take part in the ``add_trade_record`` backfill,
-    they are just not written to the script).
+    The action script written by ``save_action`` does **not** cover the settlement nor the interest
+    billing: the script replays the fills only, so a regenerated run rebuilds an unsettled, unbilled
+    book and has to call ``settlement()`` per period itself (the settlement and the interest records
+    still take part in the ``add_trade_record`` backfill, they are just not written to the script).

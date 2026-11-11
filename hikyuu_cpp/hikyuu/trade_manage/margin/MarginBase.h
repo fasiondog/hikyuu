@@ -103,6 +103,25 @@ public:
         return m_is_python_object;
     }
 
+    /**
+     * Collateral conversion rate of the security, i.e. the part of its market value that the
+     * account may count towards the available funds
+     * @details 1.0 by default, so a model that defines no conversion table leaves the available
+     *          funds exactly as they were before the rate existed. The built-in models read one
+     *          table for both directions: they accept the side and ignore it.
+     * @note Declared after every pre-existing interface: a virtual added in the middle of the class
+     *       moves the slots of the ones declared after it, which breaks the components built
+     *       against the previous header
+     * @param datetime the queried moment
+     * @param stock the held security
+     * @param side long or short
+     * @return a value in (0, 1]
+     */
+    virtual double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                                     MarginSide side) const {
+        return 1.0;
+    }
+
 protected:
     bool isPythonObject() const noexcept {
         return m_is_python_object;

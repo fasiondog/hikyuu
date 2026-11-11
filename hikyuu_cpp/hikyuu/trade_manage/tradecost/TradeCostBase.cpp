@@ -37,7 +37,9 @@ void TradeCostBase::paramChanged() {}
 TradeCostPtr TradeCostBase::clone() {
     TradeCostPtr result = _clone();
     TradeCostBase* p = result.get();
-    p->m_params = m_params;
+    // setParameter rather than a raw assignment, like MarginBase, so the clone re-runs the param
+    // check and rebuilds whatever a model derives from its params
+    p->setParameter(m_params);
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
     return result;

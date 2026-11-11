@@ -384,7 +384,11 @@ public:
      */
     virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override;
 
-    /** Whether the given moment carries a settlement record already */
+    /**
+     * Whether the calendar day of the given moment has entered a settlement batch
+     * @note The batch has two independently gated halves, the posting and the billing, while this
+     *       probe answers true once either of them exists -- it does not say the posting ran
+     */
     virtual bool isSettled(const Datetime& datetime) const override;
 
     /** Whether a forced liquidation armed by settlement() is still pending */
@@ -446,6 +450,7 @@ private:
     bool _add_sell_short_tr(const TradeRecord&);
     bool _add_buy_short_tr(const TradeRecord&);
     bool _add_settlement_tr(const TradeRecord&);
+    bool _add_interest_tr(const TradeRecord&);
 
 private:
     Datetime m_init_datetime;         // Account creation date

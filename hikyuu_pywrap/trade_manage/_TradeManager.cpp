@@ -272,7 +272,11 @@ Common parameters:
     - precision=2 (int) : the price calculation accuracy
     - support_borrow_cash=False (bool) : whether to finance automatically
     - support_borrow_stock=False (bool) : whether to short the securities automatically
-    - save_action=True (bool) : whether to save the Python command sequences)")
+    - save_action=True (bool) : whether to save the Python command sequences
+    - margin_accounting=False (bool) : whether to book the margin securities by margin
+    - settle_with_close=True (bool) : whether the daily settlement posts at the close of the K type
+    - force_liquidate=False (bool) : whether to queue the forced liquidation on a margin call
+    - annual_days=365 (int) : the days of a year, the denominator prorating the margin interest)")
       .def(py::init<>())
       .def(py::init<const string&, const TradeCostPtr&>())
 
@@ -358,11 +362,38 @@ Common parameters:
            py::arg("ktype") = KQuery::DAY,
            R"(get_available_margin(self, date, ktype="DAY")
 
-    The available funds for a new opening, i.e. the net assets minus the occupied margin
+    The available funds for a new opening, i.e. the net assets minus the collateral haircut and
+    the occupied margin
 
     :param Datetime date: the given moment
     :param str ktype: the K-line type used to get the position price
     :return: the available funds
+    :rtype: float)")
+
+      .def("get_collateral_rate", &TradeManagerBase::getCollateralRate, py::arg("date"),
+           py::arg("stock"), py::arg("side") = MarginSide::LONG,
+           R"(get_collateral_rate(self, date, stock, side=MarginSide.LONG)
+
+    Collateral conversion rate of the security, answered by the account margin model
+
+    :param Datetime date: the queried moment
+    :param Stock stock: the held security
+    :param MarginSide side: the long or the short side
+    :return: the part of the holding counted as collateral, 1.0 without a margin model
+    :rtype: float)")
+
+      .def("get_collateral_haircut", &TradeManagerBase::getCollateralHaircut, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_collateral_haircut(self, date, ktype="DAY")
+
+    The value discounted away by the collateral table, i.e. Σ collateral base × (1 - conversion
+    rate) over the long holdings. A margin-accounted holding bases the discount on what it
+    contributes to the net assets (the locked margin plus the unrealized profit) instead of on its
+    full market value, so the financed part is not taken away twice
+
+    :param Datetime date: the given moment
+    :param str ktype: the K-line type used to get the position price
+    :return: the haircut, 0 when no conversion rate is configured
     :rtype: float)")
 
       .def("is_margin_accounted", &TradeManagerBase::isMarginAccounted, py::arg("stock"),
@@ -384,17 +415,22 @@ Common parameters:
     K type), the mark-to-market profit is posted into the cash, the locked margin is recomputed at
     that price with the difference posted, and the maintenance requirement is then checked against
     the equity. A shortfall only warns unless force_liquidate is on, which queues the flattening
-    for the trading system to execute at the next open. Settling the same moment twice is a no-op.
+    for the trading system to execute at the next open. Before that check the day interest of the
+    outstanding liabilities is billed into the debt itself (0.0 rates bill nothing). Both halves
+    are gated per calendar day, so settling twice on one day posts nothing again.
 
     :param Datetime date: the settlement moment, later than or equal to lastDatetime()
     :param str ktype: the K-line type the settlement price is taken from
-    :return: True when the moment ends up settled, False when the account never settles
+    :return: True when the calendar day of the moment ends up settled, False when the account never
+             settles
     :rtype: bool)")
 
       .def("is_settled", &TradeManagerBase::isSettled, py::arg("date"),
            R"(is_settled(self, date)
 
-    Whether the given moment has already been settled
+    Whether the calendar day of the given moment has entered a settlement batch. The batch has two
+    independently gated halves, the posting and the billing, so True does not by itself say that
+    the holdings were marked on that day
 
     :param Datetime date: the moment to probe
     :rtype: bool)")
@@ -592,6 +628,26 @@ Common parameters:
       .def("get_return_cash_cost", &TradeManagerBase::getReturnCashCost)
       .def("get_borrow_stock_cost", &TradeManagerBase::getBorrowStockCost)
       .def("get_return_stock_cost", &TradeManagerBase::getReturnStockCost)
+      .def("get_borrow_cash_rate", &TradeManagerBase::getBorrowCashRate, py::arg("date"),
+           R"(get_borrow_cash_rate(self, date)
+
+    Get the annualized interest rate of the borrowed cash, answered by the cost model. It is billed
+    by the daily settlement, prorated by the annual_days parameter of the account.
+
+    :param Datetime date: the settled moment
+    :return: an annualized decimal rate, 0.0 bills nothing
+    :rtype: float)")
+
+      .def("get_borrow_stock_rate", &TradeManagerBase::getBorrowStockRate, py::arg("date"),
+           py::arg("stock"),
+           R"(get_borrow_stock_rate(self, date, stock)
+
+    Get the annualized interest rate of a borrowed security, answered by the cost model
+
+    :param Datetime date: the settled moment
+    :param Stock stock:   the borrowed security
+    :return: an annualized decimal rate, 0.0 bills nothing
+    :rtype: float)")
 
       .def("cash", &TradeManagerBase::cash, py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
            R"(cash(self, datetime[, ktype=Query.KType.DAY])

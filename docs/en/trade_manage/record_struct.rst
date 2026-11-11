@@ -35,7 +35,7 @@ Trade Business Types
     - BUSINESS.SHORT_ADJUST   - Short position quantity adjustment (ex-rights)
     - BUSINESS.DIVIDEND_COMPENSATION - Dividend compensation paid to the lender (short)
     - BUSINESS.SETTLEMENT    - Daily settlement of a margin holding (the settlement price against the mark-to-market basis), see :doc:`margin`
-    - BUSINESS.INTEREST      - Interest accrued on a liability
+    - BUSINESS.INTEREST      - Interest accrued day by day on a liability (added to the debt itself, not paid from the cash), see :doc:`margin`
     - BUSINESS.INVALID        - Invalid type
 
 
@@ -104,6 +104,11 @@ Trade Records
         price, ``number`` carries the direction (positive long, negative short, so a security held on both
         sides is told apart), ``cash`` is the cash balance after the posting, ``cost`` is 0 and ``part`` is
         the invalid part (``System.Part.INVALID``).
+
+        An interest record (``BUSINESS.INTEREST``) is no fill either: one per liability item per day,
+        ``real_price`` is the billed amount, ``number`` the borrowed quantity (0 for the cash interest,
+        the same caliber as ``BORROW_CASH``), ``stock`` the security (an empty stock for the cash
+        interest) and ``margin`` is 0.
 
 
 

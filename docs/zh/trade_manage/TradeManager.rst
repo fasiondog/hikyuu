@@ -12,7 +12,10 @@
     * **support_borrow_cash=False** *(bool)* : 是否自动融资
     * **support_borrow_stock=False** *(bool)* : 是否自动融券
     * **save_action=True** *(bool)* : 是否保存 Python 命令序列
-    * **margin_accounting=False** *(bool)* : 是否按保证金记账（Phase B，仅保证金标的生效，见 :doc:`margin`）
+    * **margin_accounting=False** *(bool)* : 是否按保证金记账（仅保证金标的生效，见 :doc:`margin`）
+    * **settle_with_close=True** *(bool)* : 结算是否以该周期收盘价过账（仅保证金记账生效，见 :doc:`margin`）
+    * **force_liquidate=False** *(bool)* : 权益不足时是否挂出强制平仓（仅保证金记账生效，见 :doc:`margin`）
+    * **annual_days=365** *(int)* : 按日计提利息的年化分母（仅保证金记账生效，见 :doc:`margin`）
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])

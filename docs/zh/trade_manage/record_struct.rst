@@ -35,7 +35,7 @@
     - BUSINESS.SHORT_ADJUST   - 卖空持仓数量调整（除权送股/缩股）
     - BUSINESS.DIVIDEND_COMPENSATION - 红利补偿（卖空向出借方支付的现金）
     - BUSINESS.SETTLEMENT     - 保证金持仓逐日结算（结算价与盯市基准之差计入盈亏），见 :doc:`margin`
-    - BUSINESS.INTEREST       - 负债计提利息
+    - BUSINESS.INTEREST       - 负债按日计提的利息（计入负债本身，不从现金支付），见 :doc:`margin`
     - BUSINESS.INVALID        - 无效类型
 
 
@@ -103,6 +103,10 @@
         逐日结算记录（``BUSINESS.SETTLEMENT``）不是成交：``real_price`` 为结算价，``number`` 带方向
         （多头为正、空头为负，用于区分同一标的的多空持仓），``cash`` 为过账后的现金余额，``cost`` 为 0，
         ``part`` 为无效部件（``System.Part.INVALID``）。
+
+        利息计提记录（``BUSINESS.INTEREST``）同样不是成交：每个负债项每日一条，``real_price`` 为计提金额，
+        ``number`` 为借券数量（融资利息为 0，与 ``BORROW_CASH`` 同口径），``stock`` 为对应标的（融资利息为空
+        证券），``margin`` 为 0。
 
     
 

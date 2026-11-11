@@ -111,6 +111,34 @@ public:
         return m_is_python_object;
     }
 
+    // The interest hooks are declared after every interface they were added alongside: a virtual
+    // added in the middle of the class moves the slots of the ones declared after it, and a cost
+    // model built against the previous header would then dispatch to the wrong function.
+
+    /**
+     * Annualized interest rate of the borrowed cash
+     * @details 0.0 by default: a cost model that bills no interest keeps the plain cash accounting
+     *          of the accounts written before the rate existed. The daily accrual of the debt uses
+     *          the rate of the settlement day, so a model may change it over time.
+     * @param datetime the day being settled
+     * @return a decimal rate, e.g. 0.06 for 6% per year
+     */
+    virtual double getBorrowCashRate(const Datetime& datetime) const {
+        return 0.0;
+    }
+
+    /**
+     * Annualized interest rate of the borrowed security
+     * @details 0.0 by default, see getBorrowCashRate. The interest is billed in cash even though it
+     *          is charged on a securities lending.
+     * @param datetime the day being settled
+     * @param stock the borrowed security
+     * @return a decimal rate, e.g. 0.10 for 10% per year
+     */
+    virtual double getBorrowStockRate(const Datetime& datetime, const Stock& stock) const {
+        return 0.0;
+    }
+
 protected:
     bool isPythonObject() const noexcept {
         return m_is_python_object;
@@ -127,10 +155,26 @@ protected:
 private:
     friend class boost::serialization::access;
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
+    void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        // setParameter instead of a raw assignment, like MarginBase: it re-runs the param check,
+        // which is the only place a model may rebuild the state it derives from its params, so the
+        // hot path stays a pure lookup and a shared model can be queried from several threads
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        setParameter(m_params);
+    }
+
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        boost::serialization::split_member(ar, *this, version);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };

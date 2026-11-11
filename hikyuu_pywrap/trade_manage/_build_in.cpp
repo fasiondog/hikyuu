@@ -16,9 +16,9 @@ void export_build_in(py::module& m) {
     m.def(
       "crtTM", &crtTM, py::arg("date") = Datetime(199001010000LL), py::arg("init_cash") = 100000,
       py::arg("cost_func") = TC_Zero(), py::arg("name") = "SYS", py::arg("margin") = MarginPtr(),
-      // The account must keep the Python half of a Python-defined margin model alive, otherwise
-      // its overrides silently fall back to the base implementation
-      py::keep_alive<0, 5>(),
+      // The account must keep the Python half of a Python-defined cost model and margin model
+      // alive, otherwise their overrides silently fall back to the base implementation
+      py::keep_alive<0, 3>(), py::keep_alive<0, 5>(),
       R"(crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS", margin = None])
 
     Create the trade manager module, managing the trade records and the fund usage of the account
@@ -112,6 +112,22 @@ void export_build_in(py::module& m) {
     :param float lowest_commission: the lowest commission value, defaulting to 5 yuan per trade
     :return: a subclass instance of :py:class:`TradeCostBase`)");
 
+    m.def(
+      "TC_MarginInterest", TC_MarginInterest, py::arg("trade_cost") = TC_Zero(),
+      py::arg("borrow_cash_rate") = 0.0, py::arg("borrow_stock_rates") = "",
+      py::arg("default_borrow_stock_rate") = 0.0,
+      R"(TC_MarginInterest([trade_cost = TC_Zero(), borrow_cash_rate = 0.0, borrow_stock_rates = "", default_borrow_stock_rate = 0.0])
+
+    Wrap another trade cost algorithm with the interest of the margin financing and the securities lending.
+
+    The wrapped algorithm keeps answering the trading fees; the rates here are read by the account in its daily settlement, prorating the outstanding debt over the calendar days gone by since the book was last billed and adding the result to the debt itself instead of paying it from the cash. Both rates are 0.0 by default, so wrapping an algorithm alone bills nothing.
+
+    :param TradeCost trade_cost: the algorithm answering the trading fees, defaulting to TC_Zero
+    :param float borrow_cash_rate: the annualized rate of the borrowed cash, in [0, 1)
+    :param str borrow_stock_rates: the "key:rate" list of the annualized securities lending rates, e.g. "12:0.10, SHF:0.12"; an all-digit key is a security type, any other key is a market code
+    :param float default_borrow_stock_rate: the rate of a security matched by no key, in [0, 1)
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
+
     m.def("TC_Zero", TC_Zero, "The zero trade cost algorithm");
 
     m.def("MG_None", MG_None,
@@ -134,8 +150,10 @@ void export_build_in(py::module& m) {
     :return: a subclass instance of :py:class:`MarginBase`)");
 
     m.def("MG_ByType", MG_ByType, py::arg("rates") = "", py::arg("maintain_rate") = 0.0,
-          py::arg("default_rate") = 0.6,
-          R"(MG_ByType([rates="", maintain_rate=0.0, default_rate=0.6])
+          py::arg("default_rate") = 0.6, py::arg("collateral_rates") = "",
+          py::arg("default_collateral_rate") = 1.0,
+          R"(MG_ByType([rates="", maintain_rate=0.0, default_rate=0.6, collateral_rates="",
+                       default_collateral_rate=1.0])
 
     The margin model keyed by the security type or the market, for a mixed account
 
@@ -143,5 +161,9 @@ void export_build_in(py::module& m) {
         security type, any other key is a market code
     :param float maintain_rate: the maintain margin ratio; 0 means the same as the opening margin
     :param float default_rate: the ratio of a security matched by no key, in (0, 1]
+    :param str collateral_rates: the collateral conversion rate list, same syntax as rates; an
+        empty list counts every holding in full
+    :param float default_collateral_rate: the conversion rate of a security matched by no
+        collateral key, in (0, 1]
     :return: a subclass instance of :py:class:`MarginBase`)");
 }

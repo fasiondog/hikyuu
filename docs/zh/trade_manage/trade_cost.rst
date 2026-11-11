@@ -63,6 +63,34 @@
     :return: :py:class:`TradeCostBase` 子类实例
 
 
+融资融券利息成本算法
+^^^^^^^^^^^^^^^^^^^^
+
+买卖手续费与利息是两个口径：A股 / ETF / 通用模型只回答买卖费用，**融资融券的年化利率由专门的包装模型
+回答**，因此可以把任意一个成本模型包进去而不改动它。
+
+.. py:function:: TC_MarginInterest([trade_cost=TC_Zero(), borrow_cash_rate=0.0, borrow_stock_rates="", default_borrow_stock_rate=0.0])
+
+    包装另一个交易成本算法，附加融资利息与融券费用的年化利率：买卖费用全部转给被包装的算法回答，本算法
+    只多回答两个利率。利率由账户结算计提，按距上次计提经过的自然日数除以账户参数 ``annual_days`` 折算金额，计入负债本身
+    而不从现金支付，产生 ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`
+
+    两个利率默认均为 0.0（不计提），因此只包装而不配置利率时，账簿与不包装时逐位一致。
+
+    :param TradeCost trade_cost: 回答买卖费用的成本算法，默认 TC_Zero
+    :param float borrow_cash_rate: 融资年化利率，[0, 1)，0.0 表示不计提利息
+    :param str borrow_stock_rates: 融券年化费率表，``"key:rate"`` 列表，如 ``"12:0.10, SHF:0.12"``；纯数字键
+        为证券类型，其他键为市场代码
+    :param float default_borrow_stock_rate: 未被任何键命中标的的融券年化费率，[0, 1)，0.0 表示不计提
+    :return: :py:class:`TradeCostBase` 子类实例
+
+.. code-block:: python
+
+    # 当前A股买卖费用 + 年化 6% 融资利率、按市场配置的融券费率
+    cost = TC_MarginInterest(TC_FixedA(), borrow_cash_rate=0.06, borrow_stock_rates="SH:0.10, SZ:0.12")
+    tm = crtTM(cost_func=cost, margin=MG_ByType("1:0.5"))
+
+
 ETF交易成本算法
 ^^^^^^^^^^^^^^^
 
@@ -110,13 +138,19 @@ ETF交易成本算法
 
 自定义交易成本算法接口：
 
-* :py:meth:`TradeCostBase.getBuyCost` - 【必须】获取买入成本
-* :py:meth:`TradeCostBase.getSellCost` - 【必须】获取卖出成本
-* :py:meth:`TradeCostBase.getBorrowCashCost` - 【可选】获取借入资金成本（融资）
-* :py:meth:`TradeCostBase.getReturnCashCost` - 【可选】获取归还借入资金成本
-* :py:meth:`TradeCostBase.getBorrowStockCost` - 【可选】获取借入股票成本（融券做空）
-* :py:meth:`TradeCostBase.getReturnStockCost` - 【可选】获取归还借入股票成本
+* :py:meth:`TradeCostBase.get_buy_cost` - 【必须】获取买入成本
+* :py:meth:`TradeCostBase.get_sell_cost` - 【必须】获取卖出成本
+* :py:meth:`TradeCostBase.get_borrow_cash_cost` - 【可选】获取借入资金成本（融资）
+* :py:meth:`TradeCostBase.get_return_cash_cost` - 【可选】获取归还借入资金成本
+* :py:meth:`TradeCostBase.get_borrow_stock_cost` - 【可选】获取借入股票成本（融券做空）
+* :py:meth:`TradeCostBase.get_return_stock_cost` - 【可选】获取归还借入股票成本
 * :py:meth:`TradeCostBase._clone` - 【必须】子类克隆接口
+
+.. note::
+
+    以上名称就是 Python 侧需要实现的覆写名，账户 C++ 代码按这些名字查找到子类实现后回调。旧版本绑定层是按 C++ 方法名
+    （``getBuyCost`` 一类）查找的，与该清单不一致，按清单写的覆写会被静默忽略；现已统一到 snake_case 名称上，以 C++
+    名定义覆写的旧代码需改名。
 
 
 
@@ -213,7 +247,30 @@ ETF交易成本算法
         :param int num: 归还数量
         :return: 交易成本记录
         :rtype: CostRecord
+
+    .. py:method:: get_borrow_cash_rate(self, datetime)
+
+        【重载接口】融资借入资金的年化利率，默认 0.0（不计提）
+
+        利率由账户结算计提，按距上次计提经过的自然日数除以账户参数 ``annual_days`` 折算金额，计入负债本身而
+        不从现金支付，产生 ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`；内建实现见
+        :py:func:`TC_MarginInterest`
         
+        :param Datetime datetime: 结算时刻
+        :return: 年化小数利率，如 0.06 表示年化 6%
+        :rtype: float
+
+    .. py:method:: get_borrow_stock_rate(self, datetime, stock)
+
+        【重载接口】融券借入标的的年化费率，默认 0.0（不计提）
+
+        按结算日借入数量的市值计提，同样计入负债并以现金结算；内建实现见 :py:func:`TC_MarginInterest`
+
+        :param Datetime datetime: 结算时刻
+        :param Stock stock: 借入对象
+        :return: 年化小数费率，如 0.10 表示年化 10%
+        :rtype: float
+
     .. py:method:: _clone(self)
     
         【重载接口】子类克隆接口

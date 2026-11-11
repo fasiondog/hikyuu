@@ -34,10 +34,12 @@ class HKU_API Performance;
  * Default parameters:
  * precision(int): 2 calculation precision
  * margin_accounting(bool): false book the openings of the margin securities by margin only
- * settle_with_close(bool): true use the close as the daily settlement price (D1(c)); off
+ * settle_with_close(bool): true use the close as the daily settlement price; off
  *                           disables the daily settlement, no other price source exists yet
  * force_liquidate(bool): false only warn on a maintenance shortfall; on queues a forced
  *                         liquidation for the trading system to execute at the next open
+ * annual_days(int): 365 days of a year, the denominator that prorates the margin interest over the
+ *                         elapsed calendar days
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -52,10 +54,12 @@ public:
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
     : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
         setParam<int>("precision", 2);  // Calculation precision
-        // Phase B real margin accounting: off by default, so the plain cash books stay unchanged
+        // Real margin accounting: off by default, so the plain cash books stay unchanged
         setParam<bool>("margin_accounting", false);
         setParam<bool>("settle_with_close", true);
         setParam<bool>("force_liquidate", false);
+        // The proration base of the daily margin interest
+        setParam<int>("annual_days", 365);
     }
 
     virtual ~TradeManagerBase() {}
@@ -167,9 +171,7 @@ public:
 
         // Mirror the valuation moment of getFunds: an unset date or the last trade date values at
         // the last trade moment, any other date at the close of that day
-        Datetime valued = (datetime == Null<Datetime>() || datetime == lastDatetime())
-                            ? lastDatetime()
-                            : Datetime(datetime.year(), datetime.month(), datetime.day(), 23, 59);
+        Datetime valued = _valuationDatetime(datetime);
 
         PositionRecordList positions = getPositionList();
         for (const auto& record : positions) {
@@ -192,7 +194,8 @@ public:
     }
 
     /**
-     * Available funds for a new opening, i.e. the net assets minus the occupied margin
+     * Available funds for a new opening, i.e. the net assets minus the collateral haircut and the
+     * occupied margin
      * @note The net assets are used instead of the cash: a short opening brings the sale proceeds
      *       into the cash, which would otherwise allow an unlimited number of shorts
      * @note Not const only because getFunds is not const (it lazily applies the ex-rights weights);
@@ -208,27 +211,37 @@ public:
                                        KQuery::KType ktype = KQuery::DAY) {
         HKU_CHECK(datetime == Null<Datetime>() || datetime >= lastDatetime(),
                   "getAvailableMargin supports only the current or a future moment!");
+        // Read in the documented order: getFunds applies the pending weights and thus changes the
+        // holdings the other two operands then price
         price_t net_assets = getFunds(datetime, ktype).net_assets();
-        return net_assets - getOccupiedMargin(datetime, ktype);
+        price_t haircut = getCollateralHaircut(datetime, ktype);
+        return net_assets - haircut - getOccupiedMargin(datetime, ktype);
     }
 
     /**
      * Settle the margin holdings of the account as of the given moment
      * @details Every margin-accounted holding is marked to the settlement price (the close of the
-     *          given K type, see D1(c)), the mark-to-market profit is posted into the cash, the
+     *          given K type), the mark-to-market profit is posted into the cash, the
      *          locked margin is recomputed at that price with the difference posted, and then the
      *          maintenance requirement of the whole book is checked against the equity of the
      *          account (the holdings the posting skipped still count on both sides). A shortfall
      *          only warns by default; force_liquidate queues the flattening for the executor of
-     *          the trading system. The plain cash books have nothing to settle and keep their live
-     *          valuation, so an account with margin_accounting off is never touched.
+     *          the trading system. Then the interest of the outstanding liabilities is billed
+     *          into the debt itself (getBorrowCashRate / getBorrowStockRate of the cost model, 0.0
+     *          bills nothing), prorated over the calendar days gone by since the book was last
+     *          billed and booked before that check, so a billed day is also a called day. The plain
+     *          cash books have nothing to settle and keep their live valuation, so an account with
+     *          margin_accounting off is never touched.
      * @param datetime the settlement moment, it must be later than or equal to lastDatetime()
      * @param ktype the K type the settlement price is taken from
      * @return true when the settlement has been posted (by this call or by an earlier call of the
-     *         same moment); false when the account never settles (the plain cash books, the switch
-     *         turned off) and when there was nothing to post (a flat book, or every holding
-     * skipped)
-     * @note Settling the same moment twice is a no-op, see isSettled()
+     *         same calendar day); false when the account never settles (the plain cash books, the
+     *         switch turned off) and when there was nothing to book at all (a flat and unborrowed
+     *         book, or every holding skipped with no liability billed)
+     * @note Both halves of the batch are gated per calendar day on their own, so settling twice on
+     *       one day posts nothing again; isSettled() only probes that the day entered a batch, not
+     *       that the posting ran. The K type of the driving system does not change this, so a finer
+     *       one simply settles at its first bar
      * @note Only the current moment can be settled: the posting is a real cash flow, so the
      *       historical dates are served by the replay of getFunds / getFundsList instead
      */
@@ -242,7 +255,9 @@ public:
     }
 
     /**
-     * Whether the given moment has already been settled
+     * Whether the calendar day of the given moment has entered a settlement batch
+     * @note The posting and the billing are gated apart, so true does not say the holdings were
+     *       marked: a day that only billed interest already answers true
      * @param datetime the moment to probe
      */
     virtual bool isSettled(const Datetime&) const {
@@ -1040,7 +1055,118 @@ public:
                (m_margin && m_margin->hasPythonPart());
     }
 
+    // The margin accounting interfaces are declared after every interface they were added
+    // alongside: a virtual added in the middle of the class moves the slots of all the ones
+    // declared after it, and an out-of-tree plugin built against the previous header would then
+    // dispatch to the wrong function.
+
+    /**
+     * Collateral conversion rate of the security, answered by the margin model
+     * @details 1.0 when the account has no margin model, i.e. the holding counts in full
+     * @param datetime the queried moment
+     * @param stock the held security
+     * @param side long or short
+     */
+    virtual double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                                     MarginSide side) const {
+        return m_margin ? m_margin->getCollateralRate(datetime, stock, side) : 1.0;
+    }
+
+    /**
+     * Value the collateral table discounts away, i.e. Σ collateral base × (1 - conversion rate)
+     * over the long holdings
+     * @details The conversion rate is what the credit account may count of a holding as collateral;
+     *          the cash and the liabilities always count in full, and the shorts contribute no
+     *          asset to discount. An unconfigured table answers 1.0, so the result is 0 and the
+     *          available funds stay as they were before the rate existed.
+     * @note A margin-accounted holding is discounted on what it contributes to the net assets (the
+     *       locked margin plus the unrealized profit) rather than on its full market value: the
+     *       financed part is already a liability, discounting the whole value would remove it twice
+     * @note Every security that getOccupiedMargin requires a margin for appears here too, but only
+     *       on its long side: a short holds no asset to discount. A security the margin model does
+     *       not belongs to the plain cash books, which are neither required to post margin nor
+     *       counted as credit collateral
+     * @note The holdings are priced exactly like getOccupiedMargin does, for the same reason
+     */
+    virtual price_t getCollateralHaircut(const Datetime& datetime,
+                                         KQuery::KType ktype = KQuery::DAY) const {
+        // The current holdings are what gets discounted, so a past date would pair them with a
+        // stale price, the same restriction getAvailableMargin states
+        HKU_CHECK(datetime.isNull() || datetime >= lastDatetime(),
+                  "getCollateralHaircut supports only the current or a future moment!");
+        price_t result = 0.0;
+        HKU_IF_RETURN(!m_margin, result);
+
+        Datetime valued = _valuationDatetime(datetime);
+        int precision = getParam<int>("precision");
+        for (const auto& record : getPositionList()) {
+            if (!m_margin->isMarginTrading(record.stock))
+                continue;
+            double rate = getCollateralRate(valued, record.stock, MarginSide::LONG);
+            // A rate outside (0, 1] breaks the contract of the interface, which a Python model can
+            // do silently: discount nothing for it and warn, the way a bad margin rate falls back
+            // to the cash caliber
+            if (!(rate > 0.0 && rate <= 1.0)) {
+                HKU_WARN(
+                  "{} {} collateral rate({}) is out of (0, 1], the holding is not "
+                  "discounted!",
+                  valued, record.stock.market_code(), rate);
+                continue;
+            }
+            // A rate of 1.0 (the default) discounts nothing, so it needs no pricing at all
+            if (rate >= 1.0) {
+                continue;
+            }
+            // The nominal is rounded before being discounted, exactly like the margin bases, so the
+            // result does not drift by half a cent per holding
+            price_t mv = roundEx(
+              record.stock.getMarketValue(valued, ktype) * record.number * record.stock.unit(),
+              precision);
+            price_t base = mv;
+            if (record.margin > 0.0) {
+                // Only the equity contribution of a margin-accounted holding counts as collateral,
+                // and a loss deeper than the margin leaves nothing of it to discount
+                base = roundEx(record.margin + (mv - record.settleBasis), precision);
+                if (base < 0.0) {
+                    base = 0.0;
+                }
+            }
+            result = roundEx(result + base * (1.0 - rate), precision);
+        }
+        return result;
+    }
+
+    /**
+     * Annualized interest rate of the borrowed cash, answered by the cost model
+     * @details 0.0 when the model has no such rate, i.e. nothing is billed
+     * @param datetime the day being settled
+     */
+    virtual double getBorrowCashRate(const Datetime& datetime) const {
+        return m_costfunc ? m_costfunc->getBorrowCashRate(datetime) : 0.0;
+    }
+
+    /**
+     * Annualized interest rate of a borrowed security, answered by the cost model
+     * @details 0.0 when the model has no such rate, i.e. nothing is billed
+     * @param datetime the day being settled
+     * @param stock the borrowed security
+     */
+    virtual double getBorrowStockRate(const Datetime& datetime, const Stock& stock) const {
+        return m_costfunc ? m_costfunc->getBorrowStockRate(datetime, stock) : 0.0;
+    }
+
 protected:
+    /**
+     * The moment the holdings of a date are valued at, mirroring what getFunds uses
+     * @details An unset date or the last trade date values at the last trade moment, any other date
+     *          at the close of that day
+     */
+    Datetime _valuationDatetime(const Datetime& datetime) const {
+        return (datetime == Null<Datetime>() || datetime == lastDatetime())
+                 ? lastDatetime()
+                 : Datetime(datetime.year(), datetime.month(), datetime.day(), 23, 59);
+    }
+
     string m_name;            // Account name
     TradeCostPtr m_costfunc;  // Cost algorithm
     MarginPtr m_margin;       // Margin model, null when the account has none

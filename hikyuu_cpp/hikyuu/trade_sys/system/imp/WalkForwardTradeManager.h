@@ -56,6 +56,7 @@ public:
                        m_tm->tryGetParam<bool>("support_borrow_cash", false));
         setParam<bool>("support_borrow_stock",
                        m_tm->tryGetParam<bool>("support_borrow_stock", false));
+        setParam<int>("annual_days", m_tm->tryGetParam<int>("annual_days", 365));
     }
 
     /**
@@ -122,6 +123,17 @@ public:
     virtual price_t getAvailableMargin(const Datetime& datetime,
                                        KQuery::KType ktype = KQuery::DAY) override {
         return m_tm->getAvailableMargin(datetime, ktype);
+    }
+
+    /** The view has no margin model of its own, so the collateral table follows the real account */
+    virtual double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                                     MarginSide side) const override {
+        return m_tm->getCollateralRate(datetime, stock, side);
+    }
+
+    virtual price_t getCollateralHaircut(const Datetime& datetime,
+                                         KQuery::KType ktype = KQuery::DAY) const override {
+        return m_tm->getCollateralHaircut(datetime, ktype);
     }
 
     /**
