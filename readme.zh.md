@@ -328,7 +328,7 @@ print(top.tm.get_funds().total_assets)
 
 > 🎁 **捐赠计划与附赠详见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
 
-捐赠用户支持群（仅接受捐赠用户，入群请注明：Hikyuu 订阅）
+捐赠用户支持群（仅接受捐赠用户，入群请注明：Hikyuu 订阅）。关于公开群，因主要为大家自行讨论发言，此处不在放置入群链接，想加入的话可从 hikyuu.org 官网获取链接和口令。
 
 <p align="center">
   <img src="docs/zh/_static/support.jpg" alt="捐赠用户支持" width="150">
