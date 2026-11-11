@@ -115,6 +115,22 @@ TEST_CASE("test_StockManager_getStock") {
     CHECK_EQ(stock.atom(), 1);
     CHECK_EQ(stock.minTradeNumber(), 1);
     CHECK_EQ(stock.maxTradeNumber(), 1000000);
+
+    /** @arg A security with a stockparam row gets the variety-level parameters instead of the
+     * type-level defaults (the coalesce join; the fixture carries the SH600006 row — a security
+     * deliberately unused by the strategy tests, whose quotas assume the type-level lots) */
+    Stock variety = sm.getStock("sh600006");
+    REQUIRE_UNARY(!variety.isNull());
+    CHECK_EQ(variety.tick(), 0.02);
+    CHECK_EQ(variety.tickValue(), 0.02);
+    CHECK_EQ(variety.unit(), 1.0);
+    CHECK_EQ(variety.precision(), 2);
+    CHECK_EQ(variety.minTradeNumber(), 200);
+    CHECK_EQ(variety.maxTradeNumber(), 2000000);
+
+    /** @arg A security without a stockparam row keeps the type-level defaults (SH000001 above
+     * carries no row, and this case also guards the empty-table fallback of the probe) */
+    CHECK_EQ(stock.tick(), 0.001);
 }
 
 /** @par Test points */

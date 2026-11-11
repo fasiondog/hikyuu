@@ -92,7 +92,10 @@ Variety Parameters and Runtime Overrides
 
 The type level ``StockTypeInfo`` provides the default tick / tickValue / precision / lot size.
 The variety-level differences (the futures contract multiplier, the HK lot size, the minimum
-tick) have no dedicated column in the ``stock`` table and are applied at runtime:
+tick) live in the ``stockparam`` table (located by ``(marketid, code)``, written by the import
+side from the exchange contract parameters; an un-upgraded database falls back to the type
+defaults automatically), and the variety level wins over the type level at load time; the
+runtime override stays at the top priority:
 
 - ``tick`` / ``tick_value``: ``unit = tick_value / tick`` follows the override immediately;
   keeping tick at 1 and setting ``tick_value`` to 10 yields the RB contract multiplier of

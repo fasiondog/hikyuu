@@ -37,6 +37,23 @@ bool SQLiteBaseInfoDriver::_init() {
     HKU_TRACE("SQLITE3: {}", dbname);
     m_pool = new ResourcePool<SQLiteConnect>(m_params);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
+
+    // Probe the variety-level parameter table; a database not yet upgraded keeps the
+    // type-level defaults only
+    try {
+        auto con = m_pool->get();
+        int count = 0;
+        auto st = con->getStatement(
+          "select count(*) from sqlite_master where type='table' and name='stockparam'");
+        st->exec();
+        if (st->moveNext()) {
+            st->getColumn(0, count);
+            m_hasStockParam = count > 0;
+        }
+    } catch (std::exception& e) {
+        HKU_WARN("Failed probe the stockparam table, keep the type-level defaults! {}", e.what());
+    }
+
     return true;
 }
 
@@ -96,7 +113,9 @@ vector<StockInfo> SQLiteBaseInfoDriver::getAllStockInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         auto con = m_pool->get();
-        con->batchLoad(result);
+        // An explicit SQL instead of batchLoad(container): the select carries the optional
+        // stockparam join, which the generic template could not pick by itself
+        con->batchLoadView(result, StockInfo::getSelectSQL(m_hasStockParam));
     } catch (...) {
     }
     return result;
@@ -107,12 +126,14 @@ StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) 
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         to_upper(market);
-        // getSelectSQL() already carries the join conditions: the generic load() would append a
-        // second "where" to it, so the filters are appended with "and" directly
+        // The plain select ends with its own where clause, so the filters are appended with
+        // "and" directly; the joined variant carries no where yet and starts one here
         auto con = m_pool->get();
-        con->loadView(result,
-                      fmt::format("{} and a.code=?1 and c.market=?2", StockInfo::getSelectSQL()),
-                      {code, market});
+        con->loadView(
+          result,
+          fmt::format("{} {} a.code=?1 and c.market=?2", StockInfo::getSelectSQL(m_hasStockParam),
+                      m_hasStockParam ? "where" : "and"),
+          {code, market});
     } catch (...) {
     }
     return result;

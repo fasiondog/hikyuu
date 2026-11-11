@@ -68,10 +68,28 @@ struct StockInfo {
         return *this;
     }
 
-    static const char* getSelectSQL() {
-        return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, b.tick, "
-               "b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from stock a, "
-               "stocktypeinfo b, market c where a.type = b.id and a.marketid = c.marketid";
+    /**
+     * The stock base info select SQL. The variety-level stockparam rows (if the table exists)
+     * override the type-level stocktypeinfo defaults through the coalesce, so the priority is
+     * the variety level > the type level; the runtime setters of a loaded Stock stay above both.
+     * @param has_stock_param whether the stockparam table exists in the current database; a
+     *        database without the table falls back to the plain type-level join
+     */
+    static const char* getSelectSQL(bool has_stock_param) {
+        if (!has_stock_param) {
+            return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, "
+                   "b.tick, b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from "
+                   "stock a, stocktypeinfo b, market c where a.type = b.id and a.marketid = "
+                   "c.marketid";
+        }
+        return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, "
+               "coalesce(sp.tick, b.tick), coalesce(sp.tickValue, b.tickValue), "
+               "coalesce(sp.precision, b.precision), "
+               "coalesce(sp.minTradeNumber, b.minTradeNumber), "
+               "coalesce(sp.maxTradeNumber, b.maxTradeNumber) "
+               "from stock a join stocktypeinfo b on a.type = b.id "
+               "join market c on a.marketid = c.marketid "
+               "left join stockparam sp on sp.marketid = a.marketid and sp.code = a.code";
     }
 
     void load(const SQLStatementPtr& st) {
@@ -234,6 +252,13 @@ private:
 
 protected:
     string m_name;
+
+    /**
+     * Whether the stockparam table exists in the current database; probed by the concrete
+     * driver in _init(), so a database not yet upgraded keeps loading with the type-level
+     * defaults only
+     */
+    bool m_hasStockParam = false;
 };
 
 typedef shared_ptr<BaseInfoDriver> BaseInfoDriverPtr;

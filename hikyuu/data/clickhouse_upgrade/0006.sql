@@ -23,6 +23,22 @@ INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'CFE', date FROM
 INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'GFE', date FROM hku_base.holiday;
 INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'INE', date FROM hku_base.holiday;
 
+-- Variety-level parameter table: the per-security tick / tickValue / trade-number bounds /
+-- precision that override the type-level stocktypeinfo defaults. The (market, code) key follows the
+-- Stock table; a missing row keeps the type-level default. Rows are written by the import side (the
+-- exchange is the authoritative source); the core reads it only. ReplacingMergeTree dedups repeated
+-- imports on merge (ClickHouse has no upsert); readers use FINAL.
+CREATE TABLE IF NOT EXISTS hku_base.stockparam (
+    market String,
+    code String,
+    tick Float64,
+    tickValue Float64,
+    minTradeNumber Float64,
+    maxTradeNumber Float64,
+    precision Int32,
+    PRIMARY KEY (market, code)
+) ENGINE = ReplacingMergeTree();
+
 -- RENAME is atomic; SELECT DISTINCT makes a rerun after interruption converge safely, the version bump follows the RENAME
 RENAME TABLE hku_base.holiday TO hku_base.holiday_old, hku_base.holiday_new TO hku_base.holiday;
 ALTER TABLE `hku_base`.`version` UPDATE `version` = 6 WHERE `id` = 0 SETTINGS mutations_sync = 1;

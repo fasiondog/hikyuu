@@ -71,7 +71,9 @@ hikyuu 最初面向 A 股单市场，当前版本已支持在同一 ``StockManag
 --------------------
 
 类型级 ``StockTypeInfo`` 给出 tick / tickValue / precision / 手数的默认值；品种级差异
-（期货合约乘数、港股每手、最小变动价位）在 ``stock`` 表中没有单独列，按运行期覆盖：
+（期货合约乘数、港股每手、最小变动价位）存于 ``stockparam`` 表（``(marketid, code)`` 定位，
+由导入侧按交易所合约参数写入，未升级的旧库自动回退类型默认），加载时品种级优先于类型级；
+运行期覆盖优先级最高：
 
 - ``tick`` / ``tick_value``：``unit = tick_value / tick`` 随覆盖即时生效；在 tick 保持 1 时
   把 ``tick_value`` 设为 10，即得螺纹钢的合约乘数 10 吨/手。
