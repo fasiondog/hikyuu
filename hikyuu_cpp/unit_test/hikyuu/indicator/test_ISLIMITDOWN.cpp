@@ -105,4 +105,56 @@ TEST_CASE("test_ISLIMITDOWN_ex_right") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_ISLIMITDOWN_ex_right_reference_price") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sz000001");
+    KData k = stock.getKData(KQuery(0, 4000));
+    REQUIRE_UNARY(k.size() > 1);
+
+    Indicator r = ISLIMITDOWN(k);
+    StockWeightList weights = stock.getWeight(k.front().datetime, k.back().datetime + Days(1));
+    REQUIRE_UNARY(!weights.empty());
+
+    size_t wpos = 0;
+    size_t checked = 0;
+    bool ref_differs = false;
+    for (size_t i = 1; i < k.size(); ++i) {
+        const Datetime day = k[i].datetime.startOfDay();
+        while (wpos < weights.size() && weights[wpos].datetime().startOfDay() < day) {
+            ++wpos;
+        }
+        if (wpos >= weights.size() || weights[wpos].datetime().startOfDay() != day ||
+            k[i - 1].datetime.startOfDay() >= day) {
+            continue;
+        }
+
+        const StockWeight& w = weights[wpos];
+        price_t change = 0.1 * (w.countAsGift() + w.countForSell() + w.increasement());
+        price_t ref =
+          w.suogu() != 0.0
+            ? k[i - 1].closePrice / w.suogu()
+            : (k[i - 1].closePrice - 0.1 * w.bonus() + w.priceForSell() * change) / (1.0 + change);
+        if (ref <= 0.0) {
+            continue;
+        }
+
+        /** @arg the ex-rights day is judged on the reference price, not the record date close */
+        ref = roundEx(ref, stock.precision());
+        const price_t limit_price = roundEx(ref * 0.9, stock.precision());
+        CHECK_EQ(r[i], price_t(k[i].closePrice <= limit_price));
+
+        const price_t raw_limit = roundEx(k[i - 1].closePrice * 0.9, stock.precision());
+        if (price_t(k[i].closePrice <= limit_price) != price_t(k[i].closePrice <= raw_limit)) {
+            ref_differs = true;
+        }
+        ++checked;
+    }
+
+    /** @arg at least one ex-rights day is covered */
+    CHECK_UNARY(checked > 0);
+    /** @arg the record date close and the reference price give different judgments somewhere */
+    CHECK_UNARY(ref_differs);
+}
+
 /** @} */

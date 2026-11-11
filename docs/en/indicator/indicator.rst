@@ -1393,11 +1393,13 @@ Parameter domain (n and the window)
     - The ChiNext/STAR Market stocks: the limit-down range is 20%
     - The ST stocks have a limit-down range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
-    The limit-down judgment logic: the close price of the day <= the close price of the previous day × (1 - the limit-down range)
+    The limit-down judgment logic: the close price of the day <= the previous close × (1 - the limit-down range), where the previous close is the raw close of the previous trading day
 
     Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
 
-    Note: the judgment runs on the backward-adjusted (BACKWARD) close series: a no-recover context is re-fetched internally with the same query, so the comparison stays continuous across ex-right dates
+    Note: the judgment runs on the raw (NO_RECOVER) closes: a recovered context is re-fetched internally with the same query, so the prices stay on the exchange scale
+
+    Note: on an ex-rights/ex-dividend day the exchange does not use the previous trading day close, but first computes the ex-rights reference price: [(record date close - cash dividend) + rights issue price × share change ratio] / (1 + share change ratio), and then uses it as the previous close to compute the limit-down price
 
     :param KData kdata: the K-line data
     :rtype: Indicator
@@ -1414,11 +1416,13 @@ Parameter domain (n and the window)
     - The ChiNext/STAR Market stocks: the limit-up range is 20%
     - The ST stocks have a limit-up range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
-    The limit-up judgment logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
+    The limit-up judgment logic: the close price of the day >= the previous close × (1 + the limit-up range), where the previous close is the raw close of the previous trading day
 
     Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
 
-    Note: the judgment runs on the backward-adjusted (BACKWARD) close series: a no-recover context is re-fetched internally with the same query, so the comparison stays continuous across ex-right dates
+    Note: the judgment runs on the raw (NO_RECOVER) closes: a recovered context is re-fetched internally with the same query, so the prices stay on the exchange scale
+
+    Note: on an ex-rights/ex-dividend day the exchange does not use the previous trading day close, but first computes the ex-rights reference price: [(record date close - cash dividend) + rights issue price × share change ratio] / (1 + share change ratio), and then uses it as the previous close to compute the limit-up price
 
     :param KData kdata: the K-line data
     :rtype: Indicator
