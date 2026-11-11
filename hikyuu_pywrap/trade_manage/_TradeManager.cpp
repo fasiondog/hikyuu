@@ -277,7 +277,8 @@ Common parameters:
     - settle_with_close=True (bool) : whether the daily settlement posts at the close of the K type
     - force_liquidate=False (bool) : whether to queue the forced liquidation on a margin call
     - annual_days=365 (int) : the days of a year, the denominator prorating the margin interest
-    - currency_rates="" (str) : the fixed rate of each market to the account currency, e.g. "HK:0.92, NASDAQ:7.15"; a market not listed is billed at 1.0 with a warning, an empty table bills everything at 1.0")
+    - currency_rates="" (str) : the fixed rate of each market to the account currency, e.g. "HK:0.92, NASDAQ:7.15"; a market not listed is billed at 1.0 with a warning, an empty table bills everything at 1.0)")
+     
       .def(py::init<>())
       .def(py::init<const string&, const TradeCostPtr&>())
 
