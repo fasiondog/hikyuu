@@ -11,6 +11,7 @@
 #include <hikyuu/trade_manage/tradecost/crt/TC_TestStub.h>
 #include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
 #include <hikyuu/trade_manage/tradecost/crt/TC_FixedAPre2015.h>
+#include <hikyuu/trade_manage/margin/crt/MG_ByType.h>
 #include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_manage/Performance.h>
 
@@ -1920,6 +1921,23 @@ TEST_CASE("test_TradeManager_reset_clone_short_state") {
     CHECK_UNARY(tm->addTradeRecord(init));
     CHECK_EQ(tm->getShortHoldNumber(Datetime(199911100000L), stock), 0.0);
     CHECK_EQ(tm->getDebtNumber(Datetime(199911100000L), stock), 0.0);
+}
+
+/** @par Test point: clone is a deep copy, the cost and the margin model are cloned, not shared */
+TEST_CASE("test_TradeManager_clone_deep_copies_models") {
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_FixedA(), "COPY");
+    tm->margin(MG_ByType("SH:0.5"));
+
+    TradeManagerPtr cloned = tm->clone();
+
+    /** @arg the models of the copy are different instances */
+    CHECK_UNARY(cloned->costFunc().get() != tm->costFunc().get());
+    CHECK_UNARY(cloned->margin().get() != tm->margin().get());
+
+    /** @arg the copies keep the parameters of the source */
+    CHECK_EQ(cloned->costFunc()->name(), tm->costFunc()->name());
+    CHECK_EQ(cloned->margin()->name(), tm->margin()->name());
+    CHECK_EQ(cloned->margin()->getParam<string>("rates"), tm->margin()->getParam<string>("rates"));
 }
 
 /** @par Test points */

@@ -30,7 +30,7 @@ void FixedPercentMoneyManager::_checkParam(const string& name) const {
 double FixedPercentMoneyManager::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                                price_t price, price_t risk, SystemPart from) {
     double p = getParam<double>("p");
-    return m_tm->cash(datetime, m_query.kType()) * p / risk;
+    return m_tm->cash(datetime, m_query.kType()) * p / m_tm->toAccount(stock, risk);
 }
 
 double FixedPercentMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
@@ -38,7 +38,8 @@ double FixedPercentMoneyManager::_getSellShortNumber(const Datetime& datetime, c
     // Base the risk budget on the net assets (the Van Tharp equity basis): the borrowed proceeds
     // in cash are a liability and must not inflate the short size
     double p = getParam<double>("p");
-    return m_tm->getFunds(datetime, m_query.kType()).net_assets() * p / risk;
+    return m_tm->getFunds(datetime, m_query.kType()).net_assets() * p /
+           m_tm->toAccount(stock, risk);
 }
 
 MoneyManagerPtr HKU_API MM_FixedPercent(double p) {

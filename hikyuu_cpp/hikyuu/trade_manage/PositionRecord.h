@@ -55,7 +55,8 @@ public:
     price_t totalRisk{0.0};    ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
                                ///< quantity, excluding the trade cost
     price_t sellMoney{0.0};    ///< Accumulated sell funds
-    price_t margin{0.0};       ///< Margin locked by the holding, 0 means the plain cash accounting
+    price_t margin{0.0};       ///< Margin locked by the holding, in the account currency; 0 means the
+                               ///< plain cash accounting
     price_t openBasis{0.0};    ///< Opening notional of the still-held lots (price x number x unit);
                                ///< the cost reference, released proportionally as the lots close
     price_t settleBasis{0.0};  ///< Mark-to-market basis of the still-held lots, rolled to the

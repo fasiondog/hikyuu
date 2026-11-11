@@ -16,6 +16,16 @@
     * **settle_with_close=True** *(bool)* : 结算是否以该周期收盘价过账（仅保证金记账生效，见 :doc:`margin`）
     * **force_liquidate=False** *(bool)* : 权益不足时是否挂出强制平仓（仅保证金记账生效，见 :doc:`margin`）
     * **annual_days=365** *(int)* : 按日计提利息的年化分母（仅保证金记账生效，见 :doc:`margin`）
+    * **currency_rates=""** *(string)* : 各市场折账户计价货币的固定汇率，形如 ``"HK:0.92, NASDAQ:7.15"``（1 单位该市场金额 = N 单位账户货币；键也可为证券类型，如 ``"12:7.0"``）。未列出的市场按 1.0 记账并告警一次；为空表时全部按 1.0，即单币种账本
+
+多币种口径：``currency_rates`` 非空时，现金收支、持仓市值与权益、保证金、出入库与分红等**账户层**金额均折算为账户计价货币，
+``PositionRecord.margin``、``TradeRecord.margin``、``TradeRecord.cash`` 也属账户层；
+而 ``PositionRecord`` 的其余金额字段（buyMoney/sellMoney/openBasis/settleBasis/totalCost/totalRisk）、``TradeRecord``
+的单价与费用、``BorrowRecord.value`` 等**记录层**字段保持证券自身货币。账户的资金接口（现金、权益、
+``get_available_margin``、``get_max_open_number`` 的 ``available``）均为本币，``available`` 由账户折算后再交给保证金模型；
+``get_open_margin`` 与 ``get_maintain_margin`` 例外，它们返回保证金模型的原币结果，由账户在内部折算后记账。
+非法的 ``currency_rates`` 表达式在设置时抛异常，须重新设置一个合法值后再保存账户。组合账户（MultiSystem）汇总子系统建议时使用子系统账户的汇率，
+因此子系统账户应与父账户配置一致的 ``currency_rates``。
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])

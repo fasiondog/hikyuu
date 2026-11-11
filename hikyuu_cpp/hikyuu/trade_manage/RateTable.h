@@ -33,9 +33,12 @@ public:
      * @param tag the name of the option being parsed, prefixing every message
      * @param allow_zero whether a ratio of 0 is valid
      * @param allow_one whether a ratio of 1 is valid
+     * @param allow_above_one whether a ratio above 1 is valid, for a rate that is not a fraction
+     *                        of the security amount (e.g. an exchange rate)
      * @throw when an item is malformed or a ratio falls outside the allowed range
      */
-    void parse(const string& src, const string& tag, bool allow_zero, bool allow_one);
+    void parse(const string& src, const string& tag, bool allow_zero, bool allow_one,
+               bool allow_above_one = false);
 
     /** The ratio of the security, fallback when no key matches */
     double lookup(const Stock& stock, double fallback) const;

@@ -381,7 +381,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             double unit = stk.unit();
             double min_trade = stk.minTradeNumber();
             if (p <= 0.0 || unit <= 0.0 ||
-                (min_trade > 0.0 && fixed_amount < min_trade * p * unit)) {
+                (min_trade > 0.0 && fixed_amount < tm->toAccount(stk, min_trade * p * unit))) {
                 target_value[stk] = 0.0;
                 continue;
             }
@@ -455,7 +455,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
                       stock.market_code());
             continue;
         }
-        double target_shares = kv.second / (p * unit);
+        double target_shares = kv.second / tm->toAccount(stock, p * unit);
         double cur_long = tm->getPosition(date, stock).number;
         double cur_short = tm->getShortPosition(stock).number;
         double cur_net = cur_long - cur_short;
@@ -573,9 +573,13 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
                             : 0.0;
         price_t unit = s.stock.unit();
         double u = (unit > 0.0) ? unit : 1.0;
-        double target_value = (current + s.number) * s.plan_price * u;
+        price_t target_value = tm ? tm->toAccount(s.stock, (current + s.number) * s.plan_price * u)
+                                  : (current + s.number) * s.plan_price * u;
         if (target_value > cap) {
-            double max_shares = (s.plan_price > 0.0) ? cap / (s.plan_price * u) : 0.0;
+            double max_shares =
+              (s.plan_price > 0.0)
+                ? cap / (tm ? tm->toAccount(s.stock, s.plan_price * u) : s.plan_price * u)
+                : 0.0;
             s.number = max_shares > current ? max_shares - current : 0.0;
             s.plan_cash = s.number * s.plan_price * u;  // Keep the exposed suggestion consistent
         }

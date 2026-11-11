@@ -8,7 +8,10 @@
 #pragma once
 
 #include <cmath>
+#include <mutex>
+#include <set>
 
+#include "RateTable.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "PositionExtInfo.h"
@@ -40,6 +43,10 @@ class HKU_API Performance;
  *                         liquidation for the trading system to execute at the next open
  * annual_days(int): 365 days of a year, the denominator that prorates the margin interest over the
  *                         elapsed calendar days
+ * currency_rates(string): "" the fixed rate of each foreign market, e.g. "HK:0.92, NASDAQ:7.15":
+ *                         1 unit of the market's currency is worth rate units of the account
+ *                         currency. A market not listed is billed at 1.0 with a warning, an empty
+ *                         table treats every market as the account currency
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -60,6 +67,8 @@ public:
         setParam<bool>("force_liquidate", false);
         // The proration base of the daily margin interest
         setParam<int>("annual_days", 365);
+        // The fixed rate of each foreign market, see the currency_rates parameter
+        setParam<string>("currency_rates", "");
     }
 
     virtual ~TradeManagerBase() {}
@@ -99,7 +108,7 @@ public:
         m_margin = m ? m : MG_None();
     }
 
-    /** Margin occupied by an opening; 0 when no margin model is set */
+    /** Margin occupied by an opening, in the security's own currency; 0 when no model is set */
     virtual price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num, MarginSide side) const {
         return m_margin ? m_margin->getOpenMargin(datetime, stock, price, num, side) : 0.0;
@@ -122,16 +131,26 @@ public:
         return locked > 0.0 ? locked : 1.0 / std::pow(10.0, double(precision));
     }
 
-    /** Maintain margin of an opening; 0 when no margin model is set */
+    /** Maintain margin of an opening, in the security's own currency; 0 when no model is set */
     virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
                                       double num, MarginSide side) const {
         return m_margin ? m_margin->getMaintainMargin(datetime, stock, price, num, side) : 0.0;
     }
 
-    /** Maximum openable quantity under the given funds; 0 when no margin model is set */
+    /** Maximum openable quantity under the given funds; 0 when no margin model is set.
+     *  The funds are given in the account currency and converted for the model, which is a pure
+     *  function in the security's own currency */
     virtual double getMaxOpenNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                     price_t available, MarginSide side) const {
-        return m_margin ? m_margin->getMaxOpenNumber(datetime, stock, price, available, side) : 0.0;
+        return m_margin ? m_margin->getMaxOpenNumber(datetime, stock, price,
+                                                     _fromAccount(stock, available), side)
+                        : 0.0;
+    }
+
+    /** Convert an amount in the security's own currency into the account currency, according to
+     *  the configured currency_rates; an empty table is the identity */
+    price_t toAccount(const Stock& stock, price_t amount) const {
+        return _toAccount(stock, amount);
     }
 
     /**
@@ -151,7 +170,8 @@ public:
     }
 
     /**
-     * Margin occupied by the current long and short positions at the given moment
+     * Margin occupied by the current long and short positions at the given moment, in the account
+     * currency
      * @details A position of a security not covered by the margin model takes nothing, so a mixed
      *          account does not count its plain cash holdings as occupied funds
      * @note The margin is the requirement recomputed at the given price for every holding the
@@ -178,8 +198,10 @@ public:
             if (!m_margin->isMarginTrading(record.stock))
                 continue;
             price_t price = record.stock.getMarketValue(valued, ktype);
-            result +=
-              m_margin->getOpenMargin(valued, record.stock, price, record.number, MarginSide::LONG);
+            // The model answers in the security's currency, the account sums in its own
+            result += _toAccount(
+              record.stock,
+              m_margin->getOpenMargin(valued, record.stock, price, record.number, MarginSide::LONG));
         }
 
         positions = getShortPositionList();
@@ -187,8 +209,9 @@ public:
             if (!m_margin->isMarginTrading(record.stock))
                 continue;
             price_t price = record.stock.getMarketValue(valued, ktype);
-            result += m_margin->getOpenMargin(valued, record.stock, price, record.number,
-                                              MarginSide::SHORT);
+            result += _toAccount(record.stock,
+                                 m_margin->getOpenMargin(valued, record.stock, price, record.number,
+                                                         MarginSide::SHORT));
         }
         return result;
     }
@@ -379,8 +402,11 @@ public:
         p->m_name = m_name;
         p->m_is_python_object = m_is_python_object;
         p->m_broker_last_datetime = m_broker_last_datetime;
-        p->m_costfunc = m_costfunc;
-        p->m_margin = m_margin;
+        // The clone is a deep copy: the models are cloned instead of being shared, so the copy
+        // never drives the model instance of the source
+        p->m_costfunc = m_costfunc ? m_costfunc->clone() : m_costfunc;
+        p->m_margin = m_margin ? m_margin->clone() : m_margin;
+        // The brokers are live connections, they stay shared by design
         p->m_broker_list = m_broker_list;
         return p;
     }
@@ -1073,8 +1099,8 @@ public:
     }
 
     /**
-     * Value the collateral table discounts away, i.e. Σ collateral base × (1 - conversion rate)
-     * over the long holdings
+     * Value the collateral table discounts away, in the account currency, i.e. Σ collateral base
+     * × (1 - conversion rate) over the long holdings
      * @details The conversion rate is what the credit account may count of a holding as collateral;
      *          the cash and the liabilities always count in full, and the shorts contribute no
      *          asset to discount. An unconfigured table answers 1.0, so the result is 0 and the
@@ -1122,11 +1148,15 @@ public:
             price_t mv = roundEx(
               record.stock.getMarketValue(valued, ktype) * record.number * record.stock.unit(),
               precision);
-            price_t base = mv;
+            // The discount is a share of the net assets, so the base is measured in the account
+            // currency
+            price_t base = _toAccount(record.stock, mv);
             if (record.margin > 0.0) {
                 // Only the equity contribution of a margin-accounted holding counts as collateral,
-                // and a loss deeper than the margin leaves nothing of it to discount
-                base = roundEx(record.margin + (mv - record.settleBasis), precision);
+                // and a loss deeper than the margin leaves nothing of it to discount; the locked
+                // margin is already booked in the account currency, the floating profit is not
+                base = roundEx(record.margin + _toAccount(record.stock, mv - record.settleBasis),
+                               precision);
                 if (base < 0.0) {
                     base = 0.0;
                 }
@@ -1177,6 +1207,27 @@ protected:
 
     bool m_is_python_object{false};
 
+protected:
+    /** The fixed rate of the security's market: 1.0 when the table is empty, or the market is not
+     * listed (warned once); the table itself is parsed by baseCheckParam */
+    price_t _currencyRate(const Stock& stock) const;
+
+    /** Convert an amount of the security's currency into the account currency */
+    price_t _toAccount(const Stock& stock, price_t amount) const {
+        return amount * _currencyRate(stock);
+    }
+
+    /** Convert an account-currency amount into the security's currency */
+    price_t _fromAccount(const Stock& stock, price_t amount) const {
+        return amount / _currencyRate(stock);
+    }
+
+protected:
+    mutable RateTable m_currency_rates;    // Parsed currency_rates, empty: all 1.0
+    mutable std::set<string> m_fx_warned;  // Markets already warned as having no rate
+    // Guards the one-off warning above: getFundsList values the dates in parallel
+    mutable std::mutex m_fx_warned_mutex;
+
 //============================================
 // Serialization support
 //============================================
@@ -1199,6 +1250,8 @@ private:
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        // The parsed caches derived from the params are not archived: rebuild them here
+        baseCheckParam("currency_rates");
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
         // A version 0 archive has no margin model: the value set by the constructor is kept
@@ -1218,6 +1271,12 @@ inline void TradeManagerBase::baseCheckParam(const string& name) const {
     if ("precision" == name) {
         int precision = getParam<int>("precision");
         HKU_ASSERT(precision > 0);
+    } else if ("currency_rates" == name) {
+        // A rate is a positive factor with no upper bound: 1 CNY = 0.14 USD, while 0 would wipe
+        // the amounts out. Kept here instead of _checkParam so that every account flavour parses
+        // it, the forwarding views included
+        m_currency_rates.parse(tryGetParam<string>("currency_rates", ""), "TM currency_rates",
+                               false, false, true);
     }
 }
 

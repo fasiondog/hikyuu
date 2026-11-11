@@ -337,7 +337,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     TradeRecordList::const_iterator trade_iter = trade_list.begin();
     for (; trade_iter != trade_list.end(); ++trade_iter) {
         if (trade_iter->business == BUSINESS_BONUS) {
-            dividends += trade_iter->realPrice;
+            dividends += tm->toAccount(trade_iter->stock, trade_iter->realPrice);
         }
     }
 
@@ -387,15 +387,18 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     PositionRecordList::const_iterator his_iter = his_position.begin();
     for (; his_iter != his_position.end(); ++his_iter) {
         const PositionRecord& pos = *his_iter;
-        total_cost += pos.totalCost;
+        total_cost += tm->toAccount(pos.stock, pos.totalCost);
 
-        price_t profit = roundEx(pos.sellMoney - pos.totalCost - pos.buyMoney, precision);
+        price_t profit = roundEx(
+          tm->toAccount(pos.stock, pos.sellMoney - pos.totalCost - pos.buyMoney), precision);
         net_profit = roundEx(net_profit + profit, precision);
 
-        price_t cost_base = pos.buyMoney + pos.totalCost;
+        price_t cost_base = tm->toAccount(pos.stock, pos.buyMoney + pos.totalCost);
         price_t profit_percent = cost_base != 0.0 ? profit / cost_base * 100. : 0.0;
 
-        price_t r = pos.totalRisk != 0.0 ? roundEx(profit / pos.totalRisk, precision) : 0.0;
+        price_t r = pos.totalRisk != 0.0
+                      ? roundEx(profit / tm->toAccount(pos.stock, pos.totalRisk), precision)
+                      : 0.0;
         total_r += r;
 
         if (profit > 0.0) {
@@ -599,8 +602,9 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         if (trade_iter->business == BUSINESS_BUY) {
             trade_number++;
             const TradeRecord& record = *trade_iter;
-            price_t hold_cash =
-              roundEx(record.realPrice * record.number + record.cost.total, precision);
+            price_t hold_cash = roundEx(
+              tm->toAccount(record.stock, record.realPrice * record.number + record.cost.total),
+              precision);
             price_t total_cash = roundEx(hold_cash + record.cash, precision);
             double percent = (total_cash != 0.0) ? hold_cash / total_cash : 0.0;
             sum_percent += percent;

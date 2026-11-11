@@ -16,6 +16,24 @@ BOOST_CLASS_EXPORT(hku::TradeManagerBase)
 
 namespace hku {
 
+price_t TradeManagerBase::_currencyRate(const Stock& stock) const {
+    // An empty table keeps the single-currency books untouched, without any warning
+    HKU_IF_RETURN(stock.isNull() || m_currency_rates.empty(), 1.0);
+    if (m_currency_rates.has(stock)) {
+        return m_currency_rates.lookup(stock, 1.0);
+    }
+
+    // A market missing from a configured table is still billed at 1.0: warn once per market
+    {
+        // getFundsList values the dates in parallel, so the one-off set needs the lock
+        std::lock_guard<std::mutex> lock(m_fx_warned_mutex);
+        HKU_IF_RETURN(!m_fx_warned.insert(stock.market()).second, 1.0);
+    }
+    HKU_WARN("{} {} has no currency rate, its amounts are billed at 1.0!", m_name,
+             stock.market_code());
+    return 1.0;
+}
+
 FundsList TradeManagerBase::getFundsList(const DatetimeList& dates, const KQuery::KType& ktype) {
     size_t total = dates.size();
     FundsList result;

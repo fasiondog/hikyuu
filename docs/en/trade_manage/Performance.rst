@@ -8,6 +8,9 @@ Performance Statistics
 
     Lightweight performance metrics
 
+    All the money metrics are in the account currency; for a multi-currency account the trade
+    manager performs the conversion.
+
     .. py:method:: reset(self)
 
         Reset and clear all computed results

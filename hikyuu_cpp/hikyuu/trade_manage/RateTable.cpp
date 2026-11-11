@@ -31,11 +31,14 @@ bool isDigitKey(const string& key) {
 }
 }  // namespace
 
-void RateTable::parse(const string& src, const string& tag, bool allow_zero, bool allow_one) {
+void RateTable::parse(const string& src, const string& tag, bool allow_zero, bool allow_one,
+                      bool allow_above_one) {
     if (src == m_src)
         return;
 
-    const string range = string(allow_zero ? "[" : "(") + "0, 1" + (allow_one ? "]" : ")");
+    const string range = allow_above_one
+                           ? string(allow_zero ? "[" : "(") + "0, +inf)"
+                           : string(allow_zero ? "[" : "(") + "0, 1" + (allow_one ? "]" : ")");
     std::unordered_map<uint32_t, double> type_rates;
     std::unordered_map<string, double> market_rates;
 
@@ -67,7 +70,7 @@ void RateTable::parse(const string& src, const string& tag, bool allow_zero, boo
         }
         HKU_CHECK(used == value.size(), "{}: invalid ratio \"{}\" of key \"{}\"!", tag, value, key);
         HKU_CHECK(std::isfinite(rate) && (allow_zero ? rate >= 0.0 : rate > 0.0) &&
-                    (allow_one ? rate <= 1.0 : rate < 1.0),
+                    (allow_above_one || (allow_one ? rate <= 1.0 : rate < 1.0)),
                   "{}: ratio({}) of key \"{}\" must be in {}!", tag, rate, key, range);
 
         if (isDigitKey(key)) {

@@ -16,6 +16,22 @@ Common parameters:
     * **settle_with_close=True** *(bool)* : whether the settlement uses the closing price of the period (only when the margin accounting is on, see :doc:`margin`)
     * **force_liquidate=False** *(bool)* : whether a shortfall of the equity queues a forced liquidation (only when the margin accounting is on, see :doc:`margin`)
     * **annual_days=365** *(int)* : the days of a year, i.e. the denominator prorating the daily interest (only when the margin accounting is on, see :doc:`margin`)
+    * **currency_rates=""** *(string)* : the fixed rate of each market to the account currency, e.g. ``"HK:0.92, NASDAQ:7.15"`` (1 unit of the market amount = N units of the account currency; a security type key such as ``"12:7.0"`` works as well). A market not listed is billed at 1.0 with a warning; an empty table bills everything at 1.0, i.e. the single-currency books
+
+Multi-currency convention: with a non-empty ``currency_rates``, the **account-level** amounts (the
+cash flows, the position market value and equity, the margin, the deposited/withdrawn aggregates and
+the dividends) are converted into the account currency; ``PositionRecord.margin``,
+``TradeRecord.margin`` and ``TradeRecord.cash`` are account-level too. The **record-level** fields
+stay in the security's own currency: the remaining money fields of ``PositionRecord``
+(buyMoney/sellMoney/openBasis/settleBasis/totalCost/totalRisk), the price and the cost of
+``TradeRecord``, and ``BorrowRecord.value``. The fund interfaces speak the account currency (cash,
+equity, ``get_available_margin`` and the ``available`` of ``get_max_open_number``, which is
+converted before the margin model). ``get_open_margin`` and ``get_maintain_margin`` are the
+exceptions: they return the raw margin-model result in the security's own currency, which the
+account converts before booking. An invalid ``currency_rates`` expression throws when set; set a
+valid one again before saving the account. A portfolio (MultiSystem) aggregates the suggestions of
+its sub-systems with the rate of the sub-system account, so the sub-systems should carry the same
+``currency_rates`` as the parent.
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])

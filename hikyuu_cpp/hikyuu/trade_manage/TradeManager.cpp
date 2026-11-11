@@ -42,10 +42,12 @@ static price_t positionSettleBasis(const PositionRecord& position, double number
  * profit measured against the settlement basis at the given price; the short side contributes as
  * a liability instead
  */
-static price_t marginPositionEquity(const PositionRecord& position, price_t price, bool is_long) {
+static price_t marginPositionEquity(const PositionRecord& position, price_t price, bool is_long,
+                                    price_t rate) {
     price_t mv = price * position.number * position.stock.unit();
     price_t basis = positionSettleBasis(position, position.number);
-    return is_long ? position.margin + (mv - basis) : position.margin - (mv - basis);
+    // The margin is booked in the account currency, the floating profit in the security's currency
+    return is_long ? position.margin + (mv - basis) * rate : position.margin - (mv - basis) * rate;
 }
 
 string TradeManager::str() const {
@@ -191,6 +193,10 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_short_position = m_short_position;
     p->m_short_position_history = m_short_position_history;
     p->m_actions = m_actions;
+    // The clone copies the params of the base, the parsed table must follow them
+    p->m_currency_rates = m_currency_rates;
+    // The copy has already reported the markets it knows, it must not repeat them
+    p->m_fx_warned = m_fx_warned;
     return p;
 }
 
@@ -578,7 +584,7 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
                                        number, CostRecord(), 0.0, m_cash, PART_INVALID));
 
     // Update the record of the accumulated deposited asset value
-    m_checkin_stock = roundEx(m_checkin_stock + market_value, precision);
+    m_checkin_stock = roundEx(m_checkin_stock + _toAccount(stock, market_value), precision);
 
     return true;
 }
@@ -638,7 +644,8 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
                                        number, CostRecord(), 0.0, m_cash, PART_INVALID));
 
     // Update the accumulated withdrawn stock value
-    m_checkout_stock = roundEx(m_checkout_stock + price * number * stock.unit(), precision);
+    m_checkout_stock =
+      roundEx(m_checkout_stock + _toAccount(stock, price * number * stock.unit()), precision);
 
     return true;
 }
@@ -781,7 +788,7 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
     CostRecord cost = getBorrowStockCost(datetime, stock, price, number);
 
     // Update the cash, deducting the cost spent when borrowing
-    m_cash = roundEx(m_cash - cost.total, precision);
+    m_cash = roundEx(m_cash - _toAccount(stock, cost.total), precision);
 
     // Add it to the trade records
     m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_BORROW_STOCK, price, price, 0.0,
@@ -885,7 +892,7 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
     }
 
     // Update the cash, deducting the cost spent when returning
-    m_cash = roundEx(m_cash - cost.total, precision);
+    m_cash = roundEx(m_cash - _toAccount(stock, cost.total), precision);
 
     // Update the trade records
     m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_RETURN_STOCK, price, price, 0.0,
@@ -959,7 +966,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         // whole-unit quota: the latter loses one unit to floating-point rounding and rejects
         // odd-lot orders the account can still afford
         price_t available = getAvailableMargin(datetime);
-        price_t need = getOpenMargin(datetime, stock, realPrice, number, MarginSide::LONG);
+        price_t need =
+          _toAccount(stock, getOpenMargin(datetime, stock, realPrice, number, MarginSide::LONG));
         double tolerance = std::max(1e-9, available * 1e-12);
         HKU_WARN_IF_RETURN(need > available + tolerance, result,
                            "{} {} Can't buy, needed margin({:<.4f}) > available({:<.4f})!",
@@ -990,14 +998,18 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
                 "{} {} The margin model reported no requirement, the opening is booked by cash!",
                 datetime, stock.market_code());
     margin_acct = margin_acct && locked_margin > 0.0;
-    price_t need = margin_acct ? locked_margin : money;
+    // The account books are kept in the account currency: the notional, the margin and the cost of
+    // a foreign market are converted with its fixed rate, while the position record keeps the
+    // amounts of the security's own currency
+    price_t need = margin_acct ? _toAccount(stock, locked_margin) : _toAccount(stock, money);
+    price_t account_cost = _toAccount(stock, cost.total);
 
     if (getParam<bool>("support_borrow_cash")) {
         // Borrow on demand, including the cost of the borrow itself: the buy cost is computed on
         // the real borrow amount (not on the full trade money), and the post-borrow cash is
         // simulated with the same formula borrowCash uses before creating any debt, so a failed
         // buy never leaves a loan record behind
-        price_t need_cash = roundEx(need + cost.total, precision);
+        price_t need_cash = roundEx(need + account_cost, precision);
         price_t gap = roundEx(need_cash - m_cash, precision);
         if (gap > 0.0) {
             bool covered = false;
@@ -1024,12 +1036,12 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         }
     }
 
-    HKU_WARN_IF_RETURN(m_cash < roundEx(need + cost.total, precision), result,
+    HKU_WARN_IF_RETURN(m_cash < roundEx(need + account_cost, precision), result,
                        "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
-                       stock.market_code(), roundEx(need + cost.total, precision), m_cash);
+                       stock.market_code(), roundEx(need + account_cost, precision), m_cash);
 
     // Update the cash
-    m_cash = roundEx(m_cash - need - cost.total, precision);
+    m_cash = roundEx(m_cash - need - account_cost, precision);
 
     // Add it to the trade records
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
@@ -1160,14 +1172,17 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     // books proportionally
     price_t basis = positionOpenBasis(position, real_number);
     price_t mtmBasis = positionSettleBasis(position, real_number);
+    // The proceeds, the realized profit and the cost of a foreign market are billed in the
+    // security's own currency and converted into the account currency
+    price_t account_cost = _toAccount(stock, cost.total);
     if (position.margin > 0.0) {
         released = roundEx(position.margin * (real_number / position.number), precision);
         // Both bases are money (price x number x unit), so the realized profit needs no unit
         // factor
-        price_t realized = roundEx(money - mtmBasis, precision);
-        m_cash = roundEx(m_cash + released + realized - cost.total, precision);
+        price_t realized = _toAccount(stock, roundEx(money - mtmBasis, precision));
+        m_cash = roundEx(m_cash + released + realized - account_cost, precision);
     } else {
-        m_cash = roundEx(m_cash + money - cost.total, precision);
+        m_cash = roundEx(m_cash + _toAccount(stock, money) - account_cost, precision);
     }
 
     // Update the trade records
@@ -1258,7 +1273,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     if (m_margin && m_margin->isMarginTrading(stock) && realPrice > 0.0) {
         // The margin of the short order itself, judged with a tolerance, same as buy
         price_t available = getAvailableMargin(datetime);
-        price_t need = getOpenMargin(datetime, stock, realPrice, number, MarginSide::SHORT);
+        price_t need =
+          _toAccount(stock, getOpenMargin(datetime, stock, realPrice, number, MarginSide::SHORT));
         double tolerance = std::max(1e-9, available * 1e-12);
         HKU_WARN_IF_RETURN(need > available + tolerance, result,
                            "{} {} Can't sellShort, needed margin({:<.4f}) > available({:<.4f})!",
@@ -1349,9 +1365,9 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     // account may borrow, otherwise the cash on hand must pay it. Like in buy, the post-borrow cash
     // is simulated before any debt exists, so a rejected order leaves no borrow residue behind
     bool margin_acct = isMarginAccounted(stock) && realPrice > 0.0;
-    price_t need = margin_acct
-                     ? getOpenMarginToLock(datetime, stock, realPrice, sell_num, MarginSide::SHORT)
-                     : 0.0;
+    price_t need = margin_acct ? _toAccount(stock, getOpenMarginToLock(datetime, stock, realPrice,
+                                                                       sell_num, MarginSide::SHORT))
+                               : 0.0;
     // A model that reports no requirement at all can't fund the short by margin: the cash books
     // keep it instead of counting the full notional as equity for free
     HKU_WARN_IF(margin_acct && !(need > 0.0),
@@ -1359,9 +1375,12 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
                 "cash!",
                 datetime, stock.market_code());
     margin_acct = margin_acct && need > 0.0;
+    // The sell fee and the securities borrow fee of a foreign market are billed in its currency
+    price_t account_cost = _toAccount(stock, cost.total);
+    price_t account_borrow_fee = _toAccount(stock, borrow_stock_fee);
     price_t need_cash = 0.0;
     if (margin_acct) {
-        need_cash = roundEx(need + cost.total + borrow_stock_fee, precision);
+        need_cash = roundEx(need + account_cost + account_borrow_fee, precision);
         price_t gap = roundEx(need_cash - m_cash, precision);
         if (gap > 0.0 && getParam<bool>("support_borrow_cash")) {
             bool covered = false;
@@ -1400,8 +1419,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     // Update the cash: a margin opening pays the margin and the sell fee (the borrow-stock fee was
     // already charged by borrowStock), a cash opening receives the net proceeds
-    m_cash = margin_acct ? roundEx(m_cash - need - cost.total, precision)
-                         : roundEx(m_cash + money, precision);
+    m_cash = margin_acct ? roundEx(m_cash - need - account_cost, precision)
+                         : roundEx(m_cash + _toAccount(stock, money), precision);
 
     // Add it to the trade records
     result = TradeRecord(stock, datetime, BUSINESS_SELL_SHORT, planPrice, realPrice, goalPrice,
@@ -1526,18 +1545,21 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
     // the books proportionally
     price_t basis = positionOpenBasis(position, real_number);
     price_t mtmBasis = positionSettleBasis(position, real_number);
+    // The buyback notional, the realized profit and the cost are billed in the security's currency
+    price_t account_cost = _toAccount(stock, cost.total);
+    price_t account_money = _toAccount(stock, money);
     if (position.margin > 0.0) {
         released = roundEx(position.margin * (real_number / position.number), precision);
-        price_t realized = roundEx(mtmBasis - money, precision);
-        m_cash = roundEx(m_cash + released + realized - cost.total, precision);
+        price_t realized = _toAccount(stock, roundEx(mtmBasis - money, precision));
+        m_cash = roundEx(m_cash + released + realized - account_cost, precision);
     } else {
-        HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
+        HKU_WARN_IF_RETURN(m_cash < roundEx(account_money + account_cost, precision), result,
                            "{} {} Can't buyShort, need cash({:<.4f}) > current cash({:<.4f})!",
-                           datetime, stock.market_code(), roundEx(money + cost.total, precision),
-                           m_cash);
+                           datetime, stock.market_code(),
+                           roundEx(account_money + account_cost, precision), m_cash);
 
         // Update the cash balance
-        m_cash = roundEx(m_cash - money - cost.total, precision);
+        m_cash = roundEx(m_cash - account_money - account_cost, precision);
     }
 
     // Update the trade records
@@ -1628,12 +1650,14 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
         auto price = record.stock.getMarketValue(lastDatetime(), ktype);
+        price_t rate = _currencyRate(record.stock);
         if (record.margin > 0.0) {
             // A margin-accounted holding contributes its locked margin plus the unrealized profit
-            value = roundEx((value + marginPositionEquity(record, price, true)), precision);
+            value = roundEx((value + marginPositionEquity(record, price, true, rate)), precision);
             occupied = roundEx(occupied + record.margin, precision);
         } else {
-            value = roundEx((value + record.number * price * record.stock.unit()), precision);
+            value =
+              roundEx((value + record.number * price * record.stock.unit() * rate), precision);
         }
     }
 
@@ -1642,14 +1666,15 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     for (; iter != m_short_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
         auto price = record.stock.getMarketValue(lastDatetime(), ktype);
+        price_t rate = _currencyRate(record.stock);
         if (record.margin > 0.0) {
             // The locked margin is an asset on either side, the unrealized profit carries the
             // direction, so the contribution joins the long market value as well
-            value = roundEx((value + marginPositionEquity(record, price, false)), precision);
+            value = roundEx((value + marginPositionEquity(record, price, false, rate)), precision);
             occupied = roundEx(occupied + record.margin, precision);
         } else {
-            short_value =
-              roundEx((short_value + record.number * price * record.stock.unit()), precision);
+            short_value = roundEx(
+              (short_value + record.number * price * record.stock.unit() * rate), precision);
         }
     }
     funds.cash = m_cash;
@@ -1662,7 +1687,7 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     funds.borrow_asset = 0;
     borrow_stock_map_type::const_iterator bor_iter = m_borrow_stock.begin();
     for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
-        funds.borrow_asset += bor_iter->second.value;
+        funds.borrow_asset += _toAccount(bor_iter->second.stock, bor_iter->second.value);
     }
     return funds;
 }
@@ -1692,13 +1717,14 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         for (; iter != m_position.end(); ++iter) {
             const PositionRecord& record = iter->second;
             price_t price = record.stock.getMarketValue(datetime, ktype);
+            price_t rate = _currencyRate(record.stock);
             if (record.margin > 0.0) {
-                market_value =
-                  roundEx(market_value + marginPositionEquity(record, price, true), precision);
+                market_value = roundEx(
+                  market_value + marginPositionEquity(record, price, true, rate), precision);
                 occupied = roundEx(occupied + record.margin, precision);
             } else {
-                market_value =
-                  roundEx(market_value + price * record.number * record.stock.unit(), precision);
+                market_value = roundEx(
+                  market_value + price * record.number * record.stock.unit() * rate, precision);
             }
         }
 
@@ -1706,13 +1732,15 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         for (; iter != m_short_position.end(); ++iter) {
             const PositionRecord& record = iter->second;
             price_t price = record.stock.getMarketValue(datetime, ktype);
+            price_t rate = _currencyRate(record.stock);
             if (record.margin > 0.0) {
-                market_value =
-                  roundEx(market_value + marginPositionEquity(record, price, false), precision);
+                market_value = roundEx(
+                  market_value + marginPositionEquity(record, price, false, rate), precision);
                 occupied = roundEx(occupied + record.margin, precision);
             } else {
-                short_market_value = roundEx(
-                  short_market_value + price * record.number * record.stock.unit(), precision);
+                short_market_value =
+                  roundEx(short_market_value + price * record.number * record.stock.unit() * rate,
+                          precision);
             }
         }
 
@@ -1726,7 +1754,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         funds.borrow_asset = 0;
         borrow_stock_map_type::iterator bor_iter = m_borrow_stock.begin();
         for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
-            funds.borrow_asset += bor_iter->second.value;
+            funds.borrow_asset += _toAccount(bor_iter->second.stock, bor_iter->second.value);
         }
 
         return funds;
@@ -1791,8 +1819,10 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                     sn.margin = roundEx(sn.margin + iter->margin, precision);
                 } else if (isMarginAccounted(iter->stock) && iter->realPrice > 0.0) {
                     sn.margin = roundEx(
-                      sn.margin + getOpenMarginToLock(iter->datetime, iter->stock, iter->realPrice,
-                                                      iter->number, MarginSide::LONG),
+                      sn.margin +
+                        _toAccount(iter->stock,
+                                   getOpenMarginToLock(iter->datetime, iter->stock, iter->realPrice,
+                                                       iter->number, MarginSide::LONG)),
                       precision);
                 }
                 break;
@@ -1859,8 +1889,10 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                     sn.margin = roundEx(sn.margin + iter->margin, precision);
                 } else if (isMarginAccounted(iter->stock) && iter->realPrice > 0.0) {
                     sn.margin = roundEx(
-                      sn.margin + getOpenMarginToLock(iter->datetime, iter->stock, iter->realPrice,
-                                                      iter->number, MarginSide::SHORT),
+                      sn.margin +
+                        _toAccount(iter->stock,
+                                   getOpenMarginToLock(iter->datetime, iter->stock, iter->realPrice,
+                                                       iter->number, MarginSide::SHORT)),
                       precision);
                 }
                 break;
@@ -1960,7 +1992,9 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                             iter->realPrice * iter->number * iter->stock.unit(),
                           precision);
                 checkin_stock = roundEx(
-                  checkin_stock + iter->realPrice * iter->number * iter->stock.unit(), precision);
+                  checkin_stock +
+                    _toAccount(iter->stock, iter->realPrice * iter->number * iter->stock.unit()),
+                  precision);
                 break;
             }
 
@@ -1979,7 +2013,9 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                              iter->stock.market_code());
                 }
                 checkout_stock = roundEx(
-                  checkout_stock + iter->realPrice * iter->number * iter->stock.unit(), precision);
+                  checkout_stock +
+                    _toAccount(iter->stock, iter->realPrice * iter->number * iter->stock.unit()),
+                  precision);
                 break;
 
             case BUSINESS_BORROW_CASH:
@@ -1997,9 +2033,10 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 break;
 
             case BUSINESS_BORROW_STOCK:
-                funds.borrow_asset =
-                  roundEx(funds.borrow_asset + iter->realPrice * iter->number * iter->stock.unit(),
-                          precision);
+                funds.borrow_asset = roundEx(
+                  funds.borrow_asset +
+                    _toAccount(iter->stock, iter->realPrice * iter->number * iter->stock.unit()),
+                  precision);
                 bor_stock_iter = bor_stock_map.find(iter->stock.id());
                 if (bor_stock_iter == bor_stock_map.end()) {
                     BorrowRecord bor;
@@ -2025,19 +2062,25 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                         list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
                         if (remain_num == bor_iter->number) {
                             funds.borrow_asset -=
-                              roundEx(bor_iter->price * remain_num * iter->stock.unit(), precision);
+                              _toAccount(iter->stock,
+                                         roundEx(bor_iter->price * remain_num * iter->stock.unit(),
+                                                 precision));
                             bor.record_list.pop_front();
                             break;
 
                         } else if (remain_num < bor_iter->number) {
                             funds.borrow_asset -=
-                              roundEx(bor_iter->price * remain_num * iter->stock.unit(), precision);
+                              _toAccount(iter->stock,
+                                         roundEx(bor_iter->price * remain_num * iter->stock.unit(),
+                                                 precision));
                             bor_iter->number -= remain_num;
                             break;
 
                         } else {  // remain_num > bor_iter->number
-                            funds.borrow_asset -= roundEx(
-                              bor_iter->price * bor_iter->number * iter->stock.unit(), precision);
+                            funds.borrow_asset -= _toAccount(
+                              iter->stock,
+                              roundEx(bor_iter->price * bor_iter->number * iter->stock.unit(),
+                                      precision));
                             remain_num -= bor_iter->number;
                             bor.record_list.pop_front();
                         }
@@ -2091,12 +2134,14 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
             // A margin-accounted holding contributes its locked margin plus the unrealized profit
             market_value = roundEx(market_value + stock_iter->second.margin +
                                      (price * number * stock_iter->second.stock.unit() -
-                                      settle_basis(stock_iter->second)),
+                                      settle_basis(stock_iter->second)) *
+                                       _currencyRate(stock_iter->second.stock),
                                    precision);
             occupied = roundEx(occupied + stock_iter->second.margin, precision);
         } else {
-            market_value =
-              roundEx(market_value + price * number * stock_iter->second.stock.unit(), precision);
+            market_value = roundEx(market_value + price * number * stock_iter->second.stock.unit() *
+                                                    _currencyRate(stock_iter->second.stock),
+                                   precision);
         }
     }
 
@@ -2108,16 +2153,18 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         }
 
         price_t price = short_stock_iter->second.stock.getMarketValue(datetime, ktype);
+        price_t rate = _currencyRate(short_stock_iter->second.stock);
         if (short_stock_iter->second.margin > 0.0) {
             market_value = roundEx(market_value + short_stock_iter->second.margin -
                                      (price * number * short_stock_iter->second.stock.unit() -
-                                      settle_basis(short_stock_iter->second)),
+                                      settle_basis(short_stock_iter->second)) *
+                                       rate,
                                    precision);
             occupied = roundEx(occupied + short_stock_iter->second.margin, precision);
         } else {
-            short_market_value =
-              roundEx(short_market_value + price * number * short_stock_iter->second.stock.unit(),
-                      precision);
+            short_market_value = roundEx(
+              short_market_value + price * number * short_stock_iter->second.stock.unit() * rate,
+              precision);
         }
     }
 
@@ -2269,12 +2316,13 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                           roundEx(iter->second.margin + trade_iter->margin, precision);
                     } else if (isMarginAccounted(trade_iter->stock) &&
                                trade_iter->realPrice > 0.0) {
-                        iter->second.margin =
-                          roundEx(iter->second.margin +
-                                    getOpenMarginToLock(trade_iter->datetime, trade_iter->stock,
-                                                        trade_iter->realPrice, trade_iter->number,
-                                                        MarginSide::LONG),
-                                  precision);
+                        iter->second.margin = roundEx(
+                          iter->second.margin +
+                            _toAccount(trade_iter->stock,
+                                       getOpenMarginToLock(trade_iter->datetime, trade_iter->stock,
+                                                           trade_iter->realPrice,
+                                                           trade_iter->number, MarginSide::LONG)),
+                          precision);
                     }
                     break;
                 }
@@ -2350,12 +2398,13 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                           roundEx(iter->second.margin + trade_iter->margin, precision);
                     } else if (isMarginAccounted(trade_iter->stock) &&
                                trade_iter->realPrice > 0.0) {
-                        iter->second.margin =
-                          roundEx(iter->second.margin +
-                                    getOpenMarginToLock(trade_iter->datetime, trade_iter->stock,
-                                                        trade_iter->realPrice, trade_iter->number,
-                                                        MarginSide::SHORT),
-                                  precision);
+                        iter->second.margin = roundEx(
+                          iter->second.margin +
+                            _toAccount(trade_iter->stock,
+                                       getOpenMarginToLock(trade_iter->datetime, trade_iter->stock,
+                                                           trade_iter->realPrice,
+                                                           trade_iter->number, MarginSide::SHORT)),
+                          precision);
                     }
                     break;
                 }
@@ -2462,10 +2511,11 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                       iter->second.settle_basis +
                         trade_iter->realPrice * trade_iter->number * trade_iter->stock.unit(),
                       precision);
-                    checkin_stock =
-                      roundEx(checkin_stock + trade_iter->realPrice * trade_iter->number *
-                                                trade_iter->stock.unit(),
-                              precision);
+                    checkin_stock = roundEx(
+                      checkin_stock +
+                        _toAccount(trade_iter->stock, trade_iter->realPrice * trade_iter->number *
+                                                        trade_iter->stock.unit()),
+                      precision);
                     break;
                 }
 
@@ -2487,10 +2537,11 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                         HKU_WARN("{} {} CheckoutStock Error in m_trade_list!", d,
                                  trade_iter->stock.market_code());
                     }
-                    checkout_stock =
-                      roundEx(checkout_stock + trade_iter->realPrice * trade_iter->number *
-                                                 trade_iter->stock.unit(),
-                              precision);
+                    checkout_stock = roundEx(
+                      checkout_stock +
+                        _toAccount(trade_iter->stock, trade_iter->realPrice * trade_iter->number *
+                                                        trade_iter->stock.unit()),
+                      precision);
                     break;
                 }
 
@@ -2508,8 +2559,9 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
 
                 case BUSINESS_BORROW_STOCK: {
                     borrow_asset =
-                      roundEx(borrow_asset + trade_iter->realPrice * trade_iter->number *
-                                               trade_iter->stock.unit(),
+                      roundEx(borrow_asset + _toAccount(trade_iter->stock,
+                                                        trade_iter->realPrice * trade_iter->number *
+                                                          trade_iter->stock.unit()),
                               precision);
                     auto iter = bor_stock_map.find(trade_iter->stock.id());
                     if (iter == bor_stock_map.end()) {
@@ -2537,23 +2589,26 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                         do {
                             auto bor_iter = bor.record_list.begin();
                             if (remain_num == bor_iter->number) {
-                                borrow_asset -=
+                                borrow_asset -= _toAccount(
+                                  trade_iter->stock,
                                   roundEx(bor_iter->price * remain_num * trade_iter->stock.unit(),
-                                          precision);
+                                          precision));
                                 bor.record_list.pop_front();
                                 break;
 
                             } else if (remain_num < bor_iter->number) {
-                                borrow_asset -=
+                                borrow_asset -= _toAccount(
+                                  trade_iter->stock,
                                   roundEx(bor_iter->price * remain_num * trade_iter->stock.unit(),
-                                          precision);
+                                          precision));
                                 bor_iter->number -= remain_num;
                                 break;
 
                             } else {  // remain_num > bor_iter->number
-                                borrow_asset -= roundEx(
-                                  bor_iter->price * bor_iter->number * trade_iter->stock.unit(),
-                                  precision);
+                                borrow_asset -= _toAccount(
+                                  trade_iter->stock, roundEx(bor_iter->price * bor_iter->number *
+                                                               trade_iter->stock.unit(),
+                                                             precision));
                                 remain_num -= bor_iter->number;
                                 bor.record_list.pop_front();
                             }
@@ -2632,12 +2687,15 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                 // profit, exactly like the getFunds replay branch
                 market_value =
                   roundEx(market_value + holding.margin +
-                            (price * holding.number * holding.stock.unit() - holding.basis),
+                            (price * holding.number * holding.stock.unit() - holding.basis) *
+                              _currencyRate(holding.stock),
                           precision);
                 occupied = roundEx(occupied + holding.margin, precision);
             } else {
                 market_value =
-                  roundEx(market_value + price * holding.number * holding.stock.unit(), precision);
+                  roundEx(market_value + price * holding.number * holding.stock.unit() *
+                                           _currencyRate(holding.stock),
+                          precision);
             }
         }
 
@@ -2652,12 +2710,15 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                 // carries the sign, so it goes into market_value and never into the liability side
                 market_value =
                   roundEx(market_value + holding.margin -
-                            (price * holding.number * holding.stock.unit() - holding.basis),
+                            (price * holding.number * holding.stock.unit() - holding.basis) *
+                              _currencyRate(holding.stock),
                           precision);
                 occupied = roundEx(occupied + holding.margin, precision);
             } else {
-                short_market_value = roundEx(
-                  short_market_value + price * holding.number * holding.stock.unit(), precision);
+                short_market_value =
+                  roundEx(short_market_value + price * holding.number * holding.stock.unit() *
+                                                 _currencyRate(holding.stock),
+                          precision);
             }
         }
 
@@ -2731,7 +2792,7 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
             if (weight_iter->bonus() != 0.0) {
                 price_t bonus = roundEx(position.number * weight_iter->bonus() * 0.1, precision);
                 position.sellMoney = roundEx(position.sellMoney + bonus, precision);
-                m_cash = roundEx(m_cash + bonus, precision);
+                m_cash = roundEx(m_cash + _toAccount(stock, bonus), precision);
 
                 TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BONUS, bonus, bonus,
                                    0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID);
@@ -2809,7 +2870,7 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
             // (a financing cost of the short position, not a negative dividend income)
             if (weight_iter->bonus() != 0.0) {
                 price_t bonus = roundEx(borrow.number * weight_iter->bonus() * 0.1, precision);
-                m_cash = roundEx(m_cash - bonus, precision);
+                m_cash = roundEx(m_cash - _toAccount(stock, bonus), precision);
                 TradeRecord record(stock, weight_iter->datetime(), BUSINESS_DIVIDEND_COMPENSATION,
                                    bonus, bonus, 0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID);
                 new_trade_buffer.push_back(record);
@@ -2932,12 +2993,15 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     size_t total = new_trade_buffer.size();
     price_t running_cash = cash_base;
     for (size_t i = 0; i < total; ++i) {
-        if (new_trade_buffer[i].business == BUSINESS_BONUS) {
-            running_cash = roundEx(running_cash + new_trade_buffer[i].realPrice, precision);
-        } else if (new_trade_buffer[i].business == BUSINESS_DIVIDEND_COMPENSATION) {
-            running_cash = roundEx(running_cash - new_trade_buffer[i].realPrice, precision);
+        TradeRecord& record = new_trade_buffer[i];
+        if (record.business == BUSINESS_BONUS) {
+            running_cash =
+              roundEx(running_cash + _toAccount(record.stock, record.realPrice), precision);
+        } else if (record.business == BUSINESS_DIVIDEND_COMPENSATION) {
+            running_cash =
+              roundEx(running_cash - _toAccount(record.stock, record.realPrice), precision);
         }
-        new_trade_buffer[i].cash = running_cash;
+        record.cash = running_cash;
     }
 
     for (size_t i = 0; i < total; ++i) {
@@ -3077,13 +3141,14 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         // direction factor beyond the sign of the price move
         price_t mv = roundEx(price * position.number * stock.unit(), precision);
         price_t basis = roundEx(positionSettleBasis(position, position.number), precision);
-        m_cash = roundEx(m_cash + (is_long ? mv - basis : basis - mv), precision);
+        m_cash = roundEx(m_cash + _toAccount(stock, is_long ? mv - basis : basis - mv), precision);
         position.settleBasis = mv;
 
         // The lock is recomputed on the settlement price; an increase is financed like an opening,
         // and an account already in a margin call may go overdrawn instead of failing to settle
         MarginSide side = is_long ? MarginSide::LONG : MarginSide::SHORT;
-        price_t relock = getOpenMarginToLock(datetime, stock, price, position.number, side);
+        price_t relock =
+          _toAccount(stock, getOpenMarginToLock(datetime, stock, price, position.number, side));
         price_t delta = roundEx(relock - position.margin, precision);
         if (delta > 0.0 && m_cash < delta) {
             HKU_WARN_IF(!_borrowForAdd(datetime, delta),
@@ -3193,7 +3258,8 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
                          datetime, borrow.stock.market_code());
                 continue;
             }
-            price_t debt_base = roundEx(price * borrow.number * borrow.stock.unit(), precision);
+            price_t debt_base = _toAccount(
+              borrow.stock, roundEx(price * borrow.number * borrow.stock.unit(), precision));
             accrue_interest(borrow.stock, debt_base, rate, borrow.number,
                             remark.empty() ? "borrow stock" : "borrow stock, " + remark);
         }
@@ -3215,8 +3281,9 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
             price = positionSettleBasis(position, position.number) / quantity;
         }
         maintain_required = roundEx(
-          maintain_required + getMaintainMargin(datetime, stock, price, position.number,
-                                                is_long ? MarginSide::LONG : MarginSide::SHORT),
+          maintain_required +
+            _toAccount(stock, getMaintainMargin(datetime, stock, price, position.number,
+                                                is_long ? MarginSide::LONG : MarginSide::SHORT)),
           precision);
     };
     for (const auto& kv : m_position) {
@@ -3234,9 +3301,12 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
     auto add_equity = [&](const PositionRecord& position, bool is_long) {
         HKU_IF_RETURN(!(position.number > 0.0), void());
         price_t price = position.stock.getMarketValue(datetime, ktype);
-        price_t contribution = position.number * price * position.stock.unit();
+        price_t contribution =
+          position.number * price * position.stock.unit() * _currencyRate(position.stock);
         if (position.margin > 0.0) {
-            equity = roundEx(equity + marginPositionEquity(position, price, is_long), precision);
+            equity = roundEx(equity + marginPositionEquity(position, price, is_long,
+                                                           _currencyRate(position.stock)),
+                             precision);
         } else {
             equity = roundEx(equity + (is_long ? contribution : -contribution), precision);
         }
@@ -3690,25 +3760,28 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     // existed falls back to the model
     bool margin_acct = isMarginAccounted(tr.stock) && tr.realPrice > 0.0;
     price_t locked_margin =
-      margin_acct ? (tr.margin > 0.0 ? tr.margin
-                                     : getOpenMarginToLock(tr.datetime, tr.stock, tr.realPrice,
-                                                           tr.number, MarginSide::LONG))
-                  : 0.0;
+      margin_acct
+        ? (tr.margin > 0.0
+             ? tr.margin
+             : _toAccount(tr.stock, getOpenMarginToLock(tr.datetime, tr.stock, tr.realPrice,
+                                                        tr.number, MarginSide::LONG)))
+        : 0.0;
     HKU_WARN_IF(margin_acct && !(locked_margin > 0.0),
                 "{} {} The margin model reported no requirement, the opening is booked by cash!",
                 tr.datetime, tr.stock.market_code());
     margin_acct = margin_acct && locked_margin > 0.0;
-    price_t need = margin_acct ? locked_margin : money;
+    price_t need = margin_acct ? locked_margin : _toAccount(tr.stock, money);
+    price_t account_cost = _toAccount(tr.stock, tr.cost.total);
 
     // The record carries the trade only: when the live books financed the shortfall, the add path
     // reproduces the debt instead of rejecting a trade the account really filled
-    price_t need_cash = roundEx(need + tr.cost.total, precision);
+    price_t need_cash = roundEx(need + account_cost, precision);
     if (m_cash < need_cash) {
         HKU_WARN_IF_RETURN(!_borrowForAdd(tr.datetime, need_cash), false,
                            "Don't have enough money! {} < {}, {}", m_cash, need_cash, tr);
     }
 
-    m_cash = roundEx(m_cash - need - tr.cost.total, precision);
+    m_cash = roundEx(m_cash - need - account_cost, precision);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
 
@@ -3785,12 +3858,13 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
     // books proportionally
     price_t basis = positionOpenBasis(position, tr.number);
     price_t mtmBasis = positionSettleBasis(position, tr.number);
+    price_t account_cost = _toAccount(tr.stock, tr.cost.total);
     if (position.margin > 0.0) {
         released = roundEx(position.margin * (tr.number / position.number), precision);
-        price_t realized = roundEx(money - mtmBasis, precision);
-        m_cash = roundEx(m_cash + released + realized - tr.cost.total, precision);
+        price_t realized = _toAccount(tr.stock, roundEx(money - mtmBasis, precision));
+        m_cash = roundEx(m_cash + released + realized - account_cost, precision);
     } else {
-        m_cash = roundEx(m_cash + money - tr.cost.total, precision);
+        m_cash = roundEx(m_cash + _toAccount(tr.stock, money) - account_cost, precision);
     }
 
     // Update the trade records
@@ -3883,7 +3957,7 @@ bool TradeManager::_add_checkin_stock_tr(const TradeRecord& tr) {
     TradeRecord new_tr(tr);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
-    m_checkin_stock = roundEx(m_checkin_stock + market_value, precision);
+    m_checkin_stock = roundEx(m_checkin_stock + _toAccount(tr.stock, market_value), precision);
     return true;
 }
 
@@ -3923,7 +3997,7 @@ bool TradeManager::_add_checkout_stock_tr(const TradeRecord& tr) {
     TradeRecord new_tr(tr);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
-    m_checkout_stock = roundEx(m_checkout_stock + market_value, precision);
+    m_checkout_stock = roundEx(m_checkout_stock + _toAccount(tr.stock, market_value), precision);
     return true;
 }
 
@@ -3994,12 +4068,13 @@ bool TradeManager::_add_borrow_stock_tr(const TradeRecord& tr) {
     price_t market_value = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
     // The lending fee is paid out of the cash: the live short opening finances it together with the
     // margin, so the add path reproduces that debt instead of driving the cash negative
-    if (getParam<bool>("support_borrow_cash") && m_cash < tr.cost.total) {
-        HKU_WARN_IF_RETURN(!_borrowForAdd(tr.datetime, tr.cost.total), false,
+    price_t account_cost = _toAccount(tr.stock, tr.cost.total);
+    if (getParam<bool>("support_borrow_cash") && m_cash < account_cost) {
+        HKU_WARN_IF_RETURN(!_borrowForAdd(tr.datetime, account_cost), false,
                            "{} Can't finance the borrow-stock fee({:<.4f})!", tr.datetime,
-                           tr.cost.total);
+                           account_cost);
     }
-    m_cash = roundEx(m_cash - tr.cost.total, precision);
+    m_cash = roundEx(m_cash - account_cost, precision);
 
     borrow_stock_map_type::iterator iter = m_borrow_stock.find(tr.stock.id());
     if (iter == m_borrow_stock.end()) {
@@ -4064,7 +4139,7 @@ bool TradeManager::_add_return_stock_tr(const TradeRecord& tr) {
         m_borrow_stock.erase(bor_iter);
     }
 
-    m_cash = roundEx(m_cash - tr.cost.total, precision);
+    m_cash = roundEx(m_cash - _toAccount(tr.stock, tr.cost.total), precision);
     TradeRecord new_tr(tr);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
@@ -4084,11 +4159,14 @@ bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
     // reproduces the books exactly; an archive written before that field existed falls back to the
     // model
     bool margin_acct = isMarginAccounted(tr.stock) && tr.realPrice > 0.0;
-    price_t need = margin_acct
-                     ? (tr.margin > 0.0 ? tr.margin
-                                        : getOpenMarginToLock(tr.datetime, tr.stock, tr.realPrice,
-                                                              tr.number, MarginSide::SHORT))
-                     : 0.0;
+    price_t need =
+      margin_acct
+        ? (tr.margin > 0.0
+             ? tr.margin
+             : _toAccount(tr.stock, getOpenMarginToLock(tr.datetime, tr.stock, tr.realPrice,
+                                                        tr.number, MarginSide::SHORT)))
+        : 0.0;
+    price_t account_cost = _toAccount(tr.stock, tr.cost.total);
     HKU_WARN_IF(margin_acct && !(need > 0.0),
                 "{} {} The margin model reported no requirement, the short opening is booked by "
                 "cash!",
@@ -4096,14 +4174,14 @@ bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
     margin_acct = margin_acct && need > 0.0;
     if (margin_acct) {
         // Same funding rule as the replayed long opening: the live books may have financed it
-        price_t need_cash = roundEx(need + tr.cost.total, precision);
+        price_t need_cash = roundEx(need + account_cost, precision);
         if (m_cash < need_cash) {
             HKU_WARN_IF_RETURN(!_borrowForAdd(tr.datetime, need_cash), false,
                                "Don't have enough money! {} < {}, {}", m_cash, need_cash, tr);
         }
     }
-    m_cash = margin_acct ? roundEx(m_cash - need - tr.cost.total, precision)
-                         : roundEx(m_cash + money, precision);
+    m_cash = margin_acct ? roundEx(m_cash - need - account_cost, precision)
+                         : roundEx(m_cash + _toAccount(tr.stock, money), precision);
     // Gross proceeds on the position; fees only in totalCost (mirrors the live sellShort)
     price_t gross = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
@@ -4187,15 +4265,17 @@ bool TradeManager::_add_buy_short_tr(const TradeRecord& tr) {
     // the books proportionally
     price_t basis = positionOpenBasis(position, tr.number);
     price_t mtmBasis = positionSettleBasis(position, tr.number);
+    price_t account_cost = _toAccount(tr.stock, tr.cost.total);
+    price_t account_money = _toAccount(tr.stock, money);
     if (position.margin > 0.0) {
         released = roundEx(position.margin * (tr.number / position.number), precision);
-        price_t realized = roundEx(mtmBasis - money, precision);
-        m_cash = roundEx(m_cash + released + realized - tr.cost.total, precision);
+        price_t realized = _toAccount(tr.stock, roundEx(mtmBasis - money, precision));
+        m_cash = roundEx(m_cash + released + realized - account_cost, precision);
     } else {
-        HKU_WARN_IF_RETURN(m_cash < roundEx(money + tr.cost.total, precision), false,
+        HKU_WARN_IF_RETURN(m_cash < roundEx(account_money + account_cost, precision), false,
                            "Can't buyShort, need cash({:<.4f}) > current cash({:<.4f})!",
-                           roundEx(money + tr.cost.total, precision), m_cash);
-        m_cash = roundEx(m_cash - money - tr.cost.total, precision);
+                           roundEx(account_money + account_cost, precision), m_cash);
+        m_cash = roundEx(m_cash - account_money - account_cost, precision);
     }
 
     TradeRecord new_tr(tr);

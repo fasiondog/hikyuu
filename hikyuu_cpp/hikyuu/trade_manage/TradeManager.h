@@ -30,6 +30,7 @@ namespace hku {
  * precision(int): 2 calculation precision
  * support_borrow_cash(bool): false whether cash is borrowed automatically on a buy operation
  * support_borrow_stock(bool): false whether the stock is borrowed automatically when short selling
+ * currency_rates(string): "" the fixed rate of each foreign market, as in TradeManagerBase
  * </pre>
  * @ingroup TradeManagerClass
  */

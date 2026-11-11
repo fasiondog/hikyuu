@@ -276,7 +276,8 @@ Common parameters:
     - margin_accounting=False (bool) : whether to book the margin securities by margin
     - settle_with_close=True (bool) : whether the daily settlement posts at the close of the K type
     - force_liquidate=False (bool) : whether to queue the forced liquidation on a margin call
-    - annual_days=365 (int) : the days of a year, the denominator prorating the margin interest)")
+    - annual_days=365 (int) : the days of a year, the denominator prorating the margin interest
+    - currency_rates="" (str) : the fixed rate of each market to the account currency, e.g. "HK:0.92, NASDAQ:7.15"; a market not listed is billed at 1.0 with a warning, an empty table bills everything at 1.0")
       .def(py::init<>())
       .def(py::init<const string&, const TradeCostPtr&>())
 
@@ -324,7 +325,8 @@ Common parameters:
     :param float price: the opening price
     :param float num: the opening quantity
     :param MarginSide side: the long or the short side
-    :return: the occupied funds
+    :return: the occupied funds in the security's own currency; the account converts it into the
+        account currency before booking
     :rtype: float)")
 
       .def("get_maintain_margin", &TradeManagerBase::getMaintainMargin, py::arg("date"),
@@ -333,7 +335,8 @@ Common parameters:
 
     Get the maintain margin (the additional-margin threshold) of an opening
 
-    :return: the maintain margin
+    :return: the maintain margin in the security's own currency; the account converts it into the
+        account currency before booking
     :rtype: float)")
 
       .def("get_max_open_number", &TradeManagerBase::getMaxOpenNumber, py::arg("date"),
@@ -343,7 +346,8 @@ Common parameters:
 
     Get the maximum openable quantity under the given available funds
 
-    :param float available: the available funds
+    :param float available: the available funds in the account currency, converted for the
+        margin model which is measured in the security's own currency
     :return: the quantity, 0 when nothing can be opened
     :rtype: float)")
 
@@ -355,7 +359,7 @@ Common parameters:
 
     :param Datetime date: the given moment
     :param str ktype: the K-line type used to get the position price
-    :return: the occupied margin
+    :return: the occupied margin in the account currency
     :rtype: float)")
 
       .def("get_available_margin", &TradeManagerBase::getAvailableMargin, py::arg("date"),
@@ -367,7 +371,7 @@ Common parameters:
 
     :param Datetime date: the given moment
     :param str ktype: the K-line type used to get the position price
-    :return: the available funds
+    :return: the available funds in the account currency
     :rtype: float)")
 
       .def("get_collateral_rate", &TradeManagerBase::getCollateralRate, py::arg("date"),
@@ -393,7 +397,7 @@ Common parameters:
 
     :param Datetime date: the given moment
     :param str ktype: the K-line type used to get the position price
-    :return: the haircut, 0 when no conversion rate is configured
+    :return: the haircut in the account currency, 0 when no conversion rate is configured
     :rtype: float)")
 
       .def("is_margin_accounted", &TradeManagerBase::isMarginAccounted, py::arg("stock"),

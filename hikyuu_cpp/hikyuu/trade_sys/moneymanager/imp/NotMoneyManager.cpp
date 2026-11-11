@@ -30,7 +30,7 @@ double NotMoneyManager::_getBuyNumber(const Datetime& datetime, const Stock& sto
     }
     // The cash of the query datetime instead of the latest one, so a historical query does not
     // see the cash of the future trades
-    return m_tm->cash(datetime, m_query.kType()) / (price * stock.unit());
+    return m_tm->cash(datetime, m_query.kType()) / m_tm->toAccount(stock, price * stock.unit());
 }
 
 double NotMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
@@ -41,7 +41,7 @@ double NotMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stoc
     // Base the size on the net assets: the borrowed proceeds in cash must not inflate the
     // short size
     FundsRecord funds = m_tm->getFunds(datetime, m_query.kType());
-    return funds.net_assets() / (price * stock.unit());
+    return funds.net_assets() / m_tm->toAccount(stock, price * stock.unit());
 }
 
 MoneyManagerPtr HKU_API MM_Nothing() {

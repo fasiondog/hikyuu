@@ -57,6 +57,9 @@ public:
         setParam<bool>("support_borrow_stock",
                        m_tm->tryGetParam<bool>("support_borrow_stock", false));
         setParam<int>("annual_days", m_tm->tryGetParam<int>("annual_days", 365));
+        // The System pre-checks convert with the view, so a missing mirror would value the need of
+        // a foreign market at 1.0 while the real account books it at its rate
+        setParam<string>("currency_rates", m_tm->tryGetParam<string>("currency_rates", ""));
     }
 
     /**

@@ -186,7 +186,9 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
         const int precision = m_tm->precision();
         auto needCash = [&](double num) {
             CostRecord cost = m_tm->getBuyCost(datetime, stock, price, num);
-            return roundEx(roundEx(num * price * stock.unit(), precision) + cost.total, precision);
+            return m_tm->toAccount(
+              stock,
+              roundEx(roundEx(num * price * stock.unit(), precision) + cost.total, precision));
         };
         price_t current_cash = m_tm->cash(datetime, m_query.kType());
         if (needCash(n) > current_cash) {

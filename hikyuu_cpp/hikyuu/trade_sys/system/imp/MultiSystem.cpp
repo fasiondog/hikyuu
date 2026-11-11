@@ -1809,6 +1809,7 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
     // short book keeps a meaningful ratio.
     double base_assets = funds_before.net_assets();
     double base_cash = funds_before.cash;
+    TMPtr sub_tm = sys->getTM();
 
     // One suggestion per executed leg (per instrument and TM primitive), never folded into one
     // signed net delta: the leg structure is the only thing the parent can mirror 1:1. A folded
@@ -1874,6 +1875,7 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
         s.number = std::fabs(acc.number);
         s.plan_price = acc.price;
         s.plan_cash = s.number * s.plan_price * stock.unit();
+        price_t plan_cash_acct = sub_tm ? sub_tm->toAccount(stock, s.plan_cash) : s.plan_cash;
         s.from = PART_SYSTEM;
         bool flattens = false;
         switch (action) {
@@ -1902,7 +1904,7 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
         // to the first leg of the stock only, so that a per-suggestion summation does not double
         // the level of a two-leg crossing
         if (base_assets > 0.0 && s.plan_price > 0.0) {
-            double ratio = s.plan_cash / base_assets;
+            double ratio = plan_cash_acct / base_assets;
             if (ratio > 1.0) {
                 ratio = 1.0;
             } else if (ratio < -1.0) {
@@ -1915,12 +1917,13 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
             if (first_leg_of_stock) {
                 double long_pos = post_book.count(stock) ? post_book[stock].first : 0.0;
                 double short_pos = post_book.count(stock) ? post_book[stock].second : 0.0;
+                price_t target_value = (long_pos - short_pos) * s.plan_price * stock.unit();
                 s.target_position_ratio =
-                  (long_pos - short_pos) * s.plan_price * stock.unit() / base_assets;
+                  (sub_tm ? sub_tm->toAccount(stock, target_value) : target_value) / base_assets;
             }
         }
         if (base_cash > 0.0) {
-            s.cash_ratio = s.plan_cash / base_cash;
+            s.cash_ratio = plan_cash_acct / base_cash;
         }
         result.push_back(s);
     }
@@ -2144,8 +2147,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
     const bool margin_trading =
       m_tm->haveParam("support_borrow_cash") && m_tm->getParam<bool>("support_borrow_cash");
     auto buy_cost_total = [&](const TradeSuggestion& s, double qty) {
-        return qty * s.plan_price * s.stock.unit() +
-               m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total;
+        return m_tm->toAccount(s.stock, qty * s.plan_price * s.stock.unit() +
+                                          m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total);
     };
     double need_cover_cash = 0.0;
     double need_buy_cash = 0.0;  // the scale denominator: the margin when financing, full otherwise
@@ -2184,9 +2187,10 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
                 need_buy_cash += buy_cost_total(s, qty);
             }
             if (m_tm->isMarginAccounted(s.stock)) {
-                need_buy_deposit +=
+                need_buy_deposit += m_tm->toAccount(
+                  s.stock,
                   m_tm->getOpenMarginToLock(date, s.stock, s.plan_price, qty, MarginSide::LONG) +
-                  m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total;
+                    m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total);
             } else {
                 need_buy_deposit += buy_cost_total(s, qty);
             }
@@ -2278,7 +2282,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             constexpr double BUY_POWER_MARGIN = 0.995;
             double rate = m_tm->getMarginRate(date, s.stock);
             double power = (rate > 0.0 ? cash / rate : cash) * BUY_POWER_MARGIN;
-            double unit_price = s.plan_price * s.stock.unit();
+            double unit_price = m_tm->toAccount(s.stock, s.plan_price * s.stock.unit());
             double cap_qty =
               (unit_price > 0.0) ? std::floor(power / unit_price / min_trade) * min_trade : 0.0;
             if (cap_qty < qty) {
@@ -4205,7 +4209,8 @@ void MultiSystem::_topUpCoverCash(const TMPtr& tm, bool enabled, const Datetime&
     int precision = tm->precision();
     CostRecord cost = tm->getBuyCost(date, stock, price, number);
     price_t needed =
-      roundEx(roundEx(price * number * stock.unit(), precision) + cost.total, precision);
+      roundEx(tm->toAccount(stock, roundEx(price * number * stock.unit(), precision) + cost.total),
+              precision);
     price_t cash = tm->cash(date);
     if (cash < needed) {
         tm->checkin(date, roundUp(needed - cash, precision));

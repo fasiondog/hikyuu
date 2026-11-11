@@ -93,8 +93,8 @@ public:
     CostRecord cost;    ///< Trade cost
     price_t stoploss;   ///< Stop-loss price
     price_t cash;       ///< Cash balance
-    price_t margin;     ///< Margin the opening locked; 0 on the cash books and for every business
-                        ///< other than buy / sell short
+    price_t margin;     ///< Margin the opening locked, in the account currency; 0 on the cash books
+                        ///< and for every business other than buy / sell short
     SystemPart from;  ///< Auxiliary record of the trading system part that issued the instruction;
                       ///< Null<int>() means invalid
     string remark;    ///< Remark (at most 100 encoded characters)

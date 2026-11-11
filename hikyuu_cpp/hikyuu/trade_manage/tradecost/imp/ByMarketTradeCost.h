@@ -10,7 +10,6 @@
 #define TRADE_MANAGE_IMP_BYMARKETTRADECOST_H_
 
 #include <map>
-#include <mutex>
 #include <set>
 
 #include "../TradeCostBase.h"
@@ -102,7 +101,6 @@ private:
 private:
     std::map<string, TradeCostPtr> m_costs;  // key (upper case) -> cost model
     TradeCostPtr m_default;                  // never null
-    mutable std::mutex m_warn_mutex;
     mutable std::set<string> m_warned;  // markets already reported as unmatched, not serialized
 
 #if HKU_SUPPORT_SERIALIZATION

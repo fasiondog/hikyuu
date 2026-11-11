@@ -1142,7 +1142,8 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
                                      cost.total,
                                    precision);
                 }
-                if (m_tm->cash(today.datetime, m_kdata.getQuery().kType()) < need) {
+                if (m_tm->cash(today.datetime, m_kdata.getQuery().kType()) <
+                    m_tm->toAccount(m_stock, need)) {
                     number =
                       _getBuyNumber(today.datetime, realPrice, realPrice - stoploss, req.from);
                 }
@@ -1229,6 +1230,7 @@ void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double nu
           precision);
     }
     price_t cash = m_tm->cash(datetime, m_kdata.getQuery().kType());
+    needed = m_tm->toAccount(m_stock, needed);
     if (cash < needed) {
         m_tm->checkin(datetime, roundUp(needed - cash, precision));
     }
