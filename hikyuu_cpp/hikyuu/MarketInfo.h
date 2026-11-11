@@ -126,7 +126,11 @@ public:
      */
     Datetime unifiedToLocal(const Datetime&) const;
 
-    /** Whether the market trades in the ambiguous local hour [01:00,02:00) of its daylight rule */
+    /**
+     * Whether the market trades in the local hour that its daylight rule's fall-back repeats:
+     * [01:00,02:00) local for the US rule, [02:00,03:00) local for the EU rule; a market without
+     * a daylight rule never has one
+     */
     bool hasAmbiguousSession() const;
 
     /** Whether the local wall clock already is the unified expression (CN / HK identity) */

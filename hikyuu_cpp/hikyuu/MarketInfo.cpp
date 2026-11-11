@@ -11,10 +11,6 @@ namespace hku {
 
 namespace {
 
-/* The local hour [01:00, 02:00) that a daylight transition repeats or skips */
-constexpr int AMBIGUOUS_LO = 60;
-constexpr int AMBIGUOUS_HI = 120;
-
 /** The nth Sunday of the given month, at midnight */
 Datetime nthSunday(long year, long month, long n) {
     long first_dow = Datetime(year, month, 1).dayOfWeek();
@@ -49,10 +45,24 @@ bool MarketInfo::hasAmbiguousSession() const {
     if (m_openTime1 == m_closeTime1 && m_openTime2 == m_closeTime2) {
         return true;
     }
+    // The local hour that the rule's fall-back repeats: the US rule switches at 02:00 local
+    // (repeating [01:00,02:00)), the EU rule switches at 01:00 UTC (repeating [02:00,03:00))
+    int lo, hi;
+    switch (m_dstRule) {
+        case 1:
+            lo = 60;
+            hi = 120;
+            break;
+        case 2:
+            lo = 120;
+            hi = 180;
+            break;
+        default:
+            return false;
+    }
     int o1(minutesOfDay(m_openTime1)), c1(minutesOfDay(m_closeTime1));
     int o2(minutesOfDay(m_openTime2)), c2(minutesOfDay(m_closeTime2));
-    return sessionIntersect(o1, c1, AMBIGUOUS_LO, AMBIGUOUS_HI) ||
-           sessionIntersect(o2, c2, AMBIGUOUS_LO, AMBIGUOUS_HI);
+    return sessionIntersect(o1, c1, lo, hi) || sessionIntersect(o2, c2, lo, hi);
 }
 
 bool MarketInfo::_isDstUTC(const Datetime& utc) const {
@@ -152,8 +162,8 @@ MarketInfo::MarketInfo(const string& market, const string& name, const string& d
   m_dataLag(dataLag) {
     // Sessions reaching the ambiguous hour can not be converted back; reject at construction
     HKU_CHECK(dstRule == 0 || !hasAmbiguousSession(),
-              "The trading sessions of market [{}] intersect the ambiguous local hour "
-              "[01:00,02:00) of its daylight rule [{}]!",
+              "The trading sessions of market [{}] intersect the repeated local hour of its "
+              "daylight rule [{}]!",
               market, dstRule);
 }
 

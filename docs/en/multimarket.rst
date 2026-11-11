@@ -50,6 +50,11 @@ Unified Time Expression
   back itself, otherwise the US / forex T-day close becomes visible on base-axis day T — one-sided
   look-ahead. The minute-level ktypes never take ``data_lag`` (the timezone unification covers
   them).
+- **Live scheduling**: ``Strategy.run_daily`` / ``run_daily_at`` / ``StockManager.is_trading_hours``
+  assume the host clock follows the unified (Beijing) convention — the session windows are
+  converted to the market-local wall clock before comparison, and the holiday judgment uses the
+  market-local date; the clock point of ``run_daily_at`` itself follows the unified convention. If
+  the host does not run on Beijing time, these judgments are offset as a whole.
 
 Dimension Conventions
 ---------------------
@@ -75,6 +80,12 @@ fixtures of SH600004 / SH000001 / SZ000001 inside the repository ``test_data`` a
 amount is about 100 times the expected value and the volume is stored in lots); they only serve
 the driver read/aggregation tests, so do not assert amounts or magnitudes on them. SZ399001 is
 the sample rebuilt to the caliber.
+
+FX and crypto booking caliber: the number is the base-currency / coin amount and the profit is
+``price diff × number × unit`` (unit defaults to 1, which gives the quote-currency amount
+directly); trading constraints like the standard lot (100K base), the pip value and the minimum
+notional have no built-in modeling and must be enforced through runtime overrides (e.g.
+``min_trade_number``) or the strategy layer.
 
 Variety Parameters and Runtime Overrides
 ----------------------------------------

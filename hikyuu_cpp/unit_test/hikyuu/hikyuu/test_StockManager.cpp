@@ -453,6 +453,15 @@ TEST_CASE("test_StockManager_isTradingHours") {
     /** @arg A market with explicit sessions (SHF 930-1130/1330-1500) is unaffected */
     CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "SHF"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109301200LL), "SHF"), false);
+    /** @arg The input follows the unified clock: NASDAQ (US DST, -300) converts before judging.
+     *        On 2021-10-07 (EDT) Beijing 21:30 is 09:30 local; on 2021-12-07 (EST) Beijing
+     *        22:30 is 09:30 local */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110072130LL), "NASDAQ"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110072259LL), "NASDAQ"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110072030LL), "NASDAQ"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110070430LL), "NASDAQ"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202112072230LL), "NASDAQ"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202112072130LL), "NASDAQ"), false);
 }
 
 /** @par Test points */

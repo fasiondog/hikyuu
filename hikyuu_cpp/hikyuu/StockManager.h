@@ -273,6 +273,8 @@ public:
 
     /**
      * Roughly judge whether the given time is inside the trading hours
+     * @note d follows the unified clock convention (Beijing naive); the holiday judgment and the
+     *       session bounds are applied on the market-local wall clock after conversion
      * @param d the given time; Null<Datetime>() throws an exception
      * @param market the given market
      */

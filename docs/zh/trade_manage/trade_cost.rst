@@ -115,20 +115,22 @@ ETF交易成本算法
 
 适用于期货、外汇、数字货币等无专用成本模型的市场。计算规则：
 
-* 买入：max(佣金比例 × 成交金额, 最低佣金) + 每手固定费 × 数量 + 其他固定费用
+* 买入：max(佣金比例 × 成交金额, 最低佣金) + per_lot × 数量 + 其他固定费用
 * 卖出：同上，另加印花税率 × 成交金额
 
 成交金额 = 价格 × 数量 × 合约乘数，合约乘数取自证券自身的 unit（股票为 1，期货为合约规模），
-因此同一套公式同时适用于股票与期货；每手固定费与其他固定费用计入 CostRecord.others。
+因此同一套公式同时适用于股票与期货；per_lot 与其他固定费用计入 CostRecord.others。
 
 .. py:function:: TC_Fixed([commission=0.0, lowest_commission=0.0, stamptax=0.0, per_lot=0.0, others=0.0])
 
     通用固定费率交易成本算法，覆盖期货、外汇、数字货币等无专用成本模型的市场
 
     :param float commission: 佣金比例（按成交金额）
-    :param float lowest_commission: 最低佣金值
+    :param float lowest_commission: 最低佣金值，按 ``max(佣金比例 × 成交金额, 最低佣金)``
+        生效——即使佣金比例 × 成交金额为 0 也照收，如需免除请置 0
     :param float stamptax: 印花税率，仅卖出收取
-    :param float per_lot: 每手（合约）固定费用，如交易所手续费
+    :param float per_lot: 按成交数量（股/张/币量）收取的固定费用，非按手——即
+        ``per_lot × number``；如需按手收费请将费率除以每手数量
     :param float others: 其他固定费用，如交割费、资金费
     :return: :py:class:`TradeCostBase` 子类实例
 

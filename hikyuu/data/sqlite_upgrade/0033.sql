@@ -1,5 +1,5 @@
 BEGIN TRANSACTION;
--- Multi-market support: register futures/FX/HK/US/crypto markets, stock types (rebuild built-in
+-- Multi-market support: register futures/FX/HK/US/crypto markets, stock types (add built-in
 -- type 10, add custom types 12~15 with id == type) and each market's representative index Stock
 -- placeholder row (calendar axis). The index kdata must be imported afterwards; before that its
 -- trading calendar is empty, which is the expected "not configured = not supported" semantics.

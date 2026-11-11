@@ -115,33 +115,38 @@ TEST_CASE("test_MarketInfo_roundTrip") {
 
 /** @par Test points */
 TEST_CASE("test_MarketInfo_hasAmbiguousSession") {
-    /** @arg A session reaching the local [01:00,02:00) hour is flagged */
-    CHECK_UNARY(makeMarket(0, 0, Hours(1), Hours(2) + Minutes(30)).hasAmbiguousSession());
-    /** @arg A near full-day session is flagged */
-    CHECK_UNARY(makeMarket(-300, 0, Hours(0), Hours(23) + Minutes(59)).hasAmbiguousSession());
-    /** @arg Both session pairs equal means a continuous 24h market, which is flagged */
-    CHECK_UNARY(makeMarket(-300, 0, TimeDelta(), TimeDelta()).hasAmbiguousSession());
-    /** @arg Normal sessions do not touch the ambiguous hour */
-    CHECK_UNARY_FALSE(makeMarket(-300, 0).hasAmbiguousSession());
-    /** @arg A second session that is unset (0/0 alone) is not a 24h market */
+    // Sessions reaching the repeated hour are rejected at construction (covered by
+    // test_MarketInfo_construction_check), so only the non-violating side is constructible
+    /** @arg A market without a daylight rule has no ambiguous hour at all */
+    CHECK_UNARY_FALSE(makeMarket(-300, 0, Hours(1), Hours(2) + Minutes(30)).hasAmbiguousSession());
+    /** @arg Normal US sessions do not touch the ambiguous hour */
     CHECK_UNARY_FALSE(makeMarket(-300, 1).hasAmbiguousSession());
+    /** @arg An EU market inside [01:00,02:00) is not flagged: the EU rule repeats [02:00,03:00) */
+    CHECK_UNARY_FALSE(makeMarket(0, 2, Hours(1), Hours(1) + Minutes(30)).hasAmbiguousSession());
     /** @arg Ending exactly at 01:00 or starting exactly at 02:00 do not overlap (half-open) */
-    CHECK_UNARY_FALSE(makeMarket(0, 0, Hours(0), Hours(1)).hasAmbiguousSession());
-    CHECK_UNARY_FALSE(makeMarket(0, 0, Hours(2), Hours(3)).hasAmbiguousSession());
-    /** @arg A reversed session is a configuration error, so it never reaches the ambiguous hour */
-    CHECK_UNARY_FALSE(makeMarket(0, 0, Hours(21), Hours(1) + Minutes(30)).hasAmbiguousSession());
+    CHECK_UNARY_FALSE(makeMarket(0, 1, Hours(0), Hours(1)).hasAmbiguousSession());
+    CHECK_UNARY_FALSE(makeMarket(0, 1, Hours(2), Hours(3)).hasAmbiguousSession());
+    /** @arg Same half-open guard for the EU window [02:00,03:00) */
+    CHECK_UNARY_FALSE(makeMarket(0, 2, Hours(0), Hours(2)).hasAmbiguousSession());
+    CHECK_UNARY_FALSE(makeMarket(0, 2, Hours(3), Hours(4)).hasAmbiguousSession());
 }
 
 /** @par Test points */
 TEST_CASE("test_MarketInfo_construction_check") {
-    /** @arg A daylight market reaching the ambiguous hour is rejected at construction */
+    /** @arg A US daylight market reaching the repeated hour is rejected at construction */
     CHECK_THROWS_AS(makeMarket(-300, 1, Hours(1), Hours(2) + Minutes(30)), std::exception);
+    /** @arg An EU daylight market reaching its repeated hour [02:00,03:00) is rejected too */
+    CHECK_THROWS_AS(makeMarket(0, 2, Hours(2), Hours(2) + Minutes(30)), std::exception);
+    /** @arg A near full-day US session covers [01:00,02:00) and is rejected */
+    CHECK_THROWS_AS(makeMarket(-300, 1, Hours(0), Hours(23) + Minutes(59)), std::exception);
     /** @arg A continuous 24h market cannot carry a daylight rule either */
     CHECK_THROWS_AS(makeMarket(-300, 1, TimeDelta(), TimeDelta()), std::exception);
     /** @arg Without a daylight rule the check does not run */
     CHECK_NOTHROW(makeMarket(-300, 0, Hours(1), Hours(2) + Minutes(30)));
     /** @arg A normal US session with the US rule is accepted */
     CHECK_NOTHROW(makeMarket(-300, 1));
+    /** @arg An EU session before its repeated hour is accepted */
+    CHECK_NOTHROW(makeMarket(0, 2, Hours(1), Hours(1) + Minutes(30)));
 }
 
 /** @} */

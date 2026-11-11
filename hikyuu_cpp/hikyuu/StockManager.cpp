@@ -1125,14 +1125,16 @@ Datetime StockManager::unifiedToMarketLocal(const Datetime& d, const string& mar
 }
 
 bool StockManager::isTradingHours(const Datetime& d, const string& market) const {
-    HKU_IF_RETURN(isHoliday(d, market), false);
-    auto hour = d - d.startOfDay();
     MarketInfo marketinfo = getMarketInfo(market);
     HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    // d follows the unified clock convention; the session bounds are market-local wall clock
+    Datetime local = marketinfo.isUnifiedClock() ? d : marketinfo.unifiedToLocal(d);
+    HKU_IF_RETURN(isHoliday(local, market), false);
     // Same convention as Stock::isTransactionTime: equal session bounds mean unlimited (24h)
     HKU_IF_RETURN(marketinfo.openTime1() == marketinfo.closeTime1() &&
                     marketinfo.openTime2() == marketinfo.closeTime2(),
                   true);
+    auto hour = local - local.startOfDay();
     HKU_IF_RETURN((hour >= marketinfo.openTime1() && hour <= marketinfo.closeTime1()) ||
                     (hour >= marketinfo.openTime2() && hour <= marketinfo.closeTime2()),
                   true);

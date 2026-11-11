@@ -136,9 +136,13 @@ fee and the extra charges both land in CostRecord.others.
     The generic fixed-rate trade cost algorithm for the futures, FX and crypto markets
 
     :param float commission: the commission rate of the turnover
-    :param float lowest_commission: the minimum commission
+    :param float lowest_commission: the minimum commission, applied as
+        ``max(rate × turnover, minimum)`` — it is charged even when rate × turnover is zero;
+        set it to 0 to waive the minimum
     :param float stamptax: the stamp duty rate, charged on sells only
-    :param float per_lot: the fixed fee per lot (contract), e.g. the exchange fee
+    :param float per_lot: the fixed fee charged per traded unit (share / contract / coin),
+        not per lot — it applies as ``per_lot × number``; divide the fee by the lot size to
+        charge per lot
     :param float others: the fixed extra charge, e.g. the delivery and funding fees
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
