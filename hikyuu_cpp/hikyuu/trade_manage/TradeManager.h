@@ -449,8 +449,6 @@ private:
     bool _add_return_stock_tr(const TradeRecord&);
     bool _add_sell_short_tr(const TradeRecord&);
     bool _add_buy_short_tr(const TradeRecord&);
-    bool _add_settlement_tr(const TradeRecord&);
-    bool _add_interest_tr(const TradeRecord&);
 
 private:
     Datetime m_init_datetime;         // Account creation date

@@ -272,8 +272,7 @@ TEST_CASE("test_TradeManager_settlement_short") {
              doctest::Approx(1000000.0 + nominal1 - nominal2));
 }
 
-/** @par Test points: the settled books are reproduced by both read-only replays and by a backfill
- *  of the same records */
+/** @par Test points: the settled books are reproduced by the read-only replays of the records */
 TEST_CASE("test_TradeManager_settlement_replay") {
     StockManager& sm = StockManager::instance();
     Stock rb = sm["SHFRB0000"];
@@ -299,7 +298,6 @@ TEST_CASE("test_TradeManager_settlement_replay") {
 
     price_t live_net = tm->getFunds(dt2, KQuery::DAY).net_assets();
     price_t live_cash = tm->currentCash();
-    price_t live_basis = tm->getPosition(dt2, rb).settleBasis;
     price_t live_lock = tm->getPosition(dt2, rb).margin;
 
     // A later record pushes the settled moment behind lastDatetime(), so the query below is served
@@ -323,19 +321,6 @@ TEST_CASE("test_TradeManager_settlement_replay") {
     CHECK_EQ(list[0].net_assets(), doctest::Approx(1000000.0));
     CHECK_EQ(list[1].occupied_margin, doctest::Approx(live_lock));
     CHECK_EQ(list[1].net_assets(), doctest::Approx(live_net));
-
-    /** @arg Backfilling the records rebuilds the identical settled holding */
-    auto copy = crtSettleTM(dt, 1000000.0, 0.1, false);
-    for (const auto& tr : tm->getRefTradeList()) {
-        if (tr.business == BUSINESS_INIT || tr.business == BUSINESS_BORROW_CASH) {
-            continue;
-        }
-        REQUIRE_UNARY(copy->addTradeRecord(tr));
-    }
-    CHECK_EQ(copy->currentCash(), doctest::Approx(cash_before_checkin + 1000.0));
-    CHECK_EQ(copy->getPosition(dt2, rb).settleBasis, doctest::Approx(live_basis));
-    CHECK_EQ(copy->getPosition(dt2, rb).margin, doctest::Approx(live_lock));
-    CHECK_EQ(copy->getFunds(dt2, KQuery::DAY).net_assets(), doctest::Approx(live_net));
 }
 
 /** @par Test points: a maintenance shortfall warns, queues the forced liquidation only with
@@ -842,46 +827,6 @@ TEST_CASE("test_TradeManager_settlement_annual_days_guard") {
     tm->setParam<int>("annual_days", 100);
     REQUIRE_UNARY(tm->settlement(dt));
     CHECK_EQ(tm->getDebtCash(dt), doctest::Approx(borrow + roundEx(borrow * 0.365 / 100.0, 2)));
-}
-
-/** @par Test points: a backfilled interest record rebuilds the same debt, counts as a settled day
- *  and is not applied twice */
-TEST_CASE("test_TradeManager_settlement_interest_replay") {
-    Datetime dt(200912310000);
-    price_t borrow = 10000.0;
-
-    auto src = crtInterestTM(dt, 1000000.0, 0.365, 0.0, 365);
-    REQUIRE_UNARY(src->borrowCash(dt, borrow));
-    REQUIRE_UNARY(src->settlement(dt));
-
-    // The record as the persistence layer hands it back
-    TradeRecord interest;
-    for (const auto& tr : src->getRefTradeList()) {
-        if (tr.business == BUSINESS_INTEREST) {
-            interest = tr;
-        }
-    }
-    REQUIRE_EQ(interest.business, BUSINESS_INTEREST);
-    REQUIRE_UNARY(interest.realPrice > 0.0);
-
-    auto tm = crtInterestTM(dt, 1000000.0, 0.365, 0.0, 365);
-    REQUIRE_UNARY(tm->borrowCash(dt, borrow));
-
-    /** @arg The rebuilt account carries the same debt and the same cash as the settled one */
-    REQUIRE_UNARY(tm->addTradeRecord(interest));
-    CHECK_EQ(tm->getDebtCash(dt), doctest::Approx(borrow + interest.realPrice));
-    CHECK_EQ(tm->currentCash(), doctest::Approx(1000000.0 + borrow));
-
-    /** @arg The replayed bill is a settled day, so the settlement does not bill it again */
-    CHECK_UNARY(tm->isSettled(dt));
-    REQUIRE_UNARY(tm->settlement(dt));
-    CHECK_EQ(countInterest(tm, dt), size_t(1));
-    CHECK_EQ(tm->getDebtCash(dt), doctest::Approx(borrow + interest.realPrice));
-
-    /** @arg Adding the very same record once more is a no-op */
-    REQUIRE_UNARY(tm->addTradeRecord(interest));
-    CHECK_EQ(countInterest(tm, dt), size_t(1));
-    CHECK_EQ(tm->getDebtCash(dt), doctest::Approx(borrow + interest.realPrice));
 }
 
 /** @par Test points: a book carrying both a cash debt and a lending bills the two items in the same

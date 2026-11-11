@@ -484,6 +484,8 @@
     .. py:method:: add_trade_record(self, tr)
 
         直接加入交易记录，如果加入初始化账户记录，将清除全部已有交易及持仓记录。
+        结算（``BUSINESS_SETTLEMENT``）与利息（``BUSINESS_INTEREST``）记录由 ``settlement()`` 生成，
+        单条记录无法复现当时的账簿状态，不接受手工回填，加入将返回 False。
 
         :param TradeRecord tr: 交易记录
         :return: True（成功） | False（失败）

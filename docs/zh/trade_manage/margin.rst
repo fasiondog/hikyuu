@@ -372,10 +372,11 @@
     延迟委托意图（与 ``System`` 丢弃延迟买入请求同口径，只删减仓方向）。
 
     历史回放不需要额外状态：结算记录本身就是账簿的一部分，``get_funds(date)``、``get_funds_list``、
-    ``Performance`` 以及 ``add_trade_record`` 回填都会按记录还原当日结算后的现金、锁定额与盯市基准；
+    ``Performance`` 都会按记录还原当日结算后的现金、锁定额与盯市基准；
     ``BUSINESS_INTEREST`` 同样计入负债余额（``get_debt_cash`` / ``get_funds`` / ``get_funds_list`` 的
     回放均会累加）。
 
     ``save_action`` 生成的动作脚本**不包含**结算与利息计提动作：脚本只回放成交，重新执行得到的是未结算、
-    未计息的账簿，需要按周期自行重跑 ``settlement()``（结算与利息记录可以参与 ``add_trade_record`` 回填，
-    只是不写入动作脚本）。
+    未计息的账簿，需要按周期自行重跑 ``settlement()``。结算与利息记录**不参与**
+    ``add_trade_record`` 回填：两者均由 ``settlement()`` 生成，单条记录无法复现当时的账簿状态，
+    手工回填会被拒绝并返回 False。
