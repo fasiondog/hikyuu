@@ -41,8 +41,9 @@ TEST_CASE("test_registerComponentParts") {
     CHECK_EQ(reg.getNameList(PartType::SE).size(), 5);
     CHECK_EQ(reg.getNameList(PartType::SYS).size(), 2);
     CHECK_EQ(reg.getNameList(PartType::TM).size(), 1);
-    CHECK_EQ(reg.getNameList(PartType::TC).size(), 8);
+    CHECK_EQ(reg.getNameList(PartType::TC).size(), 9);
     CHECK_UNARY(reg.has("core.tc.fixed"));
+    CHECK_UNARY(reg.has("core.tc.hk"));
     CHECK_EQ(reg.getNameList(PartType::MG).size(), 3);
 
     /** @arg the margin interest wrapper is registered, with the wrapped model as a part param */
@@ -81,7 +82,7 @@ TEST_CASE("test_registerComponentParts") {
             CHECK_UNARY(inserted);
         }
     }
-    CHECK_EQ(names.size(), 210);
+    CHECK_EQ(names.size(), 211);
 }
 
 /** @par Test points */

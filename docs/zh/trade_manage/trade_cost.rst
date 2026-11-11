@@ -110,6 +110,29 @@ ETF交易成本算法
     :return: :py:class:`TradeCostBase` 子类实例
 
 
+港股交易成本算法
+^^^^^^^^^^^^^^^^
+
+适用于港股。港股印花税、交易费与征费均为**买卖双边**收取（与 A 股印花税单边不同）：
+
+* 买入 / 卖出：max(佣金比例 × 成交金额, 最低佣金) + 印花税比例 × 成交金额
+  + 交易费及征费比例 × 成交金额 + 每笔固定费用
+
+.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.0000555, per_trade=0.0])
+
+    港股交易成本算法，买卖双边对称收取
+
+    :param float commission: 佣金比例（双边，按成交金额），默认万分之2.5
+    :param float lowest_commission: 最低佣金值（双边，按笔），默认 3 港元
+    :param float stamptax: 印花税率（双边收取），2023 年 11 月 17 日起为 0.1%
+    :param float tradefee: 交易费及征费合计比例（双边）：联交所交易费 0.0027% +
+        证监会征费 0.0027% + 财汇局征费 0.00015%，默认 0.0000555；计入
+        CostRecord.transferfee
+    :param float per_trade: 每笔固定费用（双边，如经纪商代收的结算费），默认 0；
+        计入 CostRecord.others
+    :return: :py:class:`TradeCostBase` 子类实例
+
+
 通用固定费率交易成本算法
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

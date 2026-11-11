@@ -15,6 +15,7 @@
 #include "crt/TC_FixedA2017.h"
 #include "crt/TC_Fixed.h"
 #include "crt/TC_FixedETF.h"
+#include "crt/TC_HK.h"
 #include "crt/TC_MarginInterest.h"
 #include "crt/TC_Zero.h"
 

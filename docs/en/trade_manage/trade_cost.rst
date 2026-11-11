@@ -118,6 +118,32 @@ The calculation rules are as follows:: python
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
+Hong Kong Stock Trade Cost Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the Hong Kong stocks. The stamp duty, the trading fee and the levies are charged on **both
+the buy and the sell sides** (unlike the one-sided A-share stamp duty):
+
+* Buy / sell: max(commission × turnover, lowest_commission) + stamptax × turnover
+  + tradefee × turnover + per_trade
+
+.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.0000555, per_trade=0.0])
+
+    The Hong Kong stock trade cost algorithm, charged symmetrically on both sides
+
+    :param float commission: the broker commission ratio (double-sided, of the turnover),
+        defaulting to 2.5 per ten thousand
+    :param float lowest_commission: the lowest commission value (double-sided, per order),
+        defaulting to HK$3
+    :param float stamptax: the stamp duty rate (charged on both sides), 0.1% since 2023-11-17
+    :param float tradefee: the aggregated ratio of the exchange trading fee and the SFC / AFIRD
+        levies (double-sided): the HKEX trading fee 0.0027% + the SFC levy 0.0027% + the AFIRD
+        levy 0.00015%, defaulting to 0.0000555; it lands in CostRecord.transferfee
+    :param float per_trade: the fixed charge per order (double-sided, e.g. the settlement fee
+        booked by the broker), defaulting to 0; it lands in CostRecord.others
+    :return: an instance of a :py:class:`TradeCostBase` subclass
+
+
 Generic Fixed-rate Trade Cost Algorithm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
