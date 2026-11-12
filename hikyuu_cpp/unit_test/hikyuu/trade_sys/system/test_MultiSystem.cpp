@@ -1525,6 +1525,40 @@ TEST_CASE("test_MultiSystem_shadow_tm_reuse") {
     CHECK(ms->getSystemList()[0]->getTM() == sub_tm);
 }
 
+/** @par Check point: the shadow account inherits the parent's currency_rates so the mode A/B
+ * suggestion ratios and the parent books share the same currency convention */
+TEST_CASE("test_MultiSystem_shadow_tm_currency_rates") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+
+    auto ms = std::make_shared<MultiSystem>("ms_rates");
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<string>("currency_rates", "NASDAQ:7.0");
+    ms->setTM(tm);
+    auto sys = create_alway_buy_sys();
+    sys->setTO(kdata);
+    ms->add(sys);
+    ms->run(kdata);
+
+    /** @arg mode A: the shadow account carries the parent's currency_rates */
+    auto sub_tm = ms->getSystemList()[0]->getTM();
+    REQUIRE(sub_tm);
+    CHECK_NE(sub_tm.get(), tm.get());
+    CHECK_EQ(sub_tm->getParam<string>("currency_rates"), "NASDAQ:7.0");
+
+    /** @arg mode C shares the parent account itself, no inheritance is needed */
+    auto ms_c = std::make_shared<MultiSystem>("ms_c_rates");
+    ms_c->setTM(tm);
+    ms_c->setMode("C");
+    auto sys_c = create_alway_buy_sys();
+    sys_c->setTO(kdata);
+    ms_c->add(sys_c);
+    ms_c->readyForRun();
+    CHECK(ms_c->getSystemList()[0]->getTM() == tm);
+}
+
 /** @par Check point: mode C shares the real account of the parent (no shadow account) and
  * restores the delay mapping of the legacy Portfolio; mode A/B keep the isolated shadow account */
 TEST_CASE("test_MultiSystem_mode_c_ready_for_run") {

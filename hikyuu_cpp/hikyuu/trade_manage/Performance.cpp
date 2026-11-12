@@ -603,7 +603,8 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
             trade_number++;
             const TradeRecord& record = *trade_iter;
             price_t hold_cash = roundEx(
-              tm->toAccount(record.stock, record.realPrice * record.number + record.cost.total),
+              tm->toAccount(record.stock, record.realPrice * record.number * record.stock.unit() +
+                                            record.cost.total),
               precision);
             price_t total_cash = roundEx(hold_cash + record.cash, precision);
             double percent = (total_cash != 0.0) ? hold_cash / total_cash : 0.0;

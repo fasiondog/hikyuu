@@ -295,6 +295,12 @@ void MultiSystem::readyForRun() {
             if (!m_shadow_sys.count(sys.get())) {
                 price_t init_cash = (getMode() == "B") ? 0.0 : m_sub_init_cash;
                 TMPtr sub_tm = crtTM(m_tm->initDatetime(), init_cash, m_tm->costFunc(), "TM_SUB");
+                // The shadow book must share the parent account's currency convention: its
+                // suggestions are consumed as account-currency ratios by the parent account
+                string rates = m_tm->tryGetParam<string>("currency_rates", "");
+                if (!rates.empty()) {
+                    sub_tm->setParam<string>("currency_rates", rates);
+                }
                 sys->setTM(sub_tm);
                 m_shadow_sys.insert(sys.get());
             }

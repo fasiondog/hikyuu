@@ -10,6 +10,7 @@
 #define TRADE_MANAGE_IMP_BYMARKETTRADECOST_H_
 
 #include <map>
+#include <mutex>
 #include <set>
 
 #include "../TradeCostBase.h"
@@ -25,7 +26,8 @@ namespace hku {
  * unmatched market is reported once and then billed by the default model.
  * The account-level hooks that carry no security (the borrowed cash cost and rate) are answered
  * by the default model. Configure the routing before the run: the table is not synchronized with
- * the queries, and only the one-off unmatched warning takes a lock.
+ * the queries, and only the one-off unmatched warning takes a lock; the warning set is guarded by
+ * a mutex so parallel valuation paths stay safe.
  * @see TC_ByMarket
  * @ingroup TradeCost
  */
@@ -102,6 +104,7 @@ private:
     std::map<string, TradeCostPtr> m_costs;  // key (upper case) -> cost model
     TradeCostPtr m_default;                  // never null
     mutable std::set<string> m_warned;  // markets already reported as unmatched, not serialized
+    mutable std::mutex m_warned_mutex;  // guards m_warned on parallel valuation paths
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

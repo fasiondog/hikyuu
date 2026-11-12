@@ -78,10 +78,13 @@ const TradeCostPtr& ByMarketTradeCost::_route(const Stock& stock) const {
 
     // An unconfigured market is billed by the default model: report it once instead of letting the
     // fallback hide itself in every trade record
-    HKU_WARN_IF(m_warned.insert(market).second,
-                "TC_ByMarket: no cost model registered for market {} (type {}), the default model "
-                "is used!",
-                market, stock.type());
+    {
+        std::lock_guard<std::mutex> lock(m_warned_mutex);
+        HKU_WARN_IF(m_warned.insert(market).second,
+                    "TC_ByMarket: no cost model registered for market {} (type {}), the default "
+                    "model is used!",
+                    market, stock.type());
+    }
     return m_default;
 }
 
