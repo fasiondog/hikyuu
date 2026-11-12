@@ -19,8 +19,11 @@
  *    executable quantity of the parent account (the folding point from the sub-system space to
  *    the individual instrument space). In mode A (Signal Aggregation) the target position market
  *    value = weight x net exposure ratio x the parent net assets, aggregated per instrument and
- *    rebalanced by the delta to the current position; in mode B the real instruction of the
- *    sub-system passes through unchanged.
+ *    rebalanced by the delta to the current position; the ratio itself (the channel's net exposure
+ *    in units of its own net assets) is bounded by `max_signal_ratio` first -- a channel
+ *    normalization rather than a portfolio cap. Mode B passes the real instruction of the
+ *    sub-system through unchanged and mode C has no aggregate target, so neither prices a ratio
+ *    and both ignore the parameter.
  *
  *  - **L3 portfolio risk control** `_checkRisk`: clip the suggestions at the portfolio
  *    dimension (e.g. the single instrument concentration cap `max_single_position`); mode B

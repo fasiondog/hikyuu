@@ -126,6 +126,18 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
       - Type and default
       - Effective modes
       - Description
+    * - ``max_signal_ratio``
+      - float, 1.0
+      - A only
+      - The L2 per-channel signal cap (**a channel normalization, not a portfolio risk cap**): the net
+        exposure ratio a sub-system reports (its own net assets being the base) is clipped to
+        ``[-value, +value]`` before it is multiplied by the weight and the parent net assets. A sub-system
+        that finances or borrows can exceed 1 (leverage); the clip keeps the channels comparable in units of
+        their own equity and stops one channel from eating the whole budget and forcing the proportional
+        scale-down onto the others. ``<=0`` passes the ratio through unchanged; a value above 1 widens the
+        channel bound (part of the leverage is allowed through, e.g. 1.2). Mode B passes the sub-system
+        instructions through and mode C has no aggregate target, so neither prices a ratio and both ignore
+        it; the ``fixed_amount > 0`` pricing only uses the sign of the ratio and is unaffected as well
     * - ``max_single_position``
       - float, 1.0
       - A only
@@ -186,12 +198,17 @@ Notes:
         lower ``fixed_amount`` or raise the cap. In mode B a zero-quota sub-system follows the
         ``sell_at_not_selected`` / ``adjust_running_sys`` rules (liquidated and stopped when the former
         is true, a running sub-system stays untouched when the latter is false). Note: AF no longer
-        scales the fixed amount down, but the executor still respects the parent funding: with automatic
-        cash financing (``support_borrow_cash``, set on the ``MultiSystem`` and propagated to the parent
-        TM by ``readyForRun``) the buying power is derived from the **margin rate per order** -- a single
-        order may exceed the available cash, while a multi-leg batch is funded in order and the later legs
-        may be shrunk (the same leg-by-leg model as the TradeManager); a short cover always needs full cash
-        and is never financed. Without financing the orders are scaled to the available cash. ``MultiSystem``
+        scales the fixed amount down, but the executor still respects the parent funding: the cash a long
+        buy needs follows the **books of the account, judged per leg** -- a margin-accounted book
+        (``margin_accounting`` on, the security covered by the margin model and, for A shares,
+        ``support_borrow_cash`` on) only pays the margin and the commission, so a single order may exceed
+        the available cash, while everything else pays the full notional and the commission scaled to the
+        available cash. A multi-leg batch is funded in order and the later margin-accounted legs may be
+        shrunk (the same leg-by-leg books as the TradeManager); a model reporting no requirement for the
+        security leaves the leg on the cash books, so it pays the full notional (the same fallback as the
+        TradeManager); a plain-book short cover pays full cash
+        and is never financed, while a margin-accounted cover returns its margin and is not charged here.
+        ``MultiSystem``
         also has ``auto_checkin`` (default ``False``): it deposits **extra principal** for the gap computed
         from the money plus the commission (combined with financing it deposits the full amount, so every
         leg is cash-covered), which keeps the planned quantities tradable at the cost of an
@@ -224,6 +241,15 @@ Notes:
         Parent-synthesized suggestions (an empty ``sys``, e.g. the zero target of an unselected instrument)
         are not affected. With ``fixed_amount>0`` the weight lookup is skipped entirely (the absolute
         amount is the target), so this item does not apply
+    * - The three caps and their order
+      - ``max_signal_ratio`` (L2, the signal strength of one channel) -> ``max_total_position`` (total
+        budget, proportional scale-down) -> ``max_single_position`` (per-instrument concentration) apply in
+        sequence. The first one is a **channel normalization**: it keeps every sub-strategy speaking in units
+        of its own equity, so a levered channel cannot eat the total budget and get the others scaled down;
+        the latter two are the **portfolio risk control** over the scale and the concentration of the parent
+        account. Below them the account hard limits stay in force (margin rate, cash, tradability); with both
+        of the first two disabled the portfolio layer no longer shrinks anything smoothly, only the per-leg
+        rejection or the cash scaling remains
     * - L3 only shrinks, it never redistributes
       - ``max_total_position`` (total budget) then ``max_single_position`` (per-instrument concentration)
         apply in sequence and both only **shrink** the excess: the budget released by the L3 clipping is
@@ -412,7 +438,8 @@ Asset Allocation Algorithm Base Class
         [Override hook] L2 behavior-level conversion: converts the weights into executable quantities for the parent account, rewriting ``suggestions`` in place.
 
         In mode A it reads the sub-system current intent state (``target_position_ratio``, the signed net target), synthesizes the per-instrument net target by ``w x ratio x the parent net assets`` and trades the delta on the parent account;
-        in mode B it passes the sub-system instructions through and applies defensive clipping. The base class default implementation is used when this hook is not overridden.
+        ``ratio`` is clipped by ``max_signal_ratio`` first (<=0 disables, >1 widens), see the parameter table;
+        in mode B it passes the sub-system instructions through and applies defensive clipping. The base class default implementation is used when this hook is not overridden -- **overriding it without reusing the base implementation bypasses both the channel cap and the ``fixed_amount`` pricing**, so the equivalent constraints are the responsibility of that override.
 
         :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
 

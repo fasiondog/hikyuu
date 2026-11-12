@@ -45,6 +45,19 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // unallocated asset ratio of the master reserve_percent is expressed by setting it to 1 - r.
     setParam<double>("max_total_position", 1.0);
 
+    // The per-channel signal cap (L2, mode A weight pricing only): the net exposure ratio a
+    // sub-system contributes -- its own net assets being the base -- is bounded to
+    // [-value, +value] before it is multiplied by the weight and the parent net assets (<=0
+    // disables the cap). It is the channel normalization, not a portfolio risk cap: a levered
+    // shadow (>1 means it borrows) reports its intent in units of its own equity, so the L1
+    // weights stay comparable and one channel cannot eat the whole max_total_position budget and
+    // force the proportional scale-down onto the others. The portfolio risk is bounded by
+    // max_single_position / max_total_position and by the account margin and cash gates; disabling
+    // both caps leaves only those hard limits (legs get rejected instead of being scaled). Mode B
+    // passes the sub-system instructions through and never prices a ratio, mode C has no aggregate
+    // target at all, so both ignore it; the fixed_amount pricing only uses the sign of the ratio
+    setParam<double>("max_signal_ratio", 1.0);
+
     // The pricing policy switch: when >0 the fixed amount takes precedence over the weights --
     // the per-instrument target in mode A / the per sub-system quota in mode B are both this
     // amount, and the L1 weights are ignored in the pricing. The sum is still bounded by
@@ -63,6 +76,7 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     setParam<double>("max_single_position", 1.0);
     setParam<double>("max_total_position", 1.0);
+    setParam<double>("max_signal_ratio", 1.0);
     setParam<double>("fixed_amount", 0.0);
     setParam<bool>("adjust_running_sys", true);
 }
@@ -81,9 +95,9 @@ void AllocateFundsBase::baseCheckParam(const string& name) const {
     HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
               name, fixed_name);
 
-    if (name == "max_single_position" || name == "max_total_position") {
-        // <=0 disables the cap and >1 is clamped in use, but a NaN silently disables both risk
-        // controls
+    if (name == "max_single_position" || name == "max_total_position" ||
+        name == "max_signal_ratio") {
+        // <=0 disables the cap and >1 is clamped in use, but a NaN silently disables the control
         HKU_ASSERT(!std::isnan(getParam<double>(name)));
     } else if (name == "fixed_amount") {
         // 0 disables the fixed amount; a negative or non-finite value would silently fall back to
@@ -290,6 +304,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     double parent_net = tm->getFunds(date, ktype).net_assets();
     double fixed_amount = getParam<double>("fixed_amount");
     double max_total = getParam<double>("max_total_position");
+    double max_signal = getParam<double>("max_signal_ratio");
 
     std::map<Stock, double> target_value;  // instrument -> signed net target market value
     std::map<Stock, double> fixed_dir;  // instrument -> aggregated signed direction (fixed_amount)
@@ -335,7 +350,16 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             }
             weight = it->second;
         }
-        double v = weight * s.target_position_ratio * parent_net;
+        // The per-channel normalization: a sub-system reports its net exposure in units of its own
+        // net assets, so a levered shadow (>1) is bounded here instead of eating the whole budget
+        // and forcing the max_total_position scale-down onto the other channels. A non-finite ratio
+        // is an upstream bug and is left as it is, so the non-finite target check below still
+        // skips it instead of being masked by the cap
+        double ratio = s.target_position_ratio;
+        if (max_signal > 0.0 && std::isfinite(ratio)) {
+            ratio = std::clamp(ratio, -max_signal, max_signal);
+        }
+        double v = weight * ratio * parent_net;
         if (!std::isfinite(v)) {
             HKU_WARN("{}::_toTargets: non-finite target value of {}, skipped!", m_name,
                      s.stock.market_code());

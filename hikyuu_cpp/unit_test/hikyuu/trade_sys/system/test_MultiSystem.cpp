@@ -2437,8 +2437,9 @@ TEST_CASE("test_MultiSystem_adjust_cycle_accumulate") {
     CHECK_EQ(trades[1].business, BUSINESS_BUY);
 }
 
-/** @par Check point: the executor uses the margin buying power when the parent supports automatic
- * cash financing, and the optional auto_checkin tops up the parent cash */
+/** @par Check point: the executor charges every long leg exactly what the trade manager books (the
+ * margin on a margin-accounted holding, the full notional on the plain cash books) and the optional
+ * auto_checkin tops up the parent cash */
 TEST_CASE("test_MultiSystem_margin_and_auto_checkin") {
     Stock stk1 = getStock("sh600000");
     Stock stk2 = getStock("sz000001");
@@ -2450,13 +2451,14 @@ TEST_CASE("test_MultiSystem_margin_and_auto_checkin") {
     REQUIRE(kdata1.size() > 1);
     REQUIRE(kdata2.size() > 1);
 
-    auto run_case = [&](bool margin, bool auto_checkin, bool single) {
+    auto run_case = [&](bool borrow_cash, bool auto_checkin, bool single, bool margin_acct) {
         auto ms = std::make_shared<MultiSystem>("ms");
         auto tm = crtTM(Datetime(199001010000LL), 20000.0, TC_FixedA2017(0.0003, 5.0));
         ms->setTM(tm);
         // readyForRun propagates the MultiSystem switch to the parent TM, a value set on the TM
-        // directly would be overwritten
-        ms->setParam<bool>("support_borrow_cash", margin);
+        // directly would be overwritten; the accounting switch lives on the TM only
+        ms->setParam<bool>("support_borrow_cash", borrow_cash);
+        tm->setParam<bool>("margin_accounting", margin_acct);
         ms->getAF()->setParam<double>("max_total_position", 0.0);  // no AF budget cap
         // The single-instrument case checks buying power, so the L3 cap must be off as well
         ms->getAF()->setParam<double>("max_single_position", single ? 0.0 : 1.0);
@@ -2485,28 +2487,41 @@ TEST_CASE("test_MultiSystem_margin_and_auto_checkin") {
         return std::make_pair(bought, buys);
     };
 
-    /** @arg without financing or the top-up the buys are scaled to the cash */
-    CHECK_LE(run_case(false, false, false).first, 20000.0 * 1.02);
+    /** @arg the plain cash books pay the full notional, so the batch is scaled to the cash even
+     *  with the automatic financing of the account on (the executor never prices leverage the
+     *  books do not take) */
+    CHECK_LE(run_case(true, false, true, false).first, 20000.0 * 1.02);
+    CHECK_LE(run_case(false, false, true, false).first, 20000.0 * 1.02);
 
-    /** @arg automatic cash financing lets a single order exceed the cash: the buying power is
-     *  cash / margin rate (0.6), so the 25000 target is filled instead of being scaled */
-    CHECK_GT(run_case(true, false, true).first, 24000.0);
+    /** @arg a margin-accounted holding pays only its margin (0.6 of the notional), so the 25000
+     *  target fits the 20000 cash */
+    CHECK_GT(run_case(true, false, true, true).first, 24000.0);
 
-    /** @arg a multi-leg financed batch is funded leg by leg (the tail must not be rejected by the
-     *  trade manager): both instruments trade */
-    auto multi = run_case(true, false, false);
+    /** @arg without financing an A-share can not be booked by margin, so the same target is scaled
+     *  to the cash */
+    CHECK_LE(run_case(false, false, true, true).first, 20000.0 * 1.02);
+
+    /** @arg a multi-leg plain batch is scaled to the cash: both instruments trade */
+    auto multi = run_case(true, false, false, false);
     CHECK_EQ(multi.second, 2);
-    CHECK_GT(multi.first, 21000.0);
+    CHECK_LE(multi.first, 20000.0 * 1.02);
+
+    /** @arg the margin books buy both legs at their notional: 2 x 15000 stays above the 20000 cash
+     *  because only 0.6 x 30000 is charged */
+    auto multi_margin = run_case(true, false, false, true);
+    CHECK_EQ(multi_margin.second, 2);
+    CHECK_GT(multi_margin.first, multi.first);
+    CHECK_GT(multi_margin.first, 20000.0);
 
     /** @arg auto_checkin deposits the gap including the commission, so both legs are filled (the
      *  filled value stays below 2 x 15000 because of the board-lot rounding) */
-    CHECK_GT(run_case(false, true, false).first, 26000.0);
+    CHECK_GT(run_case(false, true, false, false).first, 26000.0);
 
-    /** @arg financing combined with auto_checkin: the FULL gap is deposited, so every leg is
-     *  cash-covered and filled without borrowing */
-    auto both = run_case(true, true, false);
+    /** @arg the margin books need no top-up (the 20000 cash already covers the 18000 margin), so
+     *  the same batch is filled without depositing */
+    auto both = run_case(true, true, false, true);
     CHECK_EQ(both.second, 2);
-    CHECK_GT(both.first, 26000.0);
+    CHECK_GT(both.first, 20000.0);
 }
 
 /** @par Check point: fixed_amount targets exceeding the total budget are truncated to whole
@@ -4602,6 +4617,591 @@ TEST_CASE("test_AllocateFunds_L2_modeA_short_clamp_without_borrow") {
     CHECK(suggestions[0].type == SuggestionType::SELL);
     CHECK_UNARY(suggestions[0].short_side);
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+}
+
+/** @par Check point: the two margin switches of the aggregate only widen the ones of its account.
+ * An aggregate whose own params stay off (the default) must not switch off the securities lending /
+ * financing the caller configured on the account: the reset made every mode A negative net target
+ * collapse back to zero, so the aggregate could never short. */
+TEST_CASE("test_MultiSystem_ready_for_run_keeps_account_margin_params") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KData kdata = stk.getKData(KQueryByDate(Datetime(19991110), Datetime(20000225)));
+    REQUIRE(!kdata.empty());
+
+    auto ms = std::make_shared<MultiSystem>("ms");
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("support_borrow_stock", true);
+    ms->setTM(tm);
+    auto sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000.0), MM_Nothing(), EnvironmentPtr(),
+                          ConditionPtr(), SG_AllwaysBuy());
+    sys->setTO(kdata);
+    ms->add(sys);
+    ms->setTO(kdata);
+    ms->readyForRun();
+
+    /** @arg the aggregate params are off by default, the account switches survive the
+     * preparation */
+    CHECK_UNARY(!ms->getParam<bool>("support_borrow_cash"));
+    CHECK_UNARY(!ms->getParam<bool>("support_borrow_stock"));
+    CHECK_UNARY(tm->getParam<bool>("support_borrow_cash"));
+    CHECK_UNARY(tm->getParam<bool>("support_borrow_stock"));
+}
+
+/** @par Check point: mode A opens the short of a sub-system on the parent account when the account
+ * itself supports securities lending. The negative net target used to be clamped to zero because
+ * the preparation reset the account switch to the (off) aggregate parameter, so mode A never
+ * shorted. */
+TEST_CASE("test_MultiSystem_mode_a_short_enabled_by_account") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    // The sub-system opens a short on the first close and never covers it in the window
+    auto sg = make_shared<ScriptedShortSG>(kdata[0].datetime, Datetime(299901010000LL));
+    sg->setParam<bool>("support_borrow_stock", true);
+    auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setStock(stk);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, sys);
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);  // the account supports securities lending
+    auto pf = PF_SignalAggregate(tm, se, AF_EqualWeight(), 1, "query", true);  // mode A
+    REQUIRE_EQ(pf->getMode(), "A");
+    CHECK_UNARY(!pf->getParam<bool>("support_borrow_stock"));
+    pf->run(query);
+
+    size_t sell_short_count = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock == stk && tr.business == BUSINESS_SELL_SHORT) {
+            sell_short_count++;
+        }
+    }
+
+    /** @arg the negative net target of the shadow is not clamped: the parent opens the short */
+    CHECK_UNARY(sell_short_count > 0);
+    CHECK_GT(tm->getShortPosition(stk).number, 0.0);
+
+    /** @arg the account switch still holds after the run */
+    CHECK_UNARY(tm->getParam<bool>("support_borrow_stock"));
+}
+
+/** @par Check point: mode B -- the sub-system short opening / cover is mirrored onto the parent
+ * account when the account itself supports securities lending (the aggregate must not wipe the
+ * account switch with its off own parameter). */
+TEST_CASE("test_MultiSystem_mode_b_short_enabled_by_account") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto sg = make_shared<ScriptedShortSG>(kdata[0].datetime, kdata[1].datetime);
+    sg->setParam<bool>("support_borrow_stock", true);
+    auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setStock(stk);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, sys);
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);  // the account supports securities lending
+    auto pf = PF_Simple(tm, se, AF_EqualWeight(), 2, "query", true);  // mode B
+    REQUIRE_EQ(pf->getMode(), "B");
+    CHECK_UNARY(!pf->getParam<bool>("support_borrow_stock"));
+    pf->run(query);
+
+    size_t sell_short_count = 0;
+    size_t buy_short_count = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock != stk) {
+            continue;
+        }
+        if (tr.business == BUSINESS_SELL_SHORT) {
+            sell_short_count++;
+        } else if (tr.business == BUSINESS_BUY_SHORT) {
+            buy_short_count++;
+        }
+    }
+
+    /** @arg the mirrored short opening and its cover are executed on the parent account */
+    CHECK_EQ(sell_short_count, 1);
+    CHECK_EQ(buy_short_count, 1);
+}
+
+/** @par Check point: mode C -- the sub-system trades the short directly on the shared parent
+ * account, so its own switches plus the capability of that account must be enough: the account
+ * switch survives the preparation even with the aggregate parameter left off. */
+TEST_CASE("test_MultiSystem_mode_c_short_enabled_by_account") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto sg = make_shared<ScriptedShortSG>(kdata[0].datetime, Datetime(299901010000LL));
+    sg->setParam<bool>("support_borrow_stock", true);
+    auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setStock(stk);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, sys);
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);  // the account supports securities lending
+    auto pf = PF_WithoutAF(tm, se, 1, "query", true, true);  // mode C
+    REQUIRE_EQ(pf->getMode(), "C");
+    CHECK_UNARY(!pf->getParam<bool>("support_borrow_stock"));
+    pf->run(query);
+
+    size_t sell_short_count = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock == stk && tr.business == BUSINESS_SELL_SHORT) {
+            sell_short_count++;
+        }
+    }
+
+    /** @arg the sub-system opened the short on the shared account */
+    CHECK_UNARY(sell_short_count > 0);
+    CHECK_GT(tm->getShortPosition(stk).number, 0.0);
+}
+
+/** @par Check point: an odd-lot short book (a bonus share / consolidation adjustment breaks the
+ * lot alignment) is flattened completely: the cover leg rounds down to board lots, but a leg that
+ * would leave a remainder below one lot must take the whole book -- the trade manager refuses a
+ * sub-lot cover, so the remainder could never be closed by any later order. */
+TEST_CASE("test_MultiSystem_mode_a_cover_odd_lot_short") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);
+    Datetime short_date = kdata[0].datetime;
+    REQUIRE_EQ(tm->sellShort(short_date, stk, kdata[0].closePrice, 130, 0.0, 0.0,
+                             kdata[0].closePrice, PART_SYSTEM, "TEST_SHORT")
+                 .business,
+               BUSINESS_SELL_SHORT);
+    REQUIRE_EQ(tm->getShortPosition(stk).number, doctest::Approx(130.0));
+
+    // The shadow sub-system never trades: the parent short is an orphan target and must be flat
+    auto sg = make_shared<ScriptedShortSG>(Datetime(299901010000LL), Datetime(299901010000LL));
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setStock(stk);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, sys);
+    auto pf = PF_SignalAggregate(tm, se, AF_EqualWeight(), 1, "query", true);  // mode A
+    // The pre-existing book is carried across the run (the account is not reset, as in live replay)
+    pf->setParam<bool>("shared_tm", true);
+    KQuery run_query(kdata[1].datetime, kdata[kdata.size() - 1].datetime);
+    pf->run(run_query);
+
+    /** @arg the 130-share short (not a whole lot multiple) is fully covered, no sub-lot left */
+    CHECK_EQ(tm->getShortPosition(stk).number, 0.0);
+}
+
+/** @par Check point: a plain-book short cover pays the whole notional in cash and is never scaled
+ * down to the available cash: with too little cash the leg fails as a whole, the short stays and is
+ * retried at the next rebalancing close (no half-covered position is invented). */
+TEST_CASE("test_MultiSystem_mode_a_cover_needs_full_cash") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);
+    Datetime short_date = kdata[0].datetime;
+    REQUIRE_EQ(tm->sellShort(short_date, stk, kdata[0].closePrice, 100, 0.0, 0.0,
+                             kdata[0].closePrice, PART_SYSTEM, "TEST_SHORT")
+                 .business,
+               BUSINESS_SELL_SHORT);
+    // Leave almost no cash: the 100-share cover needs the full notional
+    price_t cash = tm->cash(short_date, KQuery::DAY);
+    REQUIRE_UNARY(tm->checkout(short_date, cash - 1.0));
+    REQUIRE_EQ(tm->cash(short_date, KQuery::DAY), doctest::Approx(1.0));
+
+    auto sg = make_shared<ScriptedShortSG>(Datetime(299901010000LL), Datetime(299901010000LL));
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setStock(stk);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, sys);
+    auto pf = PF_SignalAggregate(tm, se, AF_EqualWeight(), 1, "query", true);  // mode A
+    pf->setParam<bool>("shared_tm", true);
+    KQuery run_query(kdata[1].datetime, kdata[kdata.size() - 1].datetime);
+    pf->run(run_query);
+
+    /** @arg the cover is not partially filled: the short stays at its full size */
+    CHECK_EQ(tm->getShortPosition(stk).number, doctest::Approx(100.0));
+
+    /** @arg no cover trade was recorded at all */
+    size_t buy_short_count = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock == stk && tr.business == BUSINESS_BUY_SHORT) {
+            buy_short_count++;
+        }
+    }
+    CHECK_EQ(buy_short_count, 0);
+}
+
+/** @par Check point: a margin-accounted short cover does not claim the cash of the batch -- it
+ * returns the released margin instead -- so the long legs of the same batch are not starved by its
+ * notional */
+TEST_CASE("test_MultiSystem_mode_a_margin_cover_keeps_buy_budget") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata1 = stk1.getKData(query);
+    KData kdata2 = stk2.getKData(query);
+    REQUIRE(kdata1.size() > 3);
+    REQUIRE(kdata2.size() > 3);
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    tm->setParam<bool>("margin_accounting", true);
+    tm->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("support_borrow_stock", true);
+    Datetime short_date = kdata1[0].datetime;
+    REQUIRE_EQ(tm->sellShort(short_date, stk1, kdata1[0].closePrice, 100, 0.0, 0.0,
+                             kdata1[0].closePrice, PART_SYSTEM, "TEST_SHORT")
+                 .business,
+               BUSINESS_SELL_SHORT);
+    /** @arg the pre-existing short is booked by margin, so its cover pays no cash */
+    REQUIRE_GT(tm->getShortPosition(stk1).margin, 0.0);
+    // Leave only enough cash for the margin of one long leg
+    price_t cash = tm->cash(short_date, KQuery::DAY);
+    REQUIRE_UNARY(tm->checkout(short_date, cash - 3000.0));
+
+    // The shadow sub-system of stk1 never trades: the parent short is an orphan target, so the
+    // batch carries its cover
+    auto sys1 =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(),
+                 make_shared<ScriptedShortSG>(Datetime(299901010000LL), Datetime(299901010000LL)));
+    sys1->setParam<bool>("buy_delay", false);
+    sys1->setParam<bool>("sell_delay", false);
+    sys1->setStock(stk1);
+
+    // The long leg of the same batch
+    auto sys2 = create_alway_buy_sys();
+    sys2->setTO(kdata2);
+    sys2->setStock(stk2);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk1}, sys1);
+    se->addStockList({stk2}, sys2);
+    auto pf = PF_SignalAggregate(tm, se, AF_FixedWeight(0.5), 1, "query", true);  // mode A
+    pf->setParam<bool>("shared_tm", true);
+    KQuery run_query(kdata1[1].datetime, kdata1[kdata1.size() - 1].datetime);
+    pf->run(run_query);
+
+    /** @arg the margin-accounted short is covered on the rebalancing day */
+    CHECK_EQ(tm->getShortPosition(stk1).number, 0.0);
+
+    /** @arg the long leg is funded in the same batch: the cover did not claim its notional (a
+     *  later day is not an answer, the cash would be free again) */
+    size_t same_day_buys = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock == stk2 && tr.business == BUSINESS_BUY && tr.datetime == kdata1[1].datetime) {
+            ++same_day_buys;
+        }
+    }
+    CHECK_GT(same_day_buys, 0);
+}
+
+namespace {
+
+/** A model reporting no requirement for the securities it covers */
+class MG_NoRequirement : public MarginBase {
+    MARGIN_NO_PRIVATE_MEMBER_SERIALIZATION
+
+public:
+    MG_NoRequirement() : MarginBase("MG_NoRequirement") {}
+
+    price_t getOpenMargin(const Datetime&, const Stock&, price_t, double,
+                          MarginSide) const override {
+        return 0.0;
+    }
+
+    double getMarginRate(const Datetime&, const Stock&, MarginSide) const override {
+        return 0.0;
+    }
+
+    MarginPtr _clone() override {
+        return make_shared<MG_NoRequirement>();
+    }
+};
+
+}  // namespace
+
+/** @par Check point: a model reporting no requirement cannot book the holding by margin (the trade
+ * manager falls back to the cash books), so the executor must charge the leg its full notional
+ * instead of pricing a free holding -- otherwise the batch is not scaled to the cash and quietly
+ * borrows the gap */
+TEST_CASE("test_MultiSystem_zero_requirement_leg_books_by_cash") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(19991118));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 1);
+
+    auto ms = std::make_shared<MultiSystem>("ms");
+    auto tm = crtTM(Datetime(199001010000LL), 20000.0, TC_FixedA2017(0.0003, 5.0), "SYS",
+                    make_shared<MG_NoRequirement>());
+    ms->setTM(tm);
+    ms->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("margin_accounting", true);
+    ms->getAF()->setParam<double>("max_total_position", 0.0);
+    ms->getAF()->setParam<double>("max_single_position", 0.0);
+    ms->getAF()->setParam<double>("fixed_amount", 25000.0);
+    auto sys1 = create_alway_buy_sys();
+    sys1->setTO(kdata);
+    ms->add(sys1);
+    ms->setAdjustDates({kdata.getDatetimeList()[0]});
+    Datetime dt = kdata.getDatetimeList()[0];
+
+    /** @arg the model covers the security but reports no requirement */
+    REQUIRE_UNARY(tm->isMarginAccounted(stk));
+    REQUIRE_EQ(tm->getOpenMarginToLock(dt, stk, kdata[0].closePrice, 100.0, MarginSide::LONG),
+               doctest::Approx(0.0));
+
+    ms->run(kdata);
+
+    double bought = 0.0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            bought += tr.realPrice * tr.number * tr.stock.unit();
+        }
+    }
+
+    /** @arg the 25000 target is scaled to the 20000 cash instead of being financed */
+    CHECK_LE(bought, 20000.0 * 1.02);
+    CHECK_EQ(tm->getFunds(dt, KQuery::DAY).borrow_cash, doctest::Approx(0.0));
+
+    /** @arg the holding really went to the cash books */
+    CHECK_EQ(tm->getPosition(dt, stk).margin, doctest::Approx(0.0));
+}
+
+namespace {
+
+/** The values of the mode A leverage scenario: two equal-weight short shadows (A levered, B plain)
+ * mirrored by the parent account */
+struct LeverageScenario {
+    double sub_a_ratio{0.0};
+    double sub_b_ratio{0.0};
+    double parent_a{0.0};
+    double parent_b{0.0};
+    double parent_net{0.0};
+    double effective_a{0.0};  // parent exposure of A in units of the sub equity it funds
+    double effective_b{0.0};
+};
+
+LeverageScenario run_mode_a_leverage_scenario(double max_signal_ratio) {
+    LeverageScenario r;
+    Stock stock_a = getStock("sh600000");
+    Stock stock_b = getStock("sz000001");
+    REQUIRE(!stock_a.isNull());
+    REQUIRE(!stock_b.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData ka = stock_a.getKData(query);
+    KData kb = stock_b.getKData(query);
+    REQUIRE(ka.size() > 3);
+    REQUIRE(kb.size() > 3);
+
+    const price_t init_cash = 100000.0;  // the shadow accounts and the parent start equal
+    auto make_short_sys = [&](const Stock& stk, const KData& kdata, double multiple) {
+        price_t p = kdata[0].closePrice;
+        double lots = std::floor(multiple * init_cash / p / 100.0) * 100.0;
+        REQUIRE(lots >= 100.0);
+        auto sg = make_shared<ScriptedShortSG>(kdata[0].datetime, Datetime(299901010000LL));
+        sg->setParam<bool>("support_borrow_stock", true);
+        auto sys = SYS_Simple(crtTM(), MM_FixedCount(lots), EnvironmentPtr(), ConditionPtr(), sg);
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setParam<bool>("support_borrow_stock", true);
+        sys->setStock(stk);
+        return sys;
+    };
+    auto sys_a = make_short_sys(stock_a, ka, 1.5);  // levered: short book above its own equity
+    auto sys_b = make_short_sys(stock_b, kb, 0.2);  // plain
+
+    auto af = AF_EqualWeight();
+    af->setParam<double>("max_signal_ratio", max_signal_ratio);
+    auto se = SE_Fixed();
+    se->addStockList({stock_a}, sys_a);
+    se->addStockList({stock_b}, sys_b);
+    auto tm = crtTM(Datetime(199001010000LL), init_cash);
+    tm->setParam<bool>("support_borrow_stock", true);
+    auto pf = PF_SignalAggregate(tm, se, af, 1, "query", true);  // mode A
+    pf->run(query);
+
+    // Everything is valued on the last driven bar, not on the last trade day of an account, so the
+    // sub equity, the parent equity and the prices stay on the same date
+    Datetime last = ka[ka.size() - 1].datetime;
+    price_t pa = ka[ka.size() - 1].closePrice;
+    price_t pb = kb[kb.size() - 1].closePrice;
+
+    // The shadow accounts live on the systems materialized from the SE prototypes
+    SystemPtr sub_a;
+    SystemPtr sub_b;
+    for (const auto& s : pf->getSystemList()) {
+        if (s->getStock() == stock_a) {
+            sub_a = s;
+        } else if (s->getStock() == stock_b) {
+            sub_b = s;
+        }
+    }
+    REQUIRE_UNARY(sub_a);
+    REQUIRE_UNARY(sub_b);
+
+    double sub_a_value = sub_a->getTM()->getShortPosition(stock_a).number * pa * stock_a.unit();
+    double sub_a_net = sub_a->getTM()->getFunds(last, KQuery::DAY).net_assets();
+    double sub_b_value = sub_b->getTM()->getShortPosition(stock_b).number * pb * stock_b.unit();
+    double sub_b_net = sub_b->getTM()->getFunds(last, KQuery::DAY).net_assets();
+    r.sub_a_ratio = sub_a_value / sub_a_net;
+    r.sub_b_ratio = sub_b_value / sub_b_net;
+    r.parent_net = tm->getFunds(last, KQuery::DAY).net_assets();
+    r.parent_a = tm->getShortPosition(stock_a).number * pa * stock_a.unit();
+    r.parent_b = tm->getShortPosition(stock_b).number * pb * stock_b.unit();
+    // What the parent actually took, expressed as a net exposure ratio of the sub equity it funds
+    r.effective_a = r.parent_a / (0.5 * r.parent_net);
+    r.effective_b = r.parent_b / (0.5 * r.parent_net);
+
+    MESSAGE("max_signal_ratio=" << max_signal_ratio << " sub A ratio=" << r.sub_a_ratio
+                                << " sub B ratio=" << r.sub_b_ratio);
+    MESSAGE("parent A=" << r.parent_a << " B=" << r.parent_b << " net=" << r.parent_net
+                        << " effective A=" << r.effective_a << " B=" << r.effective_b);
+    return r;
+}
+
+}  // namespace
+
+/** @par Check point: the default max_signal_ratio (1.0) bounds the net exposure ratio of a channel,
+ * so a levered shadow (its short book worth more than its own net assets) is truncated when the
+ * parent synthesizes the target: the parent takes 1x the sub equity instead of the real leverage,
+ * while a plain shadow passes through untouched. */
+TEST_CASE("test_MultiSystem_mode_a_leverage_ratio_clamp") {
+    LeverageScenario r = run_mode_a_leverage_scenario(1.0);
+
+    /** @arg the shadow of A is really levered: its short book exceeds its own net assets */
+    CHECK_UNARY(r.sub_a_ratio > 1.0);
+    /** @arg the parent is truncated well below the real leverage of A */
+    CHECK_UNARY(r.effective_a < r.sub_a_ratio - 0.2);
+    /** @arg the parent ratio is capped near 1x (0.5 weight x the cap of 1.0) */
+    CHECK_UNARY(r.effective_a > 0.8 && r.effective_a < 1.05);
+    /** @arg the plain shadow is not truncated: the parent ratio tracks it */
+    CHECK_UNARY(std::fabs(r.effective_b - r.sub_b_ratio) < 0.05);
+}
+
+/** @par Check point: with max_signal_ratio disabled (<=0) the levered channel passes through as it
+ * is: the parent ratio follows the real leverage of the shadow instead of the 1x cap. */
+TEST_CASE("test_MultiSystem_mode_a_leverage_ratio_unclamped") {
+    LeverageScenario r = run_mode_a_leverage_scenario(0.0);
+
+    /** @arg the shadow of A is really levered */
+    CHECK_UNARY(r.sub_a_ratio > 1.0);
+    /** @arg the parent follows the sub intent instead of being capped at 1x */
+    CHECK_UNARY(r.effective_a > 1.0);
+    CHECK_UNARY(std::fabs(r.effective_a - r.sub_a_ratio) < 0.15);
+    /** @arg the parent holds clearly more of the levered channel than under the cap */
+    CHECK_UNARY(r.parent_a > 1.15 * 0.5 * r.parent_net);
+}
+
+/** @par Check point: the AF per-channel cap itself, at the L2 level. It bounds the ratio before the
+ * weight and the parent net are applied, so disabling it lets one levered channel crowd the budget
+ * and push the max_total_position scale-down onto the others. */
+TEST_CASE("test_AllocateFunds_L2_modeA_max_signal_ratio") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);
+    auto af = AF_EqualWeight();
+    Datetime date(200001010000LL);
+    Stock stk_a = getStock("sh600000");
+    Stock stk_b = getStock("sz000001");
+    REQUIRE(!stk_a.isNull());
+    REQUIRE(!stk_b.isNull());
+    auto sys_a = create_test_sys(3, 5);
+    auto sys_b = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys_a, 0.5}, {sys_b, 0.5}};
+
+    // A: 1.6x its own equity (levered), B: 0.5x
+    auto make_sugs = [&](double ratio_a, double ratio_b) {
+        TradeSuggestion a;
+        a.stock = stk_a;
+        a.sys = sys_a;
+        a.plan_price = 10.0;
+        a.target_position_ratio = ratio_a;
+        TradeSuggestion b = a;
+        b.stock = stk_b;
+        b.sys = sys_b;
+        b.target_position_ratio = ratio_b;
+        return TradeSuggestionList{a, b};
+    };
+    auto number_of = [](const TradeSuggestionList& list, const Stock& stk) {
+        for (const auto& s : list) {
+            if (s.stock == stk) {
+                return s.number;
+            }
+        }
+        return -1.0;
+    };
+
+    /** @arg the default 1.0 caps the levered channel: 0.5 x 1.0 x 100k = 50k -> 5000 shares */
+    TradeSuggestionList suggestions = make_sugs(1.6, 0.5);
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    CHECK_EQ(number_of(suggestions, stk_a), doctest::Approx(5000.0));
+    CHECK_EQ(number_of(suggestions, stk_b), doctest::Approx(2500.0));
+
+    /** @arg a raised cap (1.2) lets part of the leverage through: 0.5 x 1.2 x 100k -> 6000 */
+    af->setParam<double>("max_signal_ratio", 1.2);
+    suggestions = make_sugs(1.6, 0.5);
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    CHECK_EQ(number_of(suggestions, stk_a), doctest::Approx(6000.0));
+    CHECK_EQ(number_of(suggestions, stk_b), doctest::Approx(2500.0));
+
+    /** @arg a disabled cap (<=0) passes the ratio through; the gross then exceeds the total budget
+     * and the proportional scale-down crowds out the plain channel (B/A drops from 0.5 to 0.3125)
+     */
+    af->setParam<double>("max_signal_ratio", 0.0);
+    suggestions = make_sugs(1.6, 0.5);
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    double a = number_of(suggestions, stk_a);
+    double b = number_of(suggestions, stk_b);
+    CHECK_EQ(a, doctest::Approx(7619.0476));
+    CHECK_EQ(b, doctest::Approx(2380.9524));
+    CHECK_EQ(b / a, doctest::Approx(0.3125));
+
+    /** @arg the cap is symmetric: a levered short channel is bounded the same way */
+    af->setParam<double>("max_signal_ratio", 1.0);
+    suggestions = make_sugs(-1.6, -0.5);
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    for (const auto& s : suggestions) {
+        if (s.stock == stk_a) {
+            CHECK_UNARY(s.short_side);
+        }
+    }
+    CHECK_EQ(number_of(suggestions, stk_a), doctest::Approx(5000.0));
+    CHECK_EQ(number_of(suggestions, stk_b), doctest::Approx(2500.0));
 }
 
 /** Recording AF: keeps the last L1 context list so the test can inspect what MultiSystem filled */

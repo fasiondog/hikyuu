@@ -223,9 +223,24 @@ void MultiSystem::add(const SystemPtr& sys) {
 void MultiSystem::readyForRun() {
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
     // MultiSystem overrides readyForRun without delegating to System::readyForRun, so the two
-    // margin-trading switches have to be applied to the parent TM here
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
+    // margin-trading switches have to be applied to the parent TM here. A system that leaves them
+    // off must not silently disable the account the caller configured (the System convention):
+    // wiping the account switch drops the mode A negative net targets back to zero.
+    const bool sys_borrow_cash = getParam<bool>("support_borrow_cash");
+    const bool tm_borrow_cash = m_tm->tryGetParam<bool>("support_borrow_cash", false);
+    HKU_WARN_IF(!sys_borrow_cash && tm_borrow_cash,
+                "{} support_borrow_cash=False would disable the financing of the trade manager, "
+                "the account keeps it enabled!",
+                name());
+    m_tm->setParam<bool>("support_borrow_cash", sys_borrow_cash || tm_borrow_cash);
+
+    const bool sys_borrow_stock = getParam<bool>("support_borrow_stock");
+    const bool tm_borrow_stock = m_tm->tryGetParam<bool>("support_borrow_stock", false);
+    HKU_WARN_IF(!sys_borrow_stock && tm_borrow_stock,
+                "{} support_borrow_stock=False would disable the securities lending of the trade "
+                "manager, the account keeps it enabled!",
+                name());
+    m_tm->setParam<bool>("support_borrow_stock", sys_borrow_stock || tm_borrow_stock);
     // The SE-provided prototypes are materialized here as well, so that an aggregate configured
     // only with an SE can be prepared for running (the legacy Portfolio usage and the live trading
     // entry, which calls readyForRun before the first run)
@@ -395,6 +410,7 @@ void MultiSystem::_reset() {
     m_inject_truncated_notified = false;
     m_short_reduce_warned = false;
     m_short_inject_warned = false;
+    m_cover_cash_warned = false;
     m_no_se_cycle_warned = false;
     m_axis_rollback_warned = false;
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
@@ -463,6 +479,7 @@ void MultiSystem::_forceResetAll() {
     m_inject_truncated_notified = false;
     m_short_reduce_warned = false;
     m_short_inject_warned = false;
+    m_cover_cash_warned = false;
     m_no_se_cycle_warned = false;
     m_axis_rollback_warned = false;
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
@@ -2146,23 +2163,53 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
 
     // L3 cash feasibility: the mandatory short covers claim the cash first (a short left open is
     // not the intended target and a cover reduces the wrong-direction exposure); only the long
-    // buys are scaled down, with the cash left after the covers as their budget. The covers need
-    // full cash (buyShort has no financing branch), the long buys follow the TradeManager buying
-    // power: cash / margin rate with automatic cash financing, otherwise 1:1. The requirement
-    // always includes the commission, otherwise the last leg of a topped-up batch is rejected
-    const bool margin_trading =
-      m_tm->haveParam("support_borrow_cash") && m_tm->getParam<bool>("support_borrow_cash");
+    // buys are scaled down, with the cash left after the covers as their budget. A plain-book
+    // cover pays its notional, while a margin-accounted one returns the released margin instead,
+    // so only the former is charged here. The long buys follow the accounting of the trade
+    // manager leg by leg: a margin-accounted leg pays its margin, a plain one the full notional.
+    // The requirement always includes the commission, otherwise the last leg of a topped-up batch
+    // is rejected
     auto buy_cost_total = [&](const TradeSuggestion& s, double qty) {
         return m_tm->toAccount(s.stock, qty * s.plan_price * s.stock.unit() +
                                           m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total);
     };
-    double need_cover_cash = 0.0;
-    double need_buy_cash = 0.0;  // the scale denominator: the margin when financing, full otherwise
-    // What the optional top-up must actually deposit, aligned with System::_autoCheckin: a cover
-    // only pays in the plain books, and a long buy pays its margin when the holding is booked by
-    // margin (the rest is financed)
-    double need_cover_deposit = 0.0;
-    double need_buy_deposit = 0.0;
+    // The cash an opening of the long leg really pays, exactly like TradeManager::buy does
+    auto leg_cash_need = [&](const TradeSuggestion& s, double qty) {
+        if (!m_tm->isMarginAccounted(s.stock)) {
+            return buy_cost_total(s, qty);
+        }
+        price_t locked =
+          m_tm->getOpenMarginToLock(date, s.stock, s.plan_price, qty, MarginSide::LONG);
+        // A model reporting no requirement cannot book the holding by margin, so the trade manager
+        // falls back to the cash books and the leg pays the full notional
+        if (!(locked > 0.0)) {
+            return buy_cost_total(s, qty);
+        }
+        return m_tm->toAccount(s.stock,
+                               locked + m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total);
+    };
+    // The cover quantity of a short leg: capped at the short book and rounded down to board lots.
+    // A leg that would leave a remainder below one lot takes the whole book instead: the trade
+    // manager refuses a sub-lot cover, so such a remainder could never be closed afterwards (a
+    // bonus share / consolidation adjustment turns a lot-aligned short into an odd one)
+    auto cover_qty = [&](const TradeSuggestion& s) {
+        double short_num = m_tm->getShortPosition(s.stock).number;
+        if (short_num <= 0.0 || s.number <= 0.0) {
+            return 0.0;
+        }
+        double min_trade = s.stock.minTradeNumber();
+        double qty = std::min(s.number, short_num);
+        if (min_trade <= 0.0) {
+            return qty;
+        }
+        qty = std::floor(qty / min_trade) * min_trade;
+        return (short_num - qty < min_trade) ? short_num : qty;
+    };
+    double need_plain_cover_cash = 0.0;  // only the plain books pay cash for a cover
+    // The scale denominator: exactly the cash the long legs pay, i.e. the margin or the full
+    // notional. It is also what the optional top-up must deposit, aligned with
+    // System::_autoCheckin
+    double need_buy_cash = 0.0;
     for (const auto& s : netted) {
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
@@ -2170,45 +2217,36 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.type != SuggestionType::BUY) {
             continue;  // SELL legs generate cash
         }
+        if (s.short_side) {
+            double qty = cover_qty(s);
+            if (qty <= 0.0) {
+                continue;
+            }
+            // A margin-accounted short returns its margin and settles the profit instead of paying
+            // the notional, so only the plain books need the cash
+            if (m_tm->getShortPosition(s.stock).margin <= 0.0) {
+                need_plain_cover_cash += buy_cost_total(s, qty);
+            }
+            continue;
+        }
         double min_trade = s.stock.minTradeNumber();
         if (min_trade <= 0.0) {
             continue;
         }
-        double qty = std::floor(s.number / min_trade) * min_trade;
-        if (qty < min_trade) {
-            continue;
+        if (std::floor(s.number / min_trade) * min_trade < min_trade) {
+            continue;  // Below one lot: the leg is never ordered
         }
-        if (s.short_side) {
-            need_cover_cash += buy_cost_total(s, qty);
-            // A margin-accounted short returns its margin and settles the profit instead of paying
-            // the notional, so only the plain books need the cash
-            if (m_tm->getShortPosition(s.stock).margin <= 0.0) {
-                need_cover_deposit += buy_cost_total(s, qty);
-            }
-        } else {
-            if (margin_trading) {
-                double rate = m_tm->getMarginRate(date, s.stock);
-                need_buy_cash += buy_cost_total(s, qty) * ((rate > 0.0) ? rate : 1.0);
-            } else {
-                need_buy_cash += buy_cost_total(s, qty);
-            }
-            if (m_tm->isMarginAccounted(s.stock)) {
-                need_buy_deposit += m_tm->toAccount(
-                  s.stock,
-                  m_tm->getOpenMarginToLock(date, s.stock, s.plan_price, qty, MarginSide::LONG) +
-                    m_tm->getBuyCost(date, s.stock, s.plan_price, qty).total);
-            } else {
-                need_buy_deposit += buy_cost_total(s, qty);
-            }
-        }
+        // The requirement is measured on the intent the scale is applied to, not on the lot
+        // aligned quantity: flooring twice would leave the batch one lot per leg above the cash
+        need_buy_cash += leg_cash_need(s, s.number);
     }
     price_t cash = m_tm->getFunds(date, ktype).cash;
     // The optional top-up (aligned with MoneyManagerBase::auto_checkin): deposit the gap the legs
     // really pay, so every leg is cash-covered and can be filled at its planned quantity. It
     // raises the parent principal instead of borrowing, so it is meant to keep the planned
     // quantities tradable, not as a funding policy
-    if (m_auto_checkin && need_cover_deposit + need_buy_deposit > cash) {
-        price_t gap = roundUp(need_cover_deposit + need_buy_deposit - cash, m_tm->precision());
+    if (m_auto_checkin && need_plain_cover_cash + need_buy_cash > cash) {
+        price_t gap = roundUp(need_plain_cover_cash + need_buy_cash - cash, m_tm->precision());
         if (m_tm->checkin(date, gap)) {
             cash = m_tm->getFunds(date, ktype).cash;
         } else {
@@ -2218,9 +2256,21 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
               name());
         }
     }
+    // A plain-book cover pays its notional from the cash, and the covers are never scaled down (a
+    // partial cover would leave a position nobody asked for), so a shortfall makes the leg fail at
+    // the trade manager and leaves the short to the next rebalancing close. Report it once instead
+    // of leaving only the trade manager rejection in the log
+    if (need_plain_cover_cash > cash && !m_cover_cash_warned) {
+        m_cover_cash_warned = true;
+        HKU_WARN(
+          "{}: the short covers need {:.2f} cash but only {:.2f} is available; a plain-book cover "
+          "is not scaled down, the uncovered short is retried at the next rebalancing close (turn "
+          "on auto_checkin to top up the account)",
+          name(), need_plain_cover_cash, cash);
+    }
     double cash_scale = 1.0;
     if (need_buy_cash > 0.0) {
-        double available = cash - need_cover_cash;
+        double available = cash - need_plain_cover_cash;
         if (available < need_buy_cash) {
             cash_scale = available > 0.0 ? available / need_buy_cash : 0.0;
             HKU_DEBUG(
@@ -2242,17 +2292,14 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             continue;
         }
         double short_num = m_tm->getShortPosition(s.stock).number;
-        if (short_num <= 0.0) {
-            continue;
-        }
-        double min_trade = s.stock.minTradeNumber();
-        double target = std::min(s.number, short_num);
-        double num = min_trade > 0.0 ? std::floor(target / min_trade) * min_trade : target;
-        if (num < min_trade) {
-            num = 0.0;  // Below one lot: the exchange refuses such an order
-        }
+        double num = cover_qty(s);
         if (num <= 0.0) {
             continue;
+        }
+        if (num >= short_num) {
+            // Flatten the book through the full-close sentinel: a sub-lot remainder of an odd
+            // (bonus-adjusted) short is not accepted as a plain order number by the trade manager
+            num = MAX_DOUBLE;
         }
         TradeRecord tr = m_tm->buyShort(date, s.stock, s.plan_price, num, 0.0, 0.0, s.plan_price,
                                         PART_SYSTEM, "MultiSystem");
@@ -2281,20 +2328,17 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
             continue;
         }
         double qty = std::floor(s.number * cash_scale / min_trade) * min_trade;
-        if (margin_trading && qty >= min_trade) {
-            // The TradeManager finances an order only when it exceeds the remaining cash, and a
-            // cash-covered order consumes the cash 1:1: the buying power must be re-evaluated here
+        if (qty >= min_trade && m_tm->isMarginAccounted(s.stock)) {
+            // A margin-accounted leg pays only its margin, so the cash on hand buys more than the
+            // notional; the cash shrinks after every fill, hence the buying power is re-evaluated
             // leg by leg, otherwise the tail of the batch is rejected by the TM
             constexpr double BUY_POWER_MARGIN = 0.995;
-            double rate = m_tm->getMarginRate(date, s.stock);
-            double power = (rate > 0.0 ? cash / rate : cash) * BUY_POWER_MARGIN;
-            double unit_price = m_tm->toAccount(s.stock, s.plan_price * s.stock.unit());
-            double cap_qty =
-              (unit_price > 0.0) ? std::floor(power / unit_price / min_trade) * min_trade : 0.0;
-            if (cap_qty < qty) {
+            double cap_qty = m_tm->getMaxOpenNumber(date, s.stock, s.plan_price,
+                                                    cash * BUY_POWER_MARGIN, MarginSide::LONG);
+            // A model reporting no requirement books the leg by cash: the trade manager decides
+            if (cap_qty > 0.0 && cap_qty < qty) {
                 HKU_DEBUG(
-                  "The BUY leg of {} is reduced from {:.0f} to {:.0f} by the financing buying "
-                  "power",
+                  "The BUY leg of {} is reduced from {:.0f} to {:.0f} by the margin buying power",
                   s.stock.market_code(), qty, cap_qty);
                 qty = cap_qty;
             }
@@ -3497,7 +3541,9 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
         s.type =
           SuggestionType::HOLD;  // A snapshot carrier, the direction is the sign of the ratio
         s.plan_price = price_of(kv.first, 0.0);
-        s.target_position_ratio = std::clamp(kv.second, -1.0, 1.0);
+        // The intent is reported unchanged (a levered shadow may exceed its own equity): the
+        // per-channel bound belongs to the portfolio risk layer, see AF's max_signal_ratio
+        s.target_position_ratio = kv.second;
         s.short_side = (kv.second < 0.0);
         out.push_back(s);
     }

@@ -87,10 +87,22 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    by the same switch, while the covers on a sub account (the sub-system accounts of modes B/C) follow
    the ``auto_checkin`` of that sub-system's own money manager. The financing switches
    ``support_borrow_cash`` /
-   ``support_borrow_stock`` must be set on the ``MultiSystem`` and are propagated to the parent TM by
-   ``readyForRun``; with financing enabled the executor derives the buying power from the margin rate
-   **per order** (a multi-leg batch is funded in order, so later legs may be shrunk). The switch must be
-   set before ``readyForRun``; a change during ``run`` takes effect at the next preparation.
+   ``support_borrow_stock`` may be set on the ``MultiSystem`` and are propagated to the parent TM by
+   ``readyForRun``, always as a widening merge: a switch already enabled on the parent TM is never
+   turned off by an off ``MultiSystem`` parameter (the mode A negative net targets rely on it to open a
+   short instead of being clamped to zero). The cash a long buy needs follows the account books, not the
+   financing switch: the executor judges **every leg** by ``isMarginAccounted`` -- a margin-accounted
+   book (the parent TM has ``margin_accounting`` on) only pays the margin and the commission, everything
+   else pays the full notional and the commission; a multi-leg batch is funded in order, so the later
+   margin-accounted legs may be shrunk. The switch must be set before ``readyForRun``; a change during
+   ``run`` takes effect at the next preparation.
+
+   Cash treatment of the parent short covers: a plain book pays the whole notional and the cover is
+   **never scaled down to the available cash** -- when the cash falls short the leg is rejected by the
+   account (the shortfall is warned once) and the remaining short is retried at the next rebalancing
+   close; a margin-accounted short returns its margin and settles the profit (an overdraft is allowed),
+   so it is not cash constrained. Within one suggestion batch the sell legs (long sells, short opens)
+   run first, then the covers, and only the remaining cash scales the long buys.
 
    .. warning::
 
@@ -235,6 +247,11 @@ Built-in Portfolios
     suggestions into the target positions of the parent account by the AF L2 (target market value =
     weight x net exposure ratio x the parent net assets, aggregated per instrument and rebalanced by the delta
     against the current position) and the L3 portfolio risk control applies (e.g. max_single_position).
+    The sampling reports the **raw** net exposure ratio of the sub account (above 1 when the shadow
+    finances or borrows), and the per-channel bound is carried by the AF ``max_signal_ratio`` (default
+    ``1.0``, ``<=0`` disables, only the mode A weight pricing uses it -- see
+    :doc:`allocate_funds`): it is a **channel normalization**, a different job from the
+    ``max_total_position`` / ``max_single_position`` portfolio risk control.
     The unselected sub-systems are excluded from the parent target sampling, so their instruments drop out of the target and are closed; ``sell_at_not_selected`` does not take part in that behavior in mode A (the parent closes its own holdings and never touches the shadow accounts).
 
     This is the preset that ``PF_WithoutAF`` carried at the beginning of the refactoring; since

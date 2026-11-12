@@ -21,7 +21,9 @@
  *    every sub-system keeps submitting its position intent; on the sampling day
  *    the parent reads the selected ones' current net exposure snapshot and synthesizes one
  *    per-instrument signed net target by the L2 conversion (weight x net exposure ratio x the
- * parent net assets), then orders uniformly on its own account. The shadow bookkeeping never
+ * parent net assets), then orders uniformly on its own account. The ratio is reported unchanged
+ * (a levered shadow can exceed its own equity); the channel bound belongs to AF and is configured
+ * there (`max_signal_ratio`). The shadow bookkeeping never
  * touches the real funds.
  *
  *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
@@ -899,6 +901,8 @@ private:
                                         // reduction skip warning (runtime state, not serialized)
     bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota
                                         // injection skip warning (runtime state, not serialized)
+    bool m_cover_cash_warned{false};    // The once-per-instance flag of the short cover cash
+                                        // shortfall warning (runtime state, not serialized)
     bool m_no_se_cycle_warned{false};   // The once-per-instance flag of the mode C without SE cycle
                                         // silence warning (runtime state, not serialized)
     bool m_adjust_cycle_warned{false};  // The once-per-configuration flag of the out-of-range
