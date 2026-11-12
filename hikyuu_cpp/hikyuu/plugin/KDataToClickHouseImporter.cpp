@@ -84,4 +84,12 @@ bool KDataToClickHouseImporter::addStockType(uint32_t type_id, const string& des
                     : false;
 }
 
+bool KDataToClickHouseImporter::addStockParam(const string& market, const string& code,
+                                              uint32_t precision, double tick, double tick_value,
+                                              double min_trade, double max_trade) {
+    return m_plugin ? m_plugin->addStockParam(market, code, precision, tick, tick_value, min_trade,
+                                              max_trade)
+                    : false;
+}
+
 }  // namespace hku

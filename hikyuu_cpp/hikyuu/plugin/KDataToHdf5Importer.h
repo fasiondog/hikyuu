@@ -43,6 +43,10 @@ public:
                       double tick = 0.01, double tick_value = 0.01, double min_trade = 1,
                       double max_trade = 1000000);
 
+    bool addStockParam(const string& market, const string& code, uint32_t precision = 2,
+                       double tick = 0.01, double tick_value = 0.01, double min_trade = 1,
+                       double max_trade = 1000000);
+
 private:
     ImportKDataToHdf5PluginInterface* m_plugin{nullptr};
 };
