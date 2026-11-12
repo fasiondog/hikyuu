@@ -247,8 +247,9 @@ public:
     DatetimeList getTradingCalendar(const KQuery& query) const;
 
     /**
-     * Whether the given time falls inside the trading session; the date part is ignored and only
-     * the hour/minute/second is checked
+     * Whether the given time falls inside the trading session of the input's own date (the window
+     * is anchored to the start of the input's day); a session pair with equal bounds is treated as
+     * not configured and skipped, and the date itself is not validated as a trading day
      * @param time the time to check
      */
     bool isTransactionTime(Datetime time);

@@ -483,6 +483,10 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_EQ(sm.isTradingHours(Datetime(202110070430LL), "NASDAQ"), false);
     CHECK_EQ(sm.isTradingHours(Datetime(202112072230LL), "NASDAQ"), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202112072130LL), "NASDAQ"), false);
+    /** @arg a single 0/0 session pair means "not configured": NASDAQ local midnight (Beijing
+     *        12:00 under EDT) is not tradable and must not fall into the empty second session */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110071200LL), "NASDAQ"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202112071300LL), "NASDAQ"), false);
 }
 
 /** @par Test points */

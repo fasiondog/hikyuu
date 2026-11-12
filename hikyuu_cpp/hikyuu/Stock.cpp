@@ -1329,10 +1329,10 @@ vector<Block> Stock::getBelongToBlockList(const string& category) const {
     return StockManager::instance().getStockBelongs(*this, category);
 }
 
-// Judge whether the given moment falls within the current day's trading session. The window is
-// anchored to today (openTime/closeTime are TimeDelta offsets added to Datetime::today()), so only
-// the intraday time range is checked; the date itself is not validated as a trading day
-// (holidays/weekends are not excluded) and the input is assumed to be today.
+// Judge whether the given moment falls within the trading session of the given moment's date. The
+// window is anchored to the input date (openTime/closeTime are TimeDelta offsets added to the
+// start of the input's day), so only the intraday time range is checked; the date itself is not
+// validated as a trading day (holidays/weekends are not excluded)
 bool Stock::isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());
     HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
@@ -1347,13 +1347,20 @@ bool Stock::isTransactionTime(Datetime time) {
                     market_info.openTime2() == market_info.closeTime2(),
                   true);
 
-    Datetime today = Datetime::today();
-    Datetime openTime1 = today + market_info.openTime1();
-    Datetime closeTime1 = today + market_info.closeTime1();
-    // The tick time of the last day of some market data may be delayed by a few seconds, so a
-    // margin is added
-    HKU_IF_RETURN(time >= openTime1 && time <= closeTime1 + Seconds(30), true);
+    Datetime today = time.startOfDay();
+    // A session pair with equal bounds means it is not configured: skip it instead of treating
+    // midnight as a tradable moment
+    if (market_info.openTime1() != market_info.closeTime1()) {
+        Datetime openTime1 = today + market_info.openTime1();
+        Datetime closeTime1 = today + market_info.closeTime1();
+        // The tick time of the last day of some market data may be delayed by a few seconds, so a
+        // margin is added
+        HKU_IF_RETURN(time >= openTime1 && time <= closeTime1 + Seconds(30), true);
+    }
 
+    if (market_info.openTime2() == market_info.closeTime2()) {
+        return false;
+    }
     Datetime openTime2 = today + market_info.openTime2();
     Datetime closeTime2 = today + market_info.closeTime2();
     return time >= openTime2 && time <= closeTime2 + Seconds(30);

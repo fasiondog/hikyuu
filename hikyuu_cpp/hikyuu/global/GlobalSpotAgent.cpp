@@ -146,14 +146,20 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
 
     Datetime end_minute = minute - (minute - today) % gap + gap;
 
-    // Handle the last record at the close
+    // Handle the last record at the close. A session pair with equal bounds means it is not
+    // configured: an unset close must never clamp the bucket (a zero TimeDelta is never Null)
     MarketInfo market_info = StockManager::instance().getMarketInfo(stk.market());
     Datetime close1 = today + market_info.closeTime1();
     Datetime close2 = today + market_info.closeTime2();
     Datetime open2 = today + market_info.openTime2();
-    if (!close2.isNull() && end_minute > close2) {
+    bool has_first_session = market_info.openTime1() != market_info.closeTime1();
+    bool has_second_session = market_info.openTime2() != market_info.closeTime2();
+    if (has_second_session && end_minute > close2) {
         end_minute = close2;
-    } else if (!open2.isNull() && !close1.isNull() && end_minute < open2 && end_minute > close1) {
+    } else if (has_first_session && end_minute > close1 &&
+               (!has_second_session || end_minute < open2)) {
+        // A late tick after the close joins the last bucket; a two-session market clamps to close1
+        // only inside the lunch break (between close1 and open2); a 24h market is never clamped
         end_minute = close1;
     }
 

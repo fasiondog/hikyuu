@@ -1135,8 +1135,13 @@ bool StockManager::isTradingHours(const Datetime& d, const string& market) const
                     marketinfo.openTime2() == marketinfo.closeTime2(),
                   true);
     auto hour = local - local.startOfDay();
-    HKU_IF_RETURN((hour >= marketinfo.openTime1() && hour <= marketinfo.closeTime1()) ||
-                    (hour >= marketinfo.openTime2() && hour <= marketinfo.closeTime2()),
+    // A session pair with equal bounds means it is not configured: skip it instead of treating
+    // midnight as a tradable moment (the 24h case is short-circuited above)
+    auto in_session = [](const TimeDelta& open, const TimeDelta& close, const TimeDelta& t) {
+        return open != close && t >= open && t <= close;
+    };
+    HKU_IF_RETURN(in_session(marketinfo.openTime1(), marketinfo.closeTime1(), hour) ||
+                    in_session(marketinfo.openTime2(), marketinfo.closeTime2(), hour),
                   true);
     return false;
 }
