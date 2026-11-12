@@ -219,7 +219,9 @@ Routing by Market / Security Type
     the one-off unmatched warning takes a lock, so it is not meant to be modified while trading. An
     unregistered market is reported once and then billed by the default algorithm. Created from the
     part registry (``core.tc.bymarket``) only the default algorithm can be given; the routing table
-    is configured with the ``costs`` argument above.
+    is configured with the ``costs`` argument above. The key matching order is the market first,
+    then the type — the opposite of ``MG_ByType`` and ``currency_rates`` where the type key wins;
+    take care when they are mixed.
 
 
 Custom Trade Cost Algorithm

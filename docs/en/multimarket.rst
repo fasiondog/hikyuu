@@ -92,10 +92,11 @@ Variety Parameters and Runtime Overrides
 
 The type level ``StockTypeInfo`` provides the default tick / tickValue / precision / lot size.
 The variety-level differences (the futures contract multiplier, the HK lot size, the minimum
-tick) live in the ``stockparam`` table (located by ``(marketid, code)``, written by the import
-side from the exchange contract parameters; an un-upgraded database falls back to the type
-defaults automatically), and the variety level wins over the type level at load time; the
-runtime override stays at the top priority:
+tick) live in the ``stockparam`` table (located by ``(marketid, code)`` on SQLite / MySQL and
+by ``(market, code)`` on ClickHouse, written by the import side from the exchange contract
+parameters; an un-upgraded database falls back to the type defaults automatically), and the
+variety level wins over the type level at load time; the runtime override stays at the top
+priority:
 
 - ``tick`` / ``tick_value``: ``unit = tick_value / tick`` follows the override immediately;
   keeping tick at 1 and setting ``tick_value`` to 10 yields the RB contract multiplier of
@@ -193,11 +194,18 @@ Capability Boundaries
 - **Night sessions / multiple sessions**: ``isTransactionTime`` supports two sessions
   only and returns false across midnight; it affects the realtime spot filtering only,
   not backtesting.
-- **No mark-to-market or forced liquidation in futures backtesting**: no settlement
-  price, no occupied-margin snapshot, no forced-liquidation flow; the futures short
-  side has no borrow record (``borrow_asset == 0``). Use ``net_assets() / profit()`` as
-  the funds caliber; ``total_assets()`` is inflated by ``borrow_asset`` when shorting
-  stocks.
-- **Multi-currency accounting**: ``cash / market_value`` etc. are summed without a
-  currency dimension; cross-currency markets should be pre-converted to a single base
-  currency on the data side.
+- **Mark-to-market and forced liquidation in futures backtesting are optional**: with
+  ``margin_accounting=false`` (the default) there is no daily mark-to-market, no
+  forced-liquidation flow, and the margin is recorded at the open only; setting it to
+  ``true`` enables the settlement-price mark-to-market, the margin call and forced
+  liquidation, the financing interest and the conversion rates. The futures short side
+  has no borrow record (``borrow_asset == 0``). Use ``net_assets() / profit()`` as the
+  funds caliber; ``total_assets()`` is inflated by ``borrow_asset`` when shorting stocks.
+- **Multi-currency accounting**: the ``currency_rates`` parameter of ``TradeManager``
+  converts the foreign amounts statically into the account currency by the market key
+  (e.g. ``HK:0.92``) or the type key (e.g. ``12:0.05``), at the current rate once (not
+  the per-day historical rates); an unconfigured market is booked at 1.0 with a one-off
+  warning. There is no mixed-currency guard yet, so always configure a rate for every
+  market in a cross-currency portfolio. The rate keys are market/type granular only —
+  different quote currencies within one market (e.g. ``EURUSD`` vs ``USDJPY``) cannot
+  be distinguished; convert such markets on the data side before importing.
