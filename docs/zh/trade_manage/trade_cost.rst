@@ -21,7 +21,7 @@
 * TC_FixedA 为滚动默认成本模型，始终对应最新年份的费率；各年份模型（TC_FixedAPre2015 / 2015 / 2017）保持冻结，用于历史回测。
 * 2022年4月29日起过户费降为成交金额的千分之0.01（沪深京双向收取）；2023年8月28日起卖出印花税降为千分之0.5。
 
-.. py:function:: TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
+.. py:function:: TC_FixedA([commission=0.0003, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
     当前最新A股交易成本算法（滚动默认，始终对应当前费率）：过户费按成交金额的千分之0.01全市场双向收取，卖出印花税千分之0.5
 

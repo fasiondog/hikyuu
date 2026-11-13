@@ -28,9 +28,9 @@ void export_build_in(py::module& m) {
     m.def("TC_TestStub", TC_TestStub, "For testing only");
 
     m.def(
-      "TC_FixedA", TC_FixedA, py::arg("commission") = 0.0018, py::arg("lowest_commission") = 5.0,
+      "TC_FixedA", TC_FixedA, py::arg("commission") = 0.0003, py::arg("lowest_commission") = 5.0,
       py::arg("stamptax") = 0.0005, py::arg("transferfee") = 0.00001,
-      R"(TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
+      R"(TC_FixedA([commission=0.0003, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
     The A-share trade cost algorithm at the current rates (rolling default): transfer fee 0.01 per mille of the amount in both directions on all markets (since 2022-04-29), and stamp duty 0.5 per mille on sells (since 2023-08-28).
 

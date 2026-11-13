@@ -16,7 +16,7 @@ BOOST_CLASS_EXPORT(hku::FixedATradeCost)
 namespace hku {
 
 FixedATradeCost::FixedATradeCost() : FixedATradeCostBase("TC_FixedA") {
-    setParam<price_t>("commission", 0.0018);
+    setParam<price_t>("commission", 0.0003);
     setParam<price_t>("lowest_commission", 5.0);
     setParam<price_t>("stamptax", 0.0005);
     setParam<price_t>("transferfee", 0.00001);
@@ -55,7 +55,7 @@ void registerPart_TC_FixedA() {
     meta.name = "TC_FixedA";
     meta.full_name = "core.tc.fixeda";
     meta.params.push_back(
-      ParamMeta{.name = "commission", .type = "double", .default_value = "0.0018"});
+      ParamMeta{.name = "commission", .type = "double", .default_value = "0.0003"});
     meta.params.push_back(
       ParamMeta{.name = "lowest_commission", .type = "double", .default_value = "5.0"});
     meta.params.push_back(
