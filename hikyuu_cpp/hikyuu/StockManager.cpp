@@ -539,13 +539,13 @@ void StockManager::loadAllKData() {
     });
 }
 
-void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes,
+void StockManager::_loadAllKDataSafely(const vector<KQuery::KType>& ktypes,
                                        const vector<string>& low_ktypes, bool parallel) {
     try {
         if (parallel) {
-            _loadAllKDataParallel(std::move(ktypes), low_ktypes);
+            _loadAllKDataParallel(ktypes, low_ktypes);
         } else {
-            _loadAllKDataSerial(std::move(ktypes), low_ktypes);
+            _loadAllKDataSerial(ktypes, low_ktypes);
         }
     } catch (const std::exception& e) {
         HKU_ERROR("Failed preload kdata: {}", e.what());
@@ -558,7 +558,7 @@ void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes,
     }
 }
 
-void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes,
+void StockManager::_loadAllKDataSerial(const vector<KQuery::KType>& ktypes,
                                        const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side (through LoadEvent and its own polling);
     // loaded/total is no longer counted here
@@ -620,7 +620,7 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes,
     m_data_ready.store(true, std::memory_order_release);
 }
 
-void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
+void StockManager::_loadAllKDataParallel(const vector<KQuery::KType>& ktypes,
                                          const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side; loaded/total is no longer counted here
     bool bulk_finance_done = false;

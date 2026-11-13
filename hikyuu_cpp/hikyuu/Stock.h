@@ -297,6 +297,17 @@ public:
     string toString() const;
 
 private:
+    /* Rewrite a DATE query's bounds from the unified expression to the market local one, so a
+     * driver comparing raw stored numbers sees its own expression */
+    static KQuery _localQuery(const KQuery& query, const MarketInfo& tz);
+
+    /* Rewrite driver records (market local) to the unified expression; the driver must not
+     * already output unified data */
+    static void _unify(KRecordList&, const MarketInfo& tz);
+    static void _unify(TimeLineList&, const MarketInfo& tz);
+    static void _unify(TransList&, const MarketInfo& tz);
+
+private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
 
     // The following functions are basic operations guarded by a read lock
@@ -318,15 +329,7 @@ private:
      */
     MarketInfo _timeZone(const KQuery::KType& ktype) const;
 
-    /* Rewrite a DATE query's bounds from the unified expression to the market local one, so a
-     * driver comparing raw stored numbers sees its own expression */
-    KQuery _localQuery(const KQuery& query, const MarketInfo& tz) const;
 
-    /* Rewrite driver records (market local) to the unified expression; the driver must not
-     * already output unified data */
-    void _unify(KRecordList&, const MarketInfo& tz) const;
-    void _unify(TimeLineList&, const MarketInfo& tz) const;
-    void _unify(TransList&, const MarketInfo& tz) const;
 
     // Only called by StockManager during initialization
     void setPreload(const vector<KQuery::KType>& preload_ktypes);

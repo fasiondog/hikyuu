@@ -412,13 +412,13 @@ private:
 
     /* Load all the K-line data and historical finance data serially (when the driver does not
      * support parallel loading), executed in a separate thread */
-    void _loadAllKDataSerial(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes);
+    void _loadAllKDataSerial(const vector<KQuery::KType>& ktypes, const vector<string>& low_ktypes);
 
     /* Load all the K-line data and historical finance data in parallel, in a separate thread */
-    void _loadAllKDataParallel(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes);
+    void _loadAllKDataParallel(const vector<KQuery::KType>& ktypes, const vector<string>& low_ktypes);
 
     /* Run the preload body inside a catch-all: an escaping exception would call std::terminate */
-    void _loadAllKDataSafely(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes,
+    void _loadAllKDataSafely(const vector<KQuery::KType>& ktypes, const vector<string>& low_ktypes,
                              bool parallel);
 
     /* Whether Saturday / Sunday count as holidays for the market: false for the 24h crypto

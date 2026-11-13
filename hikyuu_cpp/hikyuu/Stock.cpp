@@ -459,27 +459,27 @@ MarketInfo Stock::_timeZone(const KQuery::KType& ktype) const {
     return info;
 }
 
-KQuery Stock::_localQuery(const KQuery& query, const MarketInfo& tz) const {
+KQuery Stock::_localQuery(const KQuery& query, const MarketInfo& tz) {
     HKU_IF_RETURN(tz.isUnifiedClock() || query.queryType() != KQuery::DATE, query);
     return KQueryByDate(tz.unifiedToLocal(query.startDatetime()),
                         tz.unifiedToLocal(query.endDatetime()), query.kType(), query.recoverType());
 }
 
-void Stock::_unify(KRecordList& ks, const MarketInfo& tz) const {
+void Stock::_unify(KRecordList& ks, const MarketInfo& tz) {
     HKU_IF_RETURN(tz.isUnifiedClock(), void());
     for (auto& k : ks) {
         k.datetime = tz.localToUnified(k.datetime);
     }
 }
 
-void Stock::_unify(TimeLineList& tls, const MarketInfo& tz) const {
+void Stock::_unify(TimeLineList& tls, const MarketInfo& tz) {
     HKU_IF_RETURN(tz.isUnifiedClock(), void());
     for (auto& tl : tls) {
         tl.datetime = tz.localToUnified(tl.datetime);
     }
 }
 
-void Stock::_unify(TransList& ts, const MarketInfo& tz) const {
+void Stock::_unify(TransList& ts, const MarketInfo& tz) {
     HKU_IF_RETURN(tz.isUnifiedClock(), void());
     for (auto& t : ts) {
         t.datetime = tz.localToUnified(t.datetime);
