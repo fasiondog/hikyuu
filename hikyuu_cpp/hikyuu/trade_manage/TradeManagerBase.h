@@ -58,18 +58,7 @@ public:
 
     explicit TradeManagerBase(const string& name) : TradeManagerBase(name, TC_Zero()) {}
 
-    TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
-    : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
-        setParam<int>("precision", 2);  // Calculation precision
-        // Real margin accounting: off by default, so the plain cash books stay unchanged
-        setParam<bool>("margin_accounting", false);
-        setParam<bool>("settle_with_close", true);
-        setParam<bool>("force_liquidate", false);
-        // The proration base of the daily margin interest
-        setParam<int>("annual_days", 365);
-        // The fixed rate of each foreign market, see the currency_rates parameter
-        setParam<string>("currency_rates", "");
-    }
+    TradeManagerBase(const string& name, const TradeCostPtr& costFunc);
 
     virtual ~TradeManagerBase() {}
 
@@ -122,14 +111,7 @@ public:
      * Returns 0 when the model reports no requirement at all, so the caller falls back to cash.
      */
     price_t getOpenMarginToLock(const Datetime& datetime, const Stock& stock, price_t price,
-                                double num, MarginSide side) const {
-        price_t raw = getOpenMargin(datetime, stock, price, num, side);
-        HKU_IF_RETURN(!(raw > 0.0), 0.0);
-
-        int precision = getParam<int>("precision");
-        price_t locked = roundEx(raw, precision);
-        return locked > 0.0 ? locked : 1.0 / std::pow(10.0, double(precision));
-    }
+                                double num, MarginSide side) const;
 
     /** Maintain margin of an opening, in the security's own currency; 0 when no model is set */
     virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
@@ -150,7 +132,7 @@ public:
     /** Convert an amount in the security's own currency into the account currency, according to
      *  the configured currency_rates; an empty table is the identity */
     price_t toAccount(const Stock& stock, price_t amount) const {
-        return _toAccount(stock, amount);
+        return amount * _currencyRate(stock);
     }
 
     /**
@@ -159,15 +141,7 @@ public:
      *          financed automatically (support_borrow_cash) or free of borrowing (futures, crypto)
      *          are booked by margin, all the others keep the plain cash accounting
      */
-    virtual bool isMarginAccounted(const Stock& stock) const {
-        HKU_IF_RETURN(!m_margin || stock.isNull(), false);
-        // An archive written before this switch existed carries no such key
-        HKU_IF_RETURN(!tryGetParam<bool>("margin_accounting", false), false);
-        HKU_IF_RETURN(!m_margin->isMarginTrading(stock), false);
-        bool borrow_cash =
-          haveParam("support_borrow_cash") && getParam<bool>("support_borrow_cash");
-        return borrow_cash || !m_margin->needBorrowAsset(stock);
-    }
+    virtual bool isMarginAccounted(const Stock& stock) const;
 
     /**
      * Margin occupied by the current long and short positions at the given moment, in the account
@@ -185,36 +159,7 @@ public:
      *       only meaningful for the current or a future moment
      */
     virtual price_t getOccupiedMargin(const Datetime& datetime,
-                                      KQuery::KType ktype = KQuery::DAY) const {
-        price_t result = 0.0;
-        HKU_IF_RETURN(!m_margin, result);
-
-        // Mirror the valuation moment of getFunds: an unset date or the last trade date values at
-        // the last trade moment, any other date at the close of that day
-        Datetime valued = _valuationDatetime(datetime);
-
-        PositionRecordList positions = getPositionList();
-        for (const auto& record : positions) {
-            if (!m_margin->isMarginTrading(record.stock))
-                continue;
-            price_t price = record.stock.getMarketValue(valued, ktype);
-            // The model answers in the security's currency, the account sums in its own
-            result += _toAccount(
-              record.stock,
-              m_margin->getOpenMargin(valued, record.stock, price, record.number, MarginSide::LONG));
-        }
-
-        positions = getShortPositionList();
-        for (const auto& record : positions) {
-            if (!m_margin->isMarginTrading(record.stock))
-                continue;
-            price_t price = record.stock.getMarketValue(valued, ktype);
-            result += _toAccount(record.stock,
-                                 m_margin->getOpenMargin(valued, record.stock, price, record.number,
-                                                         MarginSide::SHORT));
-        }
-        return result;
-    }
+                                      KQuery::KType ktype = KQuery::DAY) const;
 
     /**
      * Available funds for a new opening, i.e. the net assets minus the collateral haircut and the
@@ -230,16 +175,7 @@ public:
      *       historical holdings while getOccupiedMargin stays on the current ones, so mixing them
      *       would subtract today's occupation from a past net value
      */
-    virtual price_t getAvailableMargin(const Datetime& datetime,
-                                       KQuery::KType ktype = KQuery::DAY) {
-        HKU_CHECK(datetime == Null<Datetime>() || datetime >= lastDatetime(),
-                  "getAvailableMargin supports only the current or a future moment!");
-        // Read in the documented order: getFunds applies the pending weights and thus changes the
-        // holdings the other two operands then price
-        price_t net_assets = getFunds(datetime, ktype).net_assets();
-        price_t haircut = getCollateralHaircut(datetime, ktype);
-        return net_assets - haircut - getOccupiedMargin(datetime, ktype);
-    }
+    virtual price_t getAvailableMargin(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
 
     /**
      * Settle the margin holdings of the account as of the given moment
@@ -395,21 +331,7 @@ public:
     }
 
     /** Perform the clone operation */
-    shared_ptr<TradeManagerBase> clone() {
-        shared_ptr<TradeManagerBase> p = _clone();
-        HKU_CHECK(p, "Invalid ptr from _clone!");
-        p->m_params = m_params;
-        p->m_name = m_name;
-        p->m_is_python_object = m_is_python_object;
-        p->m_broker_last_datetime = m_broker_last_datetime;
-        // The clone is a deep copy: the models are cloned instead of being shared, so the copy
-        // never drives the model instance of the source
-        p->m_costfunc = m_costfunc ? m_costfunc->clone() : m_costfunc;
-        p->m_margin = m_margin ? m_margin->clone() : m_margin;
-        // The brokers are live connections, they stay shared by design
-        p->m_broker_list = m_broker_list;
-        return p;
-    }
+    shared_ptr<TradeManagerBase> clone();
 
     virtual shared_ptr<TradeManagerBase> _clone() {
         HKU_WARN("The subclass does not implement a reset method");
@@ -448,15 +370,7 @@ public:
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return net asset value list
      */
-    PriceList getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        int precision = getParam<int>("precision");
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = roundEx(funds_list[i].total_assets(), precision);
-        }
-        return ret;
-    }
+    PriceList getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the profit curve, i.e. the net asset value curve after deducting every deposit
@@ -464,15 +378,7 @@ public:
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return profit curve
      */
-    PriceList getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        int precision = getParam<int>("precision");
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = roundEx(funds_list[i].profit(), precision);
-        }
-        return ret;
-    }
+    PriceList getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the cumulative return rate curve
@@ -484,17 +390,7 @@ public:
      * @return return rate curve
      */
     PriceList getProfitCumChangeCurve(const DatetimeList& dates,
-                                      const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        int precision = getParam<int>("precision");
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            price_t base = funds_list[i].total_base();
-            ret[i] = base != 0.0 ? roundEx(funds_list[i].total_assets() / base, precision)
-                                 : Null<price_t>();
-        }
-        return ret;
-    }
+                                      const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the invested base asset curve
@@ -503,14 +399,7 @@ public:
      * @return price curve
      */
     PriceList getBaseAssetsCurve(const DatetimeList& dates,
-                                 const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = funds_list[i].total_base();
-        }
-        return ret;
-    }
+                                 const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Update the current positions and trades according to the weight (adjustment) information
@@ -1115,56 +1004,7 @@ public:
      * @note The holdings are priced exactly like getOccupiedMargin does, for the same reason
      */
     virtual price_t getCollateralHaircut(const Datetime& datetime,
-                                         KQuery::KType ktype = KQuery::DAY) const {
-        // The current holdings are what gets discounted, so a past date would pair them with a
-        // stale price, the same restriction getAvailableMargin states
-        HKU_CHECK(datetime.isNull() || datetime >= lastDatetime(),
-                  "getCollateralHaircut supports only the current or a future moment!");
-        price_t result = 0.0;
-        HKU_IF_RETURN(!m_margin, result);
-
-        Datetime valued = _valuationDatetime(datetime);
-        int precision = getParam<int>("precision");
-        for (const auto& record : getPositionList()) {
-            if (!m_margin->isMarginTrading(record.stock))
-                continue;
-            double rate = getCollateralRate(valued, record.stock, MarginSide::LONG);
-            // A rate outside (0, 1] breaks the contract of the interface, which a Python model can
-            // do silently: discount nothing for it and warn, the way a bad margin rate falls back
-            // to the cash caliber
-            if (!(rate > 0.0 && rate <= 1.0)) {
-                HKU_WARN(
-                  "{} {} collateral rate({}) is out of (0, 1], the holding is not "
-                  "discounted!",
-                  valued, record.stock.market_code(), rate);
-                continue;
-            }
-            // A rate of 1.0 (the default) discounts nothing, so it needs no pricing at all
-            if (rate >= 1.0) {
-                continue;
-            }
-            // The nominal is rounded before being discounted, exactly like the margin bases, so the
-            // result does not drift by half a cent per holding
-            price_t mv = roundEx(
-              record.stock.getMarketValue(valued, ktype) * record.number * record.stock.unit(),
-              precision);
-            // The discount is a share of the net assets, so the base is measured in the account
-            // currency
-            price_t base = _toAccount(record.stock, mv);
-            if (record.margin > 0.0) {
-                // Only the equity contribution of a margin-accounted holding counts as collateral,
-                // and a loss deeper than the margin leaves nothing of it to discount; the locked
-                // margin is already booked in the account currency, the floating profit is not
-                base = roundEx(record.margin + _toAccount(record.stock, mv - record.settleBasis),
-                               precision);
-                if (base < 0.0) {
-                    base = 0.0;
-                }
-            }
-            result = roundEx(result + base * (1.0 - rate), precision);
-        }
-        return result;
-    }
+                                         KQuery::KType ktype = KQuery::DAY) const;
 
     /**
      * Annualized interest rate of the borrowed cash, answered by the cost model
@@ -1211,11 +1051,6 @@ protected:
     /** The fixed rate of the security's market: 1.0 when the table is empty, or the market is not
      * listed (warned once); the table itself is parsed by baseCheckParam */
     price_t _currencyRate(const Stock& stock) const;
-
-    /** Convert an amount of the security's currency into the account currency */
-    price_t _toAccount(const Stock& stock, price_t amount) const {
-        return amount * _currencyRate(stock);
-    }
 
     /** Convert an account-currency amount into the security's currency */
     price_t _fromAccount(const Stock& stock, price_t amount) const {
