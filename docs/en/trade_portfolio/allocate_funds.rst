@@ -135,7 +135,8 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
         that finances or borrows can exceed 1 (leverage); the clip keeps the channels comparable in units of
         their own equity and stops one channel from eating the whole budget and forcing the proportional
         scale-down onto the others. ``<=0`` passes the ratio through unchanged; a value above 1 widens the
-        channel bound (part of the leverage is allowed through, e.g. 1.2). Mode B passes the sub-system
+        channel bound (part of the leverage is allowed through, e.g. 1.2); a non-finite value is rejected
+        by the parameter check. Mode B passes the sub-system
         instructions through and mode C has no aggregate target, so neither prices a ratio and both ignore
         it; the ``fixed_amount > 0`` pricing only uses the sign of the ratio and is unaffected as well
     * - ``max_single_position``
