@@ -56,6 +56,13 @@
  *  one-price board from a padded suspension bar). The mode B pass-through legs are not re-judged:
  *  the sub-system already gated them with its own parameters.
  *
+ *  The portfolio-level environment judgment (EV): the parent accepts an EV (the inherited setEV)
+ *  and at readyForRun pushes the run query into it and hands the same shared instance to an AF
+ *  without its own EV (a deliberately set AF EV is respected and still gets the query). The
+ *  parent itself does not gate on it: an AF subclass implements the dynamic position total
+ *  control (_getTotalPositionScale, e.g. returning the EV value of the day) with the EV at hand,
+ *  so the whole portfolio position scales with the environment.
+ *
  *  Serialization restores the shadow-account registry and the scheduling counters, so a loaded
  *  system can continue with run(reset=false); the mode C running pools are rebuilt on the next
  *  rebalancing day.

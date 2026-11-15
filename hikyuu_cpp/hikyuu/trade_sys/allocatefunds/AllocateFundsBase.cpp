@@ -36,13 +36,16 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsPtr& af) {
 
 AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // L3 single instrument concentration cap: the target market value <= total assets x this
-    // value (<=0 means no limit, >1 is clamped to 1)
+    // value (0 means no limit, the domain is [0, 1])
     setParam<double>("max_single_position", 1.0);
 
-    // The total budget cap: in mode A the aggregated gross target market value of all instruments
-    // <= net assets x this value, scaled down proportionally when exceeded; in mode B the sum of
-    // the sub-system quotas <= total assets x this value (<=0 disables the cap). The reserved /
-    // unallocated asset ratio of the master reserve_percent is expressed by setting it to 1 - r.
+    // The total budget cap (the static part of the total control): the effective budget =
+    // net assets x this value x getTotalPositionScale(date) (see there). In mode A the aggregated
+    // gross target market value of all instruments <= the effective budget, scaled down
+    // proportionally when exceeded; in mode B the sum of the sub-system quotas <= the effective
+    // budget. 0 disables the cap; >1 is leverage, the dynamic scale can never exceed 1, so the
+    // leverage beyond the net assets is expressed HERE only. The reserved / unallocated asset
+    // ratio of the master reserve_percent is expressed by setting it to 1 - r.
     setParam<double>("max_total_position", 1.0);
 
     // The pricing policy switch: when >0 the fixed amount takes precedence over the weights --
@@ -58,6 +61,10 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // running sub-systems keep their current holdings, only the new sub-systems get the remaining
     // parent cash
     setParam<bool>("adjust_running_sys", true);
+
+    // The sharing strategy of the EV part (aligned with the System shared_ev semantics): a shared
+    // EV is neither cloned by clone() nor reset by reset()
+    setParam<bool>("shared_ev", true);
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
@@ -65,6 +72,7 @@ AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     setParam<double>("max_total_position", 1.0);
     setParam<double>("fixed_amount", 0.0);
     setParam<bool>("adjust_running_sys", true);
+    setParam<bool>("shared_ev", true);
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
@@ -81,10 +89,16 @@ void AllocateFundsBase::baseCheckParam(const string& name) const {
     HKU_CHECK(fixed_name.empty(), "Deprecated hyphenated parameter name '{}'! use '{}' instead",
               name, fixed_name);
 
-    if (name == "max_single_position" || name == "max_total_position") {
-        // <=0 disables the cap and >1 is clamped in use, but a NaN silently disables both risk
-        // controls
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    if (name == "max_single_position") {
+        // 0 disables the cap and 1 caps at the net assets; a negative silently disables it and a
+        // >1 was silently clamped, both hide a configuration mistake
+        double v = getParam<double>(name);
+        HKU_ASSERT(std::isfinite(v) && v >= 0.0 && v <= 1.0);
+    } else if (name == "max_total_position") {
+        // 0 disables the cap and >1 is the documented leverage; a negative silently disables it
+        // and a non-finite value silently disables the risk control as well
+        double v = getParam<double>(name);
+        HKU_ASSERT(std::isfinite(v) && v >= 0.0);
     } else if (name == "fixed_amount") {
         // 0 disables the fixed amount; a negative or non-finite value would silently fall back to
         // the weight pricing
@@ -98,6 +112,10 @@ void AllocateFundsBase::paramChanged() {}
 void AllocateFundsBase::reset() {
     m_query = Null<KQuery>();
     m_tm.reset();
+    // The shared EV is left untouched: it belongs to the other sharers as well
+    if (m_ev && !getParam<bool>("shared_ev")) {
+        m_ev->reset();
+    }
     _reset();
 }
 
@@ -111,6 +129,9 @@ AFPtr AllocateFundsBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_tm = m_tm;
     p->m_query = m_query;
+    // The sharing strategy of the EV part: a shared clone keeps the same instance, an unshared
+    // one gets its own copy (aligned with the System shared_ev semantics)
+    p->m_ev = (m_ev && !getParam<bool>("shared_ev")) ? m_ev->clone() : m_ev;
     return p;
 }
 
@@ -138,6 +159,21 @@ void AllocateFundsBase::allocateTargets(const Datetime& date, const TradeManager
                                         const KQuery& query, const string& mode) {
     _toTargets(date, tm, suggestions, sys_weight, query, mode);
     _checkRisk(date, tm, suggestions, query, mode);
+}
+
+price_t AllocateFundsBase::getTotalPositionScale(const Datetime& date) const {
+    price_t scale = _getTotalPositionScale(date);
+    // The base guarantee: the scale is a coefficient in [0, 1] (0 = driven flat, 1 = the full
+    // max_total_position cap), so an override can never exceed the total control; a NaN is 0
+    // (the clamp alone would pass it through)
+    if (std::isnan(scale)) {
+        return 0.0;
+    }
+    return std::clamp(scale, 0.0, 1.0);
+}
+
+price_t AllocateFundsBase::_getTotalPositionScale(const Datetime& date) const {
+    return 1.0;
 }
 
 AllocateFundsBase::Weights AllocateFundsBase::_allocate(const Datetime& date,
@@ -198,7 +234,10 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
         // number of funded sub-systems is truncated instead and every funded one keeps its full
         // amount (<=0 disables the cap)
         double max_total = getParam<double>("max_total_position");
-        double cap = (max_total > 0.0 && net_assets > 0.0) ? net_assets * max_total : -1.0;
+        // The dynamic position total control (see getTotalPositionScale) scales the cap
+        double cap = (max_total > 0.0 && net_assets > 0.0)
+                       ? net_assets * max_total * getTotalPositionScale(date)
+                       : -1.0;
         size_t quota_count = 0;
         for (const auto& ctx : contexts) {
             if (ctx.sys) {
@@ -289,7 +328,13 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // mirror the sub books, so AF does not chase orphan holdings).
     double parent_net = tm->getFunds(date, ktype).net_assets();
     double fixed_amount = getParam<double>("fixed_amount");
-    double max_total = getParam<double>("max_total_position");
+    // The dynamic position total control (see getTotalPositionScale) scales the cap. The static
+    // cap <= 0 (or no net assets to price it) keeps the total control disabled; a zero effective
+    // cap (the scale 0) is an enabled cap of zero = driven flat, so the enabled test must not be
+    // "the effective value > 0"
+    double max_total_param = getParam<double>("max_total_position");
+    bool cap_enabled = (max_total_param > 0.0 && parent_net > 0.0);
+    double max_total = cap_enabled ? max_total_param * getTotalPositionScale(date) : -1.0;
 
     std::map<Stock, double> target_value;  // instrument -> signed net target market value
     std::map<Stock, double> fixed_dir;  // instrument -> aggregated signed direction (fixed_amount)
@@ -355,7 +400,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         // every target. Only executable targets are charged: an unexecutable short leg (clamped
         // away below) and a target below one board lot (dropped by the opening-leg filter later)
         // must not consume a quota that another instrument could use
-        double remaining = (max_total > 0.0 && parent_net > 0.0) ? parent_net * max_total : -1.0;
+        double remaining = cap_enabled ? parent_net * max_total : -1.0;
         size_t eligible = 0;
         size_t funded = 0;
         for (const auto& stk : fixed_order) {
@@ -432,7 +477,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // max_total_position, scaled down proportionally (<=0 disables the cap). Only the weight
     // pricing reaches here with an over-budget gross: the fixed_amount targets are already
     // truncated above, so their gross never exceeds the cap
-    if (max_total > 0.0 && parent_net > 0.0 && gross > parent_net * max_total) {
+    if (cap_enabled && gross > parent_net * max_total) {
         double scale = parent_net * max_total / gross;
         HKU_DEBUG(
           "{}::_toTargets: the aggregated gross target({:.2f}) exceeds max_total_position({}) x "
@@ -544,15 +589,11 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
         return;
     }
     // The concentration upper limit: the target position market value of a single instrument <=
-    // net assets x max_single_position (<=0 means no limit; >1 is clamped to 1). The net assets
-    // are the denominator so that a levered account is not granted a larger cap by the borrowed
-    // funds.
+    // net assets x max_single_position (0 means no limit). The net assets are the denominator so
+    // that a levered account is not granted a larger cap by the borrowed funds.
     double max_ratio = getParam<double>("max_single_position");
     if (max_ratio <= 0.0) {
         return;
-    }
-    if (max_ratio > 1.0) {
-        max_ratio = 1.0;
     }
     KQuery::KType ktype = query.kType();
     double net_assets = tm ? tm->getFunds(date, ktype).net_assets() : 0.0;

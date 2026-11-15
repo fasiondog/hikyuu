@@ -217,6 +217,24 @@ void MultiSystem::readyForRun() {
 
     _refreshRunConfig();
 
+    // The portfolio-level environment judgment (EV): the parent only accepts and forwards it --
+    // the query is pushed so the shared calculation stays current with the run. An AF without its
+    // own EV inherits the parent instance (one place setting), while a deliberately set AF EV is
+    // respected and still gets the query. The parent does not gate on it: an AF subclass
+    // implements the dynamic position total control (_getTotalPositionScale, e.g. returning the
+    // EV value of the day) with the EV at hand.
+    if (m_af && !m_af->getEV() && m_ev) {
+        m_af->setEV(m_ev);
+    }
+    if (!m_kdata.empty()) {
+        if (m_ev) {
+            m_ev->setQuery(m_kdata.getQuery());
+        }
+        if (m_af && m_af->getEV()) {
+            m_af->getEV()->setQuery(m_kdata.getQuery());
+        }
+    }
+
     // The rebalancing days are the run-level input of the cycle signals: push the days declared by
     // _runAxis down BEFORE the sub-system trading objects are (re)calculated. The entries without a
     // precomputed axis (runMoment* / intraday live / nested) declare each day at the close stage
@@ -3412,8 +3430,7 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
 
     // trace: output the rebalancing suggestions and trades
     if (getParam<bool>("trace")) {
-        HKU_INFO_IF(!suggestions.empty(), "[{}] {} | {} adjust suggestions={} executed={}", getPath(), datetime.ymd(), name(), suggestions.size(),
-                 executed.size());
+        HKU_INFO_IF(!suggestions.empty(), "[{}] {} | {} adjust suggestions={} executed={}", getPath(), datetime.ymd(), name(), suggestions.size(), executed.size());
         for (auto& s : suggestions) {
             const char* typ = s.type == SuggestionType::BUY
                                 ? "BUY"

@@ -119,14 +119,17 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     * - ``max_single_position``
       - float，1.0
       - 仅 A
-      - L3 单标的集中度上限：单标的目标持仓市值 ≤ 净资产 × 该值。≤0 表示不限制；大于 1 时按 1.0 生效
+      - L3 单标的集中度上限：单标的目标持仓市值 ≤ 净资产 × 该值。0 表示不限制；
+        取值范围为 [0, 1]，负数与大于 1 的设置会在参数检查时被拒绝
     * - ``max_total_position``
       - float，1.0
       - A / B
       - 总预算上限：模式 A 下限定 L2 全部标的聚合目标市值 ≤ 净资产 × 该值；
         模式 B 下限定 L1 各子系统**配额总和** ≤ 净资产 × 该值。
         两种口径均**包含** ``fixed_amount`` 定价部分：权重定价按**等比缩减**，固定额度按**整数个额度**
-        截断（详见下）。≤0 表示不限制；>1 即允许杠杆
+        截断（详见下）。0 表示不限制、>1 即允许杠杆，负数与非有限值会在参数检查时被拒绝。
+        该上限再乘以**动态总仓位系数**（``_get_total_position_scale``，默认 1.0，
+        见下文「市场环境判定（EV）与动态仓位总控」）
     * - ``fixed_amount``
       - float，0.0
       - A / B
@@ -141,6 +144,11 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
         ``False``：已运行子系统保持现状（不回收、不减持、不注资），
         仅新子系统获配剩余父账户现金（受父账户余额限制，可能不足额）。
         模式 A 每 bar 重定目标、恒调整；模式 C 无配额、恒不调整——两者均不受该参数影响
+    * - ``shared_ev``
+      - bool，True
+      - 全部
+      - EV 部件的共享策略（与 System 各部件一致）：``True`` 时克隆共享同一 EV 实例、复位不动 EV；
+        ``False`` 时克隆获得独立副本、复位时一并复位 EV
 
 注意事项：
 
@@ -198,6 +206,49 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
         两处都只**收缩**超额部分：L3 裁剪释放出的预算**不会**再分配给其它标的，
         因此最终总敞口可能明显低于 ``max_total_position``（如 10 个等权标的、单标的上限 0.05 时，
         总敞口仅 0.5 × 净资产）
+
+
+市场环境判定（EV）与动态仓位总控
+----------------------------------
+
+AF 基类持有市场环境判定组件（EV，见 :doc:`../trade_sys/environment`），但**只承载、不解释**：
+EV 值如何映射到仓位由子类通过**动态仓位总控接口**自行实现，基类保证接口返回值合法：
+
+* **父层接受组合级 EV**：:class:`MultiSystem` 通过继承的 ``setEV`` 设置组合级 EV，
+  在 ``readyForRun`` 时把运行 query 下发给 EV（保持共享计算与运行一致），
+  并把同一共享实例交给**未自带 EV** 的 AF（AF 自带 EV 时保持不变）；
+* **动态仓位总控（func + _func）**：公共入口 ``get_total_position_scale(date)`` 调用重载接口
+  ``_get_total_position_scale(date)``，返回**当日总仓位系数**——``max_total_position``
+  总预算上限内的动态比例：有效总预算 = 净资产 × ``max_total_position`` × 系数。
+  默认实现返回 1.0（不缩放，行为不变）；基类将系数**钳到 [0, 1]**（1 = 满上限，
+  NaN 按 0、±inf 按区间端点映射），重载值不可能突破总控——
+  超出上限的杠杆由 ``max_total_position > 1`` 表达；
+* **系数为 0 的效果**：模式 A 全部标的驱动平仓；模式 B 全部配额清零
+  （已运行子系统是否强制调整到零配额仍由 ``adjust_running_sys`` 决定，
+  为 False 时它们会保持现有持仓）；
+* **EV 值本身不限 [0, 1]**：子类可直接返回当日 EV 值作为系数，超过 1 的部分按 1（满上限）处理；
+  EV 无效（``is_valid`` 为假，含未注册日期）时应返回 0；
+* **``shared_ev`` 参数**（默认 True）：与各部件一致——克隆时共享 EV 实例、复位时不动 EV；
+  设为 False 时克隆获得独立副本、复位时一并复位 EV；
+* 未设置 EV 且不重载时行为完全不变。
+
+.. code-block:: python
+
+    class MyAF(AllocateFundsBase):
+        def _get_total_position_scale(self, date):
+            # 按当日 EV 值动态控制总仓位：EV 缺失时满仓，无效时清零
+            ev = self.ev
+            if ev is None:
+                return 1.0
+            return ev.get_value(date) if ev.is_valid(date) else 0.0
+
+    af = MyAF()
+    af.ev = EV_TwoLine(...)  # 组合级 EV（也可通过 MultiSystem 的 setEV 设置）
+
+只重载 ``_get_total_position_scale`` 即可：默认的 ``_allocate`` 会在 L1/L2 中把系数
+乘到 ``max_total_position`` 上限上。若子类自行重载 ``_allocate`` / ``_to_targets``，
+则基类的总控不再自动生效，需要自行保持总仓位约束（Python 子类可在 ``_allocate``
+内调用 ``_apply_weights`` 复用基类总控）。
 
 
 内建资产分配算法
@@ -305,6 +356,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
+    .. py:attribute:: ev    设置或获取市场环境判定组件（EV）；基类仅承载供子类使用，具体见 ``_get_total_position_scale``
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 
@@ -349,6 +401,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
         L1/L2/L3 统一入口（通常由 :class:`MultiSystem` 内部调用）：先执行 ``_allocate`` 得到权重，
         再经 ``_to_targets`` 换算为可执行数量，最后经 ``_check_risk`` 组合风控裁剪。
+        有效总预算 = 净资产 × ``max_total_position`` × 动态总仓位系数（见上文）。
 
         .. note::
 
@@ -391,6 +444,24 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
         未重载时使用基类默认实现。
 
         :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有
+
+    .. py:method:: get_total_position_scale(self, date)
+
+        获取当日**动态总仓位系数**（动态仓位总控入口）：``max_total_position``
+        总预算上限内的动态比例，0 表示清仓、1 表示满上限。
+        基类将返回值钳到 [0, 1]（NaN 按 0、±inf 按区间端点映射），不会突破总控。
+
+        :param Datetime date: 交易日
+        :return: 总仓位系数（float，[0, 1]）
+
+    .. py:method:: _get_total_position_scale(self, date)
+
+        【重载接口】动态仓位总控：返回当日总仓位系数（见 ``get_total_position_scale``）。
+        默认实现返回 1.0（不缩放，行为不变）；子类自行实现动态算法，
+        如读取 ``ev`` 返回当日 EV 值（原始值不限，基类钳到 [0, 1]）。
+
+        :param Datetime date: 交易日
+        :return: 总仓位系数
 
     .. py:method:: _reset(self)
 

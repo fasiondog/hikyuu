@@ -37,6 +37,7 @@
 #include <hikyuu/trade_sys/system/crt/SYS_WalkForward.h>
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
+#include <hikyuu/trade_sys/environment/crt/EV_Manual.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
@@ -808,11 +809,13 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
     af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
-    /** @arg max_single_position>1.0: clamped to 1.0 */
-    af->setParam<double>("max_single_position", 3.0);
-    suggestions[0] = s;
-    af->_checkRisk(date, tm, suggestions, KQuery(), "A");
-    CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
+    /** @arg max_single_position > 1.0 is rejected by the parameter check (it was silently
+     *  clamped to 1.0 before) */
+    CHECK_THROWS_AS(af->setParam<double>("max_single_position", 3.0), std::exception);
+
+    /** @arg a negative value is rejected as well (use 0 for no limit) */
+    CHECK_THROWS_AS(af->setParam<double>("max_single_position", -0.5), std::exception);
+    CHECK_THROWS_AS(af->setParam<double>("max_total_position", -1.0), std::exception);
 
     /** @arg mode B: risk control is skipped (respecting sub-manager autonomy, number unchanged) */
     af->setParam<double>("max_single_position", 0.5);
@@ -7761,6 +7764,42 @@ TEST_CASE("test_MultiSystem_mode_c_all_delayed_trades") {
     CHECK_EQ(bought, 200);
     CHECK_EQ(parent->getTM()->getHoldNumber(kdata[3].datetime, stock), 200);
     CHECK_EQ(parent->getTradeRecordList().size(), child->getTradeRecordList().size());
+}
+
+/** @par Check point: the portfolio-level EV forwarding (the AF inherits the parent EV only when it
+ *  has none, and the run query is pushed into both) */
+TEST_CASE("test_MultiSystem_ev_forwarding") {
+    Stock stock("TEST", "EVFWD", "EV forwarding");
+    stock.setKRecordList({KRecord(Datetime(202001020000), 10, 11, 9, 10, 100, 100),
+                          KRecord(Datetime(202001030000), 10, 11, 9, 10, 100, 100)});
+    KData kdata = stock.getKData(KQuery(0));
+    auto sg = SG_Manual();
+    sg->setParam<bool>("alternate", false);
+    sg->_addBuySignal(kdata[0].datetime);
+    auto child = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    child->setTO(kdata);
+
+    auto parent = std::make_shared<MultiSystem>(SystemList{child});
+    parent->setTM(crtTM(Datetime(201901010000), 100000.0, TC_Zero()));
+    parent->setMode("A");
+    auto af = AF_EqualWeight();
+    parent->setAF(af);
+
+    /** @arg an AF without its own EV inherits the parent instance at readyForRun, and the run
+     *  query is pushed into it */
+    auto ev_parent = EV_Manual();
+    parent->setEV(ev_parent);
+    parent->run(kdata);
+    CHECK_UNARY(af->getEV() == ev_parent);
+    CHECK_EQ(ev_parent->getQuery().startDatetime(), kdata.getQuery().startDatetime());
+
+    /** @arg a deliberately set AF EV is respected (not overwritten by the parent one) and still
+     *  gets the run query pushed */
+    auto ev_af = EV_Manual();
+    af->setEV(ev_af);
+    parent->run(kdata);
+    CHECK_UNARY(af->getEV() == ev_af);
+    CHECK_EQ(ev_af->getQuery().startDatetime(), kdata.getQuery().startDatetime());
 }
 
 /** @} */ /** @} */

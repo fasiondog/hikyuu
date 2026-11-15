@@ -3,10 +3,10 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  Unit tests for the portfolio-level fund allocation (AF): the base parameters, the
- *  fixed-weight-list parameter validation, the L1/L2/L3 hooks driven directly with hand-built
- *  contexts / suggestions (the gross aggregation, the weight lookup, the reversal legs and the
- *  shrink-only L3 clipping).
+ *  Unit tests for the portfolio-level fund allocation (AF): the base parameters and their
+ *  domains, the fixed-weight-list parameter validation, the L1/L2/L3 hooks driven directly with
+ *  hand-built contexts / suggestions (the gross aggregation, the weight lookup, the reversal legs
+ *  and the shrink-only L3 clipping), the dynamic position total control and the EV holding.
  */
 
 #include "../../test_config.h"
@@ -17,6 +17,7 @@
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_EqualWeight.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedAmount.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedWeightList.h>
+#include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include "../system/create_test_sys.h"
 
 using namespace hku;
@@ -26,6 +27,47 @@ using namespace hku;
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */
+
+/** A minimal EV for the tests: 20000101 -> 1.0 (full), 20000102 -> 0.5 (half), any other day is
+ *  never registered (invalid) */
+class TestEv : public EnvironmentBase {
+public:
+    TestEv() : EnvironmentBase("TestEv") {}
+    void _calculate() override {
+        _addValid(Datetime(200001010000LL), 1.0);
+        _addValid(Datetime(200001020000LL), 0.5);
+    }
+    EnvironmentPtr _clone() override {
+        return std::make_shared<TestEv>();
+    }
+};
+
+/** A custom AF standing for an EV-driven subclass: the dynamic total control returns the EV value
+ *  of the day (the intended usage of the EV held by the base) */
+class EVScaleAf : public AllocateFundsBase {
+public:
+    EVScaleAf() : AllocateFundsBase("EVScaleAf") {}
+    price_t _getTotalPositionScale(const Datetime& date) const override {
+        HKU_IF_RETURN(!getEV(), 1.0);
+        HKU_IF_RETURN(!getEV()->isValid(date), 0.0);
+        price_t value = getEV()->getValue(date);
+        return value > 0.0 ? value : 0.0;
+    }
+    ALLOCATE_FUNDS_IMP(EVScaleAf)
+};
+
+/** A custom AF with a fixed total position scale (any value, to test the base guarantee and the
+ *  cap composition) */
+class FixedScaleAf : public AllocateFundsBase {
+public:
+    FixedScaleAf() : AllocateFundsBase("FixedScaleAf"), m_scale(1.0) {}
+    explicit FixedScaleAf(price_t scale) : AllocateFundsBase("FixedScaleAf"), m_scale(scale) {}
+    price_t _getTotalPositionScale(const Datetime&) const override {
+        return m_scale;
+    }
+    price_t m_scale;
+    ALLOCATE_FUNDS_IMP(FixedScaleAf)
+};
 
 /** @par Test points */
 TEST_CASE("test_AllocateFunds_base_params") {
@@ -57,31 +99,36 @@ TEST_CASE("test_AllocateFunds_base_params") {
     CHECK_EQ(af->getParam<double>("fixed_amount"), doctest::Approx(30000.0));
     CHECK_EQ(af->getParam<bool>("adjust_running_sys"), false);
 
-    /** @arg max_single_position is not bounded from below (<=0 means no limit, no clamp on set) */
+    /** @arg max_single_position = 0 disables the limit, a negative value is rejected */
     CHECK_NOTHROW(af->setParam<double>("max_single_position", 0.0));
     CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(0.0));
-    CHECK_NOTHROW(af->setParam<double>("max_single_position", -1.0));
-    CHECK_EQ(af->getParam<double>("max_single_position"), doctest::Approx(-1.0));
+    CHECK_THROWS_AS(af->setParam<double>("max_single_position", -1.0), std::exception);
 }
 
 /** @par Test points */
 TEST_CASE("test_AllocateFunds_checkParam") {
     AFPtr af = AF_EqualWeight();
 
-    /** @arg a NaN max_single_position is rejected (it would silently disable the concentration cap)
-     */
+    /** @arg a non-finite max_single_position is rejected (it would silently disable the
+     *  concentration cap) */
     CHECK_THROWS_AS(af->setParam<double>("max_single_position", std::nan("")), std::exception);
+    CHECK_THROWS_AS(
+      af->setParam<double>("max_single_position", std::numeric_limits<double>::infinity()),
+      std::exception);
 
-    /** @arg a NaN max_total_position is rejected (it would silently disable the total budget cap)
-     */
+    /** @arg a non-finite max_total_position is rejected (it would silently disable the total
+     *  budget cap) */
     CHECK_THROWS_AS(af->setParam<double>("max_total_position", std::nan("")), std::exception);
 
-    /** @arg non-positive / >1 values stay valid: <=0 means no limit and >1 is clamped in use */
+    /** @arg the parameter domains: max_single_position in [0, 1], max_total_position >= 0 with
+     *  >1 as the documented leverage */
     CHECK_NOTHROW(af->setParam<double>("max_single_position", 0.0));
-    CHECK_NOTHROW(af->setParam<double>("max_single_position", -1.0));
-    CHECK_NOTHROW(af->setParam<double>("max_single_position", 2.0));
+    CHECK_NOTHROW(af->setParam<double>("max_single_position", 1.0));
+    CHECK_THROWS_AS(af->setParam<double>("max_single_position", -1.0), std::exception);
+    CHECK_THROWS_AS(af->setParam<double>("max_single_position", 2.0), std::exception);
     CHECK_NOTHROW(af->setParam<double>("max_total_position", 0.0));
     CHECK_NOTHROW(af->setParam<double>("max_total_position", 2.0));
+    CHECK_THROWS_AS(af->setParam<double>("max_total_position", -1.0), std::exception);
 
     /** @arg fixed_amount: 0 (disabled) and a positive amount are valid */
     CHECK_NOTHROW(af->setParam<double>("fixed_amount", 0.0));
@@ -481,6 +528,186 @@ TEST_CASE("test_AllocateFunds_L3_shrink_only") {
         gross += o.plan_cash;
     }
     CHECK_EQ(gross, doctest::Approx(50000.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_AllocateFunds_ev_property") {
+    auto af = AF_EqualWeight();
+
+    /** @arg no EV is held by default */
+    CHECK_UNARY(!af->getEV());
+
+    /** @arg setEV/getEV keeps the same shared instance (no clone on set) */
+    auto ev = std::make_shared<TestEv>();
+    ev->setQuery(KQuery(0, 10));  // trigger the calculation so the values exist
+    af->setEV(ev);
+    CHECK_UNARY(af->getEV() == ev);
+    CHECK_EQ(af->getEV()->getValue(Datetime(200001020000LL)), doctest::Approx(0.5));
+
+    /** @arg shared_ev=true (the default): the clone shares the EV instance */
+    auto af2 = af->clone();
+    CHECK_UNARY(af2->getEV() == af->getEV());
+
+    /** @arg shared_ev=false: the clone gets its own copy */
+    af->setParam<bool>("shared_ev", false);
+    auto af3 = af->clone();
+    CHECK_UNARY(af3->getEV() && af3->getEV() != af->getEV());
+
+    /** @arg shared_ev=true: the reset leaves the EV untouched (the values survive) */
+    af->setParam<bool>("shared_ev", true);
+    af->reset();
+    CHECK_EQ(af->getEV()->getValue(Datetime(200001010000LL)), doctest::Approx(1.0));
+
+    /** @arg shared_ev=false: the reset resets the EV (the calculated values are dropped) */
+    af->setParam<bool>("shared_ev", false);
+    af->reset();
+    CHECK_EQ(af->getEV()->getValue(Datetime(200001010000LL)), doctest::Approx(0.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_AllocateFunds_total_position_scale") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // net assets 100000
+    Datetime date(200001010000LL);
+    auto sys1 = create_test_sys(3, 5);
+    auto sys2 = create_test_sys(5, 10);
+
+    /** @arg the default hook returns 1.0: the behavior is unchanged */
+    auto af = AF_EqualWeight();
+    CHECK_EQ(af->getTotalPositionScale(date), doctest::Approx(1.0));
+    SubSystemContextList contexts(2);
+    contexts[0].sys = sys1;
+    contexts[1].sys = sys2;
+    af->_allocate(date, tm, contexts, KQuery(), "B");
+    CHECK_EQ(contexts[0].quota, doctest::Approx(50000.0));
+    CHECK_EQ(contexts[1].quota, doctest::Approx(50000.0));
+
+    /** @arg the scale 0.5 halves the total budget: the quotas are 25000 each */
+    auto half = std::make_shared<FixedScaleAf>(0.5);
+    SubSystemContextList half_ctxs(2);
+    half_ctxs[0].sys = sys1;
+    half_ctxs[1].sys = sys2;
+    half->_allocate(date, tm, half_ctxs, KQuery(), "B");
+    CHECK_EQ(half_ctxs[0].quota, doctest::Approx(25000.0));
+    CHECK_EQ(half_ctxs[1].quota, doctest::Approx(25000.0));
+
+    /** @arg the scale 0 drives everything flat: every quota is 0 */
+    auto flat = std::make_shared<FixedScaleAf>(0.0);
+    SubSystemContextList flat_ctxs(2);
+    flat_ctxs[0].sys = sys1;
+    flat_ctxs[1].sys = sys2;
+    flat->_allocate(date, tm, flat_ctxs, KQuery(), "B");
+    CHECK_EQ(flat_ctxs[0].quota, doctest::Approx(0.0));
+    CHECK_EQ(flat_ctxs[1].quota, doctest::Approx(0.0));
+
+    /** @arg the base guarantee: a negative scale is floored to 0 */
+    auto neg = std::make_shared<FixedScaleAf>(-1.0);
+    CHECK_EQ(neg->getTotalPositionScale(date), doctest::Approx(0.0));
+
+    /** @arg the base guarantee: a NaN scale is 0 */
+    auto nan = std::make_shared<FixedScaleAf>(std::nan(""));
+    CHECK_EQ(nan->getTotalPositionScale(date), doctest::Approx(0.0));
+
+    /** @arg the base guarantee: +inf maps to 1.0 and -inf maps to 0.0 */
+    auto pinf = std::make_shared<FixedScaleAf>(std::numeric_limits<price_t>::infinity());
+    auto ninf = std::make_shared<FixedScaleAf>(-std::numeric_limits<price_t>::infinity());
+    CHECK_EQ(pinf->getTotalPositionScale(date), doctest::Approx(1.0));
+    CHECK_EQ(ninf->getTotalPositionScale(date), doctest::Approx(0.0));
+
+    /** @arg the base guarantee: an over-range scale (2.5) is clamped to 1.0, so an override can
+     *  never exceed the max_total_position total control */
+    auto over = std::make_shared<FixedScaleAf>(2.5);
+    CHECK_EQ(over->getTotalPositionScale(date), doctest::Approx(1.0));
+
+    /** @arg mode A, scale 0.5: the gross target is scaled to half (2500 shares each) */
+    Stock a = getStock("sz000001");
+    Stock b = getStock("sh600000");
+    REQUIRE(!a.isNull());
+    REQUIRE(!b.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+    TradeSuggestion s;
+    s.stock = a;
+    s.sys = sys;
+    s.plan_price = 10.0;
+    s.target_position_ratio = 0.5;  // each instrument 50000, gross 100000
+    TradeSuggestion sb = s;
+    sb.stock = b;
+    TradeSuggestionList half_targets{s, sb};
+    half->_toTargets(date, tm, half_targets, weights, KQuery(), "A");
+    REQUIRE_EQ(half_targets.size(), 2);
+    for (const auto& o : half_targets) {
+        CHECK_EQ(o.number, doctest::Approx(2500.0));
+    }
+
+    /** @arg mode A, scale 0: the held instrument is driven flat (SELL the long), the empty one
+     *  produces no order */
+    auto tm_hold = crtTM(Datetime(200001010000LL), 100000.0);
+    REQUIRE(!tm_hold->buy(date, a, 10.0, 1000.0).isNull());
+    TradeSuggestionList flat_targets{s, sb};
+    flat->_toTargets(date, tm_hold, flat_targets, weights, KQuery(), "A");
+    REQUIRE_EQ(flat_targets.size(), 1);
+    CHECK_UNARY(flat_targets[0].stock == a);
+    CHECK(flat_targets[0].type == SuggestionType::SELL);
+    CHECK_EQ(flat_targets[0].number, doctest::Approx(1000.0));
+
+    /** @arg mode A: the over-range scale (2.5) is clamped to 1.0, so the ratio 1.5 target of
+     *  150000 stays bounded by the static cap 100000 (10000 shares, never leveraged) */
+    TradeSuggestion over_target{s};
+    over_target.target_position_ratio = 1.5;
+    TradeSuggestionList clamped_targets{over_target};
+    over->_toTargets(date, tm, clamped_targets, weights, KQuery(), "A");
+    REQUIRE_EQ(clamped_targets.size(), 1);
+    CHECK_EQ(clamped_targets[0].number, doctest::Approx(10000.0));
+
+    /** @arg the same target without any override reaches the same bound */
+    TradeSuggestionList capped_targets{over_target};
+    af->_toTargets(date, tm, capped_targets, weights, KQuery(), "A");
+    REQUIRE_EQ(capped_targets.size(), 1);
+    CHECK_EQ(capped_targets[0].number, doctest::Approx(10000.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_AllocateFunds_ev_driven_scale") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // net assets 100000
+    auto af = std::make_shared<EVScaleAf>();
+    auto ev = std::make_shared<TestEv>();
+    ev->setQuery(KQuery(0, 10));  // trigger the calculation so the values exist
+    af->setEV(ev);
+    auto sys1 = create_test_sys(3, 5);
+    auto sys2 = create_test_sys(5, 10);
+
+    /** @arg the EV value 1.0 keeps the equal weight 1/2 (each 50000) */
+    SubSystemContextList contexts(2);
+    contexts[0].sys = sys1;
+    contexts[1].sys = sys2;
+    af->_allocate(Datetime(200001010000LL), tm, contexts, KQuery(), "B");
+    CHECK_EQ(contexts[0].quota, doctest::Approx(50000.0));
+    CHECK_EQ(contexts[1].quota, doctest::Approx(50000.0));
+
+    /** @arg the EV value 0.5 halves the total budget: the quotas are 25000 each */
+    SubSystemContextList half(2);
+    half[0].sys = sys1;
+    half[1].sys = sys2;
+    af->_allocate(Datetime(200001020000LL), tm, half, KQuery(), "B");
+    CHECK_EQ(half[0].quota, doctest::Approx(25000.0));
+    CHECK_EQ(half[1].quota, doctest::Approx(25000.0));
+
+    /** @arg an invalid (never registered) day drives everything flat: every quota is 0 */
+    SubSystemContextList invalid(2);
+    invalid[0].sys = sys1;
+    invalid[1].sys = sys2;
+    af->_allocate(Datetime(200001030000LL), tm, invalid, KQuery(), "B");
+    CHECK_EQ(invalid[0].quota, doctest::Approx(0.0));
+    CHECK_EQ(invalid[1].quota, doctest::Approx(0.0));
+
+    /** @arg without an EV the subclass falls back to 1.0 (the behavior is unchanged) */
+    af->setEV(EnvironmentPtr());
+    SubSystemContextList plain(2);
+    plain[0].sys = sys1;
+    plain[1].sys = sys2;
+    af->_allocate(Datetime(200001020000LL), tm, plain, KQuery(), "B");
+    CHECK_EQ(plain[0].quota, doctest::Approx(50000.0));
+    CHECK_EQ(plain[1].quota, doctest::Approx(50000.0));
 }
 
 /** @} */
