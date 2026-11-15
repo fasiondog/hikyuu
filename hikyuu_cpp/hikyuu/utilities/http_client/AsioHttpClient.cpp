@@ -704,12 +704,13 @@ net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
         : resolver(r), host(h), port(p) {}
 
         net::awaitable<net::error_code> run() {
-            auto [e, eps] =
-              co_await resolver->async_resolve(host, port, net::as_tuple(net::use_awaitable));
-            ec = e;
+            net::error_code resolve_ec;
+            auto eps = co_await resolver->async_resolve(
+              host, port, net::redirect_error(net::use_awaitable, resolve_ec));
+            ec = resolve_ec;
             endpoints = std::move(eps);
             done = true;
-            co_return e;
+            co_return ec;
         }
     };
 
