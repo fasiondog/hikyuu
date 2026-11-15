@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+  <rect width="400" height="220" rx="12" fill="#eef2ff"/>
+  <circle cx="200" cy="88" r="36" fill="#c7d2fe"/>
+  <path d="M60 170 Q120 120 180 150 T340 130" stroke="#6366f1" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <text x="200" y="200" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#6366f1">示例图片：images/placeholder.svg</text>
+</svg>

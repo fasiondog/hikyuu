@@ -1,0 +1,33 @@
+---
+layout: default
+title: 博客
+lang: zh
+---
+
+<div class="blog-header">
+  <span class="blog-badge">Hikyuu Blog</span>
+  <h1>博客</h1>
+  <p>Hikyuu 相关的文章与笔记</p>
+</div>
+
+{% assign posts = site.pages | where: "layout", "post" | where: "lang", "zh" | sort: "date" | reverse %}
+{% if posts.size > 0 %}
+{% assign posts_by_year = posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+{% for year_group in posts_by_year %}
+<section class="year-group">
+  <h2 class="year-heading">{{ year_group.name }} 年</h2>
+  <div class="post-list">
+    {% for post in year_group.items %}
+    {% capture excerpt %}{{ post.content | strip_html | strip_newlines | truncate: 120 }}{% endcapture %}
+    <a class="post-card" href="{{ post.url | relative_url }}">
+      <span class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</span>
+      <h3>{{ post.title }}</h3>
+      <p>{{ post.summary | default: excerpt }}</p>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% else %}
+<div class="blog-empty">暂无文章</div>
+{% endif %}

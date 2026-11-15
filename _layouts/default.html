@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="{% if page.lang == 'en' %}en{% else %}zh-CN{% endif %}">
+<head>
+  <meta charset="UTF-8">
+  <title>{% if page.title %}{{ page.title }} · {% endif %}Hikyuu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script>
+    // 主题：localStorage 选择 > 系统偏好（渲染前设置，避免闪烁）
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('hikyuu-blog-theme'); } catch (e) { }
+      var theme = (saved === 'dark' || saved === 'light')
+        ? saved
+        : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --gray: #64748b;
+      --gray-light: #94a3b8;
+
+      /* 亮色主题 */
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --text-body: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-hover-border: rgba(129, 140, 248, 0.45);
+      --card-hover-shadow: 0 12px 30px -8px rgba(99, 102, 241, 0.18);
+      --code-bg: #e2e8f0;
+      --pre-bg: #0f172a;
+      --pre-border: transparent;
+      --pre-text: #e2e8f0;
+      --blockquote-bg: #eef2ff;
+      --blockquote-text: #4338ca;
+      --th-bg: #f1f5f9;
+      --divider: #e2e8f0;
+    }
+
+    html[data-theme="dark"] {
+      /* 暗色主题 */
+      --bg: #0a0f1e;
+      --text: #f1f5f9;
+      --text-body: #cbd5e1;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --card-bg: #111a2e;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(129, 140, 248, 0.45);
+      --card-hover-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.5);
+      --code-bg: #1e293b;
+      --pre-bg: #0b1220;
+      --pre-border: rgba(255, 255, 255, 0.08);
+      --pre-text: #e2e8f0;
+      --blockquote-bg: rgba(99, 102, 241, 0.12);
+      --blockquote-text: #a5b4fc;
+      --th-bg: #0f172a;
+      --divider: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.8;
+      color: var(--text);
+      background: var(--bg);
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    /* Navbar：与主站一致的深色导航 */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary-light);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      margin-left: auto;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+
+    /* 主题切换按钮 */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .theme-toggle:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* 亮色显示月亮（点击切到暗色），暗色显示太阳 */
+    html[data-theme="light"] .icon-sun {
+      display: none;
+    }
+
+    html[data-theme="dark"] .icon-moon {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        gap: 1.25rem;
+      }
+    }
+
+    /* 页面主体 */
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 7rem 1.5rem 4rem;
+    }
+
+    /* 文章列表 */
+    .blog-header {
+      margin-bottom: 3rem;
+    }
+
+    .blog-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(6, 182, 212, 0.12));
+      color: var(--primary-light);
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(129, 140, 248, 0.25);
+    }
+
+    html[data-theme="light"] .blog-badge {
+      color: var(--primary);
+    }
+
+    .blog-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .blog-header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    /* 年份分组 */
+    .year-group {
+      margin-bottom: 3rem;
+    }
+
+    .year-heading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--divider);
+    }
+
+    .post-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .post-card {
+      display: block;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.75rem 2rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--card-hover-border);
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    .post-card-date {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    .post-card h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0.35rem 0 0.5rem;
+      color: var(--text);
+    }
+
+    .post-card:hover h3 {
+      color: var(--primary-light);
+    }
+
+    html[data-theme="light"] .post-card:hover h3 {
+      color: var(--primary);
+    }
+
+    .post-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .blog-empty {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 4rem 0;
+    }
+
+    /* 文章页 */
+    .post-header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .post-header h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .post-date {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    /* Markdown 正文排版 */
+    .post-content {
+      font-size: 1.05rem;
+      color: var(--text-body);
+    }
+
+    .post-content h1,
+    .post-content h2,
+    .post-content h3,
+    .post-content h4 {
+      font-weight: 700;
+      margin: 2rem 0 0.8rem;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .post-content h1 { font-size: 1.6rem; }
+    .post-content h2 { font-size: 1.4rem; }
+    .post-content h3 { font-size: 1.15rem; }
+
+    .post-content p {
+      margin: 0.9rem 0;
+    }
+
+    .post-content a {
+      color: var(--primary-light);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(129, 140, 248, 0.35);
+    }
+
+    html[data-theme="light"] .post-content a {
+      color: var(--primary);
+    }
+
+    .post-content a:hover {
+      border-bottom-color: var(--primary-light);
+    }
+
+    .post-content ul,
+    .post-content ol {
+      margin: 0.9rem 0;
+      padding-left: 1.8rem;
+    }
+
+    .post-content li {
+      margin: 0.35rem 0;
+    }
+
+    .post-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.6rem;
+      margin: 1.2rem auto;
+      display: block;
+    }
+
+    .post-content blockquote {
+      margin: 1.2rem 0;
+      padding: 0.8rem 1.25rem;
+      border-left: 4px solid var(--primary-light);
+      background: var(--blockquote-bg);
+      border-radius: 0 0.5rem 0.5rem 0;
+      color: var(--blockquote-text);
+    }
+
+    .post-content code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 0.875em;
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 0.3rem;
+    }
+
+    .post-content pre {
+      background: var(--pre-bg);
+      color: var(--pre-text);
+      border: 1px solid var(--pre-border);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0.75rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      line-height: 1.7;
+    }
+
+    .post-content pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 0.875rem;
+      color: inherit;
+    }
+
+    .post-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0;
+      font-size: 0.95rem;
+    }
+
+    .post-content th,
+    .post-content td {
+      border: 1px solid var(--divider);
+      padding: 0.5rem 0.9rem;
+      text-align: left;
+    }
+
+    .post-content th {
+      background: var(--th-bg);
+      font-weight: 700;
+    }
+
+    .post-content hr {
+      border: none;
+      border-top: 1px solid var(--divider);
+      margin: 2rem 0;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 3rem;
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    html[data-theme="light"] .back-link {
+      color: var(--primary);
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .footer {
+      background: #070a14;
+      color: var(--gray-light);
+      padding: 2rem 2rem;
+      text-align: center;
+      font-size: 0.875rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">Hikyuu</a>
+      <ul class="nav-links">
+        <li><a href="/">{% if page.lang == 'en' %}Home{% else %}首页{% endif %}</a></li>
+        <li><a href="{% if page.lang == 'en' %}{{ '/blog/en/' | relative_url }}{% else %}{{ '/blog/zh/' | relative_url }}{% endif %}">{% if page.lang == 'en' %}Blog{% else %}博客{% endif %}</a></li>
+        <li><a href="https://github.com/fasiondog/hikyuu">GitHub</a></li>
+        <li>
+          <button type="button" class="theme-toggle" id="themeToggle"
+            aria-label="{% if page.lang == 'en' %}Toggle theme{% else %}切换主题{% endif %}">
+            <svg class="icon-moon" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+            </svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2" />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page">
+    {{ content }}
+  </main>
+
+  <footer class="footer">
+    © fasiondog · <a href="https://github.com/fasiondog/hikyuu">Hikyuu</a>
+    · {% if page.lang == 'en' %}Released under the Apache License V2{% else %}基于 Apache License V2 开源协议发布{% endif %}
+  </footer>
+
+  <script>
+    (function () {
+      var KEY = 'hikyuu-blog-theme';
+      var btn = document.getElementById('themeToggle');
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+
+      if (btn) {
+        btn.addEventListener('click', function () {
+          var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+          setTheme(next);
+          try { localStorage.setItem(KEY, next); } catch (e) { }
+        });
+      }
+
+      // 用户未手动选择时，跟随系统主题变化
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      var onChange = function (e) {
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch (err) { }
+        if (saved !== 'dark' && saved !== 'light') {
+          setTheme(e.matches ? 'dark' : 'light');
+        }
+      };
+      if (mq.addEventListener) {
+        mq.addEventListener('change', onChange);
+      } else if (mq.addListener) {
+        mq.addListener(onChange);
+      }
+    })();
+  </script>
+</body>
+</html>

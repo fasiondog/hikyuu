@@ -1,0 +1,11 @@
+# Hikyuu 官网（GitHub Pages / Jekyll）配置
+# 博客文章：blog/<日期>/index.md，目录内可放图片等资源，相对路径引用
+title: Hikyuu
+lang: zh-CN
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+permalink: pretty
