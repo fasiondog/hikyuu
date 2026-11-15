@@ -209,9 +209,9 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 AF 基类持有市场环境判定组件（EV，见 :doc:`../trade_sys/environment`），但**只承载、不解释**：
 EV 值如何映射到仓位由子类通过**动态仓位总控接口**自行实现，基类保证接口返回值合法：
 
-* **父层接受组合级 EV**：:class:`MultiSystem` 通过继承的 ``setEV`` 设置组合级 EV，
-  在 ``readyForRun`` 时把运行 query 下发给 EV（保持共享计算与运行一致），
-  并把同一共享实例交给**未自带 EV** 的 AF（AF 自带 EV 时保持不变）；
+* **父层指定组合级 EV**：:class:`MultiSystem` 在 ``readyForRun`` 时**无条件**把 EV 指定给 AF
+  （AF 上自行赋的值会被覆盖）；运行 query 在 ``run`` 入口对齐一次（``readyForRun`` 可能早于
+  行情数据，盘中逐点驱动不重复改写——EV 可能被子系统共享）；
 * **动态仓位总控（func + _func）**：公共入口 ``get_total_position_scale(date)`` 调用重载接口
   ``_get_total_position_scale(date)``，返回**当日总仓位系数**——``max_total_position``
   总预算上限内的动态比例：有效总预算 = 净资产 × ``max_total_position`` × 系数。
@@ -235,8 +235,9 @@ EV 值如何映射到仓位由子类通过**动态仓位总控接口**自行实�
                 return 1.0
             return ev.get_value(date) if ev.is_valid(date) else 0.0
 
-    af = MyAF()
-    af.ev = EV_TwoLine(...)  # 组合级 EV（也可通过 MultiSystem 的 setEV 设置）
+    ms = MultiSystem()
+    ms.ev = EV_TwoLine(...)  # 组合级 EV 由组合系统指定，运行时下发给 AF
+    ms.af = MyAF()           # AF 在运行时通过 self.ev 读取（只读）
 
 只重载 ``_get_total_position_scale`` 即可：默认的 ``_allocate`` 会在 L1/L2 中把系数
 乘到 ``max_total_position`` 上限上。若子类自行重载 ``_allocate`` / ``_to_targets``，
@@ -349,7 +350,7 @@ EV 值如何映射到仓位由子类通过**动态仓位总控接口**自行实�
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
-    .. py:attribute:: ev    设置或获取市场环境判定组件（EV）；基类仅承载供子类使用，具体见 ``_get_total_position_scale``
+    .. py:attribute:: ev    获取市场环境判定组件（EV）；只读，由组合系统在运行时指定，基类仅承载供子类使用，具体见 ``_get_total_position_scale``
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 

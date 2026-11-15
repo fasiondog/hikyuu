@@ -59,6 +59,7 @@ void MoneyManagerBase::paramChanged() {}
 void MoneyManagerBase::reset() {
     m_query = KQuery();
     m_tm.reset();
+    // The EV/CN are re-assigned by the system on every run
     m_buy_sell_counts.clear();
     _reset();
 }
@@ -73,6 +74,8 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_support_mult_buy_sell = m_support_mult_buy_sell;
     p->m_tm = m_tm;
+    p->m_ev = m_ev;
+    p->m_cn = m_cn;
     p->m_query = m_query;
     p->m_buy_sell_counts = m_buy_sell_counts;
     return p;

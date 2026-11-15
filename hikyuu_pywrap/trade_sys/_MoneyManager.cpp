@@ -109,6 +109,17 @@ The custom money management strategy interfaces:
                     "Set or get the trade manager object")
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
                     py::return_value_policy::copy, "Set or get the query condition")
+      .def_property_readonly("ev", &MoneyManagerBase::getEV,
+                             R"(Get the market environment strategy (EV) of the owning system
+
+Read only: assigned by the system at run time; the base only holds it for the subclass use (e.g.
+sizing the buy quantity by the EV value of the day).)")
+      .def_property_readonly("cn", &MoneyManagerBase::getCN,
+                             R"(Get the system valid condition (CN) of the owning system
+
+Read only: assigned by the system at run time; the base only holds it for the subclass use. Unlike
+the EV, the CN is not driven by the money manager (the system pushes the trading object into it),
+so it only has values inside a system.)")
 
       .def_property(
         "support_mult_buy_sell",

@@ -120,8 +120,7 @@ AFPtr AllocateFundsBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_tm = m_tm;
     p->m_query = m_query;
-    // The EV is a configuration usually shared with the parent aggregate: the clone keeps the
-    // same instance
+    // The EV is re-assigned by the aggregate system on every run
     p->m_ev = m_ev;
     return p;
 }

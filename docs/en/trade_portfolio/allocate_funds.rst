@@ -244,10 +244,10 @@ but **only carries it, never interprets it**: how the EV value maps to the posit
 the subclass through the **dynamic position total control interface**, and the base guarantees that
 the interface result is usable:
 
-* **The parent accepts the portfolio-level EV**: :class:`MultiSystem` sets it via the inherited
-  ``setEV``; at ``readyForRun`` it pushes the run query into the EV (keeping the shared calculation in
-  step with the run) and hands the same shared instance to an AF **without its own EV** (a deliberately
-  set AF EV is respected);
+* **The parent assigns the portfolio-level EV**: :class:`MultiSystem` assigns it to the AF
+  **unconditionally** at ``readyForRun`` (a value set on the AF is overwritten); the run query is
+  aligned once at the ``run`` entry (``readyForRun`` may precede any KData, and the intraday drives
+  do not re-align it: the EV may be shared by the sub-systems);
 * **The dynamic position total control (func + _func)**: the public entry ``get_total_position_scale(date)``
   calls the override hook ``_get_total_position_scale(date)`` which returns the **total position scale of
   the day** -- the dynamic fraction of the ``max_total_position`` cap: the effective total budget = the net
@@ -274,8 +274,9 @@ the interface result is usable:
                 return 1.0
             return ev.get_value(date) if ev.is_valid(date) else 0.0
 
-    af = MyAF()
-    af.ev = EV_TwoLine(...)  # the portfolio-level EV (may also be set via the MultiSystem setEV)
+    ms = MultiSystem()
+    ms.ev = EV_TwoLine(...)  # the portfolio-level EV is assigned by the aggregate system, and reaches the AF at run time
+    ms.af = MyAF()           # the AF reads it back (read only) as self.ev at run time
 
 Overriding only ``_get_total_position_scale`` is enough: the default ``_allocate`` multiplies the
 scale into the ``max_total_position`` cap at L1/L2. A subclass overriding ``_allocate`` /
@@ -389,7 +390,7 @@ Asset Allocation Algorithm Base Class
     .. py:attribute:: name  Name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
-    .. py:attribute:: ev    Set or get the market environment judgment part (EV); the base only carries it for the subclass use, see ``_get_total_position_scale``
+    .. py:attribute:: ev    Get the market environment judgment part (EV); it is read only and assigned by the aggregate system at run time, the base only carries it for the subclass use, see ``_get_total_position_scale``
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 

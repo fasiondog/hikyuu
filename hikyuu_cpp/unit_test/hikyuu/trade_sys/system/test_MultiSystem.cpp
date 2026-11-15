@@ -7766,8 +7766,8 @@ TEST_CASE("test_MultiSystem_mode_c_all_delayed_trades") {
     CHECK_EQ(parent->getTradeRecordList().size(), child->getTradeRecordList().size());
 }
 
-/** @par Check point: the portfolio-level EV forwarding (the AF inherits the parent EV only when it
- *  has none, and the run query is pushed into both) */
+/** @par Check point: the portfolio-level EV forwarding (the aggregate system assigns its EV to the
+ *  AF unconditionally, and the run query is pushed into it) */
 TEST_CASE("test_MultiSystem_ev_forwarding") {
     Stock stock("TEST", "EVFWD", "EV forwarding");
     stock.setKRecordList({KRecord(Datetime(202001020000), 10, 11, 9, 10, 100, 100),
@@ -7785,21 +7785,24 @@ TEST_CASE("test_MultiSystem_ev_forwarding") {
     auto af = AF_EqualWeight();
     parent->setAF(af);
 
-    /** @arg an AF without its own EV inherits the parent instance at readyForRun, and the run
-     *  query is pushed into it */
+    /** @arg the aggregate system assigns its EV to the AF at readyForRun, and the run query is
+     *  pushed into it */
     auto ev_parent = EV_Manual();
     parent->setEV(ev_parent);
     parent->run(kdata);
     CHECK_UNARY(af->getEV() == ev_parent);
     CHECK_EQ(ev_parent->getQuery().startDatetime(), kdata.getQuery().startDatetime());
 
-    /** @arg a deliberately set AF EV is respected (not overwritten by the parent one) and still
-     *  gets the run query pushed */
+    /** @arg a value set on the AF is overwritten by the aggregate system one */
     auto ev_af = EV_Manual();
     af->setEV(ev_af);
-    parent->run(kdata);
-    CHECK_UNARY(af->getEV() == ev_af);
-    CHECK_EQ(ev_af->getQuery().startDatetime(), kdata.getQuery().startDatetime());
+    parent->run(kdata, true, false);
+    CHECK_UNARY(af->getEV() == ev_parent);
+
+    /** @arg the AF EV is cleared when the aggregate system has none */
+    parent->setEV(EnvironmentPtr());
+    parent->run(kdata, true, false);
+    CHECK_UNARY(!af->getEV());
 }
 
 /** @} */ /** @} */

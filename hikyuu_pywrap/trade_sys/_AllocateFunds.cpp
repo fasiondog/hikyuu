@@ -99,8 +99,8 @@ sub-systems trade directly on the real account of the parent); it is passed into
 trailing mode argument; see the MultiSystem class docstring for the full description.
 
 The market environment (EV) and the dynamic position total control: the base class only holds the EV
-(the ev property, usually the same shared instance as the parent aggregate system) for the subclass
-use. The dynamic total control is the func + _func pair get_total_position_scale(date) /
+(the ev property, assigned by the parent aggregate system at run time) for the subclass use. The
+dynamic total control is the func + _func pair get_total_position_scale(date) /
 _get_total_position_scale(date): the hook returns the total position scale of the day (the dynamic
 fraction of the max_total_position cap; 0 = driven flat, 1 = the full cap), the default returns 1.0
 (no scaling, the behavior is unchanged) and a custom subclass implements its own algorithm (e.g.
@@ -132,12 +132,12 @@ Common parameters:
       .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "Set or get the query condition")
-      .def_property("ev", &AllocateFundsBase::getEV, &AllocateFundsBase::setEV,
-                    R"(Set or get the market environment strategy (EV)
+      .def_property_readonly(
+        "ev", &AllocateFundsBase::getEV,
+        R"(Get the market environment strategy (EV) of the owning aggregate system
 
-The base only holds it for the subclass use; how the EV value sizes the positions is decided by the
-_get_total_position_scale hook. The clone keeps the same shared instance and the reset leaves the EV
-untouched.)")
+Read only: assigned by the aggregate system at run time. The base only holds it for the subclass
+use; how the EV sizes the positions is decided by the _get_total_position_scale hook.)")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 

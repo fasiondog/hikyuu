@@ -203,6 +203,12 @@ void MultiSystem::add(const SystemPtr& sys) {
     m_sub_index[sys.get()] = m_sys_list.size() - 1;
 }
 
+void MultiSystem::_syncEvQuery(const KQuery& query) {
+    if (m_ev) {
+        m_ev->setQuery(query);  // The same query is a no-op
+    }
+}
+
 void MultiSystem::readyForRun() {
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
     // MultiSystem overrides readyForRun without delegating to System::readyForRun, so the two
@@ -217,22 +223,11 @@ void MultiSystem::readyForRun() {
 
     _refreshRunConfig();
 
-    // The portfolio-level environment judgment (EV): the parent only accepts and forwards it --
-    // the query is pushed so the shared calculation stays current with the run. An AF without its
-    // own EV inherits the parent instance (one place setting), while a deliberately set AF EV is
-    // respected and still gets the query. The parent does not gate on it: an AF subclass
-    // implements the dynamic position total control (_getTotalPositionScale, e.g. returning the
-    // EV value of the day) with the EV at hand.
-    if (m_af && !m_af->getEV() && m_ev) {
+    // The EV belongs to the aggregate system: assigned to the AF unconditionally, while the parent
+    // itself does not gate on it (an AF subclass implements the total position control). The run
+    // query is pushed at the run entry (see _syncEvQuery), readyForRun may precede any KData.
+    if (m_af) {
         m_af->setEV(m_ev);
-    }
-    if (!m_kdata.empty()) {
-        if (m_ev) {
-            m_ev->setQuery(m_kdata.getQuery());
-        }
-        if (m_af && m_af->getEV()) {
-            m_af->getEV()->setQuery(m_kdata.getQuery());
-        }
     }
 
     // The rebalancing days are the run-level input of the cycle signals: push the days declared by
@@ -324,6 +319,8 @@ void MultiSystem::readyForRun() {
                 inner->m_kdata = m_kdata;
                 inner->m_kdata_cache.clear();
                 inner->m_kdata_cache_mark = Datetime();
+                // A nested layer never runs its own _runAxis, so align its EV query here
+                inner->_syncEvQuery(m_kdata.getQuery());
             }
         } else if (sys->getTO().empty()) {
             // master compatibility: when the sub-system has no trading object but its instrument is
@@ -1700,6 +1697,9 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
     m_stock = m_kdata.getStock();
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
+
+    // The EV query is only known here, readyForRun may precede any KData
+    _syncEvQuery(kdata.getQuery());
 
     // The account date filtering consistent with the single-security System::run: only the bars
     // after [the account initialization day, the account last trade day] are driven. Purpose: when

@@ -17,6 +17,10 @@
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCountTps.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
+#include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/environment/crt/EV_Manual.h>
+#include <hikyuu/trade_sys/condition/crt/CN_Manual.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
 
 using namespace hku;
 
@@ -833,6 +837,37 @@ TEST_CASE("test_MoneyManager_ev_cn_force_clean_position") {
     mm->setParam<bool>("disable_cn_force_clean_position", false);
     CHECK_EQ(mm->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 100.0);
     CHECK_EQ(mm->getBuyShortNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 300.0);
+}
+
+/** @par Check point: the EV/CN of the owning system are assigned to the MM (the MM does not own
+ *  them; a value set on the MM itself is overwritten) */
+TEST_CASE("test_MoneyManager_ev_cn_from_system") {
+    auto mm = MM_FixedCount(100);
+    auto sys = SYS_Simple(crtTM(Datetime(202001010000), 100000.0, TC_Zero()), mm, EnvironmentPtr(),
+                          ConditionPtr(), SG_Manual());
+
+    /** @arg the system assigns its EV and CN to the MM at readyForRun */
+    auto ev = EV_Manual();
+    auto cn = CN_Manual();
+    sys->setEV(ev);
+    sys->setCN(cn);
+    sys->readyForRun();
+    CHECK_UNARY(mm->getEV() == ev);
+    CHECK_UNARY(mm->getCN() == cn);
+
+    /** @arg a value set on the MM itself is overwritten by the system one */
+    mm->setEV(EV_Manual());
+    mm->setCN(CN_Manual());
+    sys->readyForRun();
+    CHECK_UNARY(mm->getEV() == ev);
+    CHECK_UNARY(mm->getCN() == cn);
+
+    /** @arg the MM EV/CN are cleared when the system has none */
+    sys->setEV(EnvironmentPtr());
+    sys->setCN(ConditionPtr());
+    sys->readyForRun();
+    CHECK_UNARY(!mm->getEV());
+    CHECK_UNARY(!mm->getCN());
 }
 
 /** @} */

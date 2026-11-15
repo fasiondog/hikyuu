@@ -56,12 +56,12 @@
  *  one-price board from a padded suspension bar). The mode B pass-through legs are not re-judged:
  *  the sub-system already gated them with its own parameters.
  *
- *  The portfolio-level environment judgment (EV): the parent accepts an EV (the inherited setEV)
- *  and at readyForRun pushes the run query into it and hands the same shared instance to an AF
- *  without its own EV (a deliberately set AF EV is respected and still gets the query). The
- *  parent itself does not gate on it: an AF subclass implements the dynamic position total
- *  control (_getTotalPositionScale, e.g. returning the EV value of the day) with the EV at hand,
- *  so the whole portfolio position scales with the environment.
+ *  The portfolio-level environment judgment (EV): the parent owns it (the inherited setEV) and
+ *  assigns it to the AF unconditionally at readyForRun, a value set on the AF is overwritten. The
+ *  run query is pushed once at the run entry, not on every intraday drive (the EV may be shared by
+ *  the sub-systems). The parent itself does not gate on it: an AF subclass implements the dynamic
+ *  position total control (_getTotalPositionScale) with the EV at hand, so the whole portfolio
+ *  position scales with the environment.
  *
  *  Serialization restores the shadow-account registry and the scheduling counters, so a loaded
  *  system can continue with run(reset=false); the mode C running pools are rebuilt on the next
@@ -434,6 +434,9 @@ private:
 
     /** Snapshot the run-time switches from the parameters at the session start (readyForRun) */
     void _refreshRunConfig();
+
+    /** Align the EV query with the run (only the run entry knows it) */
+    void _syncEvQuery(const KQuery& query);
 
     /** Aggregate a group of trades into a net suggestion by instrument (marked with the source
      * sub-system sys). funds_before is the "before-trade" fund snapshot of the sub-system on that

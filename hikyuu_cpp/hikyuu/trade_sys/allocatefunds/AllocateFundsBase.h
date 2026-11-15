@@ -133,10 +133,10 @@ public:
         return m_query;
     }
 
-    /** Set the market environment strategy (EV). The EV value itself is not bounded; how it maps
-     *  to the total position scale is up to the subclass (the base clamps the scale into [0, 1],
-     *  see _getTotalPositionScale). The clone keeps the same shared instance and the reset
-     *  leaves the EV untouched. */
+    /** Set the market environment strategy (EV) of the owning aggregate system
+     *  @note Assigned by the system at run time, overwriting any previous value. The EV value is
+     *        not bounded; the subclass maps it to the position scale (clamped into [0, 1], see
+     *        _getTotalPositionScale). */
     void setEV(const EnvironmentPtr& ev) {
         m_ev = ev;
     }
@@ -286,9 +286,8 @@ protected:
     string m_name;
     KQuery m_query;
     TradeManagerPtr m_tm;
-    // The EV is a configuration (usually shared with the parent aggregate and the other parts):
-    // it is serialized, the clone keeps the same instance and the reset leaves it untouched; the
-    // concrete usage belongs to the subclass
+    // Assigned by the aggregate system at run time (MultiSystem::readyForRun); the clone keeps the
+    // same instance. One AF shared by several systems sees the EV of the last one to run
     EnvironmentPtr m_ev;
     bool m_is_python_object{false};
 
@@ -309,8 +308,8 @@ private:
     void serialize(Archive& ar, const unsigned int) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        // The EV is a configuration: the same instance may be shared by the System and several AF
-        // instances, the boost pointer tracking keeps them one object within one archive
+        // Kept only for the archive compatibility (the run overwrites it); the boost pointer
+        // tracking keeps the shared instance one object within one archive
         ar& BOOST_SERIALIZATION_NVP(m_ev);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }

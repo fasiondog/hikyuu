@@ -284,7 +284,9 @@ public:
         return TradeSuggestionList{};
     }
 
-    // Preparation before running; an exception is thrown on failure
+    // Preparation before running; an exception is thrown on failure. The system-owned TM is handed
+    // to the MM/PG/ST/TP and the EV/CN to the MM here, so the parts do not depend on the order in
+    // which the user set them
     virtual void readyForRun();
 
     // Called by the related parts to notify sys when the part parameters change, so that
