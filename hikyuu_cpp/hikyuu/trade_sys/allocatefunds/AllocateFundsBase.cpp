@@ -61,10 +61,6 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // running sub-systems keep their current holdings, only the new sub-systems get the remaining
     // parent cash
     setParam<bool>("adjust_running_sys", true);
-
-    // The sharing strategy of the EV part (aligned with the System shared_ev semantics): a shared
-    // EV is neither cloned by clone() nor reset by reset()
-    setParam<bool>("shared_ev", true);
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
@@ -72,7 +68,6 @@ AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     setParam<double>("max_total_position", 1.0);
     setParam<double>("fixed_amount", 0.0);
     setParam<bool>("adjust_running_sys", true);
-    setParam<bool>("shared_ev", true);
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
@@ -112,10 +107,6 @@ void AllocateFundsBase::paramChanged() {}
 void AllocateFundsBase::reset() {
     m_query = Null<KQuery>();
     m_tm.reset();
-    // The shared EV is left untouched: it belongs to the other sharers as well
-    if (m_ev && !getParam<bool>("shared_ev")) {
-        m_ev->reset();
-    }
     _reset();
 }
 
@@ -129,9 +120,9 @@ AFPtr AllocateFundsBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_tm = m_tm;
     p->m_query = m_query;
-    // The sharing strategy of the EV part: a shared clone keeps the same instance, an unshared
-    // one gets its own copy (aligned with the System shared_ev semantics)
-    p->m_ev = (m_ev && !getParam<bool>("shared_ev")) ? m_ev->clone() : m_ev;
+    // The EV is a configuration usually shared with the parent aggregate: the clone keeps the
+    // same instance
+    p->m_ev = m_ev;
     return p;
 }
 

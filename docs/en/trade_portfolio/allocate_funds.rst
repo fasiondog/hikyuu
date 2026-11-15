@@ -161,12 +161,6 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
         cash (limited by the parent balance, may be underfunded).
         Mode A re-targets every bar and always adjusts; mode C has no quota and never adjusts --
         neither is affected by this parameter
-    * - ``shared_ev``
-      - bool, True
-      - All
-      - The sharing strategy of the EV part (aligned with the System parts): ``True`` - the clone
-        shares the same EV instance and the reset leaves the EV untouched; ``False`` - the clone gets
-        its own copy and the reset resets the EV as well
 
 Notes:
 
@@ -267,9 +261,6 @@ the interface result is usable:
 * **The EV value itself is NOT bounded to [0, 1]**: a subclass may return the EV value of the day directly
   as the scale (the part above 1 is treated as the full cap); when the EV is invalid (``is_valid`` is
   false, including a never registered day) it should return 0;
-* **The ``shared_ev`` parameter** (default True): like the other parts -- the clone shares the same EV
-  instance and the reset leaves the EV untouched; when False the clone gets its own copy and the reset
-  resets the EV as well;
 * Without an EV and without overriding, the behavior is completely unchanged.
 
 .. code-block:: python

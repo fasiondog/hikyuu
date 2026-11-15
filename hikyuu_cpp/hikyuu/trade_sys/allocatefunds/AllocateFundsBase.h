@@ -38,9 +38,7 @@
  *  returns 1.0 (no scaling, the behavior is unchanged) and a subclass implements its own
  *  algorithm (e.g. the EV value of the day). The base guarantees the scale is a coefficient in
  *  [0, 1] (a NaN is 0, a signed infinity maps to the range end), so an override can never exceed
- *  the total control — the leverage beyond the cap is expressed by max_total_position > 1. The
- *  shared_ev parameter decides whether the clone shares the EV and whether the reset resets it,
- *  like the other parts.
+ *  the total control — the leverage beyond the cap is expressed by max_total_position > 1.
  *
  *  The running mode ("A" Signal Aggregation / "B" Fund Allocation / "C" Shared Account
  *  Compatibility) is **owned by MultiSystem** and is passed explicitly into every L1/L2/L3 hook
@@ -137,8 +135,8 @@ public:
 
     /** Set the market environment strategy (EV). The EV value itself is not bounded; how it maps
      *  to the total position scale is up to the subclass (the base clamps the scale into [0, 1],
-     *  see _getTotalPositionScale). Like the other parts, the shared_ev parameter decides
-     *  whether the clone shares this instance and whether the reset resets it. */
+     *  see _getTotalPositionScale). The clone keeps the same shared instance and the reset
+     *  leaves the EV untouched. */
     void setEV(const EnvironmentPtr& ev) {
         m_ev = ev;
     }
@@ -288,8 +286,9 @@ protected:
     string m_name;
     KQuery m_query;
     TradeManagerPtr m_tm;
-    // The EV is a configuration (usually shared with the parent aggregate and the other parts),
-    // it is serialized and cloned like the parameters; the concrete usage belongs to the subclass
+    // The EV is a configuration (usually shared with the parent aggregate and the other parts):
+    // it is serialized, the clone keeps the same instance and the reset leaves it untouched; the
+    // concrete usage belongs to the subclass
     EnvironmentPtr m_ev;
     bool m_is_python_object{false};
 

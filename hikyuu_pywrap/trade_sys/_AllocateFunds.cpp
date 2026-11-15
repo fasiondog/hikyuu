@@ -106,17 +106,14 @@ fraction of the max_total_position cap; 0 = driven flat, 1 = the full cap), the 
 (no scaling, the behavior is unchanged) and a custom subclass implements its own algorithm (e.g.
 reading self.ev and returning the EV value of the day). The base guarantees the scale is a coefficient
 in [0, 1] (a NaN is 0, a signed infinity maps to the range end), so an override can never exceed the
-total control - the leverage beyond the cap is expressed by max_total_position > 1. The shared_ev
-parameter decides whether the clone shares the EV and whether the reset resets it, like the other
-parts.
+total control - the leverage beyond the cap is expressed by max_total_position > 1.
 
 Common parameters:
 
     - max_single_position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); 0 means no limit, the domain is [0, 1] and a negative value or a value above 1 is rejected by the parameter check
     - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value. The weight pricing is scaled down proportionally when exceeded, while the fixed_amount pricing is truncated to whole quanta (see below); 0 disables the cap, >1 allows leverage, a negative or non-finite value is rejected by the parameter check. It is further scaled by the dynamic total position scale (see _get_total_position_scale, the default scale is 1.0)
     - fixed_amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system. The aggregate is still bounded by max_total_position: being an absolute amount it is never scaled down, instead only whole quanta are funded (mode B in sub-system order, mode A in suggestion order) and the rest gets a zero quota / is driven flat
-    - adjust_running_sys=True (bool) : whether to force-adjust the running sub-systems to the new quota on the rebalancing day; only effective in mode B (mode A always adjusts, mode C never adjusts); when False the running sub-systems keep their holdings and only the new sub-systems get the remaining cash
-    - shared_ev=True (bool) : the sharing strategy of the EV part, like the other parts; True - the clone shares the same EV instance and the reset leaves the EV untouched, False - the clone gets its own copy and the reset resets the EV as well)")
+    - adjust_running_sys=True (bool) : whether to force-adjust the running sub-systems to the new quota on the rebalancing day; only effective in mode B (mode A always adjusts, mode C never adjusts); when False the running sub-systems keep their holdings and only the new sub-systems get the remaining cash)")
 
       .def(py::init<>())
       .def(py::init<const AllocateFundsBase&>())
@@ -139,8 +136,8 @@ Common parameters:
                     R"(Set or get the market environment strategy (EV)
 
 The base only holds it for the subclass use; how the EV value sizes the positions is decided by the
-_get_total_position_scale hook. The shared_ev parameter decides whether the clone shares this
-instance and whether the reset resets it.)")
+_get_total_position_scale hook. The clone keeps the same shared instance and the reset leaves the EV
+untouched.)")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 

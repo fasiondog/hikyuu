@@ -544,24 +544,13 @@ TEST_CASE("test_AllocateFunds_ev_property") {
     CHECK_UNARY(af->getEV() == ev);
     CHECK_EQ(af->getEV()->getValue(Datetime(200001020000LL)), doctest::Approx(0.5));
 
-    /** @arg shared_ev=true (the default): the clone shares the EV instance */
+    /** @arg the clone keeps the same shared EV instance */
     auto af2 = af->clone();
     CHECK_UNARY(af2->getEV() == af->getEV());
 
-    /** @arg shared_ev=false: the clone gets its own copy */
-    af->setParam<bool>("shared_ev", false);
-    auto af3 = af->clone();
-    CHECK_UNARY(af3->getEV() && af3->getEV() != af->getEV());
-
-    /** @arg shared_ev=true: the reset leaves the EV untouched (the values survive) */
-    af->setParam<bool>("shared_ev", true);
+    /** @arg the reset leaves the EV untouched (the values survive) */
     af->reset();
     CHECK_EQ(af->getEV()->getValue(Datetime(200001010000LL)), doctest::Approx(1.0));
-
-    /** @arg shared_ev=false: the reset resets the EV (the calculated values are dropped) */
-    af->setParam<bool>("shared_ev", false);
-    af->reset();
-    CHECK_EQ(af->getEV()->getValue(Datetime(200001010000LL)), doctest::Approx(0.0));
 }
 
 /** @par Test points */

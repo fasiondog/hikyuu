@@ -133,7 +133,6 @@ class TestCrtAF(unittest.TestCase):
         it, and the base floors the result at 0"""
         dt = Datetime(200101010000)
         af = AF_EqualWeight()
-        self.assertTrue(af.get_param("shared_ev"))
         self.assertEqual(af.get_total_position_scale(dt), 1.0)
 
         class HalfAF(AllocateFundsBase):
