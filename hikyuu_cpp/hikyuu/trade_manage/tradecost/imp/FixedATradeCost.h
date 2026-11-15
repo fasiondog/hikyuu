@@ -36,7 +36,7 @@ public:
      * Default constructor, it also sets the default parameter values (current rates)
      * @details
      * <pre>
-     * Commission ratio, 1.8 per mille by default, i.e. 0.0018
+     * Commission ratio, 0.3 per mille by default, i.e. 0.0003
      * Minimum commission value, 5 yuan by default
      * Stamp duty, 0.5 per mille by default, i.e. 0.0005
      * Transfer fee, 0.01 per mille of turnover by default, i.e. 0.00001

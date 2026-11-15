@@ -32,6 +32,17 @@
  *  The overall entry is `allocate()` = L1 -> L2 -> L3. When the quota is needed before driving
  *  the sub-systems (the mode B calibration), use `allocateQuota()` (L1 only) and
  *  `allocateTargets()` (L2 -> L3) separately.
+ *
+ *  The environment judgment (EV) and the dynamic total control: the base class only holds the EV
+ *  (setEV/getEV, usually the same shared instance as the parent aggregate) for the subclass use.
+ *  The dynamic position total control is the func + _func pair getTotalPositionScale /
+ *  _getTotalPositionScale: the hook returns the total position scale of the day (the dynamic
+ *  fraction of the max_total_position cap; 0 = driven flat, 1 = the full cap), the default
+ *  returns 1.0 (no scaling, the behavior is unchanged) and a subclass implements its own
+ *  algorithm (e.g. the EV value of the day). The base guarantees the scale is a coefficient in
+ *  [0, 1] (a NaN is 0, a signed infinity maps to the range end), so an override can never exceed
+ *  the total control — the leverage beyond the cap is expressed by max_total_position > 1.
+ *
  *  The running mode ("A" Signal Aggregation / "B" Fund Allocation / "C" Shared Account
  *  Compatibility) is **owned by MultiSystem** and is passed explicitly into every L1/L2/L3 hook
  *  as the trailing `mode` argument; AF itself does not hold it. See the MultiSystem class comment
@@ -50,6 +61,7 @@
 #include <vector>
 
 #include "../../utilities/Parameter.h"
+#include "../environment/EnvironmentBase.h"
 #include "../system/SystemPart.h"
 #include "../system/TradeSuggestion.h"
 #include "../system/SubSystemContext.h"
@@ -124,6 +136,19 @@ public:
         return m_query;
     }
 
+    /** Set the market environment strategy (EV) of the owning aggregate system
+     *  @note Assigned by the system at run time, overwriting any previous value. The EV value is
+     *        not bounded; the subclass maps it to the position scale (clamped into [0, 1], see
+     *        _getTotalPositionScale). */
+    void setEV(const EnvironmentPtr& ev) {
+        m_ev = ev;
+    }
+
+    /** Get the market environment strategy (may be null) */
+    const EnvironmentPtr& getEV() const {
+        return m_ev;
+    }
+
     // @note The running mode is no longer held here: it is owned by MultiSystem and passed into
     //       every L1/L2/L3 hook through the trailing `mode` argument. In mode C the aggregate
     //       system drives the sub-systems directly on its own real account and never calls
@@ -157,6 +182,8 @@ public:
      * L1 only: calculate the weights and (in mode B) write the real quota into contexts[i].quota,
      * without converting any suggestion. It is used by the aggregate System when the quota is
      * needed **before** driving the sub-systems (the mode B quota-first calibration).
+     * @note The effective total quota cap = the net assets x max_total_position x the dynamic
+     *       total position scale (see getTotalPositionScale).
      * @return the L1 weight table (the input of allocateTargets)
      */
     Weights allocateQuota(const Datetime& date, const TradeManagerPtr& tm,
@@ -166,6 +193,8 @@ public:
      * L2 + L3 only: convert the suggestions into the executable quantity of the parent account and
      * perform the portfolio risk control. It is used together with allocateQuota by the aggregate
      * System when the suggestions are collected after the quota calibration.
+     * @note The effective mode A total target cap = the net assets x max_total_position x the
+     *       dynamic total position scale (see getTotalPositionScale).
      */
     void allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
                          TradeSuggestionList& suggestions, const Weights& sys_weight,
@@ -186,17 +215,18 @@ public:
      *        subclass; the missing index (weights shorter than contexts) falls back to the equal
      *        weight.
      *  @note The mode B quota sum (N x fixed_amount included) is bounded by
-     *        max_total_position x net assets: the weight pricing is a proportion and is scaled
-     *        down, while the fixed_amount pricing is an absolute amount and instead truncates the
-     *        number of funded sub-systems (the rest get a zero quota). */
+     *        max_total_position x net assets x the dynamic total position scale: the weight
+     *        pricing is a proportion and is scaled down, while the fixed_amount pricing is an
+     *        absolute amount and instead truncates the number of funded sub-systems (the rest get
+     *        a zero quota). */
     Weights _applyWeights(const Datetime& date, const TradeManagerPtr& tm,
                           SubSystemContextList& contexts, const KQuery& query,
                           const std::vector<double>& weights, const string& mode) const;
 
     /** L2 behavior-level conversion: in mode A it converts the parent account quantity by the
-     *  budget (weight / assets_ratio / fixed_amount, capped by max_total_position) and rewrites
-     *  the number of every suggestion (a positive magnitude, the direction expressed by the
-     *  type); in mode B the sub-system number is passed through.
+     *  budget (weight / assets_ratio / fixed_amount, capped by max_total_position x the dynamic
+     *  total position scale) and rewrites the number of every suggestion (a positive magnitude,
+     *  the direction expressed by the type); in mode B the sub-system number is passed through.
      *  @note The number is always positive; a short suggestion is turned into a SELL to reduce
      *        to its target, a SELL/CLEAR closes the current holding.
      *  @note Mode A prices a suggestion only when its system has a weight: a suggestion from a
@@ -214,7 +244,7 @@ public:
      *  (concentration / turnover, etc.); mode B can be disabled or only performs the total amount
      *  check.
      *  @note The single instrument concentration is limited by the parameter max_single_position
-     *        (<=0 means no limit, >1 is clamped to 1, so the default 1.0 caps a single instrument
+     *        (0 means no limit, the domain is [0, 1], so the default 1.0 caps a single instrument
      *        at the net assets).
      *  @note The clipping only shrinks: the budget released from a clipped instrument is not
      *        redistributed to the others, so after the total budget cap and this per-instrument
@@ -222,6 +252,21 @@ public:
     virtual void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
                             TradeSuggestionList& suggestions, const KQuery& query,
                             const string& mode);
+
+    /** Get the total position scale of the day (the dynamic total control). It is the dynamic
+     *  fraction of the max_total_position cap: the effective total budget = the net assets x
+     *  max_total_position x this scale; 0 means driven flat, 1 means the full cap (the leverage
+     *  beyond the cap is expressed by max_total_position > 1 instead). The base guarantees the
+     *  scale is a coefficient in [0, 1]: the _getTotalPositionScale result is clamped into the
+     *  range (a NaN is 0, a signed infinity maps to the range end). */
+    price_t getTotalPositionScale(const Datetime& date) const;
+
+    /** [Override hook] The dynamic position total control: the total position scale of the day
+     *  (see getTotalPositionScale). The default returns 1.0 (no scaling, the behavior is
+     *  unchanged); a subclass implements its own algorithm (e.g. read getEV() and return the EV
+     *  value of the day — the raw value is not bounded, the base clamps the result into [0, 1]:
+     *  0 = flat, 1 = the full cap). */
+    virtual price_t _getTotalPositionScale(const Datetime& date) const;
 
     /** Subclass reset interface */
     virtual void _reset() {}
@@ -233,15 +278,20 @@ public:
         return m_is_python_object;
     }
 
-    /** Whether this component or its trade manager is defined in Python; overrides may recurse */
+    /** Whether this component or its trade manager / environment is defined in Python; overrides
+     *  may recurse */
     virtual bool hasPythonPart() const noexcept {
-        return m_is_python_object || (m_tm && m_tm->hasPythonPart());
+        return m_is_python_object || (m_tm && m_tm->hasPythonPart()) ||
+               (m_ev && m_ev->hasPythonPart());
     }
 
 protected:
     string m_name;
     KQuery m_query;
     TradeManagerPtr m_tm;
+    // Assigned by the aggregate system at run time (MultiSystem::readyForRun); the clone keeps the
+    // same instance. One AF shared by several systems sees the EV of the last one to run
+    EnvironmentPtr m_ev;
     bool m_is_python_object{false};
 
     // The one-shot notices are per instance, not per process: a shared flag would hide the
@@ -261,6 +311,9 @@ private:
     void serialize(Archive& ar, const unsigned int) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        // Kept only for the archive compatibility (the run overwrites it); the boost pointer
+        // tracking keeps the shared instance one object within one archive
+        ar& BOOST_SERIALIZATION_NVP(m_ev);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */

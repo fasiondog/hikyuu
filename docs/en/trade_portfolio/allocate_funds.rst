@@ -142,7 +142,8 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
       - float, 1.0
       - A only
       - The L3 per-instrument concentration cap: the target market value of one instrument must not exceed
-        the net assets x this value. <=0 disables the limit; a value above 1 takes effect as 1.0
+        the net assets x this value. 0 disables the limit; the domain is [0, 1], a negative value or a
+        value above 1 is rejected by the parameter check
     * - ``max_total_position``
       - float, 1.0
       - A / B
@@ -150,7 +151,10 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
         by the net assets x this value; in mode B it bounds the **sum of the sub-system quotas** (L1) by
         the net assets x this value. Both bounds **include** the ``fixed_amount`` pricing: the weight
         pricing is scaled down proportionally, while the fixed amounts are truncated to a whole number of
-        quanta (see below). <=0 disables the cap; >1 allows leverage
+        quanta (see below). 0 disables the cap, >1 allows leverage, and a negative or non-finite value is
+        rejected by the parameter check. The cap is further multiplied by
+        the dynamic total position scale (``_get_total_position_scale``, default 1.0, see "The market
+        environment judgment (EV) and the dynamic total control" below)
     * - ``fixed_amount``
       - float, 0.0
       - A / B
@@ -258,6 +262,55 @@ Notes:
         a gross of only 0.5 x the net assets)
 
 
+The market environment judgment (EV) and the dynamic total control
+-------------------------------------------------------------------
+
+The AF base class holds the market environment judgment part (EV, see :doc:`../trade_sys/environment`)
+but **only carries it, never interprets it**: how the EV value maps to the positions is implemented by
+the subclass through the **dynamic position total control interface**, and the base guarantees that
+the interface result is usable:
+
+* **The parent assigns the portfolio-level EV**: :class:`MultiSystem` assigns it to the AF
+  **unconditionally** at ``readyForRun`` (a value set on the AF is overwritten); the run query is
+  aligned once at the ``run`` entry (``readyForRun`` may precede any KData, and the intraday drives
+  do not re-align it: the EV may be shared by the sub-systems);
+* **The dynamic position total control (func + _func)**: the public entry ``get_total_position_scale(date)``
+  calls the override hook ``_get_total_position_scale(date)`` which returns the **total position scale of
+  the day** -- the dynamic fraction of the ``max_total_position`` cap: the effective total budget = the net
+  assets x ``max_total_position`` x the scale. The default implementation returns 1.0 (no scaling, the
+  behavior is unchanged); the base clamps the scale into **[0, 1]** (1 = the full cap; a
+  NaN is 0 and a signed infinity maps to the range end), so an override can never exceed the total
+  control -- the leverage beyond the cap is expressed by ``max_total_position > 1``;
+* **The effect of a zero scale**: in mode A every instrument is driven flat; in mode B every quota is
+  zeroed (whether the running sub-systems are force-adjusted to the zero quota still depends on
+  ``adjust_running_sys``, when False they keep their current holdings);
+* **The EV value itself is NOT bounded to [0, 1]**: a subclass may return the EV value of the day directly
+  as the scale (the part above 1 is treated as the full cap); when the EV is invalid (``is_valid`` is
+  false, including a never registered day) it should return 0;
+* Without an EV and without overriding, the behavior is completely unchanged.
+
+.. code-block:: python
+
+    class MyAF(AllocateFundsBase):
+        def _get_total_position_scale(self, date):
+            # the dynamic total position control by the EV value of the day:
+            # full position without an EV, flat when invalid
+            ev = self.ev
+            if ev is None:
+                return 1.0
+            return ev.get_value(date) if ev.is_valid(date) else 0.0
+
+    ms = MultiSystem()
+    ms.ev = EV_TwoLine(...)  # the portfolio-level EV is assigned by the aggregate system, and reaches the AF at run time
+    ms.af = MyAF()           # the AF reads it back (read only) as self.ev at run time
+
+Overriding only ``_get_total_position_scale`` is enough: the default ``_allocate`` multiplies the
+scale into the ``max_total_position`` cap at L1/L2. A subclass overriding ``_allocate`` /
+``_to_targets`` itself no longer gets the base total control automatically and must keep the total
+position bound by itself (a Python subclass may call ``_apply_weights`` inside ``_allocate`` to
+reuse the base total control).
+
+
 Built-in Asset Allocation Algorithms
 ------------------------------------
 
@@ -363,6 +416,7 @@ Asset Allocation Algorithm Base Class
     .. py:attribute:: name  Name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
+    .. py:attribute:: ev    Get the market environment judgment part (EV); it is read only and assigned by the aggregate system at run time, the base only carries it for the subclass use, see ``_get_total_position_scale``
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 
@@ -407,6 +461,7 @@ Asset Allocation Algorithm Base Class
 
         The unified entry point for L1/L2/L3 (usually called internally by :class:`MultiSystem`): it first runs ``_allocate`` to obtain the weights,
         then converts them into executable quantities via ``_to_targets``, and finally applies risk-control clipping via ``_check_risk``.
+        The effective total budget = the net assets x ``max_total_position`` x the dynamic total position scale (see above).
 
         .. note::
 
@@ -451,6 +506,26 @@ Asset Allocation Algorithm Base Class
         It is used when this hook is not overridden.
 
         :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
+
+    .. py:method:: get_total_position_scale(self, date)
+
+        Returns the **dynamic total position scale** of the day (the dynamic total control entry): the
+        dynamic fraction of the ``max_total_position`` cap; 0 means driven flat, 1 means the full cap.
+        The base clamps the result into [0, 1] (a NaN is 0, a signed infinity maps to the range end), so
+        the result never exceeds the total control.
+
+        :param Datetime date: the trade date
+        :return: the total position scale (float, in [0, 1])
+
+    .. py:method:: _get_total_position_scale(self, date)
+
+        [Override hook] The dynamic position total control: returns the total position scale of the day
+        (see ``get_total_position_scale``). The default implementation returns 1.0 (no scaling); a subclass
+        implements its own dynamic algorithm, e.g. reading ``ev`` and returning the EV value of the day
+        (the raw value is not bounded, the base clamps it into [0, 1]).
+
+        :param Datetime date: the trade date
+        :return: the total position scale
 
     .. py:method:: _reset(self)
 

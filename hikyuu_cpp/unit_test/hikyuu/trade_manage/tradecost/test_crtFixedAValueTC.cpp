@@ -91,18 +91,18 @@ TEST_CASE("test_TC_FixedA_current") {
     /** @arg Buy a Shenzhen stock: transfer fee charged on all markets at 0.01‰ */
     result = cost_func->getBuyCost(dt, sz, 10.0, 1000);
     expect = CostRecord();
-    expect.commission = 18.0;
+    expect.commission = 5.0;
     expect.transferfee = 0.1;
-    expect.total = 18.1;
+    expect.total = 5.1;
     CHECK_EQ(result, expect);
 
     /** @arg Sell a Shanghai stock: stamp duty halved to 0.5‰ plus transfer fee */
     result = cost_func->getSellCost(dt, sh, 10.0, 1000);
     expect = CostRecord();
-    expect.commission = 18.0;
+    expect.commission = 5.0;
     expect.stamptax = 5.0;
     expect.transferfee = 0.1;
-    expect.total = 23.1;
+    expect.total = 10.1;
     CHECK_EQ(result, expect);
 }
 

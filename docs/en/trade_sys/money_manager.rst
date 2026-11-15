@@ -196,6 +196,32 @@ The custom money management strategy interface:
 * :py:meth:`MoneyManagerBase._reset` - [Optional] Reset private attributes
 * :py:meth:`MoneyManagerBase._clone` - [Required] The clone interface
 
+The run-time ``ev`` / ``cn`` are injected by the owning system (read only) and may be used in the
+custom interfaces (None before the run):
+
+.. code-block:: python
+
+    class MyMM(MoneyManagerBase):
+        def _get_buy_num(self, datetime, stock, price, risk, part):
+            if self.ev is not None and not self.ev.is_valid(datetime):
+                return 0.0
+            if self.cn is not None and not self.cn.is_valid(datetime):
+                return 0.0
+            return 100.0
+
+        def _clone(self):
+            return MyMM()
+
+.. note::
+
+    The ``ev`` is assigned by the system at run time (its query too), so it can calculate on its
+    own; the ``cn`` depends on the trading object, which the system pushes (``to``) together with
+    ``tm`` / ``sg`` into the same instance, and the money manager only holds the reference (it
+    cannot be attached by the money manager). Therefore when the money management interfaces are
+    called **standalone** (outside a system), ``cn`` is None or has no calculated day
+    (``is_valid`` always False); run inside a system (e.g. ``SYS_Simple(..., cn=cn)``) when the CN
+    has to take effect.
+
 Money Management Strategy Base Class
 ------------------------------------
 
@@ -206,6 +232,13 @@ Money Management Strategy Base Class
     .. py:attribute:: name  The strategy name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
+    .. py:attribute:: ev    Get the market environment strategy (EV)
+
+        Read only. Assigned by the owning system at run time (its query too); the base only holds it for the subclass use.
+
+    .. py:attribute:: cn    Get the system valid condition (CN)
+
+        Read only. Assigned by the owning system at run time; the base only holds it for the subclass use.
 
     .. py:attribute:: support_mult_buy_sell  Whether the strategy supports repeated scaling in/out (defaults to False)
 

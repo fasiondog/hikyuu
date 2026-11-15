@@ -76,23 +76,23 @@ enum LOG_LEVEL {
  * @param filename the log file name; it is "./hikyuu.log" in the current directory by default when
  *                 it is empty; you need to guarantee that the directory exists and is writable
  */
-void HKU_UTILS_API initLogger(bool not_use_color = false,
+HKU_UTILS_API void initLogger(bool not_use_color = false,
                               const std::string& filename = std::string());
 
 /**
  * Get the current log level
  * @return
  */
-LOG_LEVEL HKU_UTILS_API get_log_level();
+HKU_UTILS_API LOG_LEVEL get_log_level();
 
 /**
  * Set the log level
  * @param level the given log level
  */
-void HKU_UTILS_API set_log_level(LOG_LEVEL level);
+HKU_UTILS_API void set_log_level(LOG_LEVEL level);
 
 /** Owning handle to the current logger, for callers that need to keep it alive. */
-std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
+HKU_UTILS_API std::shared_ptr<spdlog::logger> getHikyuuLogger();
 
 /** Lock-free hot path used by the HKU_* macros. The returned pointer stays valid for the whole
  *  process lifetime, including when initLogger replaces the logger; only initLogger and the

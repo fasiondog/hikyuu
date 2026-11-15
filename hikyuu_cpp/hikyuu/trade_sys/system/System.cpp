@@ -399,6 +399,9 @@ void System::readyForRun() {
     }
 
     m_mm->setTM(m_tm);
+    // The EV/CN belong to the system, so they are assigned unconditionally
+    m_mm->setEV(m_ev);
+    m_mm->setCN(m_cn);
     if (m_pg)
         m_pg->setTM(m_tm);
     if (m_st)

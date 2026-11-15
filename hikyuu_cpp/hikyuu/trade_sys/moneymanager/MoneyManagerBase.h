@@ -11,6 +11,8 @@
 
 #include "../../utilities/Parameter.h"
 #include "../system/SystemPart.h"
+#include "../environment/EnvironmentBase.h"
+#include "../condition/ConditionBase.h"
 #include "../../trade_manage/TradeManager.h"
 
 namespace hku {
@@ -59,6 +61,38 @@ public:
      */
     TradeManagerPtr getTM() const {
         return m_tm;
+    }
+
+    /**
+     * Set the market environment strategy (EV) of the owning system
+     * @param ev the environment strategy, it may be null
+     * @note Assigned by the system at run time, overwriting any previous value; the base only
+     *       holds it for the subclass use
+     */
+    void setEV(const EnvironmentPtr& ev) {
+        m_ev = ev;
+    }
+
+    /** Get the market environment strategy (may be null) */
+    const EnvironmentPtr& getEV() const {
+        return m_ev;
+    }
+
+    /**
+     * Set the system valid condition (CN) of the owning system
+     * @param cn the valid condition, it may be null
+     * @note Assigned by the system at run time, overwriting any previous value; the base only
+     *       holds it for the subclass use
+     * @note Unlike the EV, the CN is not driven by the MM: the system pushes the trading object and
+     *       the TM/SG into that instance. Without a system, isValid is always false
+     */
+    void setCN(const ConditionPtr& cn) {
+        m_cn = cn;
+    }
+
+    /** Get the system valid condition (may be null) */
+    const ConditionPtr& getCN() const {
+        return m_cn;
     }
 
     /** Set the query condition */
@@ -181,9 +215,10 @@ public:
         return m_is_python_object;
     }
 
-    /** Whether this component or its trade manager is defined in Python; overrides may recurse */
+    /** Whether this component or any part it holds is defined in Python; overrides may recurse */
     virtual bool hasPythonPart() const noexcept {
-        return m_is_python_object || (m_tm && m_tm->hasPythonPart());
+        return m_is_python_object || (m_tm && m_tm->hasPythonPart()) ||
+               (m_ev && m_ev->hasPythonPart()) || (m_cn && m_cn->hasPythonPart());
     }
 
     /** Whether the MM supports multiple position building/reducing (the capability flag assigned
@@ -196,6 +231,10 @@ protected:
     string m_name;
     KQuery m_query;
     TradeManagerPtr m_tm;
+    // Assigned by the owning system at run time (System::readyForRun), not serialized; with
+    // shared_mm the last system to run decides them
+    EnvironmentPtr m_ev;
+    ConditionPtr m_cn;
     unordered_map<Stock, std::pair<size_t, size_t>> m_buy_sell_counts;
     // Not thread-safe when shared_mm=true (multiple Systems mutate the same map concurrently)
     // Whether the subclass supports multi-trading (multiple position building/reducing); it is a
@@ -216,10 +255,11 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         // m_mode has been migrated to AllocateFundsBase (portfolio-level allocation), it is no
         // longer saved.
-        // m_query and m_tm are set temporarily when the system runs, they do not need to be
-        // serialized
+        // m_query, m_tm, m_ev and m_cn are assigned when the system runs, not serialized
         // ar & BOOST_SERIALIZATION_NVP(m_query);
         // ar & BOOST_SERIALIZATION_NVP(m_tm);
+        // ar & BOOST_SERIALIZATION_NVP(m_ev);
+        // ar & BOOST_SERIALIZATION_NVP(m_cn);
     }
 
     template <class Archive>

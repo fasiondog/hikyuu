@@ -177,6 +177,28 @@
 * :py:meth:`MoneyManagerBase._reset` - 【可选】重置私有属性
 * :py:meth:`MoneyManagerBase._clone` - 【必须】克隆接口
 
+运行时的 ``ev`` / ``cn`` 由所属系统注入（只读），可在自定义接口中读取（运行前为 None）：
+
+.. code-block:: python
+
+    class MyMM(MoneyManagerBase):
+        def _get_buy_num(self, datetime, stock, price, risk, part):
+            if self.ev is not None and not self.ev.is_valid(datetime):
+                return 0.0
+            if self.cn is not None and not self.cn.is_valid(datetime):
+                return 0.0
+            return 100.0
+
+        def _clone(self):
+            return MyMM()
+
+.. note::
+
+    ``ev`` 由系统在运行时指定（含查询条件），可独立计算；``cn`` 依赖交易对象——系统运行时把
+    K 线（``to``）及 ``tm`` / ``sg`` 推入同一实例，MM 只持有引用且不能自行挂接。因此单独调用
+    MM 的数量接口（不经过系统）时 ``cn`` 为 None 或无计算结果（``is_valid`` 恒为 False），
+    需要 CN 生效时应通过系统运行（如 ``SYS_Simple(..., cn=cn)``）。
+
 资金管理策略基类
 ----------------
 
@@ -187,6 +209,13 @@
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
+    .. py:attribute:: ev    获取市场环境策略（EV）
+
+        只读。由所属系统在运行时指定（含查询条件），基类仅持有供子类使用。
+
+    .. py:attribute:: cn    获取系统有效条件（CN）
+
+        只读。CN 由所属系统在运行时指定，基类仅持有供子类使用。
 
     .. py:attribute:: support_mult_buy_sell 是否支持多次增减仓（默认 False）
 

@@ -92,7 +92,7 @@ std::shared_ptr<spdlog::logger> getHikyuuLogger() {
     return state.current;
 }
 
-void HKU_UTILS_API initLogger(bool not_use_color, const std::string& filename) {
+HKU_UTILS_API void initLogger(bool not_use_color, const std::string& filename) {
     std::string logname("hikyuu");
     // Drop the previous registration so a repeated initLogger replaces the logger cleanly
     spdlog::drop(logname);

@@ -62,6 +62,12 @@ public:
         PYBIND11_OVERLOAD_NAME(void, AllocateFundsBase, "_check_risk", _checkRisk, date, tm,
                                suggestions, query, mode);
     }
+
+    // The dynamic position total control: the total position scale of the day
+    price_t _getTotalPositionScale(const Datetime& date) const override {
+        PYBIND11_OVERLOAD_NAME(price_t, AllocateFundsBase, "_get_total_position_scale",
+                               _getTotalPositionScale, date);
+    }
 };
 
 void export_AllocateFunds(py::module& m) {
@@ -92,10 +98,20 @@ default) / "B" Fund Allocation / "C" Shared Account Compatibility (the legacy Po
 sub-systems trade directly on the real account of the parent); it is passed into every hook as the
 trailing mode argument; see the MultiSystem class docstring for the full description.
 
+The market environment (EV) and the dynamic position total control: the base class only holds the EV
+(the ev property, assigned by the parent aggregate system at run time) for the subclass use. The
+dynamic total control is the func + _func pair get_total_position_scale(date) /
+_get_total_position_scale(date): the hook returns the total position scale of the day (the dynamic
+fraction of the max_total_position cap; 0 = driven flat, 1 = the full cap), the default returns 1.0
+(no scaling, the behavior is unchanged) and a custom subclass implements its own algorithm (e.g.
+reading self.ev and returning the EV value of the day). The base guarantees the scale is a coefficient
+in [0, 1] (a NaN is 0, a signed infinity maps to the range end), so an override can never exceed the
+total control - the leverage beyond the cap is expressed by max_total_position > 1.
+
 Common parameters:
 
-    - max_single_position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); <=0 means no limit, >1 is clamped to 1
-    - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value. The weight pricing is scaled down proportionally when exceeded, while the fixed_amount pricing is truncated to whole quanta (see below); <=0 disables the cap, >1 allows leverage
+    - max_single_position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); 0 means no limit, the domain is [0, 1] and a negative value or a value above 1 is rejected by the parameter check
+    - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value. The weight pricing is scaled down proportionally when exceeded, while the fixed_amount pricing is truncated to whole quanta (see below); 0 disables the cap, >1 allows leverage, a negative or non-finite value is rejected by the parameter check. It is further scaled by the dynamic total position scale (see _get_total_position_scale, the default scale is 1.0)
     - fixed_amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system. The aggregate is still bounded by max_total_position: being an absolute amount it is never scaled down, instead only whole quanta are funded (mode B in sub-system order, mode A in suggestion order) and the rest gets a zero quota / is driven flat
     - adjust_running_sys=True (bool) : whether to force-adjust the running sub-systems to the new quota on the rebalancing day; only effective in mode B (mode A always adjusts, mode C never adjusts); when False the running sub-systems keep their holdings and only the new sub-systems get the remaining cash)")
 
@@ -116,6 +132,12 @@ Common parameters:
       .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "Set or get the query condition")
+      .def_property_readonly(
+        "ev", &AllocateFundsBase::getEV,
+        R"(Get the market environment strategy (EV) of the owning aggregate system
+
+Read only: assigned by the aggregate system at run time. The base only holds it for the subclass
+use; how the EV sizes the positions is decided by the _get_total_position_scale hook.)")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -189,6 +211,41 @@ Common parameters:
     [Overload interface] L3 portfolio risk control: clip the suggestions at the portfolio dimension
     (e.g. the single instrument concentration cap max_single_position); mode B skips the clipping
     (the sub-manager autonomy is respected), rewrite the quantity of suggestions in place)")
+
+      .def("_apply_weights", &AllocateFundsBase::_applyWeights, py::arg("date"), py::arg("tm"),
+           py::arg("contexts"), py::arg("query"), py::arg("weights"), py::arg("mode"),
+           R"(_apply_weights(self, date, tm, contexts, query, weights, mode)
+
+    [Helper] The L1 skeleton: fill the weight table by "sub-system index -> weight", and in mode B
+    write contexts[i].quota (the fixed_amount pricing takes precedence over the weights). It owns
+    the total budget cap max_total_position x the dynamic total position scale (an over-cap weight
+    pricing is scaled down, the fixed_amount pricing truncates the funded count instead). A custom
+    _allocate may delegate here to keep the base total control.
+
+    :param list weights: the weight per sub-system in the contexts order (no normalization)
+    :return: the weight table { System: weight })")
+
+      .def("get_total_position_scale", &AllocateFundsBase::getTotalPositionScale, py::arg("date"),
+           R"(get_total_position_scale(self, date)
+
+    The total position scale of the day (the dynamic total control): the dynamic fraction of the
+    max_total_position cap; 0 means driven flat, 1 means the full cap. The base clamps the
+    _get_total_position_scale result into [0, 1] (a NaN is 0, a signed infinity maps to the range
+    end), so the result never exceeds the total control.
+
+    :param Datetime date: the trade date
+    :return: the total position scale (float, in [0, 1])")
+
+      .def("_get_total_position_scale", &AllocateFundsBase::_getTotalPositionScale, py::arg("date"),
+           R"(_get_total_position_scale(self, date)
+
+    [Overload interface] The dynamic position total control: the total position scale of the day
+    (the dynamic fraction of the max_total_position cap; 0 = driven flat, 1 = the full cap). The
+    default returns 1.0 (no scaling); a subclass implements its own algorithm, e.g. reading self.ev
+    and returning the EV value of the day - the base clamps the result into [0, 1].
+
+    :param Datetime date: the trade date
+    :return: the total position scale)")
 
       .def(
         "_reset", &AllocateFundsBase::_reset,

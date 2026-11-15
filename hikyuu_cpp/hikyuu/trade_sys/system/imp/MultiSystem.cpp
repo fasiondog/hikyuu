@@ -220,6 +220,12 @@ void MultiSystem::add(const SystemPtr& sys) {
     m_sub_index[sys.get()] = m_sys_list.size() - 1;
 }
 
+void MultiSystem::_syncEvQuery(const KQuery& query) {
+    if (m_ev) {
+        m_ev->setQuery(query);  // The same query is a no-op
+    }
+}
+
 void MultiSystem::readyForRun() {
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
     // MultiSystem overrides readyForRun without delegating to System::readyForRun, so the two
@@ -248,6 +254,13 @@ void MultiSystem::readyForRun() {
     HKU_CHECK(!m_sys_list.empty(), "No subsystem specified! {}", name());
 
     _refreshRunConfig();
+
+    // The EV belongs to the aggregate system: assigned to the AF unconditionally, while the parent
+    // itself does not gate on it (an AF subclass implements the total position control). The run
+    // query is pushed at the run entry (see _syncEvQuery), readyForRun may precede any KData.
+    if (m_af) {
+        m_af->setEV(m_ev);
+    }
 
     // The rebalancing days are the run-level input of the cycle signals: push the days declared by
     // _runAxis down BEFORE the sub-system trading objects are (re)calculated. The entries without a
@@ -344,6 +357,8 @@ void MultiSystem::readyForRun() {
                 inner->m_kdata = m_kdata;
                 inner->m_kdata_cache.clear();
                 inner->m_kdata_cache_mark = Datetime();
+                // A nested layer never runs its own _runAxis, so align its EV query here
+                inner->_syncEvQuery(m_kdata.getQuery());
             }
         } else if (sys->getTO().empty()) {
             // master compatibility: when the sub-system has no trading object but its instrument is
@@ -1768,6 +1783,9 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
     m_stock = m_kdata.getStock();
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
+
+    // The EV query is only known here, readyForRun may precede any KData
+    _syncEvQuery(kdata.getQuery());
 
     // The account date filtering consistent with the single-security System::run: only the bars
     // after [the account initialization day, the account last trade day] are driven. Purpose: when

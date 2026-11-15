@@ -128,6 +128,49 @@ class TestCrtAF(unittest.TestCase):
         self.assertIn(("L2", "A"), calls)
         self.assertIn(("L3", "A"), calls)
 
+    def test_total_position_scale(self):
+        """The dynamic position total control: the default hook returns 1.0, an override scales
+        it, and the base floors the result at 0"""
+        dt = Datetime(200101010000)
+        af = AF_EqualWeight()
+        self.assertEqual(af.get_total_position_scale(dt), 1.0)
+
+        class HalfAF(AllocateFundsBase):
+            def _get_total_position_scale(self, date):
+                return 0.5
+
+        self.assertEqual(HalfAF().get_total_position_scale(dt), 0.5)
+
+        class NegativeAF(AllocateFundsBase):
+            def _get_total_position_scale(self, date):
+                return -1.0
+
+        self.assertEqual(NegativeAF().get_total_position_scale(dt), 0.0)
+
+        class NanAF(AllocateFundsBase):
+            def _get_total_position_scale(self, date):
+                return float("nan")
+
+        self.assertEqual(NanAF().get_total_position_scale(dt), 0.0)
+
+        class OverAF(AllocateFundsBase):
+            def _get_total_position_scale(self, date):
+                return 2.5
+
+        self.assertEqual(OverAF().get_total_position_scale(dt), 1.0)
+
+        class InfAF(AllocateFundsBase):
+            def _get_total_position_scale(self, date):
+                return float("inf")
+
+        self.assertEqual(InfAF().get_total_position_scale(dt), 1.0)
+
+        class NegInfAF(AllocateFundsBase):
+            def _get_total_position_scale(self, date):
+                return float("-inf")
+
+        self.assertEqual(NegInfAF().get_total_position_scale(dt), 0.0)
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(TestCrtAF)

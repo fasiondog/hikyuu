@@ -26,14 +26,14 @@ namespace hku {
  * (TC_FixedAPre2015 / 2015 / 2017) stay frozen for historical backtests.
  * </pre>
  *
- * @param commission commission ratio, 1.8 per mille by default, i.e. 0.0018
+ * @param commission commission ratio, 0.3 per mille by default, i.e. 0.0003
  * @param lowestCommission minimum commission value, 5 yuan by default
  * @param stamptax stamp duty, 0.5 per mille by default, i.e. 0.0005
  * @param transferfee transfer fee, 0.01 per mille of turnover by default, i.e. 0.00001
  * @see FixedATradeCost
  * @ingroup TradeCost
  */
-TradeCostPtr HKU_API TC_FixedA(price_t commission = 0.0018, price_t lowestCommission = 5.0,
+TradeCostPtr HKU_API TC_FixedA(price_t commission = 0.0003, price_t lowestCommission = 5.0,
                                price_t stamptax = 0.0005, price_t transferfee = 0.00001);
 
 void registerPart_TC_FixedA();
