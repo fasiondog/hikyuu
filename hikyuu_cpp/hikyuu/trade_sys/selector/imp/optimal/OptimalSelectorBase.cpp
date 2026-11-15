@@ -48,8 +48,8 @@ void OptimalSelectorBase::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<bool>("depend_on_proto_sys"));
     } else if ("market" == name) {
         string market = getParam<string>(name);
-        auto market_info = StockManager::instance().getMarketInfo(market);
-        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
+        const auto& market_info = StockManager::instance().getMarketInfo(market);
+        HKU_CHECK(market_info.isValid(), "Invalid market: {}", market);
     }
 }
 

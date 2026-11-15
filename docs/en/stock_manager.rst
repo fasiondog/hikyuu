@@ -868,3 +868,14 @@ Other Security Information Definitions
     .. py:attribute:: description : descriptive information
     .. py:attribute:: code : the main benchmark index of this market, used to derive the trading calendar
     .. py:attribute:: last_datetime : the latest trading date for which bar data is available in this market
+    .. py:attribute:: open_time1 : the start time of trading session 1
+    .. py:attribute:: close_time1 : the end time of trading session 1
+    .. py:attribute:: open_time2 : the start time of trading session 2
+    .. py:attribute:: close_time2 : the end time of trading session 2
+    .. py:attribute:: tz_offset_min : the standard UTC offset in minutes (e.g. 480 for UTC+8)
+    .. py:attribute:: dst_rule : the daylight saving rule: 0=none, 1=US, 2=EU
+    .. py:attribute:: data_lag : the visibility delay in trading days relative to the base market
+
+    .. py:method:: is_valid(self)
+
+        Whether the record is valid: an empty market means an invalid (null) record

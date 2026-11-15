@@ -186,6 +186,20 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     marketInfo = sm.getMarketInfo("Sh");
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
+
+    /** @arg The shared null instance: an empty market compares null from both sides */
+    CHECK_UNARY(MarketInfo::NullMarketInfo == Null<MarketInfo>());
+    CHECK_UNARY(Null<MarketInfo>() == MarketInfo::NullMarketInfo);
+    CHECK_UNARY(MarketInfo::NullMarketInfo != marketInfo);
+    CHECK_UNARY(nasdaq != Null<MarketInfo>());
+
+    /** @arg isValid: an empty market is invalid, a loaded record is valid */
+    CHECK_UNARY(!MarketInfo::NullMarketInfo.isValid());
+    CHECK_UNARY(!MarketInfo().isValid());
+    CHECK_UNARY(nasdaq.isValid());
+
+    /** @arg Unknown markets return the shared NullMarketInfo instance */
+    CHECK_EQ(&sm.getMarketInfo("XXX"), &MarketInfo::NullMarketInfo);
 }
 
 /** @par Test points */

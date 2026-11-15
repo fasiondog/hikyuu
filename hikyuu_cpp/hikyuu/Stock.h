@@ -325,9 +325,10 @@ private:
     /*
      * The market info for the unified time conversion, or an identity one when nothing needs
      * converting (day-and-higher ktypes, unified-clock or unregistered markets); call sites test
-     * isUnifiedClock() to skip the conversion
+     * isUnifiedClock() to skip the conversion. The returned reference is valid until the next
+     * reload
      */
-    MarketInfo _timeZone(const KQuery::KType& ktype) const;
+    const MarketInfo& _timeZone(const KQuery::KType& ktype) const;
 
 
 

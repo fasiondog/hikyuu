@@ -22,6 +22,10 @@ public:
     /** The offset in minutes of the unified expression (Beijing wall clock, UTC+8) */
     static constexpr int UNIFIED_TZ_OFFSET_MIN = 480;
 
+    /** The shared null instance: an empty market means null (operator== compares the market) */
+    static const MarketInfo NullMarketInfo;
+
+public:
     /** Default constructor, returns Null<MarketInfo>() */
     MarketInfo();
 
@@ -42,7 +46,7 @@ public:
     MarketInfo(const string& market, const string& name, const string& description,
                const string& code, const Datetime& lastDate, TimeDelta openTime1,
                TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2,
-               int tzOffsetMin = 480, int dstRule = 0, int dataLag = 0);
+               int tzOffsetMin = UNIFIED_TZ_OFFSET_MIN, int dstRule = 0, int dataLag = 0);
 
     MarketInfo(const MarketInfo&) = default;
     MarketInfo& operator=(const MarketInfo&) = default;
@@ -136,6 +140,11 @@ public:
     /** Whether the local wall clock already is the unified expression (CN / HK identity) */
     bool isUnifiedClock() const noexcept {
         return m_tzOffsetMin == UNIFIED_TZ_OFFSET_MIN && m_dstRule == 0;
+    }
+
+    /** Whether the record is valid: an empty market means an invalid (null) record */
+    bool isValid() const noexcept {
+        return !m_market.empty();
     }
 
     /** Used by __str__ of python only */

@@ -24,7 +24,6 @@ void export_BaseInfoDriver(py::module& m) {
         - _init(self) (Required)
         - getAllStockInfo(self) (Required)
         - getStockInfo(self, market, code) (Required)
-        - getMarketInfo(self, market) (Required)
         - getAllMarketInfo(self) (Required)
         - getAllStockTypeInfo(self) (Required)
         - getStockTypeInfo(self, type) (Required)
@@ -84,11 +83,6 @@ void export_BaseInfoDriver(py::module& m) {
 
     :param str market: the market identifier
     :param str code: the security code)")
-      .def("getMarketInfo", &BaseInfoDriver::getMarketInfo, py::arg("market"),
-           R"([Subclass interface (Required)] Get the specified MarketInfo
-
-    :param str market: the market abbreviation
-    :return: if it is not found, return Null<MarketInfo>())")
       .def("getAllMarketInfo", &BaseInfoDriver::getAllMarketInfo,
            "[Subclass interface (Required)] Get all the market information")
       .def("getAllStockTypeInfo", &BaseInfoDriver::getAllStockTypeInfo,

@@ -148,7 +148,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
 
     // Handle the last record at the close. A session pair with equal bounds means it is not
     // configured: an unset close must never clamp the bucket (a zero TimeDelta is never Null)
-    MarketInfo market_info = StockManager::instance().getMarketInfo(stk.market());
+    const MarketInfo& market_info = StockManager::instance().getMarketInfo(stk.market());
     Datetime close1 = today + market_info.closeTime1();
     Datetime close2 = today + market_info.closeTime2();
     Datetime open2 = today + market_info.openTime2();

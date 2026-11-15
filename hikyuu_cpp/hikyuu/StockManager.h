@@ -147,11 +147,13 @@ public:
       std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
 
     /**
-     * Get the market information
+     * Get the market information; all market information is loaded at initialization,
+     * so an unknown market always yields the Null value without querying the driver
      * @param market the given market identifier
-     * @return the matching market information; Null<MarketInfo>() if it does not exist
+     * @return the matching market information; Null<MarketInfo>() if it does not exist.
+     *         The returned reference is valid until the next reload
      */
-    MarketInfo getMarketInfo(const string& market) const noexcept;
+    const MarketInfo& getMarketInfo(const string& market) const noexcept;
 
     /**
      * Get the representative index security of the given market

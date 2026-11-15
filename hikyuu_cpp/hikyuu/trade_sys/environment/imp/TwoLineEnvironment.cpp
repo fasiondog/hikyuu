@@ -33,8 +33,8 @@ TwoLineEnvironment::~TwoLineEnvironment() {}
 void TwoLineEnvironment::_checkParam(const string& name) const {
     if ("market" == name) {
         string market = getParam<string>(name);
-        auto market_info = StockManager::instance().getMarketInfo(market);
-        HKU_CHECK(market_info != Null<MarketInfo>(), "Invalid market: {}", market);
+        const auto& market_info = StockManager::instance().getMarketInfo(market);
+        HKU_CHECK(market_info.isValid(), "Invalid market: {}", market);
     }
 }
 
@@ -48,9 +48,8 @@ EnvironmentPtr TwoLineEnvironment::_clone() {
 void TwoLineEnvironment::_calculate() {
     string market = getParam<string>("market");
     const StockManager& sm = StockManager::instance();
-    MarketInfo market_info = sm.getMarketInfo(market);
-    HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
-                        "Can't find the market({}) info!", market);
+    const MarketInfo& market_info = sm.getMarketInfo(market);
+    HKU_ERROR_IF_RETURN(!market_info.isValid(), void(), "Can't find the market({}) info!", market);
 
     Stock stock = sm.getStock(market + market_info.code());
     KData kdata = stock.getKData(m_query);

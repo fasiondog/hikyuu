@@ -809,6 +809,17 @@ StockManager/Block/Stock
     
     .. py:attribute:: market : 市场简称（如：沪市“SH”, 深市“SZ”）
     .. py:attribute:: name : 市场全称
-    .. py:attribute:: description :描述说明
+    .. py:attribute:: description : 描述说明
     .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
     .. py:attribute:: last_datetime : 该市场K线数据最后交易日期
+    .. py:attribute:: open_time1 : 交易时段1开始时间
+    .. py:attribute:: close_time1 : 交易时段1结束时间
+    .. py:attribute:: open_time2 : 交易时段2开始时间
+    .. py:attribute:: close_time2 : 交易时段2结束时间
+    .. py:attribute:: tz_offset_min : 标准 UTC 偏移（分钟），如 UTC+8 为 480
+    .. py:attribute:: dst_rule : 夏令时规则：0=无，1=美国，2=欧盟
+    .. py:attribute:: data_lag : 相对基准市场的可见性延迟（交易日）
+
+    .. py:method:: is_valid(self)
+
+        记录是否有效，market 为空表示无效（null）记录

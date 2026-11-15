@@ -30,7 +30,6 @@ public:
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end) override;
     virtual unordered_map<string, StockWeightList> getAllStockWeightList() override;
-    virtual MarketInfo getMarketInfo(const string& market) override;
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) override;
     virtual StockInfo getStockInfo(string market, const string& code) override;
     virtual vector<StockInfo> getAllStockInfo() override;

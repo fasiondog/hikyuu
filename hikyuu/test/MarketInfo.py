@@ -21,6 +21,10 @@ class MarketInfoTest(unittest.TestCase):
         self.assertEqual(market.code, "000001")
         self.assertEqual(market.last_datetime, Datetime(201112060000))
 
+    def test_is_valid(self):
+        self.assertTrue(sm.get_market_info("SH").is_valid())
+        self.assertFalse(MarketInfo().is_valid())
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MarketInfoTest)

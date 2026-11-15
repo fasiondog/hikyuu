@@ -902,27 +902,16 @@ StockList StockManager::getStockList(std::function<bool(const Stock&)>&& filter)
     return ret;
 }
 
-MarketInfo StockManager::getMarketInfo(const string& market) const noexcept {
-    MarketInfo result;
+const MarketInfo& StockManager::getMarketInfo(const string& market) const noexcept {
     string market_tmp = market;
     to_upper(market_tmp);
 
     auto iter = m_marketInfoDict.find(market_tmp);
-    if (iter != m_marketInfoDict.end()) {
-        result = iter->second;
-    } else {
-        HKU_ERROR_IF_RETURN(!m_baseInfoDriver, result,
-                            "The base info driver is not initialized!");
-        result = m_baseInfoDriver->getMarketInfo(market_tmp);
-        if (result != Null<MarketInfo>()) {
-            m_marketInfoDict[market_tmp] = result;
-        }
-    }
-    return result;
+    return iter != m_marketInfoDict.end() ? iter->second : MarketInfo::NullMarketInfo;
 }
 
 Stock StockManager::getMarketStock(const string& market) const {
-    auto market_info = getMarketInfo(market);
+    const auto& market_info = getMarketInfo(market);
     return getStock(fmt::format("{}{}", market_info.market(), market_info.code()));
 }
 
@@ -1038,8 +1027,8 @@ BlockList StockManager::getStockBelongs(const Stock& stk, const string& category
 }
 
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
-    auto marketinfo = getMarketInfo(market);
-    HKU_WARN_IF_RETURN(marketinfo == Null<MarketInfo>(), DatetimeList(), "{}: {}!",
+    const auto& marketinfo = getMarketInfo(market);
+    HKU_WARN_IF_RETURN(!marketinfo.isValid(), DatetimeList(), "{}: {}!",
                        htr("Not found market info"), market);
     return getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()))
       .getDatetimeList(query);
@@ -1097,8 +1086,8 @@ bool StockManager::_weekendIsHoliday(const string& market) const {
         }
     }
 
-    MarketInfo marketinfo = getMarketInfo(market);
-    HKU_IF_RETURN(marketinfo == Null<MarketInfo>(), true);
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_IF_RETURN(!marketinfo.isValid(), true);
 
     // The 24h crypto markets trade through weekends; a missing index keeps the default uncached
     Stock index = getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()));
@@ -1112,21 +1101,21 @@ bool StockManager::_weekendIsHoliday(const string& market) const {
 
 Datetime StockManager::marketLocalToUnified(const Datetime& d, const string& market) const {
     HKU_CHECK(!market.empty(), "The market can not be empty!");
-    MarketInfo marketinfo = getMarketInfo(market);
-    HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo.isValid(), "{}: {}!", htr("Not found market info"), market);
     return marketinfo.localToUnified(d);
 }
 
 Datetime StockManager::unifiedToMarketLocal(const Datetime& d, const string& market) const {
     HKU_CHECK(!market.empty(), "The market can not be empty!");
-    MarketInfo marketinfo = getMarketInfo(market);
-    HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo.isValid(), "{}: {}!", htr("Not found market info"), market);
     return marketinfo.unifiedToLocal(d);
 }
 
 bool StockManager::isTradingHours(const Datetime& d, const string& market) const {
-    MarketInfo marketinfo = getMarketInfo(market);
-    HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo.isValid(), "{}: {}!", htr("Not found market info"), market);
     // d follows the unified clock convention; the session bounds are market-local wall clock
     Datetime local = marketinfo.isUnifiedClock() ? d : marketinfo.unifiedToLocal(d);
     HKU_IF_RETURN(isHoliday(local, market), false);
@@ -1324,8 +1313,8 @@ void StockManager::_filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) co
         if (!market_scope.empty() && market_scope.find(upper_market) == market_scope.end()) {
             continue;
         }
-        auto market_info = getMarketInfo(market);
-        if (market_info != Null<MarketInfo>()) {
+        const auto& market_info = getMarketInfo(market);
+        if (market_info.isValid()) {
             must_load.insert(normalizeLoadScopeCode(
               fmt::format("{}{}", market_info.market(), market_info.code())));
         }

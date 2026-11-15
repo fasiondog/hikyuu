@@ -202,13 +202,6 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
     /**
-     * Get the given MarketInfo
-     * @param market market abbreviation
-     * @return Null<MarketInfo>() is returned if it is not found
-     */
-    virtual MarketInfo getMarketInfo(const string& market) = 0;
-
-    /**
      * Get all the market information
      */
     virtual vector<MarketInfo> getAllMarketInfo() = 0;

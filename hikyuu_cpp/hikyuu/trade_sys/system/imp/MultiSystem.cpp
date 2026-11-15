@@ -1754,7 +1754,7 @@ void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
         ref_stk = _findStock(m_sys_list[i]);
     }
     if (ref_stk.isNull()) {
-        MarketInfo market_info = sm.getMarketInfo("SH");
+        const MarketInfo& market_info = sm.getMarketInfo("SH");
         ref_stk = sm.getStock(market_info.market() + market_info.code());
     }
     HKU_WARN_IF_RETURN(ref_stk.isNull(), void(), "No stock as price context! [{}]", name());
@@ -3985,8 +3985,8 @@ int MultiSystem::_memberLagOf(const SystemPtr& sys) {
     if (iter != m_member_lag.end()) {
         return iter->second;
     }
-    MarketInfo info = StockManager::instance().getMarketInfo(sys->getStock().market());
-    int lag = info == Null<MarketInfo>() ? 0 : info.dataLag();
+    const MarketInfo& info = StockManager::instance().getMarketInfo(sys->getStock().market());
+    int lag = info.isValid() ? info.dataLag() : 0;
     if (lag < 0) {
         lag = 0;
     }

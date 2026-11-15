@@ -9,6 +9,8 @@
 
 namespace hku {
 
+const MarketInfo MarketInfo::NullMarketInfo;
+
 namespace {
 
 /** The nth Sunday of the given month, at midnight */

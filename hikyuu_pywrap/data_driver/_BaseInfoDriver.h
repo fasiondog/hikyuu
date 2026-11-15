@@ -83,10 +83,6 @@ public:
         PYBIND11_OVERLOAD(Parameter, BaseInfoDriver, getFinanceInfo, market, code);
     }
 
-    MarketInfo getMarketInfo(const string& market) override {
-        PYBIND11_OVERLOAD_PURE(MarketInfo, BaseInfoDriver, getMarketInfo, market);
-    }
-
     vector<MarketInfo> getAllMarketInfo() override {
         PYBIND11_OVERLOAD_PURE(vector<MarketInfo>, BaseInfoDriver, getAllMarketInfo, );
     }

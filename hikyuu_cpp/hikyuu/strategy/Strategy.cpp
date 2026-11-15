@@ -248,8 +248,8 @@ void Strategy::runDaily(const std::function<void(Strategy*)>& func, const TimeDe
     } else {
         run_at.func = [this, market = run_at.market, f = std::move(func)]() {
             const auto& sm = StockManager::instance();
-            auto market_info = sm.getMarketInfo(market);
-            HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+            const auto& market_info = sm.getMarketInfo(market);
+            HKU_ERROR_IF_RETURN(!market_info.isValid(), void(),
                                 "market {} not found! The run daily func is discard!", market);
 
             // The machine clock is assumed to follow the unified (Beijing) convention; the
@@ -327,8 +327,8 @@ void Strategy::_runDaily() {
         }
         try {
             const auto& sm = StockManager::instance();
-            auto market_info = sm.getMarketInfo(run_at.market);
-            HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+            const auto& market_info = sm.getMarketInfo(run_at.market);
+            HKU_ERROR_IF_RETURN(!market_info.isValid(), void(),
                                 "market {} not found! The run daily func is discard!",
                                 run_at.market);
 
@@ -446,8 +446,8 @@ void Strategy::runDailyAt(const std::function<void(Strategy*)>& func, const Time
     if (ignoreHoliday) {
         new_func = [this, market, f = std::move(func)]() {
             const auto& sm = StockManager::instance();
-            auto market_info = sm.getMarketInfo(market);
-            HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+            const auto& market_info = sm.getMarketInfo(market);
+            HKU_ERROR_IF_RETURN(!market_info.isValid(), void(),
                                 "market {} not found! The run daily at func is discard!", market);
             // The machine clock is assumed to follow the unified (Beijing) convention; the
             // holiday judgment uses the market-local date. The clock point (delta) itself

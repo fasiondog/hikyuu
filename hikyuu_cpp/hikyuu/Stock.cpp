@@ -448,14 +448,14 @@ void Stock::releaseKDataBuffer(KQuery::KType ktype) const {
     }
 }
 
-MarketInfo Stock::_timeZone(const KQuery::KType& ktype) const {
+const MarketInfo& Stock::_timeZone(const KQuery::KType& ktype) const {
     // Day and higher types are never converted: their datetime is a pure trading-day label
     if (!KQuery::isIntradayKType(ktype)) {
-        return MarketInfo();
+        return MarketInfo::NullMarketInfo;
     }
-    MarketInfo info = StockManager::instance().getMarketInfo(market());
+    const MarketInfo& info = StockManager::instance().getMarketInfo(market());
     // Unregistered and identity markets return the default; call sites test isUnifiedClock()
-    HKU_IF_RETURN(info == Null<MarketInfo>() || info.isUnifiedClock(), MarketInfo());
+    HKU_IF_RETURN(!info.isValid() || info.isUnifiedClock(), MarketInfo::NullMarketInfo);
     return info;
 }
 
@@ -496,7 +496,8 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
     // Proxy drivers read server buffers, already normalized; converting again doubles the offset
-    MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(kType));
+    const MarketInfo& tz =
+      driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(kType);
 
     // Load the K-line data according to the configured preload parameters
     const auto& param = StockManager::instance().getPreloadParameter();
@@ -884,7 +885,8 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
             return false;
 
         auto driver = m_kdataDriver->getConnect();
-        MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(query.kType()));
+        const MarketInfo& tz =
+          driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(query.kType());
         // The returned indices belong to the driver's local index space, no conversion needed
         if (!driver->getIndexRangeByDate(m_data->m_market, m_data->m_code, _localQuery(query, tz),
                                          out_start, out_end)) {
@@ -1113,7 +1115,8 @@ KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
 
         HKU_IF_RETURN(!m_kdataDriver || pos >= size_t(Null<int64_t>()), KRecord::NullKRecord);
         auto driver = m_kdataDriver->getConnect();
-        MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(nkType));
+        const MarketInfo& tz =
+          driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(nkType);
         // An index query carries no datetime bound, so only the returned bar needs normalizing
         auto klist = driver->getKRecordList(market(), code(), KQuery(pos, pos + 1, nkType));
         _unify(klist, tz);
@@ -1155,7 +1158,8 @@ KRecord Stock::getKRecord(const Datetime& datetime, const KQuery::KType& ktype) 
                                                         : KRecord::NullKRecord;
         }
 
-        MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(nktype));
+        const MarketInfo& tz =
+          driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(nktype);
         auto klist = driver->getKRecordList(market(), code(), _localQuery(query, tz));
         _unify(klist, tz);
         if (klist.size() > 0) {
@@ -1235,7 +1239,8 @@ KRecordList Stock::_getKRecordList(const KQuery& query) const {
 
     } else {
         auto driver = m_kdataDriver->getConnect();
-        MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(query.kType()));
+        const MarketInfo& tz =
+          driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(query.kType());
         if (query.queryType() == KQuery::DATE) {
             result =
               driver->getKRecordList(m_data->m_market, m_data->m_code, _localQuery(query, tz));
@@ -1284,7 +1289,8 @@ TimeLineList Stock::getTimeLineList(const KQuery& query) const {
     HKU_IF_RETURN(!m_kdataDriver, result);
     auto driver = m_kdataDriver->getConnect();
     // These APIs ignore the query ktype (see docs); the data granularity decides the conversion
-    MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(KQuery::TIMELINE));
+    const MarketInfo& tz =
+      driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(KQuery::TIMELINE);
     result = driver->getTimeLineList(market(), code(), _localQuery(query, tz));
     _unify(result, tz);
     if (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B) {
@@ -1300,7 +1306,8 @@ TransList Stock::getTransList(const KQuery& query) const {
     HKU_IF_RETURN(!m_kdataDriver, result);
     auto driver = m_kdataDriver->getConnect();
     // Same as getTimeLineList: the ktype carried by the query is ignored
-    MarketInfo tz(driver->isUnifiedOutput() ? MarketInfo() : _timeZone(KQuery::TRANS));
+    const MarketInfo& tz =
+      driver->isUnifiedOutput() ? MarketInfo::NullMarketInfo : _timeZone(KQuery::TRANS);
     result = driver->getTransList(market(), code(), _localQuery(query, tz));
     _unify(result, tz);
     if (type() == STOCKTYPE_ETF || type() == STOCKTYPE_FUND || type() == STOCKTYPE_B) {
@@ -1334,8 +1341,8 @@ vector<Block> Stock::getBelongToBlockList(const string& category) const {
 // start of the input's day), so only the intraday time range is checked; the date itself is not
 // validated as a trading day (holidays/weekends are not excluded)
 bool Stock::isTransactionTime(Datetime time) {
-    MarketInfo market_info = StockManager::instance().getMarketInfo(market());
-    HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
+    const MarketInfo& market_info = StockManager::instance().getMarketInfo(market());
+    HKU_IF_RETURN(!market_info.isValid(), false);
 
     HKU_ERROR_IF_RETURN(market_info.openTime1() > market_info.closeTime1() ||
                           market_info.openTime2() > market_info.closeTime2(),
@@ -1401,7 +1408,7 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 
     // The incoming record is unified but the holiday calendar is keyed by the market's local date,
     // so the gate converts it back first; the buffer itself keeps the unified expression
-    MarketInfo tz(_timeZone(inktype));
+    const MarketInfo& tz = _timeZone(inktype);
     Datetime local_datetime(tz.isUnifiedClock() ? record.datetime
                                                 : tz.unifiedToLocal(record.datetime));
 
