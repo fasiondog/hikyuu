@@ -215,7 +215,7 @@ def get_lastdatetime(connect, tablename):
 
 def get_last_krecord(connect, tablename):
     """获取最后一条K线记录
-    返回：(date, open, close, high, low, amount, volume)
+    返回：(date, open, high, low, close, amount, volume)
     """
     try:
         cur = connect.cursor()

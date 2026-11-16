@@ -142,7 +142,7 @@ def get_table(connect, market, code, ktype):
         return (f'hku_data.{nktype}_k', market.upper(), code.upper())
 
 
-@hku_catch(ret=Datetime(1970, 1, 1))
+@hku_catch(ret=None)
 def get_lastdatetime(connect, tablename):
     tmp = connect.command("select max(date) from {} where market='{}' and code='{}'".format(
         tablename[0], tablename[1], tablename[2]))
@@ -152,7 +152,8 @@ def get_lastdatetime(connect, tablename):
 
 def get_last_krecord(connect, tablename):
     """获取最后一条K线记录
-    返回：(date, open, close, high, low, amount, volume)
+    返回：(date, open, high, low, close, amount, volume)
+    注：ClickHouse 中 amount 直接按元存储，此处不做换算（KRecord 中为万元）
     """
     try:
         a = connect.query(
