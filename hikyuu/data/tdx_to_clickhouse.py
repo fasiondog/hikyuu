@@ -198,12 +198,14 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                     and record[2] >= record[4] >= record[3] > 0 \
                     and record[5] >= 0 \
                     and record[6] >= 0:
+                # 存储约定：价格为 ×1000 的整数、成交额为元、成交量为手×1000
                 buf.append(
                     (
-                        market, code,
-                        record[0] * 10000, record[1] * 0.01, record[2] * 0.01, record[3] * 0.01,
-                        record[4] * 0.01, round(record[5] * 0.001),
-                        record[6] if stktype == 2 else round(record[6] * 0.01)
+                        table[1], table[2],
+                        Datetime(record[0] * 10000).timestamp_utc() // 1000000,
+                        int(record[1] * 10), int(record[2] * 10), int(record[3] * 10),
+                        int(record[4] * 10), int(round(record[5])),
+                        record[6] * 1000 if stktype == 2 else int(round(record[6] * 10))
                     )
                 )
                 add_record_count += 1
@@ -296,10 +298,17 @@ def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record
                         and record[3] >= record[5] >= record[4] > 0\
                         and record[5] >= 0 \
                         and record[6] >= 0:
-                    buf.append(market, code, trans_date(record[0], record[1]), round(record[2], 2),
-                               round(record[3], 2), round(record[4], 2), round(record[5],
-                                                                               2), record[6] * 0.001,
-                               record[7] if stktype == 2 else round(record[7] * 0.01))
+                    # 存储约定：价格为 ×1000 的整数、成交额为元、成交量为手×1000
+                    buf.append(
+                        (
+                            table[1], table[2],
+                            Datetime(trans_date(record[0], record[1])).timestamp_utc() // 1000000,
+                            int(round(record[2] * 1000)), int(round(record[3] * 1000)),
+                            int(round(record[4] * 1000)), int(round(record[5] * 1000)),
+                            int(round(record[6])),
+                            record[7] * 1000 if stktype == 2 else int(round(record[7] * 10))
+                        )
+                    )
                     add_record_count += 1
 
                 data = src_file.read(32)
