@@ -141,12 +141,19 @@ def get_table(connect, market, code, ktype):
         'transdata': 'transdata',
     }
     nktype = ktype_dict[ktype.lower()]
+    nmarket = market.upper()
     if nktype == 'timeline':
-        return (f'hku_data.timeline', market.upper(), code.upper())
+        return (f'hku_data.timeline', nmarket, code.upper())
     elif nktype == 'transdata':
-        return (f'hku_data.transdata', market.upper(), code.upper())
+        return (f'hku_data.transdata', nmarket, code.upper())
     else:
-        return (f'hku_data.{nktype}_k', market.upper(), code.upper())
+        suffix = '' if nmarket in ('SH', 'SZ', 'BJ') else '_f64'
+        return (f'hku_data.{nktype}_k{suffix}', nmarket, code.upper())
+
+
+def is_f64_kline_table(tablename):
+    """K 线表名是否指向 Float64 表"""
+    return tablename.endswith('_f64')
 
 
 @hku_catch(ret=Datetime(1970, 1, 1))
@@ -168,6 +175,9 @@ def get_last_krecord(connect, tablename):
         # hku_info(f"{tablename} {a}")
         if not a:
             return None
+        if is_f64_kline_table(tablename[0]):
+            return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, float(a[0][1]), float(a[0][2]),
+                    float(a[0][3]), float(a[0][4]), float(a[0][5]), float(a[0][6]))
         return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, a[0][1]*0.001, a[0][2]*0.001, a[0][3]*0.001, a[0][4]*0.001, float(a[0][5]), a[0][6]*0.001)
     except:
         return None
