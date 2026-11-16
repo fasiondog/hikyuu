@@ -169,5 +169,20 @@ void export_plugin_KDataToHdf5Importer(py::module& m) {
     :rtype: bool
 
     Note: a restart (re-executing hikyuu_init) is required after the writing for it to take effect.
+)")
+      .def(
+        "add_stock_weight", &KDataToHdf5Importer::addStockWeight, py::arg("market"),
+        py::arg("code"), py::arg("weights"),
+        R"(add_stock_weight(market: str, code: str, weights: StockWeightList) -> bool
+
+    Write ex-rights/ex-dividend events into the stkWeight table of the baseinfo (sqlite3) database; rows with the same stock and date are skipped. Prices must be raw prices with splits undone; hikyuu derives adjustment from the events at runtime.
+
+    :param str market: the market abbreviation (automatically converted to uppercase), e.g. 'NASDAQ'
+    :param str code: the security code; it must match the code stored in the stock table (uppercase)
+    :param StockWeightList weights: the events; the date is the ex-date, bonus is the cash dividend per 10 shares, and suogu is the new/old share ratio of a split
+    :return: return True on success (including an empty list); return False on failure
+    :rtype: bool
+
+    Note: a restart (re-executing hikyuu_init) is required after the writing for it to take effect.
 )");
 }

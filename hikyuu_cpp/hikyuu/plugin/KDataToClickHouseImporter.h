@@ -46,6 +46,9 @@ public:
                        double tick = 0.01, double tick_value = 0.01, double min_trade = 1,
                        double max_trade = 1000000);
 
+    bool addStockWeight(const string& market, const string& code,
+                        const StockWeightList& weights);
+
 private:
     ImportKDataToClickHousePluginInterface* m_plugin{nullptr};
 };

@@ -92,4 +92,9 @@ bool KDataToClickHouseImporter::addStockParam(const string& market, const string
                     : false;
 }
 
+bool KDataToClickHouseImporter::addStockWeight(const string& market, const string& code,
+                                               const StockWeightList& weights) {
+    return m_plugin ? m_plugin->addStockWeight(market, code, weights) : false;
+}
+
 }  // namespace hku
