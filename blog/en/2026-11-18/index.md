@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Hikyuu | Implementing an RSI Mean-Reversion Trading Strategy
+title: Implementing an RSI Mean-Reversion Trading Strategy
 date: 2026-11-18
 lang: en
 summary: Implement RSI mean reversion in Hikyuu and throw it at the entire A-share market to see what happens. The goal is to get you through the "change one parameter, test a class of stocks" loop in minutes — not to prove this parameter set makes money.

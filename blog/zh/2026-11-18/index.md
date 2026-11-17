@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Hikyuu | RSI均值回归交易策略实现
+title: RSI均值回归交易策略实现
 date: 2026-11-18
 lang: zh
 summary: 在 Hikyuu 里实现 RSI 均值回归，并把它丢进「全 A」看反应。目标是让你几分钟内跑通「改一个参数、看一类标的」这条路径，不是证明这组参数能赚钱。
