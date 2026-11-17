@@ -6,8 +6,9 @@ day bars only). The on-disk format is identical to hikyuu/data/tdx_to_h5.py + co
   - dataset name = MARKET + code concatenated verbatim (HDF5 is case-sensitive; the C++
     side looks up by market + code directly);
   - datetime = trading day yyyymmdd0000 (day bars are pure date labels, no tz conversion);
-  - the four prices = real price x 1000 as integers (the h5 driver read side is fixed at
-    x0.001 regardless of precision; hence h5 can store only 3 decimals);
+  - A-share markets (SH/SZ/BJ) store prices as real price x 1000 integers; other markets
+    store prices as Float64 at API scale (no 3-decimal cap);
+  - the h5 driver read side detects the stored datatype, so both layouts are supported;
   - transAmount is approximate (close x volume), not the real turnover: the contract
     multiplier / lot size is not applied, and for index-like instruments volume is the
     constituent total whose product with the index level has no economic meaning; unit
@@ -40,6 +41,7 @@ CACHE_DIR = os.path.join("test_data", "downloads", "multi_market")
 MANIFEST = os.path.join("test_data", "multi_market_manifest.csv")  # committed; audits deviations/uncovered reasons
 SANE_MIN = datetime.date(1970, 1, 1)
 FALLBACK_YEARS = 3
+A_SHARE_MARKETS = {"SH", "SZ", "BJ"}
 
 # Target window aligns with the A-share fixture (sh_day.h5 ends 2011-12-06); newer instruments start at listing day
 SPEC = [
@@ -72,6 +74,17 @@ class KDayRecord(tb.IsDescription):
     closePrice = tb.UInt32Col()
     transAmount = tb.UInt64Col()
     transCount = tb.UInt64Col()
+
+
+class KDayRecordF64(tb.IsDescription):
+    """Float64 K-line layout used by non-A-share markets (values at API scale)"""
+    datetime = tb.UInt64Col()
+    openPrice = tb.Float64Col()
+    highPrice = tb.Float64Col()
+    lowPrice = tb.Float64Col()
+    closePrice = tb.Float64Col()
+    transAmount = tb.Float64Col()
+    transCount = tb.Float64Col()
 
 
 def to_num(v):
@@ -280,38 +293,43 @@ def pick_window(market, code, d1, d2, sources, refresh):
 
 
 def build_h5(market, code, rows, dest_dir):
-    """The h5 driver read side is fixed at x0.001 (H5KDataDriver.cpp:619-622), so prices
-    must be stored as price x 1000, regardless of stocktypeinfo.precision (precision only
-    affects display digits). Hence the h5 backend caps prices at 3 decimals; source prices
-    with more decimals get rounded - a backend capability boundary; generation reports the
-    lost-precision count."""
+    """A-share markets store prices as x1000 integers; other markets store Float64 at API
+    scale so no decimal precision is lost. The h5 driver reads by stored datatype."""
     filename = os.path.join(dest_dir, "%s_day.h5" % market.lower())
     if os.path.exists(filename):
         os.remove(filename)
-    scale = 1000
-    # count price fields rounded from the actual data (source decimals are unrelated to SPEC.precision)
+    use_f64 = market.upper() not in A_SHARE_MARKETS
     lost = 0
-    for _, o, h, l, c, _ in rows:
-        for v in (o, h, l, c):
-            raw = v * scale
-            if abs(raw - round(raw)) > 1e-9:
-                lost += 1
+    if not use_f64:
+        for _, o, h, l, c, _ in rows:
+            for v in (o, h, l, c):
+                raw = v * 1000
+                if abs(raw - round(raw)) > 1e-9:
+                    lost += 1
     filters = tb.Filters(complevel=9, complib="zlib", shuffle=True)
     with tb.open_file(filename, "w", filters=filters) as h5f:
         group = h5f.create_group("/", "data")
-        table = h5f.create_table(group, (market + code).upper(), KDayRecord,
-                                 expectedrows=len(rows))
+        desc = KDayRecordF64 if use_f64 else KDayRecord
+        table = h5f.create_table(group, (market + code).upper(), desc, expectedrows=len(rows))
         row = table.row
         for d, o, h, l, c, vol in rows:
             row["datetime"] = ymd(d) * 10000
-            row["openPrice"] = int(round(o * scale))
-            row["highPrice"] = int(round(h * scale))
-            row["lowPrice"] = int(round(l * scale))
-            row["closePrice"] = int(round(c * scale))
-            # transAmount is approximate: contract multiplier / lot size not applied
-            # (unit is overridden per variety); stored in thousands (driver x0.1 -> API 10k)
-            row["transAmount"] = int(round(c * vol))
-            row["transCount"] = int(vol)
+            if use_f64:
+                row["openPrice"] = o
+                row["highPrice"] = h
+                row["lowPrice"] = l
+                row["closePrice"] = c
+                # transAmount is approximate (contract multiplier / lot size not applied);
+                # stored at API scale in ten-thousand-yuan
+                row["transAmount"] = c * vol * 0.1
+                row["transCount"] = vol
+            else:
+                row["openPrice"] = int(round(o * 1000))
+                row["highPrice"] = int(round(h * 1000))
+                row["lowPrice"] = int(round(l * 1000))
+                row["closePrice"] = int(round(c * 1000))
+                row["transAmount"] = int(round(c * vol))
+                row["transCount"] = int(vol)
             row.append()
         table.flush()
     note = "" if not lost else "h5 caps at 3 decimals: %d price fields rounded (%d bars)" % (lost, len(rows))

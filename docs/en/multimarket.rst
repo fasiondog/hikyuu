@@ -124,9 +124,13 @@ kdata Configuration
 The ``[kdata]`` section configures the data files per market with the
 ``{market}_{ktype}`` keys: keys are split at the first ``_`` (market codes must not
 contain underscores, case-insensitive), and the ``time`` key maps to TIMELINE. Markets
-or ktypes without configuration return empty data (silent zero output). HDF5 stores
-prices fixed at ×1000 (a 3-decimal cap), so high-precision markets (forex / crypto)
-should use MySQL / ClickHouse / SQLite instead.
+or ktypes without configuration return empty data (silent zero output). HDF5 picks the
+K-line price storage format by market: A-share markets (SH/SZ/BJ) keep the fixed-point
+×1000 layout (3-decimal cap), while all other markets store prices as Float64 at API
+scale (no decimal cap). The read side adapts to the dataset's actual field type, so
+existing fixed-point files remain readable; the import side chooses the format when
+creating a dataset and preserves the existing format on subsequent writes. Timeline
+and transaction data stay fixed-point ×1000.
 
 The SQLite backend takes the table name from the code alone (the market is ignored), so with
 ``type = sqlite3`` each market needs its own database file (``sh_day`` / ``sz_day`` pointing at
