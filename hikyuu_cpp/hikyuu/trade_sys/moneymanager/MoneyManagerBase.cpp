@@ -7,12 +7,29 @@
 
 #include <cmath>
 #include "MoneyManagerBase.h"
+#include "hikyuu/StockManager.h"
 
 namespace hku {
 
 // Values above this cannot be cast to int64_t: INT64_MAX is 9.22e18 and the cast of anything
 // beyond it (or of NaN/inf) is undefined behaviour
 constexpr double MAX_INT64_CAST_VALUE{9.0e18};
+
+namespace {
+
+// The number of the trading days in (from, to] (weekends and exchange holidays excluded),
+// stopping at the given limit
+size_t tradingDaysIn(const Datetime& from, const Datetime& to, size_t limit) {
+    size_t count = 0;
+    for (Datetime d = from + TimeDelta(1); d <= to && count < limit; d = d + TimeDelta(1)) {
+        if (!StockManager::instance().isHoliday(d)) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+}  // namespace
 
 HKU_API std::ostream& operator<<(std::ostream& os, const MoneyManagerBase& mm) {
     os << "MoneyManager(" << mm.name() << ", " << mm.getParameter() << ")";
@@ -34,6 +51,10 @@ MoneyManagerBase::MoneyManagerBase() : m_name("MoneyManagerBase") {
     setParam<int>("max_stock", 20000);
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
+
+    // T+n: the shares bought within the last n trading days cannot be sold (1 = the T+1 rule,
+    // 0 turns it off); the daily KType or above is unaffected
+    setParam<int>("t_plus_n", 1);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
@@ -41,6 +62,9 @@ MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
     setParam<int>("max_stock", 20000);
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
+
+    // T+n: see the default constructor
+    setParam<int>("t_plus_n", 1);
 }
 
 MoneyManagerBase::~MoneyManagerBase() {}
@@ -51,6 +75,8 @@ void MoneyManagerBase::baseCheckParam(const string& name) const {
               name == "auto-checkin" ? "auto_checkin" : "max_stock");
     if ("max_stock" == name) {
         HKU_ASSERT(getParam<int>("max_stock") >= 1);
+    } else if ("t_plus_n" == name) {
+        HKU_ASSERT(getParam<int>("t_plus_n") >= 0);
     }
 }
 
@@ -61,6 +87,7 @@ void MoneyManagerBase::reset() {
     m_tm.reset();
     // The EV/CN are re-assigned by the system on every run
     m_buy_sell_counts.clear();
+    m_tplus_buys.clear();
     _reset();
 }
 
@@ -78,6 +105,7 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     p->m_cn = m_cn;
     p->m_query = m_query;
     p->m_buy_sell_counts = m_buy_sell_counts;
+    p->m_tplus_buys = m_tplus_buys;
     return p;
 }
 
@@ -103,9 +131,13 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
     // When the risk is not positive (NaN included, i.e. the price has reached or fallen below
     // the stop loss price), the MMs which do not support multi-trading liquidate the whole
     // position directly, otherwise the subclass _getSellNumber is left to decide
-    HKU_IF_RETURN(!(risk > 0.0) && !m_support_mult_buy_sell, MAX_DOUBLE);
+    if (!(risk > 0.0) && !m_support_mult_buy_sell) {
+        // The stop-loss liquidation cannot close the T+n locked shares either
+        return _capSellNumber(datetime, stock, MAX_DOUBLE);
+    }
 
-    double n = _getSellNumber(datetime, stock, price, risk, from);
+    double n = _capSellNumber(datetime, stock, _getSellNumber(datetime, stock, price, risk, from));
+
     // The "sell everything" sentinel is resolved to the position by the trade manager
     HKU_IF_RETURN(n == MAX_DOUBLE, MAX_DOUBLE);
     HKU_WARN_IF_RETURN(!std::isfinite(n) || n <= 0.0, 0.0,
@@ -125,6 +157,51 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
     // The size is neither clamped to the holding (the caller sells against the position it holds)
     // nor aligned to minTradeNumber: a dividend or a stock gift may leave an odd lot
     return n;
+}
+
+bool MoneyManagerBase::_isDailyOrAboveQuery() const {
+    return KQuery::getKTypeInSeconds(m_query.kType()) >= 86400;
+}
+
+double MoneyManagerBase::_capSellNumber(const Datetime& datetime, const Stock& stock, double n) {
+    HKU_IF_RETURN(getParam<int>("t_plus_n") <= 0 || _isDailyOrAboveQuery(), n);
+    double locked = _getTplusLockedNumber(datetime, stock);
+    HKU_IF_RETURN(locked <= 0.0, n);
+    double sellable = m_tm->getHoldNumber(datetime, stock) - locked;
+    // A part below minTradeNumber (e.g. the odd lot left by a dividend) would be rejected by the
+    // trade manager, so treat it as nothing sellable
+    HKU_IF_RETURN(sellable < stock.minTradeNumber(), 0.0);
+    return n > sellable ? sellable : n;
+}
+
+double MoneyManagerBase::_getTplusLockedNumber(const Datetime& datetime, const Stock& stock) {
+    auto iter = m_tplus_buys.find(stock);
+    HKU_IF_RETURN(iter == m_tplus_buys.end(), 0.0);
+    auto& entries = iter->second;
+    HKU_IF_RETURN(entries.empty(), 0.0);
+
+    _trimTplusCache(entries, datetime.startOfDay(), getParam<int>("t_plus_n"));
+
+    double locked = 0.0;
+    for (const auto& entry : entries) {
+        locked += entry.second;
+    }
+    return locked;
+}
+
+void MoneyManagerBase::_trimTplusCache(std::vector<std::pair<Datetime, double>>& entries,
+                                       const Datetime& today, int n) {
+    // The entries are appended with non-decreasing dates, so the expired ones sit at the front
+    while (!entries.empty()) {
+        const Datetime& buy_date = entries.front().first;
+        // T+1: any later trading day unlocks, no holiday lookup needed
+        bool expired =
+          n <= 1 ? today > buy_date : tradingDaysIn(buy_date, today, size_t(n)) >= size_t(n);
+        if (!expired) {
+            break;
+        }
+        entries.erase(entries.begin());
+    }
 }
 
 double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
@@ -328,6 +405,19 @@ void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
         } else {
             iter->second.first++;
             iter->second.second = 0;
+        }
+
+        // The T+n cache: aggregate the fills of the same buy date; skipped on the daily KType or
+        // above, where the rule is never applied
+        if (getParam<int>("t_plus_n") > 0 && !_isDailyOrAboveQuery()) {
+            auto& entries = m_tplus_buys[tr.stock];
+            Datetime date = tr.datetime.startOfDay();
+            if (!entries.empty() && entries.back().first == date) {
+                entries.back().second += tr.number;
+            } else {
+                entries.emplace_back(date, tr.number);
+            }
+            _trimTplusCache(entries, date, getParam<int>("t_plus_n"));
         }
     }
     _buyNotify(tr);
