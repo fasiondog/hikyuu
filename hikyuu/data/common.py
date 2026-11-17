@@ -153,31 +153,73 @@ for market in g_market_list:
     g_fund_code_name_list[market] = []
 g_last_get_fund_code_name_list_date = datetime.date(1990, 12, 9)
 
+# 数据源漏收但仍在交易的基金，固定补入基金代码表
+g_extra_fund_list = {
+    'SH': {'511880': '银华日利ETF', '511990': '华宝添益ETF'}  # 沪市货币ETF，同花顺及上交所接口均未收录
+}
+
 
 @hku_catch(ret=[], trace=True)
 @timeout(60)
 def get_fund_code_name_list(market: str) -> list:
     """
-    获取基金代码名称列表 (来源: sina)
+    获取基金代码名称列表 (来源: 同花顺 ETF/LOF + 上交所 ETF + 新浪封闭式基金)
     """
-    # 保证一天只获取一次基金股票代码表，防止对 sina 的频繁访问
+    # 保证一天只获取一次基金代码表，防止对数据源的频繁访问
     global g_last_get_fund_code_name_list_date
     now = datetime.date.today()
     if now <= g_last_get_fund_code_name_list_date:
         return g_fund_code_name_list[market]
 
-    ind_list = "封闭式基金", "ETF基金", "LOF基金"
-    for ind in ind_list:
-        df = ak.fund_etf_category_sina(ind)
-        for i in range(len(df)):
-            loc = df.loc[i]
-            try:
-                code, name = str(loc['代码']), str(loc['名称'])
-                g_fund_code_name_list[code[:2].upper()].append(dict(code=code[2:], name=name))
-            except Exception as e:
-                hku_error("{}! {}", str(e), loc)
-    hku_info("获取基金列表数量: {}", len(g_fund_code_name_list[market]))
+    new_list = {m: {} for m in g_market_list}
+    for ind in ('ETF', 'LOF'):
+        try:
+            df = ak.fund_etf_category_ths(symbol=ind)
+        except Exception as e:
+            hku_error("获取同花顺 {} 列表失败! {}", ind, str(e))
+            continue
+        for _, row in df.iterrows():
+            code = str(row['基金代码']).strip()
+            if not code or code[0] not in ('1', '5'):
+                continue
+            code_market = MARKET.SZ if code[0] == '1' else MARKET.SH
+            new_list[code_market][code] = str(row['基金名称']).strip()
+
+    # 上交所 ETF 补充
+    try:
+        df = ak.fund_etf_scale_sse()
+        for _, row in df.iterrows():
+            code = str(row['基金代码']).strip()
+            new_list[MARKET.SH].setdefault(code, str(row['基金简称']).strip())
+    except Exception as e:
+        hku_error("获取上交所 ETF 列表失败! {}", str(e))
+
+    # 新浪封闭式基金补充 REIT
+    try:
+        df = ak.fund_etf_category_sina('封闭式基金')
+        for _, row in df.iterrows():
+            code = str(row['代码']).strip()
+            code_market = code[:2].upper()
+            if code_market in g_market_list:
+                new_list[code_market].setdefault(code[2:], str(row['名称']).strip())
+    except Exception as e:
+        hku_error("获取新浪封闭式基金列表失败! {}", str(e))
+
+    if not any(new_list.values()):
+        hku_error("获取基金列表失败，暂用上次结果")
+        return g_fund_code_name_list[market]
+
+    # 补入数据源漏收的基金
+    for m, extra in g_extra_fund_list.items():
+        for code, name in extra.items():
+            new_list[m].setdefault(code, name)
+
+    # 逐市场替换，避免某个市场的数据源失败时把原列表清空
+    for m in g_market_list:
+        if new_list[m]:
+            g_fund_code_name_list[m] = [dict(code=code, name=name) for code, name in new_list[m].items()]
     g_last_get_fund_code_name_list_date = now
+    hku_info("获取基金列表数量: {}", len(g_fund_code_name_list[market]))
     return g_fund_code_name_list[market]
 
 
