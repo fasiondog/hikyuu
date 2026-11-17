@@ -1,186 +1,45 @@
--- Float64 K-line tables for non-A-share markets (market not in SH/SZ/BJ).
--- A-share markets keep using the original fixed-point tables.
+-- ClickHouse's holiday uses date as the primary key (MergeTree sort key), so one date cannot
+-- hold multiple markets; rebuild the table with the sort key (market, date) and expand existing
+-- rows over the 9 shared CN-calendar markets.
+-- Drop tables possibly left by a previous interruption first, so the script is re-runnable
+-- (MergeTree does not dedup; leftovers would double the rows)
+DROP TABLE IF EXISTS hku_base.holiday_new;
+DROP TABLE IF EXISTS hku_base.holiday_old;
 
-CREATE TABLE IF NOT EXISTS hku_data.day_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date)
-SETTINGS index_granularity = 2048;
-CREATE TABLE IF NOT EXISTS hku_data.week_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.month_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.quarter_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.halfyear_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.year_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.min_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY (market, toYear(date)-toYear(date)%10)
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.min5_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY (market, toYear(date)-toYear(date)%10)
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.min15_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY (market, toYear(date)-toYear(date)%10)
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.min30_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY (market, toYear(date)-toYear(date)%10)
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.min60_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
-CREATE TABLE IF NOT EXISTS hku_data.hour2_k_f64 (
-    `market` String,
-    `code` String,
-    `date` DateTime,
-    `open` Float64,
-    `high` Float64,
-    `low` Float64,
-    `close` Float64,
-    `amount` Float64,
-    `volume` Float64
-)
-ENGINE = MergeTree()
-PARTITION BY market
-PRIMARY KEY (market, code, date)
-ORDER BY (market, code, date);
+CREATE TABLE IF NOT EXISTS hku_base.holiday_new (
+    market String,
+    date Int32,
+    PRIMARY KEY (market, date)
+) ENGINE = MergeTree();
 
+-- SELECT DISTINCT: after an interruption the source already holds multi-market rows; dedup avoids re-expanding the same market
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'SH', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'SZ', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'BJ', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'SHF', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'DCE', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'CZC', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'CFE', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'GFE', date FROM hku_base.holiday;
+INSERT INTO hku_base.holiday_new (market, date) SELECT DISTINCT 'INE', date FROM hku_base.holiday;
+
+-- Variety-level parameter table: the per-security tick / tickValue / trade-number bounds /
+-- precision that override the type-level stocktypeinfo defaults. The (market, code) key follows the
+-- Stock table; a missing row keeps the type-level default. Rows are written by the import side (the
+-- exchange is the authoritative source); the core reads it only. ReplacingMergeTree dedups repeated
+-- imports on merge (ClickHouse has no upsert); readers use FINAL.
+CREATE TABLE IF NOT EXISTS hku_base.stockparam (
+    market String,
+    code String,
+    tick Float64,
+    tickValue Float64,
+    minTradeNumber Float64,
+    maxTradeNumber Float64,
+    precision Int32,
+    PRIMARY KEY (market, code)
+) ENGINE = ReplacingMergeTree();
+
+-- RENAME is atomic; SELECT DISTINCT makes a rerun after interruption converge safely, the version bump follows the RENAME
+RENAME TABLE hku_base.holiday TO hku_base.holiday_old, hku_base.holiday_new TO hku_base.holiday;
 ALTER TABLE `hku_base`.`version` UPDATE `version` = 7 WHERE `id` = 0 SETTINGS mutations_sync = 1;
+DROP TABLE IF EXISTS hku_base.holiday_old;
