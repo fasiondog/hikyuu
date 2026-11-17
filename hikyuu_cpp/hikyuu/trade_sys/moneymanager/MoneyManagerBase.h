@@ -205,6 +205,22 @@ public:
     virtual double _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                       price_t risk, SystemPart from);
 
+    // The shares bought within the last n trading days (the "t_plus_n" lock); the expired entries
+    // are dropped on the way
+    double _getTplusLockedNumber(const Datetime& datetime, const Stock& stock);
+
+    // Drop the entries that have passed n trading days from the T+n cache
+    void _trimTplusCache(std::vector<std::pair<Datetime, double>>& entries, const Datetime& today,
+                         int n);
+
+    // Cap a sell size (the MAX_DOUBLE "sell everything" sentinel included) at the holding minus
+    // the T+n locked part; 0 when nothing is sellable, n unchanged when the rule is off
+    double _capSellNumber(const Datetime& datetime, const Stock& stock, double n);
+
+    // Whether the query is on the daily KType or above (bar period >= one day), where the T+n
+    // rule is skipped
+    bool _isDailyOrAboveQuery() const;
+
     /** Subclass reset interface */
     virtual void _reset() {}
 
@@ -237,6 +253,10 @@ protected:
     ConditionPtr m_cn;
     unordered_map<Stock, std::pair<size_t, size_t>> m_buy_sell_counts;
     // Not thread-safe when shared_mm=true (multiple Systems mutate the same map concurrently)
+    // The T+n cache of the long buy fills (the "t_plus_n" parameter), aggregated per buy date per
+    // stock and aged by the trading days; not serialized (rebuilt by the notifications on the
+    // next run)
+    unordered_map<Stock, std::vector<std::pair<Datetime, double>>> m_tplus_buys;
     // Whether the subclass supports multi-trading (multiple position building/reducing); it is a
     // class capability which is assigned directly by the subclass constructor and not serialized
     bool m_support_mult_buy_sell{false};

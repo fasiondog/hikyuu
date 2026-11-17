@@ -171,8 +171,12 @@ TEST_CASE("test_System_runMoment_delayed_trade_accounting") {
         sg->_addBuySignal(kdata[0].datetime);
         sg->_addBuySignal(kdata[1].datetime);
         sg->_addSellSignal(kdata[2].datetime);
-        auto sys = SYS_Simple(crtTM(Datetime(201901010000), 100000.0, TC_Zero()),
-                              MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+        auto mm = MM_FixedCount(100);
+        // The phase accounting here buys and sells within the same day, which is orthogonal to
+        // the T+n rule and blocked by its default
+        mm->setParam<int>("t_plus_n", 0);
+        auto sys = SYS_Simple(crtTM(Datetime(201901010000), 100000.0, TC_Zero()), mm,
+                              EnvironmentPtr(), ConditionPtr(), sg);
         sys->setParam<bool>("sell_delay", false);
         sys->setTO(kdata);
         sys->readyForRun();
