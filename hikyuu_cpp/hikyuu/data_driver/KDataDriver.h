@@ -87,9 +87,11 @@ public:
     virtual bool canParallelLoad() = 0;
 
     /**
-     * Whether the driver already gives the datetime in the unified time expression
-     * @details Server-backed proxy drivers read buffers normalized once on the server side;
-     * converting again would shift every bar twice. Raw-storage drivers keep the default false.
+     * Whether the driver output datetime is already in the unified expression (Beijing wall
+     * clock, UTC+8); when true, Stock skips the market-local/unified conversion.
+     * @details Proxy drivers read server buffers already normalized; converting again shifts
+     *          every bar twice. Raw-storage drivers return market-local wall clock and keep the
+     *          default false.
      */
     virtual bool isUnifiedOutput() const {
         return false;

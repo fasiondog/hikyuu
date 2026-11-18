@@ -42,7 +42,8 @@ void export_KQuery(py::module& m) {
       .def_static("get_base_ktype_list", &KQuery::getBaseKTypeList, "Get all the basic KTypes")
       .def_static("get_extra_ktype_list", &KQuery::getExtraKTypeList, "Get all the extended KTypes")
       .def_static("get_ktype_in_min", &KQuery::getKTypeInMin,
-                  "Get the number of the minutes corresponding to the ktype")
+                  "Get the number of the minutes corresponding to the ktype; prefer "
+                  "get_ktype_in_seconds, which also covers second-based types such as TRANS")
       .def_static("get_ktype_in_seconds", &KQuery::getKTypeInSeconds,
                   "Get the number of the seconds corresponding to the ktype")
 

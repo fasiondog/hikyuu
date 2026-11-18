@@ -11,6 +11,16 @@
 
     K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
 
+    .. py:method:: __init__(start, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER)
+
+        构造K线查询条件，支持按索引与按日期两种方式：
+
+        - 按索引：``start`` / ``end`` 为整数索引，区间为 ``[start, end)``
+        - 按日期：``start`` / ``end`` 为 :py:class:`Datetime`，区间为 ``[start, end)``
+
+        ``end`` 省略表示右开区间；``ktype`` 默认为 ``Query.DAY``，
+        ``recover_type`` 默认为 ``Query.NO_RECOVER``。
+
     简化 :py:data:`Query.KType` 枚举值
     
     - Query.DAY - 日线类型
@@ -24,7 +34,17 @@
     - Query.MIN15 - 15分钟线类型
     - Query.MIN30 - 30分钟线类型
     - Query.MIN60 - 60分钟线类型
-    
+    - Query.HOUR2 - 2小时线类型
+    - Query.DAY3 - 3日线类型
+    - Query.DAY5 - 5日线类型
+    - Query.DAY7 - 7日线类型
+    - Query.MIN3 - 3分钟线类型
+    - Query.HOUR4 - 4小时线类型
+    - Query.HOUR6 - 6小时线类型
+    - Query.HOUR12 - 12小时线类型
+    - Query.TIMELINE - 分时线类型
+    - Query.TRANS - 分笔线类型
+
     简化 :py:data:`Query.RecoverType` 枚举值
     
     - Query.NO_RECOVER      - 不复权
@@ -88,8 +108,18 @@
         - MIN5     - 5分钟线类型
         - MIN15    - 15分钟线类型
         - MIN30    - 30分钟线类型
-        - MIN60    - 60分钟线类型    
-        
+        - MIN60    - 60分钟线类型
+        - HOUR2    - 2小时线类型
+        - DAY3     - 3日线类型
+        - DAY5     - 5日线类型
+        - DAY7     - 7日线类型
+        - MIN3     - 3分钟线类型
+        - HOUR4    - 4小时线类型
+        - HOUR6    - 6小时线类型
+        - HOUR12   - 12小时线类型
+        - TIMELINE - 分时线类型
+        - TRANS    - 分笔线类型
+
     .. py:data:: RecoverType
     
        K线复权类别枚举定义
@@ -122,7 +152,7 @@
 
         判断是否为右开区间，即未指定结束时间
 
-    .. py:method:: is_valid_ktype(self, ktype)
+    .. py:staticmethod:: is_valid_ktype(ktype)
 
         判断指定的K线类型是否有效
 
@@ -162,7 +192,14 @@
 
     .. py:staticmethod:: get_ktype_in_min(ktype)
 
-        获取指定K线类型对应的分钟数
+        获取指定K线类型对应的分钟数。建议优先使用 ``get_ktype_in_seconds``，
+        后者同时覆盖 TRANS 等按秒计的周期。
+
+        :rtype: int
+
+    .. py:staticmethod:: get_ktype_in_seconds(ktype)
+
+        获取指定K线类型对应的秒数，覆盖 TRANS 等按秒计的周期。
 
         :rtype: int
 

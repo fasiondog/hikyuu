@@ -35,7 +35,8 @@ Unified Time Expression
   the query dates of the unified expression are reverse-normalized to the market local
   time on entry, and the bar datetimes are normalized to the unified expression on exit;
   ``MarketInfo.isUnifiedClock()`` (timezone +480 without DST) is the identity fast path;
-  ``KQuery.isIntradayKType()`` decides which ktypes participate in the conversion.
+  ``KQuery.isIntradayKType()`` decides which ktypes participate in the conversion, by testing
+  whether the period in seconds is strictly below the daily one (TRANS counts in seconds).
 - Day-frequency cross-market alignment is by trading-day labels: ``data_lag`` (US / forex = 1,
   A-share / futures / HK = 0) is handled by the library at the portfolio layer — ``MultiSystem``
   truncates the member visibility on the daily (or above) axis to the last bar whose label is

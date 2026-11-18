@@ -12,6 +12,16 @@ Building Bar (Candlestick) Query Conditions
     Query criteria for bar (candlestick) data. In Python, ``Query`` is readily available in the
     hikyuu namespace and can be used directly.
 
+    .. py:method:: __init__(start, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER)
+
+        Build a bar query condition, in either of two ways:
+
+        - by index: ``start`` / ``end`` are integer indices over ``[start, end)``
+        - by date: ``start`` / ``end`` are :py:class:`Datetime` values over ``[start, end)``
+
+        Omitting ``end`` means a right-open interval. ``ktype`` defaults to ``Query.DAY`` and
+        ``recover_type`` to ``Query.NO_RECOVER``.
+
     Shortcut aliases for the :py:data:`Query.KType` enumeration values
 
     - Query.DAY - daily bar
@@ -25,6 +35,16 @@ Building Bar (Candlestick) Query Conditions
     - Query.MIN15 - 15-minute bar
     - Query.MIN30 - 30-minute bar
     - Query.MIN60 - 60-minute bar
+    - Query.HOUR2 - 2-hour bar
+    - Query.DAY3 - 3-day bar
+    - Query.DAY5 - 5-day bar
+    - Query.DAY7 - 7-day bar
+    - Query.MIN3 - 3-minute bar
+    - Query.HOUR4 - 4-hour bar
+    - Query.HOUR6 - 6-hour bar
+    - Query.HOUR12 - 12-hour bar
+    - Query.TIMELINE - intraday time-line
+    - Query.TRANS - tick data
 
     Shortcut aliases for the :py:data:`Query.RecoverType` enumeration values
 
@@ -94,6 +114,16 @@ Building Bar (Candlestick) Query Conditions
         - MIN15    - 15-minute bar
         - MIN30    - 30-minute bar
         - MIN60    - 60-minute bar
+        - HOUR2    - 2-hour bar
+        - DAY3     - 3-day bar
+        - DAY5     - 5-day bar
+        - DAY7     - 7-day bar
+        - MIN3     - 3-minute bar
+        - HOUR4    - 4-hour bar
+        - HOUR6    - 6-hour bar
+        - HOUR12   - 12-hour bar
+        - TIMELINE - intraday time-line
+        - TRANS    - tick data
 
     .. py:data:: RecoverType
 
@@ -138,7 +168,7 @@ Building Bar (Candlestick) Query Conditions
         Return whether the query covers a right-open interval, i.e. whether no end time is
         specified
 
-    .. py:method:: is_valid_ktype(self, ktype)
+    .. py:staticmethod:: is_valid_ktype(ktype)
 
         Check whether the given bar type is valid
 
@@ -178,7 +208,15 @@ Building Bar (Candlestick) Query Conditions
 
     .. py:staticmethod:: get_ktype_in_min(ktype)
 
-        Return the duration, in minutes, of the given bar type
+        Return the duration, in minutes, of the given bar type. Prefer ``get_ktype_in_seconds``,
+        which also covers second-based types such as TRANS.
+
+        :rtype: int
+
+    .. py:staticmethod:: get_ktype_in_seconds(ktype)
+
+        Return the duration, in seconds, of the given bar type, covering second-based types such
+        as TRANS.
 
         :rtype: int
 

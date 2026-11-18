@@ -69,11 +69,10 @@ struct StockInfo {
     }
 
     /**
-     * The stock base info select SQL. The variety-level stockparam rows (if the table exists)
-     * override the type-level stocktypeinfo defaults through the coalesce, so the priority is
-     * the variety level > the type level; the runtime setters of a loaded Stock stay above both.
-     * @param has_stock_param whether the stockparam table exists in the current database; a
-     *        database without the table falls back to the plain type-level join
+     * Stock base info SQL; variety-level stockparam overrides type-level stocktypeinfo via
+     * coalesce.
+     * @param has_stock_param whether the stockparam table exists; absent means a plain
+     *        type-level join
      */
     static const char* getSelectSQL(bool has_stock_param) {
         if (!has_stock_param) {

@@ -38,8 +38,6 @@ bool SQLiteBaseInfoDriver::_init() {
     m_pool = new ResourcePool<SQLiteConnect>(m_params);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
 
-    // Probe the variety-level parameter table; a database not yet upgraded keeps the
-    // type-level defaults only
     try {
         auto con = m_pool->get();
         int count = 0;
@@ -51,7 +49,9 @@ bool SQLiteBaseInfoDriver::_init() {
             m_hasStockParam = count > 0;
         }
     } catch (std::exception& e) {
-        HKU_WARN("Failed probe the stockparam table, keep the type-level defaults! {}", e.what());
+        HKU_WARN("{}", e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
     }
 
     return true;
@@ -113,8 +113,6 @@ vector<StockInfo> SQLiteBaseInfoDriver::getAllStockInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         auto con = m_pool->get();
-        // An explicit SQL instead of batchLoad(container): the select carries the optional
-        // stockparam join, which the generic template could not pick by itself
         con->batchLoadView(result, StockInfo::getSelectSQL(m_hasStockParam));
     } catch (...) {
     }
@@ -126,8 +124,6 @@ StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) 
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         to_upper(market);
-        // The plain select ends with its own where clause, so the filters are appended with
-        // "and" directly; the joined variant carries no where yet and starts one here
         auto con = m_pool->get();
         con->loadView(
           result,
@@ -336,8 +332,6 @@ SQLiteBaseInfoDriver::getAllHolidays() {
         con->batchLoad(holidays);
         for (const auto& holiday : holidays) {
             try {
-                // Fetch datetime first: broken rows throw before operator[]
-                // registers an empty market entry
                 Datetime d = holiday.datetime();
                 std::string market(holiday.market);
                 to_upper(market);
