@@ -18,4 +18,4 @@ SELECT *
 FROM (SELECT 51 AS id, 'SZ' AS market, '158' AS codepre, 5 AS type, '深证ETF' AS description)
 WHERE NOT EXISTS (SELECT * FROM `hku_base`.`coderuletype` WHERE `market`='SZ' AND `codepre`='158');
 
-ALTER TABLE `hku_base`.`version` UPDATE `version`=5 WHERE `id`=0;
+ALTER TABLE `hku_base`.`version` UPDATE `version`=5 WHERE `id`=0 SETTINGS mutations_sync = 1;

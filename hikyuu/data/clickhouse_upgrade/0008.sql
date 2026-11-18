@@ -1,5 +1,3 @@
--- Float64 K-line tables for non-A-share markets (market not in SH/SZ/BJ).
--- A-share markets keep using the original fixed-point tables.
 
 CREATE TABLE IF NOT EXISTS hku_data.day_k_f64 (
     `market` String,
