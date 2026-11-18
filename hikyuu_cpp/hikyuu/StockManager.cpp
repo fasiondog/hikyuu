@@ -715,8 +715,6 @@ void StockManager::_loadAllKDataParallel(const vector<KQuery::KType>& ktypes,
 std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
   const vector<KQuery::KType>& ktypes, bool& bulk_finance_done) {
     std::unordered_set<string> loaded_codes;
-    // The column bulk interface takes a whole ktype for every code and cannot honor the load
-    // scope, so the per-stock preload below takes over when a scope is configured
     HKU_IF_RETURN(!m_context.isAll() || _hasLoadScope(), loaded_codes);
     auto driver = _getKDataDriverPool();
     HKU_IF_RETURN(!driver || !driver->getPrototype()->isColumnFirst(), loaded_codes);
@@ -764,9 +762,6 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 
         auto k = sh000001.getKRecord(0, ktypes[i]);
         if (k.isValid()) {
-            // The column bulk interface takes one global lower bound and cannot reverse-normalize
-            // per market, so intraday types bulk-load only for identity markets; the rest keep
-            // using the Stock-layer funnel that clamps in the market's own clock
             bool intraday = KQuery::isIntradayKType(ktypes[i]);
             auto datas =
               driver->getConnect()->getAllKRecordList(ktypes[i], k.datetime, m_cancel_load);
@@ -1300,9 +1295,6 @@ void StockManager::_filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) co
         }
     }
 
-    // The must-load securities and the representative index of every market inside the scope are
-    // kept even when the type filter drops them: they carry the trading calendar and the default
-    // benchmark
     std::set<string> must_load;
     for (const auto& code : m_context.getMustLoadStockCodeList()) {
         must_load.insert(normalizeLoadScopeCode(code));
@@ -1348,7 +1340,6 @@ void StockManager::_filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) co
                     "No security found in the market {} of the load scope!", market);
     }
 
-    // fmt requires lvalue arguments here
     const size_t kept_count = kept.size();
     HKU_INFO(htr("The load scope keeps {} of {} securities", kept_count, total));
     stockInfos.swap(kept);
@@ -1365,7 +1356,6 @@ void StockManager::loadAllMarketInfos() {
         m_marketInfoDict[market] = marketInfo;
     }
 
-    // The weekend-rule cache derives from the representative index, so drop it to re-evaluate
     {
         std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
         m_weekend_holiday.clear();
@@ -1383,9 +1373,6 @@ void StockManager::loadAllStockTypeInfo() {
 }
 
 void StockManager::loadAllHolidays() {
-    // Normalize market keys to upper case: third-party/Python drivers may return lower case,
-    // while the query side (isHoliday/getMarketInfo) looks up by upper case, so unnormalized
-    // keys would silently drop that market's holidays
     auto holidays = m_baseInfoDriver->getAllHolidays();
     HolidayMap normalized;
     normalized.reserve(holidays.size());
@@ -1486,8 +1473,6 @@ void StockManager::loadAllStockWeights() {
     // addStock or newly constructed) are still handled by the on-demand lazy loading fallback of
     // Stock::getWeight.
     HKU_INFO(htr("Loading stock weight..."));
-    // The bulk collection is kept even with a load scope: the loop below only fills the registered
-    // securities, so the excluded markets cost a single wide read, not one query per security
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
         for (auto& item : all_stkweight_dict) {

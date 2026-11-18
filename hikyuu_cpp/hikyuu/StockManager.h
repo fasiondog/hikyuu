@@ -64,18 +64,12 @@ public:
     void reloadWith(const StrategyContext& context);
 
     /**
-     * Restrict what the "ALL" load scope (the context containing "ALL") reads: only the listed
-     * markets / security types are registered; the must-load securities and the representative
-     * index of every market inside the scope are always kept
-     * @note The restriction is kept in the hikyuu parameter (no object layout change, so the
-     *       prebuilt plugins stay binary compatible). Call it after init() or pass the
-     *       load_market_list / load_stock_type_list keys through the hikyuu parameter of init(),
-     *       never while the preload thread is running. Narrowing the scope does not remove the
-     *       already registered securities, so it only shrinks a fresh process
-     * @param marketList the allowed market abbreviations, e.g. {"SH", "SZ"}; empty or containing
-     *        "ALL" means no market restriction
-     * @param typeList the allowed security types, e.g. {STOCKTYPE_A, 12}; empty means no type
+     * Restrict the markets/security types loaded by the "ALL" scope; must-load securities and each
+     * market's representative index are always kept. Only affects a fresh load: call before preload
+     * starts, and narrowing never unregisters already loaded securities.
+     * @param marketList allowed market abbreviations, e.g. {"SH", "SZ"}; empty or "ALL" means no
      *        restriction
+     * @param typeList allowed security types, e.g. {STOCKTYPE_A, 12}; empty means no restriction
      */
     void setLoadScope(const vector<string>& marketList, const vector<int>& typeList);
 
@@ -147,11 +141,9 @@ public:
       std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
 
     /**
-     * Get the market information; all market information is loaded at initialization,
-     * so an unknown market always yields the Null value without querying the driver
+     * Get the market information; unknown markets yield Null<MarketInfo>() without querying the
+     * driver. The returned reference stays valid until the next reload.
      * @param market the given market identifier
-     * @return the matching market information; Null<MarketInfo>() if it does not exist.
-     *         The returned reference is valid until the next reload
      */
     const MarketInfo& getMarketInfo(const string& market) const noexcept;
 
@@ -241,20 +233,19 @@ public:
     const ZhBond10List& getZhBond10() const;
 
     /**
-     * Whether the date of the given time is a holiday for the given market
-     * @note Weekends count as holidays except for the 24h crypto markets; a market without its
-     *       own holiday rows has no weekday holidays; Null<Datetime>() throws
+     * Whether the given time's date is a market holiday
+     * @note Weekends count as holidays except 24h crypto markets; markets without holiday rows
+     *       have no weekday holidays; Null<Datetime>() throws
      * @param d the given time
      * @param market the given market
      */
     bool isHoliday(const Datetime& d, const std::string& market) const;
 
     /**
-     * Convert a market-local wall-clock datetime to the unified time expression (Beijing)
-     * @details Bar datetimes read back from the K-line interface are already unified; use this
-     * only for instants given in the market's own clock. Day and higher labels must not be
-     * converted (no ktype here; the caller decides what to convert).
-     * @param d the datetime in the local wall clock of the given market
+     * Convert a market-local wall-clock datetime to the unified expression (Beijing)
+     * @note K-line datetimes are already unified; use this only for the market's own clock.
+     *       Day-and-higher labels must not be converted (the caller decides what to convert).
+     * @param d the datetime in the market's local wall clock
      * @param market the given market
      */
     Datetime marketLocalToUnified(const Datetime& d, const string& market) const;
@@ -267,17 +258,17 @@ public:
     Datetime unifiedToMarketLocal(const Datetime& d, const string& market) const;
 
     /**
-     * Whether the date of the given time is a holiday (including Saturday and Sunday)
-     * @note Deprecated: use isHoliday(d, market) instead; equivalent to isHoliday(d, "SH")
+     * Whether the given time's date is a holiday (including weekends)
+     * @note Deprecated: use isHoliday(d, market); equivalent to isHoliday(d, "SH")
      * @param d the given time
      */
     bool isHoliday(const Datetime& d) const;
 
     /**
-     * Roughly judge whether the given time is inside the trading hours
-     * @note d follows the unified clock convention (Beijing naive); the holiday judgment and the
-     *       session bounds are applied on the market-local wall clock after conversion
-     * @param d the given time; Null<Datetime>() throws an exception
+     * Roughly judge whether the given time is inside trading hours
+     * @note d follows the unified clock (Beijing naive); holiday and session checks use the
+     *       market-local wall clock after conversion
+     * @param d the given time; Null<Datetime>() throws
      * @param market the given market
      */
     bool isTradingHours(const Datetime& d, const string& market = "SH") const;
