@@ -17,7 +17,7 @@
 #include "FundsRecord.h"
 #include "LoanRecord.h"
 #include "OrderBrokerBase.h"
-#include "crt/TC_Zero.h"
+#include "tradecost/crt/TC_Zero.h"
 
 namespace hku {
 
@@ -30,6 +30,7 @@ namespace hku {
  * precision(int): 2 calculation precision
  * support_borrow_cash(bool): false whether cash is borrowed automatically on a buy operation
  * support_borrow_stock(bool): false whether the stock is borrowed automatically when short selling
+ * currency_rates(string): "" fixed rate of each foreign market, as in TradeManagerBase
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -378,6 +379,23 @@ public:
                                    const KQuery::KType& ktype = KQuery::DAY) override;
 
     /**
+     * Settle the margin holdings as of the given moment
+     * @note See TradeManagerBase::settlement; state is rebuilt from the trade list, so no extra
+     *       archive member is needed
+     */
+    virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override;
+
+    /**
+     * Whether the calendar day of the given moment has entered a settlement batch
+     * @note Posting and billing are gated independently; this is true once either exists, not only
+     *       when posting ran
+     */
+    virtual bool isSettled(const Datetime& datetime) const override;
+
+    /** Whether a forced liquidation armed by settlement() is still pending */
+    virtual bool isForcedLiquidationQueued(const Datetime& datetime) const override;
+
+    /**
      * Add a trade record directly
      * @note If an account initialization record is added, all the existing trade and position
      *       records are cleared
@@ -408,6 +426,16 @@ public:
 private:
     // Save the trade actions in the form of a script, so that they can be corrected and calibrated
     void _saveAction(const TradeRecord&);
+
+    /** Whether the security is past its registered expiry (see Stock::lastDatetime) */
+    bool _isExpired(const Datetime& datetime, const Stock& stock) const {
+        const Datetime& last_date = stock.lastDatetime();
+        return !last_date.isNull() && datetime > last_date;
+    }
+
+    /** Fill a replayed opening's cash gap with new debt, mirroring live auto-financing: exported
+     *  records carry the trades, not the borrow that funded them */
+    bool _borrowForAdd(const Datetime& datetime, price_t needed);
 
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);
@@ -465,6 +493,13 @@ private:
     // is immutable (a live refresh is done by the nightly restart/reload, which rebuilds the
     // state), so an already-checked range never needs to be rescanned for late-arriving data.
     unordered_map<uint64_t, Datetime> m_tmp_weight_checked_until;
+
+    // Transient margin risk state, derived and rebuilt by settlement: last maintenance-check state
+    // and the moment forced liquidation was armed (Null when none pending). Not serialized: a
+    // reload restarts healthy and the next settlement re-derives it, so a live account self-heals
+    // at its next close.
+    bool m_tmp_margin_called{false};
+    Datetime m_tmp_force_liquidate_date;
 
 //==================================================
 // Serialization support

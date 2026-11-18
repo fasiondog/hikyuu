@@ -63,6 +63,22 @@ H5KDataDriver::H5KDataDriver() : KDataDriver("hdf5"), m_h5DataType(H5::CompType(
     m_h5DataType.insertMember("transCount", HOFFSET(H5Record, transCount),
                               H5::PredType::NATIVE_UINT64);
 
+    m_h5DataTypeF64 = H5::CompType(sizeof(H5RecordF64));
+    m_h5DataTypeF64.insertMember("datetime", HOFFSET(H5RecordF64, datetime),
+                                 H5::PredType::NATIVE_UINT64);
+    m_h5DataTypeF64.insertMember("openPrice", HOFFSET(H5RecordF64, openPrice),
+                                 H5::PredType::NATIVE_DOUBLE);
+    m_h5DataTypeF64.insertMember("highPrice", HOFFSET(H5RecordF64, highPrice),
+                                 H5::PredType::NATIVE_DOUBLE);
+    m_h5DataTypeF64.insertMember("lowPrice", HOFFSET(H5RecordF64, lowPrice),
+                                 H5::PredType::NATIVE_DOUBLE);
+    m_h5DataTypeF64.insertMember("closePrice", HOFFSET(H5RecordF64, closePrice),
+                                 H5::PredType::NATIVE_DOUBLE);
+    m_h5DataTypeF64.insertMember("transAmount", HOFFSET(H5RecordF64, transAmount),
+                                 H5::PredType::NATIVE_DOUBLE);
+    m_h5DataTypeF64.insertMember("transCount", HOFFSET(H5RecordF64, transCount),
+                                 H5::PredType::NATIVE_DOUBLE);
+
     m_h5IndexType = H5::CompType(sizeof(H5IndexRecord));
     m_h5IndexType.insertMember("datetime", HOFFSET(H5IndexRecord, datetime),
                                H5::PredType::NATIVE_UINT64);
@@ -161,6 +177,52 @@ void H5KDataDriver::H5ReadRecords(H5::DataSet& dataset, hsize_t start, hsize_t n
     H5::DataSpace memspace(1, count);
     dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
     dataset.read(data, m_h5DataType, memspace, dataspace);
+    memspace.close();
+    dataspace.close();
+    return;
+}
+
+void H5KDataDriver::H5ReadF64Records(H5::DataSet& dataset, hsize_t start, hsize_t nrecords,
+                                     void* data) {
+    H5::DataSpace dataspace = dataset.getSpace();
+    hsize_t offset[1];
+    hsize_t count[1];
+    offset[0] = start;
+    count[0] = nrecords;
+    H5::DataSpace memspace(1, count);
+    dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
+    dataset.read(data, m_h5DataTypeF64, memspace, dataspace);
+    memspace.close();
+    dataspace.close();
+    return;
+}
+
+bool H5KDataDriver::isF64KRecordDataSet(const H5::DataSet& dataset) {
+    try {
+        H5::CompType dtype = dataset.getCompType();
+        int index = dtype.getMemberIndex("openPrice");
+        if (index < 0) {
+            return false;
+        }
+        return dtype.getMemberClass(index) == H5T_FLOAT;
+    } catch (...) {
+        return false;
+    }
+}
+
+void H5KDataDriver::H5ReadDatetimes(H5::DataSet& dataset, hsize_t start, hsize_t nrecords,
+                                    uint64_t* data) {
+    // Only the datetime member is declared, so reading works for both storage layouts
+    H5::CompType mem_type(sizeof(uint64_t));
+    mem_type.insertMember("datetime", 0, H5::PredType::NATIVE_UINT64);
+    H5::DataSpace dataspace = dataset.getSpace();
+    hsize_t offset[1];
+    hsize_t count[1];
+    offset[0] = start;
+    count[0] = nrecords;
+    H5::DataSpace memspace(1, count);
+    dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
+    dataset.read(data, mem_type, memspace, dataspace);
     memspace.close();
     dataspace.close();
     return;
@@ -354,23 +416,23 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
         }
 
         hsize_t mid, low = 0, high = total - 1;
-        H5Record h5record;
+        uint64_t h5datetime = 0;
         while (low <= high) {
-            H5ReadRecords(dataset, high, 1, &h5record);
-            if (start_number > h5record.datetime) {
+            H5ReadDatetimes(dataset, high, 1, &h5datetime);
+            if (start_number > h5datetime) {
                 mid = high + 1;
                 break;
             }
 
-            H5ReadRecords(dataset, low, 1, &h5record);
-            if (h5record.datetime >= start_number) {
+            H5ReadDatetimes(dataset, low, 1, &h5datetime);
+            if (h5datetime >= start_number) {
                 mid = low;
                 break;
             }
 
             mid = (low + high) / 2;
-            H5ReadRecords(dataset, mid, 1, &h5record);
-            if (start_number > h5record.datetime) {
+            H5ReadDatetimes(dataset, mid, 1, &h5datetime);
+            if (start_number > h5datetime) {
                 low = mid + 1;
             } else {
                 high = mid - 1;
@@ -388,21 +450,21 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
         low = mid;
         high = total - 1;
         while (low <= high) {
-            H5ReadRecords(dataset, high, 1, &h5record);
-            if (end_number > h5record.datetime) {
+            H5ReadDatetimes(dataset, high, 1, &h5datetime);
+            if (end_number > h5datetime) {
                 mid = high + 1;
                 break;
             }
 
-            H5ReadRecords(dataset, low, 1, &h5record);
-            if (h5record.datetime >= end_number) {
+            H5ReadDatetimes(dataset, low, 1, &h5datetime);
+            if (h5datetime >= end_number) {
                 mid = low;
                 break;
             }
 
             mid = (low + high) / 2;
-            H5ReadRecords(dataset, mid, 1, &h5record);
-            if (end_number > h5record.datetime) {
+            H5ReadDatetimes(dataset, mid, 1, &h5datetime);
+            if (end_number > h5datetime) {
                 low = mid + 1;
             } else {
                 high = mid - 1;
@@ -609,20 +671,34 @@ KRecordList H5KDataDriver::_getBaseKRecordList(const string& market, const strin
         }
 
         size_t total = end_ix > all_total ? all_total - start_ix : end_ix - start_ix;
-        std::unique_ptr<H5Record[]> pBuf = std::make_unique<H5Record[]>(total);
-        H5ReadRecords(dataset, start_ix, total, pBuf.get());
-
         KRecord record;
         result.reserve(total + 2);
-        for (hsize_t i = 0; i < total; i++) {
-            record.datetime = Datetime(pBuf[i].datetime);
-            record.openPrice = price_t(pBuf[i].openPrice) * 0.001;
-            record.highPrice = price_t(pBuf[i].highPrice) * 0.001;
-            record.lowPrice = price_t(pBuf[i].lowPrice) * 0.001;
-            record.closePrice = price_t(pBuf[i].closePrice) * 0.001;
-            record.transAmount = price_t(pBuf[i].transAmount) * 0.1;
-            record.transCount = price_t(pBuf[i].transCount);
-            result.push_back(record);
+        if (isF64KRecordDataSet(dataset)) {
+            std::unique_ptr<H5RecordF64[]> pBuf = std::make_unique<H5RecordF64[]>(total);
+            H5ReadF64Records(dataset, start_ix, total, pBuf.get());
+            for (hsize_t i = 0; i < total; i++) {
+                record.datetime = Datetime(pBuf[i].datetime);
+                record.openPrice = pBuf[i].openPrice;
+                record.highPrice = pBuf[i].highPrice;
+                record.lowPrice = pBuf[i].lowPrice;
+                record.closePrice = pBuf[i].closePrice;
+                record.transAmount = pBuf[i].transAmount;
+                record.transCount = pBuf[i].transCount;
+                result.push_back(record);
+            }
+        } else {
+            std::unique_ptr<H5Record[]> pBuf = std::make_unique<H5Record[]>(total);
+            H5ReadRecords(dataset, start_ix, total, pBuf.get());
+            for (hsize_t i = 0; i < total; i++) {
+                record.datetime = Datetime(pBuf[i].datetime);
+                record.openPrice = price_t(pBuf[i].openPrice) * 0.001;
+                record.highPrice = price_t(pBuf[i].highPrice) * 0.001;
+                record.lowPrice = price_t(pBuf[i].lowPrice) * 0.001;
+                record.closePrice = price_t(pBuf[i].closePrice) * 0.001;
+                record.transAmount = price_t(pBuf[i].transAmount) * 0.1;
+                record.transCount = price_t(pBuf[i].transCount);
+                result.push_back(record);
+            }
         }
 
     } catch (std::out_of_range& e) {
@@ -677,8 +753,32 @@ KRecordList H5KDataDriver::_getIndexKRecordList(const string& market, const stri
         }
 
         size_t base_len = p_index_buf[index_len].start - p_index_buf[0].start;
-        std::unique_ptr<H5Record[]> p_base_buf = std::make_unique<H5Record[]>(base_len);
-        H5ReadRecords(base_dataset, p_index_buf[0].start, base_len, p_base_buf.get());
+        std::vector<KRecord> base_records(base_len);
+        if (isF64KRecordDataSet(base_dataset)) {
+            std::unique_ptr<H5RecordF64[]> p_base_buf = std::make_unique<H5RecordF64[]>(base_len);
+            H5ReadF64Records(base_dataset, p_index_buf[0].start, base_len, p_base_buf.get());
+            for (hsize_t i = 0; i < base_len; i++) {
+                base_records[i].datetime = Datetime(p_base_buf[i].datetime);
+                base_records[i].openPrice = p_base_buf[i].openPrice;
+                base_records[i].highPrice = p_base_buf[i].highPrice;
+                base_records[i].lowPrice = p_base_buf[i].lowPrice;
+                base_records[i].closePrice = p_base_buf[i].closePrice;
+                base_records[i].transAmount = p_base_buf[i].transAmount;
+                base_records[i].transCount = p_base_buf[i].transCount;
+            }
+        } else {
+            std::unique_ptr<H5Record[]> p_base_buf = std::make_unique<H5Record[]>(base_len);
+            H5ReadRecords(base_dataset, p_index_buf[0].start, base_len, p_base_buf.get());
+            for (hsize_t i = 0; i < base_len; i++) {
+                base_records[i].datetime = Datetime(p_base_buf[i].datetime);
+                base_records[i].openPrice = price_t(p_base_buf[i].openPrice) * 0.001;
+                base_records[i].highPrice = price_t(p_base_buf[i].highPrice) * 0.001;
+                base_records[i].lowPrice = price_t(p_base_buf[i].lowPrice) * 0.001;
+                base_records[i].closePrice = price_t(p_base_buf[i].closePrice) * 0.001;
+                base_records[i].transAmount = price_t(p_base_buf[i].transAmount) * 0.1;
+                base_records[i].transCount = price_t(p_base_buf[i].transCount);
+            }
+        }
 
         KRecord record;
         result.reserve(index_len);
@@ -686,23 +786,21 @@ KRecordList H5KDataDriver::_getIndexKRecordList(const string& market, const stri
             record.datetime = Datetime(p_index_buf[i].datetime);
             size_t start_pos = p_index_buf[i].start - p_index_buf[0].start;
             size_t end_pos = p_index_buf[i + 1].start - p_index_buf[0].start;
-            record.openPrice = 0.001 * price_t(p_base_buf[start_pos].openPrice);
-            record.closePrice = 0.001 * price_t(p_base_buf[end_pos - 1].closePrice);
-            record.highPrice = 0.001 * price_t(p_base_buf[start_pos].highPrice);
-            record.lowPrice = 0.001 * price_t(p_base_buf[start_pos].lowPrice);
-            record.transAmount = 0.1 * price_t(p_base_buf[start_pos].transAmount);
-            record.transCount = price_t(p_base_buf[start_pos].transCount);
+            record.openPrice = base_records[start_pos].openPrice;
+            record.closePrice = base_records[end_pos - 1].closePrice;
+            record.highPrice = base_records[start_pos].highPrice;
+            record.lowPrice = base_records[start_pos].lowPrice;
+            record.transAmount = base_records[start_pos].transAmount;
+            record.transCount = base_records[start_pos].transCount;
             for (hsize_t j = start_pos + 1; j < end_pos; j++) {
-                price_t temp = 0.001 * price_t(p_base_buf[j].highPrice);
-                if (temp > record.highPrice) {
-                    record.highPrice = temp;
+                if (base_records[j].highPrice > record.highPrice) {
+                    record.highPrice = base_records[j].highPrice;
                 }
-                temp = 0.001 * price_t(p_base_buf[j].lowPrice);
-                if (temp < record.lowPrice) {
-                    record.lowPrice = temp;
+                if (base_records[j].lowPrice < record.lowPrice) {
+                    record.lowPrice = base_records[j].lowPrice;
                 }
-                record.transAmount += 0.1 * price_t(p_base_buf[j].transAmount);
-                record.transCount += p_base_buf[j].transCount;
+                record.transAmount += base_records[j].transAmount;
+                record.transCount += base_records[j].transCount;
             }
             result.push_back(record);
         }

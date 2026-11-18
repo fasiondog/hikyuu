@@ -5,6 +5,7 @@
 
    record_struct
    trade_cost
+   margin
    TradeManager
    OrderBroker
    Performance

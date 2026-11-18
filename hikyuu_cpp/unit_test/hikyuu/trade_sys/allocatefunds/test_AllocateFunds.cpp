@@ -13,7 +13,7 @@
 #include <cmath>
 #include <limits>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_EqualWeight.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedAmount.h>
 #include <hikyuu/trade_sys/allocatefunds/crt/AF_FixedWeightList.h>
@@ -130,6 +130,15 @@ TEST_CASE("test_AllocateFunds_checkParam") {
     CHECK_NOTHROW(af->setParam<double>("max_total_position", 2.0));
     CHECK_THROWS_AS(af->setParam<double>("max_total_position", -1.0), std::exception);
 
+    /** @arg max_signal_ratio: any finite value is valid (<=0 disables the clip, >1 widens it),
+     *  a non-finite value is rejected (it would silently disable the channel normalization) */
+    CHECK_NOTHROW(af->setParam<double>("max_signal_ratio", 0.0));
+    CHECK_NOTHROW(af->setParam<double>("max_signal_ratio", 1.5));
+    CHECK_THROWS_AS(af->setParam<double>("max_signal_ratio", std::nan("")), std::exception);
+    CHECK_THROWS_AS(
+      af->setParam<double>("max_signal_ratio", std::numeric_limits<double>::infinity()),
+      std::exception);
+
     /** @arg fixed_amount: 0 (disabled) and a positive amount are valid */
     CHECK_NOTHROW(af->setParam<double>("fixed_amount", 0.0));
     CHECK_NOTHROW(af->setParam<double>("fixed_amount", 30000.0));
@@ -221,6 +230,67 @@ TEST_CASE("test_AllocateFunds_L2_gross_aggregated") {
     REQUIRE_EQ(clamped.size(), 1);
     CHECK_UNARY(clamped[0].stock == b);
     CHECK_EQ(clamped[0].number, doctest::Approx(5000.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_AllocateFunds_L2_signal_ratio_clamp") {
+    Datetime date(200001010000LL);
+    Stock a = getStock("sz000001");
+    REQUIRE(!a.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.stock = a;
+    s.sys = sys;
+    s.plan_price = 10.0;
+    s.target_position_ratio = 2.0;  // a levered channel: 200000 against the 100000 parent net
+
+    /** @arg the default max_signal_ratio=1.0 clips the levered long ratio to 1.0 (10000 shares
+     *  instead of 20000); the total budget cap is disabled here so only the channel clip acts */
+    auto af = AF_EqualWeight();
+    af->setParam<double>("max_total_position", 0.0);
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    tm->setParam<bool>("support_borrow_stock", true);
+    TradeSuggestionList clipped{s};
+    af->_toTargets(date, tm, clipped, weights, KQuery(), "A");
+    REQUIRE_EQ(clipped.size(), 1);
+    CHECK_UNARY(clipped[0].type == SuggestionType::BUY);
+    CHECK_EQ(clipped[0].number, doctest::Approx(10000.0));
+
+    /** @arg max_signal_ratio=0 disables the clip: the whole 2.0 ratio passes through */
+    af->setParam<double>("max_signal_ratio", 0.0);
+    TradeSuggestionList passed{s};
+    af->_toTargets(date, tm, passed, weights, KQuery(), "A");
+    REQUIRE_EQ(passed.size(), 1);
+    CHECK_EQ(passed[0].number, doctest::Approx(20000.0));
+
+    /** @arg a value above 1 widens the bound but still clips (1.5 -> 15000 shares) */
+    af->setParam<double>("max_signal_ratio", 1.5);
+    TradeSuggestionList widened{s};
+    af->_toTargets(date, tm, widened, weights, KQuery(), "A");
+    REQUIRE_EQ(widened.size(), 1);
+    CHECK_EQ(widened[0].number, doctest::Approx(15000.0));
+
+    /** @arg the clip is symmetric: a -2.0 net short ratio is clipped to -1.0 (10000 shares
+     *  opened short) */
+    af->setParam<double>("max_signal_ratio", 1.0);
+    TradeSuggestion s_short = s;
+    s_short.target_position_ratio = -2.0;
+    TradeSuggestionList short_clipped{s_short};
+    af->_toTargets(date, tm, short_clipped, weights, KQuery(), "A");
+    REQUIRE_EQ(short_clipped.size(), 1);
+    CHECK_UNARY(short_clipped[0].type == SuggestionType::SELL);
+    CHECK_UNARY(short_clipped[0].short_side);
+    CHECK_EQ(short_clipped[0].number, doctest::Approx(10000.0));
+
+    /** @arg with the clip disabled the full -2.0 short ratio is opened (20000 shares) */
+    af->setParam<double>("max_signal_ratio", 0.0);
+    TradeSuggestionList short_passed{s_short};
+    af->_toTargets(date, tm, short_passed, weights, KQuery(), "A");
+    REQUIRE_EQ(short_passed.size(), 1);
+    CHECK_UNARY(short_passed[0].short_side);
+    CHECK_EQ(short_passed[0].number, doctest::Approx(20000.0));
 }
 
 /** @par Test points */

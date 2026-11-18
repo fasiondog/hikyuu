@@ -17,13 +17,9 @@ namespace hku {
 namespace ipc {
 
 /**
- * The three realtime forwarding callbacks (they are registered after the shmserver plugin connects
- * successfully, and an empty set is registered to unregister them on disconnection)
- * @details The implementation of the forwarding target (protocol encoding and decoding,
- * transmission, shared memory reading and writing) is entirely inside the shmserver plugin; the
- * core library does not hold any plugin interface type, it only saves the forwarding functions
- * needed by the market data path (Stock / dataserver) in this struct, and all the forwardings are
- * safe no-ops when they are not registered (standalone mode / the plugin is not installed).
+ * The three realtime forwarding callbacks (registered after the shmserver plugin connects
+ * successfully; an empty set unregisters them on disconnection). The forwarding implementation is
+ * entirely inside the plugin; all forwardings are safe no-ops when not registered.
  */
 struct ShmClientForwarders {
     /** Stock::realtimeUpdate forwarding: true is returned when the server has applied it */
@@ -53,11 +49,8 @@ struct ShmClientForwarders {
 /**
  * Register / unregister the shm client forwarding callbacks (called when the plugin connects
  * successfully / disconnects; passing an empty set means unregistering)
- * @note The registration happens only in the StockManager initialization negotiation period, and
- * the forwarding calls happen in the market data thread; the implementation adopts lock-free
- *       publish-subscribe (publish-acquire), and the forwarding side only reads the stable object
- *       created in the registration period. The lifetime of the callback object follows the plugin
- *       instance, and it must be unregistered before the plugin is destroyed
+ * @note Registration happens only during the StockManager initialization negotiation; the callback
+ * object lifetime follows the plugin instance and must be unregistered before it is destroyed
  */
 HKU_API void registerShmClient(ShmClientForwarders fwd) noexcept;
 
@@ -94,9 +87,8 @@ HKU_API bool forwardPullFromBufferServer(const std::string& addr,
 
 /**
  * Register the K-line types published by the shared memory snapshot (called by the shmserver
- * plugin after a successful connect). Only these types receive the realtime mirror updates in the
- * service process; the other types are served by the local driver of the client and can be cached.
- * An empty list means the snapshot is mapped but publishes no K-line type.
+ * plugin after a successful connect); only these types receive realtime mirror updates. An empty
+ * list means the snapshot is mapped but publishes no K-line type.
  */
 HKU_API void setShmCoveredKTypes(const std::vector<KQuery::KType>& ktypes) noexcept;
 
@@ -104,8 +96,8 @@ HKU_API void setShmCoveredKTypes(const std::vector<KQuery::KType>& ktypes) noexc
 HKU_API void clearShmCoveredKTypes() noexcept;
 
 /**
- * Register the base type of an extended K-line type (called by the core when the type is
- * registered); an extended type inherits the realtime coverage of its base type
+ * Register the base type of an extended K-line type; the extended type inherits its realtime
+ * coverage (called by the core when the type is registered)
  */
 HKU_API void registerExtraKTypeBase(const KQuery::KType& ktype,
                                     const KQuery::KType& basetype) noexcept;
@@ -115,21 +107,15 @@ HKU_API void clearExtraKTypeBases() noexcept;
 
 /**
  * Whether the given K-line type is served by the realtime mirrored shared memory snapshot
- * @note An extended K-line type inherits the coverage of its base type. When the coverage is not
- *       registered (an old plugin, a failed mapping or the standalone mode), the client mode
- *       conservatively returns true so its callers skip the caches; the standalone mode returns
- *       false.
+ * @note Extended types inherit their base's coverage; with unregistered coverage the client mode
+ *       conservatively returns true (callers skip the caches), the standalone mode returns false
  */
 HKU_API bool isShmKTypeCovered(const KQuery::KType& ktype) noexcept;
 
 /**
- * Set the interruption checker during a long blocking wait (such as waiting for the data service to
- * be ready); true means the wait should be interrupted
- * @details In the python environment it is registered by the binding layer (the pending signal is
- *          checked after the GIL is re-acquired), so that the wait can be interrupted by Ctrl+C. It
- *          is a general facility of the core library: the waiting logic is entirely inside the
- *          plugin, and the plugin calls back the implementation registered here through
- *          ipc::checkInterrupted().
+ * Set the interruption checker during a long blocking wait; true means the wait should be
+ * interrupted. In Python the binding layer registers it so Ctrl+C can interrupt the wait; the
+ * waiting logic stays in the plugin, which calls back ipc::checkInterrupted().
  */
 HKU_API void setInterruptChecker(std::function<bool()> checker);
 

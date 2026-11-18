@@ -83,10 +83,6 @@ public:
         PYBIND11_OVERLOAD(Parameter, BaseInfoDriver, getFinanceInfo, market, code);
     }
 
-    MarketInfo getMarketInfo(const string& market) override {
-        PYBIND11_OVERLOAD_PURE(MarketInfo, BaseInfoDriver, getMarketInfo, market);
-    }
-
     vector<MarketInfo> getAllMarketInfo() override {
         PYBIND11_OVERLOAD_PURE(vector<MarketInfo>, BaseInfoDriver, getAllMarketInfo, );
     }
@@ -99,8 +95,10 @@ public:
         PYBIND11_OVERLOAD_PURE(StockTypeInfo, BaseInfoDriver, getStockTypeInfo, type);
     }
 
-    std::unordered_set<Datetime> getAllHolidays() override {
-        PYBIND11_OVERLOAD_PURE(std::unordered_set<Datetime>, BaseInfoDriver, getAllHolidays, );
+    std::unordered_map<std::string, std::unordered_set<Datetime>> getAllHolidays() override {
+        // The macro splits its arguments on commas, so the map type must go in through an alias
+        using HolidayMap = std::unordered_map<std::string, std::unordered_set<Datetime>>;
+        PYBIND11_OVERLOAD_PURE(HolidayMap, BaseInfoDriver, getAllHolidays, );
     }
 
     ZhBond10List getAllZhBond10() override {

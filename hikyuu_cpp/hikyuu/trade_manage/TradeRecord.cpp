@@ -52,6 +52,10 @@ string HKU_API getBusinessName(BUSINESS business) {
             return "SHORT_ADJUST";
         case BUSINESS_DIVIDEND_COMPENSATION:
             return "DIVIDEND_COMPENSATION";
+        case BUSINESS_SETTLEMENT:
+            return "SETTLEMENT";
+        case BUSINESS_INTEREST:
+            return "INTEREST";
         default:
             return "UNKNOWN";
     }
@@ -99,6 +103,10 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
         return BUSINESS_SHORT_ADJUST;
     } else if (business_name == "DIVIDEND_COMPENSATION") {
         return BUSINESS_DIVIDEND_COMPENSATION;
+    } else if (business_name == "SETTLEMENT") {
+        return BUSINESS_SETTLEMENT;
+    } else if (business_name == "INTEREST") {
+        return BUSINESS_INTEREST;
     } else {
         HKU_WARN_IF(!business_name.empty() && business_name != "UNKNOWN",
                     "Unknown business name: {}, mapped to BUSINESS_INVALID", arg);
@@ -115,6 +123,7 @@ TradeRecord::TradeRecord()
   number(0.0),
   stoploss(0.0),
   cash(0.0),
+  margin(0.0),
   from(PART_INVALID) {}
 
 TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business,
@@ -131,6 +140,7 @@ TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS 
   cost(cost),
   stoploss(stoploss),
   cash(cash),
+  margin(0.0),
   from(from),
   remark(remark) {}
 
@@ -145,6 +155,7 @@ TradeRecord::TradeRecord(TradeRecord&& rhs)
   cost(std::move(rhs.cost)),
   stoploss(rhs.stoploss),
   cash(rhs.cash),
+  margin(rhs.margin),
   from(rhs.from),
   remark(std::move(rhs.remark)) {
     rhs.business = BUSINESS_INVALID;
@@ -162,6 +173,7 @@ TradeRecord& TradeRecord::operator=(TradeRecord&& rhs) {
         cost = std::move(rhs.cost);
         stoploss = rhs.stoploss;
         cash = rhs.cash;
+        margin = rhs.margin;
         from = rhs.from;
         remark = std::move(rhs.remark);
 
@@ -198,7 +210,7 @@ bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2) {
             recordNear(d1.goalPrice, d2.goalPrice)) &&
            recordNear(d1.number, d2.number) && d1.cost == d2.cost &&
            recordNear(d1.stoploss, d2.stoploss) && recordNear(d1.cash, d2.cash) &&
-           d1.from == d2.from;
+           recordNear(d1.margin, d2.margin) && d1.from == d2.from;
 }
 
 } /* namespace hku */

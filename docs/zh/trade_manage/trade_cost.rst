@@ -23,7 +23,7 @@
 
 .. py:function:: TC_FixedA([commission=0.0003, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
-    当前最新A股交易成本算法（滚动默认，始终对应当前费率）：过户费按成交金额的千分之0.01全市场双向收取，卖出印花税千分之0.5
+    当前A股交易成本算法：过户费按成交金额的千分之0.01全市场双向收取，卖出印花税千分之0.5
 
     :param float commission: 佣金比例
     :param float lowest_commission: 最低佣金值
@@ -63,6 +63,34 @@
     :return: :py:class:`TradeCostBase` 子类实例
 
 
+融资融券利息成本算法
+^^^^^^^^^^^^^^^^^^^^
+
+买卖手续费与利息是两个口径：A股 / ETF / 通用模型只回答买卖费用，**融资融券的年化利率由专门的包装模型
+回答**，因此可以把任意一个成本模型包进去而不改动它。
+
+.. py:function:: TC_MarginInterest([trade_cost=TC_Zero(), borrow_cash_rate=0.0, borrow_stock_rates="", default_borrow_stock_rate=0.0])
+
+    包装另一交易成本算法，附加融资利息与融券费用的年化利率：买卖费用全部转给被包装算法，本算法只多回答
+    两个利率。利率由账户结算计提，按距上次计提经过的自然日数除以 ``annual_days`` 折算，计入负债本身而不从
+    现金支付，产生 ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`
+
+    两利率默认 0.0（不计提）；只包装而不配置利率时，账簿与不包装时逐位一致。
+
+    :param TradeCost trade_cost: 回答买卖费用的成本算法，默认 TC_Zero
+    :param float borrow_cash_rate: 融资年化利率，[0, 1)，0.0 表示不计提利息
+    :param str borrow_stock_rates: 融券年化费率表，``"key:rate"`` 列表，如 ``"12:0.10, SHF:0.12"``；纯数字键
+        为证券类型，其他键为市场代码
+    :param float default_borrow_stock_rate: 未被任何键命中标的的融券年化费率，[0, 1)，0.0 表示不计提
+    :return: :py:class:`TradeCostBase` 子类实例
+
+.. code-block:: python
+
+    # 当前A股买卖费用 + 年化 6% 融资利率、按市场配置的融券费率
+    cost = TC_MarginInterest(TC_FixedA(), borrow_cash_rate=0.06, borrow_stock_rates="SH:0.10, SZ:0.12")
+    tm = crtTM(cost_func=cost, margin=MG_ByType("1:0.5"))
+
+
 ETF交易成本算法
 ^^^^^^^^^^^^^^^
 
@@ -82,18 +110,112 @@ ETF交易成本算法
     :return: :py:class:`TradeCostBase` 子类实例
 
 
+港股交易成本算法
+^^^^^^^^^^^^^^^^
+
+适用于港股。港股印花税、交易费与征费均为**买卖双边**收取（与 A 股印花税单边不同）：
+
+* 买入 / 卖出：max(佣金比例 × 成交金额, 最低佣金) + 向上取整到整元的印花税
+  + 交易费及征费比例 × 成交金额
+  + 结算费（比例计征，可设每笔上下限）+ 每笔固定费用
+
+印花税按港交所规则**每笔不足 1 港元作 1 港元计**（向上取整到整元，非四舍五入到分）；
+结算费为按成交金额比例计征并带每笔上下限的收费（如港股 CCASS 0.002%、最低 2 港元、
+最高 100 港元），下限 / 上限填 0 表示不设该限。
+
+.. note::
+    港股半日市（平安夜、除夕、农历年前最后交易日等仅上午市）未建模，`holiday` 表只能表达
+    整日休市，这些日子的 13:00-16:00 会被 :py:meth:`StockManager.is_trading_hours` 判为交易中；
+    日线回测不受影响，分钟级与实盘时段的判断需自行处理。
+
+.. py:function:: TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.000085, per_trade=0.0, settlefee=0.0, settlefee_min=0.0, settlefee_max=0.0])
+
+    港股交易成本算法，买卖双边对称收取
+
+    :param float commission: 佣金比例（双边，按成交金额），默认万分之2.5
+    :param float lowest_commission: 最低佣金值（双边，按笔），默认 3 港元
+    :param float stamptax: 印花税率（双边收取），2023 年 11 月 17 日起为 0.1%；
+        每笔征收额不足 1 港元作 1 港元计（向上取整到整元）
+    :param float tradefee: 交易费及征费合计比例（双边）：联交所交易费 0.00565% +
+        证监会征费 0.0027% + 财汇局征费 0.00015%，默认 0.000085；计入
+        CostRecord.transferfee
+    :param float per_trade: 每笔固定费用（双边），默认 0；计入 CostRecord.others
+    :param float settlefee: 结算费比例（双边，如 CCASS 0.002%），默认 0 即不计；
+        与交易费及征费一并计入 CostRecord.transferfee
+    :param float settlefee_min: 结算费每笔最低收费，默认 0 表示不设下限
+    :param float settlefee_max: 结算费每笔最高收费，默认 0 表示不设上限
+    :return: :py:class:`TradeCostBase` 子类实例
+
+
+通用固定费率交易成本算法
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+适用于期货、外汇、数字货币等无专用成本模型的市场。计算规则：
+
+* 买入：max(佣金比例 × 成交金额, 最低佣金) + per_lot × 数量 + 其他固定费用
+* 卖出：同上，另加印花税率 × 成交金额
+
+成交金额 = 价格 × 数量 × 合约乘数，合约乘数取自证券自身的 unit（股票为 1，期货为合约规模），
+因此同一套公式同时适用于股票与期货；per_lot 与其他固定费用计入 CostRecord.others。
+
+.. py:function:: TC_Fixed([commission=0.0, lowest_commission=0.0, stamptax=0.0, per_lot=0.0, others=0.0])
+
+    通用固定费率交易成本算法，覆盖期货、外汇、数字货币等无专用成本模型的市场
+
+    :param float commission: 佣金比例（按成交金额）
+    :param float lowest_commission: 最低佣金值，按 ``max(佣金比例 × 成交金额, 最低佣金)``
+        生效——即使佣金比例 × 成交金额为 0 也照收，如需免除请置 0
+    :param float stamptax: 印花税率，仅卖出收取
+    :param float per_lot: 按成交数量（股/张/币量）收取的固定费用，非按手——即
+        ``per_lot × number``；如需按手收费请将费率除以每手数量
+    :param float others: 其他固定费用，如交割费、资金费
+    :return: :py:class:`TradeCostBase` 子类实例
+
+
+按市场 / 证券类型路由
+^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: TC_ByMarket([default_cost=TC_Zero(), costs={}])
+
+    本身不收取任何费用，将买卖费用与融券查询转交给该证券对应的成本算法：先按市场代码（如 ``"HK"``）匹配，
+    其次按证券类型（如 ``"type:12"``）匹配，均未注册时使用默认算法。不携带证券的账户级接口（融资借入资金的
+    成本与利率）由默认算法回答。
+
+    :param TradeCost default_cost: 未注册市场使用的兜底算法，默认 TC_Zero
+    :param dict costs: 路由表，市场代码或 ``"type:<n>"`` 映射到成本算法，如
+        ``{"HK": TC_HK(), "type:12": TC_Fixed(0.0001)}``
+    :return: :py:class:`TradeCostBase` 子类实例
+    :raises HKUException: 键为空，或 ``"type:"`` 键缺少类型编号
+
+.. code-block:: python
+
+    # 港股用 TC_HK、期货（类型 12）用 TC_Fixed，其余市场用 A 股费率
+    cost = TC_ByMarket(TC_FixedA(), {"HK": TC_HK(), "type:12": TC_Fixed(0.0001)})
+
+.. note::
+    请在回测开始前配置：路由表不与查询同步，仅未注册市场的首次提示加锁；该市场只提示一次，之后按默认算法
+    计费。经部件注册表 ``core.tc.bymarket`` 创建时只能指定默认算法，路由表须用上述 ``costs`` 参数配置。
+    键匹配顺序为先市场后类型，与 ``MG_ByType`` 及 ``currency_rates`` 的类型键优先相反，混用时注意。
+
+
 自定义交易成本算法
 ------------------
 
 自定义交易成本算法接口：
 
-* :py:meth:`TradeCostBase.getBuyCost` - 【必须】获取买入成本
-* :py:meth:`TradeCostBase.getSellCost` - 【必须】获取卖出成本
-* :py:meth:`TradeCostBase.getBorrowCashCost` - 【可选】获取借入资金成本（融资）
-* :py:meth:`TradeCostBase.getReturnCashCost` - 【可选】获取归还借入资金成本
-* :py:meth:`TradeCostBase.getBorrowStockCost` - 【可选】获取借入股票成本（融券做空）
-* :py:meth:`TradeCostBase.getReturnStockCost` - 【可选】获取归还借入股票成本
+* :py:meth:`TradeCostBase.get_buy_cost` - 【必须】获取买入成本
+* :py:meth:`TradeCostBase.get_sell_cost` - 【必须】获取卖出成本
+* :py:meth:`TradeCostBase.get_borrow_cash_cost` - 【可选】获取借入资金成本（融资）
+* :py:meth:`TradeCostBase.get_return_cash_cost` - 【可选】获取归还借入资金成本
+* :py:meth:`TradeCostBase.get_borrow_stock_cost` - 【可选】获取借入股票成本（融券做空）
+* :py:meth:`TradeCostBase.get_return_stock_cost` - 【可选】获取归还借入股票成本
 * :py:meth:`TradeCostBase._clone` - 【必须】子类克隆接口
+
+.. note::
+
+    以上名称即 Python 侧需实现的覆写名，账户 C++ 代码据此查找子类实现并回调。旧版绑定按 C++ 方法名（如
+    ``getBuyCost``）查找，与清单不符，按清单写的覆写会被静默忽略；现已统一为 snake_case，以 C++ 名定义
+    覆写的旧代码需改名。
 
 
 
@@ -190,7 +312,29 @@ ETF交易成本算法
         :param int num: 归还数量
         :return: 交易成本记录
         :rtype: CostRecord
+
+    .. py:method:: get_borrow_cash_rate(self, datetime)
+
+        【重载接口】融资借入资金的年化利率，默认 0.0（不计提）
+
+        由账户结算按距上次计提经过的自然日数除以 ``annual_days`` 折算，计入负债而非从现金支付，产生
+        ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`；内建实现见 :py:func:`TC_MarginInterest`
         
+        :param Datetime datetime: 结算时刻
+        :return: 年化小数利率，如 0.06 表示年化 6%
+        :rtype: float
+
+    .. py:method:: get_borrow_stock_rate(self, datetime, stock)
+
+        【重载接口】融券借入标的的年化费率，默认 0.0（不计提）
+
+        按结算日借入股份在结算价下的市值计提，与融资利息同样计入现金负债；内建实现见 :py:func:`TC_MarginInterest`
+
+        :param Datetime datetime: 结算时刻
+        :param Stock stock: 借入对象
+        :return: 年化小数费率，如 0.10 表示年化 10%
+        :rtype: float
+
     .. py:method:: _clone(self)
     
         【重载接口】子类克隆接口

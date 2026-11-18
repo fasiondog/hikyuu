@@ -8,10 +8,11 @@
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/OrderBrokerBase.h>
-#include <hikyuu/trade_manage/crt/TC_TestStub.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
-#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_TestStub.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedAPre2015.h>
+#include <hikyuu/trade_manage/margin/crt/MG_ByType.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_manage/Performance.h>
 
 #include <fstream>
@@ -1070,6 +1071,107 @@ TEST_CASE("test_TradeManager_updateWithWeight_bonus_cash_no_double_count") {
     CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
 }
 
+/** @par Test point: the margin gate of buy and sellShort reads the available margin, which is
+ *  served by getFunds and applies the ex-rights weights itself. Reading it after the trade flow
+ *  has already updated the weights (and dropped that stock's check frontier) rescans the same
+ *  window, so every dividend and gift would be booked twice. Both gates must therefore run before
+ *  any state change.*/
+TEST_CASE("test_TradeManager_margin_gate_applies_weight_once") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    /** @arg sellShort with the automatic securities lending on */
+    {
+        TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+        tm->setParam<bool>("support_borrow_stock", true);
+        tm->buy(Datetime(199305200000L), stk, 55.7, 100);  // cash -> 94430
+        auto short_open = tm->sellShort(Datetime(199305250000L), stk, 27.5, 100);
+        /** @arg The short opening itself goes through, not just the bookkeeping below */
+        CHECK_EQ(short_open.business, BUSINESS_SELL_SHORT);
+
+        TradeRecordList tr_list = tm->getTradeList();
+        size_t bonus_count = 0, gift_count = 0;
+        price_t bonus_cash = 0.0;
+        for (const auto& t : tr_list) {
+            if (t.datetime != Datetime(199305240000L))
+                continue;
+            if (t.business == BUSINESS_BONUS) {
+                ++bonus_count;
+                bonus_cash = t.cash;
+            } else if (t.business == BUSINESS_GIFT) {
+                ++gift_count;
+            }
+        }
+
+        /** @arg The dividend and the gift of the weight date are each booked exactly once */
+        CHECK_EQ(bonus_count, 1);
+        CHECK_EQ(gift_count, 1);
+
+        /** @arg The cash carries a single dividend, and the replay agrees with the snapshot */
+        CHECK_EQ(bonus_cash, 94460);
+        CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
+    }
+
+    /** @arg buy with the automatic financing on, adding to an existing holding */
+    {
+        TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+        tm->setParam<bool>("support_borrow_cash", true);
+        tm->buy(Datetime(199305200000L), stk, 55.7, 100);  // cash -> 94430
+        auto add = tm->buy(Datetime(199305250000L), stk, 27.5, 100);
+        /** @arg Likewise the financing buy fills, so the assertions below are not vacuously true */
+        CHECK_EQ(add.business, BUSINESS_BUY);
+
+        TradeRecordList tr_list = tm->getTradeList();
+        size_t bonus_count = 0, gift_count = 0;
+        for (const auto& t : tr_list) {
+            if (t.datetime != Datetime(199305240000L))
+                continue;
+            if (t.business == BUSINESS_BONUS)
+                ++bonus_count;
+            else if (t.business == BUSINESS_GIFT)
+                ++gift_count;
+        }
+
+        /** @arg The very same weight date is applied once on the financing path too */
+        CHECK_EQ(bonus_count, 1);
+        CHECK_EQ(gift_count, 1);
+        CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
+    }
+}
+
+/** @par Test point: a gift rescales the accumulated quantity instead of incrementing it, so the
+ *  averaged cost follows the halved price even when part of the position was sold before the
+ *  ex-rights date ("+= addcount" used to distort the baseline once totalNumber > number) */
+TEST_CASE("test_TradeManager_updateWithWeight_gift_average_price") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 1000000);
+    tm->buy(Datetime(199305200000L), stk, 55.7, 200);
+    tm->sell(Datetime(199305210000L), stk, 60.0, 100);  // partial close: totalNumber stays 200
+
+    PositionRecord before = tm->getPosition(Datetime(199305210000L), stk);
+    REQUIRE_EQ(before.number, 100.0);
+    REQUIRE_EQ(before.totalNumber, 200.0);
+
+    // Any query beyond the ex-rights date applies the 1993-05-24 weights (bonus + gift shares)
+    tm->getFunds(Datetime(199305260000L));
+    PositionRecord after = tm->getPosition(Datetime(199305260000L), stk);
+
+    /** @arg the gift really changed the quantity */
+    CHECK_GT(after.number, before.number);
+    const double ratio = after.number / before.number;
+
+    /** @arg the accumulated quantity follows the same ratio, not the added share count */
+    CHECK_LT(std::fabs(after.totalNumber - before.totalNumber * ratio), 1.0);
+
+    /** @arg the averaged cost follows the halved price (buyMoney keeps its total) */
+    CHECK_EQ(after.buyMoney, before.buyMoney);
+    CHECK_LT(
+      std::fabs(after.buyMoney / after.totalNumber - before.buyMoney / before.totalNumber / ratio),
+      1e-6);
+}
+
 /** @par Test point: test addTradeRecord */
 TEST_CASE("test_TradeManager_addTradeRecord") {
     StockManager& sm = StockManager::instance();
@@ -1821,6 +1923,23 @@ TEST_CASE("test_TradeManager_reset_clone_short_state") {
     CHECK_EQ(tm->getDebtNumber(Datetime(199911100000L), stock), 0.0);
 }
 
+/** @par Test point: clone is a deep copy, the cost and the margin model are cloned, not shared */
+TEST_CASE("test_TradeManager_clone_deep_copies_models") {
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_FixedA(), "COPY");
+    tm->margin(MG_ByType("SH:0.5"));
+
+    TradeManagerPtr cloned = tm->clone();
+
+    /** @arg the models of the copy are different instances */
+    CHECK_UNARY(cloned->costFunc().get() != tm->costFunc().get());
+    CHECK_UNARY(cloned->margin().get() != tm->margin().get());
+
+    /** @arg the copies keep the parameters of the source */
+    CHECK_EQ(cloned->costFunc()->name(), tm->costFunc()->name());
+    CHECK_EQ(cloned->margin()->name(), tm->margin()->name());
+    CHECK_EQ(cloned->margin()->getParam<string>("rates"), tm->margin()->getParam<string>("rates"));
+}
+
 /** @par Test points */
 TEST_CASE("test_TradeManager_profit_cum_change_curve") {
     StockManager& sm = StockManager::instance();
@@ -1843,6 +1962,46 @@ TEST_CASE("test_TradeManager_profit_cum_change_curve") {
     for (size_t i = 0, total = funds.size(); i < total; ++i) {
         CHECK_EQ(curve[i], roundEx(funds[i].total_assets() / funds[i].total_base(), 2));
     }
+}
+
+/** @par Test points: the expiry guard refuses opening past the registered endDate, while the last
+ * trading day and securities without a registered expiry stay tradable */
+TEST_CASE("test_TradeManager_check_expiry") {
+    StockManager& sm = StockManager::instance();
+    // Borrow a real stock's data driver so the synthetic contracts are not null
+    auto driver = sm.getStock("sh600004").getKDataDirver();
+    // Standalone contracts, like a registered futures contract: one with an expiry, one without
+    Stock expired("SHF", "rb2510", "rb", 12, true, Datetime(202001010000), Datetime(202012150000),
+                  1.0, 10.0, 0, 1, 100000);
+    expired.setKDataDriver(driver);
+    Stock listed("SHF", "rb2601", "rb", 12, true, Datetime(202001010000), Null<Datetime>(), 1.0,
+                 10.0, 0, 1, 100000);
+    listed.setKDataDriver(driver);
+    REQUIRE_UNARY(!expired.isNull());
+    REQUIRE_UNARY(expired.lastDatetime() == Datetime(202012150000));
+    REQUIRE_UNARY(listed.lastDatetime().isNull());
+
+    TradeManagerPtr tm = crtTM(Datetime(202001010000), 100000, TC_Zero(), "TEST");
+
+    /** @arg an expired buy is refused */
+    auto tr = tm->buy(Datetime(202101010000), expired, 4000.0, 1);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+
+    /** @arg an expired sellShort is refused */
+    tr = tm->sellShort(Datetime(202101010000), expired, 4000.0, 1);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+
+    /** @arg the last trading day itself stays tradable */
+    auto bought = tm->buy(Datetime(202012150000), expired, 4000.0, 1);
+    CHECK_EQ(bought.business, BUSINESS_BUY);
+
+    /** @arg a security without a registered expiry (Null lastDatetime) stays tradable */
+    tr = tm->buy(Datetime(202101010000), listed, 4000.0, 1);
+    CHECK_EQ(tr.business, BUSINESS_BUY);
+
+    /** @arg closing an expired position is not blocked (sell / buyShort stay open) */
+    auto sold = tm->sell(Datetime(202101010000), expired, 4000.0, 1);
+    CHECK_EQ(sold.business, BUSINESS_SELL);
 }
 
 /** @} */

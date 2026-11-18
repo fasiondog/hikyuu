@@ -270,6 +270,11 @@ def load_hikyuu(**kwargs):
                     'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5',
                     'min15', 'min30', 'min60', 'hour2', 'timeline', 'trans'
         preload_num (dict): {'day_max': 100000, 'week_max': 100000, 'month_max': 100000, ...}
+        market_list (list): the markets to load when stock_list contains 'ALL', e.g. ['SH', 'SZ'];
+            empty or containing 'ALL' means no restriction. The must-load securities (sh000001 /
+            sh000300) are always loaded, defaults to empty
+        stock_type_list (list of int): the security types to load when stock_list contains 'ALL',
+            empty means no restriction, defaults to empty
         load_history_finance (boolean): preload the historical finance data into memory, defaults to True
         load_weight (boolean): load the weight data, defaults to True
 
@@ -365,6 +370,19 @@ def load_hikyuu(**kwargs):
         context.ktype_list = kwargs['ktype_list']
     if 'preload_num' in kwargs:
         context.preload_num = kwargs['preload_num']
+    if 'market_list' in kwargs and kwargs['market_list'] is not None:
+        market_list = kwargs['market_list']
+        if not isinstance(market_list, (list, tuple)) or any(
+                not isinstance(x, str) for x in market_list):
+            raise TypeError("market_list must be a list of str, e.g. ['SH', 'SZ']")
+        hku_param.set("load_market_list", ";".join(market_list))
+    if 'stock_type_list' in kwargs and kwargs['stock_type_list'] is not None:
+        type_list = kwargs['stock_type_list']
+        invalid = not isinstance(type_list, (list, tuple)) or any(
+            isinstance(x, bool) or not isinstance(x, int) for x in type_list)
+        if invalid:
+            raise TypeError("stock_type_list must be a list of int, e.g. [1, 2]")
+        hku_param.set("load_stock_type_list", ";".join(str(t) for t in type_list))
     if 'load_history_finance' in kwargs:
         hku_param.set("load_history_finance", kwargs['load_history_finance'])
     if 'load_weight' in kwargs:

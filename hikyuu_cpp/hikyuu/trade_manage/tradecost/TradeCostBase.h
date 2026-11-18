@@ -9,9 +9,9 @@
 #ifndef TRADECOSTBASE_H_
 #define TRADECOSTBASE_H_
 
-#include "../Stock.h"
-#include "../utilities/Parameter.h"
-#include "CostRecord.h"
+#include "../../Stock.h"
+#include "../../utilities/Parameter.h"
+#include "../CostRecord.h"
 
 namespace hku {
 
@@ -111,6 +111,31 @@ public:
         return m_is_python_object;
     }
 
+    // New virtuals are appended to preserve vtable slot order: inserting one mid-class shifts the
+    // later slots, so models built against the old header dispatch to the wrong function.
+
+    /**
+     * Annualized interest rate of the borrowed cash
+     * @details 0.0 by default keeps the plain cash accounting of pre-rate accounts.
+     *          Accrual uses the settlement-day rate, so a model may vary it over time.
+     * @param datetime the day being settled
+     * @return decimal rate (0.06 = 6%)
+     */
+    virtual double getBorrowCashRate(const Datetime& datetime) const {
+        return 0.0;
+    }
+
+    /**
+     * Annualized interest rate of the borrowed security
+     * @details 0.0 by default, see getBorrowCashRate. Billed in cash even for a securities lending.
+     * @param datetime the day being settled
+     * @param stock the borrowed security
+     * @return decimal rate (0.10 = 10%)
+     */
+    virtual double getBorrowStockRate(const Datetime& datetime, const Stock& stock) const {
+        return 0.0;
+    }
+
 protected:
     bool isPythonObject() const noexcept {
         return m_is_python_object;
@@ -127,10 +152,25 @@ protected:
 private:
     friend class boost::serialization::access;
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
+    void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_params);
+    }
+
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        // setParameter re-runs the param check, the only place rebuilding derived state, keeping
+        // the hot path a pure lookup and shared models safe for concurrent queries
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        setParameter(m_params);
+    }
+
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        boost::serialization::split_member(ar, *this, version);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };

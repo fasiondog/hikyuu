@@ -44,6 +44,24 @@ bool MySQLBaseInfoDriver::_init() {
     connect_param.set<int>("port", port);
     m_pool = new ResourcePool<MySQLConnect>(connect_param);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
+
+    try {
+        auto con = m_pool->get();
+        auto st = con->getStatement(
+          "select count(*) from information_schema.tables where table_schema = database() "
+          "and table_name = 'stockparam'");
+        st->exec();
+        if (st->moveNext()) {
+            int64_t count = 0;
+            st->getColumn(0, count);
+            m_hasStockParam = count > 0;
+        }
+    } catch (std::exception &e) {
+        HKU_WARN("{}", e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
+    }
+
     return true;
 }
 
@@ -59,7 +77,8 @@ vector<MarketInfo> MySQLBaseInfoDriver::getAllMarketInfo() {
             try {
                 result.emplace_back(info.market(), info.name(), info.description(), info.code(),
                                     info.lastDate(), info.openTime1(), info.closeTime1(),
-                                    info.openTime2(), info.closeTime2());
+                                    info.openTime2(), info.closeTime2(), info.tzOffsetMin(),
+                                    info.dstRule(), info.dataLag());
             } catch (std::exception &e) {
                 HKU_ERROR("Failed load market, {}", e.what());
             } catch (...) {
@@ -192,7 +211,7 @@ vector<StockInfo> MySQLBaseInfoDriver::getAllStockInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         auto con = m_pool->get();
-        con->batchLoad(result);
+        con->batchLoadView(result, StockInfo::getSelectSQL(m_hasStockParam));
     } catch (...) {
     }
     return result;
@@ -203,31 +222,12 @@ StockInfo MySQLBaseInfoDriver::getStockInfo(string market, const string &code) {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         to_upper(market);
-        // getSelectSQL() already carries the join conditions: the generic load() would append a
-        // second "where" to it, so the filters are appended with "and" directly
         auto con = m_pool->get();
-        con->loadView(result,
-                      fmt::format("{} and a.code=?1 and c.market=?2", StockInfo::getSelectSQL()),
-                      {code, market});
-    } catch (...) {
-    }
-    return result;
-}
-
-MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
-    MarketInfo result;
-    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
-    auto con = m_pool->get();
-    try {
-        MarketInfoTable info;
-        string new_market(market);
-        to_upper(new_market);
-        con->load(info, Field("market") == new_market);
-        if (!info.market().empty()) {
-            result = MarketInfo(info.market(), info.name(), info.description(), info.code(),
-                                info.lastDate(), info.openTime1(), info.closeTime1(),
-                                info.openTime2(), info.closeTime2());
-        }
+        con->loadView(
+          result,
+          fmt::format("{} {} a.code=?1 and c.market=?2", StockInfo::getSelectSQL(m_hasStockParam),
+                      m_hasStockParam ? "where" : "and"),
+          {code, market});
     } catch (...) {
     }
     return result;
@@ -249,16 +249,20 @@ StockTypeInfo MySQLBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     return result;
 }
 
-std::unordered_set<Datetime> MySQLBaseInfoDriver::getAllHolidays() {
+std::unordered_map<std::string, std::unordered_set<Datetime>>
+MySQLBaseInfoDriver::getAllHolidays() {
     HKU_ASSERT(m_pool);
-    std::unordered_set<Datetime> result;
+    std::unordered_map<std::string, std::unordered_set<Datetime>> result;
     try {
         auto con = m_pool->get();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
         for (const auto &holiday : holidays) {
             try {
-                result.insert(holiday.datetime());
+                Datetime d = holiday.datetime();
+                std::string market(holiday.market);
+                to_upper(market);
+                result[std::move(market)].insert(d);
             } catch (std::exception &e) {
                 HKU_WARN(e.what());
             } catch (...) {

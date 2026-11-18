@@ -7,7 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>

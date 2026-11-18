@@ -8,8 +8,8 @@
 #include <cmath>
 #include "hikyuu/part/PartRegister.h"
 #include "OPLineCondition.h"
-#include "../../../trade_manage/crt/crtTM.h"
-#include "../../../trade_manage/crt/TC_Zero.h"
+#include "../../../trade_manage/crtTM.h"
+#include "../../../trade_manage/tradecost/crt/TC_Zero.h"
 #include "../../../indicator/crt/PRICELIST.h"
 #include "../../system/crt/SYS_Simple.h"
 #include "../../moneymanager/crt/MM_FixedCount.h"

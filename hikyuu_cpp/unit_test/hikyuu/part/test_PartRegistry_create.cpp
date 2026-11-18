@@ -10,8 +10,8 @@
 #include <hikyuu/part/PartRegistration.h>
 #include <hikyuu/part/PartRegistry.h>
 #include <hikyuu/trade_manage/TradeManagerBase.h>
-#include <hikyuu/trade_manage/crt/TC_FixedETF.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedETF.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/condition/build_in.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>

@@ -29,6 +29,9 @@ void save(Archive& ar, const hku::MarketInfo& record, unsigned int version) {
     hku::TimeDelta openTime2 = record.openTime2();
     hku::TimeDelta closeTime1 = record.closeTime1();
     hku::TimeDelta closeTime2 = record.closeTime2();
+    hku::int32_t tzOffsetMin = record.tzOffsetMin();
+    hku::int32_t dstRule = record.dstRule();
+    hku::int32_t dataLag = record.dataLag();
     ar& BOOST_SERIALIZATION_NVP(market);
     ar& BOOST_SERIALIZATION_NVP(name);
     ar& BOOST_SERIALIZATION_NVP(description);
@@ -38,6 +41,9 @@ void save(Archive& ar, const hku::MarketInfo& record, unsigned int version) {
     ar& BOOST_SERIALIZATION_NVP(closeTime1);
     ar& BOOST_SERIALIZATION_NVP(openTime2);
     ar& BOOST_SERIALIZATION_NVP(closeTime2);
+    ar& BOOST_SERIALIZATION_NVP(tzOffsetMin);
+    ar& BOOST_SERIALIZATION_NVP(dstRule);
+    ar& BOOST_SERIALIZATION_NVP(dataLag);
 }
 
 template <class Archive>
@@ -45,6 +51,7 @@ void load(Archive& ar, hku::MarketInfo& record, unsigned int version) {
     hku::string market, name, description, code;
     hku::uint64_t lastDate;
     hku::TimeDelta openTime1, openTime2, closeTime1, closeTime2;
+    hku::int32_t tzOffsetMin, dstRule, dataLag;
     ar& BOOST_SERIALIZATION_NVP(market);
     ar& BOOST_SERIALIZATION_NVP(name);
     ar& BOOST_SERIALIZATION_NVP(description);
@@ -54,8 +61,11 @@ void load(Archive& ar, hku::MarketInfo& record, unsigned int version) {
     ar& BOOST_SERIALIZATION_NVP(closeTime1);
     ar& BOOST_SERIALIZATION_NVP(openTime2);
     ar& BOOST_SERIALIZATION_NVP(closeTime2);
+    ar& BOOST_SERIALIZATION_NVP(tzOffsetMin);
+    ar& BOOST_SERIALIZATION_NVP(dstRule);
+    ar& BOOST_SERIALIZATION_NVP(dataLag);
     record = hku::MarketInfo(market, name, description, code, hku::Datetime(lastDate), openTime1,
-                             closeTime1, openTime2, closeTime2);
+                             closeTime1, openTime2, closeTime2, tzOffsetMin, dstRule, dataLag);
 }
 
 }  // namespace serialization

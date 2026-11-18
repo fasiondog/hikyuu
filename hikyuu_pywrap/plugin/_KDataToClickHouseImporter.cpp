@@ -156,5 +156,40 @@ void export_plugin_KDataToClickHouseImporter(py::module& m) {
     :rtype: bool
 
     Note: a restart (re-executing hikyuu_init) is required after the registration for it to take effect.
+)")
+      .def(
+        "add_stock_param", &KDataToClickHouseImporter::addStockParam, py::arg("market"),
+        py::arg("code"), py::arg("precision") = 2, py::arg("tick") = 0.01,
+        py::arg("tick_value") = 0.01, py::arg("min_trade") = 1.0, py::arg("max_trade") = 1000000.0,
+        R"(add_stock_param(market: str, code: str, precision: int = 2, tick: float = 0.01, tick_value: float = 0.01, min_trade: float = 1.0, max_trade: float = 1000000.0) -> bool
+
+    Write the variety-level parameters (tick / tick_value / min_trade / max_trade / precision) into the stockparam table of the baseinfo database; they override the type-level defaults. A repeated call updates the row; the table is created on demand.
+
+    :param str market: the market abbreviation (automatically converted to uppercase), e.g. 'SHF'
+    :param str code: the security code; it must match the code stored in the stock table (uppercase), otherwise the loaded parameters silently fall back to the type-level defaults
+    :param int precision: the price precision (the number of the decimal places)
+    :param float tick: the minimum tick
+    :param float tick_value: the value of each tick; the contract multiplier unit = tick_value / tick
+    :param float min_trade: the minimum trading quantity per order
+    :param float max_trade: the maximum trading quantity per order
+    :return: return True on success; return False when the license is invalid, the baseinfo_db is not configured, the market is not registered or the writing fails
+    :rtype: bool
+
+    Note: a restart (re-executing hikyuu_init) is required after the writing for it to take effect.
+)")
+      .def(
+        "add_stock_weight", &KDataToClickHouseImporter::addStockWeight, py::arg("market"),
+        py::arg("code"), py::arg("weights"),
+        R"(add_stock_weight(market: str, code: str, weights: StockWeightList) -> bool
+
+    Write ex-rights/ex-dividend events into the stkweight table of the baseinfo database; rows with the same market, code and date are skipped. Prices must be raw prices with splits undone; hikyuu derives adjustment from the events at runtime.
+
+    :param str market: the market abbreviation (automatically converted to uppercase), e.g. 'NASDAQ'
+    :param str code: the security code; it must match the code stored in the stock table (uppercase)
+    :param StockWeightList weights: the events; the date is the ex-date, bonus is the cash dividend per 10 shares, and suogu is the new/old share ratio of a split
+    :return: return True on success (including an empty list); return False on failure (including an invalid license)
+    :rtype: bool
+
+    Note: a restart (re-executing hikyuu_init) is required after the writing for it to take effect.
 )");
 }

@@ -14,9 +14,9 @@
 #include <utility>
 #include <vector>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA2017.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/crtTM.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>

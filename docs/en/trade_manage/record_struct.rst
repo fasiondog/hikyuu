@@ -10,7 +10,7 @@ Trade Business Types
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: trade business type
-    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "BORROW_ADJUST" | "SHORT_ADJUST" | "DIVIDEND_COMPENSATION" | "UNKNOWN")
+    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "BORROW_ADJUST" | "SHORT_ADJUST" | "DIVIDEND_COMPENSATION" | "SETTLEMENT" | "INTEREST" | "UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS
@@ -34,6 +34,8 @@ Trade Business Types
     - BUSINESS.BORROW_ADJUST  - Borrowed stock quantity adjustment (ex-rights)
     - BUSINESS.SHORT_ADJUST   - Short position quantity adjustment (ex-rights)
     - BUSINESS.DIVIDEND_COMPENSATION - Dividend compensation paid to the lender (short)
+    - BUSINESS.SETTLEMENT    - Daily settlement of a margin holding (the settlement price against the mark-to-market basis), see :doc:`margin`
+    - BUSINESS.INTEREST      - Interest accrued day by day on a liability (added to the debt itself, not paid from the cash), see :doc:`margin`
     - BUSINESS.INVALID        - Invalid type
 
 
@@ -91,9 +93,22 @@ Trade Records
 
     .. py:attribute:: stoploss Stop-loss price (float)
     .. py:attribute:: cash     Cash balance after the fill (float)
+    .. py:attribute:: margin   Margin locked by this opening (float), non-zero only on a margin-accounted buy/sell short so a replay reproduces the books; on a ``SETTLEMENT`` record it is the margin relocked after settlement
     .. py:attribute:: part
 
         Identifies the trading-system part that issued the instruction (see the SystemPart enumeration, also exposed as System.Part).
+
+    .. note::
+
+        A daily settlement record (``BUSINESS.SETTLEMENT``) is not a fill: ``real_price`` is the settlement
+        price, ``number`` carries the direction (positive long, negative short, so a security held on both
+        sides is told apart), ``cash`` is the cash balance after the posting, ``cost`` is 0 and ``part`` is
+        the invalid part (``System.Part.INVALID``).
+
+        An interest record (``BUSINESS.INTEREST``) is no fill either: one per liability item per day,
+        ``real_price`` is the billed amount, ``number`` the borrowed quantity (0 for the cash interest,
+        the same caliber as ``BORROW_CASH``), ``stock`` the security (an empty stock for the cash
+        interest) and ``margin`` is 0.
 
 
 
@@ -132,6 +147,9 @@ Position Records
     .. py:attribute:: total_cost     Cumulative total transaction cost (float)
     .. py:attribute:: total_risk     Cumulative risk (float): the sum over all entries of (entry price - stop-loss price) x entry quantity, excluding transaction costs
     .. py:attribute:: sell_money     Cumulative sale proceeds (float)
+    .. py:attribute:: margin         The margin currently locked (float); 0 means the plain cash accounting (see :doc:`margin`)
+    .. py:attribute:: open_basis     The opening notional of the still-held lots (float) = opening price x number x unit, released proportionally as the lots close; the cost reference
+    .. py:attribute:: settle_basis   The mark-to-market basis of the still-held lots (float); rolled to the settlement price by the daily settlement and equal to open_basis until the first settlement, the basis of the realized profit and of the equity of a margin holding
 
 
 Funds Records
@@ -150,6 +168,7 @@ Snapshot of the account's current cash, holdings, and borrowings. Returned by :p
     .. py:attribute:: base_asset         Current value of assets contributed in kind (float)
     .. py:attribute:: borrow_cash        Cash borrowed (margin loan), i.e. outstanding debt (float)
     .. py:attribute:: borrow_asset       Market value of borrowed securities (float)
+    .. py:attribute:: occupied_margin    The margin locked by the margin-accounted holdings (float); its equity contribution is already included in market_value
 
     Read-only attributes, computed automatically from the attributes above:
 

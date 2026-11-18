@@ -97,7 +97,7 @@ public:
     }
 
     double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
-        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_debt_num", getDebtNumber, datetime,
+        PYBIND11_OVERRIDE_NAME(double, TradeManagerBase, "get_debt_number", getDebtNumber, datetime,
                                stock);
     }
 
@@ -253,6 +253,9 @@ public:
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
+MarginPtr (TradeManagerBase::*get_margin)() const = &TradeManagerBase::margin;
+void (TradeManagerBase::*set_margin)(const MarginPtr&) = &TradeManagerBase::margin;
+
 TradeRecordList (TradeManagerBase::*_getTradeList_1)() const = &TradeManagerBase::getTradeList;
 TradeRecordList (TradeManagerBase::*_getTradeList_2)(const Datetime&, const Datetime&) const =
   &TradeManagerBase::getTradeList;
@@ -269,7 +272,13 @@ Common parameters:
     - precision=2 (int) : the price calculation accuracy
     - support_borrow_cash=False (bool) : whether to finance automatically
     - support_borrow_stock=False (bool) : whether to short the securities automatically
-    - save_action=True (bool) : whether to save the Python command sequences)")
+    - save_action=True (bool) : whether to save the Python command sequences
+    - margin_accounting=False (bool) : whether to book the margin securities by margin
+    - settle_with_close=True (bool) : whether the daily settlement posts at the close of the K type
+    - force_liquidate=False (bool) : whether to queue the forced liquidation on a margin call
+    - annual_days=365 (int) : the days of a year, the denominator prorating the margin interest
+    - currency_rates="" (str) : the fixed rate of each market to the account currency, e.g. "HK:0.92, NASDAQ:7.15"; a market not listed is billed at 1.0 with a warning, an empty table bills everything at 1.0)")
+     
       .def(py::init<>())
       .def(py::init<const string&, const TradeCostPtr&>())
 
@@ -299,6 +308,143 @@ Common parameters:
         "(Read-only) the price precision, the same as the common parameter 'precision'")
 
       .def_property("cost_func", get_costFunc, set_costFunc, "The trade cost algorithm")
+
+      .def_property("margin", get_margin, py::cpp_function(set_margin, py::keep_alive<1, 2>()),
+                    R"(The account's margin model (MarginBase). None falls back to the plain cash model MG_None; a
+    new account defaults to MG_Fixed(0.6), the legacy 60 % buying power.)")
+
+      .def("get_open_margin", &TradeManagerBase::getOpenMargin, py::arg("date"), py::arg("stock"),
+           py::arg("price"), py::arg("num"), py::arg("side") = MarginSide::LONG,
+           R"(get_open_margin(self, date, stock, price, num, side=MarginSide.LONG)
+
+    Get the margin occupied by an opening, according to the account margin model
+
+    :param Datetime date: the trade moment
+    :param Stock stock: the security to open
+    :param float price: the opening price
+    :param float num: the opening quantity
+    :param MarginSide side: the long or the short side
+    :return: the occupied funds in the security's own currency; the account converts it into the
+        account currency before booking
+    :rtype: float)")
+
+      .def("get_maintain_margin", &TradeManagerBase::getMaintainMargin, py::arg("date"),
+           py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("side") = MarginSide::LONG,
+           R"(get_maintain_margin(self, date, stock, price, num, side=MarginSide.LONG)
+
+    Get the maintain margin (the additional-margin threshold) of an opening
+
+    :return: the maintain margin in the security's own currency; the account converts it into the
+        account currency before booking
+    :rtype: float)")
+
+      .def("get_max_open_number", &TradeManagerBase::getMaxOpenNumber, py::arg("date"),
+           py::arg("stock"), py::arg("price"), py::arg("available"),
+           py::arg("side") = MarginSide::LONG,
+           R"(get_max_open_number(self, date, stock, price, available, side=MarginSide.LONG)
+
+    Get the maximum openable quantity under the given available funds
+
+    :param float available: the available funds in the account currency, converted for the
+        margin model which is measured in the security's own currency
+    :return: the quantity, 0 when nothing can be opened
+    :rtype: float)")
+
+      .def("get_occupied_margin", &TradeManagerBase::getOccupiedMargin, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_occupied_margin(self, date, ktype="DAY")
+
+    The margin occupied by the current long and short positions at the given moment
+
+    :param Datetime date: the given moment
+    :param str ktype: the K-line type used to get the position price
+    :return: the occupied margin in the account currency
+    :rtype: float)")
+
+      .def("get_available_margin", &TradeManagerBase::getAvailableMargin, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_available_margin(self, date, ktype="DAY")
+
+    The available funds for a new opening, i.e. the net assets minus the collateral haircut and
+    the occupied margin
+
+    :param Datetime date: the given moment
+    :param str ktype: the K-line type used to get the position price
+    :return: the available funds in the account currency
+    :rtype: float)")
+
+      .def("get_collateral_rate", &TradeManagerBase::getCollateralRate, py::arg("date"),
+           py::arg("stock"), py::arg("side") = MarginSide::LONG,
+           R"(get_collateral_rate(self, date, stock, side=MarginSide.LONG)
+
+    Collateral conversion rate of the security, answered by the account margin model
+
+    :param Datetime date: the queried moment
+    :param Stock stock: the held security
+    :param MarginSide side: the long or the short side
+    :return: the part of the holding counted as collateral, 1.0 without a margin model
+    :rtype: float)")
+
+      .def("get_collateral_haircut", &TradeManagerBase::getCollateralHaircut, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(get_collateral_haircut(self, date, ktype="DAY")
+
+    The value discounted by the collateral table: Σ collateral base × (1 - conversion rate) over
+    long holdings. For a margin-accounted holding the discount is based on its contribution to net
+    assets (locked margin + unrealized profit), not its full market value, so the financed part is
+    not deducted twice
+
+    :param Datetime date: the given moment
+    :param str ktype: the K-line type used to get the position price
+    :return: the haircut in the account currency, 0 when no conversion rate is configured
+    :rtype: float)")
+
+      .def("is_margin_accounted", &TradeManagerBase::isMarginAccounted, py::arg("stock"),
+           R"(is_margin_accounted(self, stock)
+
+    Whether an opening of the stock is booked by the margin accounting instead of the full cash
+
+    :param Stock stock: the security to check
+    :return: True when the opening locks the margin only
+    :rtype: bool)")
+
+      .def("settlement", &TradeManagerBase::settlement, py::arg("date"),
+           py::arg("ktype") = KQuery::DAY,
+           R"(settlement(self, date, ktype="DAY")
+
+    Settle the margin holdings as of the given moment
+
+    Mark each margin-accounted holding to the settlement price (the close of the given K type),
+    post the mark-to-market profit to cash, recompute the locked margin at that price and post the
+    difference, then check the maintenance requirement against equity. A shortfall only warns
+    unless force_liquidate is on, which queues a flattening for the trading system at the next open.
+    Before that check, bill the day interest of outstanding liabilities into the debt (0.0 rates
+    bill nothing). Both halves are gated per calendar day, so settling twice on one day posts
+    nothing again.
+
+    :param Datetime date: the settlement moment, later than or equal to lastDatetime()
+    :param str ktype: the K-line type the settlement price is taken from
+    :return: True when the moment's calendar day ends up settled, False when the account never
+             settles
+    :rtype: bool)")
+
+      .def("is_settled", &TradeManagerBase::isSettled, py::arg("date"),
+           R"(is_settled(self, date)
+
+    Whether the moment's calendar day has entered a settlement batch. Posting and billing are gated
+    independently, so True alone does not mean the holdings were marked that day
+
+    :param Datetime date: the moment to probe
+    :rtype: bool)")
+
+      .def("is_forced_liquidation_queued", &TradeManagerBase::isForcedLiquidationQueued,
+           py::arg("date"),
+           R"(is_forced_liquidation_queued(self, date)
+
+    Whether a forced liquidation is queued as of the given moment
+
+    :param Datetime date: the moment to probe
+    :rtype: bool)")
 
       .def_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
                     &TradeManagerBase::setBrokerLastDatetime,
@@ -350,6 +496,13 @@ Common parameters:
     :param Stock stock: the specified security
     :rtype: bool)")
 
+      .def("have_short", &TradeManagerBase::haveShort, R"(have_short(self, stock)
+
+    Whether the given security is currently held in the short position
+
+    :param Stock stock: the specified security
+    :rtype: bool)")
+
       .def("get_stock_num", &TradeManagerBase::getStockNumber, R"(get_stock_num(self)
 
     The number of the kinds of the securities currently held, i.e. how many stocks are currently held (not the position size of each stock)
@@ -367,6 +520,22 @@ Common parameters:
         :rtype: int)")
 
       .def("get_short_hold_num", &TradeManagerBase::getShortHoldNumber)
+
+      .def("get_debt_number", &TradeManagerBase::getDebtNumber,
+           R"(get_debt_number(self, datetime, stock)
+
+    Get the number of the borrowed shares at the specified moment
+
+    :param Datetime datetime: the specified moment
+    :param Stock stock: the specified security
+    :rtype: float)")
+
+      .def("get_debt_cash", &TradeManagerBase::getDebtCash, R"(get_debt_cash(self, datetime)
+
+    Get the borrowed cash amount at the specified moment
+
+    :param Datetime datetime: the specified moment
+    :rtype: float)")
 
       .def("get_trade_list", _getTradeList_1)
       .def("get_trade_list", _getTradeList_2, R"(get_trade_list(self[, start, end])
@@ -395,6 +564,35 @@ Common parameters:
     Get all the historical position records, i.e. the closed records
 
     :rtype: PositionRecordList)")
+
+      .def("get_short_position_list", &TradeManagerBase::getShortPositionList,
+           R"(get_short_position_list(self)
+
+    Get all the current short position records
+
+    :rtype: PositionRecordList)")
+
+      .def("get_short_history_position_list", &TradeManagerBase::getShortHistoryPositionList,
+           R"(get_short_history_position_list(self)
+
+    Get all the historical short position records, i.e. the closed records
+
+    :rtype: PositionRecordList)")
+
+      .def("get_short_position", &TradeManagerBase::getShortPosition,
+           R"(get_short_position(self, stock)
+
+    Get the current short position record; if not held short, return PositionRecord()
+
+    :param Stock stock: the specified security
+    :rtype: PositionRecord)")
+
+      .def("get_borrow_stock_list", &TradeManagerBase::getBorrowStockList,
+           R"(get_borrow_stock_list(self)
+
+    Get the list of the currently borrowed shares
+
+    :rtype: BorrowRecordList)")
 
       .def("get_position", &TradeManagerBase::getPosition, R"(get_position(self, date, stock)
 
@@ -432,6 +630,26 @@ Common parameters:
       .def("get_return_cash_cost", &TradeManagerBase::getReturnCashCost)
       .def("get_borrow_stock_cost", &TradeManagerBase::getBorrowStockCost)
       .def("get_return_stock_cost", &TradeManagerBase::getReturnStockCost)
+      .def("get_borrow_cash_rate", &TradeManagerBase::getBorrowCashRate, py::arg("date"),
+           R"(get_borrow_cash_rate(self, date)
+
+    Get the annualized interest rate of borrowed cash from the cost model; billed by the daily
+    settlement, prorated by the account's annual_days.
+
+    :param Datetime date: the settled moment
+    :return: an annualized decimal rate, 0.0 bills nothing
+    :rtype: float)")
+
+      .def("get_borrow_stock_rate", &TradeManagerBase::getBorrowStockRate, py::arg("date"),
+           py::arg("stock"),
+           R"(get_borrow_stock_rate(self, date, stock)
+
+    Get the annualized interest rate of a borrowed security, answered by the cost model
+
+    :param Datetime date: the settled moment
+    :param Stock stock:   the borrowed security
+    :return: an annualized decimal rate, 0.0 bills nothing
+    :rtype: float)")
 
       .def("cash", &TradeManagerBase::cash, py::arg("datetime"), py::arg("ktype") = KQuery::DAY,
            R"(cash(self, datetime[, ktype=Query.KType.DAY])
@@ -591,12 +809,51 @@ Common parameters:
     :param string remark:     the trade remark
     :rtype: TradeRecord)")
 
-      .def("buy_short", &TradeManagerBase::buyShort)
-      .def("sell_short", &TradeManagerBase::sellShort)
+      .def(
+        "buy_short", &TradeManagerBase::buyShort, py::arg("datetime"), py::arg("stock"),
+        py::arg("real_price"), py::arg("num") = MAX_DOUBLE, py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
+        py::arg("remark") = "",
+        R"(buy_short(self, datetime, stock, real_price[, num=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
+
+    The short-side buy operation, i.e. closing a short position
+
+    :param Datetime datetime: the trade time
+    :param Stock stock:       the security traded
+    :param float real_price:  the actual trade price
+    :param float num:         the trade quantity; constant.max_double means closing all
+    :param float stoploss:    the stop-loss price
+    :param float goal_price:  the target price
+    :param float plan_price:  the originally planned price
+    :param SystemPart part:   the source of the trading instruction
+    :param string remark:     the trade remark
+    :rtype: TradeRecord)")
+
+      .def(
+        "sell_short", &TradeManagerBase::sellShort, py::arg("datetime"), py::arg("stock"),
+        py::arg("real_price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("plan_price") = 0.0, py::arg("part") = PART_INVALID,
+        py::arg("remark") = "",
+        R"(sell_short(self, datetime, stock, real_price, num[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
+
+    The short-side sell operation, i.e. opening a short position
+
+    :param Datetime datetime: the trade time
+    :param Stock stock:       the security traded
+    :param float real_price:  the actual trade price
+    :param float num:         the trade quantity
+    :param float stoploss:    the stop-loss price
+    :param float goal_price:  the target price
+    :param float plan_price:  the originally planned price
+    :param SystemPart part:   the source of the trading instruction
+    :param string remark:     the trade remark
+    :rtype: TradeRecord)")
 
       .def("add_trade_record", &TradeManagerBase::addTradeRecord, R"(add_trade_record(self, tr)
 
     Add the trade record directly; if the initialization account record is added, all the existing trade and position records will be cleared.
+    Settlement (BUSINESS_SETTLEMENT) and interest (BUSINESS_INTEREST) records come from settlement();
+    a single record cannot reproduce the book state, so manual backfill is rejected and returns False.
 
     :param TradeRecord tr: the trade record
     :return: True (success) | False (failure)

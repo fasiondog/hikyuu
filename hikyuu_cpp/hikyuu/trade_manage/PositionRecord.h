@@ -37,26 +37,33 @@ public:
 
     /**
      * @brief Profit and loss = sell funds - accumulated total trade cost - buy funds
-     * @note It is valid for the closed records only; Null (NaN) is returned for the ones not yet
-     * closed, so callers can tell "unclosed" apart from a genuine zero profit
+     * @note Valid for closed records only; unclosed ones return Null (NaN), distinguishing them
+     *       from a genuine zero profit
      */
     price_t totalProfit() const;
 
-    Stock stock;              ///< Trading object
-    Datetime takeDatetime;    ///< Date of the first position opening
-    Datetime cleanDatetime;   ///< Closing date, it is Null<Datetime>() in the current position
-                              ///< records
-    double number{0.0};       ///< Current held quantity
-    price_t stoploss{0.0};    ///< Current stop-loss price
-    price_t goalPrice{0.0};   ///< Current target price
-    double totalNumber{0.0};  ///< Accumulated held quantity
-    price_t buyMoney{0.0};    ///< Accumulated buy funds
-    price_t totalCost{0.0};   ///< Accumulated total trade cost
-    price_t totalRisk{0.0};   ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
-                              ///< quantity, excluding the trade cost
-    price_t sellMoney{0.0};   ///< Accumulated sell funds
-    size_t buyCount{0};       ///< Number of buys
-    size_t sellCount{0};      ///< Number of sells
+    Stock stock;               ///< Trading object
+    Datetime takeDatetime;     ///< Date of the first position opening
+    Datetime cleanDatetime;    ///< Closing date, it is Null<Datetime>() in the current position
+                               ///< records
+    double number{0.0};        ///< Current held quantity
+    price_t stoploss{0.0};     ///< Current stop-loss price
+    price_t goalPrice{0.0};    ///< Current target price
+    double totalNumber{0.0};   ///< Accumulated held quantity
+    price_t buyMoney{0.0};     ///< Accumulated buy funds
+    price_t totalCost{0.0};    ///< Accumulated total trade cost
+    price_t totalRisk{0.0};    ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
+                               ///< quantity, excluding the trade cost
+    price_t sellMoney{0.0};    ///< Accumulated sell funds
+    price_t margin{0.0};       ///< Margin locked by the holding in account currency; 0 means plain
+                               ///< cash accounting
+    price_t openBasis{0.0};    ///< Opening notional of held lots (price x number x unit), the cost
+                               ///< reference, released proportionally as the lots close
+    price_t settleBasis{0.0};  ///< Mark-to-market basis of held lots, rolled to the settlement price
+                               ///< each settlement; measures realized profit and margin-holding
+                               ///< equity; equals openBasis until the first settlement
+    size_t buyCount{0};        ///< Number of buys
+    size_t sellCount{0};       ///< Number of sells
 
 //===================
 // Serialization support
@@ -83,6 +90,15 @@ private:
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
         ar& BOOST_SERIALIZATION_NVP(buyCount);
         ar& BOOST_SERIALIZATION_NVP(sellCount);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(margin);
+        }
+        if (version >= 2) {
+            ar& BOOST_SERIALIZATION_NVP(openBasis);
+        }
+        if (version >= 3) {
+            ar& BOOST_SERIALIZATION_NVP(settleBasis);
+        }
     }
 
     template <class Archive>
@@ -106,6 +122,23 @@ private:
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
         ar& BOOST_SERIALIZATION_NVP(buyCount);
         ar& BOOST_SERIALIZATION_NVP(sellCount);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(margin);
+        }
+        if (version >= 2) {
+            ar& BOOST_SERIALIZATION_NVP(openBasis);
+        } else {
+            // Old archives lack this basis; rebuild the best-effort value from the former averaged
+            // formula to keep them readable
+            price_t notional = buyMoney > 0.0 ? buyMoney : sellMoney;
+            openBasis = totalNumber > 0.0 ? notional * (number / totalNumber) : 0.0;
+        }
+        if (version >= 3) {
+            ar& BOOST_SERIALIZATION_NVP(settleBasis);
+        } else {
+            // Before mark-to-market, the opening notional served both roles
+            settleBasis = openBasis;
+        }
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -124,6 +157,13 @@ HKU_API std::ostream& operator<<(std::ostream&, const PositionRecord&);
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2);
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = the archives without the margin field (plain cash accounting)
+// 1 = the margin field, 2 = the remaining opening cost basis
+// 3 = the mark-to-market basis (settleBasis, it equals openBasis before the first settlement)
+BOOST_CLASS_VERSION(::hku::PositionRecord, 3)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>

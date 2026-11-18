@@ -147,3 +147,6 @@ wget-*
 hikyuu/cpp/i18n/zh_CN/hikyuu_plugin.mo
 soft_copyright_application
 compile_commands.json
+
+# multi-market test data fixture 的取数中间缓存（只提交生成的 .h5，不提交原始行情）
+test_data/downloads/multi_market/

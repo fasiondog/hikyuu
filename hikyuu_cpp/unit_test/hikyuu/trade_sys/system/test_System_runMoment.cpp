@@ -14,7 +14,7 @@
 #include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crtTM.h>
 
 using namespace hku;
 

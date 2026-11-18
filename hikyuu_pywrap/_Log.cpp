@@ -23,8 +23,8 @@ void export_log(py::module& m) {
       .export_values();
 
     m.def(
-      "initLogger", initLogger,
-      py::arg("not_use_color") = false, py::arg("filename") = std::string(),
+      "initLogger", initLogger, py::arg("not_use_color") = false,
+      py::arg("filename") = std::string(),
       "Initialize (or replace) the logger; not_use_color disables the colored output, and an empty "
       "filename defaults to ./hikyuu.log in the current directory.\n\n"
       "Call it once at startup, before starting worker threads. Repeated calls are thread-safe, "

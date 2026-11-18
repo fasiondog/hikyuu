@@ -27,6 +27,21 @@ struct H5Record {
     uint64_t transCount;
 };
 
+/**
+ * K-line record stored at API scale in floating point (non-A-share markets).
+ * Prices are direct price_t values, transAmount is in ten-thousand-yuan and transCount in
+ * lots/shares; no ×0.001 / ×0.1 scaling is applied on read.
+ */
+struct H5RecordF64 {
+    uint64_t datetime;
+    double openPrice;
+    double highPrice;
+    double lowPrice;
+    double closePrice;
+    double transAmount;
+    double transCount;
+};
+
 struct H5IndexRecord {
     uint64_t datetime;
     uint64_t start;

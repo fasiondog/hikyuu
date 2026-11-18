@@ -6,9 +6,9 @@
  */
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA2015.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA2015.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA2017.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
 
 using namespace hku;
 

@@ -428,6 +428,8 @@ replacement", we have not seen a second implementation among publicly visible op
 > The data layer supports four storage backends: **HDF5 / MySQL / ClickHouse / SQLite** (HDF5 by default;
 > ClickHouse comes as a plugin — it reads and writes minute-level data faster than HDF5 and uses far less
 > space than MySQL, fitting minute-level and higher-frequency data better).
+>
+> Multi-market data: several markets can be registered in the same `StockManager` (per-market timezone / holiday / dimension conventions, with a unified time expression on read), and `net_assets()` is the cross-market funds caliber; current boundaries — the SQLite backend supports K-lines only and needs an independent database file per market per ktype, futures backtesting has no mark-to-market or forced liquidation, and cross-currency markets must be pre-converted to a base currency on the data side; see [Multi-Market Data](https://hikyuu-en.readthedocs.io/en/latest/multimarket.html).
 
 <p align="center">
   <img src="docs/en/_static/10002-function-arc.png" alt="Functional architecture" width="800">

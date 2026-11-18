@@ -11,8 +11,8 @@
 
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/Performance.h>
-#include <hikyuu/trade_manage/crt/TC_Zero.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/crtTM.h>
 
 using namespace hku;
 

@@ -10,7 +10,7 @@
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: 交易业务类型
-    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"|"RETURN_STOCK"|"SUOGU"|"BORROW_ADJUST"|"SHORT_ADJUST"|"DIVIDEND_COMPENSATION"|"UNKNOWN")
+    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"|"RETURN_STOCK"|"SUOGU"|"BORROW_ADJUST"|"SHORT_ADJUST"|"DIVIDEND_COMPENSATION"|"SETTLEMENT"|"INTEREST"|"UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS    
@@ -34,6 +34,8 @@
     - BUSINESS.BORROW_ADJUST  - 借入股票数量调整（除权送股/缩股）
     - BUSINESS.SHORT_ADJUST   - 卖空持仓数量调整（除权送股/缩股）
     - BUSINESS.DIVIDEND_COMPENSATION - 红利补偿（卖空向出借方支付的现金）
+    - BUSINESS.SETTLEMENT     - 保证金持仓逐日结算（结算价与盯市基准之差计入盈亏），见 :doc:`margin`
+    - BUSINESS.INTEREST       - 负债按日计提的利息（计入负债本身，不从现金支付），见 :doc:`margin`
     - BUSINESS.INVALID        - 无效类型
 
 
@@ -91,9 +93,20 @@
         
     .. py:attribute:: stoploss 止损价（float）
     .. py:attribute:: cash     现金余额（float）
+    .. py:attribute:: margin   本次开仓锁定的保证金（float），仅保证金记账的买入/卖空开仓非 0，以便回放还原账面；``SETTLEMENT`` 记录中为结算后重算的锁定额
     .. py:attribute:: part     
     
         交易指示来源，区别是交易系统哪个部件发出的指示，参见： :py:class:`System.Part`
+
+    .. note::
+
+        逐日结算记录（``BUSINESS.SETTLEMENT``）不是成交：``real_price`` 为结算价，``number`` 带方向
+        （多头为正、空头为负，用于区分同一标的的多空持仓），``cash`` 为过账后的现金余额，``cost`` 为 0，
+        ``part`` 为无效部件（``System.Part.INVALID``）。
+
+        利息计提记录（``BUSINESS.INTEREST``）同样不是成交：每个负债项每日一条，``real_price`` 为计提金额，
+        ``number`` 为借券数量（融资利息为 0，与 ``BORROW_CASH`` 同口径），``stock`` 为对应标的（融资利息为空
+        证券），``margin`` 为 0。
 
     
 
@@ -132,6 +145,9 @@
     .. py:attribute:: total_cost   累计交易总成本（float）
     .. py:attribute:: total_risk   累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     .. py:attribute:: sell_money   累计卖出资金（float）
+    .. py:attribute:: margin       当前锁定的保证金（float），0 表示现金记账（见 :doc:`margin`）
+    .. py:attribute:: open_basis   仍持仓批次的开仓名义金额（float）= 开仓价 × 数量 × unit，平仓时按数量比例释放，仅作成本参考
+    .. py:attribute:: settle_basis 仍持仓批次的盯市基准（float）；逐日结算时滚动到结算价，首次结算前等于 open_basis，是已实现盈亏与保证金持仓权益的计算基准
 
     
 资产情况记录
@@ -150,6 +166,7 @@
     .. py:attribute:: base_asset         当前投入的资产价值（float）
     .. py:attribute:: borrow_cash        当前借入的资金（float），即负债
     .. py:attribute:: borrow_asset       当前借入证券资产价值（float）
+    .. py:attribute:: occupied_margin    保证金持仓锁定的保证金合计（float），其权益贡献已计入 market_value
 
     只读属性，自动根据上面的属性计算得到的结果:
 

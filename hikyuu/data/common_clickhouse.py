@@ -29,7 +29,7 @@ from pathlib import Path
 import clickhouse_connect
 
 from hikyuu import Datetime, UTCOffset
-from hikyuu.data.common import get_stktype_list, get_new_holidays
+from hikyuu.data.common import CN_HOLIDAY_MARKETS, get_stktype_list, get_new_holidays
 from hikyuu.util import hku_catch, hku_debug, hku_info
 
 
@@ -59,7 +59,8 @@ def create_database(connect):
                 try:
                     connect.command(stmt)
                 except Exception as e:
-                    print(f"执行失败: {stmt[:30]}... 错误: {e}")
+                    # upgrade failure must abort: the script tail advances version; silent run lets it never rerun
+                    raise RuntimeError(f"execute failed: {stmt[:60]}... error: {e}") from e
 
     db_version = get_db_version(connect)
     files = [x for x in Path(sql_dir).iterdir()
@@ -77,7 +78,8 @@ def create_database(connect):
                 try:
                     connect.command(stmt)
                 except Exception as e:
-                    print(f"执行失败: {stmt[:30]}... 错误: {e}")
+                    # upgrade failure must abort: the script tail advances version; silent run lets it never rerun
+                    raise RuntimeError(f"execute failed: {stmt[:60]}... error: {e}") from e
 
 
 def get_codepre_list(connect, market, quotations):
@@ -99,15 +101,20 @@ def get_stock_list(connect, market, quotations):
 
 
 def import_new_holidays(connect):
-    """导入新的交易所休假日历"""
-    last_date = connect.command("select date from `hku_base`.`holiday` order by date desc limit 1")
-    last_date = last_date if type(last_date) == int else 19901219
-    holidays = get_new_holidays()
-    new_holidays = [(int(v),) for v in holidays if int(v) > last_date]
-    if new_holidays:
-        ic = connect.create_insert_context(table='holiday', database='hku_base',
-                                           data=new_holidays)
-        connect.insert(context=ic)
+    """Import a new exchange holiday calendar (written per market; the data source covers China only)"""
+    # MergeTree does not dedup; duplicate dates write multiple rows - dedup to stay consistent with sqlite/mysql
+    holidays = sorted({int(v) for v in get_new_holidays()})
+    for market in CN_HOLIDAY_MARKETS:
+        last_date = connect.command(
+            "select date from `hku_base`.`holiday` where market='{}' order by date desc limit 1"
+            .format(market))
+        last_date = last_date if type(last_date) == int else 19901219
+        new_holidays = [(market, v) for v in holidays if v > last_date]
+        if new_holidays:
+            ic = connect.create_insert_context(table='holiday', database='hku_base',
+                                               column_names=['market', 'date'],
+                                               data=new_holidays)
+            connect.insert(context=ic)
 
 
 def get_table(connect, market, code, ktype):
@@ -134,12 +141,19 @@ def get_table(connect, market, code, ktype):
         'transdata': 'transdata',
     }
     nktype = ktype_dict[ktype.lower()]
+    nmarket = market.upper()
     if nktype == 'timeline':
-        return (f'hku_data.timeline', market.upper(), code.upper())
+        return (f'hku_data.timeline', nmarket, code.upper())
     elif nktype == 'transdata':
-        return (f'hku_data.transdata', market.upper(), code.upper())
+        return (f'hku_data.transdata', nmarket, code.upper())
     else:
-        return (f'hku_data.{nktype}_k', market.upper(), code.upper())
+        suffix = '' if nmarket in ('SH', 'SZ', 'BJ') else '_f64'
+        return (f'hku_data.{nktype}_k{suffix}', nmarket, code.upper())
+
+
+def is_f64_kline_table(tablename):
+    """K 线表名是否指向 Float64 表"""
+    return tablename.endswith('_f64')
 
 
 @hku_catch(ret=None)
@@ -162,6 +176,9 @@ def get_last_krecord(connect, tablename):
         # hku_info(f"{tablename} {a}")
         if not a:
             return None
+        if is_f64_kline_table(tablename[0]):
+            return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, float(a[0][1]), float(a[0][2]),
+                    float(a[0][3]), float(a[0][4]), float(a[0][5]), float(a[0][6]))
         return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, a[0][1]*0.001, a[0][2]*0.001, a[0][3]*0.001, a[0][4]*0.001, float(a[0][5]), a[0][6]*0.001)
     except:
         return None

@@ -53,6 +53,8 @@ static std::optional<PartType> partTypeFromParamType(const string& type) {
         return PartType::TM;
     } else if (type == "TradeCost") {
         return PartType::TC;
+    } else if (type == "Margin") {
+        return PartType::MG;
     }
     return std::nullopt;
 }

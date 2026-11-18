@@ -35,7 +35,7 @@ double FixedUnitsMoneyManager::_getBuyNumber(const Datetime& datetime, const Sto
     price_t cash = m_tm->cash(datetime, m_query.kType());
     price_t fixed_risk = (cash > m_tm->initCash()) ? cash / n : m_tm->initCash() / n;
 
-    return fixed_risk / risk;
+    return fixed_risk / m_tm->toAccount(stock, risk);
 }
 
 double FixedUnitsMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
@@ -46,7 +46,7 @@ double FixedUnitsMoneyManager::_getSellShortNumber(const Datetime& datetime, con
     price_t assets = m_tm->getFunds(datetime, m_query.kType()).net_assets();
     price_t fixed_risk = (assets > m_tm->initCash()) ? assets / n : m_tm->initCash() / n;
 
-    return fixed_risk / risk;
+    return fixed_risk / m_tm->toAccount(stock, risk);
 }
 
 MoneyManagerPtr HKU_API MM_FixedUnits(int n) {

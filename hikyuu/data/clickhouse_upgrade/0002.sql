@@ -6,4 +6,4 @@ UPDATE `minTradeNumber` = CASE
 END
 WHERE (`type` = 9 AND `description` = '科创板') 
    OR (`type` = 11 AND `description` = '北交所');
-ALTER TABLE `hku_base`.`version` UPDATE `version`=2 WHERE `id`=0;
+ALTER TABLE `hku_base`.`version` UPDATE `version`=2 WHERE `id`=0 SETTINGS mutations_sync = 1;

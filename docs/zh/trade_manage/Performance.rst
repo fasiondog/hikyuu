@@ -7,6 +7,8 @@
 .. py:class:: Performance
 
     简单绩效统计
+
+    所有金额类指标均为账户计价货币（多币种账户由交易管理实例统一折算）。
     
     .. py:method:: reset(self)
     

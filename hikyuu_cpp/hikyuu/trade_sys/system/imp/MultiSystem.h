@@ -21,7 +21,9 @@
  *    every sub-system keeps submitting its position intent; on the sampling day
  *    the parent reads the selected ones' current net exposure snapshot and synthesizes one
  *    per-instrument signed net target by the L2 conversion (weight x net exposure ratio x the
- * parent net assets), then orders uniformly on its own account. The shadow bookkeeping never
+ * parent net assets), then orders uniformly on its own account. The ratio is reported unchanged
+ * (a levered shadow can exceed its own equity); the channel bound belongs to AF and is configured
+ * there (`max_signal_ratio`). The shadow bookkeeping never
  * touches the real funds.
  *
  *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
@@ -65,20 +67,36 @@
  *
  *  Serialization restores the shadow-account registry and the scheduling counters, so a loaded
  *  system can continue with run(reset=false); the mode C running pools are rebuilt on the next
- *  rebalancing day.
+ *  rebalancing day. The lag visibility state (the driven-axis history and the frozen gates) is
+ *  runtime-only: after a load the lag members re-warm it up and are skipped on the following lag
+ *  axis days (their legs fall back to the last driven bar, so the books stay monotonic).
+ *
+ *  Cross-market day visibility (the data_lag of the member market): on a daily (or above) driving
+ *  axis, a leaf member is driven at its member-visible bar instead of the raw axis day -- the
+ *  latest bar of its own trading object at or before the axis day shifted back by the member
+ *  market data_lag trading days (the US D-day close thus becomes visible and executable on the
+ *  base axis D+1). A member without a new visible bar on the axis day is skipped (frozen at its
+ *  last visible close), while the portfolio itself still advances: the fills happen only on the
+ *  legs with a bar, the member/shadow books keep the member-visible time, and the parent account
+ *  books at the axis day (the calibration and liquidation legs on a shadow book are booked at the
+ *  member-visible time too, so the member's own fills never trip that book's datetime
+ *  monotonicity). The mode C members are excluded (a shared account cannot book at the
+ *  member time without violating the TM datetime monotonicity), and the minute axes never take
+ *  the lag (they are tz-unified instead).
  *
  *  See the doc comments of AllocateFundsBase for the precise L1/L2/L3 semantics and PF_Simple /
  *  PF_WithoutAF for the preset configurations of the modes.
  */
 
 #pragma once
+#include <deque>
 #include <list>
 #include <map>
 #include <set>
 #include <unordered_map>
 #include "hikyuu/utilities/Log.h"
 #include "../System.h"
-#include "../../../trade_manage/crt/crtTM.h"
+#include "../../../trade_manage/crtTM.h"
 #include "../../moneymanager/crt/MM_Nothing.h"
 #include "../../allocatefunds/crt/AF_EqualWeight.h"
 
@@ -713,14 +731,63 @@ private:
     /** Get the KData of the instrument within the run query (with the per-run cache) */
     KData _getStockKData(const Stock& stock);
 
+    /** Note one driven axis day (idempotent): the rolling history feeds the trading-day lag target
+     *  ("the axis day lag steps before d"), kept bounded by the largest member lag + 1 */
+    void _noteAxisDate(const Datetime& date);
+
+    /** The largest data_lag among the direct leaf members (the nested aggregates shift their own
+     *  leaves); also warms the per-member lag cache */
+    int _maxMemberLag();
+
+    /** The data_lag of the member market in trading days, resolved once and cached; the shared
+     *  resolution keeps the axis-history cap and the drive-date target lookup from ever diverging.
+     *  Precondition: sys is non-null and its stock is not null */
+    int _memberLagOf(const SystemPtr& sys);
+
+    /** Resolve the member-visible drive date of the axis day: the latest bar of the member trading
+     *  object at or before the axis day shifted back by the member market data_lag trading days.
+     *  The decision is cached per axis day (the open and the close stage share one decision); a
+     *  member without a new visible bar since its last drive is frozen (Null = skip). The mode C
+     *  members and the minute axes are passed through unchanged, and a nested aggregate is driven
+     *  at the raw axis day (it shifts its own leaves recursively) */
+    Datetime _memberDriveDate(const SystemPtr& sys, const Datetime& date);
+
+    /** Whether sys lives anywhere in this aggregate's sub-system tree (the aggregate itself is not
+     *  included) */
+    bool _containsMember(const SystemPtr& sys) const;
+
+    /** The direct child aggregate containing sys, or null when sys is a direct member of this
+     *  instance (its legs are booked here with this instance's own axis history) */
+    MultiSystem* _memberAggregate(const SystemPtr& sys);
+
+    /** The datetime a sub-account (shadow book) leg books at: the member's drive decision of the
+     *  axis day; a frozen member books at its last driven bar, and a member never driven yet (the
+     *  warm-up days, no axis history depth) books at the bar its first drive will use. This keeps
+     *  the calibration / liquidation legs of a rebalancing day from tripping the member book's own
+     *  datetime monotonicity. Mode C, the minute axes and the nested aggregates resolve to the raw
+     *  axis day (their legs book exactly as before); a leaf of a nested aggregate is resolved by
+     *  the aggregate that drives it */
+    Datetime _subLegDate(const SystemPtr& sys, const Datetime& date);
+
+    /** Drive the member at its visible date (the lag shift, see the class comment); an empty
+     *  result means the member is frozen on this axis day */
+    MomentResult _driveMemberOnOpen(const SystemPtr& sys, const Datetime& date);
+    MomentResult _driveMemberOnClose(const SystemPtr& sys, const Datetime& date);
+
     /** Force selling the parent holdings of the delisted instrument at the open stage (delisting =
      * the last trading day of the instrument is earlier than the current running date) */
     TradeRecordList _forceSellDelisted(const Datetime& date);
 
-    /** Flatten the delisted instrument recursively over the sub-system books (a dead instrument
-     *  can never be traded again and would keep distorting the quota calibration) */
-    void _clearDelistedInSubTree(const SystemPtr& sys, const Stock& stock, const Datetime& date,
-                                 price_t price);
+    /** Force closing the parent book at the open when the last settlement armed a margin call
+     *  (force_liquidate), returning the flattening records. The aggregate bypasses the System
+     *  open/close hooks, so this is the parent-side counterpart of System::_liquidateOnOpen. */
+    TradeRecordList _liquidateParentOnOpen(const Datetime& date);
+
+    /** Flatten the instrument recursively over the sub-system books (a dead instrument can never
+     *  be traded again and would keep distorting the quota calibration; a margin-called position
+     *  must not survive on the shadow books once the parent no longer holds it) */
+    void _clearStockInSubTree(const SystemPtr& sys, const Stock& stock, const Datetime& date,
+                              price_t price, const string& remark);
 
     /** Drop the queued batch kept for the next open (the batch and its bookkeeping, the calibration
      *  legs are left untouched) */
@@ -793,23 +860,23 @@ private:
     bool m_external_quota_set{false};
     bool m_external_delegate_notified{false};  // The once-per-instance notice of the nested B
                                                // fallback when the inner cannot consume the budget
-    bool m_multi_parent_warned{false};       // A child driven by another aggregate is warned once
-    bool m_not_ready_warned{false};          // Driving without readyForRun is warned once
+    bool m_multi_parent_warned{false};         // A child driven by another aggregate is warned once
+    bool m_not_ready_warned{false};            // Driving without readyForRun is warned once
     bool m_external_quota_capped_notified{false};  // The once-per-instance notice of the delegated
                                                    // quota capped by the inner reserve
-    bool m_pending_calibration_retry{false};     // The pending calibration is a retry of a previous
-                                                 // suspension, exempt from the cross-day drop
-    Datetime m_open_turnover_date;               // The rebalancing close whose mode C open fills
+    bool m_pending_calibration_retry{false};  // The pending calibration is a retry of a previous
+                                              // suspension, exempt from the cross-day drop
+    Datetime m_open_turnover_date;            // The rebalancing close whose mode C open fills
                                     // carry the turnover (trade_on_close=false); the modes
                                     // A/B attribute through m_open_pending_adjust
-    double m_open_turnover_assets{0.0};     // The assets before that close stage
-    bool m_open_pending_notified{false};    // The once-per-instance notice of the cross-day pending
-                                            // backlog (runtime state, not serialized)
+    double m_open_turnover_assets{0.0};   // The assets before that close stage
+    bool m_open_pending_notified{false};  // The once-per-instance notice of the cross-day pending
+                                          // backlog (runtime state, not serialized)
     bool m_inject_truncated_notified{false};  // The once-per-instance notice of the parent-cash
                                               // truncation of the mode B gap injection (runtime
                                               // state, not serialized)
-    std::set<System*> m_shadow_sys;         // The sub-systems whose shadow account has been created
-                                            // (runtime, not serialized)
+    std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
+                                     // (runtime, not serialized)
     // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides
     // who gets the shared cash first (the cash competition order of the legacy Portfolio);
     // m_running_set is the membership index of the very same content.
@@ -844,10 +911,27 @@ private:
                                         // reduction skip warning (runtime state, not serialized)
     bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota
                                         // injection skip warning (runtime state, not serialized)
+    bool m_cover_cash_warned{false};    // The once-per-instance flag of the short cover cash
+                                        // shortfall warning (runtime state, not serialized)
     bool m_no_se_cycle_warned{false};   // The once-per-instance flag of the mode C without SE cycle
                                         // silence warning (runtime state, not serialized)
     bool m_adjust_cycle_warned{false};  // The once-per-configuration flag of the out-of-range
                                         // adjust_cycle warning (runtime state, not serialized)
+    bool m_axis_rollback_warned{false};  // The once-per-instance flag of the out-of-order axis
+                                         // rebuild warning (runtime state, not serialized)
+    // The lag visibility runtime states (not serialized): the last bar each member was driven at,
+    // the per-axis-day drive decision cache (the open and the close stage share one decision),
+    // the rolling driven axis days for the trading-day lag target (capped at the max lag + 1),
+    // and the per-member data_lag cache
+    std::unordered_map<System*, Datetime> m_last_driven_bar;
+    std::unordered_map<System*, std::pair<Datetime, Datetime>> m_member_drive_cache;
+    std::deque<Datetime> m_axis_history;
+    std::unordered_map<System*, int> m_member_lag;
+    // The daily-or-above flag of the current driving context's ktype, resolved once per ktype (the
+    // minute axes never take the lag; the ktype lookup warns on unknown names and must not repeat
+    // per member and stage). Runtime state, not serialized.
+    KQuery::KType m_lag_axis_ktype;
+    bool m_lag_axis_daily_plus{true};
 
 //========================================
 // Serialization support

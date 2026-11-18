@@ -85,6 +85,77 @@ static void registerPredefinedExtraKType() {
     }
 }
 
+/* Split a ';' separated load scope text, blank entries and spaces are dropped */
+static void splitLoadScopeText(const string& text, vector<string>& items) {
+    string current;
+    for (const auto ch : text) {
+        if (ch == ';' || ch == ',' || ch == ' ' || ch == '\t') {
+            if (!current.empty()) {
+                items.push_back(current);
+                current.clear();
+            }
+        } else {
+            current.push_back(ch);
+        }
+    }
+    if (!current.empty()) {
+        items.push_back(current);
+    }
+}
+
+/* Normalize a security code for load scope matching: uppercase with the '/' removed */
+static string normalizeLoadScopeCode(const string& code) {
+    string result(code);
+    to_upper(result);
+    result.erase(std::remove(result.begin(), result.end(), '/'), result.end());
+    return result;
+}
+
+void StockManager::setLoadScope(const vector<string>& marketList, const vector<int>& typeList) {
+    // Only the raw text is stored; the empty / "ALL" semantics live in the consumers
+    string markets;
+    for (const auto& market : marketList) {
+        if (!markets.empty()) {
+            markets.push_back(';');
+        }
+        markets += market;
+    }
+
+    string types;
+    for (const auto& type : typeList) {
+        if (!types.empty()) {
+            types.push_back(';');
+        }
+        types += std::to_string(type);
+    }
+
+    m_hikyuuParam.set("load_market_list", markets);
+    m_hikyuuParam.set("load_stock_type_list", types);
+}
+
+bool StockManager::_hasLoadScope() const {
+    vector<string> items;
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_market_list", ""), items);
+    for (const auto& item : items) {
+        string upper_item(item);
+        to_upper(upper_item);
+        if (upper_item != "ALL") {
+            return true;
+        }
+    }
+
+    items.clear();
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_stock_type_list", ""), items);
+    for (const auto& item : items) {
+        try {
+            (void)std::stoi(item);
+            return true;
+        } catch (...) {
+        }
+    }
+    return false;
+}
+
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam, const StrategyContext& context) {
@@ -468,13 +539,13 @@ void StockManager::loadAllKData() {
     });
 }
 
-void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes,
+void StockManager::_loadAllKDataSafely(const vector<KQuery::KType>& ktypes,
                                        const vector<string>& low_ktypes, bool parallel) {
     try {
         if (parallel) {
-            _loadAllKDataParallel(std::move(ktypes), low_ktypes);
+            _loadAllKDataParallel(ktypes, low_ktypes);
         } else {
-            _loadAllKDataSerial(std::move(ktypes), low_ktypes);
+            _loadAllKDataSerial(ktypes, low_ktypes);
         }
     } catch (const std::exception& e) {
         HKU_ERROR("Failed preload kdata: {}", e.what());
@@ -487,7 +558,7 @@ void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes,
     }
 }
 
-void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes,
+void StockManager::_loadAllKDataSerial(const vector<KQuery::KType>& ktypes,
                                        const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side (through LoadEvent and its own polling);
     // loaded/total is no longer counted here
@@ -549,7 +620,7 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes,
     m_data_ready.store(true, std::memory_order_release);
 }
 
-void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
+void StockManager::_loadAllKDataParallel(const vector<KQuery::KType>& ktypes,
                                          const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side; loaded/total is no longer counted here
     bool bulk_finance_done = false;
@@ -644,7 +715,7 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
 std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
   const vector<KQuery::KType>& ktypes, bool& bulk_finance_done) {
     std::unordered_set<string> loaded_codes;
-    HKU_IF_RETURN(!m_context.isAll(), loaded_codes);
+    HKU_IF_RETURN(!m_context.isAll() || _hasLoadScope(), loaded_codes);
     auto driver = _getKDataDriverPool();
     HKU_IF_RETURN(!driver || !driver->getPrototype()->isColumnFirst(), loaded_codes);
 
@@ -691,6 +762,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 
         auto k = sh000001.getKRecord(0, ktypes[i]);
         if (k.isValid()) {
+            bool intraday = KQuery::isIntradayKType(ktypes[i]);
             auto datas =
               driver->getConnect()->getAllKRecordList(ktypes[i], k.datetime, m_cancel_load);
             if (!datas.empty() && !m_cancel_load) {
@@ -701,6 +773,9 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
                     }
                     auto date_iter = datas.find(iter->second.market_code());
                     if (date_iter != datas.end()) {
+                        if (intraday && !getMarketInfo(iter->second.market()).isUnifiedClock()) {
+                            continue;
+                        }
                         iter->second.loadKDataToBufferFromKRecordList(ktypes[i],
                                                                       std::move(date_iter->second));
                         loaded_codes.insert(iter->second.market_code());
@@ -793,6 +868,8 @@ Stock StockManager::getStock(const string& querystr) const {
         std::string prefix = query_str.substr(0, pos);
         query_str = suffix + prefix;
     }
+    // The CRYPTO market_code carries a slash (BINANCE/BTCUSDT) while the dictionary key does not
+    query_str.erase(std::remove(query_str.begin(), query_str.end(), '/'), query_str.end());
     std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
     return (iter != m_stockDict.end()) ? iter->second : result;
@@ -820,27 +897,16 @@ StockList StockManager::getStockList(std::function<bool(const Stock&)>&& filter)
     return ret;
 }
 
-MarketInfo StockManager::getMarketInfo(const string& market) const noexcept {
-    MarketInfo result;
+const MarketInfo& StockManager::getMarketInfo(const string& market) const noexcept {
     string market_tmp = market;
     to_upper(market_tmp);
 
     auto iter = m_marketInfoDict.find(market_tmp);
-    if (iter != m_marketInfoDict.end()) {
-        result = iter->second;
-    } else {
-        HKU_ERROR_IF_RETURN(!m_baseInfoDriver, result,
-                            "The base info driver is not initialized!");
-        result = m_baseInfoDriver->getMarketInfo(market_tmp);
-        if (result != Null<MarketInfo>()) {
-            m_marketInfoDict[market_tmp] = result;
-        }
-    }
-    return result;
+    return iter != m_marketInfoDict.end() ? iter->second : MarketInfo::NullMarketInfo;
 }
 
 Stock StockManager::getMarketStock(const string& market) const {
-    auto market_info = getMarketInfo(market);
+    const auto& market_info = getMarketInfo(market);
     return getStock(fmt::format("{}{}", market_info.market(), market_info.code()));
 }
 
@@ -956,8 +1022,8 @@ BlockList StockManager::getStockBelongs(const Stock& stk, const string& category
 }
 
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
-    auto marketinfo = getMarketInfo(market);
-    HKU_WARN_IF_RETURN(marketinfo == Null<MarketInfo>(), DatetimeList(), "{}: {}!",
+    const auto& marketinfo = getMarketInfo(market);
+    HKU_WARN_IF_RETURN(!marketinfo.isValid(), DatetimeList(), "{}: {}!",
                        htr("Not found market info"), market);
     return getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()))
       .getDatetimeList(query);
@@ -993,23 +1059,80 @@ const ZhBond10List& StockManager::getZhBond10() const {
 }
 
 bool StockManager::isHoliday(const Datetime& d) const {
-    HKU_IF_RETURN(d.dayOfWeek() == 0 || d.dayOfWeek() == 6, true);
-    return m_holidays.count(d.startOfDay());
+    return isHoliday(d, "SH");
+}
+
+bool StockManager::isHoliday(const Datetime& d, const string& market) const {
+    string code(market);
+    to_upper(code);
+    if (d.dayOfWeek() == 0 || d.dayOfWeek() == 6) {
+        return _weekendIsHoliday(code);
+    }
+    auto iter = m_holidays.find(code);
+    return iter != m_holidays.end() && iter->second.count(d.startOfDay()) > 0;
+}
+
+bool StockManager::_weekendIsHoliday(const string& market) const {
+    {
+        std::shared_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
+        auto iter = m_weekend_holiday.find(market);
+        if (iter != m_weekend_holiday.end()) {
+            return iter->second;
+        }
+    }
+
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_IF_RETURN(!marketinfo.isValid(), true);
+
+    // The 24h crypto markets trade through weekends; a missing index keeps the default uncached
+    Stock index = getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()));
+    HKU_IF_RETURN(index.isNull(), true);
+
+    bool weekend_holiday = index.type() != STOCKTYPE_CRYPTO;
+    std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
+    m_weekend_holiday[market] = weekend_holiday;
+    return weekend_holiday;
+}
+
+Datetime StockManager::marketLocalToUnified(const Datetime& d, const string& market) const {
+    HKU_CHECK(!market.empty(), "The market can not be empty!");
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo.isValid(), "{}: {}!", htr("Not found market info"), market);
+    return marketinfo.localToUnified(d);
+}
+
+Datetime StockManager::unifiedToMarketLocal(const Datetime& d, const string& market) const {
+    HKU_CHECK(!market.empty(), "The market can not be empty!");
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo.isValid(), "{}: {}!", htr("Not found market info"), market);
+    return marketinfo.unifiedToLocal(d);
 }
 
 bool StockManager::isTradingHours(const Datetime& d, const string& market) const {
-    HKU_IF_RETURN(isHoliday(d), false);
-    auto hour = d - d.startOfDay();
-    MarketInfo marketinfo = getMarketInfo(market);
-    HKU_CHECK(marketinfo != Null<MarketInfo>(), "{}: {}!", htr("Not found market info"), market);
-    HKU_IF_RETURN((hour >= marketinfo.openTime1() && hour <= marketinfo.closeTime1()) ||
-                    (hour >= marketinfo.openTime2() && hour <= marketinfo.closeTime2()),
+    const MarketInfo& marketinfo = getMarketInfo(market);
+    HKU_CHECK(marketinfo.isValid(), "{}: {}!", htr("Not found market info"), market);
+    // d follows the unified clock convention; the session bounds are market-local wall clock
+    Datetime local = marketinfo.isUnifiedClock() ? d : marketinfo.unifiedToLocal(d);
+    HKU_IF_RETURN(isHoliday(local, market), false);
+    // Same convention as Stock::isTransactionTime: equal session bounds mean unlimited (24h)
+    HKU_IF_RETURN(marketinfo.openTime1() == marketinfo.closeTime1() &&
+                    marketinfo.openTime2() == marketinfo.closeTime2(),
+                  true);
+    auto hour = local - local.startOfDay();
+    // A session pair with equal bounds means it is not configured: skip it instead of treating
+    // midnight as a tradable moment (the 24h case is short-circuited above)
+    auto in_session = [](const TimeDelta& open, const TimeDelta& close, const TimeDelta& t) {
+        return open != close && t >= open && t <= close;
+    };
+    HKU_IF_RETURN(in_session(marketinfo.openTime1(), marketinfo.closeTime1(), hour) ||
+                    in_session(marketinfo.openTime2(), marketinfo.closeTime2(), hour),
                   true);
     return false;
 }
 
 bool StockManager::addStock(const Stock& stock) {
-    string market_code(stock.market_code());
+    // Key by market + code like loadAllStocks does; market_code() carries a slash for CRYPTO
+    string market_code(fmt::format("{}{}", stock.market(), stock.code()));
     to_upper(market_code);
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     HKU_ERROR_IF_RETURN(m_stockDict.find(market_code) != m_stockDict.end(), false,
@@ -1021,6 +1144,9 @@ bool StockManager::addStock(const Stock& stock) {
 void StockManager::removeStock(const string& market_code) {
     string n_market_code(market_code);
     to_upper(n_market_code);
+    // Tolerate the slash-form CRYPTO market_code, same as getStock
+    n_market_code.erase(std::remove(n_market_code.begin(), n_market_code.end(), '/'),
+                        n_market_code.end());
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(n_market_code);
     if (iter != m_stockDict.end()) {
@@ -1033,31 +1159,38 @@ void StockManager::loadAllStocks() {
     vector<StockInfo> stockInfos;
     if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
+        if (_hasLoadScope()) {
+            _filterStockInfoByLoadScope(stockInfos);
+        }
     } else {
-        auto load_stock_code_list = m_context.getAllNeedLoadStockCodeList();
         auto all_market = getAllMarket();
-        for (auto stkcode : load_stock_code_list) {
-            to_upper(stkcode);
+        for (const auto& stkcode : m_context.getAllNeedLoadStockCodeList()) {
+            // Normalize like getStock: uppercase, no CRYPTO slash (stored codes must match)
+            string upper_code(stkcode);
+            to_upper(upper_code);
+            upper_code.erase(std::remove(upper_code.begin(), upper_code.end(), '/'),
+                             upper_code.end());
             const string* matched_market = nullptr;
-            for (auto& market : all_market) {
-                if (market.empty() || stkcode.size() <= market.size()) {
+            for (const auto& market : all_market) {
+                if (market.empty() || upper_code.size() <= market.size()) {
                     continue;
                 }
-                if (stkcode.compare(0, market.size(), market) == 0 &&
+                if (upper_code.compare(0, market.size(), market) == 0 &&
                     (!matched_market || market.size() > matched_market->size())) {
                     matched_market = &market;
                 }
             }
-            bool find = false;
-            if (matched_market) {
-                auto info = m_baseInfoDriver->getStockInfo(*matched_market,
-                                                           stkcode.substr(matched_market->size()));
-                if (!info.market.empty() && !info.code.empty()) {
-                    stockInfos.push_back(std::move(info));
-                    find = true;
-                }
+            if (!matched_market) {
+                HKU_WARN("Invalid stock code: {}", stkcode);
+                continue;
             }
-            HKU_WARN_IF(!find, "Invalid stock code: {}", stkcode);
+            auto info = m_baseInfoDriver->getStockInfo(*matched_market,
+                                                       upper_code.substr(matched_market->size()));
+            HKU_WARN_IF(info.market.empty() || info.code.empty(), "Invalid stock code: {}",
+                        stkcode);
+            if (!info.market.empty() && !info.code.empty()) {
+                stockInfos.push_back(std::move(info));
+            }
         }
     }
 
@@ -1138,6 +1271,80 @@ void StockManager::loadAllStocks() {
     }
 }
 
+void StockManager::_filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) const {
+    std::set<string> market_scope;
+    vector<string> items;
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_market_list", ""), items);
+    for (const auto& item : items) {
+        string upper_item(item);
+        to_upper(upper_item);
+        // "ALL" means no market restriction at all
+        if (upper_item != "ALL") {
+            market_scope.insert(upper_item);
+        }
+    }
+
+    std::set<int> type_scope;
+    items.clear();
+    splitLoadScopeText(m_hikyuuParam.tryGet<string>("load_stock_type_list", ""), items);
+    for (const auto& item : items) {
+        try {
+            type_scope.insert(std::stoi(item));
+        } catch (...) {
+            HKU_WARN("Invalid security type in the load scope: {}", item);
+        }
+    }
+
+    std::set<string> must_load;
+    for (const auto& code : m_context.getMustLoadStockCodeList()) {
+        must_load.insert(normalizeLoadScopeCode(code));
+    }
+    for (const auto& market : getAllMarket()) {
+        string upper_market(market);
+        to_upper(upper_market);
+        if (!market_scope.empty() && market_scope.find(upper_market) == market_scope.end()) {
+            continue;
+        }
+        const auto& market_info = getMarketInfo(market);
+        if (market_info.isValid()) {
+            must_load.insert(normalizeLoadScopeCode(
+              fmt::format("{}{}", market_info.market(), market_info.code())));
+        }
+    }
+
+    const size_t total = stockInfos.size();
+    vector<StockInfo> kept;
+    kept.reserve(total);
+    std::set<string> matched_markets;
+    for (auto& info : stockInfos) {
+        string upper_market(info.market);
+        to_upper(upper_market);
+        const bool market_ok =
+          market_scope.empty() || market_scope.find(upper_market) != market_scope.end();
+        if (market_ok) {
+            matched_markets.insert(upper_market);
+        }
+        const bool type_ok = type_scope.empty() || type_scope.find(info.type) != type_scope.end();
+        if (market_ok && type_ok) {
+            kept.push_back(std::move(info));
+            continue;
+        }
+        string market_code = fmt::format("{}{}", info.market, info.code);
+        if (must_load.find(normalizeLoadScopeCode(market_code)) != must_load.end()) {
+            kept.push_back(std::move(info));
+        }
+    }
+
+    for (const auto& market : market_scope) {
+        HKU_WARN_IF(matched_markets.find(market) == matched_markets.end(),
+                    "No security found in the market {} of the load scope!", market);
+    }
+
+    const size_t kept_count = kept.size();
+    HKU_INFO(htr("The load scope keeps {} of {} securities", kept_count, total));
+    stockInfos.swap(kept);
+}
+
 void StockManager::loadAllMarketInfos() {
     HKU_INFO(htr("Loading market information..."));
     auto marketInfos = m_baseInfoDriver->getAllMarketInfo();
@@ -1147,6 +1354,11 @@ void StockManager::loadAllMarketInfos() {
         string market = marketInfo.market();
         to_upper(market);
         m_marketInfoDict[market] = marketInfo;
+    }
+
+    {
+        std::unique_lock<std::shared_mutex> lock(m_weekend_holiday_mutex);
+        m_weekend_holiday.clear();
     }
 }
 
@@ -1162,8 +1374,14 @@ void StockManager::loadAllStockTypeInfo() {
 
 void StockManager::loadAllHolidays() {
     auto holidays = m_baseInfoDriver->getAllHolidays();
-    std::unordered_set<Datetime> tmp_holidays(holidays.begin(), holidays.end());
-    m_holidays = std::move(tmp_holidays);
+    HolidayMap normalized;
+    normalized.reserve(holidays.size());
+    for (const auto& item : holidays) {
+        std::string market(item.first);
+        to_upper(market);
+        normalized[market].insert(item.second.begin(), item.second.end());
+    }
+    m_holidays = std::move(normalized);
 }
 
 void StockManager::loadInnerBlocks() {

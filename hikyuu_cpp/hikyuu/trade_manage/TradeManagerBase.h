@@ -7,15 +7,22 @@
 
 #pragma once
 
+#include <cmath>
+#include <mutex>
+#include <set>
+
+#include "RateTable.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "PositionExtInfo.h"
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "LoanRecord.h"
-#include "TradeCostBase.h"
+#include "tradecost/TradeCostBase.h"
 #include "OrderBrokerBase.h"
-#include "crt/TC_Zero.h"
+#include "margin/MarginBase.h"
+#include "margin/crt/MG_None.h"
+#include "tradecost/crt/TC_Zero.h"
 #include "../utilities/Parameter.h"
 
 namespace hku {
@@ -29,6 +36,17 @@ class HKU_API Performance;
  * <pre>
  * Default parameters:
  * precision(int): 2 calculation precision
+ * margin_accounting(bool): false book margin-security openings by margin only
+ * settle_with_close(bool): true use the close as the daily settlement price; off disables daily
+ *                           settlement (no other price source yet)
+ * force_liquidate(bool): false only warn on a maintenance shortfall; on queues a forced liquidation
+ *                         for the trading system at the next open
+ * annual_days(int): 365 days per year, the denominator prorating margin interest over elapsed
+ *                   calendar days
+ * currency_rates(string): "" fixed rate of each foreign market: 1 unit of the market's currency is
+ *                         worth rate units of the account currency; an unlisted market is billed at
+ *                         1.0 with a warning, an empty table treats all markets as the account
+ *                         currency
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -40,10 +58,7 @@ public:
 
     explicit TradeManagerBase(const string& name) : TradeManagerBase(name, TC_Zero()) {}
 
-    TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
-    : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
-        setParam<int>("precision", 2);  // Calculation precision
-    }
+    TradeManagerBase(const string& name, const TradeCostPtr& costFunc);
 
     virtual ~TradeManagerBase() {}
 
@@ -70,6 +85,146 @@ public:
     /** Set the trade cost algorithm pointer */
     void costFunc(const TradeCostPtr& func) {
         m_costfunc = func;
+    }
+
+    /** Get the margin model; null when the account has none */
+    virtual MarginPtr margin() const {
+        return m_margin;
+    }
+
+    /** Set the margin model; null falls back to the plain cash model */
+    virtual void margin(const MarginPtr& m) {
+        m_margin = m ? m : MG_None();
+    }
+
+    /** Margin occupied by an opening, in the security's own currency; 0 when no model is set */
+    virtual price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                  double num, MarginSide side) const {
+        return m_margin ? m_margin->getOpenMargin(datetime, stock, price, num, side) : 0.0;
+    }
+
+    /**
+     * Margin an opening really locks: the model requirement on the account rounding grid
+     * @details A requirement below one monetary unit keeps one unit instead of rounding to zero;
+     *          a zero lock would clear the holding's margin marker, demote it to cash and count the
+     *          full notional as equity. Returns 0 when the model reports no requirement, so the
+     *          caller falls back to cash.
+     */
+    price_t getOpenMarginToLock(const Datetime& datetime, const Stock& stock, price_t price,
+                                double num, MarginSide side) const;
+
+    /** Maintain margin of an opening, in the security's own currency; 0 when no model is set */
+    virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                      double num, MarginSide side) const {
+        return m_margin ? m_margin->getMaintainMargin(datetime, stock, price, num, side) : 0.0;
+    }
+
+    /** Maximum openable quantity under the given funds; 0 when no margin model is set.
+     *  Funds are in the account currency, converted for the model, which is pure in the security's
+     *  own currency */
+    virtual double getMaxOpenNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                    price_t available, MarginSide side) const {
+        return m_margin ? m_margin->getMaxOpenNumber(datetime, stock, price,
+                                                     _fromAccount(stock, available), side)
+                        : 0.0;
+    }
+
+    /** Convert an amount from the security's own currency into the account currency via
+     *  currency_rates; an empty table is the identity */
+    price_t toAccount(const Stock& stock, price_t amount) const {
+        return amount * _currencyRate(stock);
+    }
+
+    /**
+     * Whether an opening is booked by margin accounting instead of full cash
+     * @details Requires margin_accounting on; model-covered securities that are auto-financed or
+     *          borrow-free (futures, crypto) use margin, the rest use cash
+     */
+    virtual bool isMarginAccounted(const Stock& stock) const;
+
+    /**
+     * Margin occupied by the current long and short positions at the given moment, in the account
+     * currency
+     * @details Uncovered securities take nothing, so a mixed account excludes its plain cash
+     *          holdings
+     * @note This is the requirement recomputed at the given price for every model-covered holding,
+     *       cash-accounted holdings of a margin security included (brokers count the whole
+     *       collateral); FundsRecord::occupied_margin is the amount already locked, so the two
+     *       differ by mark-to-market drift and by holdings opened on the plain cash books
+     * @note Positions are priced exactly like getFunds, so both halves of getAvailableMargin use
+     *       one snapshot
+     * @note Measured on current positions, so only current or future moments are meaningful
+     */
+    virtual price_t getOccupiedMargin(const Datetime& datetime,
+                                      KQuery::KType ktype = KQuery::DAY) const;
+
+    /**
+     * Available funds for a new opening: net assets minus collateral haircut and occupied margin
+     * @note Net assets, not cash, are used: a short adds proceeds to cash, which would otherwise
+     *       allow unlimited shorts
+     * @note Not const only because getFunds lazily applies ex-rights weights; read it before
+     *       mutating the account in a trade flow
+     * @note The operands are sequenced: getFunds applies pending weights and changes positions, so
+     *       it must run before getOccupiedMargin reads them (operator- order is unspecified)
+     * @note Only current or future moments: on a past date getFunds replays historical holdings
+     *       while getOccupiedMargin stays on current ones, subtracting today's occupation from a
+     *       past net value
+     */
+    virtual price_t getAvailableMargin(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
+
+    /**
+     * Settle the margin holdings of the account as of the given moment
+     * @details Mark each margin-accounted holding to the settlement price (the close of the given
+     *          K type), post the mark-to-market profit to cash, recompute the locked margin at that
+     *          price and post the difference, then check the whole book's maintenance requirement
+     *          against equity (skipped holdings still count on both sides). A shortfall only warns
+     *          by default; force_liquidate queues flattening for the trading system. Then bill
+     *          interest on outstanding liabilities into the debt itself (cost model's
+     *          getBorrowCashRate / getBorrowStockRate, 0.0 bills nothing), prorated over calendar
+     *          days since the last billing and posted before the check, so a billed day is also a
+     *          called day. Plain cash books have nothing to settle and keep their live valuation,
+     *          so margin_accounting off is never touched.
+     * @param datetime the settlement moment, must be later than or equal to lastDatetime()
+     * @param ktype the K type the settlement price is taken from
+     * @return true when posted (by this call or an earlier one the same calendar day); false when
+     *         the account never settles (plain cash books or switch off) or there was nothing to
+     *         book (flat and unborrowed, or all holdings skipped with no liability billed)
+     * @note Both halves are gated per calendar day, so a second settlement that day posts nothing;
+     *       isSettled() only probes that a batch was entered, not that posting ran. The system's K
+     *       type does not change this: a finer one simply settles at its first bar
+     * @note Only the current moment can be settled: posting is a real cash flow, so past dates are
+     *       served by getFunds / getFundsList replay
+     */
+    virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
+        HKU_IF_RETURN(!tryGetParam<bool>("margin_accounting", false), false);
+        HKU_WARN(
+          "Settlement is not supported by the account {}, the margin holdings stay on "
+          "their opening basis!",
+          m_name);
+        return false;
+    }
+
+    /**
+     * Whether the calendar day of the given moment has entered a settlement batch
+     * @note Posting and billing are gated apart, so true does not mean holdings were marked: a day
+     *       that only billed interest also answers true
+     * @param datetime the moment to probe
+     */
+    virtual bool isSettled(const Datetime&) const {
+        return false;
+    }
+
+    /**
+     * Whether a forced liquidation is queued as of the given moment
+     * @details Armed by settlement() when equity falls below the maintenance requirement with
+     *          force_liquidate on; the trading system flattens at the next open. Each settlement
+     *          rebuilds the queue, so a recovered account clears it; with nothing left to close the
+     *          answer is false even while the armed date is recorded. The probe means "armed and
+     *          still holding" and consumes nothing.
+     * @param datetime the moment to probe
+     */
+    virtual bool isForcedLiquidationQueued(const Datetime&) const {
+        return false;
     }
 
     /**
@@ -167,17 +322,7 @@ public:
     }
 
     /** Perform the clone operation */
-    shared_ptr<TradeManagerBase> clone() {
-        shared_ptr<TradeManagerBase> p = _clone();
-        HKU_CHECK(p, "Invalid ptr from _clone!");
-        p->m_params = m_params;
-        p->m_name = m_name;
-        p->m_is_python_object = m_is_python_object;
-        p->m_broker_last_datetime = m_broker_last_datetime;
-        p->m_costfunc = m_costfunc;
-        p->m_broker_list = m_broker_list;
-        return p;
-    }
+    shared_ptr<TradeManagerBase> clone();
 
     virtual shared_ptr<TradeManagerBase> _clone() {
         HKU_WARN("The subclass does not implement a reset method");
@@ -216,15 +361,7 @@ public:
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return net asset value list
      */
-    PriceList getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        int precision = getParam<int>("precision");
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = roundEx(funds_list[i].total_assets(), precision);
-        }
-        return ret;
-    }
+    PriceList getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the profit curve, i.e. the net asset value curve after deducting every deposit
@@ -232,15 +369,7 @@ public:
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return profit curve
      */
-    PriceList getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        int precision = getParam<int>("precision");
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = roundEx(funds_list[i].profit(), precision);
-        }
-        return ret;
-    }
+    PriceList getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the cumulative return rate curve
@@ -252,17 +381,7 @@ public:
      * @return return rate curve
      */
     PriceList getProfitCumChangeCurve(const DatetimeList& dates,
-                                      const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        int precision = getParam<int>("precision");
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            price_t base = funds_list[i].total_base();
-            ret[i] = base != 0.0 ? roundEx(funds_list[i].total_assets() / base, precision)
-                                 : Null<price_t>();
-        }
-        return ret;
-    }
+                                      const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the invested base asset curve
@@ -271,14 +390,7 @@ public:
      * @return price curve
      */
     PriceList getBaseAssetsCurve(const DatetimeList& dates,
-                                 const KQuery::KType& ktype = KQuery::DAY) {
-        FundsList funds_list = getFundsList(dates, ktype);
-        PriceList ret(funds_list.size());
-        for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = funds_list[i].total_base();
-        }
-        return ret;
-    }
+                                 const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Update the current positions and trades according to the weight (adjustment) information
@@ -843,20 +955,100 @@ public:
         return m_is_python_object;
     }
 
-    /** Whether this trade manager or its cost function is defined in Python */
+    /** Whether this trade manager, its cost function or its margin model is defined in Python */
     virtual bool hasPythonPart() const noexcept {
-        return m_is_python_object || (m_costfunc && m_costfunc->hasPythonPart());
+        return m_is_python_object || (m_costfunc && m_costfunc->hasPythonPart()) ||
+               (m_margin && m_margin->hasPythonPart());
+    }
+
+    // These interfaces are declared last: inserting a virtual mid-class shifts the vtable slots of
+    // all later ones, so an out-of-tree plugin built against the old header would dispatch wrongly.
+
+    /**
+     * Collateral conversion rate of the security, answered by the margin model
+     * @details 1.0 when the account has no margin model, i.e. the holding counts in full
+     * @param datetime the queried moment
+     * @param stock the held security
+     * @param side long or short
+     */
+    virtual double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                                     MarginSide side) const {
+        return m_margin ? m_margin->getCollateralRate(datetime, stock, side) : 1.0;
+    }
+
+    /**
+     * Value the collateral table discounts away, in the account currency: Σ collateral base ×
+     * (1 - conversion rate) over the long holdings
+     * @details The rate is the share of a holding the credit account counts as collateral; cash and
+     *          liabilities always count in full, shorts contribute no asset. An unconfigured table
+     *          answers 1.0, so the result is 0 and available funds are unchanged
+     * @note A margin-accounted holding is discounted on its net-asset contribution (locked margin
+     *       plus unrealized profit), not full value: the financed part is already a liability, so
+     *       discounting the whole value would remove it twice
+     * @note Covers every security getOccupiedMargin requires margin for, but only its long side (a
+     *       short holds no asset); securities outside the model are plain cash holdings, neither
+     *       margin-posting nor credit collateral
+     * @note Holdings are priced exactly like getOccupiedMargin, for the same reason
+     */
+    virtual price_t getCollateralHaircut(const Datetime& datetime,
+                                         KQuery::KType ktype = KQuery::DAY) const;
+
+    /**
+     * Annualized interest rate of the borrowed cash, answered by the cost model
+     * @details 0.0 when the model has no such rate, i.e. nothing is billed
+     * @param datetime the day being settled
+     */
+    virtual double getBorrowCashRate(const Datetime& datetime) const {
+        return m_costfunc ? m_costfunc->getBorrowCashRate(datetime) : 0.0;
+    }
+
+    /**
+     * Annualized interest rate of a borrowed security, answered by the cost model
+     * @details 0.0 when the model has no such rate, i.e. nothing is billed
+     * @param datetime the day being settled
+     * @param stock the borrowed security
+     */
+    virtual double getBorrowStockRate(const Datetime& datetime, const Stock& stock) const {
+        return m_costfunc ? m_costfunc->getBorrowStockRate(datetime, stock) : 0.0;
     }
 
 protected:
+    /**
+     * The moment the holdings of a date are valued at, mirroring getFunds
+     * @details An unset date or the last trade date values at the last trade moment; any other date
+     *          at that day's close
+     */
+    Datetime _valuationDatetime(const Datetime& datetime) const {
+        return (datetime == Null<Datetime>() || datetime == lastDatetime())
+                 ? lastDatetime()
+                 : Datetime(datetime.year(), datetime.month(), datetime.day(), 23, 59);
+    }
+
     string m_name;            // Account name
     TradeCostPtr m_costfunc;  // Cost algorithm
+    MarginPtr m_margin;       // Margin model, null when the account has none
 
     Datetime m_broker_last_datetime;     // The last moment an order broker performed an operation,
                                          // i.e. the current startup time
     list<OrderBrokerPtr> m_broker_list;  // Order broker list
 
     bool m_is_python_object{false};
+
+protected:
+    /** Fixed rate of the security's market: 1.0 when the table is empty or the market is unlisted
+     *  (warned once); the table is parsed by baseCheckParam */
+    price_t _currencyRate(const Stock& stock) const;
+
+    /** Convert an account-currency amount into the security's currency */
+    price_t _fromAccount(const Stock& stock, price_t amount) const {
+        return amount / _currencyRate(stock);
+    }
+
+protected:
+    mutable RateTable m_currency_rates;    // Parsed currency_rates, empty: all 1.0
+    mutable std::set<string> m_fx_warned;  // Markets already warned as having no rate
+    // Guards the one-off warning above: getFundsList values the dates in parallel
+    mutable std::mutex m_fx_warned_mutex;
 
 //============================================
 // Serialization support
@@ -869,6 +1061,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(m_margin);
+        }
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
@@ -877,8 +1072,14 @@ private:
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_params);
+        // The parsed caches derived from the params are not archived: rebuild them here
+        baseCheckParam("currency_rates");
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        // A version 0 archive has no margin model: the value set by the constructor is kept
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(m_margin);
+        }
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
@@ -892,6 +1093,11 @@ inline void TradeManagerBase::baseCheckParam(const string& name) const {
     if ("precision" == name) {
         int precision = getParam<int>("precision");
         HKU_ASSERT(precision > 0);
+    } else if ("currency_rates" == name) {
+        // A rate is a positive, unbounded factor: 0 would wipe amounts out. Parsed here rather than
+        // in _checkParam so every account flavour, including forwarding views, parses it
+        m_currency_rates.parse(tryGetParam<string>("currency_rates", ""), "TM currency_rates",
+                               false, false, true);
     }
 }
 
@@ -919,6 +1125,11 @@ inline std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
 }
 
 }  // namespace hku
+
+#if HKU_SUPPORT_SERIALIZATION
+// 0 = no margin model in the archive, 1 = m_margin added
+BOOST_CLASS_VERSION(::hku::TradeManagerBase, 1)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>

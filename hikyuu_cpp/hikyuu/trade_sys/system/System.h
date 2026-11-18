@@ -388,7 +388,9 @@ private:
     TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyDelay(const KRecord& today, const KRecord& src_today);
     void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
-    void _autoCheckin(const Datetime& datetime, price_t realPrice, double number);
+    /** Top up the cash gap of the coming order when the money manager asks for auto_checkin;
+     * cover tells a short cover (buyShort) from a long opening, their cash needs differ */
+    void _autoCheckin(const Datetime& datetime, price_t realPrice, double number, bool cover);
 
     TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from,
                       price_t goal = Null<price_t>());
@@ -416,6 +418,21 @@ private:
     TradeRecord _runMoment(const KRecord& today, const KRecord& src_today);
     TradeRecord _runMomentOnOpen(const KRecord& today, const KRecord& src_today);
     TradeRecord _runMomentOnClose(const KRecord& today, const KRecord& src_today);
+
+    /** The trading body of the close stage, without the day end settlement */
+    TradeRecord _tradeOnClose(const KRecord& today, const KRecord& src_today);
+
+    /** Flatten the account at this bar's open when the previous settlement queued a forced
+     * liquidation (force_liquidate of the trade manager), returning the flattening record */
+    TradeRecord _liquidateOnOpen(const KRecord& today, const KRecord& src_today);
+
+    /** Flatten a margin-accounted instrument at its last registered bar's close (G12), before the
+     * daily settlement so that the closing trade is the one that realizes the profit */
+    TradeRecord _liquidateOnExpiry(const KRecord& today, const KRecord& src_today);
+
+    /** Drop the queued delayed entries: the entry intent is void after a forced exit, while the
+     *  queued exits are kept because they cut the risk instead of adding it */
+    void _dropPendingEntries();
 
     // Fold the valid pending delayed requests into result.delayOnNextOpen (shared by runMoment /
     // runMomentOnClose)
@@ -705,35 +722,35 @@ inline bool System::_conditionIsValid(const Datetime& datetime) {
     return m_cn ? m_cn->isValid(datetime) : true;
 }
 
-inline double System ::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,
-                                     Part from) {
+inline double System::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,
+                                    Part from) {
     return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline double System ::_getSellNumber(const Datetime& datetime, price_t price, price_t risk,
-                                      Part from) {
+inline double System::_getSellNumber(const Datetime& datetime, price_t price, price_t risk,
+                                     Part from) {
     return m_mm ? m_mm->getSellNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline double System ::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk,
-                                           Part from) {
+inline double System::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk,
+                                          Part from) {
     return m_mm ? m_mm->getSellShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline double System ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
-                                          Part from) {
+inline double System::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
+                                         Part from) {
     return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline price_t System ::_getShortOpenRisk(price_t stoploss, price_t price) {
+inline price_t System::_getShortOpenRisk(price_t stoploss, price_t price) {
     return stoploss > 0.0 ? stoploss - price : price;
 }
 
-inline price_t System ::_getGoalPrice(const Datetime& datetime, price_t price) {
+inline price_t System::_getGoalPrice(const Datetime& datetime, price_t price) {
     return m_pg ? m_pg->getGoal(datetime, price) : Null<price_t>();
 }
 
-inline price_t System ::_getShortGoalPrice(const Datetime& datetime, price_t price) {
+inline price_t System::_getShortGoalPrice(const Datetime& datetime, price_t price) {
     return m_pg ? m_pg->getShortGoal(datetime, price) : Null<price_t>();
 }
 

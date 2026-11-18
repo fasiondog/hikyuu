@@ -107,7 +107,7 @@ if __name__ == "__main__":
     while True:
         try:
             today = Datetime.today()
-            if today.day_of_week() not in (0, 6) and not sm.is_holiday(today):
+            if not sm.is_holiday(today, "SH"):
                 hku_info("get full tick ...")
                 start_send_spot()
                 records = get_spot(stk_list, None, None, send_spot)

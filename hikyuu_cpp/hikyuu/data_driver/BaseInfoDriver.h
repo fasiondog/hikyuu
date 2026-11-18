@@ -9,6 +9,7 @@
 #ifndef BASEINFODRIVER_H_
 #define BASEINFODRIVER_H_
 
+#include <unordered_map>
 #include <unordered_set>
 #include "../utilities/Parameter.h"
 #include "../MarketInfo.h"
@@ -67,10 +68,27 @@ struct StockInfo {
         return *this;
     }
 
-    static const char* getSelectSQL() {
-        return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, b.tick, "
-               "b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from stock a, "
-               "stocktypeinfo b, market c where a.type = b.id and a.marketid = c.marketid";
+    /**
+     * Stock base info SQL; variety-level stockparam overrides type-level stocktypeinfo via
+     * coalesce.
+     * @param has_stock_param whether the stockparam table exists; absent means a plain
+     *        type-level join
+     */
+    static const char* getSelectSQL(bool has_stock_param) {
+        if (!has_stock_param) {
+            return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, "
+                   "b.tick, b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from "
+                   "stock a, stocktypeinfo b, market c where a.type = b.id and a.marketid = "
+                   "c.marketid";
+        }
+        return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, "
+               "coalesce(sp.tick, b.tick), coalesce(sp.tickValue, b.tickValue), "
+               "coalesce(sp.precision, b.precision), "
+               "coalesce(sp.minTradeNumber, b.minTradeNumber), "
+               "coalesce(sp.maxTradeNumber, b.maxTradeNumber) "
+               "from stock a join stocktypeinfo b on a.type = b.id "
+               "join market c on a.marketid = c.marketid "
+               "left join stockparam sp on sp.marketid = a.marketid and sp.code = a.code";
     }
 
     void load(const SQLStatementPtr& st) {
@@ -183,13 +201,6 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
     /**
-     * Get the given MarketInfo
-     * @param market market abbreviation
-     * @return Null<MarketInfo>() is returned if it is not found
-     */
-    virtual MarketInfo getMarketInfo(const string& market) = 0;
-
-    /**
      * Get all the market information
      */
     virtual vector<MarketInfo> getAllMarketInfo() = 0;
@@ -208,9 +219,9 @@ public:
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
 
     /**
-     * Get all the holiday dates
+     * Get all the holiday dates, grouped by market
      */
-    virtual std::unordered_set<Datetime> getAllHolidays() = 0;
+    virtual std::unordered_map<std::string, std::unordered_set<Datetime>> getAllHolidays() = 0;
 
     /**
      * Get the All Zh Bond10 object
@@ -233,6 +244,13 @@ private:
 
 protected:
     string m_name;
+
+    /**
+     * Whether the stockparam table exists in the current database; probed by the concrete
+     * driver in _init(), so a database not yet upgraded keeps loading with the type-level
+     * defaults only
+     */
+    bool m_hasStockParam = false;
 };
 
 typedef shared_ptr<BaseInfoDriver> BaseInfoDriverPtr;

@@ -248,18 +248,32 @@ void Strategy::runDaily(const std::function<void(Strategy*)>& func, const TimeDe
     } else {
         run_at.func = [this, market = run_at.market, f = std::move(func)]() {
             const auto& sm = StockManager::instance();
-            auto today = Datetime::today();
-            int day = today.dayOfWeek();
-            if (day == 0 || day == 6 || sm.isHoliday(today)) {
+            const auto& market_info = sm.getMarketInfo(market);
+            HKU_ERROR_IF_RETURN(!market_info.isValid(), void(),
+                                "market {} not found! The run daily func is discard!", market);
+
+            // The machine clock is assumed to follow the unified (Beijing) convention; the
+            // holiday judgment and the session bounds are market-local wall clock
+            Datetime now = Datetime::now();
+            Datetime local_now =
+              market_info.isUnifiedClock() ? now : market_info.unifiedToLocal(now);
+            if (sm.isHoliday(local_now.startOfDay(), market)) {
                 return;
             }
 
-            auto market_info = sm.getMarketInfo(market);
-            Datetime open1 = today + market_info.openTime1();
-            Datetime close1 = today + market_info.closeTime1();
-            Datetime open2 = today + market_info.openTime2();
-            Datetime close2 = today + market_info.closeTime2();
-            Datetime now = Datetime::now();
+            // Same convention as StockManager::isTradingHours: equal session bounds mean
+            // unlimited (24h), so no window guard is applied
+            if (market_info.openTime1() == market_info.closeTime1() &&
+                market_info.openTime2() == market_info.closeTime2()) {
+                event([this, f]() { f(this); });
+                return;
+            }
+
+            Datetime local_today = local_now.startOfDay();
+            Datetime open1 = market_info.localToUnified(local_today + market_info.openTime1());
+            Datetime close1 = market_info.localToUnified(local_today + market_info.closeTime1());
+            Datetime open2 = market_info.localToUnified(local_today + market_info.openTime2());
+            Datetime close2 = market_info.localToUnified(local_today + market_info.closeTime2());
             if ((now >= open1 && now <= close1) || (now >= open2 && now <= close2)) {
                 event([this, f]() { f(this); });
             }
@@ -313,18 +327,31 @@ void Strategy::_runDaily() {
         }
         try {
             const auto& sm = StockManager::instance();
-            auto market_info = sm.getMarketInfo(run_at.market);
-            HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+            const auto& market_info = sm.getMarketInfo(run_at.market);
+            HKU_ERROR_IF_RETURN(!market_info.isValid(), void(),
                                 "market {} not found! The run daily func is discard!",
                                 run_at.market);
 
-            auto today = Datetime::today();
+            // The machine clock is assumed to follow the unified (Beijing) convention; the
+            // session bounds and the alignment below are market-local wall clock
             auto now = Datetime::now();
-            TimeDelta now_time = now - today;
+            Datetime local_now =
+              market_info.isUnifiedClock() ? now : market_info.unifiedToLocal(now);
+            Datetime local_today = local_now.startOfDay();
+            TimeDelta now_time = local_now - local_today;
             auto open1 = market_info.openTime1();
             auto close1 = market_info.closeTime1();
             auto open2 = market_info.openTime2();
             auto close2 = market_info.closeTime2();
+
+            // Same convention as StockManager::isTradingHours: equal session bounds mean
+            // unlimited (24h); arm the periodic job right away
+            if (open1 == close1 && open2 == close2) {
+                scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+                flag->store(true);
+                continue;
+            }
+
             // A single-session market leaves session 2 unset (00:00), which would make the
             // "after close2" branch below always true; anchor session 2 at close1 so the
             // branch logic degenerates to session 1 only
@@ -333,7 +360,7 @@ void Strategy::_runDaily() {
                 close2 = close1;
             }
             if (now_time >= close2) {
-                scheduler->addFuncAtTime(today.nextDay() + market_info.openTime1(),
+                scheduler->addFuncAtTime(market_info.localToUnified(local_today.nextDay() + open1),
                                          [job, arm_duration, flag]() {
                                              if (flag->load()) {
                                                  return;
@@ -361,7 +388,7 @@ void Strategy::_runDaily() {
                 }
 
             } else if (now_time >= close1) {
-                scheduler->addFuncAtTime(today + open2,
+                scheduler->addFuncAtTime(market_info.localToUnified(local_today + open2),
                                          [job, arm_duration, flag]() {
                                              if (flag->load()) {
                                                  return;
@@ -389,7 +416,7 @@ void Strategy::_runDaily() {
                 }
 
             } else if (now_time < market_info.openTime1()) {
-                scheduler->addFuncAtTime(today + market_info.openTime1(),
+                scheduler->addFuncAtTime(market_info.localToUnified(local_today + open1),
                                          [job, arm_duration, flag]() {
                                              if (flag->load()) {
                                                  return;
@@ -408,19 +435,27 @@ void Strategy::_runDaily() {
 }
 
 void Strategy::runDailyAt(const std::function<void(Strategy*)>& func, const TimeDelta& delta,
-                          bool ignoreHoliday) {
+                          bool ignoreHoliday, const std::string& market) {
     HKU_CHECK(func, "Invalid func!");
+    HKU_CHECK(!market.empty(), "The market can not be empty!");
     HKU_CHECK(delta < Days(1), "TimeDelta must < Days(1)!");
     HKU_CHECK(m_run_daily_at_funcs.find(delta) == m_run_daily_at_funcs.end(),
               "A task already exists at this point in time!");
 
     std::function<void()> new_func;
     if (ignoreHoliday) {
-        new_func = [this, f = std::move(func)]() {
+        new_func = [this, market, f = std::move(func)]() {
             const auto& sm = StockManager::instance();
-            auto today = Datetime::today();
-            int day = today.dayOfWeek();
-            if (day != 0 && day != 6 && !sm.isHoliday(today)) {
+            const auto& market_info = sm.getMarketInfo(market);
+            HKU_ERROR_IF_RETURN(!market_info.isValid(), void(),
+                                "market {} not found! The run daily at func is discard!", market);
+            // The machine clock is assumed to follow the unified (Beijing) convention; the
+            // holiday judgment uses the market-local date. The clock point (delta) itself
+            // follows the unified clock convention like other Datetime inputs.
+            Datetime now = Datetime::now();
+            Datetime local_now =
+              market_info.isUnifiedClock() ? now : market_info.unifiedToLocal(now);
+            if (!sm.isHoliday(local_now.startOfDay(), market)) {
                 event([this, f]() { f(this); });
             }
         };

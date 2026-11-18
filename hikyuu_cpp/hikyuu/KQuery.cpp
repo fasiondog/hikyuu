@@ -63,6 +63,20 @@ static unordered_map<string, int32_t> g_ktype2min{
 };
 
 static unordered_map<string, int64_t> g_ktype2sec{
+  {KQuery::MIN, 60},
+  {KQuery::MIN3, 3 * 60},
+  {KQuery::MIN5, 5 * 60},
+  {KQuery::MIN15, 15 * 60},
+  {KQuery::MIN30, 30 * 60},
+  {KQuery::MIN60, 60 * 60},
+  {KQuery::HOUR2, 60 * 60 * 2},
+  {KQuery::DAY, 60 * 60 * 24},
+  {KQuery::WEEK, 60 * 60 * 24 * 7},
+  {KQuery::MONTH, 60 * 60 * 24 * 30},
+  {KQuery::QUARTER, 60 * 60 * 24 * 30 * 3},
+  {KQuery::HALFYEAR, 60 * 60 * 24 * 30 * 6},
+  {KQuery::YEAR, 60 * 60 * 24 * 365},
+  {KQuery::TIMELINE, 60},
   {KQuery::TRANS, 3},
 };
 
@@ -77,6 +91,11 @@ vector<KQuery::KType> KQuery::getBaseKTypeList() noexcept {
 
 vector<KQuery::KType> KQuery::getExtraKTypeList() {
     return hku::getExtraKTypeList();
+}
+
+bool KQuery::isIntradayKType(const KType& ktype) {
+    int64_t sec = getKTypeInSeconds(ktype);
+    return sec > 0 && sec < 86400;
 }
 
 int32_t KQuery::getKTypeInMin(const KType& ktype) {
@@ -104,15 +123,11 @@ int32_t KQuery::getBaseKTypeInMin(const KType& ktype) noexcept {
 int64_t KQuery::getKTypeInSeconds(const KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);
-    auto iter = g_ktype2min.find(nktype);
-    HKU_IF_RETURN(iter != g_ktype2min.end(), iter->second * 60);
+    auto iter = g_ktype2sec.find(nktype);
+    HKU_IF_RETURN(iter != g_ktype2sec.end(), iter->second);
 
     auto sec = getKTypeExtraMinutes(nktype) * 60;
-    if (sec <= 0) {
-        auto sec_iter = g_ktype2sec.find(nktype);
-        HKU_IF_RETURN(sec_iter != g_ktype2sec.end(), sec_iter->second);
-        HKU_WARN("Can't get KType in seconds: {}, will return 0", nktype);
-    }
+    HKU_WARN_IF(sec <= 0, "Can't get KType in seconds: {}, will return 0", nktype);
     return sec;
 }
 

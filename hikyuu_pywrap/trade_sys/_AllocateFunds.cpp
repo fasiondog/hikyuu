@@ -87,8 +87,10 @@ executed by allocate() in the L1 -> L2 -> L3 order:
                   executable quantity of the parent account (the folding point from the sub-system space
                   to the individual instrument space). In mode A ("Signal Aggregation") the target
                   position market value = weight x net exposure ratio x the parent net assets, aggregated
-                  per instrument and rebalanced by the delta against the current position; in mode B
-                  or mode C the real instruction of the sub-system passes through unchanged.
+                  per instrument and rebalanced by the delta against the current position; the ratio
+                  itself is first bounded by max_signal_ratio (a channel normalization, not a portfolio
+                  cap); in mode B or mode C the real instruction of the sub-system passes through
+                  unchanged.
     - _check_risk [Optional] L3 portfolio risk control: clip the suggestions at the portfolio dimension
                   (e.g. the single instrument concentration cap max_single_position); mode B and mode C
                   respect the sub-strategy autonomy and skip the clipping.
@@ -110,6 +112,7 @@ total control - the leverage beyond the cap is expressed by max_total_position >
 
 Common parameters:
 
+    - max_signal_ratio=1.0 (float) : the L2 per-channel signal cap (mode A weight pricing only), a channel normalization rather than a portfolio cap: the net exposure ratio reported by a sub-system (in units of its own net assets) is clipped to [-value, +value] before it is multiplied by the weight and the parent net assets, so that a levered shadow cannot eat the total budget and force the proportional scale-down onto the other channels; 0 or a negative value disables the clip (the ratio passes through), a value above 1 widens it, and a non-finite value is rejected by the parameter check. Mode B passes the instructions through and mode C has no aggregate target, so both ignore it; with fixed_amount > 0 only the sign of the ratio is used
     - max_single_position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); 0 means no limit, the domain is [0, 1] and a negative value or a value above 1 is rejected by the parameter check
     - max_total_position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value. The weight pricing is scaled down proportionally when exceeded, while the fixed_amount pricing is truncated to whole quanta (see below); 0 disables the cap, >1 allows leverage, a negative or non-finite value is rejected by the parameter check. It is further scaled by the dynamic total position scale (see _get_total_position_scale, the default scale is 1.0)
     - fixed_amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system. The aggregate is still bounded by max_total_position: being an absolute amount it is never scaled down, instead only whole quanta are funded (mode B in sub-system order, mode A in suggestion order) and the rest gets a zero quota / is driven flat

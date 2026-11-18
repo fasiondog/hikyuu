@@ -35,7 +35,8 @@ void export_part_main(py::module& m) {
       .value("MF", PartType::MF, "Multi factor")
       .value("SYS", PartType::SYS, "System")
       .value("TM", PartType::TM, "Trade manager")
-      .value("TC", PartType::TC, "Trade cost");
+      .value("TC", PartType::TC, "Trade cost")
+      .value("MG", PartType::MG, "Margin");
 
     py::enum_<PartMeta::Source>(m, "PartSource", "Where a part comes from")
       .value("BUILTIN", PartMeta::Source::BUILTIN, "Built into the core library")

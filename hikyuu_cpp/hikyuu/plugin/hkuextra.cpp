@@ -94,8 +94,7 @@ size_t getStockExtraCount(const Stock& stk, const string& ktype) {
 }
 
 KDataImpPtr getKDataImp(const Stock& stk, const KQuery& query) {
-    // A cached private copy freezes at the insertion moment; the shm mirrored types always need a
-    // fresh buffer built from the latest data, so the plugin cache is bypassed here
+    // A cached copy freezes at insertion; the mirrored types need fresh data, so bypass the cache
     HKU_IF_RETURN(ipc::isShmKTypeCovered(query.kType()),
                   make_shared<KDataPrivatedBufferImp>(stk, query));
     auto& sm = StockManager::instance();

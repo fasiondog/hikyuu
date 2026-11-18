@@ -12,6 +12,24 @@ Common parameters:
     * **support_borrow_cash=False** *(bool)* : whether to automatically borrow cash (financing / margin)
     * **support_borrow_stock=False** *(bool)* : whether to automatically borrow securities for short selling
     * **save_action=True** *(bool)* : whether to save the Python command sequences
+    * **margin_accounting=False** *(bool)* : whether to book the margin securities by margin only (see :doc:`margin`)
+    * **settle_with_close=True** *(bool)* : whether the settlement uses the closing price of the period (only when the margin accounting is on, see :doc:`margin`)
+    * **force_liquidate=False** *(bool)* : whether a shortfall of the equity queues a forced liquidation (only when the margin accounting is on, see :doc:`margin`)
+    * **annual_days=365** *(int)* : the days of a year, i.e. the denominator prorating the daily interest (only when the margin accounting is on, see :doc:`margin`)
+    * **currency_rates=""** *(string)* : the fixed rate of each market to the account currency, e.g. ``"HK:0.92, NASDAQ:7.15"`` (1 unit of the market amount = N units of the account currency; a security type key such as ``"12:7.0"`` works as well). A market not listed is billed at 1.0 with a warning; an empty table bills everything at 1.0, i.e. the single-currency books
+
+Multi-currency convention: with a non-empty ``currency_rates``, the **account-level** amounts (cash
+flows, position market value and equity, margin, deposited/withdrawn aggregates, dividends, and also
+``PositionRecord.margin``, ``TradeRecord.margin``, ``TradeRecord.cash``) convert into the account
+currency. The **record-level** fields stay in the security's own currency: the remaining money fields
+of ``PositionRecord`` (buyMoney/sellMoney/openBasis/settleBasis/totalCost/totalRisk), the price and
+cost of ``TradeRecord``, and ``BorrowRecord.value``. The fund interfaces are in the account currency
+(cash, equity, ``get_available_margin``, and the ``available`` of ``get_max_open_number``, which the
+account converts before passing to the margin model). ``get_open_margin`` and ``get_maintain_margin``
+are exceptions: they return the raw margin-model result in the security's own currency, converted by
+the account before booking. An invalid ``currency_rates`` expression throws when set; set a valid one
+again before saving the account. A portfolio (MultiSystem) aggregates sub-system suggestions with the
+sub-system account's rate, so sub-systems should carry the same ``currency_rates`` as the parent.
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])
@@ -486,6 +504,7 @@ Common parameters:
     .. py:method:: add_trade_record(self, tr)
 
         Add a trade record directly. If an account initialization record is added, all existing trade and position records are cleared.
+        The settlement (``BUSINESS_SETTLEMENT``) and interest (``BUSINESS_INTEREST``) records come from ``settlement()``; a single record cannot reproduce the book state, so manual backfill is rejected and returns False.
 
         :param TradeRecord tr: the trade record
         :return: True (success) | False (failure)

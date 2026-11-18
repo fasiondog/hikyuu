@@ -28,7 +28,9 @@ TEST_CASE("test_MarketInfo_serialize") {
     string filename(sm.tmpdir());
     filename += "/MarketInfo.xml";
 
-    MarketInfo m1 = sm.getMarketInfo("SH");
+    // NASDAQ carries non-default tz values (-300/1/1) so field misalignment is distinguishable
+    // from the in-class defaults (480/0/0)
+    MarketInfo m1 = sm.getMarketInfo("NASDAQ");
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -47,6 +49,8 @@ TEST_CASE("test_MarketInfo_serialize") {
     CHECK_EQ(m1.description(), m2.description());
     CHECK_EQ(m1.code(), m2.code());
     CHECK_EQ(m1.lastDate(), m2.lastDate());
+    /** @arg Every field, including the time zone ones, survives the round trip */
+    CHECK_UNARY(m1.equals(m2));
 }
 
 /** @} */

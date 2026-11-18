@@ -46,6 +46,8 @@ private:
     void initParam();
     void syncDataFromSystem(const SYSPtr&, bool isMoment);
     void syncDataToSystem(const SYSPtr&);
+    /** Merge the candidate's financing switches onto the real book, only-widen like readyForRun */
+    void _applyFinancingSwitches(const SYSPtr& sys);
 
     /** Build the window table (RunRanges) and the lazily-filled window KData from the SE */
     void ensureWindows();

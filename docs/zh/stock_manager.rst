@@ -11,6 +11,16 @@
 
     K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
 
+    .. py:method:: __init__(start, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER)
+
+        构造K线查询条件，支持按索引与按日期两种方式：
+
+        - 按索引：``start`` / ``end`` 为整数索引，区间为 ``[start, end)``
+        - 按日期：``start`` / ``end`` 为 :py:class:`Datetime`，区间为 ``[start, end)``
+
+        ``end`` 省略表示右开区间；``ktype`` 默认为 ``Query.DAY``，
+        ``recover_type`` 默认为 ``Query.NO_RECOVER``。
+
     简化 :py:data:`Query.KType` 枚举值
     
     - Query.DAY - 日线类型
@@ -24,7 +34,17 @@
     - Query.MIN15 - 15分钟线类型
     - Query.MIN30 - 30分钟线类型
     - Query.MIN60 - 60分钟线类型
-    
+    - Query.HOUR2 - 2小时线类型
+    - Query.DAY3 - 3日线类型
+    - Query.DAY5 - 5日线类型
+    - Query.DAY7 - 7日线类型
+    - Query.MIN3 - 3分钟线类型
+    - Query.HOUR4 - 4小时线类型
+    - Query.HOUR6 - 6小时线类型
+    - Query.HOUR12 - 12小时线类型
+    - Query.TIMELINE - 分时线类型
+    - Query.TRANS - 分笔线类型
+
     简化 :py:data:`Query.RecoverType` 枚举值
     
     - Query.NO_RECOVER      - 不复权
@@ -88,8 +108,18 @@
         - MIN5     - 5分钟线类型
         - MIN15    - 15分钟线类型
         - MIN30    - 30分钟线类型
-        - MIN60    - 60分钟线类型    
-        
+        - MIN60    - 60分钟线类型
+        - HOUR2    - 2小时线类型
+        - DAY3     - 3日线类型
+        - DAY5     - 5日线类型
+        - DAY7     - 7日线类型
+        - MIN3     - 3分钟线类型
+        - HOUR4    - 4小时线类型
+        - HOUR6    - 6小时线类型
+        - HOUR12   - 12小时线类型
+        - TIMELINE - 分时线类型
+        - TRANS    - 分笔线类型
+
     .. py:data:: RecoverType
     
        K线复权类别枚举定义
@@ -122,7 +152,7 @@
 
         判断是否为右开区间，即未指定结束时间
 
-    .. py:method:: is_valid_ktype(self, ktype)
+    .. py:staticmethod:: is_valid_ktype(ktype)
 
         判断指定的K线类型是否有效
 
@@ -162,7 +192,14 @@
 
     .. py:staticmethod:: get_ktype_in_min(ktype)
 
-        获取指定K线类型对应的分钟数
+        获取指定K线类型对应的分钟数。建议优先使用 ``get_ktype_in_seconds``，
+        后者同时覆盖 TRANS 等按秒计的周期。
+
+        :rtype: int
+
+    .. py:staticmethod:: get_ktype_in_seconds(ktype)
+
+        获取指定K线类型对应的秒数，覆盖 TRANS 等按秒计的周期。
 
         :rtype: int
 
@@ -400,16 +437,43 @@ StockManager/Block/Stock
         :return: 日期列表
         :rtype: DatetimeList
         
-    .. py:method:: is_holiday(self, d)
+    .. py:method:: is_holiday(self, d, market="SH")
 
-        判断时间对应日期是否为节假日(仅使用A股市场)
+        判断时间对应日期是否为指定市场的节假日
 
         :param Datetime d: 指定的时间
+        :param str market: 市场简称，使用该市场的节假日日历，默认为 "SH"
+        :return: 是否为节假日
         :rtype: bool
+
+        .. note:: 周末按市场区分：加密货币（24x7）周末不休市，其余市场周末休市；无自有节假日行的市场，工作日不算假日（照常交易）
+
+    .. py:method:: market_local_to_unified(self, d, market)
+
+        将以市场本地墙钟书写的时间转为统一表达（北京时间 naive）
+
+        K 线读出的 datetime 本身已是统一表达，用同一口径书写查询无需转换；仅当时刻来自该市场本地
+        钟面时才用本函数。日线及以上为纯交易日标签，禁止转换。
+
+        :param Datetime d: 该市场本地墙钟下的时间
+        :param str market: 市场简称
+        :return: 统一表达下的时间
+        :rtype: Datetime
+
+    .. py:method:: unified_to_market_local(self, d, market)
+
+        将统一表达（北京时间 naive）的时间转为该市场本地墙钟
+
+        :param Datetime d: 统一表达下的时间
+        :param str market: 市场简称
+        :return: 该市场本地墙钟下的时间
+        :rtype: Datetime
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 
         判断指定时间对应的日期是否为交易时间
+
+        节假日闸门按指定市场自身的日历与周末规则判断（如 BINANCE 周末不休市）
 
         :param Datetime d: 待判断的时间
         :param str market: 市场简称
@@ -782,6 +846,17 @@ StockManager/Block/Stock
     
     .. py:attribute:: market : 市场简称（如：沪市“SH”, 深市“SZ”）
     .. py:attribute:: name : 市场全称
-    .. py:attribute:: description :描述说明
+    .. py:attribute:: description : 描述说明
     .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
     .. py:attribute:: last_datetime : 该市场K线数据最后交易日期
+    .. py:attribute:: open_time1 : 交易时段1开始时间
+    .. py:attribute:: close_time1 : 交易时段1结束时间
+    .. py:attribute:: open_time2 : 交易时段2开始时间
+    .. py:attribute:: close_time2 : 交易时段2结束时间
+    .. py:attribute:: tz_offset_min : 标准 UTC 偏移（分钟），如 UTC+8 为 480
+    .. py:attribute:: dst_rule : 夏令时规则：0=无，1=美国，2=欧盟
+    .. py:attribute:: data_lag : 相对基准市场的可见性延迟（交易日）
+
+    .. py:method:: is_valid(self)
+
+        记录是否有效，market 为空表示无效（null）记录

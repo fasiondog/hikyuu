@@ -2354,4 +2354,43 @@ TEST_CASE("test_Stock_getLastUpdateTime_concurrent") {
     CHECK(true);  // survived without crash / data race
 }
 
+/** @par Test points */
+TEST_CASE("test_Stock_isTransactionTime") {
+    auto& sm = StockManager::instance();
+    Stock sh = sm.getStock("sh000001");
+    REQUIRE_UNARY(!sh.isNull());
+    Stock ndx = sm.getStock("NASDAQNDX");
+    REQUIRE_UNARY(!ndx.isNull());
+    Stock null_stock;
+
+    /** @arg a null stock is never in a transaction time */
+    CHECK_UNARY(!null_stock.isTransactionTime(Datetime(202110071000LL)));
+
+    /** @arg SH (930-1130/1300-1500): both session bounds and the lunch break */
+    CHECK_UNARY(sh.isTransactionTime(Datetime(202110080930LL)));
+    CHECK_UNARY(sh.isTransactionTime(Datetime(202110081130LL)));
+    CHECK_UNARY(!sh.isTransactionTime(Datetime(202110081131LL)));
+    CHECK_UNARY(!sh.isTransactionTime(Datetime(202110081259LL)));
+    CHECK_UNARY(sh.isTransactionTime(Datetime(202110081300LL)));
+    CHECK_UNARY(sh.isTransactionTime(Datetime(202110081500LL)));
+    CHECK_UNARY(!sh.isTransactionTime(Datetime(202110081501LL)));
+
+    /** @arg a single 0/0 session pair is not configured: local midnight is not a transaction time
+     *      (it must not fall into the empty session) */
+    CHECK_UNARY(!sh.isTransactionTime(Datetime(202110080000LL)));
+    CHECK_UNARY(!ndx.isTransactionTime(Datetime(202110070000LL)));
+
+    /** @arg the window is anchored to the input date, not the machine clock: a historical intraday
+     *      moment is judged on its own day */
+    CHECK_UNARY(sh.isTransactionTime(Datetime(199911100930LL)));
+
+    /** @arg NASDAQ (930-1600, second session not configured): the 30s tail margin covers the late
+     *      tick, noon is in session */
+    CHECK_UNARY(ndx.isTransactionTime(Datetime(202110070930LL)));
+    CHECK_UNARY(ndx.isTransactionTime(Datetime(202110071200LL)));
+    CHECK_UNARY(ndx.isTransactionTime(Datetime(202110071600LL)));
+    CHECK_UNARY(ndx.isTransactionTime(Datetime(20211007160025LL)));
+    CHECK_UNARY(!ndx.isTransactionTime(Datetime(202110071601LL)));
+}
+
 /** @} */

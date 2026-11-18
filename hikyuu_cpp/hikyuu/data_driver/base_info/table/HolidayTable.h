@@ -8,13 +8,14 @@
 #pragma once
 
 #include <limits>
+#include <string>
 #include "../../../utilities/db_connect/SQLStatementBase.h"
 #include "../../../utilities/db_connect/TableMacro.h"
 
 namespace hku {
 
 class HolidayTable {
-    TABLE_BIND1(HolidayTable, holiday, date)
+    TABLE_BIND2(HolidayTable, holiday, market, date)
 
 public:
     Datetime datetime() const {
@@ -22,7 +23,8 @@ public:
         return Datetime(date * 10000LL);
     }
 
-private:
+public:
+    std::string market;
     uint64_t date{Datetime().number()};
 };
 

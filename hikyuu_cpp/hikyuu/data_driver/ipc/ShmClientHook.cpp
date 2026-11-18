@@ -20,10 +20,8 @@
 namespace hku {
 namespace ipc {
 
-// The forwarding callback object: it is created on the heap at the registration and published with
-// release, the forwarding side reads it with acquire and then accesses it read-only; the object
-// stays resident for the process lifetime and is never released, avoiding a release-use race with
-// the market data thread (the forwarding reader); the registration happens only once or twice.
+// Heap-allocated forwarding callbacks published with release / read with acquire; they stay
+// resident for the process lifetime, avoiding a release-use race with the forwarding reader
 static std::atomic<ShmClientForwarders*> g_client{nullptr};
 
 struct CoveredKTypes {
@@ -37,8 +35,7 @@ struct ExtraKTypeBases {
     std::vector<std::pair<std::string, std::string>> bases;
 };
 
-// Immutable snapshot replaced at registration, kept resident for the same reason as g_client;
-// registrations follow the same single-threaded initialization convention as the extra type table
+// Immutable snapshot replaced at registration, resident like g_client; single-threaded init only
 static std::atomic<const ExtraKTypeBases*> g_extra_kbase{nullptr};
 
 // Same conversion rule as hku::to_upper, applied per character to avoid allocating on every query

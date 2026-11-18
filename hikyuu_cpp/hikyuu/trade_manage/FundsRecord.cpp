@@ -17,7 +17,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const FundsRecord& funds) {
     string strip(", ");
     os << "FundsRecord(" << funds.cash << strip << funds.market_value << strip
        << funds.short_market_value << strip << funds.base_cash << strip << funds.base_asset << strip
-       << funds.borrow_cash << strip << funds.borrow_asset << ")";
+       << funds.borrow_cash << strip << funds.borrow_asset << strip << funds.occupied_margin << ")";
 
     os.unsetf(std::ostream::floatfield);
     (void)os.precision();
@@ -44,6 +44,7 @@ FundsRecord FundsRecord::operator+(const FundsRecord& other) const {
     result.base_asset = base_asset + other.base_asset;
     result.borrow_cash = borrow_cash + other.borrow_cash;
     result.borrow_asset = borrow_asset + other.borrow_asset;
+    result.occupied_margin = occupied_margin + other.occupied_margin;
     return result;
 }
 
@@ -55,6 +56,7 @@ FundsRecord& FundsRecord::operator+=(const FundsRecord& other) {
     base_asset += other.base_asset;
     borrow_cash += other.borrow_cash;
     borrow_asset += other.borrow_asset;
+    occupied_margin += other.occupied_margin;
     return *this;
 }
 
@@ -63,7 +65,8 @@ bool HKU_API operator==(const FundsRecord& d1, const FundsRecord& d2) {
             recordNear(d1.short_market_value, d2.short_market_value) &&
             recordNear(d1.base_cash, d2.base_cash) && recordNear(d1.base_asset, d2.base_asset) &&
             recordNear(d1.borrow_cash, d2.borrow_cash) &&
-            recordNear(d1.borrow_asset, d2.borrow_asset));
+            recordNear(d1.borrow_asset, d2.borrow_asset) &&
+            recordNear(d1.occupied_margin, d2.occupied_margin));
 }
 
 } /* namespace hku */

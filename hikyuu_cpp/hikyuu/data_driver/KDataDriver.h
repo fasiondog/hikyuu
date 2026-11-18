@@ -87,6 +87,17 @@ public:
     virtual bool canParallelLoad() = 0;
 
     /**
+     * Whether the driver output datetime is already in the unified expression (Beijing wall
+     * clock, UTC+8); when true, Stock skips the market-local/unified conversion.
+     * @details Proxy drivers read server buffers already normalized; converting again shifts
+     *          every bar twice. Raw-storage drivers return market-local wall clock and keep the
+     *          default false.
+     */
+    virtual bool isUnifiedOutput() const {
+        return false;
+    }
+
+    /**
      * Get the amount of the K-line data of the given type
      * @param market market abbreviation
      * @param code   security code
@@ -214,6 +225,10 @@ public:
 
     bool canParallelLoad() {
         return m_driver->canParallelLoad();
+    }
+
+    bool isUnifiedOutput() {
+        return m_driver->isUnifiedOutput();
     }
 
     size_t getCount(const string& market, const string& code, const KQuery::KType& kType) {

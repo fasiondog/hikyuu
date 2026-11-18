@@ -9,6 +9,7 @@
 
 #include "hikyuu/KRecord.h"
 #include "hikyuu/KQuery.h"
+#include "hikyuu/StockWeight.h"
 #include "hikyuu/TimeLineRecord.h"
 #include "hikyuu/TransRecord.h"
 #include "hikyuu/utilities/plugin/PluginBase.h"
@@ -87,6 +88,39 @@ public:
     virtual bool addStockType(uint32_t type_id, const string& description, uint32_t precision,
                               double tick, double tick_value, double min_trade,
                               double max_trade) = 0;
+
+    /**
+     * @brief Write the variety-level parameters into the stockparam table of the baseinfo
+     *        database (they override the type-level defaults; a repeated call updates the row)
+     * @param market the market abbreviation (automatically converted to uppercase)
+     * @param code the security code; it must match the code stored in the stock table (uppercase),
+     *             otherwise the reading side silently falls back to the type-level defaults
+     * @param precision price precision (decimal places)
+     * @param tick minimum tick size
+     * @param tick_value value of every tick
+     * @param min_trade minimum trade volume per order
+     * @param max_trade maximum trade volume per order
+     * @return true success; false failure
+     * @note The table is created on demand; it takes effect only after hikyuu_init() is restarted
+     *       following the writing
+     */
+    virtual bool addStockParam(const string& market, const string& code, uint32_t precision,
+                               double tick, double tick_value, double min_trade,
+                               double max_trade) = 0;
+
+    /**
+     * @brief Write ex-rights/ex-dividend events into the stkweight table of the baseinfo database
+     *        (rows with the same market, code and date are skipped)
+     * @param market market abbreviation (converted to uppercase automatically)
+     * @param code the security code; it must match the code stored in the stock table (uppercase)
+     * @param weights events; the date is the ex-date, bonus is the cash dividend per 10 shares,
+     *                and suogu is the new/old share ratio of a split
+     * @return true on success (including an empty list); false on failure
+     * @note Prices must be raw prices with splits undone; hikyuu derives adjustment from the
+     *       events at runtime. A restart of hikyuu_init() is required after the writing.
+     */
+    virtual bool addStockWeight(const string& market, const string& code,
+                                const StockWeightList& weights) = 0;
 };
 
 }  // namespace hku

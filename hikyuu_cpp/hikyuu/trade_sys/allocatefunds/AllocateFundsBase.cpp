@@ -48,6 +48,19 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // ratio of the master reserve_percent is expressed by setting it to 1 - r.
     setParam<double>("max_total_position", 1.0);
 
+    // The per-channel signal cap (L2, mode A weight pricing only): the net exposure ratio a
+    // sub-system contributes -- its own net assets being the base -- is bounded to
+    // [-value, +value] before it is multiplied by the weight and the parent net assets (<=0
+    // disables the cap). It is the channel normalization, not a portfolio risk cap: a levered
+    // shadow (>1 means it borrows) reports its intent in units of its own equity, so the L1
+    // weights stay comparable and one channel cannot eat the whole max_total_position budget and
+    // force the proportional scale-down onto the others. The portfolio risk is bounded by
+    // max_single_position / max_total_position and by the account margin and cash gates; disabling
+    // both caps leaves only those hard limits (legs get rejected instead of being scaled). Mode B
+    // passes the sub-system instructions through and never prices a ratio, mode C has no aggregate
+    // target at all, so both ignore it; the fixed_amount pricing only uses the sign of the ratio
+    setParam<double>("max_signal_ratio", 1.0);
+
     // The pricing policy switch: when >0 the fixed amount takes precedence over the weights --
     // the per-instrument target in mode A / the per sub-system quota in mode B are both this
     // amount, and the L1 weights are ignored in the pricing. The sum is still bounded by
@@ -66,6 +79,7 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     setParam<double>("max_single_position", 1.0);
     setParam<double>("max_total_position", 1.0);
+    setParam<double>("max_signal_ratio", 1.0);
     setParam<double>("fixed_amount", 0.0);
     setParam<bool>("adjust_running_sys", true);
 }
@@ -94,6 +108,10 @@ void AllocateFundsBase::baseCheckParam(const string& name) const {
         // and a non-finite value silently disables the risk control as well
         double v = getParam<double>(name);
         HKU_ASSERT(std::isfinite(v) && v >= 0.0);
+    } else if (name == "max_signal_ratio") {
+        // <=0 disables the cap; a non-finite value would silently disable the channel
+        // normalization
+        HKU_ASSERT(std::isfinite(getParam<double>(name)));
     } else if (name == "fixed_amount") {
         // 0 disables the fixed amount; a negative or non-finite value would silently fall back to
         // the weight pricing
@@ -318,6 +336,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // mirror the sub books, so AF does not chase orphan holdings).
     double parent_net = tm->getFunds(date, ktype).net_assets();
     double fixed_amount = getParam<double>("fixed_amount");
+    double max_signal = getParam<double>("max_signal_ratio");
     // The dynamic position total control (see getTotalPositionScale) scales the cap. The static
     // cap <= 0 (or no net assets to price it) keeps the total control disabled; a zero effective
     // cap (the scale 0) is an enabled cap of zero = driven flat, so the enabled test must not be
@@ -370,7 +389,16 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             }
             weight = it->second;
         }
-        double v = weight * s.target_position_ratio * parent_net;
+        // The per-channel normalization: a sub-system reports its net exposure in units of its own
+        // net assets, so a levered shadow (>1) is bounded here instead of eating the whole budget
+        // and forcing the max_total_position scale-down onto the other channels. A non-finite ratio
+        // is an upstream bug and is left as it is, so the non-finite target check below still
+        // skips it instead of being masked by the cap
+        double ratio = s.target_position_ratio;
+        if (max_signal > 0.0 && std::isfinite(ratio)) {
+            ratio = std::clamp(ratio, -max_signal, max_signal);
+        }
+        double v = weight * ratio * parent_net;
         if (!std::isfinite(v)) {
             HKU_WARN("{}::_toTargets: non-finite target value of {}, skipped!", m_name,
                      s.stock.market_code());
@@ -416,7 +444,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             double unit = stk.unit();
             double min_trade = stk.minTradeNumber();
             if (p <= 0.0 || unit <= 0.0 ||
-                (min_trade > 0.0 && fixed_amount < min_trade * p * unit)) {
+                (min_trade > 0.0 && fixed_amount < tm->toAccount(stk, min_trade * p * unit))) {
                 target_value[stk] = 0.0;
                 continue;
             }
@@ -490,7 +518,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
                       stock.market_code());
             continue;
         }
-        double target_shares = kv.second / (p * unit);
+        double target_shares = kv.second / tm->toAccount(stock, p * unit);
         double cur_long = tm->getPosition(date, stock).number;
         double cur_short = tm->getShortPosition(stock).number;
         double cur_net = cur_long - cur_short;
@@ -604,9 +632,13 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
                             : 0.0;
         price_t unit = s.stock.unit();
         double u = (unit > 0.0) ? unit : 1.0;
-        double target_value = (current + s.number) * s.plan_price * u;
+        price_t target_value = tm ? tm->toAccount(s.stock, (current + s.number) * s.plan_price * u)
+                                  : (current + s.number) * s.plan_price * u;
         if (target_value > cap) {
-            double max_shares = (s.plan_price > 0.0) ? cap / (s.plan_price * u) : 0.0;
+            double max_shares =
+              (s.plan_price > 0.0)
+                ? cap / (tm ? tm->toAccount(s.stock, s.plan_price * u) : s.plan_price * u)
+                : 0.0;
             s.number = max_shares > current ? max_shares - current : 0.0;
             s.plan_cash = s.number * s.plan_price * u;  // Keep the exposed suggestion consistent
         }

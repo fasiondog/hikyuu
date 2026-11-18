@@ -45,8 +45,8 @@
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/STDEV.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA2017.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA2017.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Band.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCapitalFunds.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Signal.h>

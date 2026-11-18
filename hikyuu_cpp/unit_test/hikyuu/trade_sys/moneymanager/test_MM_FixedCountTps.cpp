@@ -8,9 +8,9 @@
 #include "doctest/doctest.h"
 #include <limits>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
-#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
+#include <hikyuu/trade_manage/crtTM.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/tradecost/crt/TC_FixedAPre2015.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCountTps.h>
 
 using namespace hku;

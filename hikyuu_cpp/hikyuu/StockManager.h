@@ -10,7 +10,10 @@
 #define STOCKMANAGER_H_
 
 #include <mutex>
+#include <shared_mutex>
 #include <thread>
+#include <unordered_map>
+#include <unordered_set>
 #include "hikyuu/utilities/Parameter.h"
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/utilities/plugin/PluginManager.h"
@@ -59,6 +62,16 @@ public:
      * @param context strategy context
      */
     void reloadWith(const StrategyContext& context);
+
+    /**
+     * Restrict the markets/security types loaded by the "ALL" scope; must-load securities and each
+     * market's representative index are always kept. Only affects a fresh load: call before preload
+     * starts, and narrowing never unregisters already loaded securities.
+     * @param marketList allowed market abbreviations, e.g. {"SH", "SZ"}; empty or "ALL" means no
+     *        restriction
+     * @param typeList allowed security types, e.g. {STOCKTYPE_A, 12}; empty means no restriction
+     */
+    void setLoadScope(const vector<string>& marketList, const vector<int>& typeList);
 
     /** Quit proactively and release the resources */
     static void quit();
@@ -128,11 +141,11 @@ public:
       std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
 
     /**
-     * Get the market information
+     * Get the market information; unknown markets yield Null<MarketInfo>() without querying the
+     * driver. The returned reference stays valid until the next reload.
      * @param market the given market identifier
-     * @return the matching market information; Null<MarketInfo>() if it does not exist
      */
-    MarketInfo getMarketInfo(const string& market) const noexcept;
+    const MarketInfo& getMarketInfo(const string& market) const noexcept;
 
     /**
      * Get the representative index security of the given market
@@ -220,15 +233,42 @@ public:
     const ZhBond10List& getZhBond10() const;
 
     /**
-     * Whether the date of the given time is a holiday (including Saturday and Sunday)
-     * @note Only the mainland China market is supported; Null<Datetime>() throws an exception
+     * Whether the given time's date is a market holiday
+     * @note Weekends count as holidays except 24h crypto markets; markets without holiday rows
+     *       have no weekday holidays; Null<Datetime>() throws
+     * @param d the given time
+     * @param market the given market
+     */
+    bool isHoliday(const Datetime& d, const std::string& market) const;
+
+    /**
+     * Convert a market-local wall-clock datetime to the unified expression (Beijing)
+     * @note K-line datetimes are already unified; use this only for the market's own clock.
+     *       Day-and-higher labels must not be converted (the caller decides what to convert).
+     * @param d the datetime in the market's local wall clock
+     * @param market the given market
+     */
+    Datetime marketLocalToUnified(const Datetime& d, const string& market) const;
+
+    /**
+     * Convert a datetime of the unified time expression (Beijing) to the market-local wall clock
+     * @param d the datetime in the unified expression
+     * @param market the given market
+     */
+    Datetime unifiedToMarketLocal(const Datetime& d, const string& market) const;
+
+    /**
+     * Whether the given time's date is a holiday (including weekends)
+     * @note Deprecated: use isHoliday(d, market); equivalent to isHoliday(d, "SH")
      * @param d the given time
      */
     bool isHoliday(const Datetime& d) const;
 
     /**
-     * Roughly judge whether the given time is inside the trading hours
-     * @param d the given time; Null<Datetime>() throws an exception
+     * Roughly judge whether the given time is inside trading hours
+     * @note d follows the unified clock (Beijing naive); holiday and session checks use the
+     *       market-local wall clock after conversion
+     * @param d the given time; Null<Datetime>() throws
      * @param market the given market
      */
     bool isTradingHours(const Datetime& d, const string& market = "SH") const;
@@ -242,20 +282,16 @@ public:
     /**
      * Get the equity/dividend adjustment (weight) list of the given security (through the base info
      * driver; in client mode it reads shm first and falls back to IPC/local when not covered)
-     * @note Used by StockManager::loadAllStockWeights to materialize the full weight set at startup
-     *       (the isAll branch calls getAllStockWeightList); in client mode it is also used by
-     *       Stock::getWeight as the lazy-loading fallback for securities that were not materialized
-     *       (config disabled, added by addStock, newly constructed, ...)
+     * @note Materializes the full weight set at startup (loadAllStockWeights) and serves as the
+     *       lazy-loading fallback of Stock::getWeight for non-materialized securities
      */
     StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
 
     /**
      * Add a Stock; only for special Stocks that are added temporarily
-     *
-     * Note: the added security is out of the startup loadAllStockWeights scope and does not get
-     * its ex-rights/ex-dividend data materialized: in the standalone main process getWeight
-     * returns empty for it (only the client / shm server roles would lazily load it on demand).
-     * This is intentional for the temporary special stocks this API targets.
+     * @note The added security is out of the startup loadAllStockWeights scope and gets no
+     *       materialized ex-rights data: getWeight returns empty for it in the standalone main
+     *       process (only the client / shm server roles lazily load it on demand) - intentional
      * @param stock
      * @return true on success | false on failure
      */
@@ -317,36 +353,19 @@ public:
     }
 
     /*
-     * Wait for the background preload thread to exit (idempotent: it returns immediately when the
-     * thread was never started or has already finished). It is only called on the program exit
-     * path, after cancelLoad() and before stopping m_load_tg, so that concurrent access
-     * (TOCTOU/UAF) to m_load_tg from the preload thread and the exit sequence is eliminated. That
-     * thread only loads data and dispatches load events, it performs no nng operation at all, and
-     * it checks m_cancel_load all the way, so it exits quickly after being cancelled; therefore
-     * this join will not become a new blocking point during the static destruction phase on
-     * Windows.
+     * Join the background preload thread on the exit path (after cancelLoad(), before stopping
+     * m_load_tg), eliminating the concurrent access (TOCTOU/UAF) to m_load_tg; idempotent, and the
+     * thread exits quickly once cancelled, so the join is not a new blocking point on exit
      */
     void joinPreloadThread();
 
     /**
-     * Release the locally cached weight and historical finance data of each security under the shm
-     * server role, reclaiming the memory duplicated with the shared-memory snapshot
-     * @details Called by the shmserver plugin after the "base info snapshot containing historical
-     *          finance data" is published successfully (the HISTORY_FINANCE_LOADED branch of
-     *          _onLoadEvent and the fallback publish at start()). After that, clients read through
-     *          shared memory, so the server does not need to keep two copies. It really runs only
-     *          when this process acts as the shm server and is not in client mode, otherwise it is
-     * a no-op:
-     *          - After the call, m_weight_ready / m_history_finance_ready of each security are set
-     * to false, the cache containers are cleared and the memory is returned; later Stock::getWeight
-     * / Stock::getHistoryFinance (IPC fallback reply, in-process API access) lazily reload them
-     * through the base info driver on demand, so the result stays correct at the cost of the first
-     * query of the accessed security;
-     *          - On the next data reload, loadAllStockWeights / the historical finance preload
-     *            materialize them again first, so the next snapshot rebuild is not affected;
-     *          - Never call it after publishing only the weight data (include_finance=false, i.e.
-     * the first publish after BASE_DATA_READY), otherwise the following publish that includes
-     *            finance data would read an empty weight table.
+     * Release the locally cached weight / historical finance data of each security under the shm
+     * server role, reclaiming the memory duplicated with the shared-memory snapshot; a no-op in
+     * other roles. Released data lazily reloads from the base info driver on demand, and the next
+     * reload materializes it again.
+     * @warning Do not call before the snapshot publish that includes finance data, otherwise that
+     * publish would read an empty weight table.
      */
     void releaseShmServerBaseInfoCache();
 
@@ -386,23 +405,21 @@ private:
 
     /* Load all the K-line data and historical finance data serially (when the driver does not
      * support parallel loading), executed in a separate thread */
-    void _loadAllKDataSerial(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes);
+    void _loadAllKDataSerial(const vector<KQuery::KType>& ktypes, const vector<string>& low_ktypes);
 
-    /* Load all the K-line data and historical finance data in parallel, executed in a separate
-     * thread
-     */
-    void _loadAllKDataParallel(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes);
+    /* Load all the K-line data and historical finance data in parallel, in a separate thread */
+    void _loadAllKDataParallel(const vector<KQuery::KType>& ktypes, const vector<string>& low_ktypes);
 
     /* Run the preload body inside a catch-all: an escaping exception would call std::terminate */
-    void _loadAllKDataSafely(vector<KQuery::KType> ktypes, const vector<string>& low_ktypes,
+    void _loadAllKDataSafely(const vector<KQuery::KType>& ktypes, const vector<string>& low_ktypes,
                              bool parallel);
 
-    /*
-     * Dispatch the data loading event to the registered plugin callbacks (declared unconditionally;
-     * called by loadData and the two loading functions). The core library no longer perceives the
-     * existence of the server, it only notifies in order; there is no overhead when no callback is
-     * registered.
-     */
+    /* Whether Saturday / Sunday count as holidays for the market: false for the 24h crypto
+     * markets (judged by the stock type of the representative index), true otherwise */
+    bool _weekendIsHoliday(const std::string& market) const;
+
+    /* Dispatch the data loading event to the registered plugin callbacks, in order; no overhead
+     * when no callback is registered */
     void _fireLoadEvent(LoadEvent event);
 
     /* Load the holiday information */
@@ -416,6 +433,12 @@ private:
 
     /* Load all the securities */
     void loadAllStocks();
+
+    /* Keep only the securities inside the configured load scope (plus the must-load list) */
+    void _filterStockInfoByLoadScope(vector<StockInfo>& stockInfos) const;
+
+    /* Whether a load scope (market / security type restriction) is configured */
+    bool _hasLoadScope() const;
 
     /* Load the internally generated sectors */
     void loadInnerBlocks();
@@ -459,7 +482,13 @@ private:
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
     mutable StockTypeInfoMap m_stockTypeInfo;
 
-    std::unordered_set<Datetime> m_holidays;  // Holidays
+    typedef std::unordered_map<std::string, std::unordered_set<Datetime>> HolidayMap;
+    HolidayMap m_holidays;  // Holidays grouped by market
+
+    // Whether Saturday / Sunday count as holidays for the market (false for the 24h crypto
+    // markets); a missing representative index keeps the default true and is not cached
+    mutable std::unordered_map<std::string, bool> m_weekend_holiday;
+    mutable std::shared_mutex m_weekend_holiday_mutex;
 
     ZhBond10List m_zh_bond10;  // 10-year Chinese government bond yield data
 
@@ -492,10 +521,9 @@ private:
 using LoadEventCallback = std::function<void(LoadEvent)>;
 
 /**
- * Register a data loading event callback, returning the callback id (subscribed when a plugin
- * start()s, used to publish the snapshot at the right moment)
- * @note The lock of the callback container is heap allocated and never released, so this function
- * and its inverse are safe to call during the static destruction phase as well
+ * Register a data loading event callback, returning the callback id
+ * @note The callback container's lock is heap allocated and never released, so both functions are
+ * safe during the static destruction phase
  */
 HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
 
@@ -504,12 +532,8 @@ HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
  * from inside a callback), so destroying the callback context right after it is safe */
 HKU_API void unregisterLoadEventCallback(size_t id);
 
-/**
- * Mark this process as the shm server role: _negotiateShmServer() skips the client negotiation
- * accordingly (to prevent self-connection)
- * @details Called by the facade startShmServer() before the plugin is loaded; it is safe to set
- * even if StockManager has not been initialized yet
- */
+/** Mark this process as the shm server role, so _negotiateShmServer() skips the client negotiation
+ * (to prevent self-connection); safe to call before initialization */
 HKU_API void setShmServerRole(bool role) noexcept;
 HKU_API bool isShmServerRole() noexcept;
 

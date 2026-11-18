@@ -1,0 +1,386 @@
+# coding: utf-8
+"""Multi-market representative index day-bar fixture generator
+
+Purpose: prepare test_data/{market}_day.h5 for multi-market unit tests (hdf5 backend,
+day bars only). The on-disk format is identical to hikyuu/data/tdx_to_h5.py + common_h5.py:
+  - dataset name = MARKET + code concatenated verbatim (HDF5 is case-sensitive; the C++
+    side looks up by market + code directly);
+  - datetime = trading day yyyymmdd0000 (day bars are pure date labels, no tz conversion);
+  - A-share markets (SH/SZ/BJ) store prices as real price x 1000 integers; other markets
+    store prices as Float64 at API scale (no 3-decimal cap);
+  - the h5 driver read side detects the stored datatype, so both layouts are supported;
+  - transAmount is approximate (close x volume), not the real turnover: the contract
+    multiplier / lot size is not applied, and for index-like instruments volume is the
+    constituent total whose product with the index level has no economic meaning; unit
+    tests do not assert its absolute value. transCount stores the API value as-is (lots)
+    for day bars.
+
+Best effort: when the target window is unavailable, walk the candidate source chain; if
+still not covered, fall back to "the source's actual earliest date + 3 years" and record
+the deviation in the manifest; markets with no data at all are marked uncovered (real
+data fetching belongs to the import program).
+
+Usage:
+    python hikyuu/test/tools/gen_multimarket_day_fixture.py              # prefer CSV cache; fetch only if missing
+    python hikyuu/test/tools/gen_multimarket_day_fixture.py --refresh    # force re-fetch
+    python hikyuu/test/tools/gen_multimarket_day_fixture.py --markets SHF,HK
+
+The CSV cache dir test_data/downloads/multi_market/ is not committed; the manifest (fetch
+audit record) and the generated .h5 files are committed together.
+"""
+
+import argparse
+import csv
+import datetime
+import os
+import sys
+
+import tables as tb
+
+CACHE_DIR = os.path.join("test_data", "downloads", "multi_market")
+MANIFEST = os.path.join("test_data", "multi_market_manifest.csv")  # committed; audits deviations/uncovered reasons
+SANE_MIN = datetime.date(1970, 1, 1)
+FALLBACK_YEARS = 3
+A_SHARE_MARKETS = {"SH", "SZ", "BJ"}
+
+# Target window aligns with the A-share fixture (sh_day.h5 ends 2011-12-06); newer instruments start at listing day
+SPEC = [
+    # market, code, precision, start, end, candidate source chain
+    ("SHF", "RB0000", 2, "20090327", "20111206", [("fut", "RB0"), ("fut_zh", "RB0")]),
+    ("CZC", "SR0000", 2, "20060106", "20111206", [("fut", "SR0"), ("fut_zh", "SR0")]),
+    ("CFE", "IF0000", 2, "20100416", "20111206", [("fut_zh", "IF0"), ("fut", "IF0")]),
+    ("DCE", "I0000", 2, "20131018", "20161017", [("fut_zh", "I0")]),
+    ("INE", "SC0000", 2, "20180326", "20210325", [("fut_zh", "SC0")]),
+    ("GFE", "SI0000", 2, "20221220", "20241219", [("fut_zh", "SI0")]),
+    ("HK", "HSI", 2, "20050104", "20111206", [("hk_idx", "HSI")]),
+    # The index must match the Market.code identity: .IXIC (composite) is longer but must not stand in for NDX
+    ("NASDAQ", "NDX", 2, "20050104", "20111206", [("us_idx", ".NDX")]),
+    ("NYSE", "DJI", 2, "20050104", "20111206", [("us_idx", ".DJI")]),
+    ("FX", "EURUSD", 5, "20050104", "20111206",
+     [("fx", "EURUSD"), ("fx_boc", "欧元"), ("ccy_ts", "EUR")]),
+    ("BINANCE", "BTCUSDT", 6, "20170817", "20200816", [("crypto", "BTCUSD")]),
+]
+
+CN_COLS = {"日期": "date", "开盘价": "open", "最高价": "high", "最低价": "low",
+           "收盘价": "close", "现价": "close", "成交量": "volume"}
+
+
+class KDayRecord(tb.IsDescription):
+    """Same layout as common_h5.H5Record (the C++ side reads by field name, order-free)"""
+    datetime = tb.UInt64Col()
+    openPrice = tb.UInt32Col()
+    highPrice = tb.UInt32Col()
+    lowPrice = tb.UInt32Col()
+    closePrice = tb.UInt32Col()
+    transAmount = tb.UInt64Col()
+    transCount = tb.UInt64Col()
+
+
+class KDayRecordF64(tb.IsDescription):
+    """Float64 K-line layout used by non-A-share markets (values at API scale)"""
+    datetime = tb.UInt64Col()
+    openPrice = tb.Float64Col()
+    highPrice = tb.Float64Col()
+    lowPrice = tb.Float64Col()
+    closePrice = tb.Float64Col()
+    transAmount = tb.Float64Col()
+    transCount = tb.Float64Col()
+
+
+def to_num(v):
+    s = str(v).replace(",", "").strip()
+    if s in ("", "nan", "None", "-"):
+        return 0.0
+    return float(s)
+
+
+def parse_date(v):
+    if v is None:
+        return None
+    s = str(v).strip().replace("/", "-")[:10]
+    fmt = "%Y-%m-%d" if "-" in s else "%Y%m%d"
+    try:
+        d = datetime.datetime.strptime(s, fmt).date()
+    except ValueError:
+        return None
+    return d if d >= SANE_MIN else None
+
+
+def ymd(d):
+    return d.year * 10000 + d.month * 100 + d.day
+
+
+def plus_years(d, years):
+    try:
+        return d.replace(year=d.year + years)
+    except ValueError:  # 2/29
+        return d.replace(year=d.year + years, day=d.day - 1)
+
+
+def fetch(kind, symbol):
+    """Return ascending (date, open, high, low, close, volume); sources without volume record 0"""
+    import akshare as ak
+
+    if kind == "crypto":
+        raise ValueError("crypto_js_spot has no daily history yet; historical source pending in the import program")
+
+    if kind == "fx_boc":
+        # BOC quote: the conversion price is per 100 units of foreign currency to CNY,
+        # divide by 100 for the unit price; bid acts as low, ask as high
+        df = ak.currency_boc_sina(symbol=symbol, start_date="20040101", end_date="20251231")
+        df = df.rename(columns={"日期": "date"})
+        rows = []
+        for r in df.itertuples(index=False):
+            d = parse_date(getattr(r, "date", None))
+            mid = to_num(getattr(r, "中行折算价", 0)) / 100.0
+            bid = to_num(getattr(r, "中行汇买价", 0)) / 100.0
+            ask = to_num(getattr(r, "中行汇卖价", 0)) / 100.0
+            if d is None or mid <= 0:
+                continue
+            lo = bid if bid > 0 else mid
+            hi = ask if ask > 0 else mid
+            rows.append((d, mid, max(mid, hi), min(mid, lo), mid, 0))
+        rows.sort(key=lambda x: x[0])
+        if not rows:
+            raise ValueError("empty result")
+        return rows
+
+    if kind == "ccy_ts":
+        df = ak.currency_time_series(symbol, ["USD"], "20040101", "20251231")
+        df = df.rename(columns={"时间": "date", "收盘价": "close"})
+        for c in ("open", "high", "low", "volume"):
+            df[c] = df["close"] if c != "volume" else 0
+        api = df
+    else:
+        api = {"fut": lambda: ak.futures_main_sina(symbol=symbol),
+               "fut_zh": lambda: ak.futures_zh_daily_sina(symbol=symbol),
+               "hk_idx": lambda: ak.stock_hk_index_daily_sina(symbol=symbol),
+               "us_idx": lambda: ak.index_us_stock_sina(symbol=symbol),
+               "fx": lambda: ak.forex_hist_em(symbol=symbol)}[kind]()
+
+    api = api.rename(columns=CN_COLS)
+    cols = list(api.columns)
+    if "close" not in cols:
+        raise KeyError("unrecognized columns: %s" % cols)
+
+    rows = []
+    for r in api.itertuples(index=False):
+        d = parse_date(getattr(r, "date", None) if "date" in cols else r[0])
+        if d is None:
+            continue
+
+        def pick(name, pos):
+            v = getattr(r, name, None) if name in cols else (r[pos] if pos < len(r) else None)
+            return to_num(v)
+
+        o, h, l, c = pick("open", 1), pick("high", 2), pick("low", 3), pick("close", 4)
+        v = pick("volume", 6)
+        rows.append((d, o, h, l, c, v))
+    rows.sort(key=lambda x: x[0])
+    if not rows:
+        raise ValueError("empty result")
+    return rows
+
+
+def cache_path(market, code):
+    return os.path.join(CACHE_DIR, "%s_%s.csv" % (market, code))
+
+
+def load_cache(path):
+    rows = []
+    with open(path, newline="", encoding="utf8") as f:
+        for r in csv.reader(f):
+            if len(r) < 6:
+                continue
+            rows.append((datetime.date(int(r[0][:4]), int(r[0][4:6]), int(r[0][6:8])),
+                         float(r[1]), float(r[2]), float(r[3]), float(r[4]), float(r[5])))
+    return sorted(rows, key=lambda x: x[0])
+
+
+def save_cache(path, rows):
+    with open(path, "w", newline="", encoding="utf8") as f:
+        csv.writer(f).writerows([("%08d" % ymd(r[0]),) + r[1:] for r in rows])
+
+
+def src_path(market, code):
+    """Records the real source beside the cache, so a cache hit does not record source as "cache"""
+    return os.path.join(CACHE_DIR, "%s_%s.src" % (market, code))
+
+
+def sanitize(rows):
+    """The single exit for bad bars (both cache and online fetch pass through): all four
+    prices present, high >= max(open,close), low <= min(open,close), weekends dropped.
+    Index/futures/stock sources have no weekend trading; future FX/CRYPTO weekend sessions
+    will need to relax this rule."""
+    out = []
+    for r in rows:
+        d, o, h, l, c = r[0], r[1], r[2], r[3], r[4]
+        if 0 in (o, h, l, c):
+            continue
+        if h < l or h < max(o, c) or l > min(o, c):
+            continue
+        if d.weekday() >= 5:
+            continue
+        out.append(r)
+    return out
+
+
+def pick_window(market, code, d1, d2, sources, refresh):
+    """Fetch window data along the candidate source chain. Returns (rows, source, deviation);
+    falls back to earliest available + 3 years when the window is not covered"""
+    path = cache_path(market, code)
+    errs = []
+    longest = None  # (rows, source note)
+
+    if os.path.exists(path) and not refresh:
+        rows = load_cache(path)
+        if not rows:
+            raise RuntimeError("cache empty: %s (re-fetch with --refresh)" % path)
+        clean = sanitize(rows)
+        if len(clean) != len(rows):  # old cache may predate the filter logic; write back after cleaning
+            save_cache(path, clean)
+        src = "cache"
+        if os.path.exists(src_path(market, code)):
+            with open(src_path(market, code), encoding="utf8") as f:
+                src = f.read().strip() or "cache"
+        cands = [(clean, src)]
+    else:
+        cands = []
+        for kind, symbol in sources:
+            try:
+                cands.append((sanitize(fetch(kind, symbol)), "%s(%s)" % (kind, symbol)))
+            except Exception as e:  # noqa: BLE001
+                errs.append("%s(%s): %s" % (kind, symbol, str(e)[:70]))
+        if not cands and os.path.exists(path):
+            # no regression on refresh failure: existing cache can still produce the fixture
+            rows = sanitize(load_cache(path))
+            if rows:
+                errs.append("refresh failed, falling back to old cache")
+                cands = [(rows, "cache")]
+        if cands:
+            # take the widest-coverage candidate to keep offline reruns and --refresh semantics valid
+            best = max(cands, key=lambda x: len(x[0]))
+            if not best[0]:
+                raise RuntimeError("source returned empty data: %s" % best[1])
+            save_cache(path, best[0])
+            with open(src_path(market, code), "w", encoding="utf8") as f:
+                f.write(best[1])
+
+    for rows, src in cands:
+        if longest is None or len(rows) > len(longest[0]):
+            longest = (rows, src)
+        picked = [r for r in rows if d1 <= r[0] <= d2]
+        if picked:
+            # symmetric start/end check: either side missing the target window is recorded as a deviation
+            notes = []
+            if (picked[0][0] - d1).days > 7:
+                notes.append("start delayed by %.0f days" % (picked[0][0] - d1).days)
+            if (d2 - picked[-1][0]).days > 7:
+                notes.append("end short by %.0f days" % (d2 - picked[-1][0]).days)
+            return picked, src, "; ".join(notes)
+
+    if longest is None:
+        raise RuntimeError("; ".join(errs) or "no available source")
+    rows, src = longest
+    if not rows:
+        raise RuntimeError("no available data: %s" % src)
+    s = rows[0][0]
+    e = plus_years(s, FALLBACK_YEARS)
+    picked = [r for r in rows if s <= r[0] <= e]
+    dev = ("window %s~%s not covered; fell back to earliest available %s + %d years"
+           % (ymd(d1), ymd(d2), ymd(s), FALLBACK_YEARS))
+    return picked, src, dev
+
+
+def build_h5(market, code, rows, dest_dir):
+    """A-share markets store prices as x1000 integers; other markets store Float64 at API
+    scale so no decimal precision is lost. The h5 driver reads by stored datatype."""
+    filename = os.path.join(dest_dir, "%s_day.h5" % market.lower())
+    if os.path.exists(filename):
+        os.remove(filename)
+    use_f64 = market.upper() not in A_SHARE_MARKETS
+    lost = 0
+    if not use_f64:
+        for _, o, h, l, c, _ in rows:
+            for v in (o, h, l, c):
+                raw = v * 1000
+                if abs(raw - round(raw)) > 1e-9:
+                    lost += 1
+    filters = tb.Filters(complevel=9, complib="zlib", shuffle=True)
+    with tb.open_file(filename, "w", filters=filters) as h5f:
+        group = h5f.create_group("/", "data")
+        desc = KDayRecordF64 if use_f64 else KDayRecord
+        table = h5f.create_table(group, (market + code).upper(), desc, expectedrows=len(rows))
+        row = table.row
+        for d, o, h, l, c, vol in rows:
+            row["datetime"] = ymd(d) * 10000
+            if use_f64:
+                row["openPrice"] = o
+                row["highPrice"] = h
+                row["lowPrice"] = l
+                row["closePrice"] = c
+                # transAmount is approximate (contract multiplier / lot size not applied);
+                # stored at API scale in ten-thousand-yuan
+                row["transAmount"] = c * vol * 0.1
+                row["transCount"] = vol
+            else:
+                row["openPrice"] = int(round(o * 1000))
+                row["highPrice"] = int(round(h * 1000))
+                row["lowPrice"] = int(round(l * 1000))
+                row["closePrice"] = int(round(c * 1000))
+                row["transAmount"] = int(round(c * vol))
+                row["transCount"] = int(vol)
+            row.append()
+        table.flush()
+    note = "" if not lost else "h5 caps at 3 decimals: %d price fields rounded (%d bars)" % (lost, len(rows))
+    return filename, note
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--refresh", action="store_true", help="ignore the CSV cache and re-fetch")
+    ap.add_argument("--markets", default="", help="comma-separated market names; default all")
+    ap.add_argument("--dest", default="test_data", help="h5 output directory")
+    ap.add_argument("--list", action="store_true", help="list the spec only")
+    args = ap.parse_args()
+
+    if args.list:
+        for m, c, p, s, e, srcs in SPEC:
+            print("%-8s %-8s prec=%d %s~%s %s" % (m, c, p, s, e, srcs))
+        return 0
+
+    wanted = {x.strip().upper() for x in args.markets.split(",") if x.strip()}
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    os.makedirs(args.dest, exist_ok=True)
+
+    manifest = []
+    summary = []
+    for market, code, precision, start, end, sources in SPEC:
+        if wanted and market not in wanted:
+            continue
+        d1 = datetime.date(int(start[:4]), int(start[4:6]), int(start[6:8]))
+        d2 = datetime.date(int(end[:4]), int(end[4:6]), int(end[6:8]))
+        try:
+            rows, src, dev = pick_window(market, code, d1, d2, sources, args.refresh)
+            filename, note = build_h5(market, code, rows, args.dest)
+            dev = "; ".join(x for x in (dev, note) if x)
+            manifest.append([market, code, len(rows), ymd(rows[0][0]), ymd(rows[-1][0]), src, dev])
+            summary.append("OK   %-8s %-8s rows=%-5d %s~%s%s"
+                           % (market, code, len(rows), rows[0][0], rows[-1][0],
+                              "  [dev] " + dev if dev else ""))
+        except Exception as e:  # noqa: BLE001
+            manifest.append([market, code, 0, "", "", "", "uncovered: %s" % e])
+            summary.append("FAIL %-8s %-8s %s" % (market, code, e))
+
+    with open(MANIFEST, "w", newline="", encoding="utf8") as f:
+        w = csv.writer(f)
+        w.writerow(["market", "code", "rows", "start", "end", "source", "deviation"])
+        w.writerows(manifest)
+
+    print("\n".join(summary))
+    print("\nmanifest -> %s" % MANIFEST)
+    return 1 if any(s.startswith("FAIL") for s in summary) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

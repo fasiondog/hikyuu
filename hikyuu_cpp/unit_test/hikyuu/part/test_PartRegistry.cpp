@@ -354,14 +354,15 @@ TEST_CASE("test_PartRegistry_meta_consistency") {
 
     /** @arg every registered meta is self consistent */
     const std::set<string> part_type_names = {
-      "Indicator",     "Signal",      "MoneyManager", "Stoploss",     "Condition",
-      "Environment",   "ProfitGoal",  "Slippage",     "Portfolio",    "Selector",
-      "AllocateFunds", "MultiFactor", "System",       "TradeManager", "TradeCost"};
+      "Indicator",  "Signal",       "MoneyManager", "Stoploss", "Condition",     "Environment",
+      "ProfitGoal", "Slippage",     "Portfolio",    "Selector", "AllocateFunds", "MultiFactor",
+      "System",     "TradeManager", "TradeCost",    "Margin"};
 
     vector<string> problems;
-    for (auto type : {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG,
-                      PartType::SP, PartType::AF, PartType::CN, PartType::EV, PartType::MF,
-                      PartType::PF, PartType::SE, PartType::SYS, PartType::TM, PartType::TC}) {
+    for (auto type :
+         {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG, PartType::SP,
+          PartType::AF, PartType::CN, PartType::EV, PartType::MF, PartType::PF, PartType::SE,
+          PartType::SYS, PartType::TM, PartType::TC, PartType::MG}) {
         for (const auto& m : reg.getMetaList(type)) {
             std::set<string> names;
             for (const auto& p : m.params) {
@@ -446,9 +447,8 @@ TEST_CASE("test_PartRegistry_createFromString_nesting") {
 
     PartMeta meta = makeMeta(name, PartType::IND, PartMeta::Source::BUILTIN);
     meta.params.push_back(ParamMeta{.name = "ind", .type = "Indicator", .is_part_param = true});
-    reg.registerPart(meta, [](const Parameter&, const PartRegistry::PartParamMap&) {
-        return Part(Indicator());
-    });
+    reg.registerPart(
+      meta, [](const Parameter&, const PartRegistry::PartParamMap&) { return Part(Indicator()); });
 
     /** @arg a shallow nesting of the part params is resolved */
     auto part = reg.createFromString(name + "(ind=" + name + ")");

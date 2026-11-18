@@ -37,6 +37,23 @@ bool SQLiteBaseInfoDriver::_init() {
     HKU_TRACE("SQLITE3: {}", dbname);
     m_pool = new ResourcePool<SQLiteConnect>(m_params);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
+
+    try {
+        auto con = m_pool->get();
+        int count = 0;
+        auto st = con->getStatement(
+          "select count(*) from sqlite_master where type='table' and name='stockparam'");
+        st->exec();
+        if (st->moveNext()) {
+            st->getColumn(0, count);
+            m_hasStockParam = count > 0;
+        }
+    } catch (std::exception& e) {
+        HKU_WARN("{}", e.what());
+    } catch (...) {
+        HKU_ERROR_UNKNOWN;
+    }
+
     return true;
 }
 
@@ -52,7 +69,8 @@ vector<MarketInfo> SQLiteBaseInfoDriver::getAllMarketInfo() {
             try {
                 result.emplace_back(info.market(), info.name(), info.description(), info.code(),
                                     info.lastDate(), info.openTime1(), info.closeTime1(),
-                                    info.openTime2(), info.closeTime2());
+                                    info.openTime2(), info.closeTime2(), info.tzOffsetMin(),
+                                    info.dstRule(), info.dataLag());
             } catch (std::exception& e) {
                 HKU_ERROR("Failed load market, {}", e.what());
             } catch (...) {
@@ -95,7 +113,7 @@ vector<StockInfo> SQLiteBaseInfoDriver::getAllStockInfo() {
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         auto con = m_pool->get();
-        con->batchLoad(result);
+        con->batchLoadView(result, StockInfo::getSelectSQL(m_hasStockParam));
     } catch (...) {
     }
     return result;
@@ -106,12 +124,12 @@ StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) 
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         to_upper(market);
-        // getSelectSQL() already carries the join conditions: the generic load() would append a
-        // second "where" to it, so the filters are appended with "and" directly
         auto con = m_pool->get();
-        con->loadView(result,
-                      fmt::format("{} and a.code=?1 and c.market=?2", StockInfo::getSelectSQL()),
-                      {code, market});
+        con->loadView(
+          result,
+          fmt::format("{} {} a.code=?1 and c.market=?2", StockInfo::getSelectSQL(m_hasStockParam),
+                      m_hasStockParam ? "where" : "and"),
+          {code, market});
     } catch (...) {
     }
     return result;
@@ -288,25 +306,6 @@ Parameter SQLiteBaseInfoDriver::getFinanceInfo(const string& market, const strin
     return result;
 }
 
-MarketInfo SQLiteBaseInfoDriver::getMarketInfo(const string& market) {
-    MarketInfo result;
-    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
-    auto con = m_pool->get();
-    try {
-        MarketInfoTable info;
-        string new_market(market);
-        to_upper(new_market);
-        con->load(info, Field("market") == new_market);
-        if (!info.market().empty()) {
-            result = MarketInfo(info.market(), info.name(), info.description(), info.code(),
-                                info.lastDate(), info.openTime1(), info.closeTime1(),
-                                info.openTime2(), info.closeTime2());
-        }
-    } catch (...) {
-    }
-    return result;
-}
-
 StockTypeInfo SQLiteBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     StockTypeInfo result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
@@ -323,16 +322,20 @@ StockTypeInfo SQLiteBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     return result;
 }
 
-std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
+std::unordered_map<std::string, std::unordered_set<Datetime>>
+SQLiteBaseInfoDriver::getAllHolidays() {
     HKU_ASSERT(m_pool);
-    std::unordered_set<Datetime> result;
+    std::unordered_map<std::string, std::unordered_set<Datetime>> result;
     try {
         auto con = m_pool->get();
         std::vector<HolidayTable> holidays;
         con->batchLoad(holidays);
         for (const auto& holiday : holidays) {
             try {
-                result.insert(holiday.datetime());
+                Datetime d = holiday.datetime();
+                std::string market(holiday.market);
+                to_upper(market);
+                result[std::move(market)].insert(d);
             } catch (std::exception& e) {
                 HKU_WARN(e.what());
             } catch (...) {

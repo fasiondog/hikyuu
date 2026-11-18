@@ -19,6 +19,7 @@ import KData
 import Indicator
 import NpApply
 import TradeCost
+import Margin
 
 import Environment
 import Factor
@@ -42,6 +43,7 @@ import Selector
 import MultiFactor
 import ExtInd
 import ExtraKType
+import MultiMarketTime
 import Part
 import test_common_sql
 
@@ -109,8 +111,10 @@ if __name__ == "__main__":
     suite.addTest(MultiFactor.suite())
     suite.addTest(ExtInd.suite())
     suite.addTest(ExtraKType.suite())
+    suite.addTest(MultiMarketTime.suite())
     suite.addTest(Misc.suite())
     suite.addTest(Part.suite())
+    suite.addTest(Margin.suite())
     suite.addTest(Block.suite())
     suite.addTest(PositionRecord.suite())
     suite.addTest(test_common_sql.suite())

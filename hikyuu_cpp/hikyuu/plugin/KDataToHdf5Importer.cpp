@@ -83,4 +83,17 @@ bool KDataToHdf5Importer::addStockType(uint32_t type_id, const string& descripti
                     : false;
 }
 
+bool KDataToHdf5Importer::addStockParam(const string& market, const string& code,
+                                        uint32_t precision, double tick, double tick_value,
+                                        double min_trade, double max_trade) {
+    return m_plugin ? m_plugin->addStockParam(market, code, precision, tick, tick_value, min_trade,
+                                              max_trade)
+                    : false;
+}
+
+bool KDataToHdf5Importer::addStockWeight(const string& market, const string& code,
+                                         const StockWeightList& weights) {
+    return m_plugin ? m_plugin->addStockWeight(market, code, weights) : false;
+}
+
 }  // namespace hku

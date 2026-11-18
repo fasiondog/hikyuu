@@ -409,8 +409,25 @@ void System::readyForRun() {
     if (m_tp)
         m_tp->setTM(m_tm);
 
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
+    // The system switches can only widen the trade manager's financing: a system that leaves them
+    // off must not silently disable a margin account the caller configured, which would drop the
+    // whole book back to the cash accounting
+    bool sys_borrow_cash = getParam<bool>("support_borrow_cash");
+    bool tm_borrow_cash = m_tm->tryGetParam<bool>("support_borrow_cash", false);
+    HKU_WARN_IF(
+      !sys_borrow_cash && tm_borrow_cash,
+      "{} support_borrow_cash=False would disable the financing of the trade manager, the "
+      "account keeps it enabled!",
+      name());
+    m_tm->setParam<bool>("support_borrow_cash", sys_borrow_cash || tm_borrow_cash);
+
+    bool sys_borrow_stock = getParam<bool>("support_borrow_stock");
+    bool tm_borrow_stock = m_tm->tryGetParam<bool>("support_borrow_stock", false);
+    HKU_WARN_IF(!sys_borrow_stock && tm_borrow_stock,
+                "{} support_borrow_stock=False would disable the securities lending of the trade "
+                "manager, the account keeps it enabled!",
+                name());
+    m_tm->setParam<bool>("support_borrow_stock", sys_borrow_stock || tm_borrow_stock);
 }
 
 void System::run(const KQuery& query, bool reset, bool resetAll) {
@@ -611,12 +628,31 @@ TradeRecord System::_runMomentOnOpen(const KRecord& today, const KRecord& src_to
                         "{}, close: {}, high: {}, low: {}",
                         name(), today.datetime, today.closePrice, today.highPrice, today.lowPrice);
 
+    // A liquidation queued at the previous settlement is executed first: the forced flattening
+    // must not be blocked by the requests queued at the previous close
+    TradeRecord liquidated = _liquidateOnOpen(today, src_today);
+    if (!liquidated.isNull()) {
+        // The account was just closed out: a queued delayed entry would rebuild the position at
+        // this very open and defeat the risk control
+        _dropPendingEntries();
+    }
+
     // Process the existing trade requests
     result = _processRequest(today, src_today);
-    return result;
+    return result.isNull() ? liquidated : result;
 }
 
 TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_today) {
+    // The day end sequence: the trades of the bar, then the expiry flattening, then the daily
+    // settlement. Only a wrapper can keep the settlement behind the early returns of the trading
+    // body, and every driver (run, runMoment*, the aggregate members) goes through it
+    TradeRecord traded = _tradeOnClose(today, src_today);
+    TradeRecord expired = _liquidateOnExpiry(today, src_today);
+    m_tm->settlement(today.datetime, m_kdata.getQuery().kType());
+    return traded.isNull() ? expired : traded;
+}
+
+TradeRecord System::_tradeOnClose(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
 
     //----------------------------------------------------------
@@ -633,26 +669,11 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     m_pre_ev_valid = current_ev_valid;
     m_pre_cn_valid = current_cn_valid;
 
-    // The entry intent is void once the environment or the condition turns invalid: a queued
-    // delayed buy or sell-short would re-enter right after the forced exit (the queued sells and
-    // covers are kept, they cut the risk instead of adding it)
-    auto drop_pending_entries = [&]() {
-        if (!m_buyRequestList.empty()) {
-            HKU_INFO_IF(trace, "[{}] drop {} pending buy request(s)", name(),
-                        m_buyRequestList.size());
-            m_buyRequestList.clear();
-        }
-        if (!m_sellShortRequestList.empty()) {
-            HKU_INFO_IF(trace, "[{}] drop {} pending sell-short request(s)", name(),
-                        m_sellShortRequestList.size());
-            m_sellShortRequestList.clear();
-        }
-    };
-
+    // The entry intent is void once the environment or the condition turns invalid
     // If the current environment is invalid
     if (!current_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] current EV is invalid", name()));
-        drop_pending_entries();
+        _dropPendingEntries();
         TradeRecord tr;
         // If a long position is held, liquidate it; sell_delay decides the fill timing (this close
         // or the next open)
@@ -688,7 +709,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     // If the system is currently invalid
     if (!current_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] current CN is invalid", name()));
-        drop_pending_entries();
+        _dropPendingEntries();
         TradeRecord tr;
         // If a long position is held, liquidate it (the fill timing follows sell_delay)
         if (m_tm->have(m_stock)) {
@@ -871,6 +892,72 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     return result;
 }
 
+TradeRecord System::_liquidateOnOpen(const KRecord& today, const KRecord& src_today) {
+    TradeRecord result;
+    HKU_IF_RETURN(!m_tm || m_stock.isNull(), result);
+    // The queue is armed by the previous settlement and the next open is the earliest executable
+    // moment, the same next bar convention the delayed requests follow
+    HKU_IF_RETURN(!m_tm->isForcedLiquidationQueued(today.datetime), result);
+
+    HKU_INFO_IF(getParam<bool>("trace"), "[{}] {} margin call, liquidate at the open", name(),
+                m_stock.market_code());
+
+    // Both sides are flattened at the open: a margin call closes the account, not only the side
+    // the strategy happened to open
+    if (m_tm->have(m_stock)) {
+        result = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, true);
+    }
+    if (m_tm->haveShort(m_stock)) {
+        TradeRecord cover = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, true);
+        if (result.isNull()) {
+            result = cover;
+        }
+    }
+    return result;
+}
+
+TradeRecord System::_liquidateOnExpiry(const KRecord& today, const KRecord& src_today) {
+    TradeRecord result;
+    HKU_IF_RETURN(!m_tm || m_stock.isNull(), result);
+    // Only a margin-locked holding expires; a holding the model booked on the cash side locks
+    // nothing, and the plain cash books keep their positions past the end of the data, so an
+    // A-share backtest stays byte identical
+    HKU_IF_RETURN(m_tm->getPosition(today.datetime, m_stock).margin <= 0.0 &&
+                    m_tm->getShortPosition(m_stock).margin <= 0.0,
+                  result);
+    const Datetime& last = m_stock.lastDatetime();
+    HKU_IF_RETURN(last.isNull() || today.datetime < last, result);
+
+    HKU_INFO_IF(getParam<bool>("trace"), "[{}] {} reached its last bar {}, liquidate at the close",
+                name(), m_stock.market_code(), last);
+
+    // Unconditional (G12): the expiry is a property of the data, not of the margin call state. The
+    // fill takes the close of the expiry bar and never waits for the next open
+    if (m_tm->have(m_stock)) {
+        result = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, false);
+    }
+    if (m_tm->haveShort(m_stock)) {
+        TradeRecord cover = _sellForce(today.datetime, MAX_DOUBLE, PART_INVALID, false);
+        if (result.isNull()) {
+            result = cover;
+        }
+    }
+    return result;
+}
+
+void System::_dropPendingEntries() {
+    bool trace = getParam<bool>("trace");
+    if (!m_buyRequestList.empty()) {
+        HKU_INFO_IF(trace, "[{}] drop {} pending buy request(s)", name(), m_buyRequestList.size());
+        m_buyRequestList.clear();
+    }
+    if (!m_sellShortRequestList.empty()) {
+        HKU_INFO_IF(trace, "[{}] drop {} pending sell-short request(s)", name(),
+                    m_sellShortRequestList.size());
+        m_sellShortRequestList.clear();
+    }
+}
+
 TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
 
@@ -959,7 +1046,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     }
 
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
-    _autoCheckin(today.datetime, realPrice, number);
+    _autoCheckin(today.datetime, realPrice, number, false);
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
@@ -1050,7 +1137,16 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
                 CostRecord cost = m_tm->getBuyCost(today.datetime, m_stock, realPrice, number);
                 price_t need = roundEx(
                   roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
-                if (m_tm->cash(today.datetime, m_kdata.getQuery().kType()) < need) {
+                // A margin-accounted opening only pays its margin and the fee, so the same
+                // formula as the trade manager decides whether the fill price still fits the cash
+                if (m_tm->isMarginAccounted(m_stock)) {
+                    need = roundEx(m_tm->getOpenMarginToLock(today.datetime, m_stock, realPrice,
+                                                             number, MarginSide::LONG) +
+                                     cost.total,
+                                   precision);
+                }
+                if (m_tm->cash(today.datetime, m_kdata.getQuery().kType()) <
+                    m_tm->toAccount(m_stock, need)) {
                     number =
                       _getBuyNumber(today.datetime, realPrice, realPrice - stoploss, req.from);
                 }
@@ -1080,7 +1176,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        _autoCheckin(today.datetime, realPrice, number);
+        _autoCheckin(today.datetime, realPrice, number, false);
         TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
                                        goalPrice, planPrice, req.from);
         if (BUSINESS_BUY != record.business) {
@@ -1112,17 +1208,32 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
     m_buyRequestList.push_back(req);
 }
 
-void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number) {
+void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number, bool cover) {
     HKU_IF_RETURN(!m_mm || !m_mm->getParam<bool>("auto_checkin"), void());
     HKU_IF_RETURN(datetime < m_tm->lastDatetime(), void());
 
-    // Deposit once per trade with the affordability formula of TradeManager::buy; the gap is
-    // rounded up so the following buy always passes its cash check
+    // Deposit once per trade with the affordability formula of the trade manager; the gap is
+    // rounded up so the following order always passes its cash check. A margin-accounted opening
+    // only pays its margin and the fee (the rest is financed) and a margin-accounted cover pays
+    // nothing at all (it returns the margin and settles the profit, an overdraft is legal), so
+    // neither may deposit the full notional and inflate the principal
+    if (cover) {
+        PositionRecord pos = m_tm->getShortPosition(m_stock);
+        HKU_IF_RETURN(pos.number <= 0.0 || pos.margin > 0.0, void());
+    }
+
     int precision = m_tm->precision();
     CostRecord cost = m_tm->getBuyCost(datetime, m_stock, realPrice, number);
     price_t needed =
       roundEx(roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
+    if (!cover && m_tm->isMarginAccounted(m_stock)) {
+        needed = roundEx(
+          m_tm->getOpenMarginToLock(datetime, m_stock, realPrice, number, MarginSide::LONG) +
+            cost.total,
+          precision);
+    }
     price_t cash = m_tm->cash(datetime, m_kdata.getQuery().kType());
+    needed = m_tm->toAccount(m_stock, needed);
     if (cash < needed) {
         m_tm->checkin(datetime, roundUp(needed - cash, precision));
     }
@@ -1177,10 +1288,10 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
         }
     }
 
-    // A short cover pays cash like a buy, so it gets the same top-up: a forced liquidation must
-    // not be blocked on a cash-poor account
+    // A short cover pays cash like a buy in the plain books, so it gets the same top-up: a
+    // forced liquidation must not be blocked on a cash-poor account
     if (cover_short) {
-        _autoCheckin(date, realPrice, real_sell_num);
+        _autoCheckin(date, realPrice, real_sell_num, true);
     }
 
     record = cover_short ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num,
@@ -1486,8 +1597,9 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
 
     price_t goalPrice = std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, planPrice);
 
-    // A cover pays cash like a buy: top up the gap, or a cash-poor account cannot close its short
-    _autoCheckin(today.datetime, realPrice, number);
+    // A cover pays cash like a buy in the plain books: top up the gap, or a cash-poor account
+    // cannot close its short
+    _autoCheckin(today.datetime, realPrice, number, true);
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
     if (BUSINESS_BUY_SHORT != record.business) {
@@ -1590,9 +1702,9 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             number = pos.number;
         }
 
-        // A cover pays cash like a buy: top up the gap, or a cash-poor account cannot close its
-        // short
-        _autoCheckin(today.datetime, realPrice, number);
+        // A cover pays cash like a buy in the plain books: top up the gap, or a cash-poor
+        // account cannot close its short
+        _autoCheckin(today.datetime, realPrice, number, true);
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {

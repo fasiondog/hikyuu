@@ -51,9 +51,14 @@ public:
 
 private:
     void H5ReadRecords(H5::DataSet&, hsize_t, hsize_t, void*);
+    void H5ReadF64Records(H5::DataSet&, hsize_t, hsize_t, void*);
+    void H5ReadDatetimes(H5::DataSet&, hsize_t, hsize_t, uint64_t*);
     void H5ReadIndexRecords(H5::DataSet&, hsize_t, hsize_t, void*);
     void H5ReadTimeLineRecords(H5::DataSet&, hsize_t, hsize_t, void*);
     void H5ReadTransRecords(H5::DataSet&, hsize_t, hsize_t, void*);
+
+    // Decide from the stored datatype so existing fixed-point files stay readable
+    bool isF64KRecordDataSet(const H5::DataSet&);
 
     bool _getH5FileAndGroup(const string& market, const string& code, KQuery::KType kType,
                             H5FilePtr& out_file, H5::Group& out_group);
@@ -78,6 +83,7 @@ private:
 
 private:
     H5::CompType m_h5DataType;
+    H5::CompType m_h5DataTypeF64;
     H5::CompType m_h5IndexType;
     H5::CompType m_h5TimeLineType;
     H5::CompType m_h5TransType;

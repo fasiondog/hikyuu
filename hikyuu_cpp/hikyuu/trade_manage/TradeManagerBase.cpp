@@ -16,6 +16,95 @@ BOOST_CLASS_EXPORT(hku::TradeManagerBase)
 
 namespace hku {
 
+TradeManagerBase::TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
+: m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
+    setParam<int>("precision", 2);  // Calculation precision
+    // Off by default so plain cash books stay unchanged
+    setParam<bool>("margin_accounting", false);
+    setParam<bool>("settle_with_close", true);
+    setParam<bool>("force_liquidate", false);
+    // The proration base of the daily margin interest
+    setParam<int>("annual_days", 365);
+    // The fixed rate of each foreign market, see currency_rates
+    setParam<string>("currency_rates", "");
+}
+
+shared_ptr<TradeManagerBase> TradeManagerBase::clone() {
+    shared_ptr<TradeManagerBase> p = _clone();
+    HKU_CHECK(p, "Invalid ptr from _clone!");
+    p->m_params = m_params;
+    p->m_name = m_name;
+    p->m_is_python_object = m_is_python_object;
+    p->m_broker_last_datetime = m_broker_last_datetime;
+    // Deep copy: models are cloned, not shared, so the copy never drives the source's instances
+    p->m_costfunc = m_costfunc ? m_costfunc->clone() : m_costfunc;
+    p->m_margin = m_margin ? m_margin->clone() : m_margin;
+    // Brokers are live connections and stay shared by design
+    p->m_broker_list = m_broker_list;
+    return p;
+}
+
+PriceList TradeManagerBase::getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype) {
+    FundsList funds_list = getFundsList(dates, ktype);
+    PriceList ret(funds_list.size());
+    int precision = getParam<int>("precision");
+    for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+        ret[i] = roundEx(funds_list[i].total_assets(), precision);
+    }
+    return ret;
+}
+
+PriceList TradeManagerBase::getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype) {
+    FundsList funds_list = getFundsList(dates, ktype);
+    PriceList ret(funds_list.size());
+    int precision = getParam<int>("precision");
+    for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+        ret[i] = roundEx(funds_list[i].profit(), precision);
+    }
+    return ret;
+}
+
+PriceList TradeManagerBase::getProfitCumChangeCurve(const DatetimeList& dates,
+                                                    const KQuery::KType& ktype) {
+    FundsList funds_list = getFundsList(dates, ktype);
+    PriceList ret(funds_list.size());
+    int precision = getParam<int>("precision");
+    for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+        price_t base = funds_list[i].total_base();
+        ret[i] =
+          base != 0.0 ? roundEx(funds_list[i].total_assets() / base, precision) : Null<price_t>();
+    }
+    return ret;
+}
+
+PriceList TradeManagerBase::getBaseAssetsCurve(const DatetimeList& dates,
+                                               const KQuery::KType& ktype) {
+    FundsList funds_list = getFundsList(dates, ktype);
+    PriceList ret(funds_list.size());
+    for (size_t i = 0, total = funds_list.size(); i < total; i++) {
+        ret[i] = funds_list[i].total_base();
+    }
+    return ret;
+}
+
+price_t TradeManagerBase::_currencyRate(const Stock& stock) const {
+    // An empty table keeps single-currency books untouched, with no warning
+    HKU_IF_RETURN(stock.isNull() || m_currency_rates.empty(), 1.0);
+    if (m_currency_rates.has(stock)) {
+        return m_currency_rates.lookup(stock, 1.0);
+    }
+
+    // A market missing from a configured table is still billed at 1.0: warn once per market
+    {
+        // getFundsList values the dates in parallel, so the one-off set needs the lock
+        std::lock_guard<std::mutex> lock(m_fx_warned_mutex);
+        HKU_IF_RETURN(!m_fx_warned.insert(stock.market()).second, 1.0);
+    }
+    HKU_WARN("{} {} has no currency rate, its amounts are billed at 1.0!", m_name,
+             stock.market_code());
+    return 1.0;
+}
+
 FundsList TradeManagerBase::getFundsList(const DatetimeList& dates, const KQuery::KType& ktype) {
     size_t total = dates.size();
     FundsList result;
@@ -115,6 +204,114 @@ std::vector<std::pair<Datetime, double>> TradeManagerBase::getProfitPercentYearl
     HKU_ERROR_IF_RETURN(!plugin, ret, "Can't find {} plugin!", HKU_PLUGIN_TMREPORT);
     ret = plugin->getProfitPercentYearly(shared_from_this(), datetime);
     return ret;
+}
+
+price_t TradeManagerBase::getOpenMarginToLock(const Datetime& datetime, const Stock& stock,
+                                              price_t price, double num, MarginSide side) const {
+    price_t raw = getOpenMargin(datetime, stock, price, num, side);
+    HKU_IF_RETURN(!(raw > 0.0), 0.0);
+
+    int precision = getParam<int>("precision");
+    price_t locked = roundEx(raw, precision);
+    return locked > 0.0 ? locked : 1.0 / std::pow(10.0, double(precision));
+}
+
+bool TradeManagerBase::isMarginAccounted(const Stock& stock) const {
+    HKU_IF_RETURN(!m_margin || stock.isNull(), false);
+    // An archive written before this switch existed carries no such key
+    HKU_IF_RETURN(!tryGetParam<bool>("margin_accounting", false), false);
+    HKU_IF_RETURN(!m_margin->isMarginTrading(stock), false);
+    bool borrow_cash = haveParam("support_borrow_cash") && getParam<bool>("support_borrow_cash");
+    return borrow_cash || !m_margin->needBorrowAsset(stock);
+}
+
+price_t TradeManagerBase::getOccupiedMargin(const Datetime& datetime, KQuery::KType ktype) const {
+    price_t result = 0.0;
+    HKU_IF_RETURN(!m_margin, result);
+
+    // Mirror getFunds: unset or last trade date values at the last trade moment, others at that
+    // day's close
+    Datetime valued = _valuationDatetime(datetime);
+
+    PositionRecordList positions = getPositionList();
+    for (const auto& record : positions) {
+        if (!m_margin->isMarginTrading(record.stock))
+            continue;
+        price_t price = record.stock.getMarketValue(valued, ktype);
+        // The model answers in the security's currency, the account sums in its own
+        result += toAccount(record.stock, m_margin->getOpenMargin(valued, record.stock, price,
+                                                                  record.number, MarginSide::LONG));
+    }
+
+    positions = getShortPositionList();
+    for (const auto& record : positions) {
+        if (!m_margin->isMarginTrading(record.stock))
+            continue;
+        price_t price = record.stock.getMarketValue(valued, ktype);
+        result += toAccount(
+          record.stock,
+          m_margin->getOpenMargin(valued, record.stock, price, record.number, MarginSide::SHORT));
+    }
+    return result;
+}
+
+price_t TradeManagerBase::getAvailableMargin(const Datetime& datetime, KQuery::KType ktype) {
+    HKU_CHECK(datetime == Null<Datetime>() || datetime >= lastDatetime(),
+              "getAvailableMargin supports only the current or a future moment!");
+    // getFunds applies pending weights first, changing holdings the other two operands price
+    price_t net_assets = getFunds(datetime, ktype).net_assets();
+    price_t haircut = getCollateralHaircut(datetime, ktype);
+    return net_assets - haircut - getOccupiedMargin(datetime, ktype);
+}
+
+price_t TradeManagerBase::getCollateralHaircut(const Datetime& datetime,
+                                               KQuery::KType ktype) const {
+    // Only current holdings are discounted; a past date pairs them with a stale price, as in
+    // getAvailableMargin
+    HKU_CHECK(datetime.isNull() || datetime >= lastDatetime(),
+              "getCollateralHaircut supports only the current or a future moment!");
+    price_t result = 0.0;
+    HKU_IF_RETURN(!m_margin, result);
+
+    Datetime valued = _valuationDatetime(datetime);
+    int precision = getParam<int>("precision");
+    for (const auto& record : getPositionList()) {
+        if (!m_margin->isMarginTrading(record.stock))
+            continue;
+        double rate = getCollateralRate(valued, record.stock, MarginSide::LONG);
+        // A rate outside (0, 1] breaks the contract (a Python model can return it silently):
+        // discount nothing and warn, as a bad margin rate falls back to cash
+        if (!(rate > 0.0 && rate <= 1.0)) {
+            HKU_WARN(
+              "{} {} collateral rate({}) is out of (0, 1], the holding is not "
+              "discounted!",
+              valued, record.stock.market_code(), rate);
+            continue;
+        }
+        // The default 1.0 discounts nothing, so no pricing is needed
+        if (rate >= 1.0) {
+            continue;
+        }
+        // Round the nominal before discounting, as for margin bases, to avoid half-cent drift
+        // per holding
+        price_t mv =
+          roundEx(record.stock.getMarketValue(valued, ktype) * record.number * record.stock.unit(),
+                  precision);
+        // The discount is a share of net assets, so the base is in account currency
+        price_t base = toAccount(record.stock, mv);
+        if (record.margin > 0.0) {
+            // Only a margin holding's equity contribution counts: a loss deeper than the margin
+            // leaves nothing to discount. Locked margin is already in account currency, floating
+            // profit is not
+            base =
+              roundEx(record.margin + toAccount(record.stock, mv - record.settleBasis), precision);
+            if (base < 0.0) {
+                base = 0.0;
+            }
+        }
+        result = roundEx(result + base * (1.0 - rate), precision);
+    }
+    return result;
 }
 
 }  // namespace hku

@@ -22,6 +22,14 @@ public:
 
         m_name = tm->name();
         m_costfunc = m_tm->costFunc();
+
+        // Mirror the wrapped account's accounting params on the view: getParam/setParam are
+        // non-virtual, so the System pre-checks (the deposit sizing, the delayed-buy re-size,
+        // readyForRun) read the view while the real booking reads the wrapped account. A stale
+        // default would round on another precision grid or warn about a switch the account never
+        // lost. The mirror is read-only: a write through the view never reaches the shared account
+        // (the host WalkForwardSystem writes the merged switches straight onto the real book)
+        _mirrorParams();
     }
 
     virtual ~WalkForwardTradeManager() {}
@@ -34,7 +42,24 @@ public:
         WalkForwardTradeManager* p = new WalkForwardTradeManager();
         p->m_tm = m_tm->clone();
         p->m_run_start = m_run_start;
+        p->_mirrorParams();
         return shared_ptr<TradeManagerBase>(p);
+    }
+
+    /** Copy the wrapped account's accounting params onto the view (see the constructor) */
+    void _mirrorParams() {
+        setParam<int>("precision", m_tm->precision());
+        setParam<bool>("margin_accounting", m_tm->tryGetParam<bool>("margin_accounting", false));
+        setParam<bool>("settle_with_close", m_tm->tryGetParam<bool>("settle_with_close", true));
+        setParam<bool>("force_liquidate", m_tm->tryGetParam<bool>("force_liquidate", false));
+        setParam<bool>("support_borrow_cash",
+                       m_tm->tryGetParam<bool>("support_borrow_cash", false));
+        setParam<bool>("support_borrow_stock",
+                       m_tm->tryGetParam<bool>("support_borrow_stock", false));
+        setParam<int>("annual_days", m_tm->tryGetParam<int>("annual_days", 365));
+        // The System pre-checks convert with the view, so a missing mirror would value the need of
+        // a foreign market at 1.0 while the real account books it at its rate
+        setParam<string>("currency_rates", m_tm->tryGetParam<string>("currency_rates", ""));
     }
 
     /**
@@ -50,9 +75,90 @@ public:
      * Get the margin rate of the given security
      * @param datetime date
      * @param stock the given security
+     * @note Before the window the rate is 1.0, i.e. the plain no-leverage semantics; 0 would read
+     * as an infinite buying power
      */
     virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override {
-        return (datetime >= m_run_start) ? m_tm->getMarginRate(datetime, stock) : 0.0;
+        return (datetime >= m_run_start) ? m_tm->getMarginRate(datetime, stock) : 1.0;
+    }
+
+    /**
+     * The margin model of the wrapped account
+     * @note Forwarded instead of copied: the base accessors are virtual, so a snapshot taken at
+     *       construction would go stale as soon as the host system swaps its own model
+     */
+    virtual MarginPtr margin() const override {
+        return m_tm->margin();
+    }
+
+    virtual void margin(const MarginPtr& m) override {
+        m_tm->margin(m);
+    }
+
+    virtual price_t getOpenMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                  double num, MarginSide side) const override {
+        return m_tm->getOpenMargin(datetime, stock, price, num, side);
+    }
+
+    /** The accounting switch lives on the wrapped account, so the eligibility follows it */
+    virtual bool isMarginAccounted(const Stock& stock) const override {
+        return m_tm->isMarginAccounted(stock);
+    }
+
+    virtual price_t getMaintainMargin(const Datetime& datetime, const Stock& stock, price_t price,
+                                      double num, MarginSide side) const override {
+        return m_tm->getMaintainMargin(datetime, stock, price, num, side);
+    }
+
+    /** Before the window nothing may be opened, so the quota stays 0 */
+    virtual double getMaxOpenNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                    price_t available, MarginSide side) const override {
+        return (datetime >= m_run_start)
+                 ? m_tm->getMaxOpenNumber(datetime, stock, price, available, side)
+                 : 0.0;
+    }
+
+    virtual price_t getOccupiedMargin(const Datetime& datetime,
+                                      KQuery::KType ktype = KQuery::DAY) const override {
+        return m_tm->getOccupiedMargin(datetime, ktype);
+    }
+
+    virtual price_t getAvailableMargin(const Datetime& datetime,
+                                       KQuery::KType ktype = KQuery::DAY) override {
+        return m_tm->getAvailableMargin(datetime, ktype);
+    }
+
+    /** The view has no margin model of its own, so the collateral table follows the real account */
+    virtual double getCollateralRate(const Datetime& datetime, const Stock& stock,
+                                     MarginSide side) const override {
+        return m_tm->getCollateralRate(datetime, stock, side);
+    }
+
+    virtual price_t getCollateralHaircut(const Datetime& datetime,
+                                         KQuery::KType ktype = KQuery::DAY) const override {
+        return m_tm->getCollateralHaircut(datetime, ktype);
+    }
+
+    /**
+     * Settle the wrapped account
+     * @note Forwarded to the real book (the settlement is a real cash posting) but only inside
+     *       the window: before run_start the real account holds nothing of this run
+     */
+    virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
+        return (datetime >= m_run_start) ? m_tm->settlement(datetime, ktype) : false;
+    }
+
+    virtual bool isSettled(const Datetime& datetime) const override {
+        return m_tm->isSettled(datetime);
+    }
+
+    virtual bool isForcedLiquidationQueued(const Datetime& datetime) const override {
+        return m_tm->isForcedLiquidationQueued(datetime);
+    }
+
+    /** A Python defined cost or margin model of the wrapped account decides the pickling too */
+    virtual bool hasPythonPart() const noexcept override {
+        return m_tm->hasPythonPart();
     }
 
     /** Initial cash */

@@ -11,8 +11,14 @@
 namespace hku {
 
 TradeManagerPtr HKU_API crtTM(const Datetime& datetime, price_t initcash,
-                              const TradeCostPtr& costfunc, const string& name) {
-    return make_shared<TradeManager>(datetime, initcash, costfunc, name);
+                              const TradeCostPtr& costfunc, const string& name,
+                              const MarginPtr& margin) {
+    auto tm = make_shared<TradeManager>(datetime, initcash, costfunc, name);
+    // A null margin keeps the default model of the account itself
+    if (margin) {
+        tm->margin(margin);
+    }
+    return tm;
 }
 
 void registerPart_crtTM() {
@@ -28,10 +34,11 @@ void registerPart_crtTM() {
     meta.params.push_back(
       ParamMeta{.name = "cost_func", .type = "TradeCost", .is_part_param = true});
     meta.params.push_back(ParamMeta{.name = "name", .type = "string", .default_value = "SYS"});
+    meta.params.push_back(ParamMeta{.name = "margin", .type = "Margin", .is_part_param = true});
     reg.registerPart(meta, [](const Parameter& sc, const PartParamMap& pp) -> Part {
         return crtTM((sc.have("date") ? sc.get<Datetime>("date") : Datetime(199001010000LL)),
                      sc.get<double>("init_cash"), partOr<TradeCostPtr>(pp, "cost_func", TC_Zero()),
-                     sc.get<string>("name"));
+                     sc.get<string>("name"), partOr<MarginPtr>(pp, "margin", MarginPtr()));
     });
 }
 

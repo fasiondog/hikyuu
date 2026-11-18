@@ -12,6 +12,16 @@ Building Bar (Candlestick) Query Conditions
     Query criteria for bar (candlestick) data. In Python, ``Query`` is readily available in the
     hikyuu namespace and can be used directly.
 
+    .. py:method:: __init__(start, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER)
+
+        Build a bar query condition, in either of two ways:
+
+        - by index: ``start`` / ``end`` are integer indices over ``[start, end)``
+        - by date: ``start`` / ``end`` are :py:class:`Datetime` values over ``[start, end)``
+
+        Omitting ``end`` means a right-open interval. ``ktype`` defaults to ``Query.DAY`` and
+        ``recover_type`` to ``Query.NO_RECOVER``.
+
     Shortcut aliases for the :py:data:`Query.KType` enumeration values
 
     - Query.DAY - daily bar
@@ -25,6 +35,16 @@ Building Bar (Candlestick) Query Conditions
     - Query.MIN15 - 15-minute bar
     - Query.MIN30 - 30-minute bar
     - Query.MIN60 - 60-minute bar
+    - Query.HOUR2 - 2-hour bar
+    - Query.DAY3 - 3-day bar
+    - Query.DAY5 - 5-day bar
+    - Query.DAY7 - 7-day bar
+    - Query.MIN3 - 3-minute bar
+    - Query.HOUR4 - 4-hour bar
+    - Query.HOUR6 - 6-hour bar
+    - Query.HOUR12 - 12-hour bar
+    - Query.TIMELINE - intraday time-line
+    - Query.TRANS - tick data
 
     Shortcut aliases for the :py:data:`Query.RecoverType` enumeration values
 
@@ -94,6 +114,16 @@ Building Bar (Candlestick) Query Conditions
         - MIN15    - 15-minute bar
         - MIN30    - 30-minute bar
         - MIN60    - 60-minute bar
+        - HOUR2    - 2-hour bar
+        - DAY3     - 3-day bar
+        - DAY5     - 5-day bar
+        - DAY7     - 7-day bar
+        - MIN3     - 3-minute bar
+        - HOUR4    - 4-hour bar
+        - HOUR6    - 6-hour bar
+        - HOUR12   - 12-hour bar
+        - TIMELINE - intraday time-line
+        - TRANS    - tick data
 
     .. py:data:: RecoverType
 
@@ -138,7 +168,7 @@ Building Bar (Candlestick) Query Conditions
         Return whether the query covers a right-open interval, i.e. whether no end time is
         specified
 
-    .. py:method:: is_valid_ktype(self, ktype)
+    .. py:staticmethod:: is_valid_ktype(ktype)
 
         Check whether the given bar type is valid
 
@@ -178,7 +208,15 @@ Building Bar (Candlestick) Query Conditions
 
     .. py:staticmethod:: get_ktype_in_min(ktype)
 
-        Return the duration, in minutes, of the given bar type
+        Return the duration, in minutes, of the given bar type. Prefer ``get_ktype_in_seconds``,
+        which also covers second-based types such as TRANS.
+
+        :rtype: int
+
+    .. py:staticmethod:: get_ktype_in_seconds(ktype)
+
+        Return the duration, in seconds, of the given bar type, covering second-based types such
+        as TRANS.
 
         :rtype: int
 
@@ -428,17 +466,46 @@ StockManager/Block/Stock
         :return: the list of trading dates
         :rtype: DatetimeList
 
-    .. py:method:: is_holiday(self, d)
+    .. py:method:: is_holiday(self, d, market="SH")
 
-        Return whether the date of the given time is a market holiday (the A-share calendar
-        only)
+        Return whether the date of the given time is a holiday of the given market
 
         :param Datetime d: the specified time
+        :param str market: the market abbreviation whose holiday calendar is used; defaults to "SH"
+        :return: True if it is a holiday
         :rtype: bool
+
+        .. note:: the weekend rule is per market: the 24x7 crypto markets trade through the weekend,
+           while the other markets are closed; a market without its own holiday rows has no weekday
+           holidays (its weekdays are trading days)
+
+    .. py:method:: market_local_to_unified(self, d, market)
+
+        Convert a datetime written in the market's own local wall clock to the unified time expression (Beijing)
+
+        K-line datetimes are already returned in the unified expression, so a query written in the same
+        expression needs no conversion; use this helper only when the instant comes from that market's
+        local clock. Day and higher datetimes are pure trading-day labels and must not be converted.
+
+        :param Datetime d: the datetime in the local wall clock of that market
+        :param str market: the market abbreviation
+        :return: the datetime in the unified expression
+        :rtype: Datetime
+
+    .. py:method:: unified_to_market_local(self, d, market)
+
+        Convert a datetime of the unified time expression (Beijing) to the market's own local wall clock
+
+        :param Datetime d: the datetime in the unified expression
+        :param str market: the market abbreviation
+        :return: the datetime in the local wall clock of that market
+        :rtype: Datetime
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 
         Return whether the given time falls within trading hours
+
+        The holiday gate follows the given market's own calendar and weekend rule (e.g. BINANCE trades on weekends)
 
         :param Datetime d: the time to check
         :param str market: the market abbreviation
@@ -839,3 +906,14 @@ Other Security Information Definitions
     .. py:attribute:: description : descriptive information
     .. py:attribute:: code : the main benchmark index of this market, used to derive the trading calendar
     .. py:attribute:: last_datetime : the latest trading date for which bar data is available in this market
+    .. py:attribute:: open_time1 : the start time of trading session 1
+    .. py:attribute:: close_time1 : the end time of trading session 1
+    .. py:attribute:: open_time2 : the start time of trading session 2
+    .. py:attribute:: close_time2 : the end time of trading session 2
+    .. py:attribute:: tz_offset_min : the standard UTC offset in minutes (e.g. 480 for UTC+8)
+    .. py:attribute:: dst_rule : the daylight saving rule: 0=none, 1=US, 2=EU
+    .. py:attribute:: data_lag : the visibility delay in trading days relative to the base market
+
+    .. py:method:: is_valid(self)
+
+        Whether the record is valid: an empty market means an invalid (null) record

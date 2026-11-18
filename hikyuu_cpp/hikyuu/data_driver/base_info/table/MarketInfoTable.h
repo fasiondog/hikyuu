@@ -23,7 +23,10 @@ public:
       m_openTime1(0),
       m_closeTime1(0),
       m_openTime2(0),
-      m_closeTime2(0) {}
+      m_closeTime2(0),
+      m_tzOffsetMin(480),
+      m_dstRule(0),
+      m_dataLag(0) {}
 
     uint64_t id() const {
         return m_marketid;
@@ -66,6 +69,18 @@ public:
         return _transTimeDelta(m_closeTime2);
     }
 
+    int tzOffsetMin() const {
+        return static_cast<int>(m_tzOffsetMin);
+    }
+
+    int dstRule() const {
+        return static_cast<int>(m_dstRule);
+    }
+
+    int dataLag() const {
+        return static_cast<int>(m_dataLag);
+    }
+
 private:
     TimeDelta _transTimeDelta(uint64_t time) const {
         int64_t hours = time / 100;
@@ -79,34 +94,38 @@ public:
     static const char* getInsertSQL() {
         return "insert into `market` "
                "(`marketid`, `market`, `name`, `description`, `code`, `lastDate`,"
-               " `openTime1`, `closeTime1`, `openTime2`, `closeTime2`) "
-               "values (?,?,?,?,?,?,?,?,?,?)";
+               " `openTime1`, `closeTime1`, `openTime2`, `closeTime2`,"
+               " `tz_offset_min`, `dst_rule`, `data_lag`) "
+               "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     }
 
     static const char* getUpdateSQL() {
         return "update `market` set `market`=?, `name`=?, `description`=?, "
                "`code`=?, `lastDate`=?, `openTime1`=?, `closeTime1`=?, "
-               "`openTime2=`=?, `closeTime2`=? where `marketid`=?";
+               "`openTime2`=?, `closeTime2`=?, `tz_offset_min`=?, `dst_rule`=?, "
+               "`data_lag`=? where `marketid`=?";
     }
 
     static const char* getSelectSQL() {
         return "select `marketid`,`market`,`name`, `description`, `code`, `lastDate`, "
-               "`openTime1`, `closeTime1`, `openTime2`, `closeTime2` from `market`";
+               "`openTime1`, `closeTime1`, `openTime2`, `closeTime2`, "
+               "`tz_offset_min`, `dst_rule`, `data_lag` from `market`";
     }
 
     void save(const SQLStatementPtr& st) const {
         st->bind(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate, m_openTime1,
-                 m_closeTime1, m_openTime2, m_closeTime2);
+                 m_closeTime1, m_openTime2, m_closeTime2, m_tzOffsetMin, m_dstRule, m_dataLag);
     }
 
     void update(const SQLStatementPtr& st) const {
         st->bind(0, m_market, m_name, m_description, m_code, m_lastDate, m_openTime1, m_closeTime1,
-                 m_openTime2, m_closeTime2, m_marketid);
+                 m_openTime2, m_closeTime2, m_tzOffsetMin, m_dstRule, m_dataLag, m_marketid);
     }
 
     void load(const SQLStatementPtr& st) {
         st->getColumn(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate,
-                      m_openTime1, m_closeTime1, m_openTime2, m_closeTime2);
+                      m_openTime1, m_closeTime1, m_openTime2, m_closeTime2, m_tzOffsetMin,
+                      m_dstRule, m_dataLag);
     }
 
 private:
@@ -120,6 +139,9 @@ private:
     uint64_t m_closeTime1;
     uint64_t m_openTime2;
     uint64_t m_closeTime2;
+    int64_t m_tzOffsetMin;
+    int64_t m_dstRule;
+    int64_t m_dataLag;
 };
 
 }  // namespace hku

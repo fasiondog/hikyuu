@@ -19,18 +19,47 @@ from hikyuu.hub import HubNameError, PartNotFoundError
 class PartTest(unittest.TestCase):
     def test_registry(self):
         reg = hikyuu.PartRegistry.instance()
-        self.assertEqual(reg.size(), 205)
+        self.assertEqual(reg.size(), 212)
         self.assertTrue(reg.has("core.ind.ma"))
         self.assertTrue(reg.has("core.ind.MA"))
         self.assertFalse(reg.has("core.ind.nonexistent"))
 
         names = reg.get_name_list()
-        self.assertEqual(len(names), 205)
+        self.assertEqual(len(names), 212)
         self.assertIn("core.ind.ma", names)
 
         ind_names = reg.get_name_list(hikyuu.PartType.IND)
         self.assertEqual(len(ind_names), 139)
         self.assertIn("core.ind.ma", ind_names)
+
+    def test_margin_interest_part(self):
+        """The margin interest wrapper is a registered part whose inner model is a part param"""
+        reg = hikyuu.PartRegistry.instance()
+        self.assertTrue(reg.has("core.tc.margininterest"))
+        self.assertIn("core.tc.margininterest", reg.get_name_list(hikyuu.PartType.TC))
+
+        meta = reg.get_meta("core.tc.margininterest")
+        self.assertEqual(meta.name, "TC_MarginInterest")
+        self.assertEqual(meta.type, hikyuu.PartType.TC)
+        self.assertEqual([p.name for p in meta.params], [
+            "trade_cost",
+            "borrow_cash_rate",
+            "borrow_stock_rates",
+            "default_borrow_stock_rate",
+        ])
+        self.assertTrue(meta.params[0].is_part_param)
+
+    def test_by_market_part(self):
+        """The by-market router is a registered part whose default model is a part param"""
+        reg = hikyuu.PartRegistry.instance()
+        self.assertTrue(reg.has("core.tc.bymarket"))
+        self.assertIn("core.tc.bymarket", reg.get_name_list(hikyuu.PartType.TC))
+
+        meta = reg.get_meta("core.tc.bymarket")
+        self.assertEqual(meta.name, "TC_ByMarket")
+        self.assertEqual(meta.type, hikyuu.PartType.TC)
+        self.assertEqual([p.name for p in meta.params], ["default_cost"])
+        self.assertTrue(meta.params[0].is_part_param)
 
     def test_meta(self):
         reg = hikyuu.PartRegistry.instance()
@@ -194,7 +223,8 @@ class PartTest(unittest.TestCase):
         self.assertEqual(
             sg_names, hikyuu.search_part(hub="core", part_type=hikyuu.PartType.SG)
         )
-        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 6)
+        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="tc")), 10)
+        self.assertEqual(len(hikyuu.search_part(hub="core", part_type="mg")), 3)
         self.assertEqual(hikyuu.search_part(hub="nonexistent-hub-xyz"), [])
 
     def test_normalize_part_type(self):
@@ -303,7 +333,7 @@ class PartTest(unittest.TestCase):
             hikyuu.release_python_parts()
 
         self.assertFalse(reg.has("core.ind.pyma"))
-        self.assertEqual(reg.size(), 205)
+        self.assertEqual(reg.size(), 212)
 
     def test_python_part_conflict(self):
         def make_meta(name):
@@ -342,7 +372,7 @@ class PartTest(unittest.TestCase):
 
         self.assertFalse(reg.has("core.ind.pyma2"))
         self.assertTrue(reg.has("core.ind.ma"))
-        self.assertEqual(reg.size(), 205)
+        self.assertEqual(reg.size(), 212)
 
     def test_python_part_bad_return(self):
         meta = hikyuu.PartMeta()
@@ -422,7 +452,9 @@ class PartTest(unittest.TestCase):
         )
         env = dict(os.environ)
         env['PYTHONPATH'] = base + os.pathsep + env.get('PYTHONPATH', '')
-        result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, env=env)
+        # Decode subprocess output as UTF-8: the default local GBK throws on non-GBK bytes from hikyuu logs
+        result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True,
+                                encoding="utf-8", errors="replace", env=env)
         self.assertEqual(result.returncode, 0, result.stderr)
 
 

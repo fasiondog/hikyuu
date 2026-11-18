@@ -41,7 +41,26 @@ TEST_CASE("test_registerComponentParts") {
     CHECK_EQ(reg.getNameList(PartType::SE).size(), 5);
     CHECK_EQ(reg.getNameList(PartType::SYS).size(), 2);
     CHECK_EQ(reg.getNameList(PartType::TM).size(), 1);
-    CHECK_EQ(reg.getNameList(PartType::TC).size(), 6);
+    CHECK_EQ(reg.getNameList(PartType::TC).size(), 10);
+    CHECK_UNARY(reg.has("core.tc.fixed"));
+    CHECK_UNARY(reg.has("core.tc.hk"));
+    CHECK_EQ(reg.getNameList(PartType::MG).size(), 3);
+
+    /** @arg the margin interest wrapper is registered, with the wrapped model as a part param */
+    CHECK_UNARY(reg.has("core.tc.margininterest"));
+    const PartMeta& tc_meta = reg.getMeta("core.tc.margininterest");
+    CHECK_EQ(tc_meta.name, "TC_MarginInterest");
+    CHECK_EQ(tc_meta.params.size(), 4);
+    CHECK_UNARY(tc_meta.params[0].is_part_param);
+    CHECK_EQ(tc_meta.params[0].name, "trade_cost");
+
+    /** @arg the by-market router is registered, with the default model as a part param */
+    CHECK_UNARY(reg.has("core.tc.bymarket"));
+    const PartMeta& by_market_meta = reg.getMeta("core.tc.bymarket");
+    CHECK_EQ(by_market_meta.name, "TC_ByMarket");
+    CHECK_EQ(by_market_meta.params.size(), 1);
+    CHECK_UNARY(by_market_meta.params[0].is_part_param);
+    CHECK_EQ(by_market_meta.params[0].name, "default_cost");
 
     /** @arg a component is created from its scalar and part params */
     Parameter sc;
@@ -62,15 +81,16 @@ TEST_CASE("test_registerComponentParts") {
     /** @arg the short names stay unique across all categories (they are a secondary lookup key
      *  of createFromString) */
     std::set<string> names;
-    for (auto type : {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG,
-                      PartType::SP, PartType::AF, PartType::CN, PartType::EV, PartType::MF,
-                      PartType::PF, PartType::SE, PartType::SYS, PartType::TM, PartType::TC}) {
+    for (auto type :
+         {PartType::IND, PartType::SG, PartType::MM, PartType::ST, PartType::PG, PartType::SP,
+          PartType::AF, PartType::CN, PartType::EV, PartType::MF, PartType::PF, PartType::SE,
+          PartType::SYS, PartType::TM, PartType::TC, PartType::MG}) {
         for (const auto& m : reg.getMetaList(type)) {
             bool inserted = names.insert(m.name).second;
             CHECK_UNARY(inserted);
         }
     }
-    CHECK_EQ(names.size(), 205);
+    CHECK_EQ(names.size(), 212);
 }
 
 /** @par Test points */

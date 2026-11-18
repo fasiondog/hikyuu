@@ -6,11 +6,13 @@
  */
 
 #include "doctest/doctest.h"
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <thread>
 #include <hikyuu/StockManager.h>
@@ -81,7 +83,7 @@ bool hasBlock(const BlockList& blocks, const string& category, const string& nam
 TEST_CASE("test_StockManager_size") {
     StockManager& sm = StockManager::instance();
     /** @arg Check that it matches the security count of the test data */
-    CHECK_EQ(sm.size(), 4729);
+    CHECK_EQ(sm.size(), 4753);
 }
 
 /** @par Test points */
@@ -113,6 +115,22 @@ TEST_CASE("test_StockManager_getStock") {
     CHECK_EQ(stock.atom(), 1);
     CHECK_EQ(stock.minTradeNumber(), 1);
     CHECK_EQ(stock.maxTradeNumber(), 1000000);
+
+    /** @arg A security with a stockparam row gets the variety-level parameters instead of the
+     * type-level defaults (the coalesce join; the fixture carries the SH600006 row — a security
+     * deliberately unused by the strategy tests, whose quotas assume the type-level lots) */
+    Stock variety = sm.getStock("sh600006");
+    REQUIRE_UNARY(!variety.isNull());
+    CHECK_EQ(variety.tick(), 0.02);
+    CHECK_EQ(variety.tickValue(), 0.02);
+    CHECK_EQ(variety.unit(), 1.0);
+    CHECK_EQ(variety.precision(), 2);
+    CHECK_EQ(variety.minTradeNumber(), 200);
+    CHECK_EQ(variety.maxTradeNumber(), 2000000);
+
+    /** @arg A security without a stockparam row keeps the type-level defaults (SH000001 above
+     * carries no row, and this case also guards the empty-table fallback of the probe) */
+    CHECK_EQ(stock.tick(), 0.001);
 }
 
 /** @par Test points */
@@ -136,6 +154,29 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_EQ(marketInfo.openTime2(), TimeDelta(0, 13, 00));
     CHECK_EQ(marketInfo.closeTime2(), TimeDelta(0, 15, 00));
 
+    /** @arg Time zone fields of an A-share market: UTC+8, no DST, no lag */
+    CHECK_EQ(marketInfo.tzOffsetMin(), 480);
+    CHECK_EQ(marketInfo.dstRule(), 0);
+    CHECK_EQ(marketInfo.dataLag(), 0);
+
+    /** @arg Time zone fields of a US market: UTC-5 standard, US DST rule, one day lag */
+    MarketInfo nasdaq = sm.getMarketInfo("NASDAQ");
+    CHECK_NE(nasdaq, Null<MarketInfo>());
+    CHECK_EQ(nasdaq.tzOffsetMin(), -300);
+    CHECK_EQ(nasdaq.dstRule(), 1);
+    CHECK_EQ(nasdaq.dataLag(), 1);
+
+    /** @arg Time zone fields of a 24h market: UTC, no DST, no lag */
+    MarketInfo binance = sm.getMarketInfo("BINANCE");
+    CHECK_NE(binance, Null<MarketInfo>());
+    CHECK_EQ(binance.tzOffsetMin(), 0);
+    CHECK_EQ(binance.dstRule(), 0);
+    CHECK_EQ(binance.dataLag(), 0);
+
+    /** @arg equals compares every field while operator== only compares the market */
+    CHECK_UNARY(nasdaq.equals(sm.getMarketInfo("NASDAQ")));
+    CHECK_UNARY(!nasdaq.equals(marketInfo));
+
     /** @arg Query an existing market with an all-lowercase market name */
     marketInfo = sm.getMarketInfo("sh");
     CHECK_NE(marketInfo, Null<MarketInfo>());
@@ -145,6 +186,20 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     marketInfo = sm.getMarketInfo("Sh");
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
+
+    /** @arg The shared null instance: an empty market compares null from both sides */
+    CHECK_UNARY(MarketInfo::NullMarketInfo == Null<MarketInfo>());
+    CHECK_UNARY(Null<MarketInfo>() == MarketInfo::NullMarketInfo);
+    CHECK_UNARY(MarketInfo::NullMarketInfo != marketInfo);
+    CHECK_UNARY(nasdaq != Null<MarketInfo>());
+
+    /** @arg isValid: an empty market is invalid, a loaded record is valid */
+    CHECK_UNARY(!MarketInfo::NullMarketInfo.isValid());
+    CHECK_UNARY(!MarketInfo().isValid());
+    CHECK_UNARY(nasdaq.isValid());
+
+    /** @arg Unknown markets return the shared NullMarketInfo instance */
+    CHECK_EQ(&sm.getMarketInfo("XXX"), &MarketInfo::NullMarketInfo);
 }
 
 /** @par Test points */
@@ -226,6 +281,50 @@ TEST_CASE("test_StockManager_getTradingCalendar") {
                        sm.getStock(sz_info.market() + sz_info.code())};
     DatetimeList merged = sm.getTradingCalendar(stk_list, KQuery());
     CHECK_GT(merged.size(), 0);
+
+    /** @arg Every market whose representative index has K-line data yields a non-empty,
+    ascending calendar that honours the queried date range */
+    for (const char* market : {"SHF", "CZC", "CFE", "DCE", "INE", "GFE", "HK", "NASDAQ", "NYSE"}) {
+        MarketInfo info = sm.getMarketInfo(market);
+        CHECK_UNARY(!(info == Null<MarketInfo>()));
+        if (info == Null<MarketInfo>())
+            continue;
+        Stock index = sm.getStock(info.market() + info.code());
+        CHECK_UNARY(!index.isNull());
+        if (index.isNull())
+            continue;
+        DatetimeList actual = sm.getTradingCalendar(KQuery(), market);
+        /** @arg calendar length matches the driver record count of the index */
+        CHECK_UNARY(actual.size() > 0);
+        CHECK_EQ(actual.size(), index.getCount(KQuery::DAY));
+        /** @arg calendar is strictly ascending and inside a sane date range */
+        CHECK_UNARY(std::is_sorted(actual.begin(), actual.end()));
+        CHECK_UNARY(actual.front() >= Datetime(19900101) && actual.back() <= Datetime(20300101));
+        /** @arg a date-range query is forwarded: the tail half re-queried equals its suffix */
+        size_t half = actual.size() / 2;
+        DatetimeList tail =
+          sm.getTradingCalendar(KQueryByDate(actual[half], Null<Datetime>(), KQuery::DAY), market);
+        CHECK_UNARY(tail == DatetimeList(actual.begin() + half, actual.end()));
+    }
+
+    /** @arg Markets registered without K-line data keep an empty calendar and do not throw */
+    for (const char* market : {"BJ", "FX", "BINANCE"}) {
+        CHECK_UNARY(!(sm.getMarketInfo(market) == Null<MarketInfo>()));
+        CHECK_EQ(sm.getTradingCalendar(KQuery(), market).size(), 0);
+    }
+
+    /** @arg The merged axis equals the exact union of the single-market axes */
+    MarketInfo shf_info = sm.getMarketInfo("SHF");
+    StockList cross_list{sm.getStock(sh_info.market() + sh_info.code()),
+                         sm.getStock(shf_info.market() + shf_info.code())};
+    DatetimeList sh_axis = sm.getTradingCalendar(KQuery(), "SH");
+    DatetimeList shf_axis = sm.getTradingCalendar(KQuery(), "SHF");
+    DatetimeList cross = sm.getTradingCalendar(cross_list, KQuery());
+    std::set<Datetime> want(sh_axis.begin(), sh_axis.end());
+    want.insert(shf_axis.begin(), shf_axis.end());
+    CHECK_EQ(cross.size(), want.size());
+    CHECK_UNARY(std::is_sorted(cross.begin(), cross.end()));
+    CHECK_EQ(std::set<Datetime>(cross.begin(), cross.end()).size(), cross.size());
 }
 
 /** @par Test points */
@@ -295,6 +394,57 @@ TEST_CASE("test_StockManager_isHoliday") {
     CHECK_EQ(sm.isHoliday(Datetime(202101030000LL)), true);  // Sunday
     CHECK_EQ(sm.isHoliday(Datetime(202110010000LL)), true);
     CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
+    /** @arg The calendar is per market: the CN holiday applies to the A-share / futures
+    markets but not to a market without its own holiday rows */
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "SH"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "SHF"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "SZ"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "INE"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "BINANCE"), false);
+    /** @arg An unknown market has no weekday holidays but still follows the weekend rule */
+    CHECK_EQ(sm.isHoliday(Datetime(202109300000LL), "NOSUCH"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "NOSUCH"), true);
+    /** @arg The weekend rule is per market: the 24/7 crypto market is open on weekends */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    /** @arg The market code is case-insensitive (each layer normalizes independently) */
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "sh"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL), "binance"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "sh"), true);
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_isHoliday_weekendCache") {
+    auto& sm = StockManager::instance();
+    /** @arg repeated calls hit the weekend-rule cache and stay stable */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    /** @arg an unknown market is never cached; repeated calls re-query and stay stable */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "NOSUCH"), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "NOSUCH"), true);
+    /** @arg the cached and re-queried paths agree with the first evaluation */
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_timeConvert") {
+    auto& sm = StockManager::instance();
+    /** @arg US Eastern DST: local 09:45 = Beijing same-day 21:45 (+12h) */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202607010945LL), "NASDAQ"), Datetime(202607012145LL));
+    /** @arg US Eastern standard time: 13 hours apart */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202601050945LL), "NASDAQ"), Datetime(202601052245LL));
+    /** @arg unifiedToMarketLocal is the inverse of marketLocalToUnified */
+    CHECK_EQ(sm.unifiedToMarketLocal(Datetime(202607012145LL), "NASDAQ"), Datetime(202607010945LL));
+    /** @arg identity market (A-share) is returned as is */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202607010945LL), "SH"), Datetime(202607010945LL));
+    /** @arg market name is case-insensitive */
+    CHECK_EQ(sm.marketLocalToUnified(Datetime(202607010945LL), "nasdaq"), Datetime(202607012145LL));
+    /** @arg unregistered or empty market throws instead of silently treated as identity */
+    CHECK_THROWS_AS(sm.marketLocalToUnified(Datetime(202607010945LL), "NOSUCH"), std::exception);
+    CHECK_THROWS_AS(sm.unifiedToMarketLocal(Datetime(202607010945LL), ""), std::exception);
 }
 
 /** @par Test points */
@@ -317,6 +467,40 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_EQ(sm.isTradingHours(Datetime(202109301500LL)), true);
     CHECK_EQ(sm.isTradingHours(Datetime(202109301501LL)), false);
     CHECK_THROWS(sm.isTradingHours(Datetime(202109301500LL), "invalid"));
+    /** @arg A 24h market (equal session bounds, 0/0/0/0) is tradable at any intraday time */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109302330LL), "FX"), true);
+    /** @arg The holiday check uses the market's own calendar: CN holiday closes SHF, not BINANCE */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "SHF"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110011000LL), "SH"), false);
+    /** @arg The weekend rule is per market: crypto trades on weekends, FX (weekday calendar) not */
+    CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "BINANCE"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202101021000LL), "FX"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "BINANCE"), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL), "FX"), true);
+    /** @arg A market with explicit sessions (SHF 900-1130/1330-1500) is unaffected */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300859LL), "SHF"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109300900LL), "SHF"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301000LL), "SHF"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301200LL), "SHF"), false);
+    /** @arg CFE (index futures) opens the afternoon session at 13:00, not 13:30 */
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301259LL), "CFE"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202109301300LL), "CFE"), true);
+    /** @arg The input follows the unified clock: NASDAQ (US DST, -300) converts before judging.
+     *        On 2021-10-07 (EDT) Beijing 21:30 is 09:30 local; on 2021-12-07 (EST) Beijing
+     *        22:30 is 09:30 local */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110072130LL), "NASDAQ"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110072259LL), "NASDAQ"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110072030LL), "NASDAQ"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202110070430LL), "NASDAQ"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202112072230LL), "NASDAQ"), true);
+    CHECK_EQ(sm.isTradingHours(Datetime(202112072130LL), "NASDAQ"), false);
+    /** @arg a single 0/0 session pair means "not configured": NASDAQ local midnight (Beijing
+     *        12:00 under EDT) is not tradable and must not fall into the empty second session */
+    CHECK_EQ(sm.isTradingHours(Datetime(202110071200LL), "NASDAQ"), false);
+    CHECK_EQ(sm.isTradingHours(Datetime(202112071300LL), "NASDAQ"), false);
 }
 
 /** @par Test points */
@@ -410,7 +594,87 @@ TEST_CASE("test_StockManager_loadAllStocks_by_context") {
     // Restore the full load for the following cases
     sm.reloadWith(org_context);
     sm.joinPreloadThread();
-    CHECK_EQ(sm.size(), 4729);
+    CHECK_EQ(sm.size(), 4753);
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_loadAllStocks_load_scope") {
+    auto& sm = StockManager::instance();
+    const StrategyContext org_context = sm.getStrategyContext();
+
+    /** @arg A market scope loads only the listed markets; the two removed stocks prove the reload
+     * follows the scope (the stock dictionary itself is never cleared) */
+    sm.setLoadScope({"SH"}, {});
+    sm.removeStock("SH600000");
+    sm.removeStock("SZ000001");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SH600000").isNull());
+    CHECK_UNARY(sm.getStock("SZ000001").isNull());
+
+    /** @arg The must-load securities are kept even when their market is outside the scope */
+    sm.setLoadScope({"SZ"}, {});
+    sm.removeStock("SH000300");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SZ000001").isNull());
+    CHECK_UNARY(!sm.getStock("SH000300").isNull());
+
+    /** @arg A security type scope works on its own (12 = futures) */
+    sm.setLoadScope({}, {12});
+    sm.removeStock("SH600000");
+    sm.removeStock("SHFRB0000");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SHFRB0000").isNull());
+    CHECK_UNARY(sm.getStock("SH600000").isNull());
+
+    /** @arg Markets and types intersect: both must match */
+    sm.setLoadScope({"SHF"}, {12});
+    sm.removeStock("SHFRB0000");
+    sm.removeStock("SH600000");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SHFRB0000").isNull());
+    CHECK_UNARY(sm.getStock("SH600000").isNull());
+
+    /** @arg "ALL" inside the parameter text means no market restriction (the Python path stores
+     * the raw text, so the consumer itself must understand it) */
+    sm.setLoadScope({"ALL"}, {});
+    sm.removeStock("SH600000");
+    sm.removeStock("SZ000001");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SH600000").isNull());
+    CHECK_UNARY(!sm.getStock("SZ000001").isNull());
+
+    /** @arg A type scope without the index type still keeps the representative index of every
+     * market inside the scope, so the trading calendar survives */
+    sm.setLoadScope({}, {1});
+    sm.removeStock("SH600000");
+    sm.removeStock("SZ399001");
+    sm.removeStock("SH000688");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.getStock("SH600000").isNull());
+    CHECK_UNARY(!sm.getStock("SZ399001").isNull());
+    CHECK_UNARY(!sm.getMarketStock("SZ").isNull());
+    CHECK_UNARY(sm.getStock("SH000688").isNull());
+
+    /** @arg An unknown market keeps only the must-load securities */
+    sm.setLoadScope({"XX"}, {});
+    sm.removeStock("SH600000");
+    sm.removeStock("SH000300");
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_UNARY(sm.getStock("SH600000").isNull());
+    CHECK_UNARY(!sm.getStock("SH000300").isNull());
+
+    /** @arg Clearing the scope restores the full load */
+    sm.setLoadScope({}, {});
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_EQ(sm.size(), 4753);
 }
 
 /** @par Test points */
@@ -438,9 +702,8 @@ TEST_CASE("test_StockManager_getStockList") {
 
     /** @arg The user filter may re-enter the manager (getStock) without deadlock,
      * because the dictionary lock is released before the filter runs */
-    StockList reentrant = sm.getStockList([&sm](const Stock& s) {
-        return !sm.getStock(s.market_code()).isNull();
-    });
+    StockList reentrant =
+      sm.getStockList([&sm](const Stock& s) { return !sm.getStock(s.market_code()).isNull(); });
     CHECK_EQ(reentrant.size(), sm.size());
 
     /** @arg Regression guard: a filter that requests the unique lock (addStock)
