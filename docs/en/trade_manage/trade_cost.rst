@@ -23,7 +23,7 @@ Shanghai-Shenzhen A-share Trade Cost Algorithm
 
 .. py:function:: TC_FixedA([commission=0.0003, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
-    The current A-share trade cost algorithm (rolling default, always the latest rates): transfer fee 0.01‰ of turnover charged in both directions on all markets, sell-side stamp duty 0.5‰
+    The current A-share trade cost algorithm: transfer fee 0.01‰ of turnover charged in both directions on all markets, sell-side stamp duty 0.5‰
 
     :param float commission: the commission rate
     :param float lowest_commission: the minimum commission
@@ -74,14 +74,13 @@ changing it.
 .. py:function:: TC_MarginInterest([trade_cost=TC_Zero(), borrow_cash_rate=0.0, borrow_stock_rates="", default_borrow_stock_rate=0.0])
 
     Wrap another trade cost algorithm with the annualized rates of the margin financing and the
-    securities lending: the trading fees are delegated to the wrapped algorithm and this one answers
-    the two rates only. The rates are billed by the account settlement, prorated over the calendar
-    days gone by since the last bill with the account ``annual_days`` parameter as the denominator,
-    added to the debt itself instead of paid from the cash and written as ``BUSINESS_INTEREST``
-    records, see :doc:`margin`
+    securities lending: trading fees are delegated to the wrapped algorithm, this one answers the two
+    rates only. The account bills them at settlement, prorated over the calendar days since the last
+    bill with ``annual_days`` as the denominator, added to the debt instead of paid from cash and
+    written as ``BUSINESS_INTEREST`` records, see :doc:`margin`
 
-    Both rates are 0.0 by default, i.e. nothing is billed, so wrapping an algorithm without
-    configuring a rate leaves the books exactly as they were.
+    Both rates default to 0.0 (nothing billed), so wrapping without configuring a rate leaves the
+    books exactly as they were.
 
     :param TradeCost trade_cost: the algorithm answering the trading fees, TC_Zero by default
     :param float borrow_cash_rate: the annualized interest rate of the borrowed cash, in [0, 1); 0.0
@@ -216,12 +215,11 @@ Routing by Market / Security Type
 
 .. note::
     Configure the routing before the run: the table is not synchronized with the queries and only
-    the one-off unmatched warning takes a lock, so it is not meant to be modified while trading. An
-    unregistered market is reported once and then billed by the default algorithm. Created from the
-    part registry (``core.tc.bymarket``) only the default algorithm can be given; the routing table
-    is configured with the ``costs`` argument above. The key matching order is the market first,
-    then the type — the opposite of ``MG_ByType`` and ``currency_rates`` where the type key wins;
-    take care when they are mixed.
+    the one-off unmatched warning takes a lock. An unregistered market is reported once and then
+    billed by the default algorithm. Created from the part registry (``core.tc.bymarket``) only the
+    default algorithm can be given; the routing table is set with the ``costs`` argument above. Keys
+    match by market first, then type — the opposite of ``MG_ByType`` and ``currency_rates`` where the
+    type key wins; take care when mixing.
 
 
 Custom Trade Cost Algorithm
@@ -239,10 +237,10 @@ The custom trade cost algorithm interface:
 
 .. note::
 
-    The names above are the ones a Python subclass has to implement: the C++ account code looks the override up by
-    them and calls back into it. The binding used to look the overrides up by their C++ names (``getBuyCost`` and so
-    on), which disagreed with this list, so an override written as listed here was silently ignored; the lookup is
-    now on the snake_case names, and old code that defined the C++ names has to be renamed.
+    The names above are what a Python subclass must implement: the C++ account code finds the override by them
+    and calls back. The binding used to look overrides up by their C++ names (``getBuyCost`` etc.), which disagreed
+    with this list, so a listed override was silently ignored; the lookup is now on snake_case names, and old code
+    defining the C++ names must be renamed.
 
 
 
@@ -344,10 +342,9 @@ Trade Cost Algorithm Base Class
 
         [Override hook] The annualized interest rate of the borrowed cash, 0.0 by default
         
-        The rate is billed by the account settlement, prorated over the calendar days gone by since
-        the last bill with its ``annual_days`` parameter as the denominator, added to the debt itself
-        instead of paid from the cash, and written as a
-        ``BUSINESS_INTEREST`` record; see :doc:`margin`. The built-in implementation is
+        Billed by the account settlement, prorated over the calendar days since the last bill with
+        ``annual_days`` as the denominator, added to the debt instead of paid from cash and written
+        as a ``BUSINESS_INTEREST`` record; see :doc:`margin`. The built-in implementation is
         :py:func:`TC_MarginInterest`
 
         :param Datetime datetime: the settled moment
@@ -358,8 +355,8 @@ Trade Cost Algorithm Base Class
 
         [Override hook] The annualized fee rate of the borrowed stock, 0.0 by default
 
-        It is billed on the market value of the borrowed shares at the settlement price and joins
-        the cash debt the same way. The built-in implementation is :py:func:`TC_MarginInterest`
+        Billed on the market value of the borrowed shares at the settlement price and added to the
+        cash debt like the financing interest. The built-in implementation is :py:func:`TC_MarginInterest`
 
         :param Datetime datetime: the settled moment
         :param Stock stock: the borrowed security

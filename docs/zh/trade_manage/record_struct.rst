@@ -93,7 +93,7 @@
         
     .. py:attribute:: stoploss 止损价（float）
     .. py:attribute:: cash     现金余额（float）
-    .. py:attribute:: margin   本次开仓锁定的保证金（float）；仅在保证金记账的买入/卖空开仓时非 0，其余业务为 0，用于回放时还原当时的账面；逐日结算记录（``SETTLEMENT``）中为结算后重算的锁定额
+    .. py:attribute:: margin   本次开仓锁定的保证金（float），仅保证金记账的买入/卖空开仓非 0，以便回放还原账面；``SETTLEMENT`` 记录中为结算后重算的锁定额
     .. py:attribute:: part     
     
         交易指示来源，区别是交易系统哪个部件发出的指示，参见： :py:class:`System.Part`

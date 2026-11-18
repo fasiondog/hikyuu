@@ -18,14 +18,11 @@ namespace hku {
 enum class MarginSide { LONG, SHORT };
 
 /**
- * Base class of the margin component, i.e. how much funds an opening consumes
- * @details The component only answers questions about the margin quota and thresholds; it never
- *        touches the account state, the market data or the trade cost:
- *        - funds out of the account on opening: the margin, answered here;
- *        - fees and interest: TradeCostBase;
- *        - bookkeeping and order validation: TradeManagerBase.
- *        A subclass must stay a pure function of its parameters: no StockManager lookup, no K-line
- *        access, no account mutation, since it is queried on every order of every bar.
+ * Base class of the margin component: how much funds an opening consumes
+ * @details Handles only the margin quota and thresholds, never account state, market data or trade
+ *          cost (fees/interest: TradeCostBase; bookkeeping/validation: TradeManagerBase). A subclass
+ *          must be a pure function of its parameters: no StockManager lookup, K-line access or
+ *          account mutation, as it is queried on every order of every bar.
  * @ingroup Margin
  */
 class HKU_API MarginBase {
@@ -46,9 +43,9 @@ public:
     }
 
     /**
-     * Whether the security is covered by the margin accounting
-     * @details false means it is a plain cash position: it takes no part in the occupied margin,
-     *          so it does not reduce the available funds of a mixed account
+     * Whether the security is covered by margin accounting
+     * @details false means a plain cash position: it occupies no margin and does not reduce the
+     *          available funds of a mixed account
      */
     virtual bool isMarginTrading(const Stock& stock) const {
         return true;
@@ -56,10 +53,9 @@ public:
 
     /**
      * Whether opening a short of the security needs borrowing the asset
-     * @details The default keeps the A-share securities lending semantics for the built-in
-     *          categories, while a cryptocurrency and any custom type (>= 12, i.e. futures, forex,
-     *          US or HK stocks registered for a new market) open a short without borrowing. A
-     *          subclass may override it when the market has another rule.
+     * @details Default keeps A-share securities-lending semantics for built-in categories; crypto
+     *          and custom types (>= 12, e.g. futures, forex, US/HK stocks for a new market) short
+     *          without borrowing. Override when a market has another rule.
      */
     virtual bool needBorrowAsset(const Stock& stock) const;
 
@@ -104,14 +100,11 @@ public:
     }
 
     /**
-     * Collateral conversion rate of the security, i.e. the part of its market value that the
-     * account may count towards the available funds
-     * @details 1.0 by default, so a model that defines no conversion table leaves the available
-     *          funds exactly as they were before the rate existed. The built-in models read one
-     *          table for both directions: they accept the side and ignore it.
-     * @note Declared after every pre-existing interface: a virtual added in the middle of the class
-     *       moves the slots of the ones declared after it, which breaks the components built
-     *       against the previous header
+     * Collateral conversion rate: the part of a security's market value counted as available funds
+     * @details 1.0 by default, so a model with no conversion table leaves available funds unchanged.
+     *          Built-in models use one table for both sides: side is accepted but ignored.
+     * @note Declared after all pre-existing interfaces: inserting a virtual mid-class shifts the
+     *       slots of later declarations and breaks components built against the previous header.
      * @param datetime the queried moment
      * @param stock the held security
      * @param side long or short
@@ -151,10 +144,9 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // The node name must stay m_params to match the archives written before the margin model
-        // existed. setParameter instead of a raw assignment: it re-runs the param check, which is
-        // the only place a model may rebuild the state it derives from its params, so the hot path
-        // stays a pure table lookup and a shared model can be queried from several threads
+        // Keep the node name m_params to match archives written before this model existed.
+        // setParameter (not assignment) re-runs the param check, the only place a model rebuilds
+        // derived state; that keeps the hot path a pure lookup and a shared model thread-safe.
         ar& boost::serialization::make_nvp("m_params", const_cast<Parameter&>(m_params));
         setParameter(m_params);
     }
@@ -171,8 +163,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MarginBase)
 #endif
 
 /**
- * For an inheriting subclass without private variables, this macro can be used directly for the
- * serialization
+ * Serialization helper for a subclass without private variables
  * @ingroup Margin
  */
 #if HKU_SUPPORT_SERIALIZATION

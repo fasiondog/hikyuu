@@ -19,13 +19,13 @@ namespace hku {
 TradeManagerBase::TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
 : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
     setParam<int>("precision", 2);  // Calculation precision
-    // Real margin accounting: off by default, so the plain cash books stay unchanged
+    // Off by default so plain cash books stay unchanged
     setParam<bool>("margin_accounting", false);
     setParam<bool>("settle_with_close", true);
     setParam<bool>("force_liquidate", false);
     // The proration base of the daily margin interest
     setParam<int>("annual_days", 365);
-    // The fixed rate of each foreign market, see the currency_rates parameter
+    // The fixed rate of each foreign market, see currency_rates
     setParam<string>("currency_rates", "");
 }
 
@@ -36,11 +36,10 @@ shared_ptr<TradeManagerBase> TradeManagerBase::clone() {
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
     p->m_broker_last_datetime = m_broker_last_datetime;
-    // The clone is a deep copy: the models are cloned instead of being shared, so the copy
-    // never drives the model instance of the source
+    // Deep copy: models are cloned, not shared, so the copy never drives the source's instances
     p->m_costfunc = m_costfunc ? m_costfunc->clone() : m_costfunc;
     p->m_margin = m_margin ? m_margin->clone() : m_margin;
-    // The brokers are live connections, they stay shared by design
+    // Brokers are live connections and stay shared by design
     p->m_broker_list = m_broker_list;
     return p;
 }
@@ -89,7 +88,7 @@ PriceList TradeManagerBase::getBaseAssetsCurve(const DatetimeList& dates,
 }
 
 price_t TradeManagerBase::_currencyRate(const Stock& stock) const {
-    // An empty table keeps the single-currency books untouched, without any warning
+    // An empty table keeps single-currency books untouched, with no warning
     HKU_IF_RETURN(stock.isNull() || m_currency_rates.empty(), 1.0);
     if (m_currency_rates.has(stock)) {
         return m_currency_rates.lookup(stock, 1.0);
@@ -230,8 +229,8 @@ price_t TradeManagerBase::getOccupiedMargin(const Datetime& datetime, KQuery::KT
     price_t result = 0.0;
     HKU_IF_RETURN(!m_margin, result);
 
-    // Mirror the valuation moment of getFunds: an unset date or the last trade date values at
-    // the last trade moment, any other date at the close of that day
+    // Mirror getFunds: unset or last trade date values at the last trade moment, others at that
+    // day's close
     Datetime valued = _valuationDatetime(datetime);
 
     PositionRecordList positions = getPositionList();
@@ -259,8 +258,7 @@ price_t TradeManagerBase::getOccupiedMargin(const Datetime& datetime, KQuery::KT
 price_t TradeManagerBase::getAvailableMargin(const Datetime& datetime, KQuery::KType ktype) {
     HKU_CHECK(datetime == Null<Datetime>() || datetime >= lastDatetime(),
               "getAvailableMargin supports only the current or a future moment!");
-    // Read in the documented order: getFunds applies the pending weights and thus changes the
-    // holdings the other two operands then price
+    // getFunds applies pending weights first, changing holdings the other two operands price
     price_t net_assets = getFunds(datetime, ktype).net_assets();
     price_t haircut = getCollateralHaircut(datetime, ktype);
     return net_assets - haircut - getOccupiedMargin(datetime, ktype);
@@ -268,8 +266,8 @@ price_t TradeManagerBase::getAvailableMargin(const Datetime& datetime, KQuery::K
 
 price_t TradeManagerBase::getCollateralHaircut(const Datetime& datetime,
                                                KQuery::KType ktype) const {
-    // The current holdings are what gets discounted, so a past date would pair them with a
-    // stale price, the same restriction getAvailableMargin states
+    // Only current holdings are discounted; a past date pairs them with a stale price, as in
+    // getAvailableMargin
     HKU_CHECK(datetime.isNull() || datetime >= lastDatetime(),
               "getCollateralHaircut supports only the current or a future moment!");
     price_t result = 0.0;
@@ -281,9 +279,8 @@ price_t TradeManagerBase::getCollateralHaircut(const Datetime& datetime,
         if (!m_margin->isMarginTrading(record.stock))
             continue;
         double rate = getCollateralRate(valued, record.stock, MarginSide::LONG);
-        // A rate outside (0, 1] breaks the contract of the interface, which a Python model can
-        // do silently: discount nothing for it and warn, the way a bad margin rate falls back
-        // to the cash caliber
+        // A rate outside (0, 1] breaks the contract (a Python model can return it silently):
+        // discount nothing and warn, as a bad margin rate falls back to cash
         if (!(rate > 0.0 && rate <= 1.0)) {
             HKU_WARN(
               "{} {} collateral rate({}) is out of (0, 1], the holding is not "
@@ -291,22 +288,21 @@ price_t TradeManagerBase::getCollateralHaircut(const Datetime& datetime,
               valued, record.stock.market_code(), rate);
             continue;
         }
-        // A rate of 1.0 (the default) discounts nothing, so it needs no pricing at all
+        // The default 1.0 discounts nothing, so no pricing is needed
         if (rate >= 1.0) {
             continue;
         }
-        // The nominal is rounded before being discounted, exactly like the margin bases, so the
-        // result does not drift by half a cent per holding
+        // Round the nominal before discounting, as for margin bases, to avoid half-cent drift
+        // per holding
         price_t mv =
           roundEx(record.stock.getMarketValue(valued, ktype) * record.number * record.stock.unit(),
                   precision);
-        // The discount is a share of the net assets, so the base is measured in the account
-        // currency
+        // The discount is a share of net assets, so the base is in account currency
         price_t base = toAccount(record.stock, mv);
         if (record.margin > 0.0) {
-            // Only the equity contribution of a margin-accounted holding counts as collateral,
-            // and a loss deeper than the margin leaves nothing of it to discount; the locked
-            // margin is already booked in the account currency, the floating profit is not
+            // Only a margin holding's equity contribution counts: a loss deeper than the margin
+            // leaves nothing to discount. Locked margin is already in account currency, floating
+            // profit is not
             base =
               roundEx(record.margin + toAccount(record.stock, mv - record.settleBasis), precision);
             if (base < 0.0) {

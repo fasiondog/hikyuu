@@ -34,8 +34,7 @@ FixedMargin::FixedMargin() : MarginBase("MG_Fixed") {
 FixedMargin::~FixedMargin() {}
 
 void FixedMargin::_checkParam(const string&) const {
-    // All the parameters are re-validated on any change, so the check does not depend on the
-    // order in which the named params are set
+    // Re-validate all params on any change, so the check does not depend on set order
     double rate = tryGetParam<double>("rate", 0.6);
     double rate_short = tryGetParam<double>("rate_short", 0.0);
     double maintain_rate = tryGetParam<double>("maintain_rate", 0.0);
@@ -46,8 +45,7 @@ void FixedMargin::_checkParam(const string&) const {
         checkRate("rate_short", rate_short);
     if (maintain_rate > 0.0) {
         checkRate("maintain_rate", maintain_rate);
-        // The maintenance margin must stay below the opening margin of every side, otherwise the
-        // account would be called the moment a position is opened
+        // Must stay below every side's opening margin, or a position triggers a margin call at once
         double effective_short = rate_short > 0.0 ? rate_short : rate;
         double min_open_rate = std::min(rate, effective_short);
         HKU_CHECK(maintain_rate <= min_open_rate,

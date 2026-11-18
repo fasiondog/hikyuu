@@ -199,8 +199,8 @@ void export_TradeCost(py::module& m) {
 
         [Overload interface] Get the annualized interest rate of the borrowed cash
 
-        The rate is billed by the daily settlement of the account, prorated by its annual_days
-        parameter. Returning 0.0 means that nothing is billed, which is the default.
+        The rate is billed by the account's daily settlement, prorated by its annual_days parameter.
+        0.0 (the default) bills nothing.
 
         :param Datetime date: the settled moment
         :return: an annualized decimal rate, e.g. 0.06 for 6% per year
@@ -212,8 +212,8 @@ void export_TradeCost(py::module& m) {
 
         [Overload interface] Get the annualized interest rate of the borrowed stock
 
-        The interest of a securities lending is billed in cash on the market value of the borrowed
-        shares at the settlement price. Returning 0.0 means that nothing is billed.
+        The interest is billed in cash on the market value of the borrowed shares at the settlement
+        price. 0.0 bills nothing.
 
         :param Datetime date: the settled moment
         :param Stock stock: the borrowed stock

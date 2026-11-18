@@ -37,8 +37,8 @@ public:
 
     /**
      * @brief Profit and loss = sell funds - accumulated total trade cost - buy funds
-     * @note It is valid for the closed records only; Null (NaN) is returned for the ones not yet
-     * closed, so callers can tell "unclosed" apart from a genuine zero profit
+     * @note Valid for closed records only; unclosed ones return Null (NaN), distinguishing them
+     *       from a genuine zero profit
      */
     price_t totalProfit() const;
 
@@ -55,14 +55,13 @@ public:
     price_t totalRisk{0.0};    ///< Accumulated trade risk = sum of (buy price - stop-loss) * buy
                                ///< quantity, excluding the trade cost
     price_t sellMoney{0.0};    ///< Accumulated sell funds
-    price_t margin{0.0};       ///< Margin locked by the holding, in the account currency; 0 means the
-                               ///< plain cash accounting
-    price_t openBasis{0.0};    ///< Opening notional of the still-held lots (price x number x unit);
-                               ///< the cost reference, released proportionally as the lots close
-    price_t settleBasis{0.0};  ///< Mark-to-market basis of the still-held lots, rolled to the
-                               ///< settlement price on each settlement; the realized profit and the
-                               ///< equity of a margin holding are measured against it; it equals
-                               ///< openBasis until the first settlement
+    price_t margin{0.0};       ///< Margin locked by the holding in account currency; 0 means plain
+                               ///< cash accounting
+    price_t openBasis{0.0};    ///< Opening notional of held lots (price x number x unit), the cost
+                               ///< reference, released proportionally as the lots close
+    price_t settleBasis{0.0};  ///< Mark-to-market basis of held lots, rolled to the settlement price
+                               ///< each settlement; measures realized profit and margin-holding
+                               ///< equity; equals openBasis until the first settlement
     size_t buyCount{0};        ///< Number of buys
     size_t sellCount{0};       ///< Number of sells
 
@@ -129,15 +128,15 @@ private:
         if (version >= 2) {
             ar& BOOST_SERIALIZATION_NVP(openBasis);
         } else {
-            // The old archives carried no remaining cost basis; rebuild the best-effort value the
-            // old averaged formula would have produced so the archive stays readable
+            // Old archives lack this basis; rebuild the best-effort value from the former averaged
+            // formula to keep them readable
             price_t notional = buyMoney > 0.0 ? buyMoney : sellMoney;
             openBasis = totalNumber > 0.0 ? notional * (number / totalNumber) : 0.0;
         }
         if (version >= 3) {
             ar& BOOST_SERIALIZATION_NVP(settleBasis);
         } else {
-            // Before the mark-to-market basis existed the opening notional played both roles
+            // Before mark-to-market, the opening notional served both roles
             settleBasis = openBasis;
         }
     }

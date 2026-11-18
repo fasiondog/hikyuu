@@ -14,15 +14,13 @@
 namespace hku {
 
 /**
- * Create a margin model keyed by the security type or the market
- * @param rates "key:ratio" list, e.g. "12:0.10, SHF:0.12"; an all-digit key is a security type,
- *        any other key is a market code
+ * Create a margin model keyed by security type or market
+ * @param rates "key:ratio" list; all-digit keys are security types, others are market codes
  * @param maintain_rate maintain margin ratio, 0 means the same as the opening margin
- * @param default_rate ratio of a security matched by no key, (0, 1], 0.6 by default
- * @param collateral_rates "key:ratio" list of the collateral conversion rates, same key syntax;
- *        empty counts every holding in full
- * @param default_collateral_rate conversion rate of a security matched by no collateral key,
- *        (0, 1], 1.0 by default
+ * @param default_rate ratio when no key matches, (0, 1], 0.6 by default
+ * @param collateral_rates "key:ratio" list of collateral conversion rates, same key syntax; empty
+ *        counts every holding in full
+ * @param default_collateral_rate conversion rate when no collateral key matches, (0, 1], 1.0 by default
  * @see ByTypeMargin
  * @ingroup Margin
  */

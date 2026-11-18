@@ -14,17 +14,16 @@
 namespace hku {
 
 /**
- * Generic fixed-rate trade cost algorithm: the futures / FX / crypto model, applicable to any
- * market without a dedicated cost model.
+ * Fixed-rate cost for futures, FX, crypto and other markets without a dedicated model.
  * @details
  * <pre>
  *   buy:  fee = max(commission * price * number * unit, lowest_commission) + per_lot * number
  *               + others
  *   sell: the same plus stamptax * price * number * unit
- *   commission and stamptax are rounded to the price precision of the security; per_lot and
- *   others are exact and both land in CostRecord.others (they do not depend on the turnover)
- *   unit is the contract multiplier of the security: 1 for stocks, the contract size for
- *   futures, so one formula covers both without a type branch
+ *   commission and stamptax round to the security's price precision; per_lot and others are exact
+ *   and land in CostRecord.others (turnover-independent)
+ *   unit is the contract multiplier: 1 for stocks, the contract size for futures, so one formula
+ *   covers both without a type branch
  * </pre>
  * @ingroup TradeCost
  */

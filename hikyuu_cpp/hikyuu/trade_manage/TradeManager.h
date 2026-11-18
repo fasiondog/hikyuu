@@ -30,7 +30,7 @@ namespace hku {
  * precision(int): 2 calculation precision
  * support_borrow_cash(bool): false whether cash is borrowed automatically on a buy operation
  * support_borrow_stock(bool): false whether the stock is borrowed automatically when short selling
- * currency_rates(string): "" the fixed rate of each foreign market, as in TradeManagerBase
+ * currency_rates(string): "" fixed rate of each foreign market, as in TradeManagerBase
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -380,15 +380,15 @@ public:
 
     /**
      * Settle the margin holdings as of the given moment
-     * @note See TradeManagerBase::settlement; the settled state is rebuilt from the trade list, so
-     *       no extra archive member is needed
+     * @note See TradeManagerBase::settlement; state is rebuilt from the trade list, so no extra
+     *       archive member is needed
      */
     virtual bool settlement(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * Whether the calendar day of the given moment has entered a settlement batch
-     * @note The batch has two independently gated halves, the posting and the billing, while this
-     *       probe answers true once either of them exists -- it does not say the posting ran
+     * @note Posting and billing are gated independently; this is true once either exists, not only
+     *       when posting ran
      */
     virtual bool isSettled(const Datetime& datetime) const override;
 
@@ -433,8 +433,8 @@ private:
         return !last_date.isNull() && datetime > last_date;
     }
 
-    /** Fill the cash gap of a replayed opening with new debt, mirroring the live auto-financing:
-     * the exported records carry the trades, not the borrow that funded them */
+    /** Fill a replayed opening's cash gap with new debt, mirroring live auto-financing: exported
+     *  records carry the trades, not the borrow that funded them */
     bool _borrowForAdd(const Datetime& datetime, price_t needed);
 
     bool _add_init_tr(const TradeRecord&);
@@ -494,10 +494,10 @@ private:
     // state), so an already-checked range never needs to be rescanned for late-arriving data.
     unordered_map<uint64_t, Datetime> m_tmp_weight_checked_until;
 
-    // Transient margin risk state, derived and rebuilt by settlement: the state of the last
-    // maintenance check and the moment a forced liquidation was armed at (Null when none is
-    // pending). Not serialized: a reload restarts from a healthy state and the next settlement
-    // re-derives it from the books, so a live account self-heals at its next close.
+    // Transient margin risk state, derived and rebuilt by settlement: last maintenance-check state
+    // and the moment forced liquidation was armed (Null when none pending). Not serialized: a
+    // reload restarts healthy and the next settlement re-derives it, so a live account self-heals
+    // at its next close.
     bool m_tmp_margin_called{false};
     Datetime m_tmp_force_liquidate_date;
 

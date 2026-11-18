@@ -310,10 +310,8 @@ Common parameters:
       .def_property("cost_func", get_costFunc, set_costFunc, "The trade cost algorithm")
 
       .def_property("margin", get_margin, py::cpp_function(set_margin, py::keep_alive<1, 2>()),
-                    R"(The margin model of the account (MarginBase)
-
-    Setting it to None falls back to the plain cash model MG_None. The default model of a new
-    account is MG_Fixed(0.6), i.e. the legacy 60 % buying power.)")
+                    R"(The account's margin model (MarginBase). None falls back to the plain cash model MG_None; a
+    new account defaults to MG_Fixed(0.6), the legacy 60 % buying power.)")
 
       .def("get_open_margin", &TradeManagerBase::getOpenMargin, py::arg("date"), py::arg("stock"),
            py::arg("price"), py::arg("num"), py::arg("side") = MarginSide::LONG,
@@ -391,10 +389,10 @@ Common parameters:
            py::arg("ktype") = KQuery::DAY,
            R"(get_collateral_haircut(self, date, ktype="DAY")
 
-    The value discounted away by the collateral table, i.e. Σ collateral base × (1 - conversion
-    rate) over the long holdings. A margin-accounted holding bases the discount on what it
-    contributes to the net assets (the locked margin plus the unrealized profit) instead of on its
-    full market value, so the financed part is not taken away twice
+    The value discounted by the collateral table: Σ collateral base × (1 - conversion rate) over
+    long holdings. For a margin-accounted holding the discount is based on its contribution to net
+    assets (locked margin + unrealized profit), not its full market value, so the financed part is
+    not deducted twice
 
     :param Datetime date: the given moment
     :param str ktype: the K-line type used to get the position price
@@ -416,26 +414,25 @@ Common parameters:
 
     Settle the margin holdings as of the given moment
 
-    Every margin-accounted holding is marked to the settlement price (the close of the given
-    K type), the mark-to-market profit is posted into the cash, the locked margin is recomputed at
-    that price with the difference posted, and the maintenance requirement is then checked against
-    the equity. A shortfall only warns unless force_liquidate is on, which queues the flattening
-    for the trading system to execute at the next open. Before that check the day interest of the
-    outstanding liabilities is billed into the debt itself (0.0 rates bill nothing). Both halves
-    are gated per calendar day, so settling twice on one day posts nothing again.
+    Mark each margin-accounted holding to the settlement price (the close of the given K type),
+    post the mark-to-market profit to cash, recompute the locked margin at that price and post the
+    difference, then check the maintenance requirement against equity. A shortfall only warns
+    unless force_liquidate is on, which queues a flattening for the trading system at the next open.
+    Before that check, bill the day interest of outstanding liabilities into the debt (0.0 rates
+    bill nothing). Both halves are gated per calendar day, so settling twice on one day posts
+    nothing again.
 
     :param Datetime date: the settlement moment, later than or equal to lastDatetime()
     :param str ktype: the K-line type the settlement price is taken from
-    :return: True when the calendar day of the moment ends up settled, False when the account never
+    :return: True when the moment's calendar day ends up settled, False when the account never
              settles
     :rtype: bool)")
 
       .def("is_settled", &TradeManagerBase::isSettled, py::arg("date"),
            R"(is_settled(self, date)
 
-    Whether the calendar day of the given moment has entered a settlement batch. The batch has two
-    independently gated halves, the posting and the billing, so True does not by itself say that
-    the holdings were marked on that day
+    Whether the moment's calendar day has entered a settlement batch. Posting and billing are gated
+    independently, so True alone does not mean the holdings were marked that day
 
     :param Datetime date: the moment to probe
     :rtype: bool)")
@@ -636,8 +633,8 @@ Common parameters:
       .def("get_borrow_cash_rate", &TradeManagerBase::getBorrowCashRate, py::arg("date"),
            R"(get_borrow_cash_rate(self, date)
 
-    Get the annualized interest rate of the borrowed cash, answered by the cost model. It is billed
-    by the daily settlement, prorated by the annual_days parameter of the account.
+    Get the annualized interest rate of borrowed cash from the cost model; billed by the daily
+    settlement, prorated by the account's annual_days.
 
     :param Datetime date: the settled moment
     :return: an annualized decimal rate, 0.0 bills nothing
@@ -855,7 +852,8 @@ Common parameters:
       .def("add_trade_record", &TradeManagerBase::addTradeRecord, R"(add_trade_record(self, tr)
 
     Add the trade record directly; if the initialization account record is added, all the existing trade and position records will be cleared.
-    The settlement (BUSINESS_SETTLEMENT) and interest (BUSINESS_INTEREST) records are generated by settlement(); a single record cannot reproduce the book state of that moment, so the manual backfill is rejected and returns False.
+    Settlement (BUSINESS_SETTLEMENT) and interest (BUSINESS_INTEREST) records come from settlement();
+    a single record cannot reproduce the book state, so manual backfill is rejected and returns False.
 
     :param TradeRecord tr: the trade record
     :return: True (success) | False (failure)

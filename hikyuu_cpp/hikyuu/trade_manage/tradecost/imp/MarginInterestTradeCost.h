@@ -16,11 +16,10 @@ namespace hku {
 
 /**
  * Wrapper of any cost model, adding the interest of the margin financing and the securities lending
- * @details The trading fees are answered by the wrapped model exactly as they were; this class
- * bills only the debts: the account queries both rates in its daily settlement and prorates them
- * over the calendar days gone by since the book was last billed, adding the result to the debt
- * itself instead of paying it from the cash.
- * Both rates are 0.0 by default, so wrapping a model bills nothing until a rate is configured.
+ * @details The wrapped model answers trading fees; this class bills only debts: the account queries
+ * both rates in daily settlement, prorates them over the calendar days since the last billing and
+ * adds the result to the debt rather than paying it from cash. Both rates are 0.0 by default, so
+ * wrapping alone bills nothing.
  * @see TC_MarginInterest
  * @ingroup TradeCost
  */
@@ -31,8 +30,7 @@ public:
 
     /**
      * Wrap another cost model
-     * @param trade_cost the model answering the trading fees, the wrapper falls back to a
-     *        zero-cost model when it is null
+     * @param trade_cost the model answering the trading fees; null falls back to a zero-cost model
      */
     explicit MarginInterestTradeCost(const TradeCostPtr& trade_cost);
 
@@ -68,7 +66,7 @@ public:
     /** The annualized rate of the borrowed security, matched by the borrow_stock_rates table */
     virtual double getBorrowStockRate(const Datetime& datetime, const Stock& stock) const override;
 
-    /** A Python defined inner model must keep the GIL too, so the flag propagates through it */
+    /** Also keep the GIL when the inner model is Python-defined */
     virtual bool hasPythonPart() const noexcept override {
         return m_is_python_object || (m_inner && m_inner->hasPythonPart());
     }
@@ -81,8 +79,8 @@ protected:
 private:
     TradeCostPtr m_inner;  // The model answering the trading fees
 
-    // The table is derived from the borrow_stock_rates param, hence it is not serialized; it is
-    // rebuilt by _checkParam at every param check: set_param, clone and deserialization
+    // Derived from borrow_stock_rates, so not serialized; _checkParam rebuilds it on every check
+    // (set_param, clone, deserialization)
     mutable RateTable m_stock_rates;
 
 #if HKU_SUPPORT_SERIALIZATION

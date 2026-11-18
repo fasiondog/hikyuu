@@ -72,7 +72,7 @@ double MarginInterestTradeCost::getBorrowStockRate(const Datetime& datetime,
 
 void MarginInterestTradeCost::_checkParam(const string& name) const {
     if (name == "borrow_stock_rates") {
-        // A rate is a decimal annualized ratio of the [0, 1) interval, and 0.0 bills nothing
+        // Rates are decimal annualized ratios in [0, 1); 0.0 bills nothing
         m_stock_rates.parse(tryGetParam<string>("borrow_stock_rates", ""),
                             "TC_MarginInterest borrow_stock_rates", true, false);
         return;
@@ -92,7 +92,7 @@ void MarginInterestTradeCost::_checkParam(const string& name) const {
 }
 
 TradeCostPtr MarginInterestTradeCost::_clone() {
-    // clone copies the params as they are, so the inner model has to be cloned here
+    // clone copies params only; the inner model must be cloned here
     return make_shared<MarginInterestTradeCost>(m_inner ? m_inner->clone() : TC_Zero());
 }
 

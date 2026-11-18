@@ -31,8 +31,8 @@ void export_FundsRecord(py::module& m) {
                      "The currently borrowed securities asset value (float)")
       .def_readwrite("occupied_margin", &FundsRecord::occupied_margin,
                      "The margin locked by the margin-accounted holdings (float); its equity "
-                     "contribution is already included in market_value for both the long and the "
-                     "short side, while short_market_value keeps the plain cash shorts only")
+                     "contribution is already included in market_value, while short_market_value "
+                     "keeps cash shorts only")
 
       .def_property_readonly("total_assets", &FundsRecord::total_assets, "The total assets")
       .def_property_readonly("net_assets", &FundsRecord::net_assets, "The net assets")

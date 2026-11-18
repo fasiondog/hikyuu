@@ -40,8 +40,7 @@ void MarginBase::paramChanged() {}
 MarginPtr MarginBase::clone() {
     MarginPtr result = _clone();
     MarginBase* p = result.get();
-    // setParameter rather than a raw assignment, so the clone re-runs the param check and rebuilds
-    // whatever a model derives from its params
+    // setParameter (not assignment) re-runs the param check and rebuilds derived state
     p->setParameter(m_params);
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
@@ -55,10 +54,9 @@ price_t MarginBase::nominal(const Stock& stock, price_t price, double num) {
 }
 
 bool MarginBase::needBorrowAsset(const Stock& stock) const {
-    // The borrow/return accounting is the A-share securities lending semantics, so the built-in
-    // categories keep it. A cryptocurrency and any custom type (>= 12, i.e. futures, forex, US or
-    // HK stocks registered for a new market) open a short without borrowing; the temporary
-    // placeholder type is not traded at all. Override it when a market really has another rule.
+    // Borrow/return follows A-share securities-lending semantics for built-in categories. Crypto
+    // and custom types (>= 12, e.g. futures, forex, US/HK stocks for a new market) short without
+    // borrowing; the temporary placeholder is not traded. Override when a market has another rule.
     return stock.type() < STOCKTYPE_TMP &&
            (stock.type() < STOCKTYPE_CRYPTO || stock.type() == STOCKTYPE_A_BJ);
 }
@@ -78,8 +76,7 @@ double MarginBase::getMaxOpenNumber(const Datetime& datetime, const Stock& stock
     if (!std::isfinite(available) || !std::isfinite(price) || available <= 0.0 || price <= 0.0)
         return 0.0;
 
-    // Ask for the margin of one minimum trading unit instead of one share, so that a per-lot
-    // margin (a fixed amount per contract lot) scales correctly
+    // Query the margin of one minimum trading unit, not one share, so a per-lot margin scales
     double atom = stock.minTradeNumber();
     if (!std::isfinite(atom) || atom <= 0.0)
         atom = 1.0;
@@ -88,8 +85,7 @@ double MarginBase::getMaxOpenNumber(const Datetime& datetime, const Stock& stock
     if (!std::isfinite(per_atom) || per_atom <= 0.0)
         return 0.0;
 
-    // Tolerate the floating-point rounding when the quota lands exactly on a unit boundary,
-    // otherwise a quota equal to one unit's margin can floor to zero
+    // Tolerate FP rounding at a unit boundary, else a quota equal to one unit's margin floors to 0
     double units = available / per_atom;
     units = std::floor(units + std::max(1e-9, units * 1e-12));
     double num = units * atom;

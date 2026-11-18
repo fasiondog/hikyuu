@@ -23,7 +23,7 @@
 
 .. py:function:: TC_FixedA([commission=0.0003, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
-    当前最新A股交易成本算法（滚动默认，始终对应当前费率）：过户费按成交金额的千分之0.01全市场双向收取，卖出印花税千分之0.5
+    当前A股交易成本算法：过户费按成交金额的千分之0.01全市场双向收取，卖出印花税千分之0.5
 
     :param float commission: 佣金比例
     :param float lowest_commission: 最低佣金值
@@ -71,11 +71,11 @@
 
 .. py:function:: TC_MarginInterest([trade_cost=TC_Zero(), borrow_cash_rate=0.0, borrow_stock_rates="", default_borrow_stock_rate=0.0])
 
-    包装另一个交易成本算法，附加融资利息与融券费用的年化利率：买卖费用全部转给被包装的算法回答，本算法
-    只多回答两个利率。利率由账户结算计提，按距上次计提经过的自然日数除以账户参数 ``annual_days`` 折算金额，计入负债本身
-    而不从现金支付，产生 ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`
+    包装另一交易成本算法，附加融资利息与融券费用的年化利率：买卖费用全部转给被包装算法，本算法只多回答
+    两个利率。利率由账户结算计提，按距上次计提经过的自然日数除以 ``annual_days`` 折算，计入负债本身而不从
+    现金支付，产生 ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`
 
-    两个利率默认均为 0.0（不计提），因此只包装而不配置利率时，账簿与不包装时逐位一致。
+    两利率默认 0.0（不计提）；只包装而不配置利率时，账簿与不包装时逐位一致。
 
     :param TradeCost trade_cost: 回答买卖费用的成本算法，默认 TC_Zero
     :param float borrow_cash_rate: 融资年化利率，[0, 1)，0.0 表示不计提利息
@@ -193,10 +193,9 @@ ETF交易成本算法
     cost = TC_ByMarket(TC_FixedA(), {"HK": TC_HK(), "type:12": TC_Fixed(0.0001)})
 
 .. note::
-    请在回测开始前配置完毕：路由表不与查询同步，仅未注册市场的首次提示会加锁；未注册市场只提示一次，
-    之后按默认算法计费。经部件注册表 ``core.tc.bymarket`` 创建时只能指定默认算法，路由表须用上述
-    ``costs`` 参数配置。键匹配顺序为先市场后类型，与 ``MG_ByType`` 及 ``currency_rates`` 的
-    类型键优先顺序相反，混用时注意。
+    请在回测开始前配置：路由表不与查询同步，仅未注册市场的首次提示加锁；该市场只提示一次，之后按默认算法
+    计费。经部件注册表 ``core.tc.bymarket`` 创建时只能指定默认算法，路由表须用上述 ``costs`` 参数配置。
+    键匹配顺序为先市场后类型，与 ``MG_ByType`` 及 ``currency_rates`` 的类型键优先相反，混用时注意。
 
 
 自定义交易成本算法
@@ -214,9 +213,9 @@ ETF交易成本算法
 
 .. note::
 
-    以上名称就是 Python 侧需要实现的覆写名，账户 C++ 代码按这些名字查找到子类实现后回调。旧版本绑定层是按 C++ 方法名
-    （``getBuyCost`` 一类）查找的，与该清单不一致，按清单写的覆写会被静默忽略；现已统一到 snake_case 名称上，以 C++
-    名定义覆写的旧代码需改名。
+    以上名称即 Python 侧需实现的覆写名，账户 C++ 代码据此查找子类实现并回调。旧版绑定按 C++ 方法名（如
+    ``getBuyCost``）查找，与清单不符，按清单写的覆写会被静默忽略；现已统一为 snake_case，以 C++ 名定义
+    覆写的旧代码需改名。
 
 
 
@@ -318,9 +317,8 @@ ETF交易成本算法
 
         【重载接口】融资借入资金的年化利率，默认 0.0（不计提）
 
-        利率由账户结算计提，按距上次计提经过的自然日数除以账户参数 ``annual_days`` 折算金额，计入负债本身而
-        不从现金支付，产生 ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`；内建实现见
-        :py:func:`TC_MarginInterest`
+        由账户结算按距上次计提经过的自然日数除以 ``annual_days`` 折算，计入负债而非从现金支付，产生
+        ``BUSINESS_INTEREST`` 记录，见 :doc:`margin`；内建实现见 :py:func:`TC_MarginInterest`
         
         :param Datetime datetime: 结算时刻
         :return: 年化小数利率，如 0.06 表示年化 6%
@@ -330,7 +328,7 @@ ETF交易成本算法
 
         【重载接口】融券借入标的的年化费率，默认 0.0（不计提）
 
-        按结算日借入数量的市值计提，同样计入负债并以现金结算；内建实现见 :py:func:`TC_MarginInterest`
+        按结算日借入股份在结算价下的市值计提，与融资利息同样计入现金负债；内建实现见 :py:func:`TC_MarginInterest`
 
         :param Datetime datetime: 结算时刻
         :param Stock stock: 借入对象

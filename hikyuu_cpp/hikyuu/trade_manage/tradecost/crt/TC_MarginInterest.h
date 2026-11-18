@@ -15,16 +15,14 @@ namespace hku {
 
 /**
  * Wrap another cost model with the interest of the margin financing and the securities lending
- * @details The wrapped model keeps answering the trading fees; the rates answered here are used by
- * the account in its daily settlement, prorating the outstanding debt over the calendar days gone
- * by since the book was last billed and adding the result to the debt itself. Both rates are 0.0
- * by default, i.e. wrapping a model alone bills nothing.
+ * @details The wrapped model answers the trading fees; the rates here are used in daily settlement
+ * to prorate the outstanding debt over the calendar days since the last billing and add the result
+ * to the debt. Both rates are 0.0 by default, so wrapping alone bills nothing.
  *
  * @param trade_cost the model answering the trading fees, a zero-cost model by default
  * @param borrow_cash_rate annualized rate of the borrowed cash, [0, 1), 0.0 by default
- * @param borrow_stock_rates "key:rate" list of the annualized securities lending rates, each rate
- *        in [0, 1), e.g. "12:0.10, SHF:0.12"; an all-digit key is a security type, any other key is
- *        a market code
+ * @param borrow_stock_rates "key:rate" list of annualized lending rates in [0, 1)
+ *        (e.g. "12:0.10, SHF:0.12"); an all-digit key is a security type, otherwise a market code
  * @param default_borrow_stock_rate rate of a security matched by no key, [0, 1), 0.0 by default
  * @see MarginInterestTradeCost
  * @ingroup TradeCost

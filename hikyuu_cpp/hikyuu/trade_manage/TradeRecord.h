@@ -21,9 +21,9 @@ namespace hku {
 
 /**
  * Business type
- * @note The archives store the name returned by getBusinessName() instead of the number, so the
- *       numbering is a runtime detail: BUSINESS_SETTLEMENT reuses the number the retired
- *       BUSINESS_INVALID had, which leaves every historical archive readable as is
+ * @note Archives store getBusinessName() strings, not numbers, so numbering is a runtime detail:
+ *       BUSINESS_SETTLEMENT reuses the retired BUSINESS_INVALID number, keeping historical
+ *       archives readable
  * @ingroup TradeManagerClass
  */
 enum BUSINESS {
@@ -93,8 +93,8 @@ public:
     CostRecord cost;    ///< Trade cost
     price_t stoploss;   ///< Stop-loss price
     price_t cash;       ///< Cash balance
-    price_t margin;     ///< Margin the opening locked, in the account currency; 0 on the cash books
-                        ///< and for every business other than buy / sell short
+    price_t margin;     ///< Margin locked at opening in account currency; 0 on the cash books and
+                        ///< for all businesses other than buy/sell short
     SystemPart from;  ///< Auxiliary record of the trading system part that issued the instruction;
                       ///< Null<int>() means invalid
     string remark;    ///< Remark (at most 100 encoded characters)

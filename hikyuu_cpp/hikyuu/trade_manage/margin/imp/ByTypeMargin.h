@@ -15,19 +15,16 @@
 namespace hku {
 
 /**
- * Margin model keyed by the security type or the market, for a mixed account
- * @details The rates expression is a list of "key:ratio" items separated by ",", ";" or blanks,
- *          e.g. "12:0.10, SHF:0.12". An all-digit key is a security type, any other key is a
- *          market code (compared upper-cased). A type hit wins over a market hit; when neither
- *          hits, default_rate is used. The long and the short share one ratio; use MG_Fixed or a
- *          Python subclass when they must differ.
+ * Margin model keyed by security type or market, for a mixed account
+ * @details "key:ratio" items separated by ",", ";" or blanks. All-digit keys are security types,
+ *          others are market codes (upper-cased). A type hit wins over a market hit; neither uses
+ *          default_rate. Long and short share one ratio; use MG_Fixed or a Python subclass to differ.
  * @param rates the "key:ratio" list
  * @param maintain_rate maintain margin ratio, 0 means the same as the opening margin
- * @param default_rate ratio of a security matched by no key, (0, 1], 0.6 by default
- * @param collateral_rates the "key:ratio" list of the collateral conversion rates, same syntax;
- *                         an empty list counts every holding in full
- * @param default_collateral_rate conversion rate of a security matched by no collateral key,
- *                                (0, 1], 1.0 by default
+ * @param default_rate ratio when no key matches, (0, 1], 0.6 by default
+ * @param collateral_rates "key:ratio" list of collateral conversion rates, same syntax; empty
+ *        counts every holding in full
+ * @param default_collateral_rate conversion rate when no collateral key matches, (0, 1], 1.0 by default
  * @ingroup Margin
  */
 class HKU_API ByTypeMargin : public MarginBase {
@@ -58,9 +55,8 @@ protected:
     virtual void _checkParam(const string& name) const override;
 
 private:
-    /** Parse both rate tables; called from _checkParam only, so a query method never parses nor
-     *  throws and a shared instance stays read-only at run time (each table is reparsed only when
-     *  its own expression changed) */
+    /** Parse both tables from _checkParam only, so queries never parse or throw and a shared
+     *  instance stays read-only; each table reparses only when its own expression changes */
     void parseRates() const;
 
     /** The ratio of the given security, default_rate when no key matches */
@@ -69,8 +65,8 @@ private:
     /** The conversion rate of the given security, default_collateral_rate when no key matches */
     double collateralRateOf(const Stock& stock) const;
 
-    // The tables are derived from the rate params, hence they are not serialized; they are
-    // rebuilt by parseRates at every param check: set_param, clone and deserialization
+    // Derived from the rate params, so not serialized; parseRates rebuilds them on every param
+    // check: set_param, clone and deserialization
     mutable RateTable m_rates;
     mutable RateTable m_collateral_rates;
 };

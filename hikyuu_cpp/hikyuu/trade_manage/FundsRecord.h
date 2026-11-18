@@ -31,10 +31,9 @@ public:
     price_t base_asset{0.0};         /**< Value of the currently invested assets */
     price_t borrow_cash{0.0};        /**< Currently borrowed funds, i.e. the liability */
     price_t borrow_asset{0.0};       /**< Value of the currently borrowed security assets */
-    price_t occupied_margin{0.0};    /**< Margin locked by the margin-accounted holdings, floating
-                                          profit excluded; its contribution is folded into
-                                          market_value for both sides, short_market_value keeps the
-                                          plain cash shorts only */
+    price_t occupied_margin{0.0};    /**< Margin locked by margin-accounted holdings, excluding
+                                          floating profit; folded into market_value for both sides,
+                                          while short_market_value keeps cash shorts only */
 
     // Current total assets = cash + long market value + short quantity × (borrow price - current
     // price)

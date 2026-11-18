@@ -55,12 +55,12 @@ CostRecord FixedHKTradeCost::getCost(const Stock& stock, price_t price, double n
     if (result.commission < lowest_commission) {
         result.commission = lowest_commission;
     }
-    // The HKEX rounds the stamp duty up to a whole HK dollar per order; the 1e-9 tolerance keeps
-    // the floating point noise (e.g. 10000 * 0.001 = 10.000000000000002) from adding a dollar
+    // HKEX rounds stamp duty up to a whole HK dollar per order; the 1e-9 tolerance prevents
+    // floating-point noise from adding a dollar
     price_t stamp = value * getParam<price_t>("stamptax");
     result.stamptax = stamp > 0.0 ? std::ceil(stamp - 1e-9) : 0.0;
 
-    // The settlement fee is charged as a ratio and bounded per order; 0 means the bound is off
+    // Settlement fee: ratio bounded per order, 0 disables the bound
     price_t settle = value * getParam<price_t>("settlefee");
     if (settle > 0.0) {
         price_t settle_min = getParam<price_t>("settlefee_min");

@@ -19,15 +19,11 @@ namespace hku {
 
 /**
  * Routes the cost calculation to another cost model by the market or the security type
- * @details It answers no fee itself: every query is forwarded to the model registered for the
- * security, so the fee schedule of each market stays in its own existing model (TC_FixedA, TC_HK,
- * TC_Fixed, ...). A security is matched by its market code first (e.g. "HK"), then by its security
- * type (e.g. "TYPE:12"), and falls back to the default model when neither is registered; an
- * unmatched market is reported once and then billed by the default model.
- * The account-level hooks that carry no security (the borrowed cash cost and rate) are answered
- * by the default model. Configure the routing before the run: the table is not synchronized with
- * the queries, and only the one-off unmatched warning takes a lock; the warning set is guarded by
- * a mutex so parallel valuation paths stay safe.
+ * @details Charges no fee itself: each query goes to the registered model, so each market keeps its
+ * own schedule (TC_FixedA, TC_HK, TC_Fixed, ...). Matching: market code ("HK"), then security type
+ * ("TYPE:12"), else the default after a one-off unmatched warning. Security-less account hooks
+ * (borrowed cash cost/rate) use the default. Configure before the run: the routing table is not
+ * synchronized; only the warning set is mutex-guarded for parallel valuation.
  * @see TC_ByMarket
  * @ingroup TradeCost
  */
@@ -44,7 +40,7 @@ public:
     virtual ~ByMarketTradeCost();
 
     /**
-     * Register the cost model of a key, an existing key is replaced
+     * Register a key's cost model, replacing an existing one
      * @param key the market code (e.g. "HK", case insensitive) or "type:<n>" (e.g. "type:12")
      * @param cost the cost model answering that key, ignored when null
      * @throws hku::exception an empty key, or a "type:" key without the type number

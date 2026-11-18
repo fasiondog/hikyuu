@@ -17,21 +17,18 @@ namespace hku {
  * Hong Kong stock trade cost model.
  * @details
  * <pre>
- *   buy and sell are charged symmetrically (the stamp duty and the regulatory fees are
- *   two-sided in Hong Kong):
+ *   buy and sell are symmetric: stamp duty and regulatory fees are two-sided in Hong Kong
  *     fee = max(commission * price * number * unit, lowest_commission)
  *           + ceil(stamptax * price * number * unit)   // rounded up to a whole HK dollar
  *           + tradefee * price * number * unit
  *           + clamp(settlefee * price * number * unit, settlefee_min, settlefee_max)
  *           + per_trade
- *   commission is the broker commission rate (double-sided, lifted to lowest_commission per
- *   order); stamptax is the stamp duty rate (0.1% since 2023-11-17, charged on both sides and
- *   rounded up to a whole HK dollar per order, as the HKEX does); tradefee aggregates the
- *   exchange trading fee (0.00565%) and the SFC (0.0027%) / AFIRD (0.00015%) levies charged on
- *   both sides (0.0085% in total by default); settlefee is the CCASS settlement fee ratio
- *   (0.002% by default in the market, 0 here) optionally bounded by settlefee_min / settlefee_max
- *   (0 means the bound is not applied); per_trade is the fixed charge per order. tradefee and
- *   settlefee land in CostRecord.transferfee, per_trade lands in CostRecord.others.
+ *   commission: broker rate, two-sided, lifted to lowest_commission per order
+ *   stamptax: 0.1% since 2023-11-17, two-sided, rounded up to a whole HK dollar per order (HKEX)
+ *   tradefee: exchange 0.00565% + SFC 0.0027% + AFIRD 0.00015%, two-sided (0.0085% default)
+ *   settlefee: CCASS ratio (0.002% in market, 0 here), bounded by settlefee_min/max (0 = off)
+ *   per_trade: fixed charge per order
+ *   tradefee and settlefee -> CostRecord.transferfee; per_trade -> CostRecord.others
  * </pre>
  * @ingroup TradeCost
  */
@@ -73,7 +70,7 @@ public:
     virtual TradeCostPtr _clone() override;
 
 private:
-    /** buy and sell are charged symmetrically, so both entries share one calculation */
+    /** Buy and sell are symmetric, so both share one calculation */
     CostRecord getCost(const Stock& stock, price_t price, double num) const;
 };
 

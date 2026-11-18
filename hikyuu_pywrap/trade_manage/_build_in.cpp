@@ -120,7 +120,7 @@ void export_build_in(py::module& m) {
 
     Wrap another trade cost algorithm with the interest of the margin financing and the securities lending.
 
-    The wrapped algorithm keeps answering the trading fees; the rates here are read by the account in its daily settlement, prorating the outstanding debt over the calendar days gone by since the book was last billed and adding the result to the debt itself instead of paying it from the cash. Both rates are 0.0 by default, so wrapping an algorithm alone bills nothing.
+    The wrapped algorithm keeps answering the trading fees; the account reads these rates in its daily settlement, prorating the debt over the calendar days elapsed since the last bill and adding the result to the debt instead of paying it from cash. Both rates default to 0.0, so wrapping alone bills nothing.
 
     :param TradeCost trade_cost: the algorithm answering the trading fees, defaulting to TC_Zero
     :param float borrow_cash_rate: the annualized rate of the borrowed cash, in [0, 1)
@@ -134,7 +134,7 @@ void export_build_in(py::module& m) {
       py::arg("settlefee") = 0.0, py::arg("settlefee_min") = 0.0, py::arg("settlefee_max") = 0.0,
       R"(TC_HK([commission=0.00025, lowest_commission=3.0, stamptax=0.001, tradefee=0.000085, per_trade=0.0, settlefee=0.0, settlefee_min=0.0, settlefee_max=0.0])
 
-    The Hong Kong stock trade cost algorithm. The buy and the sell are charged symmetrically: the broker commission (lifted to the lowest commission per order), the stamp duty (0.1% since 2023-11-17, charged on both sides and rounded up to a whole HK dollar per order), the exchange trading fee plus the SFC and AFIRD levies (0.0085% in total by default), the CCASS settlement fee (ratio with an optional lower / upper bound), and an optional fixed charge per order.
+    The Hong Kong stock trade cost algorithm, charging buy and sell symmetrically: broker commission (lifted to the lowest commission per order), stamp duty (0.1% since 2023-11-17, both sides, rounded up to a whole HK dollar per order), the exchange trading fee plus the SFC and AFIRD levies (0.0085% in total by default), the CCASS settlement fee (ratio with an optional lower / upper bound), and an optional fixed charge per order.
 
     :param float commission: the broker commission ratio (double-sided, of the turnover)
     :param float lowest_commission: the lowest commission value (double-sided, per order)
@@ -158,7 +158,7 @@ void export_build_in(py::module& m) {
       py::arg("default_cost") = TC_Zero(), py::arg("costs") = py::dict(),
       R"(TC_ByMarket([default_cost=TC_Zero(), costs={}])
 
-    The trade cost algorithm routing every query to the model of the security. It charges nothing itself: the buy / sell / securities lending queries are forwarded to the model registered for the security's market code (e.g. "HK"), then for its security type (e.g. "type:12"), and to the default model when neither is registered. The account-level borrowed cash cost and rate, which carry no security, are answered by the default model.
+    The trade cost algorithm routing every query to the security's own model. It charges nothing itself: buy / sell / securities lending queries are forwarded to the model registered for the security's market code (e.g. "HK"), then its security type (e.g. "type:12"), falling back to the default model when neither is registered. The account-level borrowed cash cost and rate carry no security and are answered by the default model.
 
     :param TradeCost default_cost: the model answering an unregistered market, defaulting to TC_Zero()
     :param dict costs: the routing table, a market code or "type:<n>" mapped to a TradeCost, e.g. {"HK": TC_HK(), "type:12": TC_Fixed(0.0001)}

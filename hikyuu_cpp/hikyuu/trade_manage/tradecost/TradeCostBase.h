@@ -111,17 +111,15 @@ public:
         return m_is_python_object;
     }
 
-    // The interest hooks are declared after every interface they were added alongside: a virtual
-    // added in the middle of the class moves the slots of the ones declared after it, and a cost
-    // model built against the previous header would then dispatch to the wrong function.
+    // New virtuals are appended to preserve vtable slot order: inserting one mid-class shifts the
+    // later slots, so models built against the old header dispatch to the wrong function.
 
     /**
      * Annualized interest rate of the borrowed cash
-     * @details 0.0 by default: a cost model that bills no interest keeps the plain cash accounting
-     *          of the accounts written before the rate existed. The daily accrual of the debt uses
-     *          the rate of the settlement day, so a model may change it over time.
+     * @details 0.0 by default keeps the plain cash accounting of pre-rate accounts.
+     *          Accrual uses the settlement-day rate, so a model may vary it over time.
      * @param datetime the day being settled
-     * @return a decimal rate, e.g. 0.06 for 6% per year
+     * @return decimal rate (0.06 = 6%)
      */
     virtual double getBorrowCashRate(const Datetime& datetime) const {
         return 0.0;
@@ -129,11 +127,10 @@ public:
 
     /**
      * Annualized interest rate of the borrowed security
-     * @details 0.0 by default, see getBorrowCashRate. The interest is billed in cash even though it
-     *          is charged on a securities lending.
+     * @details 0.0 by default, see getBorrowCashRate. Billed in cash even for a securities lending.
      * @param datetime the day being settled
      * @param stock the borrowed security
-     * @return a decimal rate, e.g. 0.10 for 10% per year
+     * @return decimal rate (0.10 = 10%)
      */
     virtual double getBorrowStockRate(const Datetime& datetime, const Stock& stock) const {
         return 0.0;
@@ -165,9 +162,8 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // setParameter instead of a raw assignment, like MarginBase: it re-runs the param check,
-        // which is the only place a model may rebuild the state it derives from its params, so the
-        // hot path stays a pure lookup and a shared model can be queried from several threads
+        // setParameter re-runs the param check, the only place rebuilding derived state, keeping
+        // the hot path a pure lookup and shared models safe for concurrent queries
         ar& BOOST_SERIALIZATION_NVP(m_params);
         setParameter(m_params);
     }

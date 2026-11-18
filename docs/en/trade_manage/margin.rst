@@ -223,8 +223,8 @@ Account side interfaces
 
 .. note::
 
-    The available funds use the net assets instead of the cash: a short opening brings the sale
-    proceeds into the cash, which would otherwise allow an unlimited number of shorts.
+    Available funds use net assets rather than cash: a short opening brings the sale proceeds into
+    cash, which would otherwise allow unlimited shorts.
 
     The buying power check runs only when ``support_borrow_cash=True`` (long side) or the margin
     model covers the security (short side); the buy / sell checks of a plain cash account (MG_None
@@ -417,9 +417,9 @@ of the outstanding liabilities is billed in the same batch, so **a billed day is
   get_borrow_stock_rate(the settled day, stock) * billed days / annual_days``, i.e. charged on the
   market value of the borrowed shares **at the settlement price**, not on the value they had when
   they were borrowed
-- The billed days follow the **calendar**: the days gone by since the book was last billed (1 for the
-  first bill, the day the debt was taken on), so a weekend, a suspension or a coarser K type bills
-  the days it waited for instead of silently costing nothing
+- The billed days follow the **calendar**: the days since the book was last billed (1 for the first
+  bill, the day the debt was taken on), so weekends, suspensions and holidays still bill, regardless
+  of the ``ktype``
 - The anchor is at the level of the **whole book**: one day, that of the last interest record, serves
   every liability, and no age is kept per debt. A debt taken on inside such a window is therefore
   billed over the whole of it (a little too much) and a debt that predates the very first bill is

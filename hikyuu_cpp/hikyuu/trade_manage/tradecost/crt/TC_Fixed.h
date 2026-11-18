@@ -14,8 +14,7 @@
 namespace hku {
 
 /**
- * Generic fixed-rate trade cost algorithm for the futures, FX and crypto markets (any market
- * without a dedicated cost model)
+ * Fixed-rate cost for futures, FX, crypto and other markets without a dedicated model
  * @details
  * <pre>
  *   fee = max(commission * price * number * unit, lowest_commission) + per_lot * number + others
@@ -25,8 +24,8 @@ namespace hku {
  * @param commission commission ratio of the turnover value, 0 by default
  * @param lowestCommission the lowest commission value, 0 by default
  * @param stamptax stamp duty charged on sells only, 0 by default
- * @param perLot fixed fee per lot (contract), e.g. the exchange fee of a futures contract
- * @param others fixed extra charge, carries the delivery / funding fees
+ * @param perLot fixed fee per lot (contract), e.g. a futures exchange fee
+ * @param others fixed extra charge (delivery / funding fees)
  * @see FixedTradeCost
  * @ingroup TradeCost
  */

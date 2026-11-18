@@ -87,7 +87,7 @@ void FixedTradeCost::_checkParam(const string& name) const {
 }
 
 TradeCostPtr FixedTradeCost::_clone() {
-    // clone() copies the parameters and the name over, only the defaults matter here
+    // clone copies the params and name, so a default instance is enough
     return make_shared<FixedTradeCost>();
 }
 

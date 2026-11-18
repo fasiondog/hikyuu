@@ -32,7 +32,7 @@ void ByMarketTradeCost::add(const string& key, const TradeCostPtr& cost) {
 
     string upper_key(key);
     to_upper(upper_key);
-    // A "type:<n>" key carries the security type number: a wrong suffix could never match
+    // Reject a non-numeric suffix: it could never match a security type
     if (upper_key.compare(0, 5, "TYPE:") == 0) {
         bool all_digits =
           upper_key.size() > 5 && std::all_of(upper_key.begin() + 5, upper_key.end(),
@@ -76,8 +76,7 @@ const TradeCostPtr& ByMarketTradeCost::_route(const Stock& stock) const {
         return iter->second;
     }
 
-    // An unconfigured market is billed by the default model: report it once instead of letting the
-    // fallback hide itself in every trade record
+    // Warn once per unmatched market so the default fallback is not silently hidden
     {
         std::lock_guard<std::mutex> lock(m_warned_mutex);
         HKU_WARN_IF(m_warned.insert(market).second,

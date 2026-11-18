@@ -25,22 +25,21 @@ BOOST_CLASS_EXPORT(hku::TradeManager)
 
 namespace hku {
 
-/** The proportional share of the still-held opening notional (money) for the given quantity */
+/** Proportional share of the still-held opening notional for the given quantity */
 static price_t positionOpenBasis(const PositionRecord& position, double number) {
     HKU_IF_RETURN(position.number <= 0.0, 0.0);
     return position.openBasis * (number / position.number);
 }
 
-/** The proportional share of the still-held mark-to-market basis for the given quantity */
+/** Proportional share of the still-held mark-to-market basis for the given quantity */
 static price_t positionSettleBasis(const PositionRecord& position, double number) {
     HKU_IF_RETURN(position.number <= 0.0, 0.0);
     return position.settleBasis * (number / position.number);
 }
 
 /**
- * The equity contribution of a margin-accounted position: the locked margin plus the unrealized
- * profit measured against the settlement basis at the given price; the short side contributes as
- * a liability instead
+ * Equity of a margin position: locked margin plus unrealized profit vs the settlement basis at
+ * price; the short side contributes as a liability
  */
 static price_t marginPositionEquity(const PositionRecord& position, price_t price, bool is_long,
                                     price_t rate) {
@@ -193,9 +192,9 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_short_position = m_short_position;
     p->m_short_position_history = m_short_position_history;
     p->m_actions = m_actions;
-    // The clone copies the params of the base, the parsed table must follow them
+    // The clone shares the base's params, so the parsed rate table follows
     p->m_currency_rates = m_currency_rates;
-    // The copy has already reported the markets it knows, it must not repeat them
+    // The copy inherits the reported-market warnings and must not repeat them
     p->m_fx_warned = m_fx_warned;
     return p;
 }
@@ -360,7 +359,7 @@ price_t TradeManager::getDebtCash(const Datetime& datetime) {
         } else if (iter->business == BUSINESS_RETURN_CASH) {
             debt_cash -= iter->realPrice;
         } else if (iter->business == BUSINESS_INTEREST) {
-            // The billed interest became part of the principal, exactly like settlement() does it
+            // Billed interest joins the principal, as settlement() does
             debt_cash += iter->realPrice;
         }
     }
@@ -561,8 +560,8 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
         m_position[stock.id()] = pos;
     } else {
         PositionRecord& pos = pos_iter->second;
-        // A deposit is a cash-basis lot: joining a margin-accounted holding would double the basis
-        // while the lock stays, so the equity would silently stop matching the assets
+        // Reject deposits into a margin-accounted holding: a cash-basis lot would double the
+        // basis while the lock stays, desynchronizing equity from assets
         HKU_ERROR_IF_RETURN(pos.margin > 0.0, false,
                             "{} {} Can't deposit into a margin-accounted holding, its margin books "
                             "are not supported yet!",
@@ -615,14 +614,12 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
                         stock.market_code(), number, pos.number);
 
     int precision = getParam<int>("precision");
-    // A withdrawal is a cash-basis transfer that would take the locked margin of the withdrawn lots
-    // along with them, so it is rejected on a margin-accounted holding
+    // Reject withdrawals on margin-accounted holdings: they would remove the locked margin
     HKU_ERROR_IF_RETURN(pos.margin > 0.0, false,
                         "{} {} Can't withdraw from a margin-accounted holding, its margin books "
                         "are not supported yet!",
                         datetime, stock.market_code());
-    // Withdrawing lots releases their cost basis proportionally (the price only feeds the
-    // reporting sellMoney, the cost pool follows the quantity)
+    // Withdrawals release the cost basis proportionally; price only feeds reported sellMoney
     price_t basis = positionOpenBasis(pos, number);
     price_t mtmBasis = positionSettleBasis(pos, number);
     pos.number -= number;
@@ -676,8 +673,7 @@ bool TradeManager::_borrowForAdd(const Datetime& datetime, price_t needed) {
     price_t gap = roundEx(needed - m_cash, precision);
     HKU_IF_RETURN(gap <= 0.0, true);
 
-    // The borrow fee is paid out of the borrowed cash, so the gap grows until it covers that fee as
-    // well (the iteration of buy / sellShort, on the add path)
+    // The borrow fee comes out of the borrowed cash, so grow the gap until it covers the fee
     for (int i = 0; i < 32; ++i) {
         price_t after = roundEx(m_cash + gap - getBorrowCashCost(datetime, gap).total, precision);
         if (after >= needed) {
@@ -951,20 +947,17 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     }
 #endif
 
-    // The margin gate must run before updateWithWeight: the available margin is read through
-    // getFunds, which normalizes the date to 23:59 and applies the ex-rights/ex-dividend weights
-    // itself. Reading it after the update below (and after that stock's check frontier is dropped)
-    // would rescan the same weight window and book every bonus/gift/suogu twice
-    // realPrice 0 is the legal market-order placeholder (the dealing price comes from the
-    // broker), the quota cannot be measured without a price and the plain cash/borrow logic
-    // below handles it; the gate applies only to priced orders
-    // With the margin accounting the cash only shrinks by the margin, so the gate is required for
-    // every margin-accounted order (a futures account without support_borrow_cash has none either)
+    // Gate before updateWithWeight: getAvailableMargin reads via getFunds, which normalizes the
+    // date to 23:59 and applies ex-rights weights itself; reading after the update would rescan the
+    // window and double-book every bonus/gift/suogu
+    // realPrice 0 is the legal market-order placeholder: no price means no measurable quota, so the
+    // gate skips it (the cash/borrow path handles it) and applies only to priced orders
+    // Margin accounting shrinks cash only by the margin, so every margin-accounted order needs the
+    // gate (even a futures account without support_borrow_cash)
     bool margin_acct = isMarginAccounted(stock) && realPrice > 0.0;
     if ((getParam<bool>("support_borrow_cash") || margin_acct) && realPrice > 0.0) {
-        // The admission test uses the margin of the requested order itself instead of the floored
-        // whole-unit quota: the latter loses one unit to floating-point rounding and rejects
-        // odd-lot orders the account can still afford
+        // Test the requested order's own margin, not the floored whole-unit quota: flooring loses
+        // one unit to rounding and rejects affordable odd-lot orders
         price_t available = getAvailableMargin(datetime);
         price_t need =
           toAccount(stock, getOpenMargin(datetime, stock, realPrice, number, MarginSide::LONG));
@@ -988,19 +981,18 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     // price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
 
-    // The cash locked by the opening: only the margin when the holding is booked by margin, the
-    // full notional otherwise. The notional itself is still accumulated for the reporting
-    // A model that reports no requirement at all can't book the holding by margin: the opening
-    // falls back to the cash books instead of counting the full notional as equity for free
+    // Locked cash: only the margin when booked by margin, else the full notional (still
+    // accumulated for reporting)
+    // A model reporting no requirement cannot book by margin: fall back to cash rather than count
+    // the full notional as free equity
     price_t locked_margin =
       margin_acct ? getOpenMarginToLock(datetime, stock, realPrice, number, MarginSide::LONG) : 0.0;
     HKU_WARN_IF(margin_acct && !(locked_margin > 0.0),
                 "{} {} The margin model reported no requirement, the opening is booked by cash!",
                 datetime, stock.market_code());
     margin_acct = margin_acct && locked_margin > 0.0;
-    // The account books are kept in the account currency: the notional, the margin and the cost of
-    // a foreign market are converted with its fixed rate, while the position record keeps the
-    // amounts of the security's own currency
+    // Account books use the account currency (notional, margin, cost converted at the fixed rate);
+    // the position record keeps the security's own currency
     price_t need = margin_acct ? toAccount(stock, locked_margin) : toAccount(stock, money);
     price_t account_cost = toAccount(stock, cost.total);
 
@@ -1074,8 +1066,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         position.totalRisk =
           roundEx(position.totalRisk + (realPrice - stoploss) * number * stock.unit(), precision);
         if (margin_acct) {
-            // Margin lots joining a cash-basis holding mix the two accountings in one record: the
-            // whole position then follows the margin formula on a single averaged basis
+            // Margin lots joining a cash-basis holding mix the two accountings; the whole position
+            // then follows the margin formula on one averaged basis
             HKU_WARN_IF(position.margin == 0.0,
                         "{} {} Margin lots join a cash-basis holding, the books mix the two "
                         "accountings!",
@@ -1159,25 +1151,23 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
 
-    // A margin-accounted holding returns only the released margin and the realized profit, the
-    // notional never entered the cash when it was opened; the release is proportional to the
-    // closed part of the holding. A realPrice 0 placeholder cannot be valued, and clearing the
-    // margin without paying the release out would lose that money, so it is rejected up front
+    // A margin holding returns only the released margin and realized profit (the notional never
+    // entered cash), proportional to the closed part; reject realPrice 0: it cannot be valued and
+    // clearing the margin without paying out would lose the money
     HKU_WARN_IF_RETURN(
       position.margin > 0.0 && realPrice <= 0.0, result,
       "{} {} A margin-accounted holding can't be closed at a placeholder price(0)!", datetime,
       stock.market_code());
     price_t released = 0.0;
-    // The cost notional and the settlement basis of the lots being closed, both released from the
-    // books proportionally
+    // Cost notional and settlement basis of the closed lots, released proportionally
     price_t basis = positionOpenBasis(position, real_number);
     price_t mtmBasis = positionSettleBasis(position, real_number);
-    // The proceeds, the realized profit and the cost of a foreign market are billed in the
-    // security's own currency and converted into the account currency
+    // Proceeds, realized profit and cost are billed in the security's currency and converted to
+    // the account currency
     price_t account_cost = toAccount(stock, cost.total);
     if (position.margin > 0.0) {
         released = roundEx(position.margin * (real_number / position.number), precision);
-        // Both bases are money (price x number x unit), so the realized profit needs no unit
+        // Both bases are money totals (price x number x unit), so realized profit needs no unit
         // factor
         price_t realized = toAccount(stock, roundEx(money - mtmBasis, precision));
         m_cash = roundEx(m_cash + released + realized - account_cost, precision);
@@ -1265,11 +1255,10 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
       "{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ", datetime,
       stock.market_code(), stoploss, realPrice);
 
-    // Every margin model caps a short opening by the available margin, no matter whether the
-    // account borrows securities automatically. The available funds are the net assets minus the
-    // occupied margin, because a short opening adds the sale proceeds to the cash. Like in buy,
-    // this gate must run before updateWithWeight to keep the weights from being applied twice,
-    // and it is skipped for the legal realPrice=0 market-order placeholder (see buy)
+    // Every margin model caps a short opening by available margin (net assets minus occupied
+    // margin, since the sale proceeds add to cash), whether or not the account auto-borrows
+    // As in buy, gate before updateWithWeight to avoid applying weights twice, and skip the legal
+    // realPrice=0 market-order placeholder
     if (m_margin && m_margin->isMarginTrading(stock) && realPrice > 0.0) {
         // The margin of the short order itself, judged with a tolerance, same as buy
         price_t available = getAvailableMargin(datetime);
@@ -1288,28 +1277,26 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     int precision = getParam<int>("precision");
 
-    // Resolve the executable quantity from the read-only borrow pool first, so a rejected or a
-    // capped order never touches the debt/fee state. A short opening on a borrowable security may
-    // need new borrowed securities; the borrow itself is committed only after every funding check
-    // below passed
+    // Resolve the executable quantity from the read-only borrow pool first, so a rejected or
+    // capped order never touches debt/fee state; the borrow commits only after every funding check
+    // passes
     position_map_type::iterator pos_iter = m_short_position.find(stock.id());
     double sell_num = number;
     double borrow_num = 0.0;  // securities to borrow for this order
-    // Securities that can not be lent out (futures, crypto, ...) book the short directly, without
-    // the borrow/return accounting
+    // Non-lendable securities (futures, crypto) book the short directly, without borrow/return
     const bool borrow_asset = !m_margin || m_margin->needBorrowAsset(stock);
     if (borrow_asset) {
         if (getParam<bool>("support_borrow_stock")) {
-            // Borrow on demand: the unsold stock already in the pool is used first, only the
-            // shortfall creates new debt
+            // Borrow on demand: use the pool's unsold stock first, only the shortfall creates
+            // debt
             borrow_stock_map_type::const_iterator pool_iter = m_borrow_stock.find(stock.id());
             if (pool_iter != m_borrow_stock.end()) {
                 double unsold = pool_iter->second.number;
                 if (pos_iter != m_short_position.end()) {
                     unsold -= pos_iter->second.number;
                 }
-                // The short position must not exceed the borrowed quantity (an inconsistent
-                // account); reject before borrowing so that no debt residue is left behind
+                // Reject before borrowing if the short exceeds the borrowed quantity, so no
+                // debt residue is left
                 HKU_WARN_IF_RETURN(unsold < 0.0, result, "{} {} Borrowed Stock had all selled!",
                                    datetime, stock.market_code());
                 if (unsold > 0.0) {
@@ -1343,8 +1330,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
                 can_sell_num = total_borrow_num - pos_iter->second.number;
             }
 
-            // If the planned sell quantity is greater than the sellable quantity, sell the
-            // sellable quantity
+            // Cap the planned sell quantity at the sellable quantity
             if (number > can_sell_num) {
                 sell_num = can_sell_num;
             }
@@ -1359,17 +1345,16 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     price_t borrow_stock_fee =
       borrow_num > 0.0 ? getBorrowStockCost(datetime, stock, realPrice, borrow_num).total : 0.0;
 
-    // A margin-accounted short opening locks only the margin: the sale proceeds never enter the
-    // cash, otherwise opening a short would create buying power out of nothing. The funding rule
-    // mirrors buy: cover the shortfall (margin + sell fee + borrow fee) with new debt when the
-    // account may borrow, otherwise the cash on hand must pay it. Like in buy, the post-borrow cash
-    // is simulated before any debt exists, so a rejected order leaves no borrow residue behind
+    // A margin short locks only the margin; sale proceeds never enter cash (else opening a short
+    // creates buying power from nothing). As in buy, cover the shortfall (margin + sell fee + borrow
+    // fee) with debt when allowed, else from cash; simulate post-borrow cash before creating debt so
+    // a rejected order leaves no residue
     bool margin_acct = isMarginAccounted(stock) && realPrice > 0.0;
     price_t need = margin_acct ? toAccount(stock, getOpenMarginToLock(datetime, stock, realPrice,
                                                                       sell_num, MarginSide::SHORT))
                                : 0.0;
-    // A model that reports no requirement at all can't fund the short by margin: the cash books
-    // keep it instead of counting the full notional as equity for free
+    // A model reporting no requirement cannot fund the short by margin: keep it on the cash books
+    // rather than count the full notional as free equity
     HKU_WARN_IF(margin_acct && !(need > 0.0),
                 "{} {} The margin model reported no requirement, the short opening is booked by "
                 "cash!",
@@ -1390,8 +1375,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
                 covered = after >= need_cash;
                 if (!covered) {
                     price_t next = roundEx(gap + roundEx(need_cash - after, precision), precision);
-                    // The cost rate must stay well below 100%; a non-increasing gap means the
-                    // sequence stalled and the cost can never be covered
+                    // With the rate below 100%, a non-increasing gap means the iteration stalled
+                    // and the cost can never be covered
                     HKU_WARN_IF_RETURN(
                       next <= gap, result,
                       "{} {} Can't sellShort, the borrow cost can not be covered by gap({:<.4f})!",
@@ -1410,15 +1395,15 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
                            datetime, stock.market_code(), need_cash, m_cash);
     }
 
-    // Commit the securities borrow after every check passed; its fee is deducted from the cash and
-    // is already part of need_cash above. All borrowStock preconditions were validated in the
-    // read-only step, so it can not fail here and leave a residue behind
+    // Commit the borrow only after all checks pass; its fee is already in need_cash. All
+    // borrowStock preconditions were validated read-only, so it cannot fail here and leave a
+    // residue
     if (borrow_num > 0.0) {
         borrowStock(datetime, stock, realPrice, borrow_num);
     }
 
-    // Update the cash: a margin opening pays the margin and the sell fee (the borrow-stock fee was
-    // already charged by borrowStock), a cash opening receives the net proceeds
+    // A margin opening pays the margin and sell fee (borrow-stock fee already charged by
+    // borrowStock); a cash opening receives the net proceeds
     m_cash = margin_acct ? roundEx(m_cash - need - account_cost, precision)
                          : roundEx(m_cash + toAccount(stock, money), precision);
 
@@ -1437,8 +1422,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         PositionRecord position(stock, datetime, Null<Datetime>(), sell_num, stoploss, goalPrice,
                                 sell_num, 0.0, cost.total, risk, gross);
         position.sellCount = 1;
-        // The gross opening proceeds of a short are its cost basis and its settlement basis (the
-        // long side uses buyMoney)
+        // Gross opening proceeds are the short's cost and settlement basis (the long side uses
+        // buyMoney)
         position.openBasis = gross;
         position.settleBasis = gross;
         if (margin_acct) {
@@ -1457,8 +1442,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         position.openBasis = roundEx(position.openBasis + gross, precision);
         position.settleBasis = roundEx(position.settleBasis + gross, precision);
         if (margin_acct) {
-            // Margin lots joining a cash-basis holding mix the two accountings in one record: the
-            // whole position then follows the margin formula on a single averaged basis
+            // Margin lots joining a cash-basis holding mix the two accountings; the whole position
+            // then follows the margin formula on one averaged basis
             HKU_WARN_IF(position.margin == 0.0,
                         "{} {} Margin lots join a cash-basis holding, the books mix the two "
                         "accountings!",
@@ -1532,17 +1517,16 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
 
-    // The cash must cover the buyback and its cost in the plain books; a margin-accounted short
-    // returns its released margin and the realized profit instead of paying the notional, and a
-    // closing loss beyond the released margin may overdraw the cash like a long close does. A
-    // realPrice 0 placeholder cannot be valued and would silently drop the margin, so reject it
+    // Plain books: cash must cover the buyback and cost. A margin short returns released margin
+    // and realized profit instead of paying the notional, and a loss beyond the margin may
+    // overdraw cash like a long close. Reject realPrice 0: it cannot be valued and would silently
+    // drop the margin
     HKU_WARN_IF_RETURN(
       position.margin > 0.0 && realPrice <= 0.0, result,
       "{} {} A margin-accounted holding can't be closed at a placeholder price(0)!", datetime,
       stock.market_code());
     price_t released = 0.0;
-    // The cost notional and the settlement basis of the lots being covered, both released from
-    // the books proportionally
+    // Cost notional and settlement basis of the covered lots, released proportionally
     price_t basis = positionOpenBasis(position, real_number);
     price_t mtmBasis = positionSettleBasis(position, real_number);
     // The buyback notional, the realized profit and the cost are billed in the security's currency
@@ -1608,8 +1592,8 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         returnStock(datetime, stock, realPrice, real_number);
     }
 
-    // Return the loan last, after the stock-return fee: the repay must not starve the fee and fake
-    // an overdraft the close never made
+    // Repay the loan last, after the stock-return fee, so the repay cannot starve the fee and
+    // fake an overdraft
     if (getParam<bool>("support_borrow_cash") && m_borrow_cash > 0.0 && m_cash > 0.0) {
         price_t repay = m_borrow_cash < m_cash ? m_borrow_cash : m_cash;
         HKU_WARN_IF(!returnCash(datetime, repay),
@@ -1668,8 +1652,8 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
         auto price = record.stock.getMarketValue(lastDatetime(), ktype);
         price_t rate = _currencyRate(record.stock);
         if (record.margin > 0.0) {
-            // The locked margin is an asset on either side, the unrealized profit carries the
-            // direction, so the contribution joins the long market value as well
+            // Locked margin is an asset on either side; unrealized profit carries the direction,
+            // so it joins the long market value
             value = roundEx((value + marginPositionEquity(record, price, false, rate)), precision);
             occupied = roundEx(occupied + record.margin, precision);
         } else {
@@ -1807,14 +1791,13 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 } else {
                     stock_iter->second.number += iter->number;
                 }
-                // Mirror the live margin accounting: the margin locked and the notional basis are
-                // only meaningful for the holdings opened under the current settings
+                // Mirror the live books: margin lock and notional basis are meaningful only for
+                // holdings opened under the current settings
                 Stock_Number& sn = stock_iter->second;
                 sn.settle_basis = roundEx(
                   sn.settle_basis + iter->realPrice * iter->number * iter->stock.unit(), precision);
-                // The record of a margin opening carries the amount it locked, otherwise the
-                // model under the current settings decides; realPrice 0 is the market-order
-                // placeholder and stays on the cash side
+                // A margin opening's record carries its lock, else the current model decides;
+                // realPrice 0 is the market-order placeholder and stays on the cash books
                 if (iter->margin > 0.0) {
                     sn.margin = roundEx(sn.margin + iter->margin, precision);
                 } else if (isMarginAccounted(iter->stock) && iter->realPrice > 0.0) {
@@ -1834,8 +1817,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 if (stock_iter == stock_map.end()) {
                     stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
                 } else {
-                    // The free (gift) shares and the consolidation only change the quantity; the
-                    // cost pool keeps its total, so the per-share basis dilutes or scales
+                    // Gift shares and consolidation only change the quantity; the cost pool keeps
+                    // its total, so the per-share basis dilutes or scales
                     stock_iter->second.number += iter->number;
                 }
                 break;
@@ -1845,8 +1828,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 stock_iter = stock_map.find(iter->stock.id());
                 if (stock_iter != stock_map.end()) {
                     Stock_Number& sn = stock_iter->second;
-                    // Two steps like the live sell, so the remainder matches it to the last cent;
-                    // a placeholder price never releases the margin, like the live rejection
+                    // Two steps like the live sell, so the remainder matches to the cent; a
+                    // placeholder price never releases the margin
                     price_t released = 0.0;
                     if (sn.margin > 0.0 && sn.number > 0.0) {
                         if (iter->realPrice <= 0.0) {
@@ -1902,8 +1885,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 short_stock_iter = short_stock_map.find(iter->stock.id());
                 if (short_stock_iter != short_stock_map.end()) {
                     Stock_Number& sn = short_stock_iter->second;
-                    // Two steps like the live buyShort, so the remainder matches it to the last
-                    // cent; a placeholder price never releases the margin, like the live rejection
+                    // Two steps like the live buyShort, so the remainder matches to the cent; a
+                    // placeholder price never releases the margin
                     price_t released = 0.0;
                     if (sn.margin > 0.0 && sn.number > 0.0) {
                         if (iter->realPrice <= 0.0) {
@@ -1957,8 +1940,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 if (short_stock_iter == short_stock_map.end()) {
                     short_stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
                 } else {
-                    // Both the gift and the consolidation arrive as a quantity change; the cost
-                    // pool keeps its total
+                    // Gift and consolidation are quantity changes; the cost pool keeps its total
                     short_stock_iter->second.number += iter->number;
                 }
                 break;
@@ -1985,8 +1967,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 } else {
                     stock_iter->second.number += iter->number;
                 }
-                // Mirrors the live check-in: the deposit adds its market value to the cost pool,
-                // so the average opening price is unchanged
+                // As in the live check-in, the deposit adds its market value to the cost pool,
+                // leaving the average opening price unchanged
                 stock_iter->second.settle_basis =
                   roundEx(stock_iter->second.settle_basis +
                             iter->realPrice * iter->number * iter->stock.unit(),
@@ -2027,8 +2009,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 break;
 
             case BUSINESS_INTEREST:
-                // Billed into the debt by settlement(), the cash is untouched; a securities lending
-                // carries its own stock but adds to the same cash liability
+                // Settlement() bills this into the debt, not cash; a securities lending carries
+                // its own stock but adds to the same cash liability
                 funds.borrow_cash += iter->realPrice;
                 break;
 
@@ -2094,18 +2076,17 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 break;
 
             case BUSINESS_SETTLEMENT: {
-                // The record carries the settled holding: the sign of the quantity is the side
-                // (long > 0, short < 0), realPrice is the settlement price and margin is the lock
-                // recomputed at it; the cash snapshot assigned above already carries the
-                // mark-to-market posting
+                // The record carries the settled holding: quantity sign is the side (long > 0,
+                // short < 0), realPrice the settlement price, margin the lock recomputed at it; the
+                // cash snapshot above already carries the mark-to-market posting
                 auto& holding_map = iter->number >= 0.0 ? stock_map : short_stock_map;
                 stock_iter = holding_map.find(iter->stock.id());
                 if (stock_iter != holding_map.end()) {
                     Stock_Number& sn = stock_iter->second;
                     sn.settle_basis =
                       roundEx(iter->realPrice * sn.number * iter->stock.unit(), precision);
-                    // The record always carries the lock snapshot: a zero demotes the holding to
-                    // the cash books, exactly like the live settlement did
+                    // The record always carries the lock snapshot: zero demotes the holding to
+                    // the cash books, as in live settlement
                     sn.margin = roundEx(std::max<price_t>(iter->margin, 0.0), precision);
                 }
                 break;
@@ -2279,8 +2260,7 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
     std::map<uint64_t, StockNumber> stock_map;
     std::map<uint64_t, StockNumber> short_stock_map;
     std::map<uint64_t, BorrowRecord> bor_stock_map;
-    // The remaining opening notional of the still-open holding; no rounding, same as settle_basis
-    // above
+    // Remaining opening notional of the still-open holding; unrounded, like settle_basis above
     auto basis_of = [](const StockNumber& sn) -> price_t { return sn.settle_basis; };
     auto trade_iter = m_trade_list.begin();
 
@@ -2305,8 +2285,8 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     } else {
                         iter->second.number += trade_iter->number;
                     }
-                    // The cost pool covers the held lots, so the average opening price stays the
-                    // one of the live books
+                    // The cost pool covers the held lots, so the average opening price matches
+                    // the live books
                     iter->second.settle_basis = roundEx(
                       iter->second.settle_basis +
                         trade_iter->realPrice * trade_iter->number * trade_iter->stock.unit(),
@@ -2334,8 +2314,8 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                         stock_map.emplace(trade_iter->stock.id(),
                                           StockNumber(trade_iter->stock, trade_iter->number));
                     } else {
-                        // The free (gift) shares and the consolidation only change the quantity;
-                        // the cost pool keeps its total
+                        // Gift shares and consolidation only change the quantity; the cost pool
+                        // keeps its total
                         iter->second.number += trade_iter->number;
                     }
                     break;
@@ -2345,7 +2325,7 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     auto iter = stock_map.find(trade_iter->stock.id());
                     if (iter != stock_map.end()) {
                         // Release the margin proportionally, in two steps like the live sell; a
-                        // placeholder price never releases it, like the live rejection
+                        // placeholder price never releases it
                         price_t released = 0.0;
                         if (iter->second.margin > 0.0 && iter->second.number > 0.0) {
                             if (trade_iter->realPrice <= 0.0) {
@@ -2413,7 +2393,7 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     auto iter = short_stock_map.find(trade_iter->stock.id());
                     if (iter != short_stock_map.end()) {
                         // Release the margin proportionally, in two steps like the live buyShort;
-                        // a placeholder price never releases it, like the live rejection
+                        // a placeholder price never releases it
                         price_t released = 0.0;
                         if (iter->second.margin > 0.0 && iter->second.number > 0.0) {
                             if (trade_iter->realPrice <= 0.0) {
@@ -2476,8 +2456,8 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                                           StockNumber(trade_iter->stock, trade_iter->number))
                                  .first;
                     } else {
-                        // Both the gift and the consolidation arrive as a quantity change; the
-                        // cost pool keeps its total
+                        // Gift and consolidation are quantity changes; the cost pool keeps its
+                        // total
                         iter->second.number += trade_iter->number;
                     }
                     break;
@@ -2505,8 +2485,8 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     } else {
                         iter->second.number += trade_iter->number;
                     }
-                    // The deposit adds its market value to the cost pool, so the average opening
-                    // price is unchanged
+                    // The deposit adds its market value to the cost pool, leaving the average
+                    // opening price unchanged
                     iter->second.settle_basis = roundEx(
                       iter->second.settle_basis +
                         trade_iter->realPrice * trade_iter->number * trade_iter->stock.unit(),
@@ -2522,7 +2502,7 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                 case BUSINESS_CHECKOUT_STOCK: {
                     auto iter = stock_map.find(trade_iter->stock.id());
                     if (iter != stock_map.end()) {
-                        // The withdrawal releases the cost basis proportionally (mirrors the live
+                        // The withdrawal releases the cost basis proportionally (as in the live
                         // checkoutStock)
                         price_t basis =
                           iter->second.number > 0.0
@@ -2622,17 +2602,16 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                 }
 
                 case BUSINESS_SETTLEMENT: {
-                    // Same as the replay of getFunds: the sign of the quantity is the side, the
-                    // price is the settlement price and the margin is the lock recomputed at it
+                    // As in the getFunds replay: quantity sign is the side, price is the
+                    // settlement price, margin is the lock recomputed at it
                     auto& holding_map = trade_iter->number >= 0.0 ? stock_map : short_stock_map;
                     auto iter = holding_map.find(trade_iter->stock.id());
                     if (iter != holding_map.end()) {
                         iter->second.settle_basis = roundEx(
                           trade_iter->realPrice * iter->second.number * trade_iter->stock.unit(),
                           precision);
-                        // The record always carries the lock snapshot: a zero demotes the holding
-                        // to the cash books, exactly like the live settlement and the replay of
-                        // getFunds do
+                        // The record always carries the lock snapshot: zero demotes the holding
+                        // to the cash books, as in live settlement and the getFunds replay
                         iter->second.margin =
                           roundEx(std::max<price_t>(trade_iter->margin, 0.0), precision);
                     }
@@ -2683,8 +2662,8 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
             }
             price_t price = holding.stock.getMarketValue(d_end, ktype);
             if (holding.margin > 0.0) {
-                // A margin-accounted holding contributes its locked margin plus the unrealized
-                // profit, exactly like the getFunds replay branch
+                // A margin holding contributes its locked margin plus unrealized profit, as in
+                // the getFunds replay
                 market_value =
                   roundEx(market_value + holding.margin +
                             (price * holding.number * holding.stock.unit() - holding.basis) *
@@ -2706,8 +2685,8 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
             }
             price_t price = holding.stock.getMarketValue(d_end, ktype);
             if (holding.margin > 0.0) {
-                // The locked margin of a short is an asset as well: its unrealized profit already
-                // carries the sign, so it goes into market_value and never into the liability side
+                // A short's locked margin is an asset too; its unrealized profit carries the sign,
+                // so it goes into market_value, never the liability side
                 market_value =
                   roundEx(market_value + holding.margin -
                             (price * holding.number * holding.stock.unit() - holding.basis) *
@@ -3030,9 +3009,8 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
 
 bool TradeManager::isSettled(const Datetime& datetime) const {
     HKU_IF_RETURN(datetime.isNull(), false);
-    // Both halves of the batch are daily rules, so any record answers for its whole calendar day,
-    // whatever moment of it it was written at: a system driven by a finer ktype calls settlement
-    // once per bar, and every one of those moments belongs to the same already settled day
+    // Both halves are daily rules, so any record settles its whole calendar day regardless of the
+    // moment written; a finer-ktype system calls settlement per bar, all within the same day
     const Datetime day = datetime.startOfDay();
     // The trade list is chronologically ordered, so the probe stops at the first earlier day
     for (auto iter = m_trade_list.rbegin(); iter != m_trade_list.rend(); ++iter) {
@@ -3044,8 +3022,8 @@ bool TradeManager::isSettled(const Datetime& datetime) const {
         if (datetime < date) {
             continue;
         }
-        // An interest record belongs to the same batch, so a day that only billed interest counts
-        // as settled too: otherwise a flat book with an outstanding debt would accrue it again
+        // Interest belongs to the same batch, so an interest-only day counts as settled; otherwise
+        // a flat book with debt would accrue again
         if (iter->business == BUSINESS_SETTLEMENT || iter->business == BUSINESS_INTEREST) {
             return true;
         }
@@ -3056,8 +3034,8 @@ bool TradeManager::isSettled(const Datetime& datetime) const {
 bool TradeManager::isForcedLiquidationQueued(const Datetime& datetime) const {
     HKU_IF_RETURN(m_tmp_force_liquidate_date.isNull(), false);
     HKU_IF_RETURN(!datetime.isNull() && datetime < m_tmp_force_liquidate_date, false);
-    // Consumed once the flattening is done: only an armed queue with something left to close is
-    // pending, which also keeps a flat account from being flagged again by a stale arming
+    // Only an armed queue with holdings left to close is pending; a stale arming cannot re-flag
+    // a flat account
     return !m_position.empty() || !m_short_position.empty();
 }
 
@@ -3069,8 +3047,8 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
     HKU_IF_RETURN(!m_margin, false);
     HKU_WARN_IF_RETURN(datetime < lastDatetime(), false,
                        "{} settlement must be >= lastDatetime({})!", datetime, lastDatetime());
-    // Idempotent per calendar day: neither half may run twice for the same day, while the two are
-    // gated apart so a day that only billed interest still marks a position opened later on it
+    // Idempotent per day: neither half runs twice, but the two are gated apart so an
+    // interest-only day still marks a position opened later on it
     const Datetime day = datetime.startOfDay();
     bool marked = false;
     bool billed = false;
@@ -3095,22 +3073,21 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
     }
     HKU_IF_RETURN(marked && billed, true);
 
-    // Read the proration base before anything is posted: an invalid value must fail the whole
-    // settlement rather than leave a half settled book behind
+    // Read the proration base before posting: an invalid value must fail settlement, not leave a
+    // half-settled book
     int annual_days = tryGetParam<int>("annual_days", 365);
     HKU_CHECK(annual_days > 0, "{}: annual_days({}) must be > 0!", datetime, annual_days);
 
-    // The ex-rights adjustment must land before the basis is marked: a gift or a consolidation
-    // changes the quantity while the basis keeps its total, so scaling it afterwards would book
-    // the whole price move as a false profit
+    // Apply ex-rights before marking the basis: a gift/consolidation changes quantity but not the
+    // basis total, so scaling afterwards would book the price move as false profit
     updateWithWeight(datetime);
 
     int precision = getParam<int>("precision");
     price_t maintain_required = 0.0;
     bool posted = false;
 
-    // The settlement price of a date without a bar (a suspended instrument) falls back to its last
-    // valid close: getMarketValue already does it, the probe only tags the record
+    // A date without a bar (suspended) falls back to its last close; getMarketValue does this, the
+    // probe only tags the record
     auto settle_price = [&](const Stock& stock, string& remark) -> price_t {
         KRecord record = stock.getKRecord(datetime, ktype);
         if (record.datetime != datetime) {
@@ -3121,13 +3098,12 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         return stock.getMarketValue(datetime, ktype);
     };
 
-    // Post one margin holding: the mark-to-market profit into the cash, the basis to the
-    // settlement price, then the lock recomputed at that price with the difference posted
+    // Settle one margin holding: post mark-to-market profit to cash, set basis to the settlement
+    // price, then recompute the lock at that price and post the difference
     auto settle_holding = [&](PositionRecord& position, bool is_long) {
         HKU_IF_RETURN(!(position.number > 0.0) || !(position.margin > 0.0), void());
         const Stock& stock = position.stock;
-        // A holding past its last registered bar is owned by the expiry liquidation, not by the
-        // daily settlement
+        // A holding past its last bar belongs to expiry liquidation, not daily settlement
         const Datetime& last = stock.lastDatetime();
         HKU_IF_RETURN(!last.isNull() && datetime > last, void());
 
@@ -3137,15 +3113,15 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
                            "{} {}: no settlement price, the holding is not settled!", datetime,
                            stock.market_code());
 
-        // Both bases are money totals, so the unit is already inside and neither side needs a
-        // direction factor beyond the sign of the price move
+        // Both bases are money totals, so neither side needs a unit or direction factor beyond
+        // the price-move sign
         price_t mv = roundEx(price * position.number * stock.unit(), precision);
         price_t basis = roundEx(positionSettleBasis(position, position.number), precision);
         m_cash = roundEx(m_cash + toAccount(stock, is_long ? mv - basis : basis - mv), precision);
         position.settleBasis = mv;
 
-        // The lock is recomputed on the settlement price; an increase is financed like an opening,
-        // and an account already in a margin call may go overdrawn instead of failing to settle
+        // Recompute the lock at the settlement price; finance an increase like an opening, and let
+        // an account already in margin call go overdrawn rather than fail to settle
         MarginSide side = is_long ? MarginSide::LONG : MarginSide::SHORT;
         price_t relock =
           toAccount(stock, getOpenMarginToLock(datetime, stock, price, position.number, side));
@@ -3159,8 +3135,8 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         m_cash = roundEx(m_cash - delta, precision);
         position.margin = relock;
 
-        // One record per settled holding: the sign of the quantity carries the side, because one
-        // security may be held on both sides and the replay has to tell them apart
+        // One record per holding; the quantity sign carries the side, since one security may be
+        // held both long and short and the replay must tell them apart
         TradeRecord record(stock, datetime, BUSINESS_SETTLEMENT, price, price, 0.0,
                            is_long ? position.number : -position.number, CostRecord(), 0.0, m_cash,
                            PART_INVALID, remark);
@@ -3179,17 +3155,15 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         }
     }
 
-    // Bill the interest of the outstanding liabilities in the same batch, after the posting and
-    // before the risk check, so a billed day is also a called day. The amount joins the debt and is
-    // not paid from the cash: a broker adds it to the principal, which then accrues on its own.
+    // Bill interest on outstanding liabilities in the same batch, after posting but before the
+    // risk check, so a billed day is also a called day. The amount joins the debt, not cash: it
+    // compounds into the principal
     bool interest_posted = false;
-    // The interest follows the calendar rather than the bars: one anchor serves the whole book, the
-    // calendar days gone by since it was last billed, so a weekend, a suspension or a coarser
-    // ktype bills the days it waited for instead of a single one. A debt taken on inside such a
-    // window is billed over the whole of it, and a debt that predates the very first bill is billed
-    // over a single day: both follow from the one anchor, accepted as the simplification of not
-    // keeping the days of every debt. Scanned lazily, as a book with nothing to pay never walks the
-    // list
+    // Interest follows calendar days, not bars: one anchor for the whole book gives the days since
+    // the last bill, so a weekend, suspension or coarse ktype bills every waited day, not just one.
+    // A debt taken within the window is billed over all of it, one predating the first bill over a
+    // single day (the simplification of not tracking each debt's days). Scanned lazily so an empty
+    // book skips it
     bool scanned = false;
     int days = 1;
     auto days_to_bill = [&]() -> int {
@@ -3205,8 +3179,7 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         }
         // A book never billed before covers a single day
         days = last.isNull() ? 1 : (int)(day - last).total_days();
-        // Keep the clamped value in the memo: a stale zero would bill nothing at all for the
-        // liability items asked after this one
+        // Memoize the clamped value: a stale zero would bill nothing for later liability items
         if (days < 1) {
             days = 1;
         }
@@ -3219,11 +3192,11 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
           roundEx(debt_base * rate * days_to_bill() / (double)annual_days, precision);
         HKU_IF_RETURN(!(interest > 0.0), void());
         m_borrow_cash = roundEx(m_borrow_cash + interest, precision);
-        // The billed amount becomes a loan of its own date, so returnCash can still repay the whole
-        // debt from the loan list and the next day bills on it (the compounding of the decision)
+        // The billed amount becomes a loan of its own date, so returnCash can repay the whole debt
+        // and the next day bills on it (compounding)
         m_loan_list.push_back(LoanRecord(datetime, interest));
-        // One record per liability item: realPrice carries the billed amount, while the quantity
-        // carries the borrowed base of a securities lending (0 for the cash one, like BORROW_CASH)
+        // One record per liability: realPrice is the billed amount, quantity is the lending's
+        // borrowed base (0 for cash, as in BORROW_CASH)
         TradeRecord record(stock, datetime, BUSINESS_INTEREST, interest, interest, 0.0, billed_n,
                            CostRecord(), 0.0, m_cash, PART_INVALID, remark);
         m_trade_list.push_back(record);
@@ -3236,9 +3209,8 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
                         "borrow cash");
         for (const auto& kv : m_borrow_stock) {
             const BorrowRecord& borrow = kv.second;
-            // A lending past the last registered bar of the security belongs to the expiry
-            // liquidation, exactly like settle_holding treats the holding, so its stale last close
-            // must not keep billing day after day
+            // A lending past the security's last bar belongs to expiry liquidation (as in
+            // settle_holding), so its stale last close cannot keep billing day after day
             const Datetime& last = borrow.stock.lastDatetime();
             if (!last.isNull() && datetime > last) {
                 continue;
@@ -3247,10 +3219,9 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
             if (!(rate > 0.0)) {
                 continue;
             }
-            // The securities lending is billed on the market value of the borrowed shares at the
-            // settlement price, not on the value they had when they were borrowed, so a lending of
-            // a security that has never been priced at all cannot be billed and must say so instead
-            // of passing silently
+            // Bill a lending on the borrowed shares' market value at the settlement price, not
+            // their value at borrowing; an unpriced security cannot be billed and must warn rather
+            // than pass silently
             string remark;
             price_t price = settle_price(borrow.stock, remark);
             if (!(price > 0.0)) {
@@ -3265,17 +3236,16 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         }
     }
 
-    // The maintenance requirement covers every margin-locked holding, the ones the posting above
-    // skipped included (a bar-less instrument or one past its last registered bar): the risk check
-    // has to be measured on the whole book, exactly like the equity below, otherwise a skipped
-    // holding would count on the asset side without counting on the requirement side
+    // Maintenance covers every margin-locked holding, including those the posting skipped
+    // (bar-less or past last bar): measure risk on the whole book, as with equity below, or a
+    // skipped holding counts as an asset without a requirement
     auto add_maintain = [&](const PositionRecord& position, bool is_long) {
         HKU_IF_RETURN(!(position.number > 0.0) || !(position.margin > 0.0), void());
         const Stock& stock = position.stock;
         price_t price = stock.getMarketValue(datetime, ktype);
         if (!(price > 0.0)) {
-            // A holding without any quote is valued on its own basis, so that it cannot silently
-            // drop out of the requirement
+            // A quote-less holding is valued on its own basis so it cannot drop out of the
+            // requirement
             double quantity = position.number * stock.unit();
             HKU_IF_RETURN(!(quantity > 0.0), void());
             price = positionSettleBasis(position, position.number) / quantity;
@@ -3293,10 +3263,9 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
         add_maintain(kv.second, false);
     }
 
-    // Daily risk check: the maintenance requirement of the settled holdings against the equity,
-    // which the mark-to-market posting above has just brought onto the settlement price. The
-    // equity is measured exactly like getFunds does, only at the settlement price instead of the
-    // last trade moment (a settled day without a trade still has to be valued at its own close)
+    // Daily risk check: maintenance of the settled holdings against equity, now at the settlement
+    // price thanks to the mark-to-market posting. Measure equity as getFunds does, but at the
+    // settlement price, since a settled day without a trade still needs its own close
     price_t equity = m_cash;
     auto add_equity = [&](const PositionRecord& position, bool is_long) {
         HKU_IF_RETURN(!(position.number > 0.0), void());
@@ -3335,16 +3304,16 @@ bool TradeManager::settlement(const Datetime& datetime, KQuery::KType ktype) {
     }
     m_tmp_margin_called = called;
 
-    // The queue is rebuilt from the fresh equity at every settlement: a recovered account clears
-    // it and a still short one arms it for the executor of the trading system
+    // Rebuild the queue from fresh equity each settlement: a recovered account clears it, a
+    // still-short one arms it for the trading system's executor
     bool was_queued = !m_tmp_force_liquidate_date.isNull();
     bool queue = called && tryGetParam<bool>("force_liquidate", false);
     m_tmp_force_liquidate_date = queue ? datetime : Null<Datetime>();
     HKU_WARN_IF(queue && !was_queued,
                 "{} {} Margin call, the account will be liquidated at the next open!", datetime,
                 name());
-    // Nothing to post means nothing was settled: an empty account (or one whose whole book was
-    // skipped) must not report itself as settled for the moment
+    // Nothing posted means nothing settled: an empty or wholly skipped book must not report as
+    // settled
     return marked || billed || posted || interest_posted;
 }
 
@@ -3418,10 +3387,9 @@ void TradeManager::_saveAction(const TradeRecord& record) {
 
         case BUSINESS_SETTLEMENT:
         case BUSINESS_INTEREST:
-            // Deliberately not replayed: both belong to the same settlement batch, whose amounts
-            // follow from the price data and the models of that moment, so the regenerated script
-            // has to rebuild them through settlement() rather than pin the numbers as trades; the
-            // full state is restored by replaying the trade records instead
+            // Not replayed: both belong to a settlement batch whose amounts follow from that
+            // moment's prices and models, so the script rebuilds them via settlement(); the
+            // trade-record replay restores state
             return;
 
         default:
@@ -3716,9 +3684,9 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
 
         case BUSINESS_SETTLEMENT:
         case BUSINESS_INTEREST:
-            // The settlement batches are produced by settlement() itself and never rebuilt from
-            // fed-in records: the live state (cash, margin, debt) cannot be reproduced from a
-            // single record, so accepting one would desynchronize the books
+            // Settlement batches come from settlement() itself, never fed-in records: live
+            // cash/margin/debt cannot be reproduced from one record, so accepting it would
+            // desynchronize the books
             HKU_ERROR(
               "{} {} record({}) is generated by settlement(), "
               "manual rebuild is not supported!",
@@ -3754,10 +3722,9 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     int precision = getParam<int>("precision");
     TradeRecord new_tr(tr);
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
-    // Mirror the live buy: a margin-accounted opening locks only the margin; a model reporting no
-    // requirement at all leaves the record on the cash books. The record carries the amount it
-    // locked, so the backfill reproduces the books exactly; an archive written before that field
-    // existed falls back to the model
+    // Mirror the live buy: a margin opening locks only the margin; a model reporting no
+    // requirement leaves it on the cash books. The record carries the lock for exact backfill;
+    // older archives fall back to the model
     bool margin_acct = isMarginAccounted(tr.stock) && tr.realPrice > 0.0;
     price_t locked_margin =
       margin_acct
@@ -3773,8 +3740,8 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     price_t need = margin_acct ? locked_margin : toAccount(tr.stock, money);
     price_t account_cost = toAccount(tr.stock, tr.cost.total);
 
-    // The record carries the trade only: when the live books financed the shortfall, the add path
-    // reproduces the debt instead of rejecting a trade the account really filled
+    // Reproduce the debt when the live books financed the shortfall, rather than rejecting a
+    // trade the account really filled
     price_t need_cash = roundEx(need + account_cost, precision);
     if (m_cash < need_cash) {
         HKU_WARN_IF_RETURN(!_borrowForAdd(tr.datetime, need_cash), false,
@@ -3848,14 +3815,12 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
     int precision = getParam<int>("precision");
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
-    // Update the cash balance; a margin-accounted holding returns the released margin and the
-    // realized profit only (mirrors the live sell). A realPrice 0 placeholder cannot be valued and
-    // would silently drop the margin, so the record is rejected
+    // As in the live sell, a margin holding returns only released margin and realized profit.
+    // Reject realPrice 0: it cannot be valued and would silently drop the margin
     HKU_WARN_IF_RETURN(position.margin > 0.0 && tr.realPrice <= 0.0, false,
                        "A margin-accounted holding can't be closed at a placeholder price(0)!");
     price_t released = 0.0;
-    // The cost notional and the settlement basis of the lots being closed, both released from the
-    // books proportionally
+    // Cost notional and settlement basis of the closed lots, released proportionally
     price_t basis = positionOpenBasis(position, tr.number);
     price_t mtmBasis = positionSettleBasis(position, tr.number);
     price_t account_cost = toAccount(tr.stock, tr.cost.total);
@@ -3940,8 +3905,7 @@ bool TradeManager::_add_checkin_stock_tr(const TradeRecord& tr) {
         m_position[tr.stock.id()] = pos;
     } else {
         PositionRecord& pos = pos_iter->second;
-        // Same rejection as the live checkinStock: the deposit can't join a margin-accounted
-        // holding
+        // As in checkinStock: a deposit cannot join a margin-accounted holding
         HKU_ERROR_IF_RETURN(pos.margin > 0.0, false,
                             "{} {} Can't deposit into a margin-accounted holding, its margin books "
                             "are not supported yet!",
@@ -3974,13 +3938,12 @@ bool TradeManager::_add_checkout_stock_tr(const TradeRecord& tr) {
     HKU_ERROR_IF_RETURN(tr.number > pos.number, false, "Try to checkout beyond position number!");
 
     price_t market_value = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
-    // Same rejection as the live checkoutStock: the withdrawal can't leave the margin books
+    // As in checkoutStock: a withdrawal cannot leave the margin books
     HKU_ERROR_IF_RETURN(pos.margin > 0.0, false,
                         "{} {} Can't withdraw from a margin-accounted holding, its margin books "
                         "are not supported yet!",
                         tr.datetime, tr.stock.market_code());
-    // Withdrawing lots releases their cost basis proportionally (the price only feeds the
-    // reporting sellMoney, the cost pool follows the quantity)
+    // Withdrawals release the cost basis proportionally; price only feeds reported sellMoney
     price_t basis = positionOpenBasis(pos, tr.number);
     price_t mtmBasis = positionSettleBasis(pos, tr.number);
     pos.number -= tr.number;
@@ -4066,8 +4029,8 @@ bool TradeManager::_add_borrow_stock_tr(const TradeRecord& tr) {
 
     int precision = getParam<int>("precision");
     price_t market_value = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
-    // The lending fee is paid out of the cash: the live short opening finances it together with the
-    // margin, so the add path reproduces that debt instead of driving the cash negative
+    // The lending fee comes from cash; as in the live short opening it is financed with the
+    // margin, so reproduce that debt rather than drive cash negative
     price_t account_cost = toAccount(tr.stock, tr.cost.total);
     if (getParam<bool>("support_borrow_cash") && m_cash < account_cost) {
         HKU_WARN_IF_RETURN(!_borrowForAdd(tr.datetime, account_cost), false,
@@ -4154,10 +4117,8 @@ bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
     int precision = getParam<int>("precision");
     // net proceeds, mirroring the live sellShort cash formula
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit() - tr.cost.total, precision);
-    // Mirror the live sellShort: a margin-accounted short opening locks only the margin and the
-    // sale proceeds never enter the cash. The record carries the amount it locked, so the backfill
-    // reproduces the books exactly; an archive written before that field existed falls back to the
-    // model
+    // Mirror the live sellShort: a margin short locks only the margin, sale proceeds never enter
+    // cash. The record carries the lock for exact backfill; older archives fall back to the model
     bool margin_acct = isMarginAccounted(tr.stock) && tr.realPrice > 0.0;
     price_t need =
       margin_acct
@@ -4200,8 +4161,8 @@ bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
         PositionRecord position(tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.stoploss,
                                 tr.goalPrice, tr.number, 0.0, tr.cost.total, risk, gross);
         position.sellCount = 1;
-        // The gross opening proceeds of a short are its cost basis and its settlement basis (the
-        // long side uses buyMoney)
+        // Gross opening proceeds are the short's cost and settlement basis (the long side uses
+        // buyMoney)
         position.openBasis = gross;
         position.settleBasis = gross;
         if (margin_acct) {
@@ -4255,14 +4216,13 @@ bool TradeManager::_add_buy_short_tr(const TradeRecord& tr) {
 
     int precision = getParam<int>("precision");
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
-    // Mirror the live buyShort: a margin-accounted short returns the released margin and the
-    // realized profit instead of paying the notional, an overdraft close allowed like the long
-    // one; a realPrice 0 placeholder would silently drop the margin, so reject it
+    // Mirror the live buyShort: a margin short returns released margin and realized profit,
+    // allowing an overdraft close like the long side. Reject realPrice 0: it would silently drop
+    // the margin
     HKU_WARN_IF_RETURN(position.margin > 0.0 && tr.realPrice <= 0.0, false,
                        "A margin-accounted holding can't be closed at a placeholder price(0)!");
     price_t released = 0.0;
-    // The cost notional and the settlement basis of the lots being covered, both released from
-    // the books proportionally
+    // Cost notional and settlement basis of the covered lots, released proportionally
     price_t basis = positionOpenBasis(position, tr.number);
     price_t mtmBasis = positionSettleBasis(position, tr.number);
     price_t account_cost = toAccount(tr.stock, tr.cost.total);

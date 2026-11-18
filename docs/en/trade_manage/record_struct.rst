@@ -93,7 +93,7 @@ Trade Records
 
     .. py:attribute:: stoploss Stop-loss price (float)
     .. py:attribute:: cash     Cash balance after the fill (float)
-    .. py:attribute:: margin   The margin this opening locked (float); non-zero only for a margin-accounted buy or sell short, 0 for every other business, so a replay reproduces the books of that moment; on a daily settlement record (``SETTLEMENT``) it is the relocked margin after the settlement
+    .. py:attribute:: margin   Margin locked by this opening (float), non-zero only on a margin-accounted buy/sell short so a replay reproduces the books; on a ``SETTLEMENT`` record it is the margin relocked after settlement
     .. py:attribute:: part
 
         Identifies the trading-system part that issued the instruction (see the SystemPart enumeration, also exposed as System.Part).
