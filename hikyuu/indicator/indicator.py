@@ -88,7 +88,7 @@ def df_to_ind(df, col_name, col_date=None):
     Example, get the 10-year US Treasury bond yield from akshare:
 
         import akshare as ak
-        df = ak.bond_zh_us_rate("19901219")
+        df = ak.bond_zh_us_yield_em("19901219")
         x = df_to_ind(df, '美国国债收益率10年', '日期')
 
     :param df: pandas.DataFrame

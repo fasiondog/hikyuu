@@ -137,12 +137,14 @@ def get_index_code_name_list() -> list:
 
     :return: [{'market_code': 'SHxxx'}, ...]
     """
-    if hasattr(ak, 'stock_zh_index_spot_sina'):
-        df = ak.stock_zh_index_spot_sina()
-    elif hasattr(ak, 'stock_zh_index_spot_em'):
-        df = ak.stock_zh_index_spot_em()
+    for name in ('index_zh_spot_sina', 'stock_zh_index_spot_sina',
+                 'index_zh_spot_em', 'stock_zh_index_spot_em', 'stock_zh_index_spot'):
+        if hasattr(ak, name):
+            df = getattr(ak, name)()
+            break
     else:
-        df = ak.stock_zh_index_spot()
+        hku_error("未找到可用的 akshare 指数行情接口")
+        return []
     res = [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
     ret = [v for v in res if len(v['market_code']) == 8]
     return ret
@@ -237,7 +239,9 @@ def get_new_holidays():
 @timeout(60)
 def get_china_bond10_rate(start_date="19901219"):
     """获取中国国债收益率10年"""
-    bond_zh_us_rate_df = ak.bond_zh_us_rate(start_date)
+    # akshare 1.20.41 将 bond_zh_us_rate 更名为 bond_zh_us_yield_em
+    ak_func = ak.bond_zh_us_yield_em if hasattr(ak, 'bond_zh_us_yield_em') else ak.bond_zh_us_rate
+    bond_zh_us_rate_df = ak_func(start_date)
     df = bond_zh_us_rate_df[['中国国债收益率10年', '日期']].dropna()
     return [(v[1].strftime('%Y%m%d'), int(v[0]*10000)) for v in df.values]
 
