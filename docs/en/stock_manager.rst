@@ -672,6 +672,9 @@ StockManager/Block/Stock
         Use with caution!!! Directly replaces the in-memory KRecordList. Intended only for
         supplying bar data to temporary external Stocks.
         If the data is a pandas.DataFrame, use the set_kdata_from_df method instead.
+        The registered validity range (``start_datetime`` / ``last_datetime``) is left untouched;
+        set ``last_datetime`` explicitly when a temporary stock needs expiry control (no new
+        positions after expiry, margin liquidation on expiry).
 
         :param sequence krecord_list: an iterable that yields KRecord instances, e.g. a list
                                       containing only KRecord instances

@@ -1501,8 +1501,9 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
 
     m_data->m_valid = true;
-    m_data->m_startDate = ks.front().datetime;
-    m_data->m_lastDate = ks.back().datetime;
+    // Do not touch m_startDate/m_lastDate here: they carry the registered validity range consumed
+    // by TradeManager::_isExpired etc., while the data coverage is already expressed by the buffer
+    // itself and m_lastUpdate
 }
 
 void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
@@ -1531,8 +1532,6 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     m_kdataDriver = DataDriverFactory::getKDataDriverPool(param);
 
     m_data->m_valid = true;
-    m_data->m_startDate = (*m_data->pKData[nktype]).front().datetime;
-    m_data->m_lastDate = (*m_data->pKData[nktype]).back().datetime;
 }
 
 vector<HistoryFinanceInfo> Stock::getHistoryFinance() const {

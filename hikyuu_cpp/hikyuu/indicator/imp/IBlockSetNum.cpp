@@ -62,7 +62,8 @@ void IBlockSetNum::_calculate(const Indicator& ind) {
     }
 
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
-        const Datetime& start_date = iter->startDatetime();
+        Datetime start_date =
+          iter->startDatetime().isNull() ? Datetime::min() : iter->startDatetime();
         Datetime last_date = iter->lastDatetime().isNull() ? Datetime::max() : iter->lastDatetime();
         size_t lo = std::lower_bound(dates.begin(), dates.end(), start_date) - dates.begin();
         size_t hi = std::upper_bound(dates.begin(), dates.end(), last_date) - dates.begin();
@@ -90,7 +91,8 @@ void IBlockSetNum::_increment_calculate(const Indicator& ind, size_t start_pos) 
     }
 
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
-        const Datetime& start_date = iter->startDatetime();
+        Datetime start_date =
+          iter->startDatetime().isNull() ? Datetime::min() : iter->startDatetime();
         Datetime last_date = iter->lastDatetime().isNull() ? Datetime::max() : iter->lastDatetime();
         size_t lo =
           std::lower_bound(dates.begin() + start_pos, dates.end(), start_date) - dates.begin();

@@ -74,10 +74,12 @@ TradeManagerPtr crtSysTM(price_t init_cash, double maintain_rate, bool force_liq
     return tm;
 }
 
-/** A synthetic instrument whose registered history ends exactly at its last bar, so the expiry
- *  gate is decided by the data itself instead of the security end date of the base info */
+/** A synthetic instrument whose registered expiry ends exactly at its last bar, so the expiry
+ *  gate falls on the last bar itself; the expiry is the registered end date, not implied by the
+ *  data */
 KData expiryKData() {
-    Stock stock("TEST", "EXPIRY", "Expiry");
+    Stock stock("TEST", "EXPIRY", "Expiry", 0, true, Datetime(202001020000),
+                Datetime(202001060000));
     stock.setKRecordList({KRecord(Datetime(202001020000), 10.0, 11.0, 9.0, 10.0, 100.0, 100.0),
                           KRecord(Datetime(202001030000), 10.0, 11.0, 9.0, 10.5, 100.0, 100.0),
                           KRecord(Datetime(202001060000), 10.5, 12.0, 10.0, 11.0, 100.0, 100.0)});

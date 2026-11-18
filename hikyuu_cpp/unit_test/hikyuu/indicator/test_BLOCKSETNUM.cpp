@@ -66,6 +66,23 @@ TEST_CASE("test_BLOCKSETNUM") {
         }
         CHECK_EQ(r2[i], (double)manual);
     }
+
+    /** @arg A temporary stock carries no registered validity range (setKRecordList leaves it
+     *  Null); it must still count as a member over the whole context instead of being dropped */
+    Stock tmp_stock("TEST", "BSNTMP", "BlockSetNum temp stock");
+    tmp_stock.setKRecordList({KRecord(Datetime(202001020000), 10.0, 11.0, 9.0, 10.0, 100.0, 100.0)},
+                             KQuery::DAY);
+    REQUIRE_EQ(tmp_stock.getCount(KQuery::DAY), 1u);
+    CHECK_UNARY(tmp_stock.startDatetime().isNull());
+    CHECK_UNARY(tmp_stock.lastDatetime().isNull());
+    Block tmp_block("TEST", "BLOCKSETNUM_TMP");
+    REQUIRE_UNARY(tmp_block.add(tmp_stock));
+    Indicator r3 = BLOCKSETNUM(tmp_block);
+    r3.setContext(k);
+    CHECK_EQ(r3.size(), k.size());
+    for (size_t i = 0; i < k.size(); ++i) {
+        CHECK_EQ(r3[i], 1.0);
+    }
 }
 
 /** @} */

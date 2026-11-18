@@ -627,6 +627,8 @@ StockManager/Block/Stock
 
         谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据
         如果数据格式为 pandas.DataFrame, 可以使用 set_kdata_from_df 方法。
+        本方法不改变证券的 ``start_datetime`` / ``last_datetime``（注册有效期），临时证券如需
+        到期控制（如到期后拒绝开新仓、保证金到期强平），请显式设置 ``last_datetime``。
 
         :param sequence krecord_list: 一个可迭代变量获取 KRecord 实例的对象，如: list (仅包含 KRecord 实例)
         :param Query.KType ktype: K线类别
