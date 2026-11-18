@@ -63,7 +63,7 @@ Dimension Conventions
 Everything follows the hikyuu API caliber; after importing or replacing a data source,
 self-check with the three ratios:
 
-- ``KRecord.amount``: **10K yuan (万元)**
+- ``KRecord.amount``: **10,000 yuan**
 - ``KRecord.volume``: lots (daily) / shares (minute and below)
 - ``unit``: the lot multiplier (futures=contract multiplier, forex=contract size,
   stock / crypto=1); accounting = ``price × number × unit``
