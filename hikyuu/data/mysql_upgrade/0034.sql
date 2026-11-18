@@ -4,9 +4,9 @@
 --   ALTER TABLE `hku_base`.`holiday` DROP COLUMN `market`;
 ALTER TABLE `hku_base`.`holiday` ADD COLUMN `market` VARCHAR(20) NOT NULL DEFAULT 'SH';
 -- old schemas have no unique key; repeated imports may leave duplicate (market,date) rows - dedup first, then add the unique key
-DELETE h1 FROM `hku_base`.`holiday` h1
+DELETE `hku_base`.`holiday` FROM `hku_base`.`holiday`
   JOIN `hku_base`.`holiday` h2
-    ON h1.`market` = h2.`market` AND h1.`date` = h2.`date` AND h1.`id` > h2.`id`;
+    ON `hku_base`.`holiday`.`market` = h2.`market` AND `hku_base`.`holiday`.`date` = h2.`date` AND `hku_base`.`holiday`.`id` > h2.`id`;
 INSERT INTO `hku_base`.`holiday` (`market`, `date`) SELECT 'SZ', `date` FROM `hku_base`.`holiday` WHERE `market` = 'SH';
 INSERT INTO `hku_base`.`holiday` (`market`, `date`) SELECT 'BJ', `date` FROM `hku_base`.`holiday` WHERE `market` = 'SH';
 INSERT INTO `hku_base`.`holiday` (`market`, `date`) SELECT 'SHF', `date` FROM `hku_base`.`holiday` WHERE `market` = 'SH';
