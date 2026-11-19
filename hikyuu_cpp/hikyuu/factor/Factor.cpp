@@ -114,8 +114,9 @@ IndicatorList Factor::getValues(const StockList& stocks, const KQuery& query, bo
     }
 
     if (align) {
-        DatetimeList dates =
-          align_dates.empty() ? StockManager::instance().getTradingCalendar(query) : align_dates;
+        DatetimeList dates = align_dates.empty()
+                               ? StockManager::instance().getTradingCalendar(stocks, query)
+                               : align_dates;
         HKU_IF_RETURN(dates.empty(), ret);
         auto null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);
         ret = global_parallel_for_index(0, stocks.size(), [&, tovalue, this](size_t i) {

@@ -223,8 +223,9 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
         DatetimeList dates;
         Indicator null_ind;
         if (align) {
-            dates = align_dates.empty() ? StockManager::instance().getTradingCalendar(query)
-                                        : align_dates;
+            dates =
+              align_dates.empty() ? StockManager::instance().getTradingCalendar(stocks, query)
+                                  : align_dates;
             HKU_IF_RETURN(dates.empty(), result);
             null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);
         }
@@ -286,7 +287,7 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     const auto& factors = m_data->factors;
     if (align) {
         DatetimeList dates = align_dates.empty()
-                               ? StockManager::instance().getTradingCalendar(query)
+                               ? StockManager::instance().getTradingCalendar(stocks, query)
                                : align_dates;
         HKU_IF_RETURN(dates.empty(), result);
         Indicator null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);

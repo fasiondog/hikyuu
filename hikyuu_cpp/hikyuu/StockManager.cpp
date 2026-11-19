@@ -1042,6 +1042,14 @@ DatetimeList StockManager::getTradingCalendar(const StockList& stk_list, const K
         DatetimeList temp = getTradingCalendar(query, market);
         if (temp.size() > 0) {
             date_set.insert(temp.begin(), temp.end());
+        } else {
+            // A market without a calendar (e.g. crypto) falls back to its own K-line dates
+            for (const auto& stk : stk_list) {
+                if (!stk.isNull() && stk.market() == market) {
+                    DatetimeList dates = stk.getDatetimeList(query);
+                    date_set.insert(dates.begin(), dates.end());
+                }
+            }
         }
     }
 
