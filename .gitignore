@@ -147,3 +147,4 @@ wget-*
 hikyuu/cpp/i18n/zh_CN/hikyuu_plugin.mo
 soft_copyright_application
 compile_commands.json
+.venv/
