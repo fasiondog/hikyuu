@@ -29,6 +29,10 @@ import pandas as pd
 import datetime
 import math
 from hikyuu.util import *
+from pytdxdata.models import Market, SecurityQuote
+from pytdxdata import KlinePeriod, TdxData
+import time
+import asyncio
 
 
 class MARKET:
@@ -62,7 +66,8 @@ class STOCKTYPE:
 
 def get_a_stktype_list():
     """获取A股市场证券类型元组，含B股"""
-    return (STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM, STOCKTYPE.START, STOCKTYPE.A_BJ)
+    # return (STOCKTYPE.INDEX, STOCKTYPE.BLOCK)
+    return (STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM, STOCKTYPE.START, STOCKTYPE.A_BJ, STOCKTYPE.BLOCK)
 
 
 def get_stktype_list(quotations=None):
@@ -143,9 +148,33 @@ def get_index_code_name_list() -> list:
         df = ak.stock_zh_index_spot_em()
     else:
         df = ak.stock_zh_index_spot()
-    res = [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+    res = [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称'], 'source': 'ak'} for i in range(len(df))]
+
+    tdxindexes = asyncio.run(fetch_tdxdata_index())
+    res.extend(tdxindexes)
+
     ret = [v for v in res if len(v['market_code']) == 8]
+
     return ret
+
+
+async def fetch_tdxdata_index():
+    result = []
+    # TdxData 为异步上下文管理器：进入时建连，退出时释放
+    async with TdxData() as td:
+        industry_boards = await td.get_boards(kind='industry')
+        time.sleep(1)
+        # 细分业务
+        style_boards = await td.get_boards(kind='style')
+
+        if industry_boards and len(industry_boards) > 0:
+            for board in industry_boards:
+                result.append({'market_code': 'SH' + board.code, 'name': board.name, 'source': 'tdx'})
+
+        if style_boards and len(style_boards) > 0:
+            for board in style_boards:
+                result.append({'market_code': 'SH' + board.code, 'name': board.name, 'source': 'tdx'})
+    return result
 
 
 g_fund_code_name_list = {}
@@ -198,6 +227,24 @@ def get_china_bond10_rate(start_date="19901219"):
     bond_zh_us_rate_df = ak.bond_zh_us_rate(start_date)
     df = bond_zh_us_rate_df[['中国国债收益率10年', '日期']].dropna()
     return [(v[1].strftime('%Y%m%d'), int(v[0]*10000)) for v in df.values]
+
+
+def modify_tdxdata_code(bk_member: SecurityQuote):
+    if bk_member.symbol:
+        return bk_member.symbol.upper()
+
+    market = bk_member.market
+    code = bk_member.code
+
+    if int(market) == Market.SH.value:
+        return 'SH' + code
+    if int(market) == Market.SZ.value:
+        return 'SZ' + code
+    if int(market) == Market.BJ.value:
+        return 'BJ' + code
+    else:
+        hku_warn("Unknow code: {}", code)
+        return None
 
 
 def modifiy_code(code):
@@ -259,3 +306,24 @@ def historyfinancialreader(filepath):
         results.append((file_date, modifiy_code(code), report_date, info_data))
     cw_file.close()
     return results
+
+
+def common_convert_ktype(ktype: str) -> KlinePeriod:
+    ktype_map = {
+        'DAY': KlinePeriod.DAY,
+        'WEEK': KlinePeriod.WEEK,
+        'MONTH': KlinePeriod.MONTH,
+        'QUARTER': KlinePeriod.SEASON,
+        'YEAR': KlinePeriod.YEAR,
+        'MIN': KlinePeriod.MIN_1,
+        'MIN3': KlinePeriod.MIN_3,
+        'MIN5': KlinePeriod.MIN_5,
+        '5MIN': KlinePeriod.MIN_5,
+        'MIN15': KlinePeriod.MIN_15,
+        'MIN30': KlinePeriod.MIN_30,
+        'MIN60': KlinePeriod.MIN_60,
+    }
+    nktype = ktype.upper()
+    if nktype not in ktype_map:
+        raise ValueError(f"Unsupported ktype: {ktype}")
+    return ktype_map[nktype]

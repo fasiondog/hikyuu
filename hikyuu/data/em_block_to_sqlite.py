@@ -7,14 +7,29 @@
 
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
-from hikyuu.data.download_block import *
+from hikyuu.data import download_block
+import asyncio
+from pytdxdata import TdxData
 
+async def pytdxdata_block_download() -> None:
+    # TdxData 为异步上下文管理器：进入时建连，退出时释放
+    async with TdxData() as td: 
+        try:
+            await download_block.down_tdx_hybk_info(td)
+        except Exception as e:
+            hku_warn(f"执行 行业导入 失败 {type(e).__name__}: {str(e)}")
+        
+        try:
+            await download_block.down_tdx_gnbk_info(td)
+        except Exception as e:
+            hku_warn(f"执行 概念导入 失败 {type(e).__name__}: {str(e)}")
 
 @spend_time
 def em_import_block_to_sqlite(connect):
-    download_block_info()
+    download_block.download_block_info()
+    asyncio.run(pytdxdata_block_download())
 
-    blocks_info = read_block_from_path()
+    blocks_info = download_block.read_block_from_path()
     blks = blocks_info['block']
     blks_info = blocks_info['block_info']
 
@@ -68,14 +83,13 @@ def em_import_block_to_sqlite(connect):
 
 if __name__ == "__main__":
     import sqlite3
-    from hikyuu.data.common_sqlite3 import create_database
 
     # dest_dir = "/home/fasiondog/stock"
-    dest_dir = "/Users/fasiondog/stock"
-    # dest_dir = "d:\\stock"
+    # dest_dir = "/Users/fasiondog/stock"
+    dest_dir = "/Users/Zhuanz1/data/hikyuu_stock"
 
     connect = sqlite3.connect(dest_dir + "/stock.db")
-    create_database(connect)
+    # create_database(connect)
 
     em_import_block_to_sqlite(connect)
 

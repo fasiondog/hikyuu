@@ -27,6 +27,8 @@ import os
 import math
 import datetime
 import sqlite3
+
+from pytdxdata import KlinePeriod
 from pytdx.hq import TDXParams
 from configparser import ConfigParser
 
@@ -64,7 +66,8 @@ def import_index_name(connect):
         return 0
 
     cur = connect.cursor()
-    a = cur.execute("select stockid, marketid, code from stock where type={}".format(STOCKTYPE.INDEX))
+    a = cur.execute("select stockid, marketid, code from stock where type in ({}, {})".format(
+        STOCKTYPE.INDEX, STOCKTYPE.BLOCK))
     a = a.fetchall()
     oldStockDict = {}
     for oldstock in a:
@@ -75,16 +78,17 @@ def import_index_name(connect):
     today = datetime.date.today()
     today = today.year * 10000 + today.month * 100 + today.day
     for index in index_list:
+        type = STOCKTYPE.INDEX if index['source'] == 'ak' else STOCKTYPE.BLOCK
         if index['market_code'] in oldStockDict:
             cur.execute(
-                "update stock set valid=1, name='%s' where stockid=%i" %
-                (index['name'], oldStockDict[index['market_code']])
+                "update stock set valid=1, name='%s',type=%d where stockid=%i" %
+                (index['name'], type, oldStockDict[index['market_code']])
             )
         else:
             marketid = MARKETID.SH if index['market_code'][:2] == MARKET.SH else MARKETID.SZ
             sql = "insert into Stock(marketid, code, name, type, valid, startDate, endDate) \
                            values (%s, '%s', '%s', %s, %s, %s, %s)" \
-                          % (marketid, index['market_code'][2:], index['name'], STOCKTYPE.INDEX, 1, today, 99999999)
+                          % (marketid, index['market_code'][2:], index['name'], type, 1, today, 99999999)
             cur.execute(sql)
     connect.commit()
     cur.close()
@@ -136,6 +140,7 @@ def import_stock_name(connect, api, market, quotations=None):
     stktype_list = get_stktype_list(quotations)
     stktype_list = list(stktype_list)
     stktype_list.remove(STOCKTYPE.INDEX)  # 移除指数类型
+    stktype_list.remove(STOCKTYPE.BLOCK)  # 移除板块类型
     stktype_list = tuple(stktype_list)
     a = cur.execute(
         "select stockid, code, name, valid from stock where marketid={} and type in {}".format(marketid, stktype_list)
@@ -145,7 +150,6 @@ def import_stock_name(connect, api, market, quotations=None):
     for oldstock in a:
         oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(oldstock[3])
         oldStockDict[oldcode] = oldstockid
-
         # 新的代码表中无此股票或者已退市，则置为无效
         if (oldvalid == 1) and ((oldcode not in newStockDict) or (oldcode in deSet)):
             cur.execute("update stock set valid=0 where stockid=%i" % oldstockid)
@@ -183,6 +187,10 @@ def import_stock_name(connect, api, market, quotations=None):
 
 
 def guess_day_n_step(last_datetime):
+    '''
+    根据本地 HDF5 里已有数据的最后一条日期，估算从那天到今天之间缺失的日线数据大概有多少，
+    从而决定向 pytdx 服务器分几批（n）、每批取多少根（step）K 线来补齐。
+    '''
     last_date = int(last_datetime // 10000)
     today = datetime.date.today()
 
@@ -396,6 +404,168 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     return (add_record_count, True, Datetime(last_datetime))
 
 
+def convert2_datetime(label, format_label="%Y%m%d"):
+    return datetime.datetime.strptime(label, format_label)
+
+
+async def import_tdx_single_block_data(connect, td: TdxData, h5file, market, ktype, stock_record, startDate=199012191500):
+    '''
+    通过 pytdxdata 导入单板块/概念的走势k
+    '''
+    market = market.upper()
+
+    stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
+        stock_record[4]
+
+    hku_debug("{}{} {}".format(market, code, ktype))
+    table = get_h5table(h5file, market, code)
+    if table is None:
+        hku_error("Can't get table({}{})".format(market, code))
+        return (0, True, Datetime())
+
+    last_datetime = int(table[-1]['datetime']) if table.nrows > 0 else startDate
+
+    today = datetime.date.today()
+    format_label = "%Y%m%d%H%M"
+    if ktype == 'DAY':
+        today_datetime = (today.year * 10000 + today.month * 100 + today.day) * 10000 + 1500
+    elif ktype == '1MIN':
+        today_datetime = (today.year * 10000 + today.month * 100 + today.day) * 10000 + 1500
+    elif ktype == '5MIN':
+        today_datetime = (today.year * 10000 + today.month * 100 + today.day) * 10000 + 1500
+    else:
+        return (0, True, Datetime(last_datetime))
+
+    if today_datetime <= last_datetime:
+        return (0, True, Datetime(last_datetime))
+
+    need_check = False
+    last_krecord = None
+    if table.nrows > 0:
+        need_check = True
+        last_krecord = table[-1]
+
+    # 按日期窗口分页：把 [start_date, end_date] 切成 (n+1) 个窗口，从最新向最早逐批请求
+    end_date = convert2_datetime(str(today_datetime), format_label)
+    start_date = convert2_datetime(str(last_datetime), format_label)
+
+    add_record_count = 0
+    k_period_type: KlinePeriod = common_convert_ktype(ktype)
+    row = table.row
+
+    bar_list = await td.get_bars(code, period=k_period_type,
+                                 start_date=start_date,
+                                 end_date=end_date)
+
+    for bar in bar_list:
+        try:
+            if ktype == "DAY":
+                tmp = datetime.date(bar.year, bar.month, bar.day)
+                bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * 10000
+            else:
+                tmp = datetime.datetime(bar.year, bar.month, bar.day, bar.hour, bar.minute)
+                bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * \
+                    10000 + bar.hour * 100 + bar.minute
+        except Exception as e:
+            hku_error("Failed translate datetime: {}! {}".format(bar, e))
+            continue
+
+        if need_check and bar_datetime == last_datetime:
+            # print(f'{bar_datetime} {ktype} {market}{code}')
+            if abs(last_krecord['openPrice']*0.001 - bar.open) / (last_krecord['openPrice']*0.001) > 0.02:
+                hku_error(
+                    f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord open: {last_krecord['openPrice']*0.001}, bar: {bar.open}")
+                return (0, False, Datetime(last_datetime))
+            if abs(last_krecord['highPrice']*0.001 - bar.high) / (last_krecord['highPrice']*0.001) > 0.02:
+                hku_error(
+                    f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord high: {last_krecord['highPrice']*0.001}, bar: {bar.high}")
+                return (0, False, Datetime(last_datetime))
+            if abs(last_krecord['lowPrice']*0.001 - bar.low) / (last_krecord['lowPrice']*0.001) > 0.02:
+                hku_error(
+                    f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord low: {last_krecord['lowPrice']*0.001}, bar: {bar.low}")
+                return (0, False, Datetime(last_datetime))
+            if abs(last_krecord['closePrice']*0.001 - bar.close) / (last_krecord['closePrice']*0.001) > 0.02:
+                hku_error(
+                    f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord close: {last_krecord['closePrice']*0.001}, bar: {bar.close}")
+                return (0, False, Datetime(last_datetime))
+            if ktype == 'DAY' and last_krecord['transAmount'] != 0:
+                # 成交额检查：根据数值大小分档次进行相对百分比比较
+                amount_diff_ratio = abs(float(last_krecord['transAmount']) -
+                                        round(bar.amount*0.001)) / float(last_krecord['transAmount'])
+                amount_threshold = 0.5 if float(last_krecord['transAmount']) >= 1e8 else (
+                    0.8 if float(last_krecord['transAmount']) >= 1e6 else 1.0)
+                if amount_diff_ratio > amount_threshold:
+                    hku_error(
+                        f"fetch data from tdx error! {bar_datetime} {ktype} {market}{code} last_krecord amount: {float(last_krecord['transAmount'])}, bar: {round(bar.amount*0.001)}, diff_ratio: {amount_diff_ratio:.4f}")
+                    return (0, False, Datetime(last_datetime))
+            continue
+        # 未收盘之前, 不进行当日或当前时间处理
+        if bar_datetime == today_datetime and datetime.datetime.now().time() < datetime.time(16, 0):
+            hku_info(f"跳过当日:{code[2]}")
+            continue
+
+        if (today_datetime >= bar_datetime > last_datetime
+                and bar.high >= bar.open >= bar.low > 0
+                and bar.high >= bar.close >= bar.low > 0
+                and int(bar.vol) >= 0 and int(bar.amount*0.001) >= 0):
+            try:
+                row['datetime'] = bar_datetime
+                row['openPrice'] = bar.open * 1000
+                row['highPrice'] = bar.high * 1000
+                row['lowPrice'] = bar.low * 1000
+                row['closePrice'] = bar.close * 1000
+                row['transAmount'] = round(bar.amount * 0.001)
+                row['transCount'] = round(bar.vol)
+                row.append()
+                add_record_count += 1
+            except Exception as e:
+                hku_error("Can't trans record: {}! {}".format(bar, e))
+            last_datetime = bar_datetime
+
+    if add_record_count > 0:
+        table.flush()
+        # print(market, stock_record)
+
+        if ktype == 'DAY':
+            # 更新基础信息数据库中股票对应的起止日期及其有效标志
+            # if valid == 0:
+            cur = connect.cursor()
+            cur.execute(
+                "update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
+                (table[0]['datetime'] / 10000, 99999999, stockid)
+            )
+            connect.commit()
+            cur.close()
+
+            # 记录最新更新日期
+            if (code == '000001' and marketid == MARKETID.SH) \
+                    or (code == '399001' and marketid == MARKETID.SZ) \
+                    or (code == '830799' and marketid == MARKETID.BJ):
+                update_last_date(connect, marketid, table[-1]['datetime'] / 10000)
+
+    elif table.nrows == 0:
+        # print(market, stock_record)
+        table.remove()
+
+    # table.close()
+    return (add_record_count, True, Datetime(last_datetime))
+
+
+async def batch_fetch_tdx_data(connect, stocks: list, ktype, h5file, startDate):
+    market = 'SH'
+    async with TdxData() as td:
+        for stock in stocks:
+            try:
+                this_count, success, lastdate = await import_tdx_single_block_data(connect, td, h5file, market, ktype, stock, startDate)
+                if this_count > 0:
+                    print(f"板块更新k线:{stock[2]}| {this_count}")
+                    if ktype == 'DAY':
+                        update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                    elif ktype == '5MIN':
+                        update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
+            except Exception as e:
+                hku_error("使用 PyTdxData 导入板块{}k线失败: {}{}:{}".format(ktype, market, stock[2], e))
+
 @hku_catch(ret=None)
 def get_hdf5_importer(market, ktype):
     filename = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
@@ -429,11 +599,18 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
     failed_count = 0
     failed_list = []
     total = len(stock_list)
+    tdx_block = []
     for i, stock in enumerate(stock_list):
+        # stock.type = index 4
         if stock[3] == 0 or len(stock[2]) != 6:
             if progress:
                 progress(i, total)
             continue
+        # 板块类型的 走 PyTdxData 导入
+        if str(stock[2]).startswith('8'):
+            if str(stock[4]) == '0':
+                tdx_block.append(stock)
+                continue
 
         this_count, success, lastdate = import_one_stock_data(connect, api, h5file, market, ktype, stock, startDate)
         if not success:
@@ -447,8 +624,13 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
                 update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
             elif ktype == '5MIN':
                 update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
+
         if progress:
             progress(i, total)
+
+    if len(tdx_block) > 0 and market == 'SH':
+        print('同步 tdx 板块k ... ')
+        asyncio.run(batch_fetch_tdx_data(connect, tdx_block, ktype, h5file, startDate))
 
     if total > 0 and progress:
         progress(total, total)
@@ -695,24 +877,25 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
     return add_record_count
 
 
-if __name__ == '__main__':
-    import os
-    import time
+def test_import_data():
+#     import os
+#     import time
     starttime = time.time()
 
-    dest_dir = "/Users/fasiondog/stock"
+    dest_dir = "/Users/Zhuanz1/data/hikyuu_stock"
     tdx_server = '180.101.48.170'
     tdx_port = 7709
-    quotations = ['stock', 'fund']
+    quotations = ['stock']
 
-    connect = sqlite3.connect(dest_dir + "\\stock.db")
-    create_database(connect)
+    connect = sqlite3.connect(dest_dir + "/stock.db")
+    # create_database(connect)
 
     from pytdx.hq import TdxHq_API, TDXParams
     api = TdxHq_API()
     api.connect(tdx_server, tdx_port)
-
     add_count = 0
+    add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
+    print(1)
     """
     print("导入指数代码表")
     add_count = import_index_name(connect)
@@ -728,58 +911,110 @@ if __name__ == '__main__':
     add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
 
-    print("\n导入深证日线数据")
-    add_count = import_data(connect, 'SZ', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
-    print("\n导入数量：", add_count)
-    """
+#     print("\n导入深证日线数据")
+#     add_count = import_data(connect, 'SZ', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
+#     """
 
-    print("\n导入上证5分钟线数据")
-    add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
-    print("\n导入数量：", add_count)
+#     print("\n导入上证5分钟线数据")
+#     add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
 
-    """
-    print("\n导入深证5分钟线数据")
-    add_count = import_data(connect, 'SZ', '5MIN', quotations, api, dest_dir, progress=ProgressBar)
-    print("\n导入数量：", add_count)
+#     """
+#     print("\n导入深证5分钟线数据")
+#     add_count = import_data(connect, 'SZ', '5MIN', quotations, api, dest_dir, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
 
-    print("\n导入上证分钟线数据")
-    add_count = import_data(connect, 'SH', '1MIN', quotations, api, dest_dir, progress=ProgressBar)
-    print("\n导入数量：", add_count)
+#     print("\n导入上证分钟线数据")
+#     add_count = import_data(connect, 'SH', '1MIN', quotations, api, dest_dir, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
 
-    print("\n导入深证分钟线数据")
-    add_count = import_data(connect, 'SZ', '1MIN', quotations, api, dest_dir, progress=ProgressBar)
-    print("\n导入数量：", add_count)
+#     print("\n导入深证分钟线数据")
+#     add_count = import_data(connect, 'SZ', '1MIN', quotations, api, dest_dir, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
 
-    print("\n导入权息数据")
-    print("正在下载权息数据...")
-    import urllib.request
-    net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
-    dest_filename = dest_dir + '/weight.rar'
-    with open(dest_filename, 'wb') as file:
-        file.write(net_file.read())
+#     print("\n导入权息数据")
+#     print("正在下载权息数据...")
+#     import urllib.request
+#     net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+#     dest_filename = dest_dir + '/weight.rar'
+#     with open(dest_filename, 'wb') as file:
+#         file.write(net_file.read())
 
-    print("下载完成，正在解压...")
-    os.system('unrar x -o+ -inul {} {}'.format(dest_filename, dest_dir))
+#     print("下载完成，正在解压...")
+#     os.system('unrar x -o+ -inul {} {}'.format(dest_filename, dest_dir))
 
-    print("解压完成，正在导入...")
-    add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
-    add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
-    print("导入数量：", add_count)
+#     print("解压完成，正在导入...")
+#     add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
+#     add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
+#     print("导入数量：", add_count)
 
-    print("\n导入上证分笔数据")
-    #add_count = import_trans(connect, 'SH', quotations, api, dest_dir, max_days=2, progress=ProgressBar)
-    print("\n导入数量：", add_count)
+#     print("\n导入上证分笔数据")
+#     #add_count = import_trans(connect, 'SH', quotations, api, dest_dir, max_days=2, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
 
 
-    print("\n导入上证分时数据")
-    add_count = import_time(connect, 'SZ', quotations, api, dest_dir, max_days=3, progress=ProgressBar)
-    print("\n导入数量：", add_count)
-    """
+#     print("\n导入上证分时数据")
+#     add_count = import_time(connect, 'SZ', quotations, api, dest_dir, max_days=3, progress=ProgressBar)
+#     print("\n导入数量：", add_count)
+#     """
 
-    api.disconnect()
-    connect.close()
+#     api.disconnect()
+#     connect.close()
 
-    endtime = time.time()
-    print("\nTotal time:")
-    print("%.2fs" % (endtime - starttime))
-    print("%.2fm" % ((endtime - starttime) / 60))
+#     endtime = time.time()
+#     print("\nTotal time:")
+#     print("%.2fs" % (endtime - starttime))
+#     print("%.2fm" % ((endtime - starttime) / 60))
+
+
+def test_stock_import():
+    dest_dir = "/Users/Zhuanz1/data/hikyuu_stock"
+    # temp_dir = "/Users/Zhuanz1/data/temp_stock"
+    connect = sqlite3.connect(dest_dir + "/stock.db")
+    import_index_name(connect)
+
+
+def test_kline_import():
+    dest_dir = "/Users/Zhuanz1/data/hikyuu_stock"
+    temp_dir = "/Users/Zhuanz1/data/temp_stock"
+    connect = sqlite3.connect(dest_dir + "/stock.db")
+
+    # add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
+    code = '880439'
+    market = 'SH'
+
+    h5file = open_h5file(temp_dir, market, 'DAY')
+
+    # stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
+    #     stock_record[4]
+    stock = [8494, 1, code, 1, 2,]
+
+    async def temp_func(connect, h5file, market, ktype, stock, startDate=199012191500):
+        async with TdxData() as td:
+            try:
+                this_count, success, lastdate = await import_tdx_single_block_data(connect, td, h5file, market, ktype, stock, startDate)
+                if this_count > 0:
+                    if ktype == 'DAY':
+                        update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                    elif ktype == '5MIN':
+                        update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
+            except Exception as e:
+                hku_error("使用 PyTdxData 导入板块{}k线失败: {}{}:{}".format(ktype, market, code, e))
+                raise e
+    asyncio.run(temp_func(connect, h5file, market, 'DAY', stock,))
+    # bars = api.get_index_bars(TDXParams.KLINE_TYPE_DAILY, 1, code, n * 800, step)
+    # sec_bars = api.get_security_bars(TDXParams.KLINE_TYPE_DAILY, 1, code, n * 800, step)
+    # print(bars)
+
+
+if __name__ == "__main__":
+    # test_kline_import()
+    # test_stock_import()
+    test_import_data()
+
+    # dest_dir = "/Users/Zhuanz1/data/hikyuu_stock"
+    # temp_dir = "/Users/Zhuanz1/data/temp_stock"
+    # connect = sqlite3.connect(dest_dir + "/stock.db")
+    # import_stock_name(connect, None, 'SH', ['stock'])
+    pass

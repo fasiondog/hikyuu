@@ -4,11 +4,12 @@
 # Create on: 2025-10-05
 #    Author: fasiondog
 
-from hikyuu.data.common import modifiy_code
+from hikyuu.data.common import modifiy_code, modify_tdxdata_code
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_block_em import *
 import os
 from datetime import datetime
+from pytdxdata import TdxData
 
 
 def sanitize_filename(filename: str) -> str:
@@ -123,63 +124,57 @@ def save_block(stkcodes: list,  filename: str):
     # hku_info(f"已保存至 {filename}")
 
 
-@hku_catch(trace=False)
-@timeout(60*10)
-def down_em_all_hybk_info():
-    """下载东财所有行业板块列表"""
+async def down_tdx_hybk_info(td: TdxData) -> None:
+    """下载tdx所有行业板块列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/行业板块'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    blk_list = get_hybk_names()
+    blk_list = await td.get_boards(kind='industry')
     time.sleep(random.uniform(1, 3))
     total = len(blk_list)
     for i, blk in enumerate(blk_list):
-        filename = f"{save_path}/{blk[0]}_{blk[1]}.txt"
-        if is_file_can_download(filename, 5 * 24 * 60 * 60):
-            try:
-                stk_codes = get_hybk_cons_code(blk[0])
-                hku_info(f"{i+1}|{total} 获取行业板块{blk[1]}成分: {len(stk_codes)}")
-            except (ConnectionError, ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError) as e:
-                hku_error(f"ip 封禁! 请至东财官网首页拖动划窗解锁后重试!")
-                raise e
-            except Exception as e:
-                hku_warn(f"Failed! {type(e).__name__}: {str(e)}")
-                continue
-            stk_codes = [modifiy_code(code) for code in stk_codes]
+        filename = f"{save_path}/SH{blk.code}_{blk.name}.txt"
+        try:
+            board_members = await td.get_board_members(blk.code)
+            hku_info(f"{i+1}|{total} 获取行业板块[{blk.name}]成分: {len(board_members)}")
+            stk_codes = [modify_tdxdata_code(m) for m in board_members]
             stk_codes = [code for code in stk_codes if code is not None]
             save_block(stk_codes, filename)
             time.sleep(random.uniform(1, 3))
+        except (ConnectionError, ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError) as e:
+            hku_error(f"获取行业成员数据异常")
+            raise e
+        except Exception as e:
+            hku_warn(f"Failed! {type(e).__name__}: {str(e)}")
+            continue
+    return None
 
 
-@hku_catch(trace=False)
-@timeout(60*10)
-def down_em_all_gnbk_info():
+async def down_tdx_gnbk_info(td: TdxData) -> None:
     """获取所有概念版本列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/概念板块'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    blk_names = stock_board_concept_name_em()['板块名称']
+    blk_list = await td.get_boards(kind='style')
     not_need_blks = set(["昨日连板_含一字", "昨日涨停_含一字", "昨日涨停"])
-    total = len(blk_names)
-    for i, blk_name in enumerate(blk_names):
-        if blk_name in not_need_blks:
+    total = len(blk_list)
+    for i, blk in enumerate(blk_list):
+        if blk.name in not_need_blks:
             continue
-        filename = f"{save_path}/{sanitize_filename(blk_name)}.txt"
-        if is_file_can_download(filename, 30 * 24 * 60 * 60):
-            try:
-                stk_codes = stock_board_concept_cons_em(blk_name)
-            except (ConnectionError, ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError) as e:
-                raise e
-            except Exception as e:
-                hku_warn(f"Failed! {type(e).__name__}: {str(e)}")
-                continue
-            stk_codes = stk_codes['代码'].to_list()
-            stk_codes = [modifiy_code(code) for code in stk_codes]
+        filename = f"{save_path}/SH{blk.code}_{sanitize_filename(blk.name)}.txt"
+        try:
+            board_members = await td.get_board_members(blk.code)
+            stk_codes = [modify_tdxdata_code(m) for m in board_members]
             stk_codes = [code for code in stk_codes if code is not None]
-            hku_info(f"{i+1}|{total} 获取概念板块{blk_name}成分: {len(stk_codes)}")
+            hku_info(f"{i+1}|{total} 获取概念板块[{blk.name}]成分: {len(stk_codes)}")
             save_block(stk_codes, filename)
             time.sleep(random.uniform(1, 3))
-
+        except (ConnectionError, ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError) as e:
+            raise e
+        except Exception as e:
+            hku_warn(f"Failed! {type(e).__name__}: {str(e)}")
+            continue
+    return None
 
 @hku_catch(trace=False)
 @timeout(60*10)
@@ -246,7 +241,7 @@ def down_em_all_dybk_info():
 
 
 @hku_catch(trace=False)
-@timeout(60*10)
+@timeout(120*10)
 def download_all_zsbk_info():
     """获取所有指数成分股列表"""
     save_path = f'{_BLOCK_SAVE_PATH}/指数板块'
@@ -337,10 +332,8 @@ def download_all_zsbk_info():
 
 
 def download_block_info():
-    # down_em_all_hybk_info()
-    # down_em_all_dybk_info()
-    # down_em_all_gnbk_info()
     download_all_zsbk_info()
+    
 
 
 if __name__ == "__main__":

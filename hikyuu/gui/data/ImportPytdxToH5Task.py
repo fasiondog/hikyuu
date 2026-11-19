@@ -25,6 +25,7 @@
 import logging
 import sqlite3
 import mysql.connector
+from pytdxdata import TdxData
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_data as h5_import_data
 from hikyuu.data.pytdx_to_mysql import import_data as mysql_import_data
