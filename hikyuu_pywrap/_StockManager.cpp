@@ -311,7 +311,8 @@ void export_StockManager(py::module& m) {
            py::arg("stk_list"), py::arg("query"),
            R"(get_trading_calendar(self, stk_list, query)
 
-    Get the superimposed trading calendar according to the specified security list (mainly used when the securities of the different markets are included)
+    Get the superimposed trading calendar according to the specified security list (mainly used when the securities of the different markets are included).
+    The A-share markets (SH/SZ/BJ) share the SH calendar; a market without a calendar (e.g. crypto) uses its own K-line dates.
 
     :param StockList stk_list: the stock list
     :param KQuery query: the Query condition

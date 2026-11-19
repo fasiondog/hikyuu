@@ -11,11 +11,15 @@
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <set>
 #include <stdexcept>
 #include <thread>
+#include <hikyuu/Stock.h>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/data_driver/DataDriverFactory.h>
+#include <hikyuu/data_driver/KDataDriver.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/utilities/Log.h>
 #include "../plugin_valid.h"
@@ -71,6 +75,51 @@ bool hasBlock(const BlockList& blocks, const string& category, const string& nam
     }
     return false;
 }
+
+// Hands out the prepared K-lines per code, so a security of a calendar-less market can be given
+// its own data without touching the test data set
+class FakeKRecordDriver : public KDataDriver {
+public:
+    FakeKRecordDriver(const string& name, std::map<string, KRecordList> records)
+    : KDataDriver(name), m_records(std::move(records)) {}
+
+    KDataDriverPtr _clone() override {
+        return std::make_shared<FakeKRecordDriver>(*this);
+    }
+
+    bool isIndexFirst() override {
+        return true;
+    }
+
+    bool canParallelLoad() override {
+        return false;
+    }
+
+    size_t getCount(const string&, const string& code, const KQuery::KType&) override {
+        auto iter = m_records.find(code);
+        return iter == m_records.end() ? 0 : iter->second.size();
+    }
+
+    KRecordList getKRecordList(const string&, const string& code, const KQuery&) override {
+        auto iter = m_records.find(code);
+        return iter == m_records.end() ? KRecordList() : iter->second;
+    }
+
+private:
+    std::map<string, KRecordList> m_records;
+};
+
+// Registers a kdata driver prototype for its own lifetime and removes it again afterwards
+class KDataDriverRegistry {
+public:
+    explicit KDataDriverRegistry(const string& name) : m_name(name) {}
+    ~KDataDriverRegistry() {
+        DataDriverFactory::removeKDataDriver(m_name);
+    }
+
+private:
+    string m_name;
+};
 }  // namespace
 
 /**
@@ -325,6 +374,70 @@ TEST_CASE("test_StockManager_getTradingCalendar") {
     CHECK_EQ(cross.size(), want.size());
     CHECK_UNARY(std::is_sorted(cross.begin(), cross.end()));
     CHECK_EQ(std::set<Datetime>(cross.begin(), cross.end()).size(), cross.size());
+
+    /** @arg The A-share markets (SH/SZ/BJ) share one calendar: the merged axis is the SH one */
+    KQuery first_twenty = KQuery(0, 20, KQuery::DAY);
+    DatetimeList sh_twenty = sm.getTradingCalendar(first_twenty, "SH");
+    CHECK_EQ(sh_twenty.size(), 20);
+    StockList a_share_stocks{sm.getStock(sh_info.market() + sh_info.code()),
+                             sm.getStock("sz000001")};
+    CHECK_UNARY(sm.getTradingCalendar(a_share_stocks, first_twenty) == sh_twenty);
+
+    /** @arg A market without a calendar (e.g. crypto) falls back to the security's own K-lines */
+    const string fake_driver_name("fake_no_calendar");
+    std::map<string, KRecordList> fake_ks;
+    fake_ks["000001"] = KRecordList{KRecord(Datetime(20200102), 1.0, 2.0, 0.5, 1.5, 100.0, 10.0),
+                                    KRecord(Datetime(20200103), 1.1, 2.1, 0.6, 1.6, 110.0, 11.0),
+                                    KRecord(Datetime(20200106), 1.2, 2.2, 0.7, 1.7, 120.0, 12.0)};
+    fake_ks["000002"] = KRecordList{KRecord(Datetime(20200107), 1.3, 2.3, 0.8, 1.8, 130.0, 13.0)};
+
+    DataDriverFactory::regKDataDriver(
+      std::make_shared<FakeKRecordDriver>(fake_driver_name, fake_ks));
+    KDataDriverRegistry driver_registry(fake_driver_name);
+
+    Parameter param;
+    param.set<string>("type", fake_driver_name);
+    KDataDriverConnectPoolPtr pool = DataDriverFactory::getKDataDriverPool(param);
+
+    Stock no_calendar_stk("TESTMKT", "000001", "NoCalendar", STOCKTYPE_A, true, Datetime(20200101),
+                          Null<Datetime>());
+    no_calendar_stk.setKDataDriver(pool);
+    Stock second_stk("TESTMKT", "000002", "NoCalendar2", STOCKTYPE_A, true, Datetime(20200101),
+                     Null<Datetime>());
+    second_stk.setKDataDriver(pool);
+
+    KQuery fake_query = KQueryByDate(Datetime(20200101), Datetime(20200110), KQuery::DAY);
+    CHECK_EQ(sm.getTradingCalendar(KQuery(), "TESTMKT").size(), 0);
+
+    DatetimeList fallback_dates = sm.getTradingCalendar(StockList{no_calendar_stk}, fake_query);
+    DatetimeList want_fallback;
+    want_fallback.push_back(Datetime(20200102));
+    want_fallback.push_back(Datetime(20200103));
+    want_fallback.push_back(Datetime(20200106));
+    CHECK_UNARY(fallback_dates == want_fallback);
+
+    /** @arg Securities of one calendar-less market merge their own K-lines */
+    DatetimeList multi_dates =
+      sm.getTradingCalendar(StockList{no_calendar_stk, second_stk}, fake_query);
+    DatetimeList want_multi(want_fallback);
+    want_multi.push_back(Datetime(20200107));
+    CHECK_UNARY(multi_dates == want_multi);
+
+    /** @arg Duplicate securities in the list do not change the merged axis */
+    DatetimeList dup_dates =
+      sm.getTradingCalendar(StockList{no_calendar_stk, no_calendar_stk}, fake_query);
+    CHECK_UNARY(dup_dates == fallback_dates);
+
+    /** @arg An index query on one security resolves in its own k-line space, without a warning */
+    KQuery index_query(0, 3, KQuery::DAY);
+    DatetimeList one_index = sm.getTradingCalendar(StockList{no_calendar_stk}, index_query);
+    CHECK_EQ(one_index.size(), 3);
+
+    /** @arg An index query over several securities of a calendar-less market warns, as the range is
+     * resolved in each security's own k-line space */
+    DatetimeList multi_index =
+      sm.getTradingCalendar(StockList{no_calendar_stk, second_stk}, index_query);
+    CHECK_EQ(multi_index.size(), 4);
 }
 
 /** @par Test points */

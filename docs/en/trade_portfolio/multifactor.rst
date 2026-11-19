@@ -28,7 +28,7 @@ Built-in Factor Composition Algorithms
     :param sequence(stock) stks: the list of securities to calculate
     :param sequence(float) weights: the weight list (must be the same length as the number of factors)
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for date alignment (defaults to sh000001 when unspecified)
+    :param Stock ref_stk: the reference security used for date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day forward return corresponding to the default IC
     :param bool spearman: calculate the correlation coefficient with Spearman by default; otherwise Pearson
     :param int mode: the sorting mode for the cross-section data: 0 descending, 1 ascending, 2 no sorting
@@ -54,7 +54,7 @@ Built-in Factor Composition Algorithms
     :param input: the factor input, which can be a FactorSet object or a sequence of Indicators
     :param sequence(stock) stks: the list of securities to calculate
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for date alignment (defaults to sh000001 when unspecified)
+    :param Stock ref_stk: the reference security used for date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day forward return corresponding to the default IC
     :param bool spearman: calculate the correlation coefficient with Spearman by default; otherwise Pearson
     :param int mode: the sorting mode for the cross-section data: 0 descending, 1 ascending, 2 no sorting
@@ -79,7 +79,7 @@ Built-in Factor Composition Algorithms
     :param input: the factor input, which can be a FactorSet object or a sequence of Indicators
     :param sequence(stock) stks: the list of securities to calculate
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for date alignment (defaults to sh000001 when unspecified)
+    :param Stock ref_stk: the reference security used for date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day forward return corresponding to the default IC
     :param int ic_rolling_n: the rolling window for the IC
     :param bool spearman: calculate the correlation coefficient with Spearman by default; otherwise Pearson
@@ -105,7 +105,7 @@ Built-in Factor Composition Algorithms
     :param input: the factor input, which can be a FactorSet object or a sequence of Indicators
     :param sequence(stock) stks: the list of securities to calculate
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for date alignment (defaults to sh000001 when unspecified)
+    :param Stock ref_stk: the reference security used for date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day forward return corresponding to the default IC
     :param int ic_rolling_n: the rolling window for the IC
     :param bool spearman: calculate the correlation coefficient with Spearman by default; otherwise Pearson

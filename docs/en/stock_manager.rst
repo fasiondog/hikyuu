@@ -461,6 +461,11 @@ StockManager/Block/Stock
         **Form 2:** return the union of the trading calendars of the given securities (mainly
         used when the list contains securities from different markets)
 
+        - The A-share markets (SH/SZ/BJ) share the SH trading calendar;
+        - A market without a trading calendar (e.g. crypto) uses the securities' own K-line dates;
+          an index query over several securities is then resolved in each security's own K-line
+          space and logs a warning
+
         :param StockList stk_list: the security list
         :param Query query: the Query criteria
         :return: the list of trading dates

@@ -170,16 +170,17 @@ Load Scope
 Portfolio Calendar
 ------------------
 
-``MultiSystem.run(query)`` is driven by the **A-share (SH) trading calendar** by default: a
-cross-market portfolio that sets no axis runs on the SH days, so the days unique to the other
-market are skipped and the SH-only days run empty (NYSE vs SH over 2005-01-04~2011-12-06 differ
-by 115 / 54 days). Inject the target calendar explicitly:
+``MultiSystem.run(query)`` is driven by the **merged calendar of the sub-system securities** by
+default (the aggregate's own security is included; a market without a trading calendar falls back
+to its own K-line dates), so a cross-market portfolio neither skips the trading days unique to one
+market nor runs empty on the other's. Inject a fixed axis explicitly when the axis must be
+independent of the securities (e.g. driving a US portfolio by the NYSE calendar):
 
 .. code-block:: python
 
     q = Query(Datetime(20050104), Datetime(20111206), Query.DAY)
     ms.set_axis_mode("calendar")
-    ms.set_date_axis(sm.get_trading_calendar(q, "NYSE"))  # "SH" by default
+    ms.set_date_axis(sm.get_trading_calendar(q, "NYSE"))  # market defaults to "SH"
     ms.run(q)
 
 Capability Boundaries

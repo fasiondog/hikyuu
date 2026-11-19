@@ -7,6 +7,7 @@
 
 #include "../../test_config.h"
 #include <fstream>
+#include <set>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/AMA.h>
@@ -142,6 +143,54 @@ TEST_CASE("test_MF_EqualWeight") {
          i++) {
         CHECK_EQ(ind4[i], doctest::Approx((ind1[i] + ind2[i] + ind3[i]) / 3.0));
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_MF_EqualWeight_ref_stock") {
+    StockManager& sm = StockManager::instance();
+    StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(-100);
+    IndicatorList src_inds = {MA(CLOSE(), 3)};
+
+    /** @arg An unspecified reference keeps the constituents' merged calendar as the axis */
+    auto mf = MF_EqualWeight(src_inds, stks, query, Null<Stock>());
+    CHECK_UNARY(mf->getRefStock().isNull());
+    CHECK_UNARY(mf->getDatetimeList() == sm.getTradingCalendar(stks, query));
+
+    /** @arg A given reference security aligns on its own dates */
+    Stock ref_stk = sm["sh600004"];
+    mf->setRefStock(ref_stk);
+    CHECK_EQ(mf->getRefStock(), ref_stk);
+    CHECK_UNARY(mf->getDatetimeList() == ref_stk.getDatetimeList(query));
+
+    /** @arg A null reference security clears it back to the constituents' calendar */
+    mf->setRefStock(Null<Stock>());
+    CHECK_UNARY(mf->getRefStock().isNull());
+    CHECK_UNARY(mf->getDatetimeList() == sm.getTradingCalendar(stks, query));
+}
+
+/** @par Test points */
+TEST_CASE("test_MF_EqualWeight_cross_market_ref") {
+    StockManager& sm = StockManager::instance();
+    Stock sh = sm["sh600004"];
+    Stock dji = getStock("NYSEDJI");
+    REQUIRE_UNARY(!sh.isNull());
+    REQUIRE_UNARY(!dji.isNull());
+    StockList stks{sh, dji};
+    KQuery query = KQueryByDate(Datetime(20100601), Datetime(20101001));
+    IndicatorList src_inds = {MA(CLOSE(), 3)};
+
+    /** @arg Without a reference security the axis is the union of the members' market calendars,
+     * not the SH calendar alone */
+    auto mf = MF_EqualWeight(src_inds, stks, query, Null<Stock>());
+    DatetimeList axis = mf->getDatetimeList();
+    std::set<Datetime> want;
+    for (const auto& stk : stks) {
+        DatetimeList one = sm.getTradingCalendar(query, stk.market());
+        want.insert(one.begin(), one.end());
+    }
+    CHECK_EQ(axis.size(), want.size());
+    CHECK_GT(axis.size(), sm.getTradingCalendar(query, "SH").size());
 }
 
 //-----------------------------------------------------------------------------

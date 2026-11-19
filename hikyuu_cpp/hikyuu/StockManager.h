@@ -221,6 +221,7 @@ public:
     /**
      * Get the merged trading calendar of the given security list (mainly used when securities of
      * different markets are included)
+     * @note The A-share markets (SH/SZ/BJ) share one calendar and are represented by SH
      * @note A market without a calendar (e.g. crypto) contributes its own K-line dates instead
      * @param stk_list
      * @param query

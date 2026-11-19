@@ -168,16 +168,15 @@ void MultiFactorBase::_checkData() {
         HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
     }
 
-    // Get the reference dates used for the alignment
-    if (m_ref_stk.isNull()) {
-        m_ref_stk = StockManager::instance().getMarketStock("SH");
-    }
-    m_ref_dates = m_ref_stk.getDatetimeList(m_query);
-    HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
-              m_ref_dates.size());
-
     HKU_CHECK(m_stks.size() >= 2, "The number of stock is insufficient! current stock number: {}",
               m_stks.size());
+
+    // Alignment dates: the given reference security's own dates, or the merged calendar of the
+    // constituents when it is not specified
+    m_ref_dates = m_ref_stk.isNull() ? StockManager::instance().getTradingCalendar(m_stks, m_query)
+                                     : m_ref_stk.getDatetimeList(m_query);
+    HKU_CHECK(m_ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
+              m_ref_dates.size());
 }
 
 void MultiFactorBase::clearCalculatedData() {
@@ -251,11 +250,13 @@ void MultiFactorBase::setQuery(const KQuery& query) {
 }
 
 void MultiFactorBase::setRefStock(const Stock& stk) {
-    Stock tmp_stk = stk.isNull() ? StockManager::instance().getMarketStock("SH") : stk;
-    DatetimeList ref_dates = tmp_stk.getDatetimeList(m_query);
-    HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
-              ref_dates.size());
-    m_ref_stk = tmp_stk;
+    // A null security keeps the alignment axis as the merged calendar of the constituents
+    if (!stk.isNull()) {
+        DatetimeList ref_dates = stk.getDatetimeList(m_query);
+        HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
+                  ref_dates.size());
+    }
+    m_ref_stk = stk;
     m_calculated.store(false, std::memory_order_relaxed);
 }
 

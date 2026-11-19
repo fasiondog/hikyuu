@@ -8,7 +8,7 @@ The walk-forward trading system runs multiple candidate trading systems, evaluat
 
 Common parameters (in addition to those inherited from SYS):
 
-    * **market='SH'** *(str)* : the market used to align the trading dates
+    * **market=''** *(str)* : the market used to align the trading dates; empty means the merged calendar of the candidate securities
     * **train_len=100** *(int)* : the length of the rolling in-sample window over which system performance is evaluated
     * **test_len=20** *(int)* : the length of the out-of-sample period traded with the best system selected during train_len
     * **clean_hold_when_select_changed=True** *(bool)* : when the newly selected system differs from the previous one, liquidate the existing position at the open

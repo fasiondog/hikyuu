@@ -431,7 +431,11 @@ StockManager/Block/Stock
         :rtype: DatetimeList
         
         **方式二：** 根据指定的证券列表获取叠加后的交易日历（主要用于包含不同市场证券时）
-        
+
+        - A 股市场（SH/SZ/BJ）共用 SH 的交易日历；
+        - 没有交易日历的市场（如数字货币）使用其证券自身的 K 线日期；此时若按索引方式查询且涉及
+          多只证券，索引区间会分别在各自的 K 线空间内解释，日志中给出警告
+
         :param StockList stk_list: 股票列表
         :param Query query: Query查询条件
         :return: 日期列表

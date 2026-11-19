@@ -128,15 +128,16 @@ SZ000001）才不会互读对方的数据；库内表名按 code 小写建。
 组合日历
 --------
 
-``MultiSystem.run(query)`` 的驱动日历默认为 **A 股（SH）**：跨市场组合不显式指定时，
-美股独有交易日会被跳过、A 股独有交易日空跑（NYSE 与 SH 在 2005-01-04~2011-12-06 区间
-相差 115 / 54 天）。跨市场组合应显式注入目标市场日历：
+``MultiSystem.run(query)`` 的驱动日历默认为**子系统标的所在市场的合并日历**（聚合自身的标的也
+计入；没有交易日历的市场回退到其自身 K 线日期）：跨市场组合既不跳过某一市场独有的交易日，也
+不会在另一市场独有的交易日上空跑。当时间轴需要与标的口径无关时（例如按 NYSE 日历驱动美股组
+合），显式注入：
 
 .. code-block:: python
 
     q = Query(Datetime(20050104), Datetime(20111206), Query.DAY)
     ms.set_axis_mode("calendar")
-    ms.set_date_axis(sm.get_trading_calendar(q, "NYSE"))  # 默认参数为 "SH"
+    ms.set_date_axis(sm.get_trading_calendar(q, "NYSE"))  # get_trading_calendar 的市场默认为 "SH"
     ms.run(q)
 
 能力边界

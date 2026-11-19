@@ -8428,7 +8428,8 @@ TEST_CASE("test_MultiSystem_data_lag_visibility") {
     REQUIRE(!dji.isNull());
     KQuery query(Datetime(20100601), Datetime(20101001));
 
-    DatetimeList axis = sm.getTradingCalendar(query);
+    // The driving axis defaults to the merged calendar of the members' markets (SH + NYSE)
+    DatetimeList axis = sm.getTradingCalendar(StockList{sh, dji}, query);
     REQUIRE_UNARY(!axis.empty());
     DatetimeList sh_dates;
     KData sh_kdata = sh.getKData(query);
@@ -8482,7 +8483,8 @@ TEST_CASE("test_MultiSystem_data_lag_mode_c_boundary") {
     KQuery query(Datetime(20100601), Datetime(20101001));
 
     auto& sm = StockManager::instance();
-    DatetimeList axis = sm.getTradingCalendar(query);
+    // The driving axis defaults to the merged calendar of the members' markets (SH + NYSE)
+    DatetimeList axis = sm.getTradingCalendar(StockList{sh, dji}, query);
     REQUIRE_UNARY(!axis.empty());
     DatetimeList dji_dates;
     KData dji_kdata = dji.getKData(query);
@@ -8583,7 +8585,8 @@ TEST_CASE("test_MultiSystem_data_lag_mode_b_calibration") {
     REQUIRE(!dji.isNull());
     KQuery query(Datetime(20100601), Datetime(20101001));
 
-    DatetimeList axis = sm.getTradingCalendar(query);
+    // The driving axis defaults to the merged calendar of the members' markets (SH + NYSE)
+    DatetimeList axis = sm.getTradingCalendar(StockList{sh, dji}, query);
     REQUIRE_UNARY(!axis.empty());
     DatetimeList sh_dates;
     KData sh_kdata = sh.getKData(query);
@@ -8655,7 +8658,8 @@ TEST_CASE("test_MultiSystem_data_lag_mode_b_warmup") {
     // setup: the sub-system is prepared with its own wider query and is not re-clipped by the run)
     KQuery wide_query(Datetime(20100501), Datetime(20101001));
 
-    DatetimeList axis = sm.getTradingCalendar(query);
+    // The driving axis defaults to the merged calendar of the members' markets (SH + NYSE)
+    DatetimeList axis = sm.getTradingCalendar(StockList{sh, dji}, query);
     REQUIRE_UNARY(!axis.empty());
     DatetimeList sh_dates;
     KData sh_kdata = sh.getKData(query);

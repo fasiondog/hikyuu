@@ -64,7 +64,7 @@ public:
         return m_ref_stk;
     }
 
-    /** Set the reference security */
+    /** Set the reference security, a null security means the merged calendar of the constituents */
     void setRefStock(const Stock& stk);
 
     /** Get the security list */

@@ -484,7 +484,7 @@ void export_Selector(py::module& m) {
       :param int topn: only select the first topn systems in the cross-section; when it is less than or equal to 0, there is no limit
       :param int ic_n: the N-day return corresponding to the default IC
       :param int ic_rolling_n: the IC rolling period
-      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, the merged calendar of the constituents' markets is used
       :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
 
@@ -493,7 +493,7 @@ void export_Selector(py::module& m) {
       :param int topn: only select the first topn systems in the cross-section; when it is less than or equal to 0, there is no limit
       :param int ic_n: the N-day return corresponding to the default IC
       :param int ic_rolling_n: the IC rolling period
-      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, the merged calendar of the constituents' markets is used
       :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
 
@@ -568,7 +568,7 @@ void export_Selector(py::module& m) {
       :param FactorSet input: the factor set
       :param int ic_n: the N-day return corresponding to the default IC
       :param int ic_rolling_n: the IC rolling period
-      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, the merged calendar of the constituents' markets is used
       :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
       :param ScoresFilterBase filter: the scores filter
@@ -577,7 +577,7 @@ void export_Selector(py::module& m) {
       :param sequence(Indicator) input: the original factor list
       :param int ic_n: the N-day return corresponding to the default IC
       :param int ic_rolling_n: the IC rolling period
-      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, the merged calendar of the constituents' markets is used
       :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
       :param ScoresFilterBase filter: the scores filter

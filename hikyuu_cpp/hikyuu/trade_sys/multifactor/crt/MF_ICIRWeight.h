@@ -25,8 +25,8 @@ MultiFactorPtr HKU_API MF_ICIRWeight();
  * @ingroup MultiFactor
  * @param stks the security list to be calculated
  * @param query the date range query condition
- * @param ref_stk the reference security, used for the date alignment, empty by default (equivalent
- *                to SH000001)
+ * @param ref_stk the reference security, used for the date alignment, empty by default (the merged
+ *                calendar of the constituents is used)
  * @param ic_n the N-day return period corresponding to the default IC, 5 by default
  * @param ic_rolling_n the IC rolling window size, 120 by default
  * @param spearman whether to use spearman to calculate the correlation coefficient: true means

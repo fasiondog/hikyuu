@@ -13,11 +13,10 @@ namespace hku {
 DatetimeList getAnalysisCalendar(const StockList& stk_list, const KQuery& query) {
     auto& sm = StockManager::instance();
 
-    // A positive absolute index is ambiguous here: sys->run() interprets it in each security's own
-    // K-line space, while the market calendar (backed by the market index stock) would interpret it
-    // in the index stock's space, sending the statistics stop date years into the past.
+    // A positive index counts in each security's own K-lines, not the market index, so the market
+    // calendar would shift the stop date years into the past
     if (query.queryType() != KQuery::INDEX || query.start() < 0) {
-        return sm.getTradingCalendar(query);
+        return sm.getTradingCalendar(stk_list, query);
     }
 
     Datetime start_date;
@@ -41,14 +40,14 @@ DatetimeList getAnalysisCalendar(const StockList& stk_list, const KQuery& query)
     }
 
     if (!has) {
-        return sm.getTradingCalendar(query);
+        return sm.getTradingCalendar(stk_list, query);
     }
 
     // The date query is right-open; push the end one minute forward so end_date stays included for
     // both day and intraday ktypes.
     KQuery date_query =
       KQueryByDate(start_date, end_date + Minutes(1), query.kType(), query.recoverType());
-    return sm.getTradingCalendar(date_query);
+    return sm.getTradingCalendar(stk_list, date_query);
 }
 
 vector<AnalysisSystemOutput> HKU_API analysisSystemList(const SystemList& sys_list,

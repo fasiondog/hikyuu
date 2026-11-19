@@ -1739,11 +1739,27 @@ void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
     HKU_CHECK(mode == "query" || mode == "day" || query.kType() == KQuery::DAY,
               "The kType of query must be DAY when adjust_mode is not \"query\"! [{}]", name());
 
-    // The driving axis: the explicitly injected fixed time axis takes precedence (respecting the
-    // injection of the axis_mode=calendar users), otherwise the market trading calendar is used
-    DatetimeList dates = (getAxisMode() == "calendar" && !m_date_axis.empty())
-                           ? m_date_axis
-                           : sm.getTradingCalendar(query);
+    // Axis: an injected fixed axis wins, else the merged calendar of the sub-system and own
+    // securities, else the market trading calendar
+    _adoptSEProtos();
+    DatetimeList dates;
+    if (getAxisMode() == "calendar" && !m_date_axis.empty()) {
+        dates = m_date_axis;
+    } else {
+        StockList axis_stocks;
+        for (const auto& sys : m_sys_list) {
+            Stock stk = _findStock(sys);
+            if (!stk.isNull()) {
+                axis_stocks.emplace_back(stk);
+            }
+        }
+        Stock own_stk = getStock();
+        if (!own_stk.isNull()) {
+            axis_stocks.emplace_back(own_stk);
+        }
+        dates = axis_stocks.empty() ? sm.getTradingCalendar(query)
+                                    : sm.getTradingCalendar(axis_stocks, query);
+    }
     HKU_WARN_IF_RETURN(dates.empty(), void(), "No trading date in the query range! [{}]", name());
 
     // The context KData (only carrying the query/ktype and the price query context):

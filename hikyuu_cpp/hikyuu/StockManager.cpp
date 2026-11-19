@@ -15,6 +15,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdlib>
+#include <map>
 #include <fmt/format.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -1030,26 +1031,37 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
 }
 
 DatetimeList StockManager::getTradingCalendar(const StockList& stk_list, const KQuery& query) {
-    std::unordered_set<string> markets;
+    std::map<string, StockList> market_stocks;
     for (const auto& stk : stk_list) {
         if (!stk.isNull()) {
-            markets.insert(stk.market());
+            const string& market = stk.market();
+            market_stocks[(market == "SZ" || market == "BJ") ? "SH" : market].push_back(stk);
         }
     }
 
     std::set<Datetime> date_set;
-    for (const auto& market : markets) {
+    for (const auto& [market, stocks] : market_stocks) {
         DatetimeList temp = getTradingCalendar(query, market);
         if (temp.size() > 0) {
             date_set.insert(temp.begin(), temp.end());
         } else {
             // A market without a calendar (e.g. crypto) falls back to its own K-line dates
-            for (const auto& stk : stk_list) {
-                if (!stk.isNull() && stk.market() == market) {
+            std::set<string> codes;
+            for (const auto& stk : stocks) {
+                if (codes.insert(stk.code()).second) {
                     DatetimeList dates = stk.getDatetimeList(query);
                     date_set.insert(dates.begin(), dates.end());
                 }
             }
+
+            // An index query over several securities is resolved in each security's own k-line
+            // space, so the merged axis may mix different date ranges: report it
+            HKU_WARN_IF(
+              query.queryType() == KQuery::INDEX && codes.size() > 1,
+              "No trading calendar of the market {}, the index query covers {} securities "
+              "and is resolved in their own k-line space, the merged axis may mix "
+              "different date ranges!",
+              market, codes.size());
         }
     }
 

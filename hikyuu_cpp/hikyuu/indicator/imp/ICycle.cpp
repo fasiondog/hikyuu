@@ -159,8 +159,8 @@ void ICycle::_calculate(const Indicator& data) {
 
     DatetimeList datelist = k.getStock().getTradingCalendar(k.getQuery());
     if (datelist.empty()) {
-        m_discard = total;
-        return;
+        // A market without a calendar (e.g. crypto) falls back to the context dates
+        datelist = k.getDatetimeList();
     }
 
     int adjust_cycle = getParam<int>("adjust_cycle");

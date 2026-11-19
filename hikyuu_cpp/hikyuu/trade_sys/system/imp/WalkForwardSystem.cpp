@@ -59,7 +59,8 @@ WalkForwardSystem::WalkForwardSystem(const SystemList& candidate_sys_list, const
 }
 
 void WalkForwardSystem::initParam() {
-    setParam<string>("market", "SH");
+    // Empty means the merged calendar of the candidate systems' securities
+    setParam<string>("market", "");
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
     setParam<bool>("se_trace", false);
@@ -76,8 +77,10 @@ void WalkForwardSystem::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<int>("test_len") > 0);
     } else if ("market" == name) {
         string market = getParam<string>(name);
-        const auto& market_info = StockManager::instance().getMarketInfo(market);
-        HKU_CHECK(market_info.isValid(), "Invalid market: {}", market);
+        if (!market.empty()) {
+            const auto& market_info = StockManager::instance().getMarketInfo(market);
+            HKU_CHECK(market_info.isValid(), "Invalid market: {}", market);
+        }
     }
 }
 

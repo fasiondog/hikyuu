@@ -263,11 +263,12 @@ The custom multi-factor model override hooks:
       .def("have_param", &MultiFactorBase::haveParam, "Whether the specified parameter exists")
 
       .def("get_ref_stock", &MultiFactorBase::getRefStock, py::return_value_policy::copy,
-           "Get the reference security")
+           "Get the reference security, a null security means the merged calendar of the "
+           "constituents is used for the date alignment")
       .def("set_ref_stock", &MultiFactorBase::setRefStock, R"(set_ref_stock(self, stk)
-      
-    Set the reference security
-    
+
+    Set the reference security, a null security means the merged calendar of the constituents is used for the date alignment
+
     :param Stock stk: the reference security)")
 
       .def(
@@ -577,7 +578,7 @@ The custom multi-factor model override hooks:
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
     :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day return corresponding to the default IC
     :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
     :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
@@ -631,7 +632,7 @@ The custom multi-factor model override hooks:
     :param sequence(stock) stks: the list of the securities to calculate
     :param sequence(float) weights: the weight list (must be the same length as the number of the factors)
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day return corresponding to the default IC
     :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
     :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
@@ -684,7 +685,7 @@ The custom multi-factor model override hooks:
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
     :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day return corresponding to the default IC
     :param int ic_rolling_n: the IC rolling period
     :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
@@ -737,7 +738,7 @@ The custom multi-factor model override hooks:
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
     :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
-    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, the merged calendar of the constituents' markets is used)
     :param int ic_n: the N-day return corresponding to the default IC
     :param int ic_rolling_n: the IC rolling period
     :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson

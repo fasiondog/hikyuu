@@ -30,7 +30,8 @@ OptimalSelectorBase::OptimalSelectorBase(const string& name) : SelectorBase(name
 
 void OptimalSelectorBase::_initParams() {
     setParam<bool>("depend_on_proto_sys", true);
-    setParam<string>("market", "SH");
+    // Empty means the merged calendar of the candidate systems' securities
+    setParam<string>("market", "");
     setParam<int>("index", 0);  // Take the index-th result after the sorting
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
@@ -48,8 +49,10 @@ void OptimalSelectorBase::_checkParam(const string& name) const {
         HKU_ASSERT(getParam<bool>("depend_on_proto_sys"));
     } else if ("market" == name) {
         string market = getParam<string>(name);
-        const auto& market_info = StockManager::instance().getMarketInfo(market);
-        HKU_CHECK(market_info.isValid(), "Invalid market: {}", market);
+        if (!market.empty()) {
+            const auto& market_info = StockManager::instance().getMarketInfo(market);
+            HKU_CHECK(market_info.isValid(), "Invalid market: {}", market);
+        }
     }
 }
 
@@ -127,7 +130,18 @@ bool OptimalSelectorBase::_prepareCalculate(const KQuery& query, DatetimeList& d
     size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
     size_t test_len = static_cast<size_t>(getParam<int>("test_len"));
 
-    dates = StockManager::instance().getTradingCalendar(query, getParam<string>("market"));
+    string market = getParam<string>("market");
+    if (market.empty()) {
+        // No market given: use the merged calendar of the candidate securities
+        StockList axis_stocks;
+        axis_stocks.reserve(m_pro_sys_list.size());
+        for (const auto& sys : m_pro_sys_list) {
+            axis_stocks.emplace_back(sys->getStock());
+        }
+        dates = StockManager::instance().getTradingCalendar(axis_stocks, query);
+    } else {
+        dates = StockManager::instance().getTradingCalendar(query, market);
+    }
     size_t dates_len = dates.size();
 
     size_t start = 0, end = train_len;
