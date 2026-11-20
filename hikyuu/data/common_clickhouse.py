@@ -28,9 +28,28 @@ from pathlib import Path
 
 import clickhouse_connect
 
-from hikyuu import Datetime, UTCOffset
+from hikyuu import Datetime
 from hikyuu.data.common import CN_HOLIDAY_MARKETS, get_stktype_list, get_new_holidays
 from hikyuu.util import hku_catch, hku_debug, hku_info
+
+# 统一表达式（北京墙钟 UTC+8）与 ClickHouse 真 UTC 秒互转，不依赖机器时区。
+# 前提：入参 dt 必须是数据自带的统一表达式标签（pytdx/通达信报的交易所墙钟），
+# 不是 Datetime.now() 这类机器本地时钟；标签来自数据内容，因此在任何时区的机器上运行
+# 导入都得到相同的 epoch。旧实现 timestamp_utc()/from_timestamp_utc() 依赖导入机时区，
+# 跨机器时区导入/读取会整体错位。
+# 本仓 Python 导入路径仅覆盖 CN 市场（SH/SZ/BJ），市场墙钟即统一表达式，固定 ±8h；
+# 若后续导入非 CN 市场数据，须按该市场 tz 换算（与 C++ 插件端 marketWallToUtcUs 一致）。
+CH_UTC_OFFSET_US = 8 * 3600 * 1000000
+
+
+def to_ch_timestamp(dt):
+    """统一表达式 Datetime → ClickHouse 真 UTC 秒"""
+    return (dt.timestamp() - CH_UTC_OFFSET_US) // 1000000
+
+
+def from_ch_timestamp(ts):
+    """ClickHouse 真 UTC 秒 → 统一表达式 Datetime"""
+    return Datetime.from_timestamp(ts * 1000000 + CH_UTC_OFFSET_US)
 
 
 def is_exist_db(connect):
@@ -158,10 +177,9 @@ def is_f64_kline_table(tablename):
 
 @hku_catch(ret=None)
 def get_lastdatetime(connect, tablename):
-    tmp = connect.command("select max(date) from {} where market='{}' and code='{}'".format(
+    tmp = connect.command("select toUInt32(max(date)) from {} where market='{}' and code='{}'".format(
         tablename[0], tablename[1], tablename[2]))
-    tmp = Datetime(tmp)
-    return None if tmp == Datetime(1970, 1, 1) else tmp + UTCOffset()
+    return None if tmp == 0 else from_ch_timestamp(tmp)
 
 
 def get_last_krecord(connect, tablename):
@@ -177,9 +195,9 @@ def get_last_krecord(connect, tablename):
         if not a:
             return None
         if is_f64_kline_table(tablename[0]):
-            return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, float(a[0][1]), float(a[0][2]),
+            return (from_ch_timestamp(a[0][0]).ymdhm, float(a[0][1]), float(a[0][2]),
                     float(a[0][3]), float(a[0][4]), float(a[0][5]), float(a[0][6]))
-        return (Datetime.from_timestamp_utc(a[0][0]*1000000).ymdhm, a[0][1]*0.001, a[0][2]*0.001, a[0][3]*0.001, a[0][4]*0.001, float(a[0][5]), a[0][6]*0.001)
+        return (from_ch_timestamp(a[0][0]).ymdhm, a[0][1]*0.001, a[0][2]*0.001, a[0][3]*0.001, a[0][4]*0.001, float(a[0][5]), a[0][6]*0.001)
     except:
         return None
 
@@ -394,7 +412,7 @@ def update_extern_data(connect, market, code, data_type):
         else:
             index_last_date = index_last_date.ymdhm
             start_date, _ = getNewDate(index_type, index_last_date)
-            start_date = Datetime(start_date).timestamp_utc() // 1000000
+            start_date = to_ch_timestamp(Datetime(start_date))
             sql = f"select toUInt32(date), open, high, low, close, amount, volume from {base_table[0]} where market='{base_table[1]}' and code='{base_table[2]}' and date>={start_date} order by date asc"
         a = connect.query(sql, settings={'optimize_skip_merged_partitions': 1})
         base_list = a.result_rows
@@ -405,7 +423,7 @@ def update_extern_data(connect, market, code, data_type):
         insert_buffer = index_data[index_type]
         length_base_all = len(base_list)
         for x in range(length_base_all):
-            current_date = Datetime.from_timestamp_utc(base_list[x][0] * 1000000).ymdhm
+            current_date = from_ch_timestamp(base_list[x][0]).ymdhm
             if current_date <= last_end_date:
                 continue
             last_start_date, last_end_date = getNewDate(index_type, current_date)
@@ -413,7 +431,7 @@ def update_extern_data(connect, market, code, data_type):
             base_record_list = []
             start_ix = x
             while start_ix < length_base_all:
-                ix_date = Datetime.from_timestamp_utc(base_list[start_ix][0] * 1000000).ymdhm
+                ix_date = from_ch_timestamp(base_list[start_ix][0]).ymdhm
                 if ix_date < last_start_date or ix_date > last_end_date:
                     break
                 base_record_list.append(base_list[start_ix])
@@ -437,7 +455,7 @@ def update_extern_data(connect, market, code, data_type):
                 amount += base_record_list[i][5]
                 count += base_record_list[i][6]
 
-            last_timestamp = Datetime(last_end_date).timestamp_utc()//1000000
+            last_timestamp = to_ch_timestamp(Datetime(last_end_date))
             if last_end_date != index_last_date:
                 insert_buffer.append((index_table[1], index_table[2], last_timestamp, open_price,
                                       high_price, low_price, close_price, amount, count))

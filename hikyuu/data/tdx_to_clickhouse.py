@@ -36,7 +36,8 @@ from io import SEEK_END, SEEK_SET
 from hikyuu import Datetime
 from hikyuu.data.common import get_stktype_list, MARKET
 from hikyuu.data.common_clickhouse import (
-    create_database, get_codepre_list, get_table, get_lastdatetime, update_extern_data
+    create_database, get_codepre_list, get_table, get_lastdatetime, update_extern_data,
+    to_ch_timestamp, from_ch_timestamp
 )
 
 
@@ -147,9 +148,8 @@ def update_stock_info(connect, market, code):
         b = b.result_rows
         if b:
             valid, startDate, endDate = b[0]
-            ticks = 1000000
-            now_start = Datetime.from_timestamp_utc(a[0][0]*ticks).ymd
-            now_end = Datetime.from_timestamp_utc(a[0][1]*ticks).ymd
+            now_start = from_ch_timestamp(a[0][0]).ymd
+            now_end = from_ch_timestamp(a[0][1]).ymd
             if valid == 1 and now_start != startDate:
                 sql = f"alter table hku_base.stock update startDate={now_start}, endDate=99999999 where market='{market}' and code='{code}'"
                 connect.command(sql)
@@ -202,7 +202,7 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                 buf.append(
                     (
                         table[1], table[2],
-                        Datetime(record[0] * 10000).timestamp_utc() // 1000000,
+                        to_ch_timestamp(Datetime(record[0] * 10000)),
                         int(record[1] * 10), int(record[2] * 10), int(record[3] * 10),
                         int(record[4] * 10), int(round(record[5])),
                         record[6] * 1000 if stktype == 2 else int(round(record[6] * 10))
@@ -302,7 +302,7 @@ def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record
                     buf.append(
                         (
                             table[1], table[2],
-                            Datetime(trans_date(record[0], record[1])).timestamp_utc() // 1000000,
+                            to_ch_timestamp(Datetime(trans_date(record[0], record[1]))),
                             int(round(record[2] * 1000)), int(round(record[3] * 1000)),
                             int(round(record[4] * 1000)), int(round(record[5] * 1000)),
                             int(round(record[6])),

@@ -42,6 +42,8 @@ from hikyuu.data.common_clickhouse import (
     get_lastdatetime,
     get_last_krecord,
     update_extern_data,
+    to_ch_timestamp,
+    from_ch_timestamp,
 )
 
 
@@ -370,7 +372,7 @@ def import_one_stock_data(
                     buf.append(
                         (
                             table[1], table[2],
-                            Datetime(bar_datetime).timestamp_utc()//1000000,
+                            to_ch_timestamp(Datetime(bar_datetime)),
                             int(bar["open"]*1000),
                             int(bar["high"]*1000),
                             int(bar["low"]*1000),
@@ -399,11 +401,10 @@ def update_stock_info(connect, market):
     # hku_info(sql)
     a = connect.query(sql)
     a = a.result_rows
-    ticks = 1000000
     for v in a:
         code, valid, startDate, endDate, min_date, max_date = v
-        now_start = Datetime.from_timestamp_utc(min_date*ticks).ymd
-        now_end = Datetime.from_timestamp_utc(max_date*ticks).ymd
+        now_start = from_ch_timestamp(min_date).ymd
+        now_end = from_ch_timestamp(max_date).ymd
         if valid == 1 and now_start != startDate:
             sql = f"alter table hku_base.stock update startDate={now_start}, endDate=99999999 where market='{market}' and code='{code}'"
             connect.command(sql)
@@ -425,7 +426,7 @@ def clear_extern_data(connect, market, data_type):
         for index_type in index_list:
             sql = f"delete from hku_data.{index_type}_k where market='{market}' and date>={lastdate}"
             # hku_info(
-            #     f"delete from hku_data.{index_type}_k where market='{market}' and date>={Datetime.from_timestamp_utc(lastdate*1000000)}")
+            #     f"delete from hku_data.{index_type}_k where market='{market}' and date>={from_ch_timestamp(lastdate)}")
             connect.command(sql, settings={"mutations_sync": 0})
             # hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.{index_type}_k", settings={
             #                          "mutations_sync": 0})
@@ -435,8 +436,8 @@ def clear_extern_data(connect, market, data_type):
         index_list = ('min15', 'min30', 'min60', 'hour2')
         lastdate = connect.command(
             f"select toInt32(max(date)) from hku_data.min5_k where market='SH' and code='000001'")
-        lastdate = Datetime.from_timestamp_utc(int(lastdate*1000000)).start_of_day()
-        last_timestamp = Datetime(lastdate).timestamp_utc()//1000000
+        lastdate = from_ch_timestamp(int(lastdate)).start_of_day()
+        last_timestamp = to_ch_timestamp(Datetime(lastdate))
         for index_type in index_list:
             sql = f"delete from hku_data.{index_type}_k where market='{market}' and date>={last_timestamp}"
             # hku_info(f"delete from hku_data.{index_type}_k where market='{market}' and date>={lastdate}")
@@ -717,7 +718,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                     trans_buf.append(
                         (
                             market, code,
-                            Datetime(bar_datetime).timestamp_utc()//1000000,
+                            to_ch_timestamp(Datetime(bar_datetime)),
                             int(record["price"]*1000),
                             int(record["vol"]),
                             record["buyorsell"],
@@ -881,8 +882,8 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
 
                     # 检查是否重复
                     if bar_datetime not in seen_datetimes:
-                        time_buf.append((market, code, Datetime(bar_datetime).timestamp_utc() //
-                                         ticks, int(record['price']*1000.0), int(record['vol'])))
+                        time_buf.append((market, code, to_ch_timestamp(Datetime(bar_datetime)),
+                                         int(record['price']*1000.0), int(record['vol'])))
                         # 标记为已处理
                         seen_datetimes.add(bar_datetime)
                 time += 1

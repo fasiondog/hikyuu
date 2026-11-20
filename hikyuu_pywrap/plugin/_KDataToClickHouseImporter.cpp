@@ -72,7 +72,7 @@ void export_plugin_KDataToClickHouseImporter(py::module& m) {
 
     :param str market: the market abbreviation, e.g. 'SH'
     :param str code: the security code (excluding the market abbreviation), e.g. '600000'
-    :param list krecords: a list of the KRecords; for the field meanings, see KRecord (datetime, open, high, low, close, amount, volume)
+    :param list krecords: a list of the KRecords; for the field meanings, see KRecord (datetime, open, high, low, close, amount, volume). The krecord datetime is the market-local wall clock (for CN markets, the Beijing wall clock)
     :param Query.KType ktype: the K-line period, e.g. Query.DAY, Query.MIN, Query.MIN5
     :return: None
 
