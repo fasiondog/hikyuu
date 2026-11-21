@@ -17,6 +17,17 @@ If installed with pip, the dataserver command can be executed directly in the sh
 
 dataserver needs to work with the quote collection service; it can run on the same machine as the quote collection service, or the two can run on separate machines, but the network needs to be configured properly.
 
+.. note::
+
+    The ``-save`` option writes the ``hku_data.ticks`` realtime snapshot table in ClickHouse. Its
+    ``datetime`` column is converted using the writing machine's local timezone
+    (``Datetime.timestampUTC()``), which differs from the "true UTC seconds" convention used by
+    K-line data. This table is a CN tick cache that is self-consistent when written and read on
+    the same machine, and currently has no reader, so it has not been unified yet. Moving this
+    table across machines with different timezones shifts all timestamps; in that case recollect
+    on the target machine rather than migrating the database file directly. Parquet files written
+    via ``-parquet_path`` already store true UTC seconds and are not affected.
+
 Start the quote collection data service as follows; for other ways such as the command line below, please refer to the related python files in the gui subdirectory under the installation directory.
 
 .. figure:: ../_static/dataserver_01.png

@@ -115,18 +115,22 @@ void export_plugin_KDataToMySQLImporter(py::module& m) {
         "add_market", &KDataToMySQLImporter::addMarket, py::arg("market"), py::arg("name"),
         py::arg("description"), py::arg("index_code"), py::arg("open1") = 930,
         py::arg("close1") = 1130, py::arg("open2") = 1300, py::arg("close2") = 1500,
-        R"(add_market(market: str, name: str, description: str, index_code: str, open1: int = 930, close1: int = 1130, open2: int = 1300, close2: int = 1500) -> bool
+        py::arg("tz_offset_min") = 480, py::arg("dst_rule") = 0, py::arg("data_lag") = 0,
+        R"(add_market(market: str, name: str, description: str, index_code: str, open1: int = 930, close1: int = 1130, open2: int = 1300, close2: int = 1500, tz_offset_min: int = 480, dst_rule: int = 0, data_lag: int = 0) -> bool
 
     Register a new market to the baseinfo database, an idempotent operation: when the market already exists, skip the writing and return True.
 
     :param str market: the market abbreviation (automatically converted to uppercase), e.g. 'US'
     :param str name: the market name
-    :param str description: the market description; it is recommended to note the time zone, e.g. 'NASDAQ/UTC-5'
+    :param str description: the market description
     :param str index_code: the market representative index code; get_market_stock and the trading calendar depend on {market}{index_code}
     :param int open1: the morning open time, in the HHMM format, e.g. 930
     :param int close1: the morning close time, in the HHMM format, e.g. 1130
     :param int open2: the afternoon open time, in the HHMM format, e.g. 1300
     :param int close2: the afternoon close time, in the HHMM format, e.g. 1500
+    :param int tz_offset_min: standard UTC offset in minutes, e.g. 480 for UTC+8, -300 for UTC-5
+    :param int dst_rule: daylight saving rule: 0=none, 1=US, 2=EU; invalid values are rejected
+    :param int data_lag: visibility delay in trading days relative to the base market, e.g. 1 for US; must be non-negative
     :return: return True when the registration succeeds or the market already exists; return False when the license is invalid or the writing fails
     :rtype: bool
 

@@ -57,22 +57,26 @@ public:
      * is returned if it already exists)
      * @param market market abbreviation (converted to uppercase automatically)
      * @param name market name
-     * @param description description (it is recommended to note the time zone, such as
-     *                     "NASDAQ/UTC-5")
+     * @param description market description
      * @param index_code the representative index code of the market (getMarketStock / the trading
      *                   calendar depend on {market}{index_code})
      * @param open1 morning opening time HHMM
      * @param close1 morning closing time HHMM
      * @param open2 afternoon opening time HHMM
      * @param close2 afternoon closing time HHMM
+     * @param tz_offset_min standard UTC offset in minutes (e.g. 480 for UTC+8, -300 for UTC-5)
+     * @param dst_rule daylight saving rule: 0=none, 1=US, 2=EU (invalid values are rejected)
+     * @param data_lag visibility delay in trading days relative to the base market (e.g. 1 for US;
+     *                 must be non-negative)
      * @return true success or it already exists; false failure (invalid license, baseinfo not
      *         configured, SQL exception, and so on)
      * @note It takes effect only after hikyuu_init() is restarted following the registration; the
      *       representative index K-lines must be imported separately
      */
-    virtual bool addMarket(const string& market, const string& name, const string& description,
+     virtual bool addMarket(const string& market, const string& name, const string& description,
                            const string& index_code, uint64_t open1, uint64_t close1,
-                           uint64_t open2, uint64_t close2) = 0;
+                           uint64_t open2, uint64_t close2, int tz_offset_min, int dst_rule,
+                         int data_lag) = 0;
 
     /**
      * @brief Register a security type into the baseinfo database (idempotent: it is skipped and

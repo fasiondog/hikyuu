@@ -17,6 +17,14 @@ pip 安装的，可在 shell 下直接执行 dataserver 命令。或使用 Pytho
 
 dataserver 需要配合行情采集服务使用，可以和行情采集服务所在机器在同一台机器上运行，也可以在两台机器上分别运行，但需要配置好网络。
 
+.. note::
+
+    ``-save`` 写入 ClickHouse 的 ``hku_data.ticks`` 实时快照表，其 ``datetime`` 时间列按写入机器的
+    本地时区换算（``Datetime.timestampUTC()``），与 K 线数据的「真 UTC 秒」口径不同。该表是同机
+    写读自洽的 CN tick 缓存，当前无读取方，故暂不统一；跨机器搬运此表数据会整体错位。若读取机与
+    写入机时区不同，应在目标机重新采集，而非直接迁移库文件。``-parquet_path`` 写出的 Parquet
+    文件已存真 UTC 秒，不在此列。
+
 启动行情采集数据服务如下，如下命令行等其他方式，请查看安装目录下 gui 子目录下相关 python 文件
 
 .. figure:: ../_static/dataserver_01.png

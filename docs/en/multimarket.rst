@@ -56,6 +56,10 @@ Unified Time Expression
   converted to the market-local wall clock before comparison, and the holiday judgment uses the
   market-local date; the clock point of ``run_daily_at`` itself follows the unified convention. If
   the host does not run on Beijing time, these judgments are offset as a whole.
+- **Exception**: the ``hku_data.ticks`` realtime snapshot table written by ``dataserver -save``
+  does not follow the unified convention above; its timestamps use the writing machine's local
+  timezone and are self-consistent only for same-machine read/write. It currently has no reader
+  and has not been unified; see :doc:`vip/dataserver`.
 
 Dimension Conventions
 ---------------------

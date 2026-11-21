@@ -69,9 +69,10 @@ void KDataToMySQLImporter::addTransList(const string& market, const string& code
 bool KDataToMySQLImporter::addMarket(const string& market, const string& name,
                                      const string& description, const string& index_code,
                                      uint64_t open1, uint64_t close1, uint64_t open2,
-                                     uint64_t close2) {
+                                     uint64_t close2, int tz_offset_min, int dst_rule,
+                                     int data_lag) {
     return m_plugin ? m_plugin->addMarket(market, name, description, index_code, open1, close1,
-                                          open2, close2)
+                                          open2, close2, tz_offset_min, dst_rule, data_lag)
                     : false;
 }
 
