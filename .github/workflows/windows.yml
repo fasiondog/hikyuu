@@ -24,18 +24,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: xmake-io/github-action-setup-xmake@v1
-      with:
-        xmake-version: 3.0.8
-        actions-cache-folder: '.xmake-cache'
-        actions-cache-key: 'windows'
-
     - name: Install VS ClangCL component
       run: |
-        & "C:\Program Files\Microsoft Visual Studio\Installer\vs_installer.exe" `
-        modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Enterprise" `
-        --add "Microsoft.VisualStudio.Component.VC.LLVM" `
-        --quiet --norestart --wait
+          & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" `
+          modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Enterprise" `
+          --add "Microsoft.VisualStudio.Component.VC.LLVM" `
+          --quiet --norestart --wait
 
     - name: Load MSVC + ClangCL dev environment
       uses: ilammy/msvc-dev-cmd@v1
@@ -47,6 +41,12 @@ jobs:
       run: |
         where clang-cl
         clang-cl --version
+
+    - uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: 3.0.8
+        actions-cache-folder: '.xmake-cache'
+        actions-cache-key: 'windows'
 
     - name: configure
       shell: cmd
