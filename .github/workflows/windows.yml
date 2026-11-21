@@ -30,6 +30,24 @@ jobs:
         actions-cache-folder: '.xmake-cache'
         actions-cache-key: 'windows'
 
+    - name: Install VS ClangCL component
+      run: |
+        & "C:\Program Files\Microsoft Visual Studio\Installer\vs_installer.exe" `
+        modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Enterprise" `
+        --add "Microsoft.VisualStudio.Component.VC.LLVM" `
+        --quiet --norestart --wait
+
+    - name: Load MSVC + ClangCL dev environment
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: ClangCL
+        arch: x64
+
+    - name: Verify clang-cl (must be VS bundled one)
+      run: |
+        where clang-cl
+        clang-cl --version
+
     - name: configure
       shell: cmd
       run: |
