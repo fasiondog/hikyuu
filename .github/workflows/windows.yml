@@ -26,10 +26,10 @@ jobs:
 
     - name: Install VS ClangCL component
       run: |
-          & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" `
-          modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Enterprise" `
-          --add "Microsoft.VisualStudio.Component.VC.LLVM" `
-          --quiet --norestart --wait
+          $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          & $installer modify --installPath $vsPath --add "Microsoft.VisualStudio.Component.VC.LLVM" --quiet --norestart
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     - name: Load MSVC + ClangCL dev environment
       uses: ilammy/msvc-dev-cmd@v1
