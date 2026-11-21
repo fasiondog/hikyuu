@@ -31,11 +31,15 @@ jobs:
           & $installer modify --installPath $vsPath --add "Microsoft.VisualStudio.Component.VC.LLVM" --quiet --norestart
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    - name: Load MSVC + ClangCL dev environment
+    - name: Load MSVC dev environment
       uses: ilammy/msvc-dev-cmd@v1
       with:
-        toolset: ClangCL
         arch: x64
+
+    - name: Add VS clang-cl to PATH
+      run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          Add-Content -Path $env:GITHUB_PATH -Value "$vsPath\VC\Tools\Llvm\x64\bin"
 
     - name: Verify clang-cl (must be VS bundled one)
       run: |
