@@ -15,6 +15,12 @@ Registration and Market Info
   columns: ``tz_offset_min`` (minute offset relative to UTC, may be negative),
   ``dst_rule`` (0=none / 1=US / 2=EU, DST computed by calendar rules without tzdata) and
   ``data_lag`` (the visibility delay in days relative to the base market).
+- Validation: ``tz_offset_min`` in [-720, 840], ``dst_rule`` in {0, 1, 2}, ``data_lag``
+  non-negative; a market trading 24h (both session pairs equal) can not carry a ``dst_rule``,
+  because the repeated local hour of the fall-back has no unique inverse. ``add_market``
+  validates the same rules before writing and returns False for an invalid configuration; an
+  invalid row already in the baseinfo makes the market be ignored at load time with an error
+  logged.
 - Stock types (``StockTypeInfo``) are registered per market convention; ``unit`` is the
   lot multiplier (e.g. the futures contract multiplier).
 - Each market must have daily K-lines of its representative index (``market`` + the
@@ -58,8 +64,9 @@ Unified Time Expression
   the host does not run on Beijing time, these judgments are offset as a whole.
 - **Exception**: the ``hku_data.ticks`` realtime snapshot table written by ``dataserver -save``
   does not follow the unified convention above; its timestamps use the writing machine's local
-  timezone and are self-consistent only for same-machine read/write. It currently has no reader
-  and has not been unified; see :doc:`vip/dataserver`.
+  timezone (equal to the K-line convention on a UTC+8 machine, shifted as a whole on any other)
+  and are self-consistent only for same-machine read/write. It currently has no reader and has
+  not been unified; see :doc:`vip/dataserver`.
 
 Dimension Conventions
 ---------------------

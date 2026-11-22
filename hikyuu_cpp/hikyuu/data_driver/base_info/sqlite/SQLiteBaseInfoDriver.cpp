@@ -72,9 +72,9 @@ vector<MarketInfo> SQLiteBaseInfoDriver::getAllMarketInfo() {
                                     info.openTime2(), info.closeTime2(), info.tzOffsetMin(),
                                     info.dstRule(), info.dataLag());
             } catch (std::exception& e) {
-                HKU_ERROR("Failed load market, {}", e.what());
+                HKU_ERROR("Ignore the invalid market [{}]: {}", info.market(), e.what());
             } catch (...) {
-                HKU_ERROR_UNKNOWN;
+                HKU_ERROR("Ignore the invalid market [{}]!", info.market());
             }
         }
 

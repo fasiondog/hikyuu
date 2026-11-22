@@ -42,13 +42,20 @@ bool sessionIntersect(int open_min, int close_min, int lo, int hi) {
 
 }  // namespace
 
+TimeDelta MarketInfo::hhmmToTimeDelta(uint64_t hhmm) {
+    HKU_CHECK(hhmm / 100 <= 23 && hhmm % 100 <= 59, "Invalid time: {}!", hhmm);
+    return TimeDelta(0, hhmm / 100, hhmm % 100);
+}
+
 bool MarketInfo::hasAmbiguousSession() const {
     // Same as isTradingHours: both session pairs equal means 24h; a single 0/0 pair is unset
     if (m_openTime1 == m_closeTime1 && m_openTime2 == m_closeTime2) {
         return true;
     }
-    // The local hour that the rule's fall-back repeats: the US rule switches at 02:00 local
-    // (repeating [01:00,02:00)), the EU rule switches at 01:00 UTC (repeating [02:00,03:00))
+    // The local hour that the rule's fall-back repeats: the US rule switches at 02:00 local in
+    // every zone (repeating [01:00,02:00)), the EU rule switches at 01:00 UTC, so its repeated
+    // local hour shifts with the standard offset (real EU markets stay within UTC-1..+2, which
+    // keeps the window inside a day)
     int lo, hi;
     switch (m_dstRule) {
         case 1:
@@ -56,8 +63,8 @@ bool MarketInfo::hasAmbiguousSession() const {
             hi = 120;
             break;
         case 2:
-            lo = 120;
-            hi = 180;
+            lo = 60 + m_tzOffsetMin;
+            hi = 120 + m_tzOffsetMin;
             break;
         default:
             return false;
@@ -162,6 +169,13 @@ MarketInfo::MarketInfo(const string& market, const string& name, const string& d
   m_tzOffsetMin(tzOffsetMin),
   m_dstRule(dstRule),
   m_dataLag(dataLag) {
+    // Out-of-range timezone fields would silently degrade the conversion, reject at construction
+    HKU_CHECK(tzOffsetMin >= MIN_TZ_OFFSET_MIN && tzOffsetMin <= MAX_TZ_OFFSET_MIN,
+              "Invalid tz_offset_min [{}] of market [{}]!", tzOffsetMin, market);
+    HKU_CHECK(dstRule >= 0 && dstRule <= 2, "Invalid dst_rule [{}] of market [{}]!", dstRule,
+              market);
+    HKU_CHECK(dataLag >= 0, "Invalid data_lag [{}] of market [{}]!", dataLag, market);
+
     // Sessions reaching the ambiguous hour can not be converted back; reject at construction
     HKU_CHECK(dstRule == 0 || !hasAmbiguousSession(),
               "The trading sessions of market [{}] intersect the repeated local hour of its "

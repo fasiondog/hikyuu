@@ -22,6 +22,10 @@ public:
     /** The offset in minutes of the unified expression (Beijing wall clock, UTC+8) */
     static constexpr int UNIFIED_TZ_OFFSET_MIN = 480;
 
+    /** The supported standard UTC offset range in minutes (UTC-12:00 .. UTC+14:00) */
+    static constexpr int MIN_TZ_OFFSET_MIN = -720;
+    static constexpr int MAX_TZ_OFFSET_MIN = 840;
+
     /** The shared null instance: an empty market means null (operator== compares the market) */
     static const MarketInfo NullMarketInfo;
 
@@ -118,6 +122,12 @@ public:
     bool equals(const MarketInfo& rhs) const;
 
     /**
+     * Convert the HHMM notation of the session fields (e.g. 930) into the time of day
+     * @param hhmm the hour and the minute packed as HHMM, HH in [0, 23] and MM in [0, 59]
+     */
+    static TimeDelta hhmmToTimeDelta(uint64_t hhmm);
+
+    /**
      * Convert a market-local wall-clock datetime into the unified expression (Beijing)
      * @details CN / HK (offset 480, no daylight) returns the input unchanged; null in, null out
      */
@@ -125,15 +135,16 @@ public:
 
     /**
      * Convert a unified expression (Beijing) datetime back to the market-local wall clock
-     * @details Exact inverse of localToUnified; the repeated local hour of a daylight transition
-     * resolves to the standard side (which is why the constructor rejects such sessions)
+     * @details Inverse of localToUnified, except for the hour missing at a spring-forward
+     * transition; the repeated local hour of a fall-back resolves to the standard side (which is
+     * why the constructor rejects such sessions)
      */
     Datetime unifiedToLocal(const Datetime&) const;
 
     /**
      * Whether the market trades in the local hour that its daylight rule's fall-back repeats:
-     * [01:00,02:00) local for the US rule, [02:00,03:00) local for the EU rule; a market without
-     * a daylight rule never has one
+     * [01:00,02:00) local for the US rule; for the EU rule (01:00 UTC) the same hour shifted by
+     * the standard offset; a market without a daylight rule never has one
      */
     bool hasAmbiguousSession() const;
 

@@ -137,7 +137,7 @@ void export_plugin_KDataToClickHouseImporter(py::module& m) {
     :param int tz_offset_min: standard UTC offset in minutes, e.g. 480 for UTC+8, -300 for UTC-5
     :param int dst_rule: daylight saving rule: 0=none, 1=US, 2=EU; invalid values are rejected
     :param int data_lag: visibility delay in trading days relative to the base market, e.g. 1 for US; must be non-negative
-    :return: return True when the registration succeeds or the market already exists; return False when the license is invalid or the writing fails
+    :return: return True when the registration succeeds or the market already exists; return False when the configuration is invalid, the license is invalid or the writing fails
     :rtype: bool
 
     Note: a restart (re-executing hikyuu_init) is required after the registration for it to take effect; the K-lines of the market representative index need to be imported separately.)")

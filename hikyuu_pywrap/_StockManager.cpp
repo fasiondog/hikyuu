@@ -360,11 +360,11 @@ void export_StockManager(py::module& m) {
     :rtype: Datetime)")
 
       .def("is_trading_hours", &StockManager::isTradingHours, py::arg("d"),
-           py::arg("market") = "SH", R"(is_trading_hours(self, d)
+           py::arg("market") = "SH", R"(is_trading_hours(self, d[, market='SH'])
 
     Judge whether the date corresponding to the specified time is the trading time
 
-    :param Datetime d: the time to judge
+    :param Datetime d: the time to judge, in the unified expression
     :param str market: the market abbreviation
     :return: whether it is the trading time
     :rtype: bool)")

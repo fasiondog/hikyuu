@@ -4001,11 +4001,9 @@ int MultiSystem::_memberLagOf(const SystemPtr& sys) {
     if (iter != m_member_lag.end()) {
         return iter->second;
     }
+    // An unregistered market has no delay; MarketInfo guarantees a non-negative data_lag
     const MarketInfo& info = StockManager::instance().getMarketInfo(sys->getStock().market());
     int lag = info.isValid() ? info.dataLag() : 0;
-    if (lag < 0) {
-        lag = 0;
-    }
     m_member_lag.emplace(sys.get(), lag);
     return lag;
 }

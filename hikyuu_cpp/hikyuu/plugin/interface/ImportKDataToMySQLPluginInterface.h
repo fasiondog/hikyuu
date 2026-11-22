@@ -67,14 +67,15 @@ public:
      * @param dst_rule daylight saving rule: 0=none, 1=US, 2=EU (invalid values are rejected)
      * @param data_lag visibility delay in trading days relative to the base market (e.g. 1 for US;
      *                 must be non-negative)
-     * @return true success or it already exists; false failure
+     * @return true success or it already exists; false failure (invalid configuration, invalid
+     *         license, and so on)
      * @note It takes effect only after hikyuu_init() is restarted following the registration; the
      *       representative index K-lines must be imported separately
      */
-     virtual bool addMarket(const string& market, const string& name, const string& description,
+    virtual bool addMarket(const string& market, const string& name, const string& description,
                            const string& index_code, uint64_t open1, uint64_t close1,
                            uint64_t open2, uint64_t close2, int tz_offset_min, int dst_rule,
-                         int data_lag) = 0;
+                           int data_lag) = 0;
 
     /**
      * @brief Register a security type into the baseinfo database (idempotent: it is skipped and

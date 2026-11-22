@@ -7,6 +7,7 @@
 
 #include "interface/plugins.h"
 #include "KDataToClickHouseImporter.h"
+#include "MarketConfigCheck.h"
 
 namespace hku {
 
@@ -72,9 +73,12 @@ bool KDataToClickHouseImporter::addMarket(const string& market, const string& na
                                           uint64_t open1, uint64_t close1, uint64_t open2,
                                           uint64_t close2, int tz_offset_min, int dst_rule,
                                           int data_lag) {
-    return m_plugin ? m_plugin->addMarket(market, name, description, index_code, open1, close1,
-                                          open2, close2, tz_offset_min, dst_rule, data_lag)
-                    : false;
+    HKU_IF_RETURN(!m_plugin, false);
+    HKU_IF_RETURN(!checkMarketConfig(market, name, description, index_code, open1, close1, open2,
+                                     close2, tz_offset_min, dst_rule, data_lag),
+                  false);
+    return m_plugin->addMarket(market, name, description, index_code, open1, close1, open2, close2,
+                               tz_offset_min, dst_rule, data_lag);
 }
 
 bool KDataToClickHouseImporter::addStockType(uint32_t type_id, const string& description,

@@ -116,27 +116,29 @@ TEST_CASE("test_MarketInfo_roundTrip") {
 /** @par Test points */
 TEST_CASE("test_MarketInfo_hasAmbiguousSession") {
     // Sessions reaching the repeated hour are rejected at construction (covered by
-    // test_MarketInfo_construction_check), so only the non-violating side is constructible
+    // test_MarketInfo_construction_check), so this case only observes the non-violating side
     /** @arg A market without a daylight rule has no ambiguous hour at all */
     CHECK_UNARY_FALSE(makeMarket(-300, 0, Hours(1), Hours(2) + Minutes(30)).hasAmbiguousSession());
     /** @arg Normal US sessions do not touch the ambiguous hour */
     CHECK_UNARY_FALSE(makeMarket(-300, 1).hasAmbiguousSession());
-    /** @arg An EU market inside [01:00,02:00) is not flagged: the EU rule repeats [02:00,03:00) */
-    CHECK_UNARY_FALSE(makeMarket(0, 2, Hours(1), Hours(1) + Minutes(30)).hasAmbiguousSession());
+    /** @arg The EU repeated hour moves with the offset: [02:00,03:00) at UTC+1 */
+    CHECK_UNARY_FALSE(makeMarket(60, 2, Hours(1), Hours(1) + Minutes(30)).hasAmbiguousSession());
     /** @arg Ending exactly at 01:00 or starting exactly at 02:00 do not overlap (half-open) */
     CHECK_UNARY_FALSE(makeMarket(0, 1, Hours(0), Hours(1)).hasAmbiguousSession());
     CHECK_UNARY_FALSE(makeMarket(0, 1, Hours(2), Hours(3)).hasAmbiguousSession());
-    /** @arg Same half-open guard for the EU window [02:00,03:00) */
-    CHECK_UNARY_FALSE(makeMarket(0, 2, Hours(0), Hours(2)).hasAmbiguousSession());
-    CHECK_UNARY_FALSE(makeMarket(0, 2, Hours(3), Hours(4)).hasAmbiguousSession());
+    /** @arg Same half-open guard for the EU window [02:00,03:00) at UTC+1 */
+    CHECK_UNARY_FALSE(makeMarket(60, 2, Hours(0), Hours(2)).hasAmbiguousSession());
+    CHECK_UNARY_FALSE(makeMarket(60, 2, Hours(3), Hours(4)).hasAmbiguousSession());
 }
 
 /** @par Test points */
 TEST_CASE("test_MarketInfo_construction_check") {
     /** @arg A US daylight market reaching the repeated hour is rejected at construction */
     CHECK_THROWS_AS(makeMarket(-300, 1, Hours(1), Hours(2) + Minutes(30)), std::exception);
-    /** @arg An EU daylight market reaching its repeated hour [02:00,03:00) is rejected too */
-    CHECK_THROWS_AS(makeMarket(0, 2, Hours(2), Hours(2) + Minutes(30)), std::exception);
+    /** @arg An EU daylight market reaching its repeated hour is rejected too: [02:00,03:00) at
+     *      UTC+1, [01:00,02:00) at UTC+0 */
+    CHECK_THROWS_AS(makeMarket(60, 2, Hours(2), Hours(2) + Minutes(30)), std::exception);
+    CHECK_THROWS_AS(makeMarket(0, 2, Hours(1), Hours(1) + Minutes(30)), std::exception);
     /** @arg A near full-day US session covers [01:00,02:00) and is rejected */
     CHECK_THROWS_AS(makeMarket(-300, 1, Hours(0), Hours(23) + Minutes(59)), std::exception);
     /** @arg A continuous 24h market cannot carry a daylight rule either */
@@ -145,8 +147,34 @@ TEST_CASE("test_MarketInfo_construction_check") {
     CHECK_NOTHROW(makeMarket(-300, 0, Hours(1), Hours(2) + Minutes(30)));
     /** @arg A normal US session with the US rule is accepted */
     CHECK_NOTHROW(makeMarket(-300, 1));
-    /** @arg An EU session before its repeated hour is accepted */
-    CHECK_NOTHROW(makeMarket(0, 2, Hours(1), Hours(1) + Minutes(30)));
+    /** @arg An EU session before its repeated hour (UTC+1) is accepted */
+    CHECK_NOTHROW(makeMarket(60, 2, Hours(1), Hours(1) + Minutes(30)));
+}
+
+/** @par Test points */
+TEST_CASE("test_MarketInfo_timezone_field_check") {
+    /** @arg The extreme real-world offsets are accepted */
+    CHECK_NOTHROW(makeMarket(-720, 0));
+    CHECK_NOTHROW(makeMarket(840, 0));
+    /** @arg Out-of-range offsets are rejected */
+    CHECK_THROWS_AS(makeMarket(-721, 0), std::exception);
+    CHECK_THROWS_AS(makeMarket(841, 0), std::exception);
+    /** @arg Only the defined daylight rules are accepted */
+    CHECK_NOTHROW(makeMarket(-300, 2));
+    CHECK_THROWS_AS(makeMarket(-300, 3), std::exception);
+    CHECK_THROWS_AS(makeMarket(-300, -1), std::exception);
+    /** @arg The visibility delay must be non-negative */
+    CHECK_THROWS_AS(MarketInfo("TST", "test market", "for the timezone conversion", "000001",
+                               Datetime(202601010000LL), Hours(9) + Minutes(30), Hours(16),
+                               TimeDelta(), TimeDelta(), 480, 0, -1),
+                    std::exception);
+
+    /** @arg The HHMM notation is converted, the overflowing hour or minute is rejected */
+    CHECK_EQ(MarketInfo::hhmmToTimeDelta(930), Hours(9) + Minutes(30));
+    CHECK_EQ(MarketInfo::hhmmToTimeDelta(0), TimeDelta());
+    CHECK_EQ(MarketInfo::hhmmToTimeDelta(2359), Hours(23) + Minutes(59));
+    CHECK_THROWS_AS(MarketInfo::hhmmToTimeDelta(960), std::exception);
+    CHECK_THROWS_AS(MarketInfo::hhmmToTimeDelta(2400), std::exception);
 }
 
 /** @} */
