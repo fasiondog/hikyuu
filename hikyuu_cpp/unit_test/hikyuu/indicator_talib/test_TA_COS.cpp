@@ -26,7 +26,7 @@ TEST_CASE("test_TA_COS") {
 
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(i / 10);
+        a.push_back(i / 10.0);
     }
 
     Indicator data = PRICELIST(a);
@@ -35,7 +35,7 @@ TEST_CASE("test_TA_COS") {
     CHECK_EQ(result.name(), "TA_COS");
     CHECK_EQ(result.discard(), 0);
     for (int i = 0; i < 10; ++i) {
-        CHECK_EQ(result[i], std::cos(data[i]));
+        CHECK_EQ(result[i], doctest::Approx(std::cos(data[i])).epsilon(1e-12));
     }
 
     result = TA_COS(-0.1);

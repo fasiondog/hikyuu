@@ -29,12 +29,12 @@ TEST_CASE("test_TA_MAXINDEX") {
     /** @arg The normal data */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(i / 10);
+        a.push_back(i / 10.0);
     }
 
     Indicator data = PRICELIST(a);
     Indicator expect = PRICELIST(
-      PriceList{Null<Indicator::value_t>(), Null<Indicator::value_t>(), 0, 1, 2, 3, 4, 5, 6, 7});
+      PriceList{Null<Indicator::value_t>(), Null<Indicator::value_t>(), 2, 3, 4, 5, 6, 7, 8, 9});
 
     Indicator result = TA_MAXINDEX(data, 3);
     CHECK_EQ(result.name(), "TA_MAXINDEX");
